@@ -1,0 +1,54 @@
+INIT
+	CHARACTER:__Me
+	CHARACTERTEMPLATE:%Spiderling_Regular="LUC_SpiderBoss_Spiderling_d4c7abfb-1cd9-4f34-b156-a0919ecfa992"
+	INT:%SpiderHatches_Current=0
+	INT:%SpiderHatches_Desired=2
+
+//------------------------
+EVENTS
+EVENT OnInit_GetRandomHatchingValue_PeaceHatchTimer
+ON
+	OnInit()
+ACTIONS
+	GetRandomBetween(%SpiderHatches_Desired,0,1)
+	StartTimer("CMB_LUC_SpiderBoss_EggHatchTimer",12,0)
+	
+EVENT OnTimer_PeaceHatch
+ON
+	OnTimer("CMB_LUC_SpiderBoss_EggHatchTimer")
+ACTIONS
+	IF "!c1"
+		IsInCombat(__Me)
+	THEN
+		CharacterPlayEffect(__Me,"FX_GP_Hit_Ooze_A_Large")
+		SpawnCharacter(_,%Spiderling_Regular,__Me,0)
+		CharacterDie(__Me)
+	ENDIF
+	
+EVENT OnTurn_CombatHatchTimer
+ON
+	OnTurn()
+ACTIONS
+	IF "c1&!c2"
+		IsLessThen(%SpiderHatches_Current,%SpiderHatches_Desired)
+		CharacterHasStatus(__Me,"FROZEN")
+	THEN		
+		Add(%SpiderHatches_Current,1)
+		CharacterEndTurn()
+	ELIF "c1&!c2&!c3"
+		IsEqual(%SpiderHatches_Current,%SpiderHatches_Desired)
+		CharacterHasStatus(__Me,"FROZEN")
+		CharacterIsDead(__Me)
+	THEN 
+		CharacterPlayEffect(__Me,"FX_GP_Hit_Ooze_A_Large")
+		SpawnCharacter(_,%Spiderling_Regular,__Me,0)
+		CharacterDie(__Me)
+	ELSE
+		CharacterEndTurn()
+	ENDIF
+
+EVENT OnInit_OnCombatEnded_PeaceHatchTimer
+ON
+	OnCombatEnded()
+ACTIONS
+	StartTimer("CMB_LUC_SpiderBoss_EggHatchTimer",12,0)	

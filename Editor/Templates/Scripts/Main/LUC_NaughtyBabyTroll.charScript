@@ -1,0 +1,47 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter
+CHARACTER:__ME
+FIXEDSTRING:%NextAction
+
+BEHAVIOUR
+
+REACTION AnswerToKing, 0
+USAGE PEACE
+VARS
+	FLOAT:_SleepingTime = 2
+ACTIONS
+	GetRandom(_SleepingTime, 2, 1.5, 1, 0.8, 1.6, 1.1, 1.9)
+	Sleep(_SleepingTime)
+	DisplayText(__Me, "LUC_BabyTrollResponse", 2)	
+	SetPriority("AnswerToKing", 0)
+	
+REACTION BadBehaviour, 0
+USAGE PEACE
+ACTIONS
+	CharacterWander(TRIGGER:LUC_AreaTrollClassroom_0c882e66-81bb-40a7-8a05-26a1c948ae5d, 4, 1)
+	DisplayText(__Me, "LUC_NaughtyTrollBabyReaction", 2)
+	GlobalSetEvent("LUC_BabyTrollBehavingBad")
+	
+REACTION MoveBackToClass, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(TRIGGER:LUC_PointNaughtyBabyTroll_a5a8f761-943c-4827-abc0-71f9f17ecafb, 0)
+	CharacterLookFrom(TRIGGER:LUC_PointNaughtyBabyTroll_a5a8f761-943c-4827-abc0-71f9f17ecafb)
+
+EVENTS
+
+EVENT KingQuestion
+ON
+	OnGlobalEventSet("LUC_BabyRespond")
+ACTIONS
+	GetRandom(%NextAction, "AnswerToKing", "BadBehaviour")
+	SetPriority(%NextAction, 1060)
+	
+EVENT ReturnToClass
+ON
+	OnGlobalEventSet("LUC_BabyTrollPunished")
+ACTIONS
+	SetPriority(%NextAction, 0)
+	SetPriority("MoveBackToClass", 1060)

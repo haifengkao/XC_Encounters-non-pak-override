@@ -1,0 +1,41 @@
+INIT
+
+CHARACTER:__Me
+
+BEHAVIOUR 
+
+REACTION Care, 900
+USAGE PEACE
+VARS
+	FLOAT:_Sleep
+ACTIONS
+
+	CharacterMoveTo(TRIGGER:END_Point_Behavior_NegaBoris_Evelyn1_16a0e9fc-3f8e-4b37-8278-5a95e0c2de2c)
+	CharacterLookFrom(TRIGGER:END_Point_Behavior_NegaBoris_Evelyn1_16a0e9fc-3f8e-4b37-8278-5a95e0c2de2c)
+	GetRandomBetween(_Sleep, 7.0, 12.0)
+	Sleep(_Sleep)
+	
+	IF "c1&c2"
+		CharacterCanSee(__Me, CHARACTER:END_NegaEvelyn_0280359b-0cdb-4557-891d-1453d7ce6961, 1)
+		IsRandom(0.3)
+	THEN		
+		DialogStart("END_AD_NegaPatientWatcher_Carry1", __Me)
+	ENDIF
+	
+	GetRandomBetween(_Sleep, 7.0, 12.0)
+	Sleep(_Sleep)
+	
+	CharacterMoveTo(TRIGGER:END_Point_Behavior_NegaBoris_Evelyn2_486a1a4e-73fe-457c-93fd-ba9d042a2895)
+	CharacterLookFrom(TRIGGER:END_Point_Behavior_NegaBoris_Evelyn2_486a1a4e-73fe-457c-93fd-ba9d042a2895)
+	
+	GetRandomBetween(_Sleep, 7.0, 12.0)
+	Sleep(_Sleep)
+	
+	IF "c1&c2"
+		CharacterCanSee(__Me, CHARACTER:END_NegaEvelyn_0280359b-0cdb-4557-891d-1453d7ce6961, 1)
+		IsRandom(0.3)
+	THEN		
+		DialogStart("END_AD_NegaPatientWatcher_Carry1", __Me)
+	ENDIF
+	
+	Reset()

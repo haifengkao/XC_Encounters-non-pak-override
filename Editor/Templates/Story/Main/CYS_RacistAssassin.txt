@@ -1,0 +1,235 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Dialogs(CHARACTER_CYS_OrcLibrarian,"CYS_OrcLibrarian");
+DB_Dialogs(CHARACTER_CYS_Eglandaer,"CYS_Eglandaer");
+
+ItemToCharacter(ITEM_CYS_Key_Eglandaer,CHARACTER_CYS_Eglandaer);
+ItemToCharacter(ITEM_CYS_EglandaerVictimAmulet,CHARACTER_CYS_Eglandaer);
+ItemToCharacter(ITEM_CYS_VictoriaAmulet,CHARACTER_CYS_OrcLibrarian);
+
+DB_EventGivesPartyDialog("CYS_AfterEglandaer","CYS_DD_AfterEglandaer");
+DB_IsNotMessingAround(CHARACTER_CYS_Eglandaer);
+
+DB_NoRunAway(CHARACTER_CYS_OrcLibrarian);
+KBSECTION
+IF
+GlobalEventSet("CYS_FreeBooks")
+THEN
+ItemClearOwner(ITEM_CYS_LibraryBook1);
+ItemClearOwner(ITEM_CYS_LibraryBook2);
+ItemClearOwner(ITEM_CYS_LibraryBook3);
+ItemClearOwner(ITEM_CYS_LibraryBook4);
+ItemClearOwner(ITEM_CYS_LibraryBook5);
+ItemClearOwner(ITEM_CYS_LibraryBook6);
+ItemClearOwner(ITEM_CYS_LibraryBook7);
+ItemClearOwner(ITEM_CYS_LibraryBook8);
+ItemClearOwner(ITEM_BOOK_PhilosophyOfDeath_A_000);
+ItemClearOwner(ITEM_CYS_LibraryCase1);
+ItemClearOwner(ITEM_CYS_LibraryCase2);
+ItemClearOwner(ITEM_CYS_LibraryCase3);
+ItemClearOwner(ITEM_CYS_LibraryCase4);
+ItemClearOwner(ITEM_CYS_LibraryCase5);
+ItemClearOwner(ITEM_CYS_LibraryCase6);
+ItemClearOwner(ITEM_CYS_LibraryCase7);
+ItemClearOwner(ITEM_CYS_LibraryCase8);
+ItemClearOwner(ITEM_CYS_LibraryCase9);
+ItemClearOwner(ITEM_CYS_HN_CysealJokes);
+ItemClearOwner(ITEM_CYS_HN_CysealCreation);
+
+//REGION MEETING EGLANDAER
+IF
+DialogEnded("CYS_Eglandaer",_)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_Eglandaer,"CYS_EglandaerToInn",1)
+THEN
+CharacterSetHasDialog(CHARACTER_CYS_Eglandaer,0);
+CharacterSetVarInteger(CHARACTER_CYS_Eglandaer,"CYS_EglandaerToInn",0);
+ProcCharacterMoveToTrigger(CHARACTER_CYS_Eglandaer,TRIGGER_CYS_Point_Tavern_GoDown,0,"CYS_EglandaerDownstairs");
+DB_CYSEglandaerMoveDest(1);
+
+IF
+CharacterEvent(CHARACTER_CYS_Eglandaer,"CYS_EglandaerDownstairs")
+THEN
+NOT DB_CYSEglandaerMoveDest(1);
+CharacterTeleportToTrigger(CHARACTER_CYS_Eglandaer,TRIGGER_CYS_Point_Tavern_GoUp,"");
+ProcCharacterMoveToTrigger(CHARACTER_CYS_Eglandaer,TRIGGER_CYS_PointEglandaer1,0,"CYS_EglandaerAtDoor");
+DB_CYSEglandaerMoveDest(2);
+
+IF
+CharacterEvent(CHARACTER_CYS_Eglandaer,"CYS_EglandaerAtDoor")
+THEN
+NOT DB_CYSEglandaerMoveDest(2);
+DB_CYSEglandaerMoveDest(3);
+NOT DB_ExplorationZones(TRIGGER_CYS_XP_Eglandaer01,1,2,5);
+ItemUnlockAndOpen(ITEM_CYS_Door_Eglandaer);
+ProcCharacterMoveToTrigger(CHARACTER_CYS_Eglandaer,TRIGGER_CYS_PointEglandaer2,0,"CYS_EglandaerInRoom");
+
+IF
+CharacterEvent(CHARACTER_CYS_Eglandaer,"CYS_EglandaerInRoom")
+THEN
+NOT DB_CYSEglandaerMoveDest(3);
+CharacterSetHasDialog(CHARACTER_CYS_Eglandaer,1);
+CharacterSetVarFixedString(CHARACTER_CYS_Eglandaer,"currentState","State_InRoom");
+CharacterSetVarInteger(CHARACTER_CYS_Eglandaer,"CYS_EglandaerInRoom",1);
+//END_REGION
+
+//REGION GETTING EGLANDAER ARRESTED
+IF
+ItemAddedToCharacter(ITEM_CYS_EglandaerVictimAmulet,_Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+GlobalSetEvent("CYS_HasEglandaerAmulet");
+
+IF
+ItemRemovedFromCharacter(ITEM_CYS_EglandaerVictimAmulet,_Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+GlobalClearEvent("CYS_HasEglandaerAmulet");
+
+IF
+DialogCharacterEventSet("CYS_TakeEglandaerAmulet",_Player,_)
+AND
+ItemIsInPartyInventory(ITEM_CYS_EglandaerVictimAmulet,_Player,1,1)
+THEN
+NOOP(1);
+//END_REGION
+
+//REGION GETTING VICTORIA AMULET
+IF
+DialogCharacterEventSet("CYS_LibrarianGivesAmulet",CHARACTER_CYS_OrcLibrarian,_ID)
+AND
+DB_DialogPlayers(_ID,_Player,1)
+THEN
+ItemToCharacter(ITEM_CYS_VictoriaAmulet,_Player);
+
+IF
+ItemAddedToCharacter(ITEM_CYS_VictoriaAmulet,_Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+PROC_CYS_CheckVictoriaAmulet();
+GlobalSetEvent("CYS_HasVictoriaAmulet");
+
+IF
+ItemRemovedFromCharacter(ITEM_CYS_VictoriaAmulet,_Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+GlobalClearEvent("CYS_HasVictoriaAmulet");
+
+IF
+DialogCharacterEventSet("CYS_TakeVictoriaAmulet",_Player,_)
+AND
+ItemIsInPartyInventory(ITEM_CYS_VictoriaAmulet,_Player,1,1)
+THEN
+NOOP(1);
+
+PROC
+PROC_CYS_CheckVictoriaAmulet()
+AND
+CharacterGetVarInteger(CHARACTER_CYS_OrcLibrarian,"CYS_LibrarianGivesAmulet",0)
+THEN
+GlobalSetEvent("CYS_StoleVictoriaAmulet");
+//END_REGION
+
+//REGION EGLANDAER LEAVES
+IF
+GlobalEventSet("CYS_EglandaerLeft")
+THEN
+//Disable arrest scene
+NOT CHARACTER_CYS_Aureus.ArrestsNPC(CHARACTER_CYS_Eglandaer);
+NOT DB_CYS_ArrestNPC(CHARACTER_CYS_Eglandaer,"CYS_EglandaerGetsArrested",CHARACTER_CYS_ArrestLegionnaire_Eglandaer,"CYS_AD_EglandaerArrest",TRIGGER_CYS_Point_EglandaerJail,"CYS_EglandaerInJail",ITEM_CYS_EglandaerPrisonDoor);
+ItemToCharacter(ITEM_CYS_VictoriaAmulet,CHARACTER_CYS_Eglandaer);
+
+IF
+DialogEnded("CYS_Eglandaer",_)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_Eglandaer,"CYS_EglandaerLeaves",1)
+THEN
+CharacterSetHasDialog(CHARACTER_CYS_Eglandaer,0);
+ProcRemoveDialogEntryForSpeaker(CHARACTER_CYS_Eglandaer,"CYS_Eglandaer");
+DB_CYSEglandaerMoveDest(4);
+ProcCharacterMoveToTrigger(CHARACTER_CYS_Eglandaer,TRIGGER_CYS_Point_Tavern_GoUp,0,"CYS_EglandaerDisappears");
+
+IF
+CharacterEvent(CHARACTER_CYS_Eglandaer,"CYS_EglandaerDisappears")
+THEN
+NOT DB_CYSEglandaerMoveDest(4);
+CharacterSetOnStage(CHARACTER_CYS_Eglandaer,0);
+//END_REGION
+
+//REGION KILL EGLANDAER
+IF
+CharacterDied(CHARACTER_CYS_Eglandaer)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_Eglandaer, "askedMurder", 1)
+AND
+NOT DB_Dead(CHARACTER_CYS_OrcLibrarian)
+THEN
+GlobalSetEvent("CYS_EglandaerDead");
+QuestUpdate("CYS_Victoria","KilledEglandaer");
+//END_REGION
+
+IF
+DB_Dead(CHARACTER_CYS_Eglandaer)
+AND
+DB_Dead(CHARACTER_CYS_OrcLibrarian)
+THEN
+QuestClose("CYS_Victoria");
+
+//REGION KILL VICTORIA
+IF
+CharacterDied(CHARACTER_CYS_OrcLibrarian)
+AND
+NOT DB_Dead(CHARACTER_CYS_Eglandaer)
+THEN
+GlobalSetEvent("CYS_VictoriaDead");
+QuestUpdate("CYS_Victoria","KilledVictoria");
+//END_REGION
+
+IF
+TextEventSet("eggyamulet")
+THEN
+ItemToCharacter(ITEM_CYS_EglandaerVictimAmulet,CHARACTER_Player2);
+
+IF
+TextEventSet("vicamulet")
+THEN
+ItemToCharacter(ITEM_CYS_VictoriaAmulet,CHARACTER_Player2);
+
+IF
+DialogEnded("CYS_Cecil", _)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_Cecil, "goSeeVictoria", 1)
+AND
+NOT CHARACTER_CYS_Cecil.Mourning()
+THEN
+CharacterSetHasDialog(CHARACTER_CYS_Cecil,0);
+CHARACTER_CYS_Cecil.Mourning();
+CharacterSetVarInteger(CHARACTER_CYS_Cecil, "goSeeVictoria", 0);
+ProcCharacterMoveToTrigger(CHARACTER_CYS_Cecil,TRIGGER_CYS_Point_Cecil_GoDown,1,"CYS_CecilIsUp");
+
+IF
+DialogEnded("CYS_Eglandaer", _)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_Eglandaer, "CYS_GiveEglandaerReward", 1)
+THEN
+ProcRewardQuestMedium(TRIGGER_CYS_PointEglandaer2);
+
+IF
+DialogEnded("CYS_OrcLibrarian", _)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_OrcLibrarian, "GiveSHReward", 1)
+AND
+NOT OnlyOnce("CYS_VictoriaReward")
+THEN
+ProcRewardQuestMedium(TRIGGER_CYS_RewardVictoria);
+OnlyOnce("CYS_VictoriaReward");
+
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

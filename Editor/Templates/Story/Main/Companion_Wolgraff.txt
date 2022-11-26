@@ -1,0 +1,541 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Dialogs(CHARACTER_Wolgraff,"CYS_Wolgraff");
+DB_NoCharacterCompanionReplace(CHARACTER_Wolgraff);
+DB_DismissEvent(CHARACTER_Wolgraff,"WolgraffDismissed");
+DB_CustomWarningDialog(CHARACTER_Wolgraff,"Wolgraff_please_Dont_attack");
+DB_AttackDialog(CHARACTER_Wolgraff,"Companion_Wolgraff_Attacks");
+DB_NoRunAway(CHARACTER_Wolgraff);
+NeverThreatenedDialog(CHARACTER_Wolgraff);
+DB_NoDefaultBehavior(CHARACTER_Wolgraff);
+NoStealingReaction(CHARACTER_Wolgraff);
+DB_NpcCannotCallGuards(CHARACTER_Wolgraff);
+DB_IsNotMessingAround(CHARACTER_Wolgraff);
+
+DB_WOL_SourceHunter(1);
+PROC_CheckIfWolgraffWantsToBeSourceHunter(1);
+CharacterSetVarInteger(CHARACTER_Wolgraff,"VoiceBack",0);
+
+ProcTriggerRegisterForPlayers(TRIGGER_DAF_ZandalorsStudy);
+ProcTriggerRegisterForPlayers(TRIGGER_HOM_WolgraffSeesTapestry);
+
+DB_WolgraffTimers("WolVoice1");
+DB_WolgraffTimers("WolVoice2");
+DB_WolgraffTimers("WolVoice3");
+DB_WolgraffTimers("WolVoice4");
+DB_WolgraffTimers("WolVoice5");
+KBSECTION
+//REGION Special case: Companions cant recruit Wolgraff. He has no decent Default_Companion dialog
+IF
+DialogStartRequested(CHARACTER_Wolgraff,_Player)
+AND
+QryGetValidDialogSpeaker(_Player)
+AND
+DB_DialogSpeaker(_Speaker)
+AND
+DB_Companion_Default_Dialog(CHARACTER_Wolgraff,_Dialog)
+THEN
+ProcDoTwoSpeakerDialog(_Dialog,CHARACTER_Wolgraff,_Speaker);
+
+IF
+DB_Dialogs(CHARACTER_Wolgraff,_Dialog)
+AND
+_Dialog != "SHA_Wolgraff"
+THEN
+ProcRemoveDialogEntryForSpeaker(CHARACTER_Wolgraff,_Dialog);
+NOT DB_Dialogs(CHARACTER_Wolgraff,_Dialog);
+//END_REGION
+
+//REGION Party join/leave
+IF
+GlobalEventSet("Unsheathe_Wolgraff")
+THEN
+CharacterApplyStatus(CHARACTER_Wolgraff, "UNSHEATHED", -1.0, 1);
+GlobalClearEvent("Unsheathe_Wolgraff");
+
+IF
+GlobalEventSet("Sheathe_Wolgraff")
+THEN
+CharacterRemoveStatus(CHARACTER_Wolgraff, "UNSHEATHED");
+GlobalClearEvent("Sheathe_Wolgraff");
+
+IF
+DialogCharacterEventSet("Wolgraff_Recruited",_Player,_)
+THEN
+ProcRemoveDialogEntryForSpeaker(CHARACTER_Wolgraff,"CYS_Wolgraff");
+NOT DB_Companion_Default_Dialog(CHARACTER_Wolgraff,"CYS_Wolgraff");
+DB_Companion_Default_Dialog(CHARACTER_Wolgraff,"WOL_Default");
+DB_Dialogs(CHARACTER_Wolgraff,"WOL_Default");
+DB_CompanionRecruited(CHARACTER_Wolgraff);
+CharacterMakeCompanion(CHARACTER_Wolgraff,_Player);
+Proc_LimitAbilitiesForCompanion(CHARACTER_Wolgraff);
+CharacterSetEvent(CHARACTER_Wolgraff,"Hired");
+DB_Companion(CHARACTER_Wolgraff);
+ProcSetPartyFullIfLoneWolf();
+CHARACTER_Wolgraff.hasBeenRecruited();
+NOT DB_IsNotMessingAround(CHARACTER_Wolgraff);
+CharacterSetOnStage(CHARACTER_Wolgraff,1);
+
+IF
+DialogEnded(_Dialog,_)
+AND
+DB_Companion_Default_Dialog(CHARACTER_Wolgraff,_Dialog)
+AND 
+DB_GlobalEvent("WolgraffDismissed")
+AND
+DB_Companion(CHARACTER_Wolgraff)
+THEN
+ProcDismissWolgraff();
+
+PROC
+ProcDoDismissOfCompanion(CHARACTER_Wolgraff)
+THEN
+ProcDismissWolgraff();
+
+PROC
+ProcDismissWolgraff()
+AND
+DB_Companion(CHARACTER_Wolgraff)
+THEN
+OnCompanionDismissed(CHARACTER_Wolgraff);
+DB_IsNotMessingAround(CHARACTER_Wolgraff);
+ProcHACKFixCompanionReputation(CHARACTER_Wolgraff);
+
+PROC
+ProcDismissWolgraff()
+AND
+NOT DB_GlobalEvent("HallOfHeroesUnlocked")
+AND
+CharacterGetPosition(CHARACTER_Wolgraff,_X,_Y,_Z)
+AND
+DB_Companion(CHARACTER_Wolgraff)
+THEN
+ProcCancelAllCompanionDialogs(CHARACTER_Wolgraff);
+NOT DB_Companion(CHARACTER_Wolgraff);
+CharacterDetachFromGroup(CHARACTER_Wolgraff);
+CharacterMakeNPC(CHARACTER_Wolgraff);
+CharacterRemoveFromParty(CHARACTER_Wolgraff);
+CharacterTeleportToTrigger(CHARACTER_Wolgraff,TRIGGER_CYS_Tavern_Wolgraff,"");
+PlayEffectAtPosition("FX_GP_TeleportSmoke_A",_X,_Y,_Z);
+PROC_END_RemoveCompInDBRoomB(CHARACTER_Wolgraff);
+
+PROC
+ProcDismissWolgraff()
+AND
+DB_GlobalEvent("HallOfHeroesUnlocked")
+AND
+CharacterGetPosition(CHARACTER_Wolgraff,_X,_Y,_Z)
+AND
+DB_Companion(CHARACTER_Wolgraff)
+THEN
+NOT DB_Companion(CHARACTER_Wolgraff);
+CharacterDetachFromGroup(CHARACTER_Wolgraff);
+CharacterMakeNPC(CHARACTER_Wolgraff);
+CharacterRemoveFromParty(CHARACTER_Wolgraff);
+CharacterTeleportToTrigger(CHARACTER_Wolgraff,TRIGGER_HOM_HoH_Wolgraff_Neutral,"");
+PlayEffectAtPosition("FX_GP_TeleportSmoke_A",_X,_Y,_Z);
+PROC_END_RemoveCompInDBRoomB(CHARACTER_Wolgraff);
+
+IF
+DialogCharacterEventSet("WolgraffRejoins",_Player,_ID)
+THEN
+DB_Companion(CHARACTER_Wolgraff);
+CharacterMakeCompanion(CHARACTER_Wolgraff,_Player);
+DialogClearCharacterEvent("WolgraffRejoins",_Player,_ID);
+ProcSetPartyFullIfLoneWolf();
+NOT DB_IsNotMessingAround(CHARACTER_Wolgraff);
+
+IF
+GlobalEventSet("HallOfHeroesUnlocked")
+AND
+DB_GlobalEvent("WolgraffDismissed")
+THEN
+CharacterTeleportToTrigger(CHARACTER_Wolgraff,TRIGGER_HOM_HoH_Wolgraff_Neutral,"");
+//END_REGION
+
+//REGION Wants to be a source hunter
+IF
+GlobalEventSet("WOL_PlusSourceHunter")
+AND
+DB_WOL_SourceHunter(_OldVal)
+AND
+IntegerSum(_OldVal,1,_NewVal)
+THEN
+NOT DB_WOL_SourceHunter(_OldVal);
+DB_WOL_SourceHunter(_NewVal);
+GlobalClearEvent("WOL_PlusSourceHunter");
+PROC_CheckIfWolgraffWantsToBeSourceHunter(_NewVal);
+
+IF
+GlobalEventSet("WOL_MinSourceHunter")
+AND
+DB_WOL_SourceHunter(_OldVal)
+AND
+IntegerSum(_OldVal,-1,_NewVal)
+THEN
+NOT DB_WOL_SourceHunter(_OldVal);
+DB_WOL_SourceHunter(_NewVal);
+GlobalClearEvent("WOL_MinSourceHunter");
+GlobalClearEvent("WOL_SourceHunter");
+PROC_CheckIfWolgraffWantsToBeSourceHunter(_NewVal);
+
+PROC
+PROC_CheckIfWolgraffWantsToBeSourceHunter((INTEGER)_NewVal)
+AND
+_NewVal >= 0
+THEN
+GlobalSetEvent("WOL_SourceHunter");
+//END_REGION
+
+//REGION Companion comments & dialogs
+IF
+GlobalEventSet("WolgraffVoiceBack")
+THEN
+CharacterSetVarInteger(CHARACTER_Wolgraff,"VoiceBack",1);
+
+IF
+DialogEnded("CYS_AureusGuards",_)
+AND
+DB_GlobalEvent("CYS_HelpLighthouseGuards")
+AND
+NOT DB_GlobalEvent("WolgraffVoiceBack")
+THEN
+Proc_CompanionComment(CHARACTER_Wolgraff,"WOL_CC_Legion_Pos",CHARACTER_CYS_Aureus);
+GlobalSetEvent("WOL_PlusSourceHunter");
+
+IF
+DialogEnded("CYS_AureusGuards",_)
+AND
+DB_GlobalEvent("CYS_AccuseLighthouseGuards")
+AND
+NOT DB_GlobalEvent("WolgraffVoiceBack")
+THEN
+Proc_CompanionComment(CHARACTER_Wolgraff,"WOL_CC_Legion_Neg",CHARACTER_CYS_Aureus);
+GlobalSetEvent("WOL_MinSourceHunter");
+
+IF
+DialogEnded("CYS_MysteriousAdventurer",_)
+AND
+DB_GlobalEvent("CYS_EscortArchaeologist")
+AND
+NOT DB_GlobalEvent("WolgraffVoiceBack")
+THEN
+Proc_CompanionComment(CHARACTER_Wolgraff,"WOL_CC_Archaeologist_Pos",CHARACTER_CYS_Adventurer);
+GlobalSetEvent("WOL_PlusSourceHunter");
+
+IF
+DialogEnded("CYS_MysteriousAdventurer",_)
+AND
+DB_GlobalEvent("CYS_AbandonArchaeologist")
+AND
+NOT DB_GlobalEvent("WolgraffVoiceBack")
+THEN
+Proc_CompanionComment(CHARACTER_Wolgraff,"WOL_CC_Archaeologist_Neg",CHARACTER_CYS_Adventurer);
+GlobalSetEvent("WOL_MinSourceHunter");
+
+IF
+DialogCharacterEventSet("LUC_GaveMarisaWill",_Player,_)
+AND
+NOT DB_GlobalEvent("WolgraffVoiceBack")
+THEN
+Proc_CompanionComment(CHARACTER_Wolgraff,"WOL_CC_Will_Pos",_Player);
+GlobalSetEvent("WOL_PlusSourceHunter");
+
+IF
+DialogCharacterEventSet("LUC_GaveMarisaAlteredWill",_Player,_)
+AND
+NOT DB_GlobalEvent("WolgraffVoiceBack")
+THEN
+Proc_CompanionComment(CHARACTER_Wolgraff,"WOL_CC_Will_Neg",_Player);
+GlobalSetEvent("WOL_MinSourceHunter");
+
+IF
+DialogEnded("LUC_ImpMaster",_)
+AND
+DB_GlobalEvent("LUC_GiveMasterBloodStone")
+AND
+NOT DB_GlobalEvent("WolgraffVoiceBack")
+THEN
+Proc_CompanionComment(CHARACTER_Wolgraff,"WOL_CC_Frederick_Neg",CHARACTER_LUC_ImpMaster);
+GlobalSetEvent("WOL_MinSourceHunter");
+
+IF
+DialogEnded("LUC_ImpMaster",_)
+AND
+DB_GlobalEvent("LUC_LieToMasterBloodStone")
+AND
+NOT DB_GlobalEvent("WolgraffVoiceBack")
+THEN
+Proc_CompanionComment(CHARACTER_Wolgraff,"WOL_CC_Frederick_Pos",CHARACTER_LUC_ImpMaster);
+GlobalSetEvent("WOL_PlusSourceHunter");
+
+IF
+DialogEnded("DAF_PonderingSkeleton",_)
+AND
+DB_GlobalEvent("PonderingSkeleton_Skull")
+AND
+NOT DB_GlobalEvent("WolgraffVoiceBack")
+THEN
+Proc_CompanionComment(CHARACTER_Wolgraff,"WOL_CC_Skull_Pos",CHARACTER_DAF_PonderingSkeleton);
+GlobalSetEvent("WOL_PlusSourceHunter");
+
+IF
+DialogEnded("DAF_PonderingSkeleton",_)
+AND
+DB_GlobalEvent("PonderingSkeleton_Die")
+AND
+NOT DB_GlobalEvent("WolgraffVoiceBack")
+THEN
+Proc_CompanionComment(CHARACTER_Wolgraff,"WOL_CC_Skull_Neg",CHARACTER_DAF_PonderingSkeleton);
+GlobalSetEvent("WOL_MinSourceHunter");
+
+IF
+DialogEnded("DAF_Lovers",_)
+AND
+DB_GlobalEvent("DAF_LoversSilence")
+AND
+NOT DB_GlobalEvent("WolgraffVoiceBack")
+THEN
+Proc_CompanionComment(CHARACTER_Wolgraff,"WOL_CC_Lovers_Pos",CHARACTER_DAF_PonderingSkeleton);
+GlobalSetEvent("WOL_PlusSourceHunter");
+
+IF
+DialogEnded("DAF_Lovers",_)
+AND
+DB_GlobalEvent("DAF_LoversFight")
+AND
+NOT DB_GlobalEvent("WolgraffVoiceBack")
+THEN
+Proc_CompanionComment(CHARACTER_Wolgraff,"WOL_CC_Lovers_Neg",CHARACTER_DAF_PonderingSkeleton);
+GlobalSetEvent("WOL_MinSourceHunter");
+
+IF
+DialogEnded("DAF_Join_Poker",_)
+AND
+DB_GlobalEvent("PlayedPokerOnce")
+AND
+NOT DB_GlobalEvent("WolgraffVoiceBack")
+THEN
+Proc_CompanionComment(CHARACTER_Wolgraff,"WOL_CC_CardGame",CHARACTER_DAF_BO_GarrickGuard_03);
+
+IF
+CharacterEnteredTrigger(CHARACTER_Wolgraff,TRIGGER_DAF_ZandalorsStudy)
+AND
+NOT DB_GlobalEvent("WolgraffVoiceBack")
+THEN
+Proc_CompanionComment(CHARACTER_Wolgraff,"WOL_CC_ZandalorRoom",CHARACTER_Wolgraff);
+
+IF
+CharacterEnteredTrigger(CHARACTER_Wolgraff,TRIGGER_HOM_WolgraffSeesTapestry)
+AND
+NOT DB_GlobalEvent("WolgraffVoiceBack")
+THEN
+Proc_CompanionComment(CHARACTER_Wolgraff,"WOL_CC_Tapestry",CHARACTER_Wolgraff);
+
+IF
+DialogEnded("CYS_Cecil",_)
+AND
+NOT DB_GlobalEvent("WolgraffVoiceBack")
+THEN
+Proc_CompanionComment(CHARACTER_Wolgraff,"WOL_CC_Mayor",CHARACTER_CYS_Cecil);
+
+IF
+DialogEnded(_Dialog,_)
+AND
+DB_HomesteadImps(_Imp,_Dialog,_,_)
+AND
+NOT DB_GlobalEvent("WolgraffVoiceBack")
+THEN
+Proc_CompanionComment(CHARACTER_Wolgraff,"WOL_CC_RedImps",_Imp);
+
+IF
+DialogEnded("CYS_Bellegar",_)
+AND
+NOT DB_GlobalEvent("WolgraffVoiceBack")
+THEN
+Proc_CompanionComment(CHARACTER_Wolgraff,"WOL_CC_Bellegar",CHARACTER_CYS_Bellegar);
+
+IF
+CharacterLeftTrigger(_Player,TRIGGER_LUC_AreaProstituteRoom)
+AND
+DB_LUC_PlayerHeardRubyStory(_Player)
+AND
+NOT DB_GlobalEvent("WolgraffVoiceBack")
+THEN
+Proc_CompanionComment(CHARACTER_Wolgraff,"WOL_CC_Ruby",_Player);
+
+IF
+DialogEnded("LUC_GV_Totem",_)
+AND
+ItemGetClosestPlayer(ITEM_LUC_GV_Totem,_Player)
+AND
+NOT DB_GlobalEvent("WolgraffVoiceBack")
+THEN
+Proc_CompanionComment(CHARACTER_Wolgraff,"WOL_CC_Totem",_Player);
+
+IF
+DialogEnded("HIB_HopperSnowman",_)
+AND
+ItemGetClosestPlayer(ITEM_LUC_GV_Totem,_Player)
+AND
+NOT DB_GlobalEvent("WolgraffVoiceBack")
+THEN
+Proc_CompanionComment(CHARACTER_Wolgraff,"WOL_CC_Snowman",CHARACTER_HIB_Hopper_Snowman);
+
+IF
+DialogEnded("LUC_Icara",_)
+AND
+NOT DB_GlobalEvent("WolgraffVoiceBack")
+THEN
+Proc_CompanionDialog(CHARACTER_Wolgraff,"WOL_CD_IcaraFreed",CHARACTER_HIB_Icara);
+
+IF
+CharacterDied(CHARACTER_CYS_SkeletonKing)
+AND
+NOT DB_GlobalEvent("WolgraffVoiceBack")
+THEN
+Proc_CompanionDialog(CHARACTER_Wolgraff,"WOL_CD_BaronOfBones",CHARACTER_CYS_SkeletonKing);
+
+PROC
+DisapproveTheft((CHARACTER)_Character,_,_,_)
+AND
+_Character.DB_IsPlayer()
+AND
+_Character != CHARACTER_Wolgraff
+AND
+NOT DB_GlobalEvent("WolgraffVoiceBack")
+THEN
+Proc_CompanionDialog(CHARACTER_Wolgraff,"WOL_CD_Steal",_Character);
+
+PROC
+RegisterKilling((CHARACTER)_Npc,_)
+AND
+NOT NoReflectionDialogOnKill(_Npc)
+AND
+NOT DB_GlobalEvent("WolgraffVoiceBack")
+THEN
+Proc_CompanionDialog(CHARACTER_Wolgraff,"WOL_CD_KilledInnocent",_Npc);
+
+IF
+GlobalEventSet("CYS_MuteRabbitDone")
+THEN
+Proc_CompanionDialog(CHARACTER_Wolgraff,"WOL_CD_MuteRabbit",CHARACTER_CYS_CoweringRabbit);
+
+IF
+GlobalEventSet("LUC_MuteDeerDone")
+THEN
+Proc_CompanionDialog(CHARACTER_Wolgraff,"WOL_CD_MuteDeer",CHARACTER_LUC_MuteDeer);
+
+IF
+GlobalEventSet("DAF_MuteDogDone")
+THEN
+Proc_CompanionDialog(CHARACTER_Wolgraff,"WOL_CD_MuteDog",CHARACTER_DAF_MuteDog);
+
+IF
+GlobalEventSet("DAF_MuteBoarDone")
+THEN
+Proc_CompanionDialog(CHARACTER_Wolgraff,"WOL_CD_MuteBoar",CHARACTER_DAF_MuteBoar);
+
+IF
+CharacterDied(CHARACTER_DAF_Imal)
+AND
+NOT DB_GlobalEvent("WolgraffVoiceBack")
+THEN
+Proc_CompanionComment(CHARACTER_Wolgraff,"WOL_CC_ImalDead",CHARACTER_DAF_Imal);
+
+IF
+RegionStarted(_)
+AND
+DB_GlobalEvent("WolgraffVoiceBack")
+AND
+DB_GlobalEvent("WOL_SourceHunter")
+AND
+NOT DB_OnlyOnce("WolgraffEnding")
+THEN
+DB_OnlyOnce("WolgraffEnding");
+Proc_CompanionDialog(CHARACTER_Wolgraff,"WOL_CD_ConclusionSourceHunter",CHARACTER_Wolgraff);
+
+IF
+RegionStarted(_)
+AND
+DB_GlobalEvent("WolgraffVoiceBack")
+AND
+NOT 	DB_GlobalEvent("WOL_SourceHunter")
+AND
+NOT DB_OnlyOnce("WolgraffEnding")
+THEN
+DB_OnlyOnce("WolgraffEnding");
+Proc_CompanionDialog(CHARACTER_Wolgraff,"WOL_CD_ConclusionNoSourceHunter",CHARACTER_Wolgraff);
+
+IF
+GlobalEventSet("WolgraffVoiceBack")
+THEN
+TimerLaunch("WolVoice1",600000);
+
+IF
+TimerFinished(_Timer)
+AND
+DB_Combat(CHARACTER_Wolgraff, _)
+AND
+DB_WolgraffTimers(_Timer)
+THEN
+TimerLaunch(_Timer,300000);
+
+
+IF
+TimerFinished("WolVoice1")
+AND
+NOT DB_Combat(CHARACTER_Wolgraff, _)
+THEN
+Proc_CompanionComment(CHARACTER_Wolgraff,"WOL_CC_Voice1",CHARACTER_Wolgraff);
+TimerLaunch("WolVoice2",600000);
+
+IF
+TimerFinished("WolVoice2")
+AND
+NOT DB_Combat(CHARACTER_Wolgraff, _)
+THEN
+Proc_CompanionComment(CHARACTER_Wolgraff,"WOL_CC_Voice2",CHARACTER_Wolgraff);
+TimerLaunch("WolVoice3",600000);
+
+IF
+TimerFinished("WolVoice3")
+AND
+NOT DB_Combat(CHARACTER_Wolgraff, _)
+THEN
+Proc_CompanionComment(CHARACTER_Wolgraff,"WOL_CC_Voice3",CHARACTER_Wolgraff);
+TimerLaunch("WolVoice4",600000);
+
+IF
+TimerFinished("WolVoice4")
+AND
+NOT DB_Combat(CHARACTER_Wolgraff, _)
+THEN
+Proc_CompanionComment(CHARACTER_Wolgraff,"WOL_CC_Voice4",CHARACTER_Wolgraff);
+TimerLaunch("WolVoice5",600000);
+
+IF
+TimerFinished("WolVoice5")
+AND
+NOT DB_Combat(CHARACTER_Wolgraff, _)
+THEN
+Proc_CompanionComment(CHARACTER_Wolgraff,"WOL_CC_Voice5",CHARACTER_Wolgraff);
+//END_REGION
+
+//REGION test
+IF
+TextEventSet("WolgraffHate")
+AND
+DB_WOL_SourceHunter(_OldVal)
+THEN
+NOT DB_WOL_SourceHunter(_OldVal);
+DB_WOL_SourceHunter(-12);
+GlobalClearEvent("WOL_MinSourceHunter");
+GlobalClearEvent("WOL_SourceHunter");
+PROC_CheckIfWolgraffWantsToBeSourceHunter(-12);
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

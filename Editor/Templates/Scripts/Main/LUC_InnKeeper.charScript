@@ -1,0 +1,105 @@
+#INCLUDE State_Manager
+
+INIT
+
+USING State_Manager
+CHARACTER:__Me
+TRIGGER:%point_bar_01 		= LUC_Point_InnBar_01_51e38278-456e-4975-a13d-140e2f5b16ea
+TRIGGER:%point_bar_02 		= LUC_Point_InnBar_02_755b5e50-487d-43a5-91ce-b05af0aa09f3
+TRIGGER:%point_bar_03 		= LUC_Point_InnBar_03_18df6dec-a447-4d1c-b750-a3782e3d7fbe
+TRIGGER:%point_giveDrinks	= LUC_Point_InnKeeperToWaitress_7e7dda73-4461-4ba3-bffa-ea96e0684da9
+CHARACTER:%customerAtBar_01 = LUC_InnCustomer_01_b43d92d5-4225-44b3-8b66-9e16babf1881
+CHARACTER:%currentCustomer  = null
+CHARACTER:%waitress			= LUC_TavernSilverglen_Waitress_b0103c0d-9f7a-4eef-9ebc-9eb7a2eefd2b
+
+BEHAVIOUR
+REACTION State_TakeOrders, 0
+USAGE PEACE
+VARS
+	TRIGGER:_currentPoint
+	INT:_loopCount
+	FIXEDSTRING:_animation
+	FIXEDSTRING:_text
+ACTIONS
+	GetRandom(_text, "GEN_Confirmation_01", "GEN_Confirmation_02", "GEN_Confirmation_03")
+	DisplayText(__Me, _text)
+	GetRandom(_loopCount, 2)
+	WHILE "c1"
+		IsGreaterThen(_loopCount, 0)
+	DO
+		GetRandom(_currentPoint, %point_bar_01, %point_bar_02, %point_bar_03)
+		CharacterMoveTo(_currentPoint, 0)
+		CharacterLookFrom(_currentPoint)
+		GetRandom(_animation, "Fidget_Low_01", "Fidget_Low_02", "Fidget_Low_03")
+		CharacterPlayAnimation(_animation)
+		CharacterMoveTo(%point_giveDrinks, 0)
+		CharacterLookFrom(%point_giveDrinks)
+		GetRandom(_animation, "Fidget_Forward_01", "Fidget_Forward_02")
+		CharacterPlayAnimation(_animation)
+		Subtract(_loopCount, 1)
+	ENDWHILE
+	DisplayText(__Me, "GEN_CallWaitress_07")
+	CharacterEvent(%waitress, "gotDrinksFromBartender")
+	Sleep(5)
+	Set(%currentState, "State_ActionManager")
+
+REACTION State_ActionManager, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, "Action_CleanBar", "Action_FillShelf")
+	GotoIfEqual(%previousAction, %currentAction, "Start")
+	Set(%previousAction, %currentAction)
+	SetPriority(%currentAction, 1100)
+	
+REACTION Action_CleanBar, 0
+USAGE PEACE
+VARS
+	INT:_iterations
+	TRIGGER:_barPoint
+ACTIONS
+	GetRandom(_iterations, 1, 2, 3, 4)
+	WHILE "c1"
+		IsGreaterThen(_iterations, 0)
+	DO
+		GetRandom(_barPoint, %point_bar_01, %point_bar_02, %point_bar_03)
+		CharacterMoveTo(_barPoint, 0)
+		CharacterLookFrom(_barPoint)
+		CharacterPlayAnimation("WipeTable_01")
+		Subtract(_iterations, 1)
+	ENDWHILE
+	SetPriority(%currentAction, 0)
+	
+REACTION Action_FillShelf, 0
+USAGE PEACE
+VARS
+	INT:_loopCount
+	FIXEDSTRING:_animation
+ACTIONS
+	CharacterMoveTo(%point_bar_02, 0)
+	GetRandom(_loopCount, 2, 3, 4, 5, 6)
+	WHILE "c1"
+		IsGreaterThen(_loopCount, 0)
+	DO
+		GetRandom(_animation, "Fidget_Low_01", "Fidget_Low_02", "Fidget_Low_03")
+		CharacterPlayAnimation(_animation)
+		GetRandom(_animation, "Fidget_High_01", "Fidget_High_02", "Fidget_Forward_01", "Fidget_Forward_02")
+		CharacterPlayAnimation(_animation)
+		Subtract(_loopCount, 1)
+	ENDWHILE
+	SetPriority(%currentAction, 0)
+	
+REACTION Action_TalkToCustomer, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%point_bar_03, 0)
+	CharacterLookFrom(%point_bar_03)
+	DialogStart("LUC_InnkeeperCustomer_01", __Me, %customerAtBar_01)
+	SetPriority(%currentAction, 0)
+	
+EVENTS
+
+EVENT GettingOrder
+ON
+	OnCharacterEvent(%waitress, "orderDrinks")
+ACTIONS
+	Set(%currentState, "State_TakeOrders")	

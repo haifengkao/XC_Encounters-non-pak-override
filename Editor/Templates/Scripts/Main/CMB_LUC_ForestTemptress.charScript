@@ -1,0 +1,74 @@
+INIT
+CHARACTER:__Me
+FLOAT:%MySightRange
+
+//------------------------------
+BEHAVIOUR
+REACTION Temptress_UsesCharmingProjectile,600
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&c4"
+	CharacterCanCast(__Me,Projectile_EnemyCharm)
+	CharacterGet(_ChosenTarget,__Me,%MySightRange,Highest,Intelligence,Enemy)
+	CharacterIsPlayer(_ChosenTarget)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,Projectile_EnemyCharm)	
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)			
+	CharacterUseSkill(Projectile_EnemyCharm,_ChosenTarget)
+
+/*REACTION Temptress_UsesCharmingTouch,500
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&c4"
+	CharacterCanCast(__Me,Target_EnemyCharmingTouch)
+	CharacterGet(_ChosenTarget,__Me,%MySightRange,Highest,Strength,Enemy)
+	CharacterIsPlayer(_ChosenTarget)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,Target_EnemyCharmingTouch)	
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)			
+	CharacterUseSkill(Target_EnemyCharmingTouch,_ChosenTarget)*/
+
+REACTION Temptress_Blink,0
+USAGE COMBAT
+CHECK "c1"
+	CharacterCanCast(__Me,Shout_EnemyBlink)
+ACTIONS
+	CharacterUseSkill(Shout_EnemyBlink,__Me)
+	SetPriority("Temptress_Blink",0)
+	
+//------------------------------
+EVENTS	
+EVENT OnInit_GetSightRange_GiveSkills
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%MySightRange,__Me,Sight)
+	THEN
+		CharacterAddSkill(Projectile_EnemyCharm)
+		CharacterAddSkill(Target_EnemyCharmingTouch)	
+	ENDIF
+	
+EVENT GetHit_IncreaseBlinkPriority_Slashing
+ON
+	OnDamage(Slashing,_,_,_)
+ACTIONS
+	SetPriority("Temptress_Blink",400)
+	
+EVENT GetHit_IncreaseBlinkPriority_Piercing
+ON
+	OnDamage(Piercing,_,_,_)
+ACTIONS
+	SetPriority("Temptress_Blink",400)
+
+EVENT GetHit_IncreaseBlinkPriority_Crushing
+ON
+	OnDamage(Crushing,_,_,_)
+ACTIONS
+	SetPriority("Temptress_Blink",400)	

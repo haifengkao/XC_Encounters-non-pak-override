@@ -1,0 +1,14 @@
+INIT
+	CHARACTER:__Me
+	
+BEHAVIOUR
+
+REACTION Dying, 1100
+USAGE PEACE
+ACTIONS
+	IF "!c1"
+		CharacterHasStatus(__Me,"LYING")
+	THEN
+		CharacterUseItem(ITEM:CYS_BC_DeadOrc_Invisibed_8e8bad5e-9a3e-46cc-81cf-ff751cb39a9d)
+	ENDIF
+	Sleep(5)

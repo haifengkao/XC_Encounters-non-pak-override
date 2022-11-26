@@ -1,0 +1,47 @@
+#INCLUDE Base
+
+INIT
+USING Base
+CHARACTER:__Me
+CHARACTER:%Friend1 = CYS_PatrollingGuardWest_1_d142fdee-3858-4b14-b91c-a23e2aa62e96
+CHARACTER:%Friend2 = CYS_PatrollingGuardEast_1_41b50b7d-64ef-4975-a569-9d19ce950037
+INT:%AnswerPatrolGuardWest = 0
+INT:%AnswerPatrolGuardEast = 0
+
+BEHAVIOUR
+
+REACTION AnswerPatrolGuardWest, 1050
+USAGE PEACE
+	CHECK "c1"
+		IsEqual(%AnswerPatrolGuardWest,1)
+	ACTIONS
+		Set(%AnswerPatrolGuardWest,0)
+		CharacterLookAt(%Friend1)
+		DisplayText(__Me, "CYS_GuardAnswerPatrolGuard_2", 5)
+
+REACTION AnswerPatrolGuardEast, 1050
+USAGE PEACE
+	CHECK "c1"
+		IsEqual(%AnswerPatrolGuardEast,1)
+	ACTIONS
+		Set(%AnswerPatrolGuardEast,0)
+		CharacterLookAt(%Friend1)
+		DisplayText(__Me, "CYS_GuardAnswerPatrolGuard_1", 5)
+
+
+EVENTS	
+EVENT AnswerPatrolGuardWest
+	ON	
+	OnCharacterEvent(__Me,"AnswerPatrolGuardWest")
+	ACTIONS	
+	Set(%AnswerPatrolGuardWest,1)
+	
+EVENT AnswerPatrolGuardEast
+	ON	
+	OnCharacterEvent(__Me,"AnswerPatrolGuardEast")
+	ACTIONS	
+	Set(%AnswerPatrolGuardEast,1)
+
+	
+	
+	

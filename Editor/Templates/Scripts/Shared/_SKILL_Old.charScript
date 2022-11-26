@@ -1,0 +1,49 @@
+#TEMPLATE "_SKILL_Base" : $1
+
+INIT
+
+EXTERN COMPARE:%targetFindHow_$1=Random
+EXTERN COMPAREFUNC:%targetFindWhat_$1=Vitality
+EXTERN SURFACE:%targetOnSurface_$1=null
+EXTERN RELATION:%targetRelation_$1=Enemy
+EXTERN FLOAT:%targetHealthEqOrLower_$1=1
+EXTERN STATUS:%targetStatus_$1=null
+
+EVENTS
+// Calculate the priority of the skill
+EVENT CalculateScore_$1
+VARS
+CHARACTER:_char
+FLOAT:_hp
+ON
+	OnFunction("CalculateScore_$1")
+ACTIONS		
+	IF "!c1"
+		IsEqual(%ActionScore_$1,0)
+	THEN
+		IterateCharactersNear(__Me,30,"CalculateTarget_$1",%targetFindHow_$1,%targetFindWhat_$1)
+	ENDIF
+	
+// Calculate the character we should attack
+EVENT CalculateTarget_Projectile_$1
+VARS	
+	CHARACTER:_Char
+	FLOAT:_hp
+ON
+	OnIterateCharacter(_Char,"CalculateTarget_$1")	
+ACTIONS	
+	IF "c1&!c2&!c3&c4&(c5|c6)&(c7|c8)&c9&c10&!c11"
+		IsEqual(%SkillTargetChar_$1,null)
+		CharacterIsDead(_Char)
+		CharacterHasStatus(_Char,INVISIBLE)
+		CharacterCheckRelation(_Char,%targetRelation_$1)
+		IsEqual(%targetStatus_$1,null)
+		CharacterHasStatus(_Char,%targetStatus_$1)		
+		IsEqual(%targetOnSurface_$1,null)
+		IsInSurface(_Char,%targetOnSurface_$1)		
+		CharacterCanSee(__Me,_Char)	
+		CharacterGetStat(_hp,_Char,Vitality)
+		IsGreaterThen(_hp,%targetHealthEqOrLower_$1)	
+	THEN	
+		Set(%SkillTargetChar_$1,_Char)		
+	ENDIF

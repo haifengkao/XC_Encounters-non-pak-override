@@ -1,0 +1,127 @@
+INIT
+	CHARACTER:__Me
+	FLOAT:%DelPrj_SightRange
+	FLOAT3:%SelectedSpot
+	INT:%SelectedSpotFX_Handle		
+	INT:%Bool_BombHasBeenPlanted=0
+	EXTERN SKILL:%ProjectileType="Projectile_EnemyDragonProjectileEarth"	
+	EXTERN SURFACE:%SurfaceType="Ooze"
+	EXTERN FLOAT:%SurfaceRadius=2	
+	EXTERN STRING:%DelPrj_SelectedSpotFX="FX_Skills_WitchCraft_Generic_A_Prepare"
+	EXTERN STRING:%DelPrj_CasterFX="FX_Skills_Earth_PoisonDart_Prepare_A"
+	EXTERN COMPARE:%DelPrj_Comp="Highest"
+	EXTERN COMPAREFUNC:%DelPrj_CompFct="Distance"
+	EXTERN INT:%Bool_ShouldLeaveSurface=0		
+	EXTERN INT:%ProjectileLevel=5	
+	EXTERN INT:%DelPrj_TurnCurrent=0
+	EXTERN INT:%DelPrj_TurnDesired=2
+
+//-----------------
+BEHAVIOUR
+REACTION DelayedProjectile_PlaceMarkOnTheGround,0
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MyCurrentAP
+CHECK "c1&c2&c3&c4&!c5"
+	CharacterGet(_Target,__Me,%DelPrj_SightRange,%DelPrj_Comp,%DelPrj_CompFct,Enemy)
+	CharacterIsPlayer(_Target)
+	GetPosition(_Target,%SelectedSpot)
+	CharacterGetStat(_MyCurrentAP,__Me,ActionPoints)
+	IsLessThen(_MyCurrentAP,4)
+ACTIONS
+	CharacterLookAt(_Target)
+	CharacterPlayEffect(__Me,%DelPrj_CasterFX)
+	CharacterPlayAnimation("cast_long_loop",0,1)
+	CharacterPlayAnimation("cast_long_cast",1,1)
+	Sleep(0.2)
+	CharacterUseActionPoints(__Me,3)
+	PlayLoopEffectAt(%SelectedSpotFX_Handle,%SelectedSpot,%DelPrj_SelectedSpotFX)
+	Set(%Bool_BombHasBeenPlanted,1)
+	Sleep(0.5)	
+	SetPriority("DelayedProjectile_PlaceMarkOnTheGround",0)
+
+REACTION DelayedProjectile_ExplodeAt,0
+USAGE COMBAT
+ACTIONS
+	CharacterLookAt(%SelectedSpot)
+	CharacterPlayAnimation("cast_long_cast",1,0)
+	Sleep(0.5)
+	ExplodeAt(%SelectedSpot,%ProjectileType,%ProjectileLevel,__Me)
+	IF "c1"
+		IsEqual(%Bool_ShouldLeaveSurface,1)
+	THEN
+		CreateSurfaceAt(%SelectedSpot,%SurfaceType,%SurfaceRadius,4)
+	ENDIF
+	StopLoopEffect(%SelectedSpotFX_Handle)
+	Set(%DelPrj_TurnCurrent,0)
+	Set(%Bool_BombHasBeenPlanted,0)	
+	SetPriority("DelayedProjectile_ExplodeAt",0)	
+	
+//-----------------
+EVENTS
+EVENT OnInit_GetSightRange
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%DelPrj_SightRange,__Me,Sight)
+	THEN
+	ENDIF
+	IF "c1"
+		IsEqual(%Bool_BombHasBeenPlanted,1)
+	THEN
+		PlayLoopEffectAt(%SelectedSpotFX_Handle,%SelectedSpot,%DelPrj_SelectedSpotFX)
+	ENDIF
+
+EVENT OnTurn_SpellControl
+ON
+	OnTurn()
+ACTIONS
+	IF "c1"
+		IsLessThen(%DelPrj_TurnCurrent,%DelPrj_TurnDesired)
+	THEN
+		Add(%DelPrj_TurnCurrent,1)
+	ELIF "c1"
+		IsEqual(%DelPrj_TurnCurrent,%DelPrj_TurnDesired)
+	THEN
+		Add(%DelPrj_TurnCurrent,1)
+		SetPriority("DelayedProjectile_PlaceMarkOnTheGround",1000)
+	ELIF "c1&c2"
+		IsGreaterThen(%DelPrj_TurnCurrent,%DelPrj_TurnDesired)
+		IsEqual(%Bool_BombHasBeenPlanted,1)	
+	THEN
+		SetPriority("DelayedProjectile_ExplodeAt",900)
+	ENDIF
+	
+EVENT OnCombatEnded_RemoveFXHandle
+ON
+	OnCombatEnded()
+ACTIONS
+	IF "c1"
+		IsEqual(%Bool_BombHasBeenPlanted,1)
+	THEN
+		StopLoopEffect(%SelectedSpotFX_Handle)
+	ENDIF
+	
+EVENT OnShutdown_StopLoopingFX
+ON
+	OnShutdown()
+ACTIONS
+	StopLoopEffect(%SelectedSpotFX_Handle)
+	
+EVENT OnDie_RemoveFXHandle
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	IF "c1"
+		IsEqual(%Bool_BombHasBeenPlanted,1)
+	THEN
+		StopLoopEffect(%SelectedSpotFX_Handle)
+	ENDIF
+	
+EVENT OnDeactivate_StopLoopFX
+ON
+	OnDeactivate()
+ACTIONS
+	StopLoopEffect(%SelectedSpotFX_Handle)

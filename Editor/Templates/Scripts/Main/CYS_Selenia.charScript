@@ -1,0 +1,27 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%Lighthouse1 = CYS_LighthouseDare1_2f9f9cc7-c9e5-4620-ae50-5ddb5bbff37d
+	CHARACTER:%Lighthouse2 = CYS_LighthouseDare2_d5f3aa68-69bb-4afb-81fd-90cae50a5177
+	INT:%Dialog = 0
+	
+BEHAVIOUR
+
+REACTION Dialog,1600
+	USAGE PEACE
+	CHECK "c1&!c2&!c3&!c4"
+		IsEqual(%Dialog,1)
+		IsInDialog(%Lighthouse1)
+		IsInDialog(%Lighthouse2)
+		IsInDialog(__Me)
+	ACTIONS
+		Set(%Dialog,0)
+		CharacterLookAt(%Lighthouse1)
+		DialogStart("CYS_AD_Aureus_Guards",%Lighthouse1,%Lighthouse2,__Me)
+
+EVENTS
+
+EVENT StartDialog
+ON
+	OnCharacterEvent(__Me,"DialogRequest")
+ACTIONS
+	Set(%Dialog,1)

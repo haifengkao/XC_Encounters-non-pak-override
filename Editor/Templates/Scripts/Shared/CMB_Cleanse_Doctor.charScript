@@ -1,0 +1,111 @@
+INIT
+
+	CHARACTER:__Me
+	CHARACTER:%Target=null
+	STATUS:%CurrentStatus=null
+	FLOAT:%lowestDistance=50000
+
+BEHAVIOUR
+REACTION CleanseStatusDoctorIterator,0
+USAGE COMBAT
+CHECK "c1"
+	IsEqual(%Target,null)
+ACTIONS
+	Set(%lowestDistance,50000)
+	IterateCharactersInCombat(__Me,"GetSickAllies")
+	IF "c1"
+		IsEqual(%Target,null)
+	THEN
+		SetPriority(CleanseStatusDoctorIterator,0)
+	ENDIF
+
+REACTION CleanseStatusDoctor,500
+VARS
+	FLOAT:_minRange
+	FLOAT:_maxRange
+USAGE COMBAT
+CHECK "c1&!c2"
+	CharacterGetSkillRange(_minRange,_maxRange,__Me,Target_DoctorEnemy)
+	IsEqual(%Target,null)
+ACTIONS
+	CharacterMoveInRange(%Target,_minRange,_maxRange,1)
+	CharacterUseSkill(Target_DoctorEnemy,%Target)
+
+EVENTS
+EVENT Initiliaze
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill(Target_DoctorEnemy)
+
+EVENT GetSickAlliesIterator // Blind;Mute;InfectiousDiseased;Weak;Crippled;Bleeding;Diseased;Poison;Knockdown
+VARS
+	CHARACTER:_Char
+	FLOAT:_targetDistance
+ON
+	OnIterateCharacter(_Char,"GetSickAllies")
+ACTIONS
+	IF "c1&(c2|c3|c4|c5|c6|c7|c8|c9|c10)&c11"
+		CharacterIsAlly(__Me,_Char)
+		CharacterHasStatus(_Char,STATUS:MUTED)
+		CharacterHasStatus(_Char,STATUS:WEAK)
+		CharacterHasStatus(_Char,STATUS:BLIND)
+		CharacterHasStatus(_Char,STATUS:INFECTIOUS_DISEASED)
+		CharacterHasStatus(_Char,STATUS:CRIPPLED)
+		CharacterHasStatus(_Char,STATUS:BLEEDING)
+		CharacterHasStatus(_Char,STATUS:DISEASED)
+		CharacterHasStatus(_Char,STATUS:POISONED)
+		CharacterHasStatus(_Char,STATUS:KNOCKED_DOWN)
+		GetDistance(_targetDistance,__Me,_Char)	
+	THEN
+		IF "c1"
+			IsLessThen(_targetDistance,%lowestDistance)
+		THEN
+			Set(%lowestDistance,_targetDistance)
+			Set(%Target,_Char)
+		ENDIF
+	ENDIF		
+
+EVENT AllyGetsStatus
+VARS
+	CHARACTER:_Char
+	STATUS:_Status
+ON
+	OnCharacterStatus(_Char,_Status)
+ACTIONS
+	IF "c1&(c2|c3|c4|c5|c6|c7|c8|c9|c10)"
+		CharacterIsAlly(__Me,_Char)
+		IsEqual(_Status,STATUS:MUTED)
+		IsEqual(_Status,STATUS:WEAK)
+		IsEqual(_Status,STATUS:BLIND)
+		IsEqual(_Status,STATUS:INFECTIOUS_DISEASED)
+		IsEqual(_Status,STATUS:CRIPPLED)
+		IsEqual(_Status,STATUS:BLEEDING)
+		IsEqual(_Status,STATUS:DISEASED)
+		IsEqual(_Status,STATUS:POISONED)
+		IsEqual(_Status,STATUS:KNOCKED_DOWN)
+	THEN
+		SetPriority("CleanseStatusDoctorIterator",600)
+	ENDIF
+
+
+EVENT AllyLosesStatus
+VARS
+	STATUS:_Status
+ON
+	OnCharacterStatusRemoved(%Target,_Status)
+ACTIONS
+	IF "c1|c2|c3|c4|c5|c6|c7|c8|c9"
+		IsEqual(_Status,STATUS:MUTED)
+		IsEqual(_Status,STATUS:WEAK)
+		IsEqual(_Status,STATUS:BLIND)
+		IsEqual(_Status,STATUS:INFECTIOUS_DISEASED)
+		IsEqual(_Status,STATUS:CRIPPLED)
+		IsEqual(_Status,STATUS:BLEEDING)
+		IsEqual(_Status,STATUS:DISEASED)
+		IsEqual(_Status,STATUS:POISONED)
+		IsEqual(_Status,STATUS:KNOCKED_DOWN)
+	THEN
+		Set(%Target,null)
+		SetPriority("CleanseStatusDoctorIterator",600)
+	ENDIF

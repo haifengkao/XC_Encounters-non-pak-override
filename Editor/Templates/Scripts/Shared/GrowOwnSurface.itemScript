@@ -1,0 +1,27 @@
+INIT
+	ITEM:__Me
+	INT:%Counting = 0
+	EXTERN SURFACE:%SurfaceType = null
+	EXTERN FLOAT:%SurfaceRadius = null
+	EXTERN FIXEDSTRING:%SurfaceTimer = null
+	EXTERN FLOAT:%SurfaceDelay = null
+	
+BEHAVIOUR
+
+REACTION CreateSurface, 1000
+	CHECK "!c1&c2"
+		IsSurface(__Me, %SurfaceRadius, %SurfaceType)
+		IsEqual(%Counting, 0)
+	ACTIONS
+		StartTimer(%SurfaceTimer, %SurfaceDelay, 0)
+		Set(%Counting, 1)
+		
+		
+EVENTS
+
+EVENT GrowBack
+	ON
+		OnTimer(%SurfaceTimer)
+	ACTIONS
+		CreateSurfaceAt(__Me, %SurfaceType, %SurfaceRadius, -1)
+		Set(%Counting, 0)

@@ -1,0 +1,54 @@
+/*
+
+Use this script on an enemy that has lots of animations (skeletons, humans)
+Give their combat group allies the script CMB_SendGotDamage
+This guy will react to his friends getting damage
+
+*/
+
+INIT
+CHARACTER:%ally=null
+EXTERN STRING:%gotdamage=null
+
+BEHAVIOUR
+
+REACTION IntimidateAnim,0
+USAGE ALL
+VARS
+	CHARACTER:_char
+	FIXEDSTRING:_anim
+CHECK "c1&!c2"
+	GetClosestPlayer(_char)
+	CharacterHasStatus(_char,INVISIBLE)
+ACTIONS
+	CharacterLookAt(_char)
+	GetRandom(_anim,"Intimidate_01","Intimidate_02","Chuckle_02","Taunt_02","Taunt_01")
+	CharacterPlayAnimation(_anim)
+	SetPriority("IntimidateAnim",0)
+	
+REACTION OohNoAnim,0
+USAGE ALL
+VARS
+	FIXEDSTRING:_anim
+ACTIONS
+	CharacterLookAt(%ally)
+	GetRandom(_anim,"Annoyed_01","No_03","Cower_01","Cower_02","Ignore_01","Sigh_01","Surprise_01")
+	CharacterPlayAnimation(_anim)
+	SetPriority("OohNoAnim",0)	
+
+EVENTS
+EVENT CombatStarted
+ON
+	OnCombatStarted()
+ACTIONS
+	SetPriority("IntimidateAnim",5000)
+	
+EVENTS
+EVENT GotDamage
+VARS
+	CHARACTER:_char
+ON
+	OnCharacterEvent(_char,%gotdamage)
+ACTIONS
+	Set(%ally,_char)
+	SetPriority("OohNoAnim",5000)

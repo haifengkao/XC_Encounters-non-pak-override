@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<palette xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <palettes />
+  <objectids>
+    <guid>973a242d-0ffa-4c59-923b-4e4883d581b5</guid>
+    <guid>ec4c782e-1bf7-414a-b349-7cb101c64d86</guid>
+    <guid>b2b9fa45-bc38-4466-88ad-94325835dd10</guid>
+    <guid>38931082-4422-4eae-8ab9-fa9761389804</guid>
+    <guid>0ab442f8-56a0-4fed-a826-7fc99bc20e8b</guid>
+    <guid>7e6718e2-5d30-4ff3-8643-374d90f33fa3</guid>
+    <guid>e1d6a4aa-6c54-4312-93eb-01b7bdda3cad</guid>
+    <guid>a8f565dd-303b-43c8-9f9f-d310bbdd56a5</guid>
+    <guid>85dfa31c-6dd3-4e34-ab80-80ae084e500a</guid>
+    <guid>eba43365-abd5-4092-b3b6-b2184afb8832</guid>
+    <guid>b46429a8-afb1-49a4-b45a-313ec4775027</guid>
+    <guid>8a899897-daeb-4ab0-bac5-9882fff10348</guid>
+    <guid>e5bf3051-8645-4280-8d59-5abe08589d87</guid>
+    <guid>6a11ac30-54a9-4f99-a94a-fe07f8659056</guid>
+    <guid>d41757df-852b-4aba-922e-25a9bb0a701c</guid>
+    <guid>33e89dc3-678b-4e05-9eb4-9f0e5bbde870</guid>
+  </objectids>
+  <name>Lakes</name>
+</palette>

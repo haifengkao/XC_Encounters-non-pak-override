@@ -1,0 +1,158 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Dialogs(CHARACTER_CYS_Moira,"CYS_Moira");
+DB_Dialogs(CHARACTER_CYS_CharmedOrcGuard1,CHARACTER_CYS_CharmedOrcGuard2,"CYS_CharmedOrcGuards");
+DB_Dialogs(CHARACTER_CYS_CharmedOrc,"CYS_CharmedOrc");
+
+DB_CYS_Charmed_OrcGuards(CHARACTER_CYS_CharmedOrcGuard1);
+DB_CYS_Charmed_OrcGuards(CHARACTER_CYS_CharmedOrcGuard2);
+
+ProcTriggerRegisterForPlayers(TRIGGER_CYS_Poly_Cyseal);
+ProcTriggerRegisterForPlayers(TRIGGER_CYS_CharmedOrcKillCheck);
+
+DB_PlayerComments("CYS_CommentCharmedOrcDeadGuards","CYS_CommentCharmedOrcDeadGuards_1_1",1,1);
+DB_PlayerComments("CYS_CommentCharmedOrcDeadGuards","CYS_CommentCharmedOrcDeadGuards_2_1",2,1);
+DB_PlayerComments("CYS_CommentCharmedOrcDeadGuards","CYS_CommentCharmedOrcDeadGuards_2_2",2,2);
+
+DB_NoRunAway(CHARACTER_CYS_CharmedOrc);
+DB_IsNotMessingAround(CHARACTER_CYS_CharmedOrc);
+NoStealingReaction(CHARACTER_CYS_CharmedOrc);
+KBSECTION
+IF
+GlobalEventSet("CYS_KillCharmedOrc")
+THEN
+CHARACTER_CYS_CharmedOrc.isKilled();
+Proc_CompanionDialog(CHARACTER_Madoc,"MAD_CD_OrcKilled",CHARACTER_CYS_CharmedOrc);
+
+IF
+GlobalEventSet("CYS_SpareCharmedOrc")
+THEN
+CHARACTER_CYS_CharmedOrc.isSpared();
+Proc_CompanionDialog(CHARACTER_Madoc,"MAD_CD_OrcSpared",CHARACTER_CYS_CharmedOrc);
+
+IF
+DialogEnded("CYS_CharmedOrcGuards",_)
+AND
+CHARACTER_CYS_CharmedOrc.isSpared()
+THEN
+PROC_CYS_CharmedOrc_GuardsSetDialog(0);
+ProcRemoveDialogEntryForSpeaker(CHARACTER_CYS_CharmedOrcGuard1,"CYS_CharmedOrcGuards");
+QuestUpdate("CYS_CharmedOrc","Update3");
+
+IF
+DialogEnded("CYS_CharmedOrcGuards",_)
+AND
+CHARACTER_CYS_CharmedOrc.isKilled()
+THEN
+DB_NoDefaultBehavior(CHARACTER_CYS_CharmedOrcGuard1);
+DB_NoDefaultBehavior(CHARACTER_CYS_CharmedOrcGuard2);
+CharacterSetFightMode(CHARACTER_CYS_CharmedOrcGuard1, 1, 0);
+CharacterSetScriptframe(CHARACTER_CYS_CharmedOrcGuard1,"KillOrc");
+PROC_CYS_CharmedOrc_GuardsSetDialog(0);
+ProcRemoveDialogEntryForSpeaker(CHARACTER_CYS_CharmedOrcGuard1,"CYS_CharmedOrcGuards");
+
+IF
+CharacterAttackedByCharacter(CHARACTER_CYS_CharmedOrc, CHARACTER_CYS_CharmedOrcGuard1)
+AND
+CHARACTER_CYS_CharmedOrc.isKilled()
+THEN
+CharacterDie(CHARACTER_CYS_CharmedOrc, 0);
+
+IF
+CharacterDied(CHARACTER_CYS_CharmedOrc)
+AND
+NOT CHARACTER_CYS_CharmedOrc.isSpared()
+AND
+NOT CHARACTER_CYS_CharmedOrc.isKilled()
+THEN
+PROC_CYS_CharmedOrc_GuardsSetDialog(0);
+ProcRemoveDialogEntryForSpeaker(CHARACTER_CYS_CharmedOrcGuard1,"CYS_CharmedOrcGuards");
+DB_CYS_FinishCharmedOrcEarly(CHARACTER_CYS_CharmedOrc);
+
+IF
+DB_CYS_FinishCharmedOrcEarly(CHARACTER_CYS_CharmedOrc)
+AND
+NOT DB_Combat(CHARACTER_CYS_CharmedOrcGuard1, _)
+AND
+NOT DB_Combat(CHARACTER_CYS_CharmedOrcGuard2, _)
+THEN
+GlobalSetEvent("CYS_CharmedOrcDead");
+NOT DB_NoDefaultBehavior(CHARACTER_CYS_CharmedOrcGuard1);
+NOT DB_NoDefaultBehavior(CHARACTER_CYS_CharmedOrcGuard2);
+ProcCharacterMoveToTrigger(CHARACTER_CYS_CharmedOrcGuard1,TRIGGER_CYS_PointOrcGuard1,1,"CYS_GuardWalkAway");
+
+IF
+CharacterEnteredCombat(_OrcGuard,_)
+AND
+DB_CYS_Charmed_OrcGuards(_OrcGuard)
+THEN
+CharacterClearScriptframe(_OrcGuard);
+
+IF
+CharacterDied(CHARACTER_CYS_CharmedOrc)
+AND
+CHARACTER_CYS_CharmedOrc.isKilled()
+THEN
+DialogStartTwoSpeakerDialog("CYS_AD_OrcFemaleGuards2",CHARACTER_CYS_CharmedOrcGuard2,CHARACTER_CYS_CharmedOrcGuard1);
+GlobalSetEvent("CYS_CharmedOrcDead");
+QuestUpdate("CYS_CharmedOrc","Update2");
+QuestClose("CYS_CharmedOrc");
+CharacterSetFightMode(CHARACTER_CYS_CharmedOrcGuard1, 0, 0);
+NOT DB_NoDefaultBehavior(CHARACTER_CYS_CharmedOrcGuard1);
+NOT DB_NoDefaultBehavior(CHARACTER_CYS_CharmedOrcGuard2);
+
+PROC
+PROC_CYS_CharmedOrc_GuardsSetDialog((INTEGER)_bool)
+AND
+DB_CYS_Charmed_OrcGuards(_guard)
+THEN
+CharacterSetHasDialog(_guard, _bool);
+
+PROC
+PROC_CYS_CharmedOrc_KillGuards()
+AND
+DB_CYS_Charmed_OrcGuards(_guard)
+THEN
+CharacterDie(_guard,1);
+NOT DB_CYS_Charmed_OrcGuards(_guard);
+
+IF
+AutomatedDialogEnded("CYS_AD_OrcFemaleGuards2",_)
+THEN
+ProcCharacterMoveToTrigger(CHARACTER_CYS_CharmedOrcGuard1,TRIGGER_CYS_PointOrcGuard1,1,"CYS_GuardWalkAway");
+
+IF
+CharacterEvent(CHARACTER_CYS_CharmedOrcGuard1,"CYS_GuardWalkAway")
+THEN
+DB_Dialogs(CHARACTER_CYS_CharmedOrcGuard1, "CYS_Marius");
+GoalCompleted;
+
+IF
+CharacterEnteredTrigger(_Player,TRIGGER_CYS_Poly_Cyseal)
+AND
+CHARACTER_CYS_CharmedOrc.isSpared()
+THEN
+ProcCheckOtherPlayersInTrigger(_Player,TRIGGER_CYS_CharmedOrcKillCheck);
+
+PROC
+ProcCheckOtherPlayersInTrigger(_Player,TRIGGER_CYS_CharmedOrcKillCheck)
+AND
+NOT DB_OtherPlayersInRegion(TRIGGER_CYS_CharmedOrcKillCheck,1)
+THEN
+PROC_CYS_CharmedOrc_KillGuards();
+CharacterSetOnStage(CHARACTER_CYS_CharmedOrc,0);
+DB_PlayerComment_Trigger(TRIGGER_CYS_CommentCharmedOrcDeadGuards,"CYS_CommentCharmedOrcDeadGuards");
+DB_OneShotPlayerTrigger(TRIGGER_CYS_UpdateCharmedOrcDeadGuards);
+GlobalSetEvent("CYS_OrcFemaleGuardsDead");
+
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,TRIGGER_CYS_UpdateCharmedOrcDeadGuards)
+THEN
+QuestUpdate("CYS_CharmedOrc","Update4");
+QuestClose("CYS_CharmedOrc");
+GoalCompleted;
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

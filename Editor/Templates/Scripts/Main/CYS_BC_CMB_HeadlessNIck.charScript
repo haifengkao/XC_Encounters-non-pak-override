@@ -1,0 +1,27 @@
+#INCLUDE DefaultCharacter
+INIT
+	USING DefaultCharacter
+	CHARACTER:__Me
+
+EVENTS
+
+EVENT DontAttackAlliesOrInvisibles OVERRIDE
+VARS
+	CHARACTER:_Target
+ON
+	OnTurn()
+ACTIONS
+
+
+BEHAVIOUR
+
+REACTION AttackAnybody, 1100
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+ACTIONS
+	IF "c1"
+		CharacterGet(_Target, __Me, 12, Random, Vitality, All)
+	THEN
+		CharacterAttack(_Target)
+	ENDIF

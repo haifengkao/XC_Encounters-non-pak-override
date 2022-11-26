@@ -1,0 +1,39 @@
+#INCLUDE CYS_BurningShipHelper
+
+INIT
+USING CYS_BurningShipHelper
+CHARACTER:%Friend = CYS_Helper1_b6fa9235-40ff-41b4-8c0a-b542366dd58e
+
+BEHAVIOUR
+
+REACTION State_ActionManager, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, "Action_Idle")
+	SetPriority(%currentAction, 1100)
+	
+REACTION Action_Idle, 0
+USAGE PEACE
+VARS 
+	FIXEDSTRING:_Animation
+	FLOAT:_SleepTime
+ACTIONS
+	GetRandom(_Animation,"idle1","idle2","idle3","still")
+	CharacterPlayAnimation(_Animation)
+	GetRandom(_SleepTime,0,0.5,1.2,1.5,3,4)
+	Sleep(_SleepTime)
+	SetPriority(%currentAction, 0)
+	
+REACTION LookAtFriend, 0
+USAGE PEACE
+ACTIONS
+	CharacterLookAt(%Friend)
+	SetPriority("LookAtFriend", 0)
+
+EVENTS
+
+EVENT LookatFriend
+ON
+	OnCharacterEvent(%Friend, "LookAtMe")
+ACTIONS
+	SetPriority("LookAtFriend", 2500)

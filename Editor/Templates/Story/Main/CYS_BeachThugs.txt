@@ -1,0 +1,43 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_CYSBeachThugs(CHARACTER_CYS_NWBeach_Thug1);
+DB_CYSBeachThugs(CHARACTER_CYS_NWBeach_Thug2);
+DB_CYSBeachThugs(CHARACTER_CYS_NWBeach_Thug3);
+DB_CYSBeachThugs(CHARACTER_CYS_NWBeach_Thug4);
+DB_CYSBeachThugs(CHARACTER_CYS_NWBeach_Thug5);
+
+DB_PlayerComments("CYS_Comment_ThugCamp","CYS_Comment_ThugCamp_1_1",1,1);
+DB_PlayerComments("CYS_Comment_ThugCamp","CYS_Comment_ThugCamp_2_1",2,1);
+DB_PlayerComments("CYS_Comment_ThugCamp","CYS_Comment_ThugCamp_2_2",2,2);
+KBSECTION
+IF
+DB_Combat(_Char,_ID)
+AND
+DB_CYSBeachThugs(_Char)
+AND
+DB_Combat(_Player,_ID)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_DidBeachComment(1)
+THEN
+DB_DidBeachComment(1);
+Launch_PlayerComment(_Player, "CYS_Comment_ThugCamp");	
+ProcCYSClearBeachThugs();
+
+PROC
+PROC_CleanUpPlayerComments("CYS_Comment_ThugCamp")
+THEN
+GoalCompleted;
+
+PROC
+ProcCYSClearBeachThugs()
+AND
+DB_CYSBeachThugs(_Char)
+THEN
+NOT DB_CYSBeachThugs(_Char);
+EXITSECTION
+NOT DB_DidBeachComment(1);
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

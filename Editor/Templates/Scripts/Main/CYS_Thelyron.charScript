@@ -1,0 +1,74 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+INT:%position = 3
+INT:%Dying = 0
+INT:%Sleeping = 0
+
+BEHAVIOUR
+REACTION DyingInBraccusDungeon, 1300
+USAGE ALL
+CHECK "c1"
+	IsEqual(%Dying,1)
+ACTIONS
+	Sleep(3)
+
+
+REACTION State_ActionManager, 0
+USAGE PEACE
+ACTIONS
+	GetWeightedRandom(%currentAction, "Action_CheckOnFire", INT:5, "Action_ReadBook", INT:15,"Action_StandAtTable",INT:10)
+	SetPriority(%currentAction, 1100)
+	
+REACTION Action_CheckOnFire, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(TRIGGER:CYS_ThelyronOpenFirePoint_3bbc91ef-f025-4194-991b-0abcc2db8149, 0)
+	Set(%position,INT:1)
+	CharacterLookFrom(TRIGGER:CYS_ThelyronOpenFirePoint_3bbc91ef-f025-4194-991b-0abcc2db8149)
+	CharacterPlayAnimation("Fidget_Low_01")
+	IF "c1"
+		IsRandom(0.4)
+	THEN
+		DialogStart("CYS_AD_ThelyronMumbles",__Me)
+	ENDIF
+	Sleep(2.0)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)
+
+REACTION Action_ReadBook, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(TRIGGER:CYS_ThelyronBookshelf_3dee3a3a-56bb-49b0-9ad7-c156dc6dbf20, 0)
+	Set(%position,INT:2)
+	CharacterLookFrom(TRIGGER:CYS_ThelyronBookshelf_3dee3a3a-56bb-49b0-9ad7-c156dc6dbf20)
+	CharacterPlayAnimation("Fidget_High_01")
+	IF "c1"
+		IsRandom(0.4)
+	THEN
+		DialogStart("CYS_AD_ThelyronMumbles",__Me)
+	ENDIF
+	Sleep(2.0)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)
+	
+REACTION Action_StandAtTable, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(TRIGGER:CYS_Point_Evelyn_ReadPatientFiles_84743b9c-ca22-48e5-b048-3e57c26b1f8d, 0)
+	Set(%position,INT:3)
+	CharacterLookFrom(TRIGGER:CYS_Point_Evelyn_ReadPatientFiles_84743b9c-ca22-48e5-b048-3e57c26b1f8d)
+	CharacterPlayAnimation("Stand_Read_01")
+	IF "c1"
+		IsRandom(0.4)
+	THEN
+		DialogStart("CYS_AD_ThelyronMumbles",__Me)
+	ENDIF
+	Sleep(2.0)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)

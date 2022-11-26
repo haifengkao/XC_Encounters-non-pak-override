@@ -1,0 +1,63 @@
+INIT
+
+CHARACTER:__Me
+CHARACTER:%GoblinAssistent = CHARACTER:DAF_BO_TorturerGoblin_eb2a9262-78f2-4259-a204-a7fa2f946353
+CHARACTER:%PrisonGuard = CHARACTER:DAF_BO_PrisonGuard2_7aeeaf52-8945-46f9-ae14-188ff65c0425
+CHARACTER:%Player = null
+
+BEHAVIOUR
+
+REACTION GuardRoom, 0
+USAGE PEACE
+VARS
+	FLOAT:_Dist
+ACTIONS
+	CharacterMoveTo(TRIGGER:DAF_PointTorturerOrc_5f9a9c5d-2d97-467a-a38f-cc8145db95d5,0,1,1,0.0)
+	CharacterLookFrom(TRIGGER:DAF_PointTorturerOrc_5f9a9c5d-2d97-467a-a38f-cc8145db95d5,1)
+	Sleep(5)
+	IF "c1&c2"
+		GetDistance(_Dist,__Me,%GoblinAssistent)
+		IsLessThen(_Dist,3.0)		
+	THEN
+		DialogStart("DAF_AD_BO_WaitingTorturers", __Me, %GoblinAssistent)
+	ENDIF
+	Sleep(5)
+	
+STORY
+
+SCRIPTFRAME EnterAfterNolanGotKilled
+ACTIONS
+	DialogRequestStop("DAF_AD_BO_WaitingTorturers")
+	SetPriority("GuardRoom", 0)
+	DisplayText(__Me, "DAF_BO_OrcTorturerScream", 10) //We heard a lot of noise! Me want to check out!
+	CharacterMoveTo(%Player, 1)
+	Sleep(2)
+	DisplayText(__Me, "DAF_BO_OrcTortureNolanDied_01", 5) //Great! Puny human killed him!
+	CharacterMoveTo(TRIGGER:DAF_Point_BO_Nolan_bbf1c17a-a71e-4b18-9243-5fcc33ae06a2, 0)
+	DisplayText(__Me, "DAF_BO_OrcTortureNolanDied_02", 5) //You see, human no better torturer then Orc! Me best torturer!
+	Sleep(2)
+	DisplayText(%GoblinAssistent, "DAF_BO_GoblinAssistentNolanDied_01", 5) //Apparently! C'mon, get lost here! We will take it over again from here!
+	CharacterMoveTo(TRIGGER:DAF_Point_BO_Corpses_23e9e452-d8ba-44c1-88b8-4b74d7297446, 0)
+	DisplayText(__Me, "DAF_BO_OrcTortureNolanDied_03", 5) //Should we wait now? Or start on the next one?
+	CharacterMoveTo(%GoblinAssistent, 0)
+	DialogStart("DAF_AD_BO_OrcTorturerNolanDied", __Me, %GoblinAssistent)
+	
+SCRIPTFRAME EnterAfterNolanGotRescued
+ACTIONS
+	DialogRequestStop("DAF_AD_BO_WaitingTorturers")
+	DisplayText(__Me, "DAF_BO_OrcTortureNolanRescued_01", 10) //Filthy human untied prisoner! You die, here and now!
+	SetPriority("GuardRoom", 0)
+	CharacterMoveTo(%Player, 1)
+	
+SCRIPTFRAME SpottedDeadGuard
+ACTIONS
+	CharacterLookAt(%GoblinAssistent)
+	DisplayText(__Me, "DAF_OrcTorturerSeesDeadGuard_01", 5) //Guard dead? How can it be?!
+	Sleep(3)
+	CharacterMoveTo(%Player, 1)
+	DisplayText(__Me, "DAF_BO_TorturersSpottedDeadGuard_01", 5) //You false Ragnar! You killed guard! Die, scum!
+	GlobalSetEvent("DAF_BO_NolanInterruptDialog")
+	
+SCRIPTFRAME WaitingOutside
+ACTIONS
+	SetPriority("GuardRoom", 1070)

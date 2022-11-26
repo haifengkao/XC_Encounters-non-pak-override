@@ -1,0 +1,124 @@
+INIT
+	CHARACTER:__Me
+	FLOAT:%MySightRange=null
+	ITEMTEMPLATE:%OilBarrel_RT="CONT_Barrel_Oil_A_1b34b32c-e96c-404e-90cc-054cb549c558"
+	ITEMTEMPLATE:%OozeBarrel_RT="CONT_Barrel_Ooze_A_0ae0668f-418c-46c4-bcbb-1683aa3c68e3"
+	ITEMTEMPLATE:%ExplosiveCorpse_RT1="COR_Zombie_Explode_A_a8157d6e-1d74-4acd-ad0f-d1314dc0bb1b"
+	ITEMTEMPLATE:%ExplosiveCorpse_RT2="COR_Zombie_Explode_B_806d6816-bff3-4dd7-8bf1-e648bf10badc"
+	ITEMTEMPLATE:%BloatedCorpse_RT1="COR_Zombie_Gas_A_ec256fe4-4436-4480-9ac1-8e4ace37f81b"
+	ITEMTEMPLATE:%BloatedCorpse_RT2="COR_Zombie_Gas_B_f90d1ab1-8754-4dea-8afa-8e633737dfb7"
+	ITEMTEMPLATE:%ExplosiveMushroom_RT="NAT_Mushroom_Explode_A_1c665dad-d631-4174-9a88-49b2521710eb"
+	ITEM:%DetectedDestructibleObject=null
+	CHARACTER:%CharacterNearObject=null
+
+	//WHAT'S MISSING:
+	//try to see if there are allies near the targeted object
+	//get away from the object before shooting it
+
+//-----------------------
+BEHAVIOUR
+REACTION ScanFor_DestructibleItems,0 
+USAGE COMBAT
+VARS
+	ITEMTEMPLATE:_ObjectTemplate
+	FLOAT:_SecurityRange=7
+	FLOAT:_MaxRange
+ACTIONS
+	Set(%DetectedDestructibleObject,null)
+	IterateItemsNear(__Me,%MySightRange,"OnIterate_ScanFor_Destructibles")
+	IF "!c1"
+		IsEqual(%DetectedDestructibleObject,null)
+	THEN
+		IF "c1&c2"
+			CharacterCanCast(__Me,"Projectile_EnemyFireball")	
+			CharacterGetSkillRange(_,_MaxRange,__Me,"Projectile_EnemyFireball")
+		THEN
+			CharacterMoveInRange(%DetectedDestructibleObject,_SecurityRange,_MaxRange,1)
+			CharacterUseSkill("Projectile_EnemyFireball",%DetectedDestructibleObject)
+		ELIF "c1&c2"
+			CharacterCanCast(__Me,"Projectile_EnemyExplosionArrow")
+			CharacterGetSkillRange(_,_MaxRange,__Me,"Projectile_EnemyExplosionArrow")
+		THEN
+			CharacterMoveInRange(%DetectedDestructibleObject,_SecurityRange,_MaxRange,1)
+			CharacterUseSkill("Projectile_EnemyExplosionArrow",%DetectedDestructibleObject)
+		ELIF "c1&c2"
+			CharacterCanCast(__Me,"Projectile_EnemyFlare")
+			CharacterGetSkillRange(_,_MaxRange,__Me,"Projectile_EnemyFlare")
+		THEN
+			CharacterMoveInRange(%DetectedDestructibleObject,_SecurityRange,_MaxRange,1)
+			CharacterUseSkill("Projectile_EnemyFlare",%DetectedDestructibleObject)
+		ELIF "c1&c2"
+			CharacterCanCast(__Me,"Projectile_EnemyFireArrow")
+			CharacterGetSkillRange(_,_MaxRange,__Me,"Projectile_EnemyFireArrow")
+		THEN
+			CharacterMoveInRange(%DetectedDestructibleObject,_SecurityRange,_MaxRange,1)
+			CharacterUseSkill("Projectile_EnemyFireArrow",%DetectedDestructibleObject)
+		ELIF "c1&c2"
+			CharacterCanCast(__Me,"Projectile_EnemyStaffOfMagusFire")
+			CharacterGetSkillRange(_,_MaxRange,__Me,"Projectile_EnemyStaffOfMagusFire")
+		THEN
+			CharacterMoveInRange(%DetectedDestructibleObject,_SecurityRange,_MaxRange,1)
+			CharacterUseSkill("Projectile_EnemyStaffOfMagusFire",%DetectedDestructibleObject)
+		ELIF "c1&c2"
+			CharacterCanCast(__Me,"Projectile_EnemyPoisonHair")
+			CharacterGetSkillRange(_,_MaxRange,__Me,"Projectile_EnemyPoisonHair")
+		THEN
+			CharacterMoveInRange(%DetectedDestructibleObject,_SecurityRange,_MaxRange,1)
+			CharacterUseSkill("Projectile_EnemyPoisonHair",%DetectedDestructibleObject)	
+		ELIF "c1&c2"
+			CharacterCanCast(__Me,"Projectile_EnemyPoisonDart")
+			CharacterGetSkillRange(_,_MaxRange,__Me,"Projectile_EnemyPoisonDart")
+		THEN
+			CharacterMoveInRange(%DetectedDestructibleObject,_SecurityRange,_MaxRange,1)
+			CharacterUseSkill("Projectile_EnemyPoisonDart",%DetectedDestructibleObject)	
+		ELSE
+			IF "c1&!(c2|c3)"
+				ItemGetTemplate(%DetectedDestructibleObject,_ObjectTemplate)
+				IsEqual(_ObjectTemplate,%OilBarrel_RT)
+				IsEqual(_ObjectTemplate,%OozeBarrel_RT)
+			THEN
+				CharacterAttack(%DetectedDestructibleObject)
+			ENDIF
+		ENDIF
+	ENDIF
+	SetPriority("ScanFor_DestructibleItems",0)
+
+//-----------------------
+EVENTS
+EVENT OnInit_GetMySightRange
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%MySightRange,__Me,Sight)
+	THEN
+	ENDIF
+
+EVENT OnTurn_RestoreScanningReactionPrio
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("ScanFor_DestructibleItems",500)
+
+EVENT OnIterate_ScanFor_Destructibles
+VARS 
+	ITEM:_DetectedDestructible
+	ITEMTEMPLATE:_DetectedDestructible_RT
+	CHARACTER:_Character
+ON
+	OnIterateItem(_DetectedDestructible,"OnIterate_ScanFor_Destructibles")
+ACTIONS
+	IF "!c1&c2&(c3|c4|c5|c6|c7|c8|c9)&c10"
+		ItemIsDestroyed(_DetectedDestructible)										//!c1
+		ItemGetTemplate(_DetectedDestructible,_DetectedDestructible_RT)				//c2
+		IsEqual(_DetectedDestructible_RT,%OilBarrel_RT)								//c3
+		IsEqual(_DetectedDestructible_RT,%OozeBarrel_RT)							//c4
+		IsEqual(_DetectedDestructible_RT,%ExplosiveMushroom_RT)						//c5
+		IsEqual(_DetectedDestructible_RT,%ExplosiveCorpse_RT1)						//c6				
+		IsEqual(_DetectedDestructible_RT,%ExplosiveCorpse_RT2)						//c7				
+		IsEqual(_DetectedDestructible_RT,%BloatedCorpse_RT1)						//c8					
+		IsEqual(_DetectedDestructible_RT,%BloatedCorpse_RT2)						//c9					
+		CharacterGet(_Character,_DetectedDestructible,3,Lowest,Distance,Enemy)		//c10
+	THEN
+		Set(%DetectedDestructibleObject,_DetectedDestructible)
+	ENDIF

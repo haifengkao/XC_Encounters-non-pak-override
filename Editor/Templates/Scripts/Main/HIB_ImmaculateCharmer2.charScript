@@ -1,0 +1,47 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+EXTERN CHARACTER:%Partner = null
+EXTERN STRING:%Dialog = null
+TRIGGER:%Point1 = HIB_Point_ImmaculateCharmer2_a785483c-200e-4144-be32-ea74696c8623
+INT:%HIB_AtCamp = 0
+
+BEHAVIOUR
+
+REACTION State_AtCamp, 0
+USAGE PEACE
+ACTIONS
+	CharacterLookAt(%Point1)
+	CharacterPlayAnimation("Warm_Hands_01")
+	Sleep(5)
+
+REACTION State_InForest, 0
+USAGE PEACE
+ACTIONS
+	Sleep(5)
+
+REACTION State_Dialog, 0
+USAGE PEACE
+CHECK "!c1&!c2"
+	IsInDialog(%Partner)
+	IsInDialog(__Me)
+ACTIONS
+	IF "!c1"
+		CharacterIsDead(%Partner)
+	THEN
+		CharacterLookAt(%Partner)
+		DialogStart(%Dialog,%Partner,__Me)
+	ENDIF
+	Set(%currentState,%previousState)
+INTERRUPT
+	Set(%currentState,%previousState)
+
+EVENTS
+
+EVENT StartDialog
+ON
+	OnCharacterEvent(__Me,"DialogRequest")
+ACTIONS
+	Set(%currentState,"State_Dialog")

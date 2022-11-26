@@ -1,0 +1,6 @@
+#INCLUDE CYS_FairPeople
+
+INIT
+USING CYS_FairPeople
+FIXEDSTRING:%CurrentlyWatching = "State_WatchReginald"
+INT:%GallagherPaid = 0

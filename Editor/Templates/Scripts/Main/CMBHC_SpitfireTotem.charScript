@@ -1,0 +1,66 @@
+INIT
+	CHARACTER:__Me
+
+//----------
+BEHAVIOUR
+REACTION SpitfireTotem_Attack,400
+USAGE COMBAT
+ACTIONS
+	CharacterPlayEffect(__Me,"FX_Skills_Fire_Flare_Impact_A")
+	CharacterEvent(__Me,"CMBHC_SpitfireTotem_Attack_Event")
+	CharacterPlayEffect(__Me,"FX_Creatures_Skills_Fire_Totem_Attack_A")
+	CharacterPlayAnimation("attack1",1,1)
+	IterateCharactersNear(__Me,4,"CMBHC_SpitfireTotem_ScanForNearbyCharacters",Lowest,Distance)
+	CharacterEndTurn()
+
+REACTION SpitfireTotem_Fallback,50
+USAGE COMBAT
+ACTIONS
+	CharacterEndTurn()
+	
+//----------
+EVENTS
+EVENT OnIterate_ScanForNearbyCharacters
+VARS
+	CHARACTER:_Character
+ON
+	OnIterateCharacter(_Character,"CMBHC_SpitfireTotem_ScanForNearbyCharacters")
+ACTIONS	
+	IF "!c1"
+		CharacterIsDead(_Character)
+	THEN
+		CharacterApplyStatus(_Character,"BURNING",2)
+	ENDIF
+
+EVENT OnCharacterEvent_CreateSurface_01
+ON
+	OnCharacterEvent(__Me,"CMBHC_SpitfireTotem_Attack_Event")
+ACTIONS
+	CreateSurfaceAt(__Me,"Fire",1,2)
+	StartTimer("CMBHC_SpitfireTotem_CreateSurface_Timer1",0.5,0)
+	
+EVENT OnTimer_CreateSurface_02
+ON
+	OnTimer("CMBHC_SpitfireTotem_CreateSurface_Timer1")
+ACTIONS
+	CreateSurfaceAt(__Me,"Fire",1.5,2)
+	StartTimer("CMBHC_SpitfireTotem_CreateSurface_Timer2",0.5,0)
+	
+EVENT OnTimer_CreateSurface_03
+ON
+	OnTimer("CMBHC_SpitfireTotem_CreateSurface_Timer2")
+ACTIONS
+	CreateSurfaceAt(__Me,"Fire",2,2)
+	StartTimer("CMBHC_SpitfireTotem_CreateSurface_Timer3",0.5,0)
+		
+EVENT OnTimer_CreateSurface_04
+ON
+	OnTimer("CMBHC_SpitfireTotem_CreateSurface_Timer3")
+ACTIONS
+	CreateSurfaceAt(__Me,"Fire",2.5,2)
+	
+EVENT OnDie_Explode
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	ExplodeAt(__Me,"Projectile_EnemyFireball",-1)

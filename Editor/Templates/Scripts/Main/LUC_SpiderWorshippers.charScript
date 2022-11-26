@@ -1,0 +1,76 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	EXTERN CHARACTER:%LeftEgg = null
+	EXTERN CHARACTER:%RightEgg = null
+	EXTERN CHARACTER:%SouthernEgg1 = null
+	EXTERN CHARACTER:%SouthernEgg2 = null
+
+//------------------------
+BEHAVIOUR
+
+REACTION State_Worshipping_LeftEgg, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterLookAt(%LeftEgg)
+		GetWeightedRandom(%currentAction,"Action_Worship",INT:6,"Action_DoNothing",INT:2,"Action_Speak",INT:1)
+		SetPriority(%currentAction, 1100)
+		
+REACTION State_Worshipping_RightEgg, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterLookAt(%RightEgg)
+		GetWeightedRandom(%currentAction,"Action_Worship",INT:6,"Action_DoNothing",INT:2,"Action_Speak",INT:1)
+		SetPriority(%currentAction, 1100)
+		
+REACTION State_Worshipping_SouthernEgg1, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterLookAt(%SouthernEgg1)
+		GetWeightedRandom(%currentAction,"Action_Worship",INT:6,"Action_DoNothing",INT:2,"Action_Speak",INT:1)
+		SetPriority(%currentAction, 1100)
+
+REACTION State_Worshipping_SouthernEgg2, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterLookAt(%SouthernEgg2)
+		GetWeightedRandom(%currentAction,"Action_Worship",INT:6,"Action_DoNothing",INT:2,"Action_Speak",INT:1)
+		SetPriority(%currentAction, 1100)		
+
+REACTION State_Crying, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+	FLOAT:_Timer
+ACTIONS
+	GetWeightedRandom(_Animation,"Crying_01",FLOAT:15,"Depressed_01",FLOAT:5)
+	CharacterPlayAnimation(_Animation)
+	GetRandomBetween(_Timer, 2, 6)
+	Sleep(_Timer)
+
+REACTION Action_Worship, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterPlayAnimation(Worship_01)
+		SetPriority(%currentAction,0)
+
+REACTION Action_DoNothing, 0
+	USAGE PEACE
+	VARS
+		FLOAT:_SleepValue
+	ACTIONS
+		GetRandomBetween(_SleepValue,0,2)
+		Sleep(_SleepValue)
+		SetPriority(%currentAction,0)
+		
+REACTION Action_Speak, 0
+	USAGE PEACE
+	VARS
+		FIXEDSTRING:_worshipperText
+	ACTIONS
+		GetRandom(_worshipperText,"LUC_SpiderWorshipper_01","LUC_SpiderWorshipper_02","LUC_SpiderWorshipper_03","LUC_SpiderWorshipper_04","LUC_SpiderWorshipper_05","LUC_SpiderWorshipper_06","LUC_SpiderWorshipper_07")
+		DisplayText(__Me,_worshipperText,4)
+		Sleep(10)
+		SetPriority(%currentAction,0)

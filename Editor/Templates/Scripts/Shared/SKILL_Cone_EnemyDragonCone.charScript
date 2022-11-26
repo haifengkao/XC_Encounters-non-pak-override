@@ -1,0 +1,84 @@
+#TEMPLATE "_SKILL_Base" : Cone_EnemyDragonCone
+
+INIT
+CHARACTER:__Me
+FLOAT:%SkillTargetScore_Cone_EnemyDragonCone=-1000000
+// [GLOBAL_VARS]
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_Cone_EnemyDragonCone
+VARS
+	// [CALC_VARS]
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_Cone_EnemyDragonCone")
+ACTIONS
+	Set(%SkillTargetScore_Cone_EnemyDragonCone, -1000000)
+
+	// [CALC_ACTIONS_PRE]
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	IterateCharactersInCombat(__Me, "CalculateTarget_Cone_EnemyDragonCone", Random, Vitality)
+	IF "!c1"
+		IsEqual(%SkillTargetChar_Cone_EnemyDragonCone, null)
+	THEN
+		Add(%ActionScore_Cone_EnemyDragonCone, %SkillTargetScore_Cone_EnemyDragonCone)
+	ENDIF
+	// [~CALC_ACTIONS]
+
+	
+
+	
+// Calculate the character we should attack
+EVENT CalculateTarget_Cone_EnemyDragonCone
+VARS	
+	CHARACTER:_Char
+	// [CALC_TARGET_VARS]
+	FLOAT:_Score
+	// [~CALC_TARGET_VARS]
+ON
+	OnIterateCharacter(_Char, "CalculateTarget_Cone_EnemyDragonCone")	
+ACTIONS
+	// [CALC_CHAR_TARGET_ACTIONS_PRE]
+	Set(_Score, 0.0)
+	// [~CALC_CHAR_TARGET_ACTIONS_PRE]
+	// [CALC_CHAR_TARGET_ACTIONS]
+	IF "(!c1&!c2&!c3)"
+	    CharacterIsDead(_Char) // c1
+	    CharacterHasStatus(_Char, INVISIBLE) // c2
+	    CharacterHasStatus(_Char, SNEAKING) // c3
+	THEN
+	    IF "(c1)"
+	        CharacterHasStatus(_Char, AGGRO_MARKED) // c1
+	    THEN
+	        Add(_Score, 5.0)
+	    ENDIF
+	    // Can see score calculation
+	    IF "!c1"
+	    	CharacterCanSee(__Me, _Char)
+	    THEN
+	    	Add(_Score, -10.0)
+	    ENDIF
+	    
+	    IF "c1"
+	    	IsGreaterThen(_Score, %SkillTargetScore_Cone_EnemyDragonCone)
+	    THEN
+	    	Set(%SkillTargetChar_Cone_EnemyDragonCone, _Char)
+	    	Set(%SkillTargetScore_Cone_EnemyDragonCone, _Score)
+	    ENDIF	
+	ENDIF
+	// [~CALC_CHAR_TARGET_ACTIONS]
+	
+	
+	
+	
+	
+	
+	
+	

@@ -1,0 +1,21 @@
+INIT
+	ITEM:__Me
+	EXTERN STRING:%DialogKeyNoLastDigit = null
+	EXTERN INT:%DigitMaxRange = 1
+	EXTERN FLOAT:%DisplayTime = 5
+
+EVENTS
+
+EVENT OnClick
+	VARS
+		CHARACTER:_Source
+		INT:_Digit
+		STRING:_TextStr
+		FIXEDSTRING:_Text
+	ON
+		OnUseItem(_Source,__Me)
+	ACTIONS
+		GetRandomBetween(_Digit, 1, %DigitMaxRange)
+		Print(_TextStr, "[1][2]", %DialogKeyNoLastDigit, _Digit)
+		Cast(_Text, _TextStr)
+		DisplayText(_Source, _Text, %DisplayTime)

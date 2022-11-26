@@ -1,0 +1,76 @@
+INIT
+	CHARACTER:__Me
+
+//-------------	
+BEHAVIOUR
+REACTION BlackCultist_UsePhoenixDive, 500
+USAGE COMBAT
+VARS
+	CHARACTER:_Player
+	INT:_Failures=0
+	INT:_Successes=0
+	FLOAT:_Angle
+	FLOAT:_Dist
+	FLOAT:_DistBtwMeAndPlayer
+	FLOAT3:_Destination
+	FLOAT3:_PosOffset
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&c4&c5&(c6|!c7)"
+	CharacterCanCast(__Me,"Jump_EnemyPhoenixDive")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Jump_EnemyPhoenixDive")	
+	CharacterGet(_Player,__Me,50,Lowest,Distance,Enemy)
+	CharacterIsPlayer(_Player)
+	GetDistance(_DistBtwMeAndPlayer,__Me,_Player)
+	IsGreaterThen(_DistBtwMeAndPlayer,7)
+	CharacterCanSee(__Me,_Player)
+ACTIONS
+	WHILE "c1&c2"
+		IsLessThen(_Successes,1)
+		IsLessThen(_Failures,15)
+	DO
+		IF "c1"
+			GetPosition(_Player,_Destination)
+		THEN
+			Set(_PosOffset,{1;0;0})
+			GetRandomBetween(_Angle,0,360)
+			GetRandomBetween(_Dist,1.5,2.5)
+			RotateY(_PosOffset,_Angle)
+			Multiply(_PosOffset,_Dist)
+			Add(_Destination,_PosOffset)
+		ENDIF
+		IF "c1"
+			FindValidPosition(_Destination,3)
+		THEN
+			//CharacterMoveInRange(_Destination,_MinRange,_MaxRange,1)
+			CharacterUseSkill("Jump_EnemyPhoenixDive",_Destination)
+			Add(_Successes,1)
+		ELSE
+			Add(_Failures,1)
+		ENDIF
+	ENDWHILE
+	IF "c1"
+		IsEqual(_Failures,15)
+	THEN
+		Set(_Failures,0)
+		CharacterEndTurn()
+	ENDIF
+	Set(_Successes,0)
+	Set(_Failures,0)
+	SetPriority("BlackCultist_UsePhoenixDive",0)
+INTERRUPT
+	Reset()
+
+//-------------
+EVENTS
+EVENT OnInit_GiveSpells
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill("Jump_EnemyPhoenixDive")
+	
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("BlackCultist_UsePhoenixDive",500)

@@ -1,0 +1,14 @@
+INIT
+	ITEM:__Me
+
+EVENTS
+
+EVENT OnClick
+	VARS
+		FIXEDSTRING:_Text
+		CHARACTER:_Char
+	ON
+		OnUseItem(_Char,__Me)
+	ACTIONS
+		GetRandom(_Text, "LUC_WC_Mirror_01", "LUC_WC_Mirror_02", "LUC_WC_Mirror_03", "LUC_WC_Mirror_04")
+		DisplayText(_Char, _Text, 4)

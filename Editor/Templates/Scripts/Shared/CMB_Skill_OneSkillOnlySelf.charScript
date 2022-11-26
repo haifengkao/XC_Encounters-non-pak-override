@@ -1,0 +1,68 @@
+#INCLUDE Base
+
+INIT
+USING Base
+CHARACTER:__Me
+CHARACTER:%oneSkillSelfTarget=null
+EXTERN INT:%frequencyOSSelfStartAt=0
+EXTERN SKILL:%chooseSelfSkill=null
+EXTERN INT:%frequencyOSSelf=2
+EXTERN INT:%priorityOSSelf=400
+EXTERN FLOAT:%whenHealthEqOrLowerOSSelf=0.8
+EXTERN FIXEDSTRING:%saveAPTextSelf="CMB_MageSkipsTurnToCastOnSelf"
+EXTERN INT:%displaySaveAPTextSelf=1
+
+BEHAVIOUR
+REACTION CastSkillOnSelf,0
+USAGE COMBAT
+VARS
+	FLOAT:_oneSkillOnlySelfHealth
+CHECK "c1&c2&!c3"
+	CharacterCanCast(__Me,%chooseSelfSkill,1)
+	CharacterGetStat(_oneSkillOnlySelfHealth,__Me,Vitality)
+	IsGreaterThen(_oneSkillOnlySelfHealth,%whenHealthEqOrLowerOSSelf)
+ACTIONS
+	IF "c1"
+		CharacterCanCast(__Me,%chooseSelfSkill,0)
+	THEN
+		CharacterUseSkill(%chooseSelfSkill,__Me)
+		Set(%frequencyOSSelfStartAt,0)
+		SetPriority("CastSkillOnSelf",0)
+	ELSE
+		IF "c1"
+			IsEqual(%displaySaveAPTextSelf,1)
+		THEN
+			DisplayText(__Me,%saveAPTextSelf,2)
+		ENDIF
+		CharacterPlayEffect(__Me, "FX_GP_Status_SkipTurn_A_Icon", "Dummy_OverheadFX")
+		CharacterEndTurn()
+	ENDIF
+
+EVENTS
+EVENT AddSkillOneSelf
+ON
+	OnInit()
+ACTIONS
+	IF "!c1"
+		IsEqual(%chooseSelfSkill,null)
+	THEN
+		CharacterAddSkill(%chooseSelfSkill)
+	ENDIF
+	
+EVENT SetFrequenceSelf
+ON
+	OnTurn()
+ACTIONS
+	IF "c1"
+		IsGreaterThen(%whenHealthEqOrLowerOSSelf,1)
+	THEN
+		DebugText(__Me,"Health cannot be bigger than one")
+		Set(%whenHealthEqOrLowerOSSelf,1)
+	ENDIF
+	IF "c1"
+		IsLessThen(%frequencyOSSelfStartAt,%frequencyOSSelf)
+	THEN		
+		Add(%frequencyOSSelfStartAt,1)
+	ELSE
+		SetPriority("CastSkillOnSelf",%priorityOSSelf)
+	ENDIF

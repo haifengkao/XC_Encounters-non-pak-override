@@ -1,0 +1,85 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter
+CHARACTER:__Me
+
+FIXEDSTRING:%CurrentAction = ""
+FIXEDSTRING:%PreviousAction = ""
+FIXEDSTRING:%CurrentAnimation = ""
+
+INT:%NumberOfAnimations =  1
+
+BEHAVIOUR
+
+REACTION ChooseAction, 1060
+USAGE PEACE
+ACTIONS
+	//CharacterSwitchWeaponType(OneHanded)
+	CharacterApplyStatus(__Me,UNSHEATHED,-1)
+	GetRandom(%CurrentAction, "GoToBarrel", "GoToCart","GoToMiningPoint")
+	GotoIfEqual(%PreviousAction, %CurrentAction, "Start")
+	Set(%PreviousAction, %CurrentAction)
+	SetPriority(%CurrentAction, 1070)
+
+REACTION GoToBarrel,0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(TRIGGER:LUC_PointMinerPlatform1_b4ea8887-3ee5-4f7f-a9b6-e531e816d0ef,0)
+	CharacterLookFrom(TRIGGER:LUC_PointMinerPlatform1_b4ea8887-3ee5-4f7f-a9b6-e531e816d0ef)
+	CharacterPlayAnimation("Fidget_Forward_01")
+	SetPriority(%CurrentAction,0)
+INTERRUPT
+	Reset()
+	
+REACTION GoToCart,0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(TRIGGER:LUC_Mine_Cart9_006065b3-876e-44ef-a256-75602e15818d,0)
+	CharacterLookFrom(TRIGGER:LUC_Mine_Cart9_006065b3-876e-44ef-a256-75602e15818d)
+	CharacterRemoveStatus(__Me,UNSHEATHED)
+	StartTimer("LUC_M_DisplayGrunt",1.5,0)
+	CharacterPlayAnimation("LoadingCart_01")
+	SetPriority(%CurrentAction,0)
+INTERRUPT
+	Reset()
+
+REACTION GoToMiningPoint,0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(TRIGGER:LUC_PointMinerPlatform2_28ebf3e2-9733-441e-8f8e-f5afe2896aeb,0)
+	CharacterLookFrom(TRIGGER:LUC_PointMinerPlatform2_28ebf3e2-9733-441e-8f8e-f5afe2896aeb)
+	GetRandom(%NumberOfAnimations, 2, 2, 2)
+	Set(%CurrentAnimation, "Mining_01")
+	SetPriority("LoopAnimation", 1080)
+INTERRUPT
+	Reset()
+
+REACTION LoopAnimation, 0
+VARS
+	INT:_Counter = 0
+USAGE PEACE
+ACTIONS
+	SetPriority(%CurrentAction, 0)
+	CharacterPlayAnimation(%CurrentAnimation)
+	Add(_Counter, 1)
+	IF "!c1"
+		IsGreaterThen(_Counter, %NumberOfAnimations)
+	THEN
+		Goto("Start")
+	ELSE
+		Set(_Counter, 0)
+		SetPriority("LoopAnimation", 0)
+	ENDIF
+INTERRUPT
+	SetPriority("LoopAnimation", 0)
+
+EVENTS
+EVENT GruntTimerIsUp
+VARS
+	FIXEDSTRING:_TextToDisplay = "LUC_M_FuseCartLoading_01"
+ON
+	OnTimer("LUC_M_DisplayGrunt")
+ACTIONS
+	GetRandom(_TextToDisplay, "LUC_M_FuseCartLoading_01", "LUC_M_FuseCartLoading_02", "LUC_M_FuseCartLoading_03")
+	DisplayText(__Me, _TextToDisplay, 3)	

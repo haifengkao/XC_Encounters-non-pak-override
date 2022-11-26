@@ -1,0 +1,29 @@
+INIT
+CHARACTER:__Me
+CHARACTER:%Rat = DAF_RatCatcherRat01_d72416e3-e669-4a5a-86ba-30cc2d26f19e
+CHARACTER:%Rat2 = DAF_RatCatcherRat02_3cfe338f-f8e8-49a5-86f2-d1262c979d6d
+INT:%GiveCommentOnRat = 0
+
+BEHAVIOUR
+REACTION GiveRatComment,1100
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%GiveCommentOnRat,1)
+ACTIONS
+	Check()
+	CharacterLookAt(%Rat)
+	DisplayText(__Me,"DAF_Ratcatcher_Script_0",3) // Hey, get back here!
+	CharacterPlayAnimation("idle1")
+	CharacterLookAt(%Rat2)
+	DisplayText(__Me,"DAF_Ratcatcher_Script_1",3) // See that? Damn rats, what's wrong with you?
+	Label("StartGrunting")
+	Check()
+		IF "c1"
+			IsRandom(0.3)
+		THEN
+			DisplayText(__Me,"DAF_RatCatcher_Script_2",3) // Listen to me! Find the villagers!
+		ENDIF
+	Sleep(3)	
+	Goto("StartGrunting")
+INTERRUPT
+	Reset()

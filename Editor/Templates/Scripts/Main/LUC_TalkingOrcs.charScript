@@ -1,0 +1,43 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	CHARACTER:%LeftOrc = LUC_TalkingOrcB_2285787b-47a4-4162-a57e-9605692e9296
+	
+//---------------------------------
+BEHAVIOUR
+REACTION State_Chatting, 0
+	USAGE PEACE
+	ACTIONS
+		Sleep(5)
+		GetWeightedRandom(%currentAction, "Action_BeQuiet", INT:1, "Action_Talk",INT:2)
+		SetPriority(%currentAction, 1100)
+		
+REACTION Action_BeQuiet, 0
+	USAGE PEACE
+	ACTIONS
+		Sleep(5)
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)		
+		
+REACTION Action_Talk, 0
+	USAGE PEACE
+	CHECK "!c1&!c2&!c3"
+		IsInDialog(__Me)
+		IsInDialog(%LeftOrc)
+		CharacterIsDead(%LeftOrc)
+	ACTIONS
+		DialogStart("LUC_AD_OrcsTalking",%LeftOrc,__Me)
+		Sleep(15)
+		SetPriority(%currentAction, 0)
+
+		
+EVENTS
+	
+EVENT TakingDamageInterruptDialogue
+ON
+	OnCombatStarted()
+ACTIONS
+	DialogRequestStop("LUC_AD_OrcsTalking")

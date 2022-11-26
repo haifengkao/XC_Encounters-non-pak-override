@@ -1,0 +1,48 @@
+INIT
+	ITEM:__Me
+	INT:%FlameFX = 0
+	INT:%SmokeFX = 0
+	INT:%HasBeenWet = 0
+	FLOAT:%SmokeTimer
+
+//------------------------
+EVENTS
+EVENT FireBurns
+ON
+	OnInit()
+ACTIONS
+	Set(%FlameFX,0)
+	Set(%SmokeFX,0)
+	ItemPlayLoopEffect(%FlameFX,__Me,"FX_Env_CampFire_A")
+	//ItemSetOnStage(__Me,0)
+	
+EVENT WhenRaining
+ON
+	OnItemStatus(__Me,WET)
+ACTIONS
+	IF "c1"
+		IsEqual(%HasBeenWet,0)
+	THEN
+		StopLoopEffect(%FlameFX)
+		Set(%FlameFX,0)
+		ItemPlayLoopEffect(%SmokeFX,__Me,"FX_Env_Smoke_Fire_A")
+		Set(%HasBeenWet,1)
+		GetRandomBetween(%SmokeTimer,60,120)
+		StartTimer("SmokeClears",%SmokeTimer,1)
+	ENDIF
+
+EVENT SmokeTimerEnds
+ON
+	OnTimer("SmokeClears")
+ACTIONS
+	StopLoopEffect(%SmokeFX)
+	Set(%SmokeFX,0)
+	
+EVENT OnDestroy
+ON
+	OnShutdown()
+ACTIONS
+	StopLoopEffect(%SmokeFX)
+	Set(%SmokeFX,0)
+	StopLoopEffect(%FlameFX)
+	Set(%FlameFX,0)

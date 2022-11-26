@@ -1,0 +1,216 @@
+INIT
+	CHARACTER:__Me	
+	FLOAT3:%SelectedSpot1
+	FLOAT3:%SelectedSpot2
+	FLOAT3:%SelectedSpot3
+	FLOAT3:%SelectedSpot4
+	INT:%CastingFX_Handle
+	INT:%SelectedSpot1_FXHandle		
+	INT:%SelectedSpot2_FXHandle		
+	INT:%SelectedSpot3_FXHandle
+	INT:%SelectedSpot4_FXHandle	
+	INT:%Bool_FXRestore_Spot_01=0
+	INT:%Bool_FXRestore_Spot_02=0
+	INT:%Bool_FXRestore_Spot_03=0
+	INT:%Bool_FXRestore_Spot_04=0	
+	INT:%IterateStatus=1	
+	EXTERN INT:%IAmASkeleton=0
+	EXTERN INT:%CreateSurfaces_Current=2
+	EXTERN INT:%CreateSurfaces_Desired=3
+	
+//------------------------
+BEHAVIOUR
+REACTION Ragequin_LookAtTarget, 1500
+USAGE ALL
+VARS
+	CHARACTER:_Enemy
+CHECK "c1&c2"
+	IsEqual(%IAmASkeleton,0)
+	CharacterGet(_Enemy,__Me,20,Lowest,Distance,Enemy)
+ACTIONS
+	CharacterLookAt(_Enemy)
+	SetPriority("Ragequin_LookAtTarget",0)
+	
+REACTION Ragequin_GetPartyMembers_MarkGroundBeneathThem,0
+USAGE COMBAT
+VARS
+	CHARACTER:_Target	
+	FLOAT:_MyCurrentAP	
+CHECK "c1&c2&c3&c4&c5&!c6"
+	IsHardcore()
+	IsEqual(%IAmASkeleton,1)
+	CharacterGet(_Target,__Me,30,Highest,Distance,Enemy)
+	CharacterIsPlayer(_Target)
+	CharacterGetStat(_MyCurrentAP,__Me,ActionPoints)
+	IsLessThen(_MyCurrentAP,7)
+ACTIONS
+	SetPriority("Combat_AttackSetEnemy",0)
+	SetPriority("Combat_MoveToSetEnemy",0)
+	CharacterFleeFrom(Enemy,7)
+	CharacterLookAt(_Target)
+	CharacterPlayLoopEffect(%CastingFX_Handle,__Me,"FX_Skills_Fire_Fireball_Prepare_Dummy_A")
+	CharacterPlayAnimation("cast_long_loop",0,1)
+	CharacterPlayAnimation("cast_long_cast",1,0)
+	CharacterFleeFrom(Enemy,3)
+	Set(%IterateStatus,1)
+	IterateCharactersNear(__Me,30,"CMB_DAF_Ragequin_ScanForEnemies_Event",Lowest,Distance)
+	Set(%CreateSurfaces_Current,0)
+	Sleep(1)
+	StopLoopEffect(%CastingFX_Handle)
+	CombatLogText(__Me,"CYS_CMBHC_TUT_RagequinCreatesExplosiveArea",0,1)
+	SetPriority("Ragequin_GetPartyMembers_MarkGroundBeneathThem",0)
+INTERRUPT
+	Reset()	
+	
+//------------------------
+EVENTS
+EVENT OnInit_IfGhostApplyGhostMaterial
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		IsEqual(%Bool_FXRestore_Spot_01,1)
+	THEN
+		PlayLoopEffectAt(%SelectedSpot1_FXHandle,%SelectedSpot1,"FX_GP_LightPillarOrange_A")
+	ENDIF
+	IF "c1"
+		IsEqual(%Bool_FXRestore_Spot_02,1)
+	THEN
+		PlayLoopEffectAt(%SelectedSpot2_FXHandle,%SelectedSpot2,"FX_GP_LightPillarOrange_A")
+	ENDIF	
+	IF "c1"
+		IsEqual(%Bool_FXRestore_Spot_03,1)
+	THEN
+		PlayLoopEffectAt(%SelectedSpot3_FXHandle,%SelectedSpot3,"FX_GP_LightPillarOrange_A")
+	ENDIF
+	IF "c1"
+		IsEqual(%Bool_FXRestore_Spot_04,1)
+	THEN
+		PlayLoopEffectAt(%SelectedSpot4_FXHandle,%SelectedSpot4,"FX_GP_LightPillarOrange_A")
+	ENDIF		
+
+EVENT OnTurn_GeneralControl
+VARS
+	INT:_LavaFX1_Handle
+	INT:_LavaFX2_Handle
+	INT:_LavaFX3_Handle
+	INT:_LavaFX4_Handle
+ON
+	OnTurn()
+ACTIONS
+	IF "c1"
+		IsLessThen(%CreateSurfaces_Current,%CreateSurfaces_Desired)
+	THEN
+		Add(%CreateSurfaces_Current,1)
+	ELSE
+		SetPriority("Ragequin_GetPartyMembers_MarkGroundBeneathThem",1000)	
+	ENDIF
+//--	
+	IF "!c1"
+		IsEqual(%SelectedSpot1,null)
+	THEN
+		ExplodeAt(%SelectedSpot1,"Projectile_EnemyFireball",1,__Me)					
+		Set(%SelectedSpot1,null)		
+		StopLoopEffect(%SelectedSpot1_FXHandle)
+		Set(%Bool_FXRestore_Spot_01,0)
+	ENDIF
+	IF "!c1"
+		IsEqual(%SelectedSpot2,null)
+	THEN
+		ExplodeAt(%SelectedSpot2,"Projectile_EnemyFireball",1,__Me)									
+		Set(%SelectedSpot2,null)		
+		StopLoopEffect(%SelectedSpot2_FXHandle)	
+		Set(%Bool_FXRestore_Spot_02,0)		
+	ENDIF	
+	IF "!c1"
+		IsEqual(%SelectedSpot3,null)
+	THEN
+		ExplodeAt(%SelectedSpot3,"Projectile_EnemyFireball",1,__Me)									
+		Set(%SelectedSpot3,null)	
+		StopLoopEffect(%SelectedSpot3_FXHandle)	
+		Set(%Bool_FXRestore_Spot_03,0)		
+	ENDIF
+	IF "!c1"
+		IsEqual(%SelectedSpot4,null)
+	THEN
+		ExplodeAt(%SelectedSpot4,"Projectile_EnemyFireball",1,__Me)									
+		Set(%SelectedSpot4,null)	
+		StopLoopEffect(%SelectedSpot4_FXHandle)	
+		Set(%Bool_FXRestore_Spot_04,0)
+	ENDIF
+	SetPriority("Combat_AttackSetEnemy",7)
+	SetPriority("Combat_MoveToSetEnemy",6)
+	
+EVENT OnIterate_PlaceMarkOnTheGround_BeneathEnemies
+VARS
+	CHARACTER:_Enemy
+ON
+	OnIterateCharacter(_Enemy,"CMB_DAF_Ragequin_ScanForEnemies_Event")
+ACTIONS
+	IF "!c1&c2&!(c3|c4|c5|c6|c7)"
+		CharacterIsDead(_Enemy)												//!c1
+		CharacterIsInParty(_Enemy)											//c2
+		CharacterIsSummon(_Enemy)											//!c3
+		CharacterHasStatus(_Enemy,FROZEN)									//!c4
+		CharacterHasStatus(_Enemy,STUNNED)									//!c5
+		CharacterHasStatus(_Enemy,PETRIFIED)								//!c6
+		CharacterHasStatus(_Enemy,KNOCKED_DOWN)								//!c7
+	THEN
+		IF "c1&c2"
+			IsEqual(%IterateStatus,1)
+			GetPosition(_Enemy,%SelectedSpot1)
+		THEN
+			CharacterPlayEffect(_Enemy,"FX_GP_CameraShake_B")
+			PlayLoopEffectAt(%SelectedSpot1_FXHandle,%SelectedSpot1,"FX_GP_LightPillarOrange_A")	//FX_Skills_Fire_Summon_Prepare_A
+			Set(%Bool_FXRestore_Spot_01,1)
+			CreateSurfaceAt(%SelectedSpot1,CloudSmoke,1.5,1)
+			CharacterApplyStatus(_Enemy,WARM,1)
+			Add(%IterateStatus,1)			
+		ELIF "c1&c2"
+			IsEqual(%IterateStatus,2)
+			GetPosition(_Enemy,%SelectedSpot2)
+		THEN
+			CharacterPlayEffect(_Enemy,"FX_GP_CameraShake_B")
+			PlayLoopEffectAt(%SelectedSpot2_FXHandle,%SelectedSpot2,"FX_GP_LightPillarOrange_A")
+			Set(%Bool_FXRestore_Spot_02,1)
+			CreateSurfaceAt(%SelectedSpot2,CloudSmoke,1.5,1)
+			CharacterApplyStatus(_Enemy,WARM,1)
+			Add(%IterateStatus,1)			
+		ELIF "c1&c2"
+			IsEqual(%IterateStatus,3)		
+			GetPosition(_Enemy,%SelectedSpot3)
+		THEN
+			CharacterPlayEffect(_Enemy,"FX_GP_CameraShake_B")
+			PlayLoopEffectAt(%SelectedSpot3_FXHandle,%SelectedSpot3,"FX_GP_LightPillarOrange_A")
+			Set(%Bool_FXRestore_Spot_03,1)
+			CreateSurfaceAt(%SelectedSpot3,CloudSmoke,1.5,1)
+			CharacterApplyStatus(_Enemy,WARM,1)	
+			Add(%IterateStatus,1)			
+		ELIF "c1&c2"
+			IsEqual(%IterateStatus,4)
+			GetPosition(_Enemy,%SelectedSpot4)
+		THEN
+			CharacterPlayEffect(_Enemy,"FX_GP_CameraShake_B")
+			PlayLoopEffectAt(%SelectedSpot4_FXHandle,%SelectedSpot4,"FX_GP_LightPillarOrange_A")
+			Set(%Bool_FXRestore_Spot_04,1)
+			CreateSurfaceAt(%SelectedSpot4,CloudSmoke,1.5,1)
+			CharacterApplyStatus(_Enemy,WARM,1)			
+			Add(%IterateStatus,1)			
+		ENDIF
+	ENDIF
+	
+EVENT OnDie_CleanUp
+ON
+	OnDie(__Me,_,_,_)
+	OnCombatEnded()
+	OnDeactivate()
+ACTIONS
+	Set(%Bool_FXRestore_Spot_01,0)
+	Set(%Bool_FXRestore_Spot_02,0)
+	Set(%Bool_FXRestore_Spot_03,0)
+	Set(%Bool_FXRestore_Spot_04,0)
+	StopLoopEffect(%CastingFX_Handle)
+	StopLoopEffect(%SelectedSpot1_FXHandle)	
+	StopLoopEffect(%SelectedSpot2_FXHandle)		
+	StopLoopEffect(%SelectedSpot3_FXHandle)
+	StopLoopEffect(%SelectedSpot4_FXHandle)

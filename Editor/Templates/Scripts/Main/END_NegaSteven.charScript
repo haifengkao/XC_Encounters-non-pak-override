@@ -1,0 +1,36 @@
+INIT
+
+CHARACTER:__Me
+
+BEHAVIOUR 
+
+REACTION Care, 900
+USAGE PEACE
+VARS
+	FLOAT:_Sleep
+ACTIONS
+	
+	CharacterMoveTo(TRIGGER:END_Point_Behavior_NegaSteveShelf_00aac373-7767-4245-b382-b22959d8b1aa)
+	CharacterLookFrom(TRIGGER:END_Point_Behavior_NegaSteveShelf_00aac373-7767-4245-b382-b22959d8b1aa)
+	
+	GetRandomBetween(_Sleep, 15.0, 30.0)
+	Sleep(_Sleep)
+
+	
+	CharacterMoveTo(TRIGGER:END_Point_Behavior_NegaSteveThelyron_023d06de-d239-46a3-9765-ab356a855a1a)
+	CharacterLookFrom(TRIGGER:END_Point_Behavior_NegaSteveThelyron_023d06de-d239-46a3-9765-ab356a855a1a)
+	
+	GetRandomBetween(_Sleep, 15.0, 30.0)
+	Sleep(_Sleep)
+	
+	IF "c1&c2"
+		CharacterCanSee(__Me, CHARACTER:END_NegaThelyron_3be2623b-8072-4beb-812e-0e2de195a633, 1)
+		IsRandom(0.4)
+	THEN		
+		DialogStart("END_AD_NegaPatientWatcher_Carry1", __Me)
+	ENDIF
+	
+	GetRandomBetween(_Sleep, 15.0, 30.0)
+	Sleep(_Sleep)
+
+	Reset()

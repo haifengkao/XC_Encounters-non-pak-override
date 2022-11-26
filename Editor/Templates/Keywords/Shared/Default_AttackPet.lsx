@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<save>
+    <header version="2" time="1402839440" />
+    <version major="1" minor="3" revision="0" build="0" />
+    <region id="keywordDialog">
+        <node id="root">
+            <attribute id="KeywordVoiced" value="0" type="19" />
+            <attribute id="keywordAutoImport" value="0" type="19" />
+            <attribute id="keywordName" value="Default_AttackPet" type="22" />
+            <attribute id="PlayGreeting" value="0" type="19" />
+            <children>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="386b2a7f-05c8-479f-a781-a6e6603ba8aa" type="22" />
+                    <attribute id="keywordContentMapValue" value="What kind of coward does violence to an harmless creature? If you so much as raise a hand to my little friend again, you&apos;ll be sorry!" handle="h351a6c78gbd02g437dg9c85g733660b32516" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="50741bd7-803f-4b93-a26a-3255a06d5d18" type="22" />
+                    <attribute id="keywordContentMapValue" value="Greeting" handle="h7f890f24g8572g4902g90b4gd362b7e9bdf2" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="cc87af83-9ebe-43c1-beb2-065ad2c3bff5" type="22" />
+                    <attribute id="keywordContentMapValue" value="Guards! Quickly! This bloodthirsty monster is out to slit my humble creature&apos;s throat!" handle="h7e80a4e5gbde8g44c8g87b8gafa724923137" type="28" />
+                </node>
+                <node id="keywordNode">
+                    <attribute id="keywordActions" value="" type="23" />
+                    <attribute id="keywordConditions" value="" type="23" />
+                    <attribute id="keywordDisplayedText" value="50741bd7-803f-4b93-a26a-3255a06d5d18" type="22" />
+                    <attribute id="keywordId" value="Greeting" type="22" />
+                    <attribute id="keywordLast" value="0" type="19" />
+                    <attribute id="keywordOwner" value="-1" type="4" />
+                    <attribute id="keywordShow" value="0" type="19" />
+                    <attribute id="keywordSource" value="0" type="5" />
+                    <children>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value="CONDITION IsCharacterFlag(&quot;EVENT_CallingGuards&quot;,1,1)&#x0D;&#x0A;CHECK !c" type="23" />
+                            <attribute id="keywordEmotion" value="1" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="386b2a7f-05c8-479f-a781-a6e6603ba8aa" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="ACTION CallGuards()" type="23" />
+                            <attribute id="keywordConditions" value="CONDITION IsCharacterFlag(&quot;EVENT_CallingGuards&quot;,1,1)&#x0D;&#x0A;CHECK c" type="23" />
+                            <attribute id="keywordEmotion" value="1" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="cc87af83-9ebe-43c1-beb2-065ad2c3bff5" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value="CONDITION IsCharacterFlag(&quot;EVENT_CallingGuards&quot;,1,1)&#x0D;&#x0A;CHECK c" type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordStub" value="1" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                        </node>
+                    </children>
+                </node>
+                <node id="keywordSpeakerNames" />
+            </children>
+        </node>
+    </region>
+</save>

@@ -1,0 +1,38 @@
+#INCLUDE CYS_BC_QuestGhost
+
+INIT
+	USING CYS_BC_QuestGhost
+	CHARACTER:__Me
+	TRIGGER:%Trigger1 = CYS_BC_Point_Nemris1_be847c2a-1daa-4c44-8d53-e5676f9ed8e9
+	TRIGGER:%Trigger2 = CYS_BC_Point_Nemris2_c462c285-9b1a-43ee-920b-7f0e59321bbc
+	TRIGGER:%Trigger3 = CYS_BC_Point_Nemris3_4d4c678f-b5b7-45b1-a99a-9db4224c6398
+	TRIGGER:%Trigger4 = CYS_BC_Point_Nemris4_d1a047ac-135f-4e69-8668-cb6e6958df2c.
+	TRIGGER:%currentPoint = null
+	TRIGGER:%nextPoint = null
+
+BEHAVIOUR
+
+REACTION State_BeforeQuest, 0 OVERRIDE
+	USAGE PEACE
+	ACTIONS
+		GetRandom(%currentAction, "Action_Idle", "Action_FidlingBooks")
+		SetPriority(%currentAction, 1100)
+
+REACTION Action_FidlingBooks, 0  
+	USAGE PEACE
+	VARS
+		FIXEDSTRING:_Animation
+	ACTIONS
+		GetRandom(%nextPoint, %Trigger1, %Trigger2, %Trigger3, %Trigger4)
+		GotoIfEqual(%nextPoint, %currentPoint, "Start")
+		Set(%currentPoint, %nextPoint)
+		GetRandom(_Animation,"Look_Down_Short_01","Look_Down_Long_01","Fidget_Book_01","Fidget_Low_01")
+		CharacterMoveTo(%currentPoint)
+		CharacterLookFrom(%currentPoint)
+		Sleep(2)
+		CharacterPlayAnimation(_Animation)
+		DialogStart("CYS_BC_AD_Nemris",__Me)
+		Sleep(2)
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)

@@ -1,0 +1,33 @@
+#INCLUDE Base
+
+INIT
+USING Base
+CHARACTER:__Me
+
+BEHAVIOUR 
+
+REACTION ExtinguishFireStatus, 50
+USAGE COMBAT
+VARS
+	CHARACTER:_Ally
+CHECK "c1&c2"	
+	CharacterCanCast(__Me,Rain_Water)
+	CharacterGet(_Ally,__Me,15,Random,null,Ally,null,BURNING)
+ACTIONS
+	CharacterUseSkill(Rain_Water, _Ally)
+	Sleep(2)
+INTERRUPT
+	Reset()
+
+REACTION AttackEnemy,20
+USAGE COMBAT 
+VARS
+	CHARACTER:_Enemy
+CHECK "c1&c2"
+	CharacterCanCast(__Me,Projectile_Fireball)
+	CharacterGet(_Enemy,__Me,15,Lowest,Distance,Enemy,null,null)
+ACTIONS
+	CharacterUseSkill(Projectile_Fireball, _Enemy)
+	CharacterEndTurn()
+INTERRUPT
+	Reset()

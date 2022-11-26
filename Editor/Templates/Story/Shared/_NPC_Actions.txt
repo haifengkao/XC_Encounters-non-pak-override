@@ -1,0 +1,1895 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_GenericTimersDefined(1);
+
+KBSECTION
+IF
+_Player.DB_IsPlayer()
+AND
+CharacterGetUUID(_Player,_UUID)
+AND
+StringConcatenate("DoNotStartDialogsDueToGenericRules_",_UUID,_Timer)
+THEN
+GenericDialogTimers(_Player,_Timer);
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+// Functions implementing the behavior of friends or guards called for help.
+//
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// TryCallFriends((NPC)_Npc))
+//
+//		Try get help from friends. Successful if we are in a region for which friend groups
+//		are defined (see DB_InRegion/3).
+//		If friends come to help, they always attack the player.
+//		(Guards have more nuance and come as well to arrest or even to warn only.)
+//
+// DIRK 6/9/2001: DISABLED because:
+//		1) difficult to have a dialog first and then only have the friends attacking
+//		2) TryCallFriends causes the friends to attack, changing the alignment, causing the
+//				event AlignmentChanged/2 to be generated, causing AGAIN an attitude decrease AND a DoRevenge
+//		3) friends appearing INSIDE a house is not nice to see
+//
+PROC	
+TryCallFriends((CHARACTER)_Player,(CHARACTER)_Npc)
+THEN 
+NOP(1);
+
+/*PROC	TryCallFriends((NPC)_Npc) AND
+	DB_InRegion(NPC_Hero,_Region) AND		// take region of the player as region of the _Npc calling help
+	DB_InRegion(_Friend,_Region) AND _Friend != _Npc AND NOT // find all friends that are in this region
+	IsStoryNpc(_Friend) AND					// don't call story npcs!!
+	DefaultDialog(_Friend,_,_) AND			// don't call npcs dat don't have a dialog (cfr. Otho's pigs)
+	AlignmentValue(_Npc,_Friend,_Value) AND		// is this _Friend really a friend?
+	_Value > 50 AND
+	CharacterLevel(_Friend,_LevelFriend) AND		// is this Friend courageous enough to come and fight?
+	PlayerExp(ENGINE_GAME,_LevelPlayer,_,_) AND
+	_LevelPlayer <= _LevelFriend
+THEN	CallFriend(_Friend);		// random appear nearby player and attack
+	DB_NpcGotHelp(_Npc);
+
+// Must NOT be called if IsStoryNpc(_Friend) !!!
+PROC	CallFriend((NPC)_Friend) AND
+	Random(FUNCTION_Math,6,_Rnd) AND IntegerSum(FUNCTION_Math,_Rnd,16,_Distance) AND
+	Random(FUNCTION_Math,360,_IAngle) AND Real(FUNCTION_Math,_IAngle,_Angle)
+THEN	Appear(_Friend,NPC_Hero,_Distance,_Angle);
+	EnableDefaultBehavior(_Friend,0);
+	Attack(_Friend,NPC_Hero);
+*/
+	
+///////////////////////////////////////////////////////////////////////////////////////////
+// TryCallHelp((NPC)_Npc,(INTEGER)_Reason)
+//
+//		General call for help function.
+//		First, guards are tried (for success, we need to be in a GuardRegion)
+//		If no guards available, we check whether there are friends available.
+//		If not, TryCallHelp does nothing.
+//
+//		_Reason should be the player's action that caused the NPC to call for help.
+//		It determines the action of the guards (see GuardAction/2).
+//
+PROC	
+TryCallHelp(_,(CHARACTER)_Npc,(INTEGER)_Reason) 
+AND 
+DB_NpcGotHelp(_Npc)
+THEN	
+NOT DB_NpcGotHelp(_Npc);		// remove fact. If it is asserted, TryCallGuards and TryCallFriends will not bring on "extra" help
+
+PROC	
+TryCallHelp((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Reason)
+THEN	
+TryCallGuards(_Player,_Npc,_Reason);
+
+PROC	
+TryCallHelp((CHARACTER)_Player,(CHARACTER)_Npc,_) 
+AND
+NOT	DB_NpcGotHelp(_Npc)
+THEN	
+TryCallFriends(_Player,_Npc);
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+// Functions implementing NPC actions
+//
+
+// 2 special functions to prevent that several dialogs are started at the same time
+// due to generic rules:
+PROC	
+SetAndStartDialog_DisableDialogsCausedByGenericRules((CHARACTER)_Player,(CHARACTER)_Npc,(STRING)_Dialog)
+THEN	
+DisableTradeForDialog(_Player,_Dialog);
+SetAndStartDialog(_Player,_Npc,_Dialog);
+Dialog_DueToGenericRule_Started(_Player,_Dialog);
+DoNotStartDialogsDueToGenericRules(_Player,1);
+
+IF
+DB_Dead(_Char)
+AND
+DialogRunning(_Dialog,_Char,_Player)
+AND
+DoNotStartDialogsDueToGenericRules(_Player,1)
+THEN
+NOT DoNotStartDialogsDueToGenericRules(_Player,1);
+NOT _Player.DB_IsInDialog();
+SetStoryNpcStatus(_Player);
+
+IF
+DB_Dead(_Char)
+AND
+DialogRunning(_Dialog,_Char,_Player)
+THEN
+NOT _Char.DB_IsInDialog();
+NOT DialogRunning(_Dialog,_Char,_Player);
+NOT DialogRunning(_Player,1);
+
+IF
+DB_Dead(_Char)
+AND
+DB_CrimeInProgress(_Player,_Char, _Crime)
+THEN
+NOT DB_CrimeInProgress(_Player,_Char, _Crime);
+NOT DB_GenericsBlockedFor(_Player);
+ClearVandalismValue(_Player);
+
+IF		
+DialogEnded(_Dialog,_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,2)
+AND
+Dialog_DueToGenericRule_Started(_Player,_Dialog)
+AND
+GenericDialogTimers(_Player,_Timer)
+THEN	
+NOT Dialog_DueToGenericRule_Started(_Player,_Dialog);
+TimerLaunch(_Timer,1200);
+
+IF		
+DialogEnded(_Dialog,_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+Dialog_DueToGenericRule_Started(_Player,_Dialog)
+AND
+GenericDialogTimers(_Player,_Timer)
+THEN	
+NOT Dialog_DueToGenericRule_Started(_Player,_Dialog);
+TimerLaunch(_Timer,1200);
+
+IF		
+TimerFinished(_Timer)
+AND
+GenericDialogTimers(_Player,_Timer)
+THEN	
+NOT DoNotStartDialogsDueToGenericRules(_Player,1);
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// YellBattleCry_AttackingAlone((NPC)_Npc,(INTEGER)_Reason)
+//
+
+// For in case a group of _npc's has a simultaneous alignment change, we program a period in which
+// only one battlecry dialog will be started. The other npcs will just attack without saying anything.
+PROC	
+YellBattleCry_AttackingAlone((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Reason)
+AND 
+DoNotStartDialogsDueToGenericRules(_Player,1)
+THEN	
+ProcMakeNPCHostile(_Player,_Npc);
+NOT DB_GoHostileAfterDialog(_Npc,_Player);
+
+PROC	
+YellBattleCry_AttackingAlone((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Reason) 
+AND 
+NOT DoNotStartDialogsDueToGenericRules(_Player,1)
+THEN	
+DoYellBattleCry_AttackingAlone(_Player,_Npc,_Reason);
+
+
+// On popular request,.... ;) we removed the "yell battle cry" when it's just "I attack you":
+
+PROC	
+DoYellBattleCry_AttackingAlone((CHARACTER)_Player,(CHARACTER)_Npc,1)//TODO DEFINE ACTION_THEFT_FROM_ME 
+AND 
+NOT DB_EvilDude(_Npc)
+THEN
+DB_GoHostileAfterDialog(_Npc,_Player);
+ProcLaunchOverheadDialogReplacement(_Npc);
+SetAndStartDialog_DisableDialogsCausedByGenericRules(_Player,_Npc,"Hey_thief_I_will_teach_you");
+
+PROC	
+DoYellBattleCry_AttackingAlone((CHARACTER)_Player,(CHARACTER)_Npc,1) //TODO DEFINE ACTION_THEFT_FROM_ME
+AND
+DB_EvilDude(_Npc)
+THEN	
+SetAndStartDialog_DisableDialogsCausedByGenericRules(_Player,_Npc,"Nobody_steals_from_me");
+
+PROC	
+DoYellBattleCry_AttackingAlone((CHARACTER)_Player,(CHARACTER)_Npc,2) //TODO DEFINE ACTION_THEFT_NOT_FROM_ME
+AND
+NOT DB_EvilDude(_Npc)
+THEN
+ProcLaunchOverheadDialogReplacement(_Npc);
+DB_GoHostileAfterDialog(_Npc,_Player);
+SetAndStartDialog_DisableDialogsCausedByGenericRules(_Player,_Npc,"Hey_thief_I_will_teach_you");
+
+//PROC	DoYellBattleCry_AttackingAlone((NPC)_Npc,ACTION_THEFT_NOT_FROM_ME) AND DB_EvilDude(_Npc)
+//THEN	SetAndStartDialog_DisableDialogsCausedByGenericRules(_Npc,DIALOG_I_attack_you_EVIL);
+
+// Dante 06-05-2002
+// Re-enabled this, but added the condition for "not a scene".
+// I've received too many complaints about "npcs that attack without saying anything first".
+PROC
+ProcStartAttackDialog((CHARACTER)_Player,(CHARACTER)_Npc,(STRING)_Default)
+AND
+NOT DB_CustomAttackDialog(_Npc,_)
+THEN
+DB_I_Attack_Dialog(_Player,_Npc,_Default);
+SetAndStartDialog_DisableDialogsCausedByGenericRules(_Player,_Npc,_Default);
+
+PROC
+ProcStartAttackDialog((CHARACTER)_Player,(CHARACTER)_Npc,(STRING)_Default)
+AND
+DB_CustomAttackDialog((CHARACTER)_Npc,(STRING)_Dialog)
+THEN
+DB_I_Attack_Dialog(_Player,_Npc,_Dialog);
+ProcLaunchOverheadDialogReplacement(_Npc);
+SetAndStartDialog_DisableDialogsCausedByGenericRules(_Player,_Npc,_Dialog);
+
+PROC	
+DoYellBattleCry_AttackingAlone((CHARACTER)_Player,(CHARACTER)_Npc,_Reason)
+AND
+_Reason > 2 //TODO DEFINE ACTION_THEFT_NOT_FROM_ME
+AND
+NOT DB_EvilDude(_Npc) 
+AND
+NOT SceneRunning(_Player,1)
+THEN	
+ProcLaunchOverheadDialogReplacement(_Npc);
+DB_GoHostileAfterDialog(_Npc,_Player);
+ProcStartAttackDialog(_Player,_Npc,"I_attack_you");
+
+PROC
+DoYellBattleCry_AttackingAlone((CHARACTER)_Player,(CHARACTER)_Npc,_Reason)
+AND
+_Reason >  2 //TODO DEFINE ACTION_THEFT_NOT_FROM_ME
+AND
+DB_EvilDude(_Npc)
+THEN	
+ProcLaunchOverheadDialogReplacement(_Npc);
+ProcStartAttackDialog(_Player,_Npc,"I_attack_you_EVIL");
+
+IF
+DialogEnded(_Diag,_Inst)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_I_Attack_Dialog(_Player,_Npc,_Dialog)
+AND
+NOT DB_CrimeForcedStop(_Npc)
+THEN
+NOT DB_GoHostileAfterDialog(_Npc,_Player);
+ProcClearCrimesFor(_Npc,_Player);
+ProcCheckToMakeNPCsHostile(_Npc,_Player);
+
+PROC
+ProcCheckToMakeNPCsHostile((CHARACTER)_Npc,(CHARACTER)_Player)
+AND
+CharacterIsDead(_Npc,0)
+THEN
+ProcMakeNPCHostile(_Player,_Npc);
+
+PROC
+ProcCheckToMakeNPCsHostile((CHARACTER)_Npc,(CHARACTER)_Player)
+AND
+DB_Dead(_Npc)
+AND
+CharacterGetClosestAllyWhoSeesMeAndMyAttackerAndCanFight(_Npc,_Player,_Ally)
+THEN
+DoRevengeOnAttack(_Ally,_Player);
+
+IF
+DialogEnded(_Dialog,_Inst)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+AND
+DB_I_Attack_Dialog(_,_Npc,_Dialog)
+THEN
+NOT DB_CrimeForcedStop(_Npc);
+
+IF
+DialogEnded("Nobody_steals_from_me",_Inst)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+THEN
+NOT DB_GoHostileAfterDialog(_Npc,_Player);
+ProcMakeNPCHostile(_Player,_Npc);
+ProcClearCrimesFor(_Npc,_Player);
+
+IF
+DialogEnded(_Dialog,_Instance)
+AND
+NOT DB_AttackSrcDialog(_Instance)
+AND
+DB_DialogNPCs(_Instance,_Npc,1)
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+AND
+DB_GoHostileAfterDialog(_Npc,_Player)
+THEN
+NOT DB_GoHostileAfterDialog(_Npc,_Player);
+SetStoryNpcStatus(_Player);
+SetStoryNpcStatus(_Npc);
+ProcMakeNPCHostile(_Player,_Npc);
+
+IF
+DialogEnded(_,_Instance)
+AND
+DB_AttackSrcDialog(_Instance)
+THEN
+NOT DB_AttackSrcDialog(_Instance);
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// DoRevenge((NPC)_Npc,(INTEGER)_Reason):
+// 	_Npc will do what he can to get even with player:
+//
+//				If he dares, _Npc will attack player, calling friends.
+//				If he dares not to attack himself, _Npc will call for help.
+//				If no help available and npc does not dare to attack himself, he runs off.
+//
+// NOTE: StoryNpcs should never attack because of general behavior, hence it is ensured
+//				that storynpcs do not attack below.
+//	NOTE 2: DoRevenge should not be called for unintelligent npcs since it might start a dialog
+
+PROC	
+DoRevenge((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_)
+AND
+NoDefaultBehavior_AllNpcs(_Player,1)
+THEN	
+DoRevenge_Handled(_Player,_Npc);
+ProcClearGoHostileAfterDialog(_Npc);
+
+PROC
+DoRevenge((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_)
+AND
+DB_NoDefaultBehavior(_Npc)
+THEN	
+DoRevenge_Handled(_Player,_Npc);
+ProcClearGoHostileAfterDialog(_Npc);
+
+PROC
+ProcClearGoHostileAfterDialog((CHARACTER)_Npc)
+AND
+DB_CrimeInProgress( _Player,_Npc,_Type) 
+THEN
+NOT DB_CrimeInProgress( _Player,_Npc,_Type);
+
+PROC
+ProcClearGoHostileAfterDialog((CHARACTER)_Npc)
+AND
+DB_GoHostileAfterDialog(_Npc,_Player)
+THEN
+NOT DB_GoHostileAfterDialog(_Npc,_Player);
+
+//
+// STEP 0:
+// If trade busy, close the trade plate. (The npc will throw the player out or call the guards.)
+//
+PROC	
+DoRevenge((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_) 
+AND
+NOT DoRevenge_Handled(_Player,_Npc)
+THEN	
+StopTrading(_Player,_Npc);
+
+//
+// STEP 1:
+// See if _Npc attacks himself. If so, check if there are friends available to help:
+//
+
+// Do check:
+PROC	
+DoRevenge((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Reason) 
+AND
+NOT DoRevenge_Handled(_Player,_Npc)
+THEN	
+CheckIfAttacksHero(_Player,_Npc,_Reason);
+
+PROC	
+DoRevenge((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Reason) 
+AND 
+NOT DoRevenge_Handled(_Player,_Npc) 
+AND
+NpcAttacksHimself(_Player,_Npc)
+THEN
+TryCallFriends(_Player,_Npc);
+
+PROC	
+CheckIfAttacksHero((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Reason)
+THEN	
+NOT NpcAttacksHimself(_Player,_Npc);
+NOT NpcDoesNotAttackHimself(_Player,_Npc);		// this one only for internal use - callers should check on NpcAttacksHimself
+CheckIfGeneralStoryRulesMayInstructNpcToAttack(_Player,_Npc,_Reason);
+
+// Soldiers do not start fighting if it is about a theft:
+PROC
+CheckIfAttacksHero((CHARACTER)_Player,(CHARACTER)_Npc,2) //TODO DEFINE ACTION_THEFT_NOT_FROM_ME
+AND
+_Npc.DB_IsGuard()
+THEN
+NpcDoesNotAttackHimself(_Player,_Npc);
+
+PROC
+CheckIfAttacksHero((CHARACTER)_Player,(CHARACTER)_Npc,_Reason) 
+AND
+_Npc.DB_IsGuard()
+AND
+_Reason!=2//TODO DEFINE ACTION_THEFT_NOT_FROM_ME
+THEN
+NpcAttacksHimself(_Player,_Npc);
+
+// good guys attack if they are strong enough (being story npc blocks this):
+PROC	
+CheckIfAttacksHero((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Reason)
+AND
+NOT NpcDoesNotAttackHimself(_Player,_Npc) 
+AND
+GeneralStoryRulesMayInstructNpcToAttack(_Player,_Npc)
+AND
+CharacterGetLevel(_Npc,_NpcLevel) 
+AND
+CharacterGetLevel(_Player,_Level) 
+AND
+_Level <= _NpcLevel
+THEN	
+NpcAttacksHimself(_Player,_Npc);
+
+// evil dudes always attack (being story npc blocks this):
+PROC
+CheckIfAttacksHero((CHARACTER)_Player,(CHARACTER)_Npc,_) 
+AND 
+NOT NpcDoesNotAttackHimself(_Player,_Npc) 
+AND
+GeneralStoryRulesMayInstructNpcToAttack(_Player,_Npc) 
+AND
+DB_EvilDude(_Npc)
+THEN
+NpcAttacksHimself(_Player,_Npc);
+
+PROC	
+CheckIfAttacksHero((CHARACTER)_Player,(CHARACTER)_Npc,_)
+THEN	
+NOT GeneralStoryRulesMayInstructNpcToAttack(_Player,_Npc);
+
+// 
+// STEP 2:
+// If npc attacks himself and found friends to help, do revenge with friends:
+//
+PROC	
+DoRevenge((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Reason) 
+AND 
+NOT DoRevenge_Handled(_Player,_Npc) 
+AND
+NpcAttacksHimself(_Player,_Npc) 
+AND
+DB_NpcGotHelp(_Npc)
+THEN
+DoRevenge_WithFriends(_Player,_Npc,_Reason);
+DoRevenge_Handled(_Player,_Npc);
+
+// If the npc attacks himself and has some friends to help, say "let' teach him":
+// It could be refined what is said, depending on _Reason and/or player gender.
+PROC	
+DoRevenge_WithFriends((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Reason) 
+AND
+DoNotStartDialogsDueToGenericRules(_Player,1)
+THEN	
+Attack(_Npc,_Player);
+
+PROC	
+DoRevenge_WithFriends((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Reason)
+AND
+NOT DoNotStartDialogsDueToGenericRules(_Player,1)
+AND
+NOT DB_EvilDude(_Npc)
+THEN
+ProcLaunchOverheadDialogReplacement(_Npc);
+SetAndStartDialog_DisableDialogsCausedByGenericRules(_Player,_Npc,"Lets_teach_himher");
+
+IF	
+DialogEnded("Lets_teach_himher",_Inst)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+THEN
+Attack(_Npc,_Player);
+
+IF	
+DialogEnded("Lets_teach_himher",_Inst)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+THEN
+ProcCheckCallGuards(_Player,_Npc);
+
+PROC
+ProcCheckCallGuards((CHARACTER)_Player,(CHARACTER)_Npc)
+AND 
+NOT SummonGuardsAfterCallDialog(_Player,_,_,_)
+AND
+NOT GuardsGoTalkToHeroAfterCallDialog(_Player,_,_,_)
+AND
+NOT DoNotStartDialogsDueToGenericRules(_Player,1)
+THEN
+Story_CallGuards(_Player,_Npc,5);
+DB_CheckGuardsHandled(1);
+
+PROC
+ProcCheckCallGuards((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT DB_CheckGuardsHandled(1)
+THEN
+GetGuardsPronto(_Player,1);
+
+PROC
+ProcCheckCallGuards((CHARACTER)_Player,(CHARACTER)_Npc)
+THEN
+NOT DB_CheckGuardsHandled(1);
+
+PROC
+DoRevenge_WithFriends((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Reason)
+AND
+NOT DoNotStartDialogsDueToGenericRules(_Player,1)
+AND
+DB_EvilDude(_Npc)
+THEN
+ProcLaunchOverheadDialogReplacement(_Npc);
+SetAndStartDialog_DisableDialogsCausedByGenericRules(_Player,_Npc,"Lets_teach_himher_EVIL");
+
+IF		
+DialogEnded("Lets_teach_himher_EVIL",_Inst)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+THEN 
+Attack(_Npc,_Player);
+
+
+//
+// STEP 3:
+// If npc did not get help from friends or does not want to fight himself.
+// Try the guards:
+//
+PROC	
+DoRevenge((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Reason) 
+AND 
+NOT DoRevenge_Handled(_Player,_Npc)		// friends did not come
+THEN	
+TryCallGuards(_Player,_Npc,_Reason);
+
+// If the guards come AND the reason for the revenge is not attack from the hero,
+// then the npc abstains from fighting himself.
+PROC	
+DoRevenge((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Reason) 
+AND 
+NOT DoRevenge_Handled(_Player,_Npc) 
+AND
+DB_NpcGotHelp(_Npc) 
+AND
+_Reason < 5 //TODO define ACTION_ALIGNMENT_CHANGE_TO_ENEMY
+THEN	
+DisableAttackIfPossible(_Player,_Npc);
+
+PROC
+DisableAttackIfPossible((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT DB_IsGuard(_Npc)
+THEN
+NOT NpcAttacksHimself(_Player,_Npc);
+// Also, make the npc not attack the player, because guards are coming...
+Unhostile(_Player,_Npc);		// just makes npc unhostile, setting attitude at _MinAtt
+
+//
+// STEP 4:
+// act depending on whether npc attacks himself or not, and whether the guards come or not:
+// 
+PROC	
+DoRevenge((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Reason) 
+AND 
+NOT DoRevenge_Handled(_Player,_Npc) 
+AND
+DB_NpcGotHelp(_Npc) 
+AND		// from the guards
+NpcAttacksHimself(_Player,_Npc)
+THEN	
+DoRevenge_WithGuards(_Player,_Npc,_Reason);
+DoRevenge_Handled(_Player,_Npc);
+
+PROC	
+DoRevenge((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Reason)
+AND
+NOT DoRevenge_Handled(_Player,_Npc)
+AND
+NOT DB_NpcGotHelp(_Npc)
+AND
+NpcAttacksHimself(_Player,_Npc)
+THEN	
+YellBattleCry_AttackingAlone(_Player,_Npc,_Reason);
+DoRevenge_AttackIfNeeded(_Player,_Npc,_Reason);
+DoRevenge_Handled(_Player,_Npc);
+
+// If the npc attacks himself and has some friends to help, say "let' teach him":
+// It could be refined what is said, depending on _Reason and/or player gender.
+// When guards assist, it is always true: NOT DB_EvilDude(_Npc)
+PROC	
+DoRevenge_WithGuards((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Reason)
+AND
+DoNotStartDialogsDueToGenericRules(_Player,1)
+THEN	
+GetGuardsPronto(_Player,1);
+DoRevenge_AttackIfNeeded(_Player,_Npc,_Reason);
+
+PROC
+DoRevenge_WithGuards((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Reason)
+AND
+NOT DoNotStartDialogsDueToGenericRules(_Player,1)
+THEN
+DB_GuardCallReason(_Player,_Npc,_Reason);
+ProcLaunchOverheadDialogReplacement(_Npc);
+SetAndStartDialog_DisableDialogsCausedByGenericRules(_Player,_Npc,"Guards_Lets_teach_himher");
+
+IF		
+DialogEnded("Guards_Lets_teach_himher",_Inst)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_GuardCallReason(_Player,_Npc,_Reason)
+THEN	
+NOT DB_GuardCallReason(_Player,_Npc,_Reason);
+NpcAttacksHimself(_Player,_Npc);	//this was set, but is already unset when the dialog ends
+ProcRerouteGuardsIfneeded(_Player,_Reason);
+GetGuardsPronto(_Player,1);
+DoRevenge_AttackIfNeeded(_Player,_Npc,_Reason);
+NOT NpcAttacksHimself(_Player,_Npc);
+
+PROC
+ProcRerouteGuardsIfneeded((CHARACTER)_Player,(INTEGER)_Reason)
+AND
+_Reason<5	//don't do it for 5 and 6 (attack and trespass)
+THEN
+ProcRerouteSummonedGuardsForPlayer(_Player);
+
+//
+PROC	
+DoRevenge_AttackIfNeeded((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Reason) 
+AND
+NpcAttacksHimself(_Player,_Npc)
+AND
+NOT DB_GoHostileAfterDialog(_Npc,_Player)
+AND
+_Reason!=6
+THEN	
+Attack(_Npc,_Player);
+
+PROC	
+DoRevenge_AttackIfNeeded((CHARACTER)_Player,(CHARACTER)_Npc,6) 
+AND
+NpcAttacksHimself(_Player,_Npc)
+AND
+NOT DB_GoHostileAfterDialog(_Npc,_Player)
+AND
+NOT DB_GotActualGuardHelp(_Player,1)
+THEN	
+Attack(_Npc,_Player);
+
+// Following rules are always for NOT NpcAttacksHimself:
+//
+// If cowering npc has help, let him say an appropriate message:
+// Guards only come in aid to good npcs, so the rules below do not need to check if DB_EvilDude(_Npc)
+IF		
+DialogEnded("Catch_the_thief",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+THEN	
+GetGuardsPronto(_Player,1);
+
+IF		
+DialogEnded("Catch_the_vandal",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+THEN	
+NOT DB_GenericsBlockedFor(_Player);
+ClearVandalismValue(_Player);
+GetGuardsPronto(_Player,1);
+
+IF		
+DialogEnded("Catch_the_trespasser",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+THEN	
+ProcGoHostileIfNoGuards(_Player,_Npc);
+
+PROC
+ProcGoHostileIfNoGuards((CHARACTER)_Player,(CHARACTER)_Npc)
+THEN
+GetGuardsPronto(_Player,1);
+
+PROC
+ProcGoHostileIfNoGuards((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT DB_GotActualGuardHelp(_Player,1)
+THEN
+ProcMakeNPCHostile(_Player,_Npc);
+
+IF		
+DialogEnded("Dont_destroy_my_stuff_Please_Leave",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_CrimeInProgress(_Player,_Spotter,"Vandalism")
+THEN	
+NOT DB_GenericsBlockedFor(_Player);
+ClearVandalismValue(_Player);
+NOT DB_CrimeInProgress(_Player,_Spotter,"Vandalism");
+
+IF		
+DialogEnded("Save_my_property",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+THEN	
+NOT DB_GenericsBlockedFor(_Player);
+ClearVandalismValue(_Player);
+GetGuardsPronto(_Player,1);
+
+IF		
+DialogEnded("Guard_save_my_property",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+THEN	
+NOT DB_GenericsBlockedFor(_Player);
+ClearVandalismValue(_Player);
+GetGuardsPronto(_Player,1);
+
+IF		
+DialogEnded("Save_me",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+THEN	
+GetGuardsPronto(_Player,1);
+
+///
+//got help, but didn't act on this yet
+PROC	
+DoRevenge((CHARACTER)_Player,_Npc,6) 
+AND
+NOT DoRevenge_Handled(_Player,_Npc) 
+AND
+DB_NpcGotHelp(_Npc)
+THEN
+ProcDoTrespassingRevenge(_Player,_Npc);
+
+PROC	
+ProcDoTresspassingRevenge1((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND 
+DoNotStartDialogsDueToGenericRules(_Player,1)
+THEN	
+GetGuardsPronto(_Player,1);
+
+PROC	
+ProcDoTresspassingRevenge1((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT DoNotStartDialogsDueToGenericRules(_Player,1)
+THEN	
+ProcLaunchOverheadDialogReplacement(_Npc);
+SetAndStartDialog_DisableDialogsCausedByGenericRules(_Player,_Npc,"Catch_the_trespasser");
+
+PROC
+ProcDoTrespassingRevenge((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT DB_IsHostile(_Player,_Npc)
+THEN
+ProcDoTresspassingRevenge1(_Player,_Npc);
+DoRevenge_Handled(_Player,_Npc);
+
+PROC
+ProcDoTrespassingRevenge((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_IsHostile(_Player,_Npc)
+THEN
+ProcClearGuardInfoIfNotSummoned(_Player);
+ProcRerouteSummonedGuardsForPlayer(_Player);
+DoRevenge(_Player,_Npc,5);	//he's going to go hostile
+
+//
+PROC	
+DoRevenge((CHARACTER)_Player,_Npc,1) //TODO DEFINE ACTION_THEFT_FROM_ME
+AND
+NOT DoRevenge_Handled(_Player,_Npc) 
+AND
+DB_NpcGotHelp(_Npc)
+THEN
+ProcDoThieveryRevenge(_Player,_Npc,1);
+
+PROC
+ProcDoThieveryRevenge((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_)
+AND
+DB_IsHostile(_Player,_Npc)
+THEN
+ProcClearGuardInfoIfNotSummoned(_Player);
+ProcRerouteSummonedGuardsForPlayer(_Player);
+DoRevenge(_Player,_Npc,5);	//he's going to go hostile
+
+PROC
+ProcDoThieveryRevenge((CHARACTER)_Player,(CHARACTER)_Npc,1)
+AND
+NOT DB_IsHostile(_Player,_Npc)
+THEN
+DoRevenge_CatchTheThief1(_Player,_Npc);
+DoRevenge_Handled(_Player,_Npc);
+
+PROC
+ProcClearGuardInfoIfNotSummoned((CHARACTER)_Player)
+AND
+SummonedGuards(_Player,_Type)
+AND
+NOT SummonedGuards(_Player,_,_Type,_,_,_)
+THEN
+NOT SummonedGuards(_Player,_Type);
+
+PROC
+ProcRerouteSummonedGuardsForPlayer((CHARACTER)_Player)
+AND
+DB_PlayerSummonID(_Player,_SummonID)
+AND
+SummonedGuards(_Player,_Region,_Type,_N,_Reason,_SummonID) 
+AND
+NOT CleaningUpGuards(_Player,_SummonID)
+THEN
+NOT SummonedGuards(_Player,_Region,_Type,_N,_Reason,_SummonID);
+SummonedGuards(_Player,_Region,_Type,_N,5,_SummonID);
+
+PROC
+ProcRerouteSummonedGuardsForPlayer((CHARACTER)_Player)
+AND
+GuardsGoTalkToHeroAfterCallDialog(_Player,_Type,_N,_Reason)
+THEN
+NOT GuardsGoTalkToHeroAfterCallDialog(_Player,_Type,_N,_Reason);
+GuardsGoTalkToHeroAfterCallDialog(_Player,_Type,_N,5);
+
+PROC
+ProcRerouteSummonedGuardsForPlayer((CHARACTER)_Player)
+AND
+SummonGuardsAfterCallDialog(_Player,_Region,_Type,_Reason)
+THEN
+NOT SummonGuardsAfterCallDialog(_Player,_Region,_Type,_Reason);
+SummonGuardsAfterCallDialog(_Player,_Region,_Type,5);
+
+PROC	
+DoRevenge_CatchTheThief1((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND 
+DoNotStartDialogsDueToGenericRules(_Player,1)
+THEN	
+GetGuardsPronto(_Player,1);
+
+PROC	
+DoRevenge_CatchTheThief1((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT DoNotStartDialogsDueToGenericRules(_Player,1)
+THEN
+ProcLaunchOverheadDialogReplacement(_Npc);
+SetAndStartDialog_DisableDialogsCausedByGenericRules(_Player,_Npc,"Catch_the_thief");
+
+//
+PROC
+DoRevenge((CHARACTER)_Player,(CHARACTER)_Npc,2) //TODO DEFINE ACTION_THEFT_NOT_FROM_ME
+AND
+NOT DoRevenge_Handled(_Player,_Npc)
+AND 
+DB_NpcGotHelp(_Npc)
+THEN	
+ProcDoThieveryRevenge(_Player,_Npc,2);
+
+PROC
+ProcDoThieveryRevenge((CHARACTER)_Player,(CHARACTER)_Npc,2)
+AND
+NOT DB_IsHostile(_Player,_Npc)
+THEN
+DoRevenge_CatchTheThief2(_Player,_Npc);
+DoRevenge_Handled(_Player,_Npc);
+
+PROC	
+DoRevenge_CatchTheThief2((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DoNotStartDialogsDueToGenericRules(_Player,1)
+THEN
+GetGuardsPronto(_Player,1);
+
+PROC	
+DoRevenge_CatchTheThief2((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+NOT DoNotStartDialogsDueToGenericRules(_Player,1)
+AND
+NOT DB_IsGuard(_Npc)
+THEN
+ProcLaunchOverheadDialogReplacement(_Npc);
+SetAndStartDialog_DisableDialogsCausedByGenericRules(_Player,_Npc,"Catch_the_thief");
+
+PROC	
+DoRevenge_CatchTheThief2((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+NOT DoNotStartDialogsDueToGenericRules(_Player,1)
+AND
+DB_IsGuard(_Npc)
+THEN
+GetGuardsPronto(_Player,1);
+
+//
+PROC	
+DoRevenge((CHARACTER)_Player,_Npc,4)//TODO define ACTION_DESTROY_PROPERTY
+AND
+NOT DoRevenge_Handled(_Player,_Npc) 
+AND
+DB_NpcGotHelp(_Npc)
+THEN
+DoRevenge_SaveMyProperty(_Player,_Npc);
+DoRevenge_Handled(_Player,_Npc);
+
+PROC
+DoRevenge_SaveMyProperty((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND 
+DoNotStartDialogsDueToGenericRules(_Player,1)
+THEN
+GetGuardsPronto(_Player,1);
+
+PROC	
+DoRevenge_SaveMyProperty((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT DoNotStartDialogsDueToGenericRules(_Player,1)
+AND
+NOT DB_IsGuard(_Npc)
+THEN	
+ProcLaunchOverheadDialogReplacement(_Npc);
+SetAndStartDialog_DisableDialogsCausedByGenericRules(_Player,_Npc,"Save_my_property");
+
+PROC	
+DoRevenge_SaveMyProperty((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT DoNotStartDialogsDueToGenericRules(_Player,1)
+AND
+DB_IsGuard(_Npc)
+THEN	
+ProcLaunchOverheadDialogReplacement(_Npc);
+SetAndStartDialog_DisableDialogsCausedByGenericRules(_Player,_Npc,"Guard_save_my_property");
+
+//
+PROC	
+DoRevenge((CHARACTER)_Player,_Npc,5) //TODO define ACTION_ALIGNMENT_CHANGE_TO_ENEMY
+AND 
+NOT DoRevenge_Handled(_Player,_Npc) 
+AND 
+DB_NpcGotHelp(_Npc)
+THEN
+DoRevenge_SaveMe(_Player,_Npc);
+DoRevenge_Handled(_Player,_Npc);
+
+PROC	
+DoRevenge_SaveMe((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DoNotStartDialogsDueToGenericRules(_Player,1)
+THEN
+GetGuardsPronto(_Player,1);
+
+PROC	
+DoRevenge_SaveMe((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT DoNotStartDialogsDueToGenericRules(_Player,1)
+AND
+NOT DB_IsGuard(_Npc)
+THEN	
+ProcLaunchOverheadDialogReplacement(_Npc);
+SetAndStartDialog_DisableDialogsCausedByGenericRules(_Player,_Npc,"Save_me");
+
+PROC	
+DoRevenge_SaveMe((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT DoNotStartDialogsDueToGenericRules(_Player,1)
+AND
+DB_IsGuard(_Npc)
+THEN	
+ProcLaunchOverheadDialogReplacement(_Npc);
+SetAndStartDialog_DisableDialogsCausedByGenericRules(_Player,_Npc,"Guards_Lets_teach_himher");
+
+// If an attacked but cowering npc does not get help, he runs away (not for storynpcs):
+PROC	
+DoRevenge((CHARACTER)_Player,_Npc,_) 
+AND 
+NOT DoRevenge_Handled(_Player,_Npc) 
+AND
+NOT DB_NpcGotHelp(_Npc) 
+AND
+NextDoRevengeDialogIsWarning(_Player,_Npc,_Dialog)
+THEN
+SetAndStartDialog(_Player,_Npc,_Dialog);
+DoRevenge_Handled(_Player,_Npc);
+
+// Do not run away if there is a warning dialog to play
+PROC	
+DoRevenge(_Player,_Npc,5) //TODO define ACTION_ALIGNMENT_CHANGE_TO_ENEMY
+AND 
+NOT DoRevenge_Handled(_Player,_Npc) 
+AND
+NOT DB_NpcGotHelp(_Npc)
+AND
+NOT DB_IsGuard(_Npc)
+THEN
+Runaway(_Player,_Npc);
+DoRevenge_Handled(_Player,_Npc);
+
+PROC	
+DoRevenge(_Player,_Npc,5) //TODO define ACTION_ALIGNMENT_CHANGE_TO_ENEMY
+AND 
+NOT DoRevenge_Handled(_Player,_Npc) 
+AND
+NOT DB_NpcGotHelp(_Npc)
+AND
+DB_IsGuard(_Npc)
+THEN
+ProcLaunchOverheadDialogReplacement(_Npc);
+SetAndStartDialog_DisableDialogsCausedByGenericRules(_Player,_Npc,"Guards_Lets_teach_himher");
+DoRevenge_Handled(_Player,_Npc);
+
+// So, a cowering npc that does not get help, but is not attacked, does show he is disgusted
+PROC	
+DoRevenge(_Player,_Npc,_) 
+AND 
+NOT DoRevenge_Handled(_Player,_Npc) 
+AND
+NOT DB_NpcGotHelp(_Npc)
+THEN
+DoDisgustedAction(_Player,_Npc);
+
+// Cleanup
+PROC	
+DoRevenge(_Player,_Npc,_)
+THEN	
+NOT NpcAttacksHimself(_Player,_Npc);
+NOT DB_NpcGotHelp(_Npc);
+NOT DoRevenge_Handled(_Player,_Npc);
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Runaway
+//
+
+// Storynpcs should stay where they are and keep their dialogs.
+// They cannot be attacked anyway.
+//PROC	Runaway((NPC)_Npc) AND NOT IsStoryNpc(_Npc)
+//THEN	SetDefaultDialog(_Npc,DIALOG_Runaway,1);		// from now on the npc always panics
+	
+// Do not run away if we cannot start DIALOG_Runaway:
+PROC
+Runaway((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND 
+NOT IsStoryNpc(_Npc) 
+AND 
+DoNotStartDialogsDueToGenericRules(_Player,1)
+AND
+DB_GoHostileAfterDialog(_Npc,_Player)		//we blocked through another behaviour, but we're supposed to go hostile so still do that
+THEN
+NOT DB_GoHostileAfterDialog(_Npc,_Player);
+SetStoryNpcStatus(_Npc);
+ProcMakeNPCHostile(_Player,_Npc);
+
+PROC
+Runaway((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND 
+NOT IsStoryNpc(_Npc) 
+AND 
+NOT DoNotStartDialogsDueToGenericRules(_Player,1)
+AND
+NOT DB_NoRunAway(_Npc)
+AND
+NOT DB_DidDialogRanAway(_Npc)
+THEN
+ProcLaunchOverheadDialogReplacement(_Npc);
+SetAndStartDialog_DisableDialogsCausedByGenericRules(_Player,_Npc,"Runaway");
+
+PROC
+Runaway((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND 
+NOT IsStoryNpc(_Npc) 
+AND 
+NOT DoNotStartDialogsDueToGenericRules(_Player,1)
+AND
+NOT DB_NoRunAway(_Npc)
+AND
+DB_DidDialogRanAway(_Npc)
+THEN
+ProcCheckIAttackYouRunawayDialog(_Player,_Npc);	//if this fails, we'll end up in the next rule
+
+PROC
+Runaway((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND 
+NOT IsStoryNpc(_Npc) 
+AND
+DB_NoRunAway(_Npc)
+THEN
+ProcCheckIAttackYouRunawayDialog(_Player,_Npc);	//if this fails, we'll end up in the next rule
+
+PROC
+ProcCheckIAttackYouRunawayDialog((CHARACTER)_Player,(CHARACTER)_Npc)
+AND 
+DoNotStartDialogsDueToGenericRules(_Player,1)
+THEN
+SetStoryNpcStatus(_Npc);
+ProcMakeNPCHostile(_Player,_Npc);
+
+PROC
+ProcCheckIAttackYouRunawayDialog((CHARACTER)_Player,(CHARACTER)_Npc)
+AND 
+NOT DoNotStartDialogsDueToGenericRules(_Player,1)
+THEN
+ProcLaunchOverheadDialogReplacement(_Npc);
+ProcStartAttackDialog(_Player,_Npc,"I_attack_you");
+
+IF		
+DialogEnded("Runaway",_Inst)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+CharacterIsDead(_Npc,0)	// _Npc can be killed in the mean time
+THEN	
+DB_DidDialogRanAway(_Npc);
+DoRunaway(_Player,_Npc);
+
+// Do the actual runaway, unless default behavior is blocked
+// NOTE: checking DB_NoDefaultBehavior is preferred over the more general IsStoryNpc.
+PROC 
+DoRunaway((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+NOT DB_NoDefaultBehavior(_Npc) 		// do not run away if no default behavior
+AND
+NOT NoDefaultBehavior_AllNpcs(_Player,1)
+AND
+NOT DB_NoRunAway(_Npc)
+THEN
+DoRunaway_1(_Player,_Npc);
+
+PROC 
+DoRunaway((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+DB_NoRunAway(_Npc)
+THEN
+ProcMakeNPCHostile(_Player,_Npc);
+
+// If the npc has default behavior, use that to walk away:
+PROC	
+DoRunaway_1((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND 
+Script(_Npc,"outside",(STRING)_,(INTEGER)_)
+THEN
+SelectScript(_Npc,"outside");
+DoRunaway_1Done(_Player,1);
+
+// else: use the predefined runaway locations to move to
+PROC	
+DoRunaway_1((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+NOT DoRunaway_1Done(_Player,1)
+AND
+CharacterGetUUID(_Npc,_Uuid)
+AND
+CharacterGetPosition(_Npc,_X,_Y,_Z)
+AND
+CharacterIsDead(_Npc,0)
+THEN	
+CharacterFleeOutOfSight(_Npc,_Uuid);
+DB_VanishedNPCs(_Npc,_Uuid);
+DB_VanishedNPCsPos(_Npc,_X,_Y,_Z);
+DecreaseReputation(_Player,1);		// npc goes gossiping in the local tavern
+// The _Npc will return home after a while, via the default behavior. (If present.)
+DoRunaway_1Done(_Player,1);
+
+IF
+CharacterEvent(_Npc,_Event)
+AND
+DB_VanishedNPCs(_Npc,_Event)
+AND
+Random(30000,_Add)
+AND
+IntegerSum(_Add,60000,_Time)
+AND
+NOT DB_Combat(_Npc,_)
+THEN
+TimerLaunch(_Event,_Time);
+
+PROC
+ProcCharacterLeftCombat((CHARACTER)_,(INTEGER)_Id)
+AND
+DB_WasInCombat(_CheckNPC,_Id)
+AND
+DB_VanishedNPCs(_CheckNPC,_Event)
+AND
+Random(30000,_Add)
+AND
+IntegerSum(_Add,60000,_Time)
+THEN
+LaunchTimerIfCombatEnded(_Event,_Time,_Id);
+
+PROC
+LaunchTimerIfCombatEnded((STRING)_Event,(INTEGER)_Time,(INTEGER)_ID)
+AND
+NOT DB_Combat(_,_ID)
+THEN
+TimerLaunch(_Event,_Time);
+
+IF
+TimerFinished(_Event)
+AND
+DB_VanishedNPCs(_Npc,_Event)
+AND
+DB_VanishedNPCsPos(_Npc,_X,_Y,_Z)
+THEN
+NOT DB_VanishedNPCs(_Npc,_Event);
+NOT DB_VanishedNPCsPos(_Npc,_X,_Y,_Z);
+CharacterAppearAtPositionOutOfSightTo(_Npc,_X,_Y,_Z,0,0,"");
+
+PROC	
+DoRunaway_1((CHARACTER)_Player,(CHARACTER)_Npc)
+THEN	
+NOT DoRunaway_1Done(_Player,1);		// Cleanup
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// DoDisgustedAction
+//
+// Good for npcs that notice something bad about the player (e.g. stealing) but cannot DO
+// anything. (This can be because of several reasons: being storynpc, being to weak and no guards or friends around.)
+PROC	
+DoDisgustedAction((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+NOT NoDefaultBehavior_AllNpcs(_Player,1) 
+AND
+NOT DB_NoDefaultBehavior(_Npc) 
+AND
+DB_IsGuard(_Npc)
+THEN	
+ProcLaunchOverheadDialogReplacement(_Npc);
+ProcStartAttackDialog(_Player,_Npc,"I_attack_you");
+
+PROC	
+DoDisgustedAction((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+NOT NoDefaultBehavior_AllNpcs(_Player,1) 
+AND
+NOT DB_NoDefaultBehavior(_Npc) 
+AND
+NOT DB_IsGuard(_Npc)
+AND
+Random(3,_R)		// Pick a random disgusted action
+THEN	
+DoDisgustedAction(_Player,_Npc,_R);
+// Disgusted action 0: say something (if allowed) and walk away (we use DoRunaway for that)
+
+PROC	
+DoDisgustedAction((CHARACTER)_Player,(CHARACTER)_Npc,0) 
+AND
+DoNotStartDialogsDueToGenericRules(_Player,1)
+THEN
+DoRunaway(_Player,_Npc);
+
+PROC	
+DoDisgustedAction((CHARACTER)_Player,(CHARACTER)_Npc,0)
+AND 
+NOT DoNotStartDialogsDueToGenericRules(_Player,1)
+THEN	
+ProcLaunchOverheadDialogReplacement(_Npc);
+SetAndStartDialog_DisableDialogsCausedByGenericRules(_Player,_Npc,"YouScum");
+
+IF		
+DialogEnded("YouScum",_Inst)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+THEN
+DoRunaway(_Player,_Npc);
+
+
+// Disgusted action 1: say something (if allowed)
+PROC	
+DoDisgustedAction((CHARACTER)_Player,(CHARACTER)_Npc,1)
+AND
+NOT DoNotStartDialogsDueToGenericRules(_Player,1)
+THEN	
+ProcLaunchOverheadDialogReplacement(_Npc);
+SetAndStartDialog_DisableDialogsCausedByGenericRules(_Player,_Npc,"YouScum");
+
+// Disgusted action 2: do nothing
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+// Definition of the NPC actions (triggered by events usually)
+//
+
+//////////////////////////////////////////////////////////////////////////////////////
+// ActPositively:
+//
+// This can at most start a dialog. Even while trade is running.
+//
+// We do not act if not allowed by main story:
+PROC	
+ActPositively((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Intensity,2)//TODO DEFINE ACTION_THEFT_NOT_FROM_ME
+AND
+NOT NoDefaultBehavior_AllNpcs(_Player,1)
+AND
+NOT DB_NoDefaultBehavior(_Npc) 
+AND
+NOT Unintelligent(_Npc) 
+AND				// Unintelligent creatures do not act
+NOT DoNotStartDialogsDueToGenericRules(_Player,1) 
+AND
+DB_InRegion(_Player,_Region)
+AND
+GuardedRegion(_Region,_,_,_) 
+THEN	
+SetAndStartDialog(_Player,_Npc,"Encourage_thievery_warn_for_guards");
+
+//////////////////////////////////////////////////////////////////////////////////////
+// ActNegatively:
+//
+
+// ActNegatively_NoRevenge((NPC)_Npc,ACTION_THEFT_FROM_ME)
+//		act on a negative feeling, but not in a "revenge style"
+//		(_Intensity in ActNegatively/3 was low)
+
+// 1. ACTION_THEFT_FROM_ME
+PROC	
+ActNegatively_NoRevenge((CHARACTER)_Player,(CHARACTER)_Npc,_) 
+AND
+DB_NpcGotHelp(_Npc)
+THEN
+NOT DB_NpcGotHelp(_Npc);	//clear it so the guards will come 
+
+PROC	
+ActNegatively_NoRevenge((CHARACTER)_Player,(CHARACTER)_Npc,1) //TODO DEFINE ACTION_THEFT_FROM_ME
+AND
+CharacterGetRepAttitudeTowardsPlayer(_Npc,_Player,_Att)
+AND
+_Att >= 0
+THEN
+StopTrading(_Player,_Npc);
+DoStartDialog(_Player,_Npc,"Npc_accepts_theft_of_own_objects");
+
+PROC	
+ActNegatively_NoRevenge((CHARACTER)_Player,_Npc,1) //TODO DEFINE ACTION_THEFT_FROM_ME
+AND
+CharacterGetRepAttitudeTowardsPlayer(_Npc,_Player,_Att)
+AND 
+_Att < 0
+AND
+NpcAskedToLeave(_Player,_Npc)
+THEN	
+StopTrading(_Player,_Npc);
+//EndDialog(ENGINE_GAME); TODO?
+//Story_CallGuards(_Player,_Npc,1);  //TODO DEFINE ACTION_THEFT_FROM_ME
+TryCallGuards(_Player,_Npc,1);  //TODO DEFINE ACTION_THEFT_FROM_ME
+CheckForDisgustedAction(_Player,_Npc);
+
+
+PROC
+CheckForDisgustedAction((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT	DB_NpcGotHelp(_Npc)
+THEN
+DoDisgustedAction(_Player,_Npc);		// in 50% of the cases, npc walks away
+
+PROC
+CheckForDisgustedAction((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_NpcGotHelp(_Npc)
+THEN
+ProcLaunchOverheadDialogReplacement(_Npc);
+SetAndStartDialog_DisableDialogsCausedByGenericRules(_Player,_Npc,"Catch_the_thief");
+
+PROC
+CheckForDisgustedAction((CHARACTER)_Player,(CHARACTER)_Npc)
+THEN
+NOT DB_NpcGotHelp(_Npc);
+
+PROC	
+ActNegatively_NoRevenge((CHARACTER)_Player,_Npc,1) //TODO DEFINE ACTION_THEFT_FROM_ME
+AND
+CharacterGetRepAttitudeTowardsPlayer(_Npc,_Player,_Att)
+AND
+_Att < 0 
+AND
+NOT NpcAskedToLeave(_Player,_Npc)
+AND
+NOT DB_IsHostile(_Player,_Npc)
+THEN	
+StopTrading(_Player,_Npc);
+GiveBackStolenStuff(_Player,1);
+ProcLaunchOverheadDialogReplacement(_Npc);
+DoStartDialog(_Player,_Npc,"Dont_steal_from_me_Please_Leave");
+NpcAskedToLeave(_Player,_Npc);
+	
+// 2. ACTION_THEFT_NOT_FROM_ME
+PROC	
+ActNegatively_NoRevenge((CHARACTER)_Player,(CHARACTER)_Npc,2) //TODO DEFINE ACTION_THEFT_NOT_FROM_ME
+AND
+NOT DoNotStartDialogsDueToGenericRules(_Player,1)
+AND
+NOT TradeRunning(_Player,_Npc,1)
+AND
+CharacterGetRepAttitudeTowardsPlayer(_Npc,_Player,_Att)
+AND
+_Att > 0 
+THEN	
+GiveBackStolenStuff(_Player,1);
+ProcLaunchOverheadDialogReplacement(_Npc);
+SetAndStartDialog(_Player,_Npc,"Thievery_is_unwise");
+
+PROC	
+ActNegatively_NoRevenge((CHARACTER)_Player,(CHARACTER)_Npc,2)//TODO DEFINE ACTION_THEFT_NOT_FROM_ME
+AND
+NOT DoNotStartDialogsDueToGenericRules(_Player,1) 
+AND
+NOT TradeRunning(_Player,_Npc,1)
+AND
+CharacterGetRepAttitudeTowardsPlayer(_Npc,_Player,_Att)
+AND
+_Att <= 0 
+THEN	
+GiveBackStolenStuff(_Player,1);
+ProcLaunchOverheadDialogReplacement(_Npc);
+SetAndStartDialog(_Player,_Npc,"You_are_a_thief_Please_leave");
+/*
+// TradeRunning: this means ActNegatively_NoRevenge is called because of a Theft_ByEvidence event:
+PROC	
+ActNegatively_NoRevenge((CHARACTER)_Player,_Npc,2) //TODO DEFINE ACTION_THEFT_NOT_FROM_ME
+AND
+TradeRunning(_Player,_Npc,1)
+THEN	
+DecideTradingStolenGoods(_Player,_Npc);
+
+// a stolen item (not from me) is offered for trade and _Npc is not a BlackMarketTrader,
+// _Npc stops trading and gives a warning
+PROC
+DecideTradingStolenGoods((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+NOT BlackMarketTrader(_Npc)
+THEN	
+StopTradingAndGiveWarning(_Player,_Npc);
+
+// a stolen item (not from me) is offered for trade and we did not yet conclude DIALOG_AcceptTradeStolenItems
+// to a thieves relation:
+PROC	
+DecideTradingStolenGoods((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND 
+BlackMarketTrader(_Npc)
+AND
+NOT PlayerHasThievesRelationWith(_Player,_Npc)
+THEN
+// interrupt trade and ask player if he wants to admit he is selling stolen goods:
+StopTrading(_Player,_Npc);
+CannotTrade(_Player,_Npc);		// disable trade button for DIALOG_AcceptTradeStolenItems
+SetAndRememberDialogEvent(_Player,"EVENT_trade_stolen_items_player_proceeds",0);
+SetAndRememberDialogEvent(_Player,"EVENT_trade_stolen_items_player_aborts",0);
+DoStartDialog(_Player,_Npc,"AcceptTradeStolenItems");
+
+// player admitted selling stolen goods. Proceed (start trade again).
+IF		
+DialogCharacterEventSet("EVENT_trade_stolen_items_player_proceeds",_Player,_Inst)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+THEN	
+PlayerHasThievesRelationWith(_Player,_Npc);
+NOT CannotTrade(_Player,_Npc);
+SetTradeStatus(_Player,_Npc);
+StartTrade(_Player,_Npc);		// start trade again
+
+// player does not admit selling stolen goods. No trade, and _Npc's attitude drops.
+IF		
+DialogCharacterEventSet("EVENT_trade_stolen_items_player_proceeds",_Player,_Inst)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+THEN	
+DecreaseAttitude(_Player,_Npc,10);
+StopTradingAndGiveWarning(_Player,_Npc);
+
+
+IF		
+DialogEnded("AcceptTradeStolenItems",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+THEN	
+NOT CannotTrade(_Player,_Npc);
+SetTradeStatus(_Player,_Npc);	// allow trade again
+*/
+
+// a stolen item (not from me) is offered for trade and we did already accept to trade stolen items
+// do nothing: trade just continues.
+//PROC	DecideTradingStolenGoods((NPC)_Npc) AND BlackMarketTrader(_Npc) AND PlayerHasThievesRelationWith(_Npc)
+//THEN	nothing happens: trade just continues.
+
+PROC
+StopTradingAndGiveWarning((CHARACTER)_Player,(CHARACTER)_Npc)
+THEN	
+StopTrading(_Player,_Npc);
+DoStartDialog(_Player,_Npc,"RejectTradeStolenItems",1);
+
+// 3.
+// if dialog started with sword pulled out: ACTION_THREATHEN
+// This is implemented in goal "Dialogs".
+// This can change the attitude a bit without causing a DoRevenge action.
+
+/* never called:
+// 4. ACTION_DESTROY_PROPERTY
+PROC	ActNegatively(_Npc,ACTION_DESTROY_PROPERTY)
+THEN	DoRevenge(_Npc,ACTION_DESTROY_PROPERTY);*/
+
+PROC
+CheckForDisgustedVandalismAction((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT	DB_NpcGotHelp(_Npc)
+THEN
+DoDisgustedAction(_Player,_Npc);		// in 50% of the cases, npc walks away
+
+PROC
+CheckForDisgustedVandalismAction((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_NpcGotHelp(_Npc)
+THEN
+ProcLaunchOverheadDialogReplacement(_Npc);
+SetAndStartDialog_DisableDialogsCausedByGenericRules(_Player,_Npc,"Catch_the_vandal");
+
+PROC
+CheckForDisgustedVandalismAction((CHARACTER)_Player,(CHARACTER)_Npc)
+THEN
+NOT DB_NpcGotHelp(_Npc);
+
+PROC
+CheckForDisgustedForbiddenAction((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT	DB_NpcGotHelp(_Npc)
+THEN
+Attack(_Npc,_Player);
+NOT DB_CrimeInProgress(_Player,_Npc,"Trespassing");
+
+PROC
+CheckForDisgustedForbiddenAction((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_NpcGotHelp(_Npc)
+THEN
+ProcLaunchOverheadDialogReplacement(_Npc);
+SetAndStartDialog_DisableDialogsCausedByGenericRules(_Player,_Npc,"Catch_the_trespasser");
+
+PROC
+CheckForDisgustedForbiddenAction((CHARACTER)_Player,(CHARACTER)_Npc)
+THEN
+NOT DB_NpcGotHelp(_Npc);
+
+PROC	
+ActNegatively_NoRevenge((CHARACTER)_Player,(CHARACTER)_Npc,4) //TODO DEFINE ACTION_DESTROY_PROPERTY
+AND
+CharacterGetRepAttitudeTowardsPlayer(_Npc,_Player,_Att)
+AND
+_Att >= 0
+THEN
+StopTrading(_Player,_Npc);
+DoStartDialog(_Player,_Npc,"Npc_accepts_destruction_of_own_objects");
+
+PROC	
+ActNegatively_NoRevenge((CHARACTER)_Player,_Npc,4) //TODO DEFINE ACTION_DESTROY_PROPERTY
+AND
+CharacterGetRepAttitudeTowardsPlayer(_Npc,_Player,_Att)
+AND 
+_Att < 0
+AND
+NpcAskedToLeave(_Player,_Npc)
+THEN	
+StopTrading(_Player,_Npc);
+//EndDialog(ENGINE_GAME); TODO?
+TryCallGuards(_Player,_Npc,4);  //TODO DEFINE ACTION_DESTROY_PROPERTY
+CheckForDisgustedVandalismAction(_Player,_Npc);
+
+PROC	
+ActNegatively_NoRevenge((CHARACTER)_Player,_Npc,4) //TODO DEFINE ACTION_DESTROY_PROPERTY
+AND
+CharacterGetRepAttitudeTowardsPlayer(_Npc,_Player,_Att)
+AND
+_Att < 0 
+AND
+NOT NpcAskedToLeave(_Player,_Npc)
+AND
+NOT DB_IsHostile(_Player,_Npc)
+THEN	
+StopTrading(_Player,_Npc);
+ProcLaunchOverheadDialogReplacement(_Npc);
+DoStartDialog(_Player,_Npc,"Dont_destroy_my_stuff_Please_Leave");
+NpcAskedToLeave(_Player,_Npc);
+
+
+PROC	
+ActNegatively_NoRevenge((CHARACTER)_Player,(CHARACTER)_Npc,6) //TODO DEFINE ACTION_ENTER_FORBIDDEN_AREA
+AND
+CharacterGetRepAttitudeTowardsPlayer(_Npc,_Player,_Att)
+AND
+_Att >= 0
+THEN
+StopTrading(_Player,_Npc);
+DoStartDialog(_Player,_Npc,"Npc_accepts_player_attempt_to_enter_forbidden_area");
+
+IF
+DialogEnded("Npc_accepts_player_attempt_to_enter_forbidden_area",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+AND
+DB_ForbiddenArea(_ID,_Npc)
+AND
+DB_ForbiddenAreaTriggers(_ID,_Region,_Teleport)
+AND
+DB_InRegion(_Player,_Region)
+THEN
+CharacterTeleportToTrigger(_Player,_Teleport,"");
+NOT DB_CrimeInProgress(_Player,_Npc,"Trespassing");
+
+
+PROC	
+ActNegatively_NoRevenge((CHARACTER)_Player,_Npc,6) //TODO DEFINE ACTION_ENTER_FORBIDDEN_AREA
+AND
+CharacterGetRepAttitudeTowardsPlayer(_Npc,_Player,_Att)
+AND 
+_Att < 0
+THEN	
+StopTrading(_Player,_Npc);
+TryCallGuards(_Player,_Npc,6);  //TODO DEFINE ACTION_ENTER_FORBIDDEN_AREA
+CheckForDisgustedForbiddenAction(_Player,_Npc);
+
+////////////////////////////////////////////////////////////////////////////
+// ActNegatively:
+
+// NOTE: DoRevenge/2 always closes the trade plate.
+
+// We do not act if not allowed by main story:
+PROC	
+ActNegatively((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_,(INTEGER)_) 
+AND 
+NoDefaultBehavior_AllNpcs(_Player,1)
+THEN	
+DidActNegatively(_Player,1);
+
+PROC	
+ActNegatively((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_,(INTEGER)_)
+AND
+DB_NoDefaultBehavior(_Npc)
+THEN
+DidActNegatively(_Player,1);
+
+// Unintelligent creatures do not act:
+PROC	
+ActNegatively((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_,(INTEGER)_) 
+AND 
+Unintelligent(_Npc)
+THEN	
+DidActNegatively(_Player,1);
+
+// Any reason, high intensity:
+PROC	
+ActNegatively((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Intensity,(INTEGER)_Reason) 
+AND 
+NOT DidActNegatively(_Player,1) 
+AND
+_Intensity >= 50
+THEN
+DoRevenge(_Player,_Npc,_Reason);
+DidActNegatively(_Player,1);
+
+// Any reason, any intensity but _Att is below _MinAtt
+// (_Npc is so fed up with player that any action causes him to flip)
+PROC	
+ActNegatively((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_,(INTEGER)_Reason)
+AND
+NOT DidActNegatively(_Player,1) 
+AND
+DB_IsHostile(_Player,_Npc)
+THEN	
+DoRevenge(_Player,_Npc,_Reason);		
+DidActNegatively(_Player,1);
+
+// All other cases:
+PROC	
+ActNegatively((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Intensity,(INTEGER)_Reason)
+AND
+NOT DidActNegatively(_Player,1)
+THEN	
+ActNegatively_NoRevenge(_Player,_Npc,_Reason);
+
+// cleanup:
+PROC	
+ActNegatively((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Intensity,(INTEGER)_Reason)
+THEN	
+NOT DidActNegatively(_Player,1);
+
+PROC	
+ActNegatively((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Intensity,(INTEGER)_Reason)
+AND
+NextDoRevengeDialogIsWarning(_Player,_Npc,_Dialog)
+THEN	
+NOT NextDoRevengeDialogIsWarning(_Player,_Npc,_Dialog);		// Cleanup for in case we did not use this dialog.
+																						// (This is the case when we had something more appropriate to say.)
+
+/////////////////////////////////////////////////////////////////////////////////////////
+// A dialog event forces us to let an npc attack the player:
+//
+IF		
+DialogConditionTrue(_Player,_DialogEvent)
+AND
+DialogEvent_triggers_Attack(_DialogEvent,(CHARACTER)_Attacker) 
+AND
+NOT Unintelligent(_Attacker)
+THEN	
+DecreaseAttitude(_Player,_Attacker,50);
+DoRevenge(_Player,_Attacker,5);		// cannot be used for unintelligent creatures because might start a dialog //TODO define ACTION_ALIGNMENT_CHANGE_TO_ENEMY
+
+IF		
+DialogConditionTrue(_Player,_DialogEvent)
+AND
+DialogEvent_triggers_Attack(_DialogEvent,(CHARACTER)_Attacker) 
+AND
+Unintelligent(_Attacker)
+THEN	
+DecreaseAttitude(_Player,_Attacker,50);
+Attack(_Attacker,_Player);
+
+PROC
+ProcHandleCrimeInterrupt((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT DB_HandlingCrimeInterrupt(_Npc)	//don't do this multiple times
+THEN
+DB_HandlingCrimeInterrupt(_Npc);
+DB_CrimeForcedStop(_Npc);
+DialogRequestStopForCharacter(_Npc);
+ProcRerouteCalledGuardsForNpc(_Player,_Npc);
+ProcClearCrimesFor(_Player);
+ProcFreezeCriminalsForNPC(_Npc);
+ProcCheckIfWeNeedToDoRevenge(_Player,_Npc);
+
+PROC
+ProcSaveNoRunawayState((CHARACTER)_Npc)
+AND
+DB_NoRunAway(_Npc)
+THEN
+DB_TempRunAway(_Npc,1);
+
+PROC
+ProcResetRunawayState((CHARACTER)_Npc)
+AND
+DB_TempRunAway(_Npc,1)
+THEN
+NOT DB_TempRunAway(_Npc,1);
+DB_NoRunAway(_Npc);
+
+PROC
+ProcCheckIfWeNeedToDoRevenge((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT DB_ReroutedGuards(_Npc,1)
+THEN
+ProcSaveNoRunawayState(_Npc);
+DB_NoRunAway(_Npc);
+DoRevenge(_Player,_Npc,5);	//5 so he'll go on the attack
+NOT DB_NoRunAway(_Npc);
+ProcResetRunawayState(_Npc);
+
+PROC
+ProcCheckIfWeNeedToDoRevenge((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_ReroutedGuards(_Npc,1)
+THEN
+NOT DB_CrimeForcedStop(_Npc);
+DB_AlignmentChangedByStory(_Player,_Npc);
+ProcMakeNPCHostile(_Player,_Npc);
+
+PROC
+ProcCheckIfWeNeedToDoRevenge((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT DB_ReroutedGuards(_Npc,1)
+AND
+NOT DB_GotActualGuardHelp(_Player,1)
+THEN
+NOT DB_CrimeForcedStop(_Npc);
+DB_GoHostileAfterDialog(_Npc,_Player);
+
+PROC
+ProcCheckIfWeNeedToDoRevenge((CHARACTER)_Player,(CHARACTER)_Npc)
+THEN
+NOT DB_ReroutedGuards(_Npc,1);
+
+PROC
+ProcRerouteCalledGuardsForNpc((CHARACTER)_OtherPlayer,(CHARACTER)_Npc)
+AND
+DB_CrimeInProgress(_Player,_Npc,_)
+AND
+_Player!=_OtherPlayer
+AND
+SummonedGuards(_Player,_Region,_Type,_N,_OldReason,_ID) 
+AND
+_OldReason!=5
+THEN
+SetStoryNpcStatus(_Player);
+SummonedGuards(_Player,_Region,_Type,_N,5,_ID);
+NOT SummonedGuards(_Player,_Region,_Type,_N,_OldReason,_ID);
+SummonedGuards(_OtherPlayer,_Region,_Type,_N,5,_ID);
+SetFightEvent(_Player,_OldReason);
+NOT DoNotStartDialogsDueToGenericRules(_Player,1);
+NOT DoNotStartDialogsDueToGenericRules(_OtherPlayer,1);
+NOT DialogRunning(_Player,1);
+NOT DialogRunning(_OtherPlayer,1);
+NOT _Player.DB_IsInDialog();
+NOT _OtherPlayer.DB_IsInDialog();
+DialogRequestStopForCharacter(_Player);
+DialogRequestStopForCharacter(_OtherPlayer);
+ClearDialogQueue(_Player);
+ClearDialogQueue(_OtherPlayer);
+ProcSetupOtherPlayerGuards(_Player);
+DB_ReroutedGuards(_Npc,1);
+GuardsDoAttack(_Player,_Type,_N);
+GuardsDoAttack(_OtherPlayer,_Type,_N);
+
+IF
+CharacterLeftCombat(_Npc,_)
+AND
+DB_HandlingCrimeInterrupt(_Npc)
+THEN
+NOT DB_HandlingCrimeInterrupt(_Npc);
+
+PROC
+ProcFreezeCriminalsForNPC((CHARACTER)_Npc)
+AND
+DB_CrimeInProgress(_Char,_Npc,_)
+THEN
+ProcClearCrimesFor(_Char);
+Hold(_Char);
+
+PROC
+ProcClearCrimesFor((CHARACTER)_Player)
+AND
+DB_CrimeInProgress(_Player,_Npc,_Crime)
+THEN
+NOT DB_CrimeInProgress(_Player,_Npc,_Crime);
+
+PROC
+ProcClearCrimesFor((CHARACTER)_Npc,(CHARACTER)_Player)
+AND
+DB_CrimeInProgress(_Player,_Npc,_Crime)
+THEN
+NOT DB_CrimeInProgress(_Player,_Npc,_Crime);
+
+//make sure that any frozen players are unfrozen when the NPCs go over to combat
+IF
+CharacterEnteredCombat(_Char,_)
+THEN
+CharacterUnfreeze(_Char);	
+
+EXITSECTION
+
+ENDEXITSECTION

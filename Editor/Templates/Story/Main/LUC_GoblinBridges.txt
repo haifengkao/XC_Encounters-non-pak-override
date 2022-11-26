@@ -1,0 +1,137 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+//REGION Player Comments
+DB_PlayerComment_Trigger(TRIGGER_LUC_GoblinBridges_FirstGuard_T01,"LUC_GoblinBridges_FirstGuard");
+DB_PlayerComments("LUC_GoblinBridges_FirstGuard","LUC_GoblinBridges_FirstGuard_1_1",1,1);
+DB_PlayerComments("LUC_GoblinBridges_FirstGuard","LUC_GoblinBridges_FirstGuard_2_1",2,1);
+DB_PlayerComments("LUC_GoblinBridges_FirstGuard","LUC_GoblinBridges_FirstGuard_2_2",2,2);
+
+DB_PlayerComment_Trigger(TRIGGER_LUC_GoblinBridges_SleepingGuards_T01,"LUC_GoblinBridges_SleepingGuards");
+DB_PlayerComments("LUC_GoblinBridges_SleepingGuards","LUC_GoblinBridges_SleepingGuards_1_1",1,1);
+DB_PlayerComments("LUC_GoblinBridges_SleepingGuards","LUC_GoblinBridges_SleepingGuards_2_1",2,1);
+DB_PlayerComments("LUC_GoblinBridges_SleepingGuards","LUC_GoblinBridges_SleepingGuards_2_2",2,2);
+
+DB_PlayerComment_Trigger(TRIGGER_LUC_GoblinBridges_MinesWarning_T01,"LUC_GoblinBridges_MinesWarning");
+DB_PlayerComments("LUC_GoblinBridges_MinesWarning","LUC_GoblinBridges_MinesWarning_1_1",1,1);
+DB_PlayerComments("LUC_GoblinBridges_MinesWarning","LUC_GoblinBridges_MinesWarning_2_1",2,1);
+DB_PlayerComments("LUC_GoblinBridges_MinesWarning","LUC_GoblinBridges_MinesWarning_2_2",2,2);
+//END_REGION
+
+//REGION Trap Database
+DB_LUC_GoblinBridges_Traps(ITEM_LUC_GoblinBridges_Invisible_Cannon_A_01);
+DB_LUC_GoblinBridges_Traps(ITEM_LUC_GoblinBridges_Invisible_Cannon_A_02);
+DB_LUC_GoblinBridges_Traps(ITEM_LUC_GoblinBridges_Invisible_Cannon_B_01);
+DB_LUC_GoblinBridges_Traps(ITEM_LUC_GoblinBridges_Invisible_Cannon_B_02);
+//END_REGION
+
+PROC_LUC_SetTrapsOffStage();
+DB_OneShotPlayerTrigger(TRIGGER_LUC_GoblinBridges_ActivateTraps);	
+
+DB_LUC_SleepingGob(CHARACTER_LUC_GoblinBridges_AsleepGob_01);
+DB_LUC_SleepingGob(CHARACTER_LUC_GoblinBridges_AsleepGob_03);
+DB_LUC_SleepingGob(CHARACTER_LUC_GoblinBridges_AsleepGob_02);
+DB_LUC_SleepingGob(CHARACTER_LUC_GoblinBridges_AsleepGob_04);
+DB_LUC_SleepingGob(CHARACTER_LUC_GoblinBridges_AsleepGob_05);
+DB_LUC_SleepingGob(CHARACTER_LUC_GoblinBridges_AsleepGob_06);
+DB_LUC_SleepingGob(CHARACTER_LUC_GoblinBridges_AsleepGob_07);
+DB_LUC_SleepingGob(CHARACTER_LUC_GoblinBridges_AsleepGob_08);
+DB_LUC_SleepingGob(CHARACTER_LUC_GoblinBridges_AsleepGob_09);
+
+DB_LUC_SpiderEgg(CHARACTER_LUC_BarrenLands_SpiderEgg_01);
+DB_LUC_SpiderEgg(CHARACTER_LUC_BarrenLands_SpiderEgg_02);
+DB_LUC_SpiderEgg(CHARACTER_LUC_BarrenLands_SpiderEgg_03);
+DB_LUC_SpiderEgg(CHARACTER_LUC_BarrenLands_SpiderEgg_04);
+DB_LUC_SpiderEgg(CHARACTER_LUC_BarrenLands_SpiderEgg_05);
+DB_LUC_SpiderEgg(CHARACTER_LUC_BarrenLands_SpiderEgg_06);
+DB_LUC_SpiderEgg(CHARACTER_LUC_BarrenLands_SpiderEgg_07);
+DB_LUC_SpiderEgg(CHARACTER_LUC_BarrenLands_SpiderEgg_08);
+DB_LUC_SpiderEgg(CHARACTER_LUC_BarrenLands_SpiderEgg_09);
+DB_LUC_SpiderEgg(CHARACTER_LUC_BarrenLands_SpiderEgg_10);
+DB_LUC_SpiderEgg(CHARACTER_LUC_BarrenLands_SpiderEgg_11);
+DB_LUC_SpiderEgg(CHARACTER_LUC_BarrenLands_SpiderEgg_12);
+DB_LUC_SpiderEgg(CHARACTER_LUC_BarrenLands_SpiderEgg_13);
+DB_LUC_SpiderEgg(CHARACTER_LUC_BarrenLands_SpiderEgg_14);
+DB_LUC_SpiderEgg(CHARACTER_LUC_WorshipedEgg1);
+DB_LUC_SpiderEgg(CHARACTER_LUC_WorshipedEgg2);
+DB_LUC_SpiderEgg(CHARACTER_LUC_WorshipedEgg3);
+DB_LUC_SpiderEgg(CHARACTER_LUC_WorshipedEgg4);
+DB_LUC_SpiderEgg(CHARACTER_LUC_WorshipedEgg5);
+DB_LUC_SpiderEgg(CHARACTER_LUC_WorshipedEgg6);
+DB_LUC_SpiderEgg(CHARACTER_LUC_WorshipedEgg7);
+DB_LUC_SpiderEgg(CHARACTER_LUC_WorshipedEgg8);
+KBSECTION
+PROC
+PROC_LUC_SetTrapsOffStage()
+AND
+DB_LUC_GoblinBridges_Traps(_Trap)
+THEN
+ItemSetOnstage(_Trap,0);
+
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,TRIGGER_LUC_GoblinBridges_ActivateTraps)
+AND
+DB_LUC_GoblinBridges_Traps(_Trap)
+THEN	
+ItemSetOnstage(_Trap,1);
+
+IF
+CharacterItemEvent(_Player,ITEM_LUC_GoblinBridges_Trap_Lever,"LUC_GoblinBridges_StopTraps")	
+AND
+DB_LUC_GoblinBridges_Traps(_Trap)
+THEN
+ItemSetOnstage(_Trap,0);
+
+IF
+CharacterEnteredCombat(_Gob, _)
+AND
+DB_LUC_SleepingGob(_Gob)
+AND
+NOT DB_OnlyOnce("RemovedSleepingGobComment")
+THEN
+NOT DB_PlayerComment_Trigger(TRIGGER_LUC_GoblinBridges_SleepingGuards_T01,"LUC_GoblinBridges_SleepingGuards");
+DB_OnlyOnce("RemovedSleepingGobComment");
+
+IF
+CharacterEnteredCombat(_Gob, _)
+AND
+DB_LUC_SleepingGob(_Gob)
+AND
+CharacterConsume(_Gob, "Quest_GoblinPerceptionBoost", _)
+THEN
+NOP(1);
+
+IF
+CharacterLeftCombat(_Gob, _)
+AND
+DB_LUC_SleepingGob(_Gob)
+AND	NOT
+DB_Dead(_Gob)
+AND
+CharacterConsume(_Gob, "Quest_GoblinPerceptionLow", _)
+THEN
+NOP(1);
+
+IF
+CharacterEnteredCombat(_Gob, _)
+AND
+DB_LUC_SpiderEgg(_Gob)
+AND
+CharacterConsume(_Gob, "Quest_GoblinPerceptionBoost", _)
+THEN
+NOP(1);
+
+IF
+CharacterLeftCombat(_Gob, _)
+AND
+DB_LUC_SpiderEgg(_Gob)
+AND	NOT
+DB_Dead(_Gob)
+AND
+CharacterConsume(_Gob, "Quest_GoblinPerceptionLow", _)
+THEN
+NOP(1);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

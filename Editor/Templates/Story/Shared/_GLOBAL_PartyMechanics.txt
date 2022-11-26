@@ -1,0 +1,72 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+//REGION Partymember Resurrect out of combat
+/*
+IF
+CharacterDied(_Character)
+AND
+CharacterIsPartyMember(_Character,1)
+AND
+CharacterGetUUID(_Character,_UUID)
+AND
+StringConcatenate("Rez_Timer_",_UUID,_TimerName)
+THEN
+DB_Rez_Checks(_TimerName,_Character);
+TimerLaunch(_TimerName,1000);
+
+IF
+TimerFinished(_TimerName)
+AND
+DB_Rez_Checks(_TimerName,_Character)
+AND
+CharacterGetHitpointsPercentage(_Character,_P1HP)
+AND
+_P1HP <= 0
+THEN
+NOT DB_Rezzing(_Character);
+ProcRez(_Character,CHARACTER_Player1);
+ProcRez(_Character,CHARACTER_Player2);
+ProcRestartTimer(_Character,_TimerName);
+
+PROC
+ProcRestartTimer((CHARACTER)_Character,(STRING)_TimerName)
+AND
+NOT DB_Rezzing(_Character)
+THEN
+TimerLaunch(_TimerName,1000);
+
+PROC
+ProcRez((CHARACTER)_Character,(CHARACTER)_Savior)
+AND
+NOT DB_Rezzing(_Character)
+AND
+CombatGetIDForCharacter(_Savior,0)
+AND
+CharacterGetHitpointsPercentage(_Savior,_SaviorHP)
+AND
+_SaviorHP > 0
+AND
+CharacterGetDistanceToCharacter(_Character,_Savior,_Dist)
+AND
+_Dist < 10
+AND
+DB_Rez_Checks(_TimerName,_Character)
+THEN
+CharacterResurrect(_Character);
+DB_Rezzing(_Character);
+
+IF
+CharacterResurrected(_Character)
+AND
+DB_Rez_Checks(_TimeLine,_Character)
+THEN
+CharacterSetHitpointsPercentage(_Character,15);
+NOT DB_Rez_Checks(_TimeLine,_Character);
+*/
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION

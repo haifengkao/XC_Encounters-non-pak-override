@@ -1,0 +1,9 @@
+INIT
+CHARACTER:__Me
+
+EVENTS
+EVENT InformVargo
+ON
+	OnCombatStarted()
+ACTIONS
+	CharacterEvent(__Me,"AlphaWolfEnteredCombat")

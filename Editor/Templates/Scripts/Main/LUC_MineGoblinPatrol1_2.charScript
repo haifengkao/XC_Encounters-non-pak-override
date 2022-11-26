@@ -1,0 +1,26 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter
+CHARACTER:__Me
+CHARACTER:%Friend = LUC_MineGoblinPatrol1_1_3f0c6ed0-d1ec-467a-948b-13bba5790631
+INT:%Dialog = 0
+TRIGGER:%Trigger1 = LUC_PointMineGoblinPatrol2_1_f6f46515-a3c1-4609-90f1-37e58b27e112
+TRIGGER:%Trigger2 = LUC_PointMineGoblinPatrol2_2_95e7cb79-48ee-4353-94c7-b3cf3e83f7b0
+
+BEHAVIOUR
+
+REACTION CartWalk,1000
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Trigger1,1)
+	CharacterLookAt(ITEM:MINE_Cart_A_OO6_de598264-c701-4bd7-92b8-d102de8be50e)
+	DisplayText(__Me,"LUC_MineGoblinPatrol1_2_Script_0",3) // Why is nobody pushing this cart?
+	Sleep(4)
+	CharacterMoveTo(%Trigger2,1)
+	DisplayText(__Me,"LUC_MineGoblinPatrol1_2_Script_1",3) // Hey! Somebody! Come over and push that cart overthere!
+	Sleep(5)
+	DisplayText(__Me,"LUC_MineGoblinPatrol1_2_Script_2",3) // *Sigh*... Lazy miners.
+	Sleep(4)
+	Goto("Start")
+	

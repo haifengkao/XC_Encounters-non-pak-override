@@ -1,0 +1,1691 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_HOM_Teleporter(ITEM_HOM_TeleportFromObservatory_Inactive,ITEM_HOM_TeleportFromObservatory,ITEM_HOM_TeleportFromObservatory,ITEM_HOM_TeleportFromObservatory);
+DB_HOM_Teleporter(ITEM_HOM_TeleportToFireRoom_Inactive,ITEM_HOM_TeleportToFireRoom,ITEM_HOM_TeleportFromFire,ITEM_HOM_TeleportToFireRoom_Unvisited);
+DB_HOM_Teleporter(ITEM_HOM_TeleportToIceRoom_Inactive,ITEM_HOM_TeleportToIceRoom,ITEM_HOM_TeleportFromIce,ITEM_HOM_TeleportToIceRoom_Unvisited);
+DB_HOM_Teleporter(ITEM_HOM_TeleportToEarth_Inactive,ITEM_HOM_TeleportToEarth,ITEM_HOM_TeleportFromEarth,ITEM_HOM_TeleportToEarth_Unvisited);
+DB_HOM_Teleporter(ITEM_HOM_TeleportToAir_Inactive,ITEM_HOM_TeleportToAir,ITEM_HOM_TeleportFromAir,ITEM_HOM_TeleportToAir_Unvisited);
+DB_HOM_Teleporter(ITEM_HOM_TeleportToHallOfHeroes_Inactive,ITEM_HOM_TeleportToHallOfHeroes,ITEM_HOM_TeleportFromHallHeroes,ITEM_HOM_TeleportToHallOfHeroes_Unvisited);
+DB_HOM_Teleporter(ITEM_HOM_TeleportToWarehouse_Inactive,ITEM_HOM_TeleportToWarehouse,ITEM_HOM_TeleportFromWarehouse,ITEM_HOM_TeleportToWarehouse_Unvisited);
+DB_HOM_Teleporter(ITEM_HOM_TeleportToTellerOfSecrets_Inactive,ITEM_HOM_TeleportToTellerOfSecrets,ITEM_HOM_TeleportFromTellerOfSecrets,ITEM_HOM_TeleportToTellerOfSecrets_Unvisited);
+DB_HOM_Teleporter(ITEM_HOM_TeleportToMephisto_Inactive,ITEM_HOM_TeleportToMephisto,ITEM_HOM_TeleportFromMephisto,ITEM_HOM_TeleportToMephisto_Unvisited);
+DB_HOM_Teleporter(ITEM_HOM_TeleportToArmoury_Inactive,ITEM_HOM_TeleportToArmoury,ITEM_HOM_TeleportFromArmoury,ITEM_HOM_TeleportToArmoury_Unvisited);
+DB_HOM_Teleporter(ITEM_HOM_TeleportToTrader_Inactive,ITEM_HOM_TeleportToTrader,ITEM_HOM_TeleportFromTrader,ITEM_HOM_TeleportToTrader_Unvisited);
+DB_HOM_Teleporter(ITEM_HOM_TeleportToChapel_Inactive,ITEM_HOM_TeleportToChapel,ITEM_HOM_TeleportFromChapel,ITEM_HOM_TeleportToChapel_Unvisited);
+
+DB_HOM_Teleporter(ITEM_HOM_EdenShrine_Inactive,ITEM_HOM_EdenShrine,ITEM_NULL,ITEM_HOM_EdenShrine);
+
+
+DB_PlayerComments("HOM_Comment_HallofHeroes", "HOM_Comment_HallofHeroes_1_1",1,1);
+DB_PlayerComments("HOM_Comment_HallofHeroes", "HOM_Comment_HallofHeroes_2_1",2,1);
+DB_PlayerComments("HOM_Comment_HallofHeroes", "HOM_Comment_HallofHeroes_2_2",2,2);
+DB_PlayerOnlyComment_Trigger(TRIGGER_HOM_HallOfHeroes_Comment, "HOM_Comment_HallofHeroes");
+
+DB_PlayerComments("HOM_Comment_Bedroom", "HOM_Comment_Bedroom_1_1",1,1);
+DB_PlayerComments("HOM_Comment_Bedroom", "HOM_Comment_Bedroom_2_1",2,1);
+DB_PlayerComments("HOM_Comment_Bedroom", "HOM_Comment_Bedroom_2_2",2,2);
+DB_PlayerOnlyComment_Trigger(TRIGGER_HOM_WareHouse_Comment, "HOM_Comment_Bedroom");
+
+DB_PlayerComments("HOM_Comment_FireRoom", "HOM_Comment_FireRoom_1_1",1,1);
+DB_PlayerComments("HOM_Comment_FireRoom", "HOM_Comment_FireRoom_2_1",2,1);
+DB_PlayerComments("HOM_Comment_FireRoom", "HOM_Comment_FireRoom_2_2",2,2);
+DB_PlayerOnlyComment_Trigger(TRIGGER_HOM_FireRoom_Comment, "HOM_Comment_FireRoom");
+
+DB_PlayerComments("HOM_Comment_IceRoom", "HOM_Comment_IceRoom_1_1",1,1);
+DB_PlayerComments("HOM_Comment_IceRoom", "HOM_Comment_IceRoom_2_1",2,1);
+DB_PlayerComments("HOM_Comment_IceRoom", "HOM_Comment_IceRoom_2_2",2,2);
+DB_PlayerOnlyComment_Trigger(TRIGGER_HOM_IceRoom_Comment, "HOM_Comment_IceRoom");
+
+DB_PlayerComments("HOM_Comment_SecretsRoom", "HOM_Comment_SecretsRoom_1_1",1,1);
+DB_PlayerComments("HOM_Comment_SecretsRoom", "HOM_Comment_SecretsRoom_2_1",2,1);
+DB_PlayerComments("HOM_Comment_SecretsRoom", "HOM_Comment_SecretsRoom_2_2",2,2);
+DB_PlayerOnlyComment_Trigger(TRIGGER_HOM_SecretsRoom_Comment, "HOM_Comment_SecretsRoom");
+
+DB_PlayerComments("HOM_Comment_MephistoRoom", "HOM_Comment_MephistoRoom_1_1",1,1);
+DB_PlayerComments("HOM_Comment_MephistoRoom", "HOM_Comment_MephistoRoom_2_1",2,1);
+DB_PlayerComments("HOM_Comment_MephistoRoom", "HOM_Comment_MephistoRoom_2_2",2,2);
+DB_PlayerOnlyComment_Trigger(TRIGGER_HOM_MephistoRoom_Comment, "HOM_Comment_MephistoRoom");
+
+DB_PlayerComments("HOM_Comment_ArmouryRoom", "HOM_Comment_ArmouryRoom_1_1",1,1);
+DB_PlayerComments("HOM_Comment_ArmouryRoom", "HOM_Comment_ArmouryRoom_2_1",2,1);
+DB_PlayerComments("HOM_Comment_ArmouryRoom", "HOM_Comment_ArmouryRoom_2_2",2,2);
+DB_PlayerOnlyComment_Trigger(TRIGGER_HOM_ArmouryRoom_Comment, "HOM_Comment_ArmouryRoom");
+
+DB_PlayerComments("HOM_Comment_InterdimensionalRoom", "HOM_Comment_InterdimensionalRoom_1_1",1,1);
+DB_PlayerComments("HOM_Comment_InterdimensionalRoom", "HOM_Comment_InterdimensionalRoom_2_1",2,1);
+DB_PlayerComments("HOM_Comment_InterdimensionalRoom", "HOM_Comment_InterdimensionalRoom_2_2",2,2);
+DB_PlayerOnlyComment_Trigger(TRIGGER_HOM_BoxTraderRoomComment, "HOM_Comment_InterdimensionalRoom");
+
+DB_PlayerComments("HOM_Comment_ChapelRoom", "HOM_Comment_ChapelRoom_1_1",1,1);
+DB_PlayerComments("HOM_Comment_ChapelRoom", "HOM_Comment_ChapelRoom_2_1",2,1);
+DB_PlayerComments("HOM_Comment_ChapelRoom", "HOM_Comment_ChapelRoom_2_2",2,2);
+DB_PlayerOnlyComment_Trigger(TRIGGER_HOM_BoxChapelComment, "HOM_Comment_ChapelRoom");
+
+DB_PlayerComments("HOM_Comment_AirRoom", "HOM_Comment_AirRoom_1_1",1,1);
+DB_PlayerComments("HOM_Comment_AirRoom", "HOM_Comment_AirRoom_2_1",2,1);
+DB_PlayerComments("HOM_Comment_AirRoom", "HOM_Comment_AirRoom_2_2",2,2);
+DB_PlayerOnlyComment_Trigger(TRIGGER_HOM_BoxAirComment, "HOM_Comment_AirRoom");
+
+DB_PlayerComments("HOM_Comment_EarthRoom", "HOM_Comment_EarthRoom_1_1",1,1);
+DB_PlayerComments("HOM_Comment_EarthRoom", "HOM_Comment_EarthRoom_2_1",2,1);
+DB_PlayerComments("HOM_Comment_EarthRoom", "HOM_Comment_EarthRoom_2_2",2,2);
+DB_PlayerOnlyComment_Trigger(TRIGGER_HOM_BoxEarthComment, "HOM_Comment_EarthRoom");
+
+DB_PlayerComments("HOM_Comment_OutOfHoH", "HOM_Comment_OutOfHoH_1_1",1,1);
+DB_PlayerComments("HOM_Comment_OutOfHoH", "HOM_Comment_OutOfHoH_2_1",2,1);
+DB_PlayerComments("HOM_Comment_OutOfHoH", "HOM_Comment_OutOfHoH_2_2",2,2);
+
+DB_PlayerComments("HOM_Comment_AfterFirstShrike", "HOM_Comment_AfterFirstShrike_1_1",1,1);
+DB_PlayerComments("HOM_Comment_AfterFirstShrike", "HOM_Comment_AfterFirstShrike_2_1",2,1);
+DB_PlayerComments("HOM_Comment_AfterFirstShrike", "HOM_Comment_AfterFirstShrike_2_2",2,2);
+
+DB_PlayerComments("HOM_Comment_AfterAstarteDespair", "HOM_Comment_AfterAstarteDespair_1_1",1,1);
+DB_PlayerComments("HOM_Comment_AfterAstarteDespair", "HOM_Comment_AfterAstarteDespair_2_1",2,1);
+DB_PlayerComments("HOM_Comment_AfterAstarteDespair", "HOM_Comment_AfterAstarteDespair_2_2",2,2);
+
+DB_PlayerComments("HOM_Comment_AfterShrikeGratitude", "HOM_Comment_AfterShrikeGratitude_1_1",1,1);
+DB_PlayerComments("HOM_Comment_AfterShrikeGratitude", "HOM_Comment_AfterShrikeGratitude_2_1",2,1);
+DB_PlayerComments("HOM_Comment_AfterShrikeGratitude", "HOM_Comment_AfterShrikeGratitude_2_2",2,2);
+
+DB_PlayerComments("HOM_Comment_AfterAstarteChild", "HOM_Comment_AfterAstarteChild_1_1",1,1);
+DB_PlayerComments("HOM_Comment_AfterAstarteChild", "HOM_Comment_AfterAstarteChild_2_1",2,1);
+DB_PlayerComments("HOM_Comment_AfterAstarteChild", "HOM_Comment_AfterAstarteChild_2_2",2,2);
+
+DB_PlayerComments("HOM_Comment_AfterZixzaxShrike", "HOM_Comment_AfterZixzaxShrike_1_1",1,1);
+DB_PlayerComments("HOM_Comment_AfterZixzaxShrike", "HOM_Comment_AfterZixzaxShrike_2_1",2,1);
+DB_PlayerComments("HOM_Comment_AfterZixzaxShrike", "HOM_Comment_AfterZixzaxShrike_2_2",2,2);
+
+DB_PlayerComments("HOM_Comment_AfterShrikeFailure", "HOM_Comment_AfterShrikeFailure_1_1",1,1);
+DB_PlayerComments("HOM_Comment_AfterShrikeFailure", "HOM_Comment_AfterShrikeFailure_2_1",2,1);
+DB_PlayerComments("HOM_Comment_AfterShrikeFailure", "HOM_Comment_AfterShrikeFailure_2_2",2,2);
+
+DB_PlayerComments("HOM_Comment_AfterAstarteNeedYou", "HOM_Comment_AfterAstarteNeedYou_1_1",1,1);
+DB_PlayerComments("HOM_Comment_AfterAstarteNeedYou", "HOM_Comment_AfterAstarteNeedYou_2_1",2,1);
+DB_PlayerComments("HOM_Comment_AfterAstarteNeedYou", "HOM_Comment_AfterAstarteNeedYou_2_2",2,2);
+
+DB_PlayerComments("HOM_Comment_AfterShrikeWarning", "HOM_Comment_AfterShrikeWarning_1_1",1,1);
+DB_PlayerComments("HOM_Comment_AfterShrikeWarning", "HOM_Comment_AfterShrikeWarning_2_1",2,1);
+DB_PlayerComments("HOM_Comment_AfterShrikeWarning", "HOM_Comment_AfterShrikeWarning_2_2",2,2);
+
+DB_PlayerComments("HOM_Comment_AfterAstarteSpeech", "HOM_Comment_AfterAstarteSpeech_1_1",1,1);
+DB_PlayerComments("HOM_Comment_AfterAstarteSpeech", "HOM_Comment_AfterAstarteSpeech_2_1",2,1);
+DB_PlayerComments("HOM_Comment_AfterAstarteSpeech", "HOM_Comment_AfterAstarteSpeech_2_2",2,2);
+
+DB_HOMRoomEvents(TRIGGER_HOM_HallOfHeroes_Comment,"HOM_EnteredHallOfHeroes");
+DB_HOMRoomEvents(TRIGGER_HOM_WareHouse_Comment,"HOM_EnteredWarehouse");
+DB_HOMRoomEvents(TRIGGER_HOM_FireRoom_Comment,"HOM_EnteredFireRoom");
+DB_HOMRoomEvents(TRIGGER_HOM_IceRoom_Comment,"HOM_EnteredIceRoom");
+DB_HOMRoomEvents(TRIGGER_HOM_SecretsRoom_Comment,"HOM_EnteredSecretsRoom");
+DB_HOMRoomEvents(TRIGGER_HOM_ArmouryRoom_Comment,"HOM_EnteredArmouryRoom");
+DB_HOMRoomEvents(TRIGGER_HOM_BoxChapelComment,"HOM_EnteredChapel");
+
+DB_RoomUnlockSequence(2,ITEM_HOM_TeleportToHallOfHeroes_Inactive,TRIGGER_HOM_BoxHohZixZaxTalkArea,TRIGGER_HOM_TeleportReturnHallOfHeroes);	//this one can't be queued since it's the first unlock
+DB_RoomUnlockSequence(3,ITEM_HOM_TeleportToWarehouse_Inactive,TRIGGER_HOM_BoxWareHouseZixZaxTalkArea,TRIGGER_HOM_TeleportReturnWarehouse);	
+DB_RoomUnlockSequence(4,ITEM_HOM_ElementalPortalStatue,TRIGGER_HOM_BoxElementalZixZaxTalkArea,TRIGGER_HOM_ZixZaxElementalDir);
+DB_RoomUnlockSequence(5,ITEM_HOM_TeleportToTellerOfSecrets_Inactive,TRIGGER_HOM_BoxTellerOfSecretsZixZaxTalkArea,TRIGGER_HOM_TeleportReturnTellerOfSecrets);
+DB_RoomUnlockSequence(6,ITEM_HOM_ElementalPortalStatue,TRIGGER_HOM_BoxElementalZixZaxTalkArea,TRIGGER_HOM_ZixZaxElementalDir);
+DB_RoomUnlockSequence(7,ITEM_HOM_TeleportToMephisto_Inactive,TRIGGER_HOM_BoxMephistoZixzaxTalkArea,TRIGGER_HOM_TeleportReturnMephisto);
+DB_RoomUnlockSequence(8,ITEM_HOM_ElementalPortalStatue,TRIGGER_HOM_BoxElementalZixZaxTalkArea,TRIGGER_HOM_ZixZaxElementalDir);
+DB_RoomUnlockSequence(9,ITEM_HOM_TeleportToArmoury_Inactive,TRIGGER_HOM_BoxArmouryZixzaxTalkArea,TRIGGER_HOM_TeleportReturnArmoury);
+DB_RoomUnlockSequence(10,ITEM_HOM_TeleportToTrader_Inactive,TRIGGER_HOM_BoxTraderZixZaxTalkArea,TRIGGER_HOM_TeleportReturnTrader);
+DB_RoomUnlockSequence(11,ITEM_HOM_ElementalPortalStatue,TRIGGER_HOM_BoxElementalZixZaxTalkArea,TRIGGER_HOM_ZixZaxElementalDir);
+DB_RoomUnlockSequence(12,ITEM_HOM_TeleportToChapel_Inactive,TRIGGER_HOM_BoxChapelZixzaxTalkArea,TRIGGER_HOM_TeleportReturnFromChapel);
+
+DB_ZixZaxTalks(2,TRIGGER_HOM_ZixzaxTalk,TRIGGER_HOM_BoxZixZaxTalkArea,"HOM_Zixzax_HallOfHeroes");
+DB_ZixZaxTalks(3,TRIGGER_HOM_ZixzaxTalk,TRIGGER_HOM_BoxZixZaxTalkArea,"HOM_ZixZax_WhatyouSawTalk");
+DB_ZixZaxTalks(4,TRIGGER_HOM_ZixzaxTalk,TRIGGER_HOM_BoxZixZaxTalkArea,"HOM_ZixZax_GoToWeaverTalk");
+DB_ZixZaxTalks(5,TRIGGER_HOM_ZixzaxTalk,TRIGGER_HOM_BoxZixZaxTalkArea,"HOM_ZixZax_SoulTalk");
+DB_ZixZaxTalks(6,TRIGGER_HOM_ZixzaxTalk,TRIGGER_HOM_BoxZixZaxTalkArea,"HOM_ZixZax_Identity");
+DB_ZixZaxTalks(7,TRIGGER_HOM_ZixzaxTalk,TRIGGER_HOM_BoxZixZaxTalkArea,"HOM_ZixZax_Mephisto");
+DB_ZixZaxTalks(8,TRIGGER_HOM_ZixzaxTalk,TRIGGER_HOM_BoxZixZaxTalkArea,"HOM_ZixZax_Guardians");
+DB_ZixZaxTalks(9,TRIGGER_HOM_ZixzaxTalk,TRIGGER_HOM_BoxZixZaxTalkArea,"HOM_ZixZax_Shrike");
+DB_ZixZaxTalks(10,TRIGGER_HOM_ZixzaxTalk,TRIGGER_HOM_BoxZixZaxTalkArea,"HOM_ZixZax_Redeem");
+DB_ZixZaxTalks(11,TRIGGER_HOM_ZixzaxTalk,TRIGGER_HOM_BoxZixZaxTalkArea,"HOM_ZixZax_Watch");
+DB_ZixZaxTalks(12,TRIGGER_HOM_ZixzaxTalk,TRIGGER_HOM_BoxZixZaxTalkArea,"HOM_ZixZax_Tricked");
+
+DB_RoomDialogs("HOM_Astarte1",2,CHARACTER_HOM_Astarte,0);
+DB_RoomDialogs("HOM_Shrike1",3,CHARACTER_HOM_Shrike,0);
+DB_RoomDialogs("HOM_AD_Astarte2",4,CHARACTER_HOM_Astarte,1);
+DB_RoomDialogs("HOM_Astarte3",5,CHARACTER_HOM_Astarte,0);
+DB_RoomDialogs("HOM_AD_Shrike2",6,CHARACTER_HOM_Shrike,1);
+DB_RoomDialogs("HOM_Shrike3",7,CHARACTER_HOM_Shrike,0);
+DB_RoomDialogs("HOM_Astarte4",8,CHARACTER_HOM_Astarte,0);
+DB_RoomDialogs("HOM_Shrike4",9,CHARACTER_HOM_Shrike,0);
+DB_RoomDialogs("HOM_Astarte5",10,CHARACTER_HOM_Astarte,0);
+DB_RoomDialogs("HOM_Shrike5",11,CHARACTER_HOM_Shrike,0);
+DB_RoomDialogs("HOM_Astarte6",12,CHARACTER_HOM_Astarte,0);
+
+DB_ZixzaxMovies(4,"DOS Cutscene 1.bik");
+DB_ZixzaxMovies(6,"DOS Cutscene 2.bik");
+DB_ZixzaxMovies(8,"DOS Cutscene 3.bik");
+DB_ZixzaxMovies(10,"DOS Cutscene 4.bik");
+DB_ZixzaxMovies(11,"DOS Cutscene 5.bik");
+
+DB_LoomUpgrades("Hom_Loom_Transform1","Quest_Loom_Tapestry_E_fc2738c9-4cd0-4ecf-bc36-d35f81aa89ab","FX_Item_Tapestry_Repair_A");
+DB_LoomUpgrades("Hom_Loom_Transform2","Quest_Loom_Tapestry_D_634471f6-f14f-4341-a852-85eeba801c52","FX_Item_Tapestry_Repair_B");
+DB_LoomUpgrades("Hom_Loom_Transform3","Quest_Loom_Tapestry_C_aa460c4d-e0dc-4833-b9fe-6c5abb105a9d","FX_Item_Tapestry_Repair_C");
+DB_LoomUpgrades("Hom_Loom_Transform4","Quest_Loom_Tapestry_B_babaaf6f-09e2-43f7-b0ad-8b89c25178a6","FX_Item_Tapestry_Repair_D");
+DB_LoomUpgrades("Hom_Loom_Transform5","Quest_Loom_Tapestry_A_d8e8c712-7a1b-4025-9ffc-3d839dbecce7","FX_Item_Tapestry_Repair_E");
+
+DB_NumStarStonesFound(0);
+ItemSetCanInteract(ITEM_HOM_ElementalPortalStatue,0);
+DB_ItemPlayerOnlyDialogs(ITEM_HOM_ElementalPortalStatue,"HOM_ChooseChamber");
+
+DB_ElementalRoom("Fire",ITEM_HOM_TeleportToFireRoom_Inactive,"HOM_FireUnlocked");
+DB_ElementalRoom("Ice",ITEM_HOM_TeleportToIceRoom_Inactive,"HOM_IceUnlocked");
+DB_ElementalRoom("Earth",ITEM_HOM_TeleportToEarth_Inactive,"HOM_EarthUnlocked");
+DB_ElementalRoom("Air",ITEM_HOM_TeleportToAir_Inactive,"HOM_AirUnlocked");
+
+DB_MovieEvents("DOS Cutscene 1.bik","HOM_HadZixzaxMovie1",1,"Update1");
+DB_MovieEvents("DOS Cutscene 2.bik","HOM_HadZixzaxMovie2",2,"Update2");
+DB_MovieEvents("DOS Cutscene 3.bik","HOM_HadZixzaxMovie3",3,"Update3");
+DB_MovieEvents("DOS Cutscene 4.bik","HOM_HadZixzaxMovie4",4,"Update4");
+DB_MovieEvents("DOS Cutscene 5.bik","HOM_HadZixzaxMovie5",5,"Update5");
+
+DB_WeaverMovies("DOS Cutscene 1.bik","HOM_WeaverPlayMovie1");
+DB_WeaverMovies("DOS Cutscene 2.bik","HOM_WeaverPlayMovie2");
+DB_WeaverMovies("DOS Cutscene 3.bik","HOM_WeaverPlayMovie3");
+DB_WeaverMovies("DOS Cutscene 4.bik","HOM_WeaverPlayMovie4");
+DB_WeaverMovies("DOS Cutscene 5.bik","HOM_WeaverPlayMovie5");
+
+DB_HomesteadImps(CHARACTER_HOM_RedImp1,"HOM_Tadhg",0,TRIGGER_HOM_ImpScene1);
+DB_HomesteadImps(CHARACTER_HOM_RedImp2,"HOM_Raet_Nil_Tov",0,TRIGGER_HOM_ImpScene2);
+DB_HomesteadImps(CHARACTER_HOM_RedImp3,"HOM_Jaesun",0,TRIGGER_HOM_ImpScene3);
+DB_HomesteadImps(CHARACTER_HOM_RedImp4,"HOM_CrookedBee",0,TRIGGER_HOM_ImpScene4);
+DB_HomesteadImps(CHARACTER_HOM_RedImp5,"HOM_Ta_oma_Mente",0,TRIGGER_HOM_ImpScene5);
+DB_HomesteadImps(CHARACTER_HOM_RedImp6,"HOM_Sitra_Achara",0,TRIGGER_HOM_ImpScene6);
+DB_HomesteadImps(CHARACTER_HOM_RedImp7,"HOM_Evdk",0,TRIGGER_HOM_ImpScene7);
+DB_HomesteadImps(CHARACTER_HOM_RedImp8,"HOM_Oscar_Majestik",0,TRIGGER_HOM_ImpScene8);
+DB_HomesteadImps(CHARACTER_HOM_RedImp9,"HOM_Angthoron",0,TRIGGER_HOM_ImpScene9);
+DB_HomesteadImps(CHARACTER_HOM_RedImpLeader,"HOM_RedImpLeader",0,TRIGGER_HOM_ImpLeaderScene);
+
+//ID,AttackAtmos,NormalAtmos
+DB_HomesteadAtmosphere("b323f8af-a9bc-4643-af95-92209fc1bbd9","Under_Attack","TheLoom");	//Main hall
+DB_HomesteadAtmosphere("67f1e14e-d7ab-4e2f-82b4-0d8ac614185a","Under_Attack","Elemental_Air");	
+DB_HomesteadAtmosphere("88d33c7b-883f-470b-b69b-8a8e87e1d5fa","Under_Attack","Elemental_Fire");	
+DB_HomesteadAtmosphere("da7bc463-aea4-432f-97b4-44613ff07b19","Under_Attack","Elemental_Ice");	
+DB_HomesteadAtmosphere("d191b92f-cd57-40cd-81f6-2818baa72a75","Under_Attack","Elemental_Earth");	//Hall of heroes
+DB_HomesteadAtmosphere("58ba0cfe-ddff-4570-a2d0-64beabaec06b","Under_Attack","HallofHeroes");	//Armoury
+DB_HomesteadAtmosphere("ec0d9d28-1f43-4e65-8a9e-b8d4c30be1b0","Under_Attack","Elemental_Air");	//chapel
+DB_HomesteadAtmosphere("91b984a9-f0f0-4e01-a796-a19b393949f9","Under_Attack","TheLoom");		//warehouse
+DB_HomesteadAtmosphere("93f9b1b2-0f8f-4823-a922-a7de0990165e","Under_Attack","TheLoom");		//teller of secrets 
+DB_HomesteadAtmosphere("8006ad6f-d03b-411e-8ede-d96fdc7a1e8c","Under_Attack","TheLoom");		//interdimensional trader 
+DB_HomesteadAtmosphere("f62fe670-634e-4032-a772-51bc1469bb90","Under_Attack","Elemental_Fire");	//mephisto 
+DB_HomesteadAtmosphere("464f2119-8243-4eb4-a608-034e25875c9e","Under_Attack","TheLoom");		//Observatory
+
+DB_Dialogs(CHARACTER_HOM_Earth_Skill_Trainer,"HOM_Earth_Elemental");
+DB_Dialogs(CHARACTER_HOM_Fire_Skill_Trainer,"HOM_Fire_Elemental");
+DB_Dialogs(CHARACTER_HOM_Ice_Skill_Trainer,"HOM_Ice_Elemental");
+DB_Dialogs(CHARACTER_HOM_Trader,"HOM_Trader");
+DB_Dialogs(CHARACTER_HOM_Weaver,"HOM_Weaver");
+DB_Dialogs(CHARACTER_HOM_Wind_Skill_Trainer,"HOM_Air_Elemental");
+DB_Dialogs(CHARACTER_HOM_TellerOfSecrets,"HOM_TellerOfSecrets");
+
+DB_HomesteadDialogEvents("HOM_Mephisto","HOM_MetMephisto");
+DB_HomesteadDialogEvents("HOM_Earth_Elemental","HOM_MetEarthElemental");
+DB_HomesteadDialogEvents("HOM_Air_Elemental","HOM_MetAirElemental");
+DB_HomesteadDialogEvents("HOM_Trader","HOM_MetInterdimensionalTrader");
+DB_HomesteadDialogEvents("HOM_TellerOfSecrets","HOM_MetTellerOfSecrets");
+
+DB_HomeRoomLog("Fire",ITEM_HOM_TeleportFromFire);
+DB_HomeRoomLog("Ice",ITEM_HOM_TeleportFromIce);
+DB_HomeRoomLog("Earth",ITEM_HOM_TeleportFromEarth);
+DB_HomeRoomLog("Air",ITEM_HOM_TeleportFromAir);
+DB_HomeRoomLog("HoH",ITEM_HOM_TeleportFromHallHeroes);
+DB_HomeRoomLog("Bedroom",ITEM_HOM_TeleportFromWarehouse);
+DB_HomeRoomLog("Secrets",ITEM_HOM_TeleportFromTellerOfSecrets);
+DB_HomeRoomLog("Mephisto",ITEM_HOM_TeleportFromMephisto);
+DB_HomeRoomLog("Armoury",ITEM_HOM_TeleportFromArmoury);
+DB_HomeRoomLog("Trader",ITEM_HOM_TeleportFromTrader);
+DB_HomeRoomLog("Chapel",ITEM_HOM_TeleportFromChapel);
+
+DB_HOMRegionToRoom(TRIGGER_HOM_REGION_FireElemental,ITEM_HOM_TeleportFromFire);
+DB_HOMRegionToRoom(TRIGGER_HOM_REGION_IceElemental,ITEM_HOM_TeleportFromIce);
+DB_HOMRegionToRoom(TRIGGER_HOM_REGION_EarthElemental,ITEM_HOM_TeleportFromEarth);
+DB_HOMRegionToRoom(TRIGGER_HOM_REGION_AirElemental,ITEM_HOM_TeleportFromAir);
+DB_HOMRegionToRoom(TRIGGER_HOM_REGION_HallOfHeroes,ITEM_HOM_TeleportFromHallHeroes);
+DB_HOMRegionToRoom(TRIGGER_HOM_REGION_Warehouse,ITEM_HOM_TeleportFromWarehouse);
+DB_HOMRegionToRoom(TRIGGER_HOM_REGION_TellerOfSecrets,ITEM_HOM_TeleportFromTellerOfSecrets);
+DB_HOMRegionToRoom(TRIGGER_HOM_REGION_Mephisto,ITEM_HOM_TeleportFromMephisto);
+DB_HOMRegionToRoom(TRIGGER_HOM_REGION_Armoury,ITEM_HOM_TeleportFromArmoury);
+DB_HOMRegionToRoom(TRIGGER_HOM_REGION_Trader,ITEM_HOM_TeleportFromTrader);
+DB_HOMRegionToRoom(TRIGGER_HOM_REGION_Chapel,ITEM_HOM_TeleportFromChapel);
+
+IsStoryNpc(CHARACTER_HOM_Astarte);
+IsStoryNpc(CHARACTER_HOM_Shrike);
+SetStoryNpcStatus(CHARACTER_HOM_Astarte);
+SetStoryNpcStatus(CHARACTER_HOM_Shrike);
+DB_NoDefaultBehavior(CHARACTER_HOM_Astarte);
+DB_NoDefaultBehavior(CHARACTER_HOM_Shrike);
+
+DB_HOM_MarkerDB(ITEM_HOM_TeleportToAir,TRIGGER_HOM_REGION_AirElemental,"SUBREGION_HOM_Air");
+DB_HOM_MarkerDB(ITEM_HOM_TeleportToArmoury,TRIGGER_HOM_REGION_Armoury,"SUBREGION_HOM_Armoury");
+DB_HOM_MarkerDB(ITEM_HOM_TeleportToChapel,TRIGGER_HOM_REGION_Chapel,"SUBREGION_HOM_Chapel");
+DB_HOM_MarkerDB(ITEM_HOM_TeleportToEarth,TRIGGER_HOM_REGION_EarthElemental,"SUBREGION_HOM_Earth");
+DB_HOM_MarkerDB(ITEM_HOM_TeleportToFireRoom,TRIGGER_HOM_REGION_FireElemental,"SUBREGION_HOM_Fire");
+DB_HOM_MarkerDB(ITEM_HOM_TeleportToHallOfHeroes,TRIGGER_HOM_REGION_HallOfHeroes,"SUBREGION_HOM_HallOfHeroes");
+DB_HOM_MarkerDB(ITEM_HOM_TeleportToIceRoom,TRIGGER_HOM_REGION_IceElemental,"SUBREGION_HOM_Ice");
+DB_HOM_MarkerDB(ITEM_HOM_TeleportToMephisto,TRIGGER_HOM_REGION_Mephisto,"SUBREGION_HOM_Mephisto");
+DB_HOM_MarkerDB(ITEM_HOM_TeleportToTellerOfSecrets,TRIGGER_HOM_REGION_TellerOfSecrets,"SUBREGION_HOM_TellerOfSecrets");
+DB_HOM_MarkerDB(ITEM_HOM_TeleportToTrader,TRIGGER_HOM_REGION_Trader,"SUBREGION_HOM_Trader");
+DB_HOM_MarkerDB(ITEM_HOM_TeleportToWarehouse,TRIGGER_HOM_REGION_Warehouse,"SUBREGION_HOM_Warehouse");
+
+DB_HOM_VoidDemonProjectileShooters(ITEM_HOM_VoidDemonShooter1);
+DB_HOM_VoidDemonProjectileShooters(ITEM_HOM_VoidDemonShooter2);
+
+DB_CustomWarningDialog(CHARACTER_CYS_Zixzax,"Zixzax_please_dont_attack");
+DB_CustomWarningDialog(CHARACTER_CYS_Bellegar,"Bellegar_please_dont_attack");
+DB_CustomWarningDialog(CHARACTER_HOM_Icara,"Icara_please_dont_attack");
+DB_CustomWarningDialog(CHARACTER_Zandalor,"Zandalor_please_dont_attack");
+
+IsStoryNPC(CHARACTER_HOM_Weaver);
+SetStoryNpcStatus(CHARACTER_HOM_Weaver);
+DB_NoDefaultBehavior(CHARACTER_HOM_Weaver);
+
+KBSECTION
+IF
+RegionStarted("Homestead")
+THEN
+ItemSetForceSynch(ITEM_HOM_Loom,1);
+
+IF
+RegionEnded("Homestead")
+THEN
+ItemSetForceSynch(ITEM_HOM_Loom,0);
+
+IF
+CharacterUsedItem(_Character,ITEM_HOM_TeleportToForbiddenZone)
+THEN
+CharacterDisplayText(_Character,"HOM_Forbidden");
+
+IF
+DB_HOM_Teleporter(_InactiveTP,_ActiveTP,_,_UnvisitedTP)
+THEN
+ItemSetOnstage(_ActiveTP,0);
+ItemSetOnstage(_UnvisitedTP,0);
+
+IF
+DB_HOM_UnlockTeleporter(_InactiveTP)
+AND
+DB_CurrentLevel("Homestead")
+THEN
+PROC_Transform_HOM_Teleporter(_InactiveTP);
+
+PROC
+PROC_Transform_HOM_Teleporter((ITEM)_InactiveTP)
+AND
+ItemGetPosition(_InactiveTP,_X,_Y,_Z)
+THEN
+PlayEffectAtPosition("FX_GP_StarStone_Down_A",_X,_Y,_Z);
+ItemTimer(_InactiveTP,"Unlock_HOM_Teleporter",400);
+
+IF
+ItemTimerFinished(ITEM_HOM_ElementalPortalStatue,"Unlock_HOM_Teleporter")
+THEN
+NOT DB_HOM_UnlockTeleporter(ITEM_HOM_ElementalPortalStatue);
+
+IF
+ItemTimerFinished(_InactiveTP,"Unlock_HOM_Teleporter")
+AND
+DB_CurrentLevel("Homestead")
+AND
+DB_HOM_Teleporter(_InactiveTP,_ActiveTP,_OtherSide,_UnvisitedTP)
+AND
+ItemGetPosition(_InactiveTP,_X,_Y,_Z)
+THEN
+NOT DB_HOM_UnlockTeleporter(_InactiveTP);
+ItemSetOnstage(_InactiveTP,0);
+ItemTeleportToPosition(_UnvisitedTP,_X,_Y,_Z);
+ItemSetOnstage(_UnvisitedTP,1);
+
+IF
+CharacterUsedItem(_Player,_UnvisitedTP)
+AND
+ItemGetPosition(_UnvisitedTP,_X,_Y,_Z)
+AND
+DB_HOM_Teleporter(_InactiveTP,_ActiveTP,_OtherSide,_UnvisitedTP)
+THEN
+ItemSetOnstage(_UnvisitedTP,0);
+ItemTeleportToPosition(_ActiveTP,_X,_Y,_Z);
+ItemSetOnstage(_ActiveTP,1);
+NOT DB_HOM_Teleporter(_InactiveTP,_ActiveTP,_OtherSide,_UnvisitedTP);
+ProcClearNewHOMRoom();
+
+PROC
+ProcShowNewRoomTutorialMessage()
+AND
+DB_GlobalEvent("CYS_HomesteadKeyGiven")
+THEN
+PROC_CheckPlayTut("TUT_HOMRoomUnlocked");
+
+PROC
+Proc_HOM_UnlockMajorRoom()
+AND
+DB_NumStarStonesFound(_Num)
+AND
+IntegerSum(_Num,1,_New)
+THEN
+CharacterSetVarInteger(CHARACTER_CYS_Zixzax,"DoWalkAbout",0);
+NOT DB_NumStarStonesFound(_Num);
+DB_NumStarStonesFound(_New);
+ProcHOMHandleRoomUnlock(_New);
+
+PROC
+ProcHOMHandleRoomUnlock((INTEGER)_New)
+AND
+NOT DB_HOMNoRoomUnlock(1) 
+THEN
+ProcShowNewRoomTutorialMessage();
+ProcQueueStarstoneRoom(_New);
+
+PROC
+ProcHOMHandleRoomUnlock((INTEGER)_New)
+AND
+DB_HOMNoRoomUnlock(1) 
+THEN
+DB_StarStoneRoomQueue(_New);
+
+PROC
+ProcQueueStarstoneRoom((INTEGER)_Room)
+AND
+NOT DB_StarStoneRoomQueue(_)
+THEN
+ProcHOMSetupZixZaxRoomDialog(_Room);
+
+PROC
+ProcHOMClearOffworldchamber()
+AND
+DB_HOMOffworldRoom(_Room)
+THEN
+NOT DB_HOMOffworldRoom(_Room);
+
+PROC
+ProcHOMSetOffworldChamber((INTEGER)_Room)
+THEN
+ProcHOMClearOffworldchamber();
+DB_HOMOffworldRoom(_Room);
+
+PROC
+ProcHOMSetupZixZaxRoomDialog((INTEGER)_Room)
+AND
+NOT DB_CurrentLevel("Homestead")
+AND
+DB_ZixZaxTalks(_Room,_ZixZaxTrig,_TalkArea,_Diag)
+AND
+NOT DB_Dead(CHARACTER_CYS_Zixzax)
+THEN
+ProcHOMSetOffworldChamber(_Room);
+CharacterSetVarItem(CHARACTER_CYS_Zixzax,"Seat",ITEM_NULL);
+CharacterTeleportToTrigger(CHARACTER_CYS_Zixzax,_ZixZaxTrig,"");
+DB_ZixzaxDialog(_TalkArea,_Diag);
+
+IF
+DB_ZixzaxDialog((TRIGGER)_Trig,(STRING)_Dialog)
+THEN
+ProcSetZixzaxDialog(_Trig,_Dialog);
+
+PROC
+ProcHOMCancelOldZixzaxDialog()
+AND
+DB_ZixzaxDialog(_Other,_Dialog)
+THEN
+TriggerUnregisterForPlayers(_Other);
+NOT DB_ZixzaxDialog(_Other,_Dialog);
+
+PROC
+ProcSetZixzaxDialog((TRIGGER)_Trig,(STRING)_Dialog)
+AND
+DB_ZixzaxDialog(_Other,_Dialog)
+AND
+_Other!=_Trig
+THEN
+DB_ZixzaxDuplicateTrigger(_Trig,_Dialog);
+
+PROC
+ProcSetZixzaxDialog((TRIGGER)_Trig,(STRING)_Dialog)
+AND
+NOT DB_ZixzaxDuplicateTrigger(_Trig,_Dialog)
+THEN
+TriggerRegisterForPlayers(_Trig);
+
+PROC
+ProcSetZixzaxDialog((TRIGGER)_Trig,(STRING)_Dialog)
+AND
+DB_ZixzaxDuplicateTrigger(_Trig,_Dialog)
+THEN
+NOT DB_ZixzaxDialog((TRIGGER)_Trig,(STRING)_Dialog);
+
+PROC
+ProcSetZixzaxDialog((TRIGGER)_Trig,(STRING)_Dialog)
+THEN
+NOT DB_ZixzaxDuplicateTrigger(_Trig,_Dialog);
+
+IF
+CharacterEnteredTrigger(_Player,_Trig)
+AND
+DB_ZixzaxDialog(_Trig,_Dialog)
+AND
+NOT DB_Dead(_Player)
+AND
+NOT DB_IsInDialog(_Player)
+THEN
+DialogRequestStopForCharacter(CHARACTER_CYS_Zixzax);
+NOT DB_IsInDialog(CHARACTER_CYS_Zixzax);
+NOT DB_ZixzaxDialog(_Trig,_Dialog);
+TriggerUnregisterForPlayers(_Trig);
+ProcDoDualDialogPlayerCheck(_Player);
+ProcDoTwoSpeakerDialog(_Dialog,CHARACTER_CYS_Zixzax,_Player);
+
+PROC
+ProcHOMSetupZixZaxRoomDialog((INTEGER)_Room)
+AND
+NOT DB_CurrentLevel("Homestead")
+AND
+NOT DB_ZixZaxTalks(_Room,_,_,_)
+AND
+NOT DB_Dead(CHARACTER_CYS_Zixzax)
+AND
+DB_RoomUnlockSequence(_Room,_Item,_,_)
+THEN
+ProcHOMSetOffworldChamber(_Room);
+DB_ZixZaxRunTarget(_Room);
+ProcCharacterMoveToItem(CHARACTER_CYS_Zixzax,_Item,1,"ZixZaxArrivedAtQueuedRoom");
+
+PROC
+ProcHOMSetupZixZaxRoomDialog((INTEGER)_Room)
+AND
+DB_CurrentLevel("Homestead")
+AND
+DB_RoomUnlockSequence(_Room,_Item,_,_Dir)
+AND
+NOT DB_Dead(CHARACTER_CYS_Zixzax)
+THEN
+DB_ZixZaxRunTarget(_Room);
+DialogRequestStopForCharacter(CHARACTER_CYS_Zixzax);
+CharacterSetHasDialog(CHARACTER_CYS_Zixzax,0);
+CharacterSetVarItem(CHARACTER_CYS_Zixzax,"Seat",ITEM_NULL);
+ProcCharacterMoveToItem(CHARACTER_CYS_Zixzax,_Item,1,"ZixZaxArrivedAtQueuedRoom");
+CharacterLookFromTrigger(CHARACTER_CYS_Zixzax,_Dir,0);
+
+PROC
+ProcHOMSetupZixZaxRoomDialog((INTEGER)_Room)
+AND
+DB_RoomUnlockSequence(_Room,_Item,_,_Dir)
+AND
+DB_Dead(CHARACTER_CYS_Zixzax)
+AND
+NOT DB_ChoosingElementalRoom(_)
+AND
+NOT DB_RoomToUnlock(_,_,_,_)
+THEN
+DB_NoRoomQueue(1);
+ProcUnlockRoom(_Room);
+
+PROC
+ProcQueueStarstoneRoom((INTEGER)_Room)
+AND
+NOT DB_NoRoomQueue(1)
+THEN
+DB_StarStoneRoomQueue(_Room);
+
+PROC
+ProcQueueStarstoneRoom((INTEGER)_Room)
+AND
+DB_RoomUnlockSequence(_Room,_,_,_)
+THEN
+ProcIndicateNewHOMRoom();
+
+PROC
+ProcQueueStarstoneRoom((INTEGER)_Room)
+THEN
+NOT DB_NoRoomQueue(1);
+
+IF
+DialogEnded(_Diag,_)
+AND
+DB_ZixZaxTalks(_Room,_ZixZaxTrig,_TalkArea,_Diag)
+AND
+NOT DB_GlobalEvent("HOM_ZixzaxReady")
+THEN
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_CYS_Zixzax);
+DB_Dialogs(CHARACTER_CYS_Zixzax,_Diag);
+
+IF
+DialogEnded(_Diag,_)
+AND
+DB_ZixZaxTalks(_Room,_ZixZaxTrig,_TalkArea,_Diag)
+AND
+DB_GlobalEvent("HOM_ZixzaxReady")
+AND
+DB_RoomUnlockSequence(_Room,_Item,_,_)
+THEN
+GlobalClearEvent("HOM_ZixzaxReady");
+CharacterSetVarItem(CHARACTER_CYS_Zixzax,"Seat",ITEM_NULL);
+ProcCharacterMoveToItem(CHARACTER_CYS_Zixzax,_Item,1,"");
+CharacterSetVarInteger(CHARACTER_CYS_Zixzax,"WaitAtPortal",1);
+ProcUnlockRoom(_Room);
+
+PROC
+ProcUnlockRoom((INTEGER)_Room)
+AND
+DB_RoomUnlockSequence(_Room,_Item,_TalkArea,_Dir)
+THEN
+DB_CurrentRoom(_Room);
+DB_HOM_UnlockTeleporter(_Item);
+NOT DB_RoomUnlockSequence(_Room,_Item,_TalkArea,_Dir);
+NOT DB_CurrentRoom(_Room);
+
+PROC
+ProcUnlockRoom((INTEGER)_Room)
+AND
+NOT DB_StarStoneRoomQueue(_)
+AND
+_Room>1
+AND
+DB_RoomToUnlock(_,_,_,_)
+THEN
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_CYS_Zixzax);
+ProcCheckZixZaxRoomWaitDialog();
+
+PROC
+ProcUnlockRoom((INTEGER)_Room)
+AND
+DB_StarStoneRoomQueue(_)
+AND
+NOT DB_SetupUnlockDialog(1)
+THEN
+DB_SetupUnlockDialog(1);
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_CYS_Zixzax);
+ProcCheckZixZaxRoomWaitDialog();
+
+PROC
+ProcCheckZixZaxRoomWaitDialog()
+AND
+NOT DB_ChoosingElementalRoom(_)
+THEN
+ProcRemoveNPCADs(CHARACTER_CYS_Zixzax);
+CharacterSetVarInteger(CHARACTER_CYS_Zixzax,"AtElementalStatue",0);
+DB_AD_Dialog(CHARACTER_CYS_Zixzax,"HOM_AD_ZixzaxWaitForRoomUnlock");
+
+PROC
+ProcCheckZixZaxRoomWaitDialog()
+AND
+DB_ChoosingElementalRoom(_)
+THEN
+ProcRemoveNPCADs(CHARACTER_CYS_Zixzax);
+CharacterSetVarInteger(CHARACTER_CYS_Zixzax,"AtElementalStatue",1);
+DB_AD_Dialog(CHARACTER_CYS_Zixzax,"HOM_AD_ZixzaxChooseRoom");
+
+PROC
+ProcUnlockRoom((INTEGER)_Room)
+THEN
+NOT DB_SetupUnlockDialog(1);
+
+PROC
+ProcUnlockRoom((INTEGER)_Room)
+AND
+DB_ZixZaxTalks(_Room,_ZixZaxTrig,_TalkArea,_Diag)
+THEN
+NOT DB_ZixZaxTalks(_Room,_ZixZaxTrig,_TalkArea,_Diag);
+
+PROC
+ProcCheckRoomQueue()
+AND
+DB_HOMNoRoomUnlock(1)
+THEN
+//if we get here, that means we unlocked a room by some action 
+//we shouldn't progress to a new one, but we can clear some facts since we're done with that room
+DB_PickedNewRoom(1);
+ProcHOMClearOffworldchamber();
+DB_PickedNewRoom(1);
+ProcClearRoomToUnlock();
+
+PROC
+ProcCheckRoomQueue()
+AND
+NOT DB_StarStoneRoomQueue(_)
+AND
+NOT DB_PickedNewRoom(1)
+THEN
+ProcHOMClearOffworldchamber();
+DB_PickedNewRoom(1);
+ProcClearRoomToUnlock();
+ProcSetupZixzaxOnEmptyQueue();
+
+PROC
+ProcSetupZixzaxOnEmptyQueue()
+AND
+NOT DB_Dead(CHARACTER_CYS_Zixzax)
+THEN
+CharacterSetVarInteger(CHARACTER_CYS_Zixzax,"WaitAtPortal",0);
+ProcRemoveNPCADs(CHARACTER_CYS_Zixzax);
+CharacterSetHasDialog(CHARACTER_CYS_Zixzax,0);
+DB_Dialogs(CHARACTER_CYS_Zixzax,"HOM_ZixZax");
+CharacterMoveToCharacter(CHARACTER_CYS_Zixzax,CHARACTER_HOM_Weaver,1,"ZixZaxArrivedAtWeaver",0);
+CharacterSetVarItem(CHARACTER_CYS_Zixzax,"Seat",ITEM_HOM_Chair_Zixzax);
+
+IF
+CharacterEvent(CHARACTER_CYS_Zixzax,"ZixZaxArrivedAtWeaver")
+THEN
+CharacterSetHasDialog(CHARACTER_CYS_Zixzax,1);
+
+IF
+CharacterDying(CHARACTER_CYS_Zixzax)
+AND
+DB_ZixZaxTalks(_Nr,_Trig,_Talk,_Event)
+THEN
+NOT DB_ZixZaxTalks(_Nr,_Trig,_Talk,_Event);
+ProcHOMClearOffworldchamber();
+
+PROC
+ProcCheckRoomQueue()
+AND
+DB_StarStoneRoomQueue(_Room)
+AND
+NOT DB_PickedNewRoom(1)
+AND
+DB_RoomUnlockSequence(_Room,_Item,_Area,_Dir)
+THEN
+ProcClearRoomToUnlock();
+DB_PickedNewRoom(1);
+ProcHOMSetupZixZaxRoomDialog(_Room);
+DB_ZixZaxRunTarget(_Room);
+
+PROC
+ProcCheckRoomQueue()
+AND
+NOT DB_PickedNewRoom(1)
+AND
+DB_StarStoneRoomQueue(_Room)
+AND
+NOT DB_RoomUnlockSequence(_Room,_,_,_)
+THEN
+NOT DB_StarStoneRoomQueue(_Room);
+
+PROC
+ProcCheckRoomQueue()
+AND
+NOT DB_PickedNewRoom(1)
+AND
+NOT DB_StarStoneRoomQueue(_)
+THEN
+ProcCheckRoomQueue();
+
+IF
+CharacterEvent(CHARACTER_CYS_Zixzax,"ZixZaxArrivedAtQueuedRoom")
+AND
+DB_ZixZaxRunTarget(_Room)
+THEN
+CharacterSetVarInteger(CHARACTER_CYS_Zixzax,"WaitAtPortal",1);
+ProcSetZixzaxRoomDialog(_Room);
+
+PROC
+ProcSetZixzaxRoomDialog((INTEGER)_Room)
+AND
+NOT DB_ChoosingElementalRoom(_)
+THEN
+ProcSetZixzaxRoomDialog_Normal(_Room);
+
+PROC
+ProcSetZixzaxRoomDialog((INTEGER)_Room)
+AND
+DB_ChoosingElementalRoom(_)
+THEN
+ProcRemoveDialogEntryForSpeaker(CHARACTER_CYS_Zixzax,"HOM_ZixZax");
+CharacterSetVarInteger(CHARACTER_CYS_Zixzax,"AtElementalStatue",1);
+DB_AD_Dialog(CHARACTER_CYS_Zixzax,"HOM_AD_ZixzaxChooseRoom");
+
+PROC
+ProcSetZixzaxRoomDialog_Normal((INTEGER)_Room)
+AND
+DB_RoomUnlockSequence(_Room,_Item,_TalkArea,_)
+AND
+DB_ZixZaxTalks(_Room,_,_,_Diag)
+THEN
+DB_ZixzaxDialog(_TalkArea,_Diag);
+
+PROC
+ProcSetZixzaxRoomDialog_Normal((INTEGER)_Room)
+AND
+DB_RoomUnlockSequence(_Room,_Item,_TalkArea,_)
+AND
+NOT DB_ZixZaxTalks(_Room,_,_,_)
+THEN
+ProcUnlockRoom(_Room);
+
+IF
+CharacterEvent(CHARACTER_CYS_Zixzax,"ZixZaxArrivedAtQueuedRoom")
+AND
+DB_ZixZaxRunTarget(_Room)
+THEN
+NOT DB_ZixZaxRunTarget(_Room);
+
+PROC
+ProcCheckRoomQueue()
+THEN
+NOT DB_PickedNewRoom(1);
+
+PROC
+ProcHOMGiveRoomQuestUpdate((ITEM)_Item)
+AND
+DB_HomeRoomLog(_Update,_Item)
+AND
+_Update!=""
+THEN
+NOT DB_HomeRoomLog(_Update,_Item);
+QuestUpdate("HOM_Starstones",_Update);
+
+IF
+DB_HOMRegionToRoom(_Trigger,_)
+THEN
+TriggerRegisterForPlayers(_Trigger);
+
+IF
+CharacterLeftTrigger(_Player,_Trigger)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_Companion(_Player)
+AND
+DB_HOMRegionToRoom(_Trigger,_Item)
+AND
+DB_RoomToUnlock(_Entry,_Room,_Item,_Unvisited)
+AND
+NOT DB_RoomDialogs(_,_Room,_,_)
+AND
+DB_CurrentLevel("Homestead")
+THEN
+ProcHOMGiveRoomQuestUpdate(_Item);
+ProcHOMDoFinalRoomUnlock(_Room);
+ProcCheckRoomQueue();
+
+IF
+CharacterLeftRegion(_Char,"Homestead")
+AND
+_Char.DB_IsPlayer()
+AND
+DB_RoomToUnlock(_Entry,_Room,_Exit,_Unvisited)
+AND
+NOT DB_RoomDialogs(_,_Room,_,_)
+AND
+DB_HomeRoomLog(_Update,_Exit)
+AND
+_Update!=""
+THEN
+ProcHOMDoFinalRoomUnlock(_Room);
+NOT DB_HomeRoomLog(_Update,_Exit);
+QuestUpdate("HOM_Starstones",_Update);
+
+PROC
+ProcHOMDoFinalRoomUnlock((INTEGER)_Room)
+AND
+DB_RoomToUnlock(_Entry,_Room,_Exit,_Unvisited)
+THEN
+NOT DB_StarStoneRoomQueue(_Room);
+NOT DB_RoomToUnlock(_Entry,_Room,_Exit,_Unvisited);
+ProcHOMSetupRoomMarker(_Entry);
+
+PROC
+ProcOneShotTriggerEntered(_,(TRIGGER)_Trigger)
+AND
+DB_HOMRoomEvents(_Trigger,_Event)
+THEN
+GlobalSetEvent(_Event);
+
+PROC
+ProcHOMSetupRoomMarker((ITEM)_Entry)
+AND
+DB_HOM_MarkerDB(_Entry,_Trigger,_Message)
+THEN
+DB_Subregion(_Trigger,_Message,1);
+ProcShowMarker(_Message);
+
+IF
+AutomatedDialogStarted(_Diag,_)
+AND
+DB_RoomDialogs(_Diag,_Room,_Char,_AD)
+AND
+DB_RoomToUnlock(_Item,_Room,_Exit,_Unvisited)
+THEN
+DB_CurRoomAD(_Diag,_Char);
+NOT DB_RoomDialogs(_Diag,_Room,_Char,_AD);
+
+IF
+AutomatedDialogEnded(_Diag,_)
+AND
+DB_CurRoomAD(_Diag,_Char)
+THEN
+NOT DB_CurRoomAD(_Diag,_Char);
+Poof(_Char);
+
+IF
+DialogEnded(_Diag,_)
+AND
+DB_RoomDialogs(_Diag,_Room,_Char,_AD)
+AND
+DB_RoomToUnlock(_Item,_Room,_,_)
+THEN
+NOT DB_RoomDialogs(_Diag,_Room,_Char,_AD);
+ProcHOMPoofAstarteShrikeIfNeeded(_Diag,_Char);
+
+PROC
+ProcHOMPoofAstarteShrikeIfNeeded((STRING)_Dialog,(CHARACTER)_Char)
+AND
+_Dialog!="HOM_Astarte1"
+AND
+_Dialog!="HOM_Shrike1"
+THEN
+Poof(_Char);
+
+IF
+RegionStarted("Homestead")
+THEN
+DB_WasInHomeStead(1);
+
+IF
+RegionStarted(_Region)
+AND
+_Region!="Homestead"
+AND
+DB_WasInHomeStead(1)
+AND
+NOT DB_ChoosingElementalRoom(_)
+AND
+NOT DB_HOMNoRoomUnlock(1)
+AND
+NOT DB_RoomToUnlock(_,_,_,_)
+THEN
+ProcHOMCancelOldZixzaxDialog();
+ProcCheckRoomQueue();
+
+IF
+RegionStarted(_Region)
+AND
+_Region!="Homestead"
+THEN
+NOT DB_WasInHomeStead(1);
+
+PROC
+ProcClearRoomToUnlock()
+AND
+DB_RoomToUnlock(_Item,_Room,_Exit,_Unvisited)
+THEN
+NOT DB_RoomToUnlock(_Item,_Room,_Exit,_Unvisited);
+
+PROC
+ProcIndicateNewHOMRoom()
+THEN
+SetHomesteadKeyState(2);
+TimerCancel("HOM_StopTheFlashing");
+DB_HomeSteadFlashing(1);
+
+PROC
+ProcClearNewHOMRoom()
+AND
+DB_HomeSteadFlashing(1)
+THEN
+NOT DB_HomeSteadFlashing(1);
+SetHomesteadKeyState(1);
+TimerCancel("HOM_StopTheFlashing");
+
+IF
+RegionStarted("Homestead")
+AND
+DB_HomeSteadFlashing(1)
+THEN
+ProcClearNewHOMRoom();
+
+IF
+DB_HomeSteadFlashing(1)
+AND
+NOT DB_StarStoneRoomQueue(_)
+THEN
+ProcClearNewHOMRoom();
+
+IF
+DB_HomeSteadFlashing(1)
+THEN
+TimerLaunch("HOM_StopTheFlashing",180000);
+
+IF
+TimerFinished("HOM_StopTheFlashing")
+AND
+DB_HomeSteadFlashing(1)
+THEN
+ProcClearNewHOMRoom();
+
+IF
+DB_HOM_UnlockTeleporter(ITEM_HOM_TeleportToWarehouse_Inactive)
+THEN
+EnableSendToHomestead(1);
+
+IF
+DB_HOM_UnlockTeleporter(_Item)
+AND
+DB_HOM_Teleporter(_Item,_Unlocked,_ExitTeleporter,_Unvisited)
+AND
+DB_CurrentRoom(_Room)
+THEN
+DB_RoomToUnlock(_Unlocked,_Room,_ExitTeleporter,_Unvisited);
+
+//REGION Chosing your elemental chamber
+
+IF
+DB_HOM_UnlockTeleporter(ITEM_HOM_ElementalPortalStatue)
+AND
+DB_CurrentRoom(_Room)
+THEN
+DB_ChoosingElementalRoom(_Room);
+DB_OneShotPlayerOnlyTrigger(TRIGGER_HOM_BoxStatueTalkArea);
+PROC_LoopEffectAtItem("FX_GP_Light_Blue_A", ITEM_HOM_ElementalPortalStatue,"ElementalStatueAttention","Homestead");
+ItemSetCanInteract(ITEM_HOM_ElementalPortalStatue,1);
+
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,TRIGGER_HOM_BoxStatueTalkArea)
+THEN
+ProcDoTwoSpeakerItemDialog("HOM_ChooseChamber", _Player, ITEM_HOM_ElementalPortalStatue);
+
+IF
+DialogEnded("HOM_ChooseChamber",_Inst)
+AND
+DB_GlobalEvent("HOM_RoomSure")
+AND
+DialogGetLocalEventString(_Inst,"ChosenRoom",_Room)
+AND
+DB_ChoosingElementalRoom(_ElemRoom)
+THEN
+NOT DB_ChoosingElementalRoom(_ElemRoom);
+GlobalClearEvent("HOM_RoomSure");
+DB_CurrentRoom(_ElemRoom);
+ProcUnLockElementalRoom(_Room);
+NOT DB_CurrentRoom(_ElemRoom);
+
+PROC
+ProcHOMRemoveZixzaxAD()
+AND
+NOT DB_RoomToUnlock(_,_,_,_)
+THEN
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_CYS_Zixzax);
+ProcRemoveNPCADs(CHARACTER_CYS_Zixzax);
+
+PROC
+ProcHOMRemoveZixzaxAD()
+AND
+DB_RoomToUnlock(_,_,_,_)
+THEN
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_CYS_Zixzax);
+ProcRemoveNPCADs(CHARACTER_CYS_Zixzax);
+CharacterSetVarInteger(CHARACTER_CYS_Zixzax,"AtElementalStatue",0);
+DB_AD_Dialog(CHARACTER_CYS_Zixzax,"HOM_AD_ZixzaxWaitForRoomUnlock");
+
+IF
+DialogEnded("HOM_ChooseChamber",_Int)
+AND
+DB_GlobalEvent("HOM_UnlockLastElementalRoom")
+AND
+DB_ElementalRoom(_Room,_,_)
+AND
+DB_ChoosingElementalRoom(_ElemRoom)
+THEN
+NOT DB_ChoosingElementalRoom(_ElemRoom);
+GlobalClearEvent("HOM_UnlockLastElementalRoom");
+DB_CurrentRoom(_ElemRoom);
+ProcUnLockElementalRoom(_Room);
+NOT DB_CurrentRoom(_ElemRoom);
+
+PROC
+ProcUnLockElementalRoom((STRING)_Room)
+AND
+DB_ElementalRoom(_Room,_Item,_UnlockEvent)
+THEN
+ItemSetCanInteract(ITEM_HOM_ElementalPortalStatue,0);
+PROC_StopEffectAtItem(ITEM_HOM_ElementalPortalStatue,"ElementalStatueAttention");
+DB_HOM_UnlockTeleporter(_Item);
+NOT DB_ElementalRoom(_Room,_Item,_UnlockEvent);
+ProcCheckLastElementalRoom();
+GlobalSetEvent(_UnlockEvent);
+ProcHOMRemoveZixzaxAD();
+
+PROC
+ProcCheckLastElementalRoom()
+THEN
+DB_NumElementalRoomsLeft(0);
+
+PROC
+ProcCheckLastElementalRoom()
+AND
+DB_ElementalRoom(_Room,_,_)
+AND
+DB_NumElementalRoomsLeft(_Nr)
+AND
+IntegerSum(_Nr,1,_New)
+THEN
+NOT DB_NumElementalRoomsLeft(_Nr);
+DB_NumElementalRoomsLeft(_New);
+
+PROC
+ProcCheckLastElementalRoom()
+AND
+DB_NumElementalRoomsLeft(1)
+THEN
+GlobalSetEvent("HOM_OneElementalRoomLeft");
+
+PROC
+ProcCheckLastElementalRoom()
+AND
+DB_NumElementalRoomsLeft(_Nr)
+THEN
+NOT DB_NumElementalRoomsLeft(_Nr);
+
+IF
+DialogStarted(_Diag,_)
+AND
+DB_HomesteadDialogEvents(_Diag,_Event)
+THEN
+NOT DB_HomesteadDialogEvents(_Diag,_Event);
+GlobalSetEvent(_Event);
+//END_REGION
+
+//REGION Homestead movies 
+
+IF
+DialogEnded(_Diag,_Inst)
+AND
+DB_GlobalEvent("HOM_StartMovie")
+AND
+DB_ZixZaxTalks(_Room,_,_,_Diag)
+AND
+DB_ZixzaxMovies(_Room,_Movie)
+THEN
+GlobalClearEvent("HOM_StartMovie");
+CharacterSetHasDialog(CHARACTER_CYS_Zixzax,0);
+ProcStartMovie(_Movie);
+
+IF
+GlobalEventSet(_Event)
+AND
+DB_LoomUpgrades(_Event,_,_FX)
+AND
+ItemGetPosition(ITEM_HOM_Loom,_X,_Y,_Z)
+THEN
+CameraActivate(CHARACTER_Player1,"SpectatorCameraTrigger_loom",6.0,0,0,1);
+CameraActivate(CHARACTER_Player2,"SpectatorCameraTrigger_loom",6.0,0,0,1);
+PlayEffectAtPosition(_FX,_X,_Y,_Z);
+TimerLaunch(_Event,3200);
+
+IF
+TimerFinished(_Timer)
+AND
+DB_LoomUpgrades(_Timer,_Template,_)
+THEN
+ItemTransformIntoItemTemplate(ITEM_HOM_Loom,_Template);
+
+IF
+MovieFinished((STRING)_Movie)
+AND
+DB_ZixzaxMovies(_Room,_Movie)
+AND
+DB_RoomUnlockSequence(_Room,_Item,_,_)
+THEN
+DB_AfterMovieRoom(_Room);
+NOT DB_ZixzaxMovies(_Room,_Movie);
+CharacterSetVarInteger(CHARACTER_CYS_Zixzax,"WaitAtPortal",1);
+CharacterSetVarItem(CHARACTER_CYS_Zixzax,"Seat",ITEM_NULL);
+ProcCharacterMoveToItem(CHARACTER_CYS_Zixzax,_Item,1,"ZixZaxArrivedAfterMovie");
+
+IF
+CharacterEvent(CHARACTER_CYS_Zixzax,"ZixZaxArrivedAfterMovie")
+AND
+DB_AfterMovieRoom(_Room)
+THEN
+NOT DB_AfterMovieRoom(_Room);
+ProcUnlockRoom(_Room);
+CharacterSetHasDialog(CHARACTER_CYS_Zixzax,1);
+
+PROC
+ProcStartMovie((STRING)_Movie)
+AND
+_Char.DB_IsPlayer()
+AND
+CharacterGetReservedPeerID(_Char,_ID)
+AND
+NOT DB_MoviePlayed(_ID,_Movie)
+THEN
+DB_MoviePlayed(_ID,_Movie);
+MoviePlay(_Char,_Movie);
+
+IF
+DialogCharacterEventSet(_Event,_Char,_ID)
+AND
+DB_WeaverMovies(_Movie,_Event)
+THEN
+DialogRequestStopForCharacter(_Char);
+MoviePlay(_Char,_Movie);
+DialogClearCharacterEvent(_Event,_Char,_ID);
+
+//END_REGION
+
+//REGION Player comments and Party Dialogs 
+IF
+DialogStarted("HOM_Astarte1",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+THEN
+DB_DoAstarteComment(_Player);
+
+IF
+CharacterUsedItem(_Player,ITEM_HOM_TeleportFromHallHeroes)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_Companion(_Player)
+AND
+NOT DB_OnlyOnce("FromHOHComment")
+AND
+DB_DoAstarteComment(_Player)
+THEN
+NOT DB_DoAstarteComment(_Player);
+DB_OnlyOnce("FromHOHComment");
+Launch_PlayerComment(_Player, "HOM_Comment_OutOfHoH");
+
+IF
+DialogEnded("HOM_Shrike1",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+THEN
+Launch_PlayerComment(_Player, "HOM_Comment_AfterFirstShrike");
+
+IF
+DialogEnded("HOM_Astarte3",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+THEN
+Launch_PlayerComment(_Player, "HOM_Comment_AfterAstarteDespair");
+
+IF
+DialogEnded("HOM_Shrike3",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+THEN
+Launch_PlayerComment(_Player, "HOM_Comment_AfterShrikeGratitude");
+
+IF
+DialogEnded("HOM_Astarte4",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+THEN
+Launch_PlayerComment(_Player, "HOM_Comment_AfterAstarteChild");
+
+IF
+DialogEnded("HOM_ZixZax_Shrike",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+THEN
+Launch_PlayerComment(_Player, "HOM_Comment_AfterZixzaxShrike");
+
+IF
+DialogEnded("HOM_Shrike4",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+THEN
+Launch_PlayerComment(_Player, "HOM_Comment_AfterShrikeFailure");
+
+IF
+DialogEnded("HOM_Astarte5",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+THEN
+Launch_PlayerComment(_Player, "HOM_Comment_AfterAstarteNeedYou");
+
+IF
+DialogEnded("HOM_Shrike5",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+THEN
+Launch_PlayerComment(_Player, "HOM_Comment_AfterShrikeWarning");
+
+IF
+DialogEnded("HOM_Astarte6",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+THEN
+Launch_PlayerComment(_Player, "HOM_Comment_AfterAstarteSpeech");
+
+IF
+MovieFinished("DOS Cutscene 1.bik")
+THEN
+QuestUpdate("HOM_Starstones", "AfterMovie1");
+
+IF
+DialogEnded("HOM_ZixZax_SoulTalk",_)
+THEN
+ProcDefinePartyDialog("HOM_DD_AfterGreaterSoul");
+
+IF
+MovieFinished("DOS Cutscene 2.bik")
+THEN
+ProcDefinePartyDialog("HOM_DD_AfterChaosVideo");
+QuestUpdate("HOM_Starstones", "AfterMovie2");
+
+IF
+MovieFinished("DOS Cutscene 3.bik")
+THEN
+ProcDefinePartyDialog("HOM_DD_AfterGuardiansMovie");
+QuestUpdate("HOM_Starstones", "AfterMovie3");
+
+IF
+MovieFinished("DOS Cutscene 4.bik")
+THEN
+ProcDefinePartyDialog("HOM_DD_AfterShrikeMovie");
+QuestUpdate("HOM_Starstones", "AfterMovie5");
+
+IF
+MovieFinished("DOS Cutscene 5.bik")
+THEN
+ProcDefinePartyDialog("HOM_DD_AfterStarStoneMovie");
+QuestUpdate("HOM_Starstones", "AfterMovie4");
+
+IF
+MovieFinished(_Mov)
+AND
+DB_MovieEvents(_Mov,_Event,_Number,_Update)
+THEN
+NOT DB_MovieEvents(_Mov,_Event,_Number,_Update);
+GlobalSetEvent(_Event);
+Proc_LoreQuest_Update("LORE_Godbox",_Number,_Update);
+
+IF
+DialogEnded("HOM_ZixZax_Tricked",_)
+THEN
+ProcDefinePartyDialog("HOM_DD_AfterTrickedDialog");
+
+//END_REGION
+
+//REGION Events 
+
+IF
+TextEventSet("disroom")
+THEN
+PROC_LUC_BG_ShowAttacker();
+
+IF
+TextEventSet("enroom")
+THEN
+PROC_LUC_BG_HideAttacker();
+
+//NOTE: this only works from OUTSIDE the HomeStead!
+PROC
+ProcHOMDisableRoomUnlocking()
+AND
+NOT DB_HOMNoRoomUnlock(1)
+THEN
+CharacterSetVarInteger(CHARACTER_CYS_Zixzax,"DoWalkAbout",0);
+DB_HOMNoRoomUnlock(1);
+ProcHOMCancelCurrentUnlockedRoom();
+
+IF
+RegionStarted("Homestead")
+AND
+CharacterGetVarInteger(CHARACTER_CYS_Zixzax, "homesteadAttack", 1)
+THEN
+ProcHOMStartShooters();
+TimerLaunch("HOM_UpdateShooters",500);
+DB_ResetHOMAtmos(1);
+ProcHOMSetAttackAtmospheres();
+
+IF
+TextEventSet("shoot")
+THEN
+ProcHOMPositionShooters();
+TimerLaunch("HOM_UpdateShooters",500);
+
+IF
+TextEventSet("shoot")
+AND
+DB_HOM_VoidDemonProjectileShooters(_Shooter)
+THEN
+ItemSetVarInteger(_Shooter,"ActiveShooting",1);
+
+
+PROC
+ProcHOMPositionShooters()
+AND
+CharacterGetPosition(CHARACTER_Player1,_X,_Y,_Z)
+AND
+DB_HOM_VoidDemonProjectileShooters(_Shooter)
+THEN
+ItemTeleportToPosition(_Shooter,_X,_Y,_Z);
+
+PROC
+ProcHOMStopShooters()
+AND
+DB_HOM_VoidDemonProjectileShooters(_Shooter)
+THEN
+ItemSetVarInteger(_Shooter,"ActiveShooting",0);
+
+PROC
+ProcHOMStartShooters()
+AND
+DB_HOM_VoidDemonProjectileShooters(_Shooter)
+THEN
+ItemSetVarInteger(_Shooter,"ActiveShooting",1);
+
+IF
+TimerFinished("HOM_UpdateShooters")
+THEN
+ProcHOMPositionShooters();
+TimerLaunch("HOM_UpdateShooters",500);
+
+IF
+RegionEnded("Homestead")
+THEN
+ProcHOMStopShooters();
+
+IF
+RegionStarted("Homestead")
+AND
+CharacterGetVarInteger(CHARACTER_CYS_Zixzax, "homesteadAttack", 0)
+AND
+DB_ResetHOMAtmos(1)
+THEN
+NOT DB_ResetHOMAtmos(1);
+ProcHOMStopShooters();
+ProcHOMSetNormalAtmospheres();
+
+PROC
+ProcHOMEnableRoomUnlocking()
+AND
+DB_HOMNoRoomUnlock(1)
+THEN
+NOT DB_HOMNoRoomUnlock(1);
+ProcHOMRestoreRoomUnlock();
+
+PROC
+ProcHOMCancelCurrentUnlockedRoom()
+THEN
+CharacterSetVarInteger(CHARACTER_CYS_Zixzax,"WaitAtPortal",0);
+ItemSetCanInteract(ITEM_HOM_ElementalPortalStatue,0);
+PROC_StopEffectAtItem(ITEM_HOM_ElementalPortalStatue,"ElementalStatueAttention");
+NOT DB_OneShotPlayerOnlyTrigger(TRIGGER_HOM_BoxStatueTalkArea);
+TriggerUnregisterForPlayers(TRIGGER_HOM_BoxStatueTalkArea);
+
+PROC
+ProcHOMCancelCurrentUnlockedRoom()
+AND
+NOT DB_Dead(CHARACTER_CYS_Zixzax)
+THEN
+ProcRemoveNPCADs(CHARACTER_CYS_Zixzax);
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_CYS_Zixzax);
+DB_Dialogs(CHARACTER_CYS_Zixzax,"HOM_Zixzax");
+CharacterSetVarItem(CHARACTER_CYS_Zixzax,"Seat",ITEM_HOM_Chair_Zixzax);
+CharacterTeleportToCharacter(CHARACTER_CYS_Zixzax,CHARACTER_HOM_Weaver,"");
+
+PROC
+ProcHOMCancelCurrentUnlockedRoom()
+AND
+NOT DB_RoomToUnlock(_,_,_,_)
+AND
+NOT DB_ChoosingElementalRoom(_)
+AND
+DB_HOMOffworldRoom(_Room)
+AND
+DB_ZixZaxTalks(_Room,_ZixZaxTrig,_TalkArea,_Diag)
+THEN
+NOT DB_ZixzaxDialog(_TalkArea,_Diag);
+TriggerUnregisterForPlayers(_TalkArea);
+
+PROC
+ProcHOMCancelCurrentUnlockedRoom()
+AND
+NOT DB_RoomToUnlock(_,_,_,_)
+AND
+NOT DB_ChoosingElementalRoom(_)
+AND
+DB_HOMOffworldRoom(_Room)
+AND
+DB_RoomUnlockSequence(_Room,_Item,_TalkArea,_)
+AND
+DB_ZixZaxTalks(_Room,_,_,_Diag)
+THEN
+NOT DB_ZixzaxDialog(_TalkArea,_Diag);
+TriggerUnregisterForPlayers(_TalkArea);
+
+PROC
+ProcHOMRestoreRoomUnlock()
+AND
+NOT DB_Dead(CHARACTER_CYS_Zixzax)
+AND
+NOT DB_RoomToUnlock(_,_,_,_)
+AND
+NOT DB_ChoosingElementalRoom(_)
+AND
+DB_HOMOffworldRoom(_Room)
+AND
+DB_ZixZaxTalks(_Room,_ZixZaxTrig,_TalkArea,_Diag)
+THEN
+CharacterSetVarItem(CHARACTER_CYS_Zixzax,"Seat",ITEM_NULL);
+CharacterTeleportToTrigger(CHARACTER_CYS_Zixzax,_ZixZaxTrig,"");
+DB_ZixzaxDialog(_TalkArea,_Diag);
+
+PROC
+ProcHOMRestoreRoomUnlock()
+AND
+NOT DB_Dead(CHARACTER_CYS_Zixzax)
+AND
+DB_RoomToUnlock(_,_Room,_,_Unvisited)
+THEN
+CharacterSetVarInteger(CHARACTER_CYS_Zixzax,"WaitAtPortal",1);
+CharacterSetVarInteger(CHARACTER_CYS_Zixzax,"AtElementalStatue",0);
+CharacterSetVarItem(CHARACTER_CYS_Zixzax,"Seat",ITEM_NULL);
+ProcCharacterMoveToItem(CHARACTER_CYS_Zixzax,_Unvisited,1,"");
+ProcRemoveNPCADs(CHARACTER_CYS_Zixzax);
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_CYS_Zixzax);
+DB_AD_Dialog(CHARACTER_CYS_Zixzax,"HOM_AD_ZixzaxWaitForRoomUnlock");
+
+PROC
+ProcHOMRestoreRoomUnlock()
+AND
+DB_ChoosingElementalRoom(_ElemRoom)
+THEN
+PROC_LoopEffectAtItem("FX_GP_Light_Blue_A", ITEM_HOM_ElementalPortalStatue,"ElementalStatueAttention","Homestead");
+ItemSetCanInteract(ITEM_HOM_ElementalPortalStatue,1);
+DB_OneShotPlayerOnlyTrigger(TRIGGER_HOM_BoxStatueTalkArea);
+
+PROC
+ProcHOMRestoreRoomUnlock()
+AND
+NOT DB_Dead(CHARACTER_CYS_Zixzax)
+AND
+DB_ChoosingElementalRoom(_ElemRoom)
+THEN
+CharacterSetVarInteger(CHARACTER_CYS_Zixzax,"AtElementalStatue",1);
+CharacterSetVarInteger(CHARACTER_CYS_Zixzax,"WaitAtPortal",1);
+CharacterSetVarItem(CHARACTER_CYS_Zixzax,"Seat",ITEM_NULL);
+ProcCharacterMoveToItem(CHARACTER_CYS_Zixzax,ITEM_HOM_ElementalPortalStatue,1,"");
+ProcRemoveNPCADs(CHARACTER_CYS_Zixzax);
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_CYS_Zixzax);
+DB_AD_Dialog(CHARACTER_CYS_Zixzax,"HOM_AD_ZixzaxChooseRoom");
+
+PROC
+ProcHOMRestoreRoomUnlock()
+AND
+NOT DB_RoomToUnlock(_,_,_,_)
+AND
+NOT DB_ChoosingElementalRoom(_)
+AND
+NOT DB_HOMOffworldRoom(_)
+THEN
+ProcCheckRoomQueue();
+
+PROC
+ProcHOMSetAttackAtmospheres()
+AND
+DB_HomesteadAtmosphere(_ID,_AttackAtmos,_)
+THEN
+TriggerSetAtmosphere(_ID,_AttackAtmos);
+
+PROC
+ProcHOMSetNormalAtmospheres()
+AND
+DB_HomesteadAtmosphere(_ID,_,_Normal)
+THEN
+TriggerSetAtmosphere(_ID,_Normal);
+
+//END_REGION
+
+//REGION Homestead Red Imps 
+
+IF
+TextEventSet("imps")
+THEN
+ProcHOMHandleRoomUnlock(7);
+
+IF
+DB_HomesteadImps(_Char,_Dialog,0,_)
+THEN
+CharacterSetOnStage(_Char,0);
+DB_Dialogs(_Char,_Dialog);
+DB_IsNotMessingAround(_Char);
+
+IF
+DB_HomesteadImps(_Char,_Dialog,1,_)
+THEN
+CharacterSetOnStage(_Char,0);
+DB_AD_Dialog(_Char,_Dialog);
+DB_IsNotMessingAround(_Char);
+
+PROC
+ProcHOMSetupZixZaxRoomDialog(7)
+THEN
+GlobalSetEvent("HOM_RedImpsArrived");
+
+PROC
+ProcHOMSetupZixZaxRoomDialog(7)
+THEN
+GlobalSetEvent("GLO_MephistoImpsTurn");
+
+PROC
+ProcHOMSetupZixZaxRoomDialog(_Nr)
+AND
+_Nr!=7
+THEN
+GlobalClearEvent("GLO_MephistoImpsTurn");
+
+PROC
+ProcHOMSetupZixZaxRoomDialog(7)
+AND
+DB_HomesteadImps(_Char,_,_,_)
+AND
+Random(2000,_Time)
+THEN
+CharTimer(_Char,"Spawn",_Time);
+
+IF
+CharTimerFinished(_Character,"Spawn")
+AND
+DB_HomesteadImps(_Character,_,_,_)
+AND
+ItemGetPosition(ITEM_HOM_TeleportToMephisto_Inactive,_x,_y,_z)
+THEN
+CharacterTeleportToPosition(_Character,_X,_Y,_Z,"");
+CharacterFlushQueue(_Character);
+Foop(_Character);
+
+IF
+AutomatedDialogStarted("HOM_AD_ImpBanter",_Inst)
+AND
+DialogGetInvolvedNPC(_Inst,1,_Imp1)
+AND
+DialogGetInvolvedNPC(_Inst,2,_Imp2)
+THEN
+ProcFaceEachother(_Imp1,_Imp2);
+
+IF
+AutomatedDialogStarted("HOM_AD_ImpLeaderBanter",_Inst)
+AND
+DialogGetInvolvedNPC(_Inst,1,_Imp1)
+AND
+DialogGetInvolvedNPC(_Inst,2,_Imp2)
+THEN
+ProcFaceEachother(_Imp1,_Imp2);
+//END_REGION
+
+//REGION Zixzax Teleporting to other regions 
+
+PROC
+ProcMakeZixzaxAppearAt((TRIGGER)_Trigger,(STRING)_AppearEvent)
+AND
+CharacterGetPosition(CHARACTER_CYS_Zixzax, _X, _Y, _Z)
+THEN
+DB_ExteriorZixZaxPos(_X, _Y, _Z);
+CharacterSetReactionPriority(CHARACTER_CYS_Zixzax, "WaitAtPortal", 0);
+CharacterSetVarItem(CHARACTER_CYS_Zixzax,"Seat",ITEM_NULL);
+CharacterTeleportToTrigger(CHARACTER_CYS_Zixzax, _Trigger, _AppearEvent);
+CharacterFlushQueue(CHARACTER_CYS_Zixzax);
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_CYS_Zixzax);
+CharacterSetHasDialog(CHARACTER_CYS_Zixzax,0);
+
+PROC
+ProcSetZixzaxBackInHomestead((STRING)_AppearEvent)
+AND
+DB_ExteriorZixZaxPos(_,_,_)
+THEN
+DB_ZixzaxAppearEvent(_AppearEvent);
+CharacterSetVarItem(CHARACTER_CYS_Zixzax,"Seat",ITEM_HOM_Chair_Zixzax);
+CharacterTeleportToTrigger(CHARACTER_CYS_Zixzax, TRIGGER_HOM_ZixZax_Neutral, _AppearEvent);
+
+IF
+CharacterEvent(CHARACTER_CYS_Zixzax, _AppearEvent)
+AND
+DB_ZixzaxAppearEvent(_AppearEvent)
+AND
+DB_ExteriorZixZaxPos(_X, _Y, _Z)
+THEN
+CharacterSetHasDialog(CHARACTER_CYS_Zixzax,1);
+NOT DB_ZixzaxAppearEvent(_AppearEvent);
+CharacterTeleportToPosition(CHARACTER_CYS_Zixzax, _X, _Y, _Z, "");
+CharacterSetReactionPriority(CHARACTER_CYS_Zixzax, "WaitAtPortal", 200);
+CharacterSetOnStage(CHARACTER_CYS_Zixzax, 1);
+NOT DB_ExteriorZixZaxPos(_X, _Y, _Z);
+//END_REGION
+
+//REGION Resurrect Zixzax 
+
+IF
+CharacterDied(CHARACTER_CYS_Zixzax)
+THEN
+GlobalSetEvent("HOM_ZixzaxKilled");
+Poof(CHARACTER_CYS_Zixzax);
+TimerLaunch("HOM_ResZixzax",500);
+
+IF
+TimerFinished("HOM_ResZixzax")
+THEN
+Foop(CHARACTER_CYS_Zixzax);
+CharacterResurrect(CHARACTER_CYS_Zixzax);
+
+IF
+CharacterResurrected(CHARACTER_CYS_Zixzax)
+THEN
+CharacterPlayAnimation(CHARACTER_CYS_Zixzax,"still","");
+NOT DB_Dead(CHARACTER_CYS_Zixzax);
+DB_Dialogs(CHARACTER_CYS_Zixzax,"HOM_ZixZax");
+
+//END_REGION
+
+//REGION fix for Shrike when unlocking rooms
+PROC
+Poof(CHARACTER_HOM_Shrike)
+AND
+CHARACTER_HOM_Shrike.HOMWaitingForEndgameDialog()
+THEN
+CharacterTeleportToTrigger(CHARACTER_HOM_Shrike,TRIGGER_HOM_EndGame_ShrikeDest,"");
+CharacterSetOnStage(CHARACTER_HOM_Shrike,1);
+
+//END_REGION
+
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

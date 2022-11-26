@@ -1,0 +1,29 @@
+INIT
+CHARACTER:__Me
+TRIGGER:%Point1 = LUC_BC_Jareth1_50ec5c3e-3040-4de5-bfa1-1d5d0beb4828
+TRIGGER:%Point2 = LUC_BC_Jareth2_2c934b87-7cee-4920-a469-c4366f7ab5d1
+TRIGGER:%Point3 = LUC_BC_Jareth3_b5ed621e-1c38-4c8c-a819-0a131c9b09d3
+
+BEHAVIOUR
+REACTION Main, 500
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Point1)
+	CharacterLookFrom(%Point1)
+	CharacterPlayAnimation("Fidget_Low_01")
+	Sleep(0.5)
+	
+	CharacterMoveTo(%Point2)
+	CharacterLookFrom(%Point2)
+	CharacterPlayAnimation("Fidget_Low_02")
+	Sleep(0.5)
+	
+	CharacterMoveTo(%Point3)
+	CharacterLookFrom(%Point3)
+	CharacterPlayAnimation("Fidget_Low_01")
+	Sleep(0.5)
+	
+	CharacterMoveTo(%Point2)
+	CharacterLookFrom(%Point2)
+	CharacterPlayAnimation("Fidget_Low_02")
+	Sleep(0.5)	

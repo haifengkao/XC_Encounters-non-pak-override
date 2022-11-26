@@ -1,0 +1,127 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_OneShotPlayerTrigger(TRIGGER_CYS_Box_SkeletonKingDialog);
+DB_IsNotMessingAround(CHARACTER_CYS_SkeletonKing);
+DB_IsNotMessingAround(CHARACTER_CYS_SkeletonQueen);
+
+DB_CYS_SkeletonRoyalty(CHARACTER_CYS_SkeletonKing);
+DB_CYS_SkeletonRoyalty(CHARACTER_CYS_SkeletonQueen);
+
+DB_SkeletonMinions(CHARACTER_CYS_SkeletonMinion1,"CYS_SkeletonMinion1");
+DB_SkeletonMinions(CHARACTER_CYS_SkeletonMinion2,"CYS_SkeletonMinion2");
+DB_SkeletonMinions(CHARACTER_CYS_SkeletonMinion3,"CYS_SkeletonMinion3");
+DB_SkeletonMinions(CHARACTER_CYS_SkeletonMinion4,"CYS_SkeletonMinion4");
+DB_SkeletonMinions(CHARACTER_CYS_SkeletonBard1,"CYS_SkeletonMinion5");
+KBSECTION
+PROC
+ProcOneShotTriggerEntered(_Player, TRIGGER_CYS_Box_SkeletonKingDialog)
+AND
+NOT DB_Combat(_Player, _)
+AND
+NOT CHARACTER_CYS_SkeletonKing.DB_DoingBraccusFight()
+THEN
+PROC_MendatoryDialog("CYS_SkeletonKing",CHARACTER_CYS_SkeletonKing, _Player);
+
+//fi we walk inside the trigger and the skeleton boss is doing Braccus, just start the fight without him
+PROC
+ProcOneShotTriggerEntered(_Player, TRIGGER_CYS_Box_SkeletonKingDialog)
+AND
+NOT DB_Combat(_Player, _)
+AND
+CHARACTER_CYS_SkeletonKing.DB_DoingBraccusFight()
+THEN
+ProcCYSSkeletonKingStartFight();
+
+PROC
+ProcOneShotTriggerEntered(_Player, TRIGGER_CYS_Box_SkeletonKingDialog)
+AND
+DB_Combat(_Player, _)
+THEN
+CharacterSetVarInteger(CHARACTER_CYS_SkeletonKing,"SpawnSkeletons",1);
+
+IF
+DB_SkeletonMinions(_Skel,_)
+THEN
+CharacterSetOnStage(_Skel,0);
+
+IF
+DB_CYS_SkeletonRoyalty(_Char)
+THEN
+DB_EvilDude(_Char);
+
+IF
+CharacterEnteredCombat(_Skeleton,_)
+AND
+DB_CYS_SkeletonRoyalty(_Skeleton)
+THEN
+ProcTriggerUnregisterForPlayers(TRIGGER_CYS_Box_SkeletonKingDialog);
+NOT DB_OneShotPlayerTrigger(TRIGGER_CYS_Box_SkeletonKingDialog);
+ProcCYSCheckSummonSkeletonKingMinions();
+
+PROC
+ProcCYSCheckSummonSkeletonKingMinions()
+AND
+NOT DB_CYSSkeletonKingSummoningSkeletons(1)
+THEN
+DB_CYSSkeletonKingSummoningSkeletons(1);
+ProcCYSSummonSkeletonKingMinions();
+
+IF
+DialogEnded("CYS_SkeletonKing",_)
+THEN
+CharacterSetVarInteger(CHARACTER_CYS_SkeletonKing,"SpawnSkeletons",1);
+QuestAdd("CYS_Braccus");
+QuestUpdate("CYS_Braccus","UpdateBaron");
+
+IF
+CharacterEvent(CHARACTER_CYS_SkeletonKing,"SummonSkeletons")
+THEN
+ProcCYSSkeletonKingStartFight();
+
+PROC
+ProcCYSSkeletonKingStartFight()
+THEN
+DB_CYSSkeletonKingSummoningSkeletons(1);
+ProcCYSMakeSkeletonKingHostile();
+ProcCYSSummonSkeletonKingMinions();
+
+PROC
+ProcCYSMakeSkeletonKingHostile()
+THEN
+SetRelationFactionToPlayers("CYS_SkeletonKing", 0);
+
+PROC
+ProcCYSSummonSkeletonKingMinions()
+AND
+DB_SkeletonMinions(_Minion,_Timer)
+AND
+Random(1000,_Rand)
+AND
+IntegerSum(_Rand,500,_Delay)
+THEN
+TimerLaunch(_Timer,_Delay);
+
+IF
+TimerFinished(_Timer)
+AND
+DB_SkeletonMinions(_Minion,_Timer)
+THEN
+CharacterAppear(_Minion,1);
+NOT DB_SkeletonMinions(_Minion,_Timer);
+
+IF
+CharacterDied(CHARACTER_CYS_SkeletonKing)
+THEN
+GlobalSetEvent("CYS_SkeletonKingKilled");
+ProcCYSMakeSkeletonKingHostile();		//just in case we kill him before he summons
+GoalCompleted;
+
+
+
+EXITSECTION
+NOT DB_CYS_SkeletonRoyalty(CHARACTER_CYS_SkeletonKing);
+NOT DB_CYS_SkeletonRoyalty(CHARACTER_CYS_SkeletonQueen);
+NOT DB_CYSSkeletonKingSummoningSkeletons(1);
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

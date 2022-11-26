@@ -1,0 +1,87 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+CharacterSetOnStage(CHARACTER_CYS_BC_Nemris, 0);
+CharacterSetOnStage(CHARACTER_CYS_BC_Nemris_Dog_01,0);
+CharacterSetOnStage(CHARACTER_CYS_BC_Nemris_Dog_02,0);
+CharacterSetOnStage(CHARACTER_CYS_BC_Nemris_Dog_03,0);
+DB_CYS_BC_NemrisScore(0);
+DB_NoDefaultBehavior(CHARACTER_CYS_BC_Nemris);
+DB_Dialogs(CHARACTER_CYS_BC_Nemris,"CYS_BC_Nemris");
+KBSECTION
+IF
+GlobalEventSet("DAF_NemrisTest_Correct")
+AND
+DB_CYS_BC_NemrisScore(_currentScore)
+AND
+IntegerSum(_currentScore, 1, _new)
+THEN
+NOT DB_CYS_BC_NemrisScore(_currentScore);
+DB_CYS_BC_NemrisScore(_new);
+GlobalClearEvent("DAF_NemrisTest_Correct");
+CharacterSetVarInteger(CHARACTER_CYS_BC_Nemris, "Score", _new);
+
+
+//REGION ATTITUDE CHANGED
+
+IF
+DialogEnded("CYS_BC_Nemris",_)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_BC_Nemris, "Score", 3)
+THEN
+ChangeAttitude(CHARACTER_CYS_BC_Nemris,CHARACTER_Player1,50);
+ChangeAttitude(CHARACTER_CYS_BC_Nemris,CHARACTER_Player2,50);
+
+//END_REGION
+IF
+DialogEnded("CYS_BC_Nemris", _)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_BC_Nemris, "stays", 1)
+THEN
+CharacterDisplayText(CHARACTER_CYS_BC_Nemris, "CYS_NemrisFight");
+CharacterSetHasDialog(CHARACTER_CYS_BC_Nemris, 0);
+
+IF
+DialogEnded("CYS_BC_Nemris", _)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_BC_Nemris, "leave", 1)
+THEN
+CharacterDisplayText(CHARACTER_CYS_BC_Nemris, "CYS_NemrisLeave");
+CharacterSetHasDialog(CHARACTER_CYS_BC_Nemris, 0);
+
+IF
+CharacterDisplayTextEnded(CHARACTER_CYS_BC_Nemris, "CYS_NemrisLeave")
+THEN
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_CYS_BC_Nemris);
+CharacterSetOnStage(CHARACTER_CYS_BC_Nemris, 0);
+ProcRewardQuestMedium(TRIGGER_CYS_ShovelNemris);
+
+IF
+CharacterDisplayTextEnded(CHARACTER_CYS_BC_Nemris, "CYS_NemrisFight")
+AND 
+CharacterGetClosestAlivePlayer(CHARACTER_CYS_BC_Nemris, _Source)
+THEN
+ProcMakeNPCHostile(_Source, CHARACTER_CYS_BC_Nemris);
+
+IF
+CharacterAttackedByCharacter(CHARACTER_CYS_BC_Nemris, _Source)
+AND
+_Source.DB_IsPlayer()
+THEN
+ProcMakeNPCHostile(_Source, CHARACTER_CYS_BC_Nemris);
+
+IF
+CharacterEnteredCombat(CHARACTER_CYS_BC_Nemris,_)
+AND 
+CharacterGetClosestAlivePlayer(CHARACTER_CYS_BC_Nemris, _Source)
+THEN
+Foop(CHARACTER_CYS_BC_Nemris_Dog_01);
+ProcMakeNPCHostile(_Source, CHARACTER_CYS_BC_Nemris_Dog_01);
+Foop(CHARACTER_CYS_BC_Nemris_Dog_02);
+ProcMakeNPCHostile(_Source, CHARACTER_CYS_BC_Nemris_Dog_02);
+Foop(CHARACTER_CYS_BC_Nemris_Dog_03);
+ProcMakeNPCHostile(_Source, CHARACTER_CYS_BC_Nemris_Dog_03);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

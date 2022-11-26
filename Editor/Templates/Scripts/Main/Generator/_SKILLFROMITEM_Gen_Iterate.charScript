@@ -1,0 +1,69 @@
+#TEMPLATE "_SKILLFROMITEM_Base" : [ACTION], [SKILLOVERRIDE]
+
+INIT
+CHARACTER:__Me
+FLOAT:%SkillTargetScore_[ACTION]=-1000000
+[GLOBAL_VARS]
+
+EVENTS
+
+[EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_[ACTION]
+VARS
+	[CALC_VARS]
+ON
+	OnFunction("CalculateScore_[ACTION]")
+ACTIONS
+	Set(%SkillTargetScore_[ACTION], -1000000)
+
+	[CALC_PRE_ACTIONS]
+
+	[CALC_POS_ACTIONS]
+	Set(%SkillTargetPos_[ACTION], [TARGET_POS])
+	Add(%ActionScore_[ACTION], [POS_SCORE])
+	[CALC_POS_ACTIONS_END]
+	
+	[CALC_CHAR_ACTIONS]
+	IterateCharactersInCombat(__Me, "CalculateTarget_[ACTION]", [COMPFUNC], [COMP])
+	IF "!c1"
+		IsEqual(%SkillTargetChar_[ACTION], null)
+	THEN
+		Add(%ActionScore_[ACTION], %SkillTargetScore_[ACTION])
+	ENDIF
+	[CALC_CHAR_ACTIONS_END]
+	
+// Calculate the character we should attack
+EVENT CalculateTarget_[ACTION]
+VARS	
+	CHARACTER:_Char
+	[CALC_TARGET_VARS]
+ON
+	OnIterateCharacter(_Char, "CalculateTarget_[ACTION]")	
+ACTIONS
+	[CALC_CHAR_TARGET_PRE_ACTIONS]
+	
+	[CALC_CHAR_TARGET_ACTIONS]
+	// Can see score calculation
+	IF "!c1"
+		CharacterCanSee(__Me, _Char)
+	THEN
+		Add([CHAR_SCORE], [CANT_SEE_SCORE])
+	ENDIF
+	
+	IF "c1"
+		IsGreaterThen([CHAR_SCORE], %SkillTargetScore_[ACTION])
+	THEN
+		Set(%SkillTargetChar_[ACTION], _Char)
+		Set(%SkillTargetScore_[ACTION], [CHAR_SCORE])
+	ENDIF	
+	[CALC_CHAR_TARGET_ACTIONS_END]
+	
+	
+	
+	
+	
+	
+	
+	

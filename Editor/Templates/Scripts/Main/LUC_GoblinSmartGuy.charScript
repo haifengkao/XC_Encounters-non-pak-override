@@ -1,0 +1,41 @@
+#INCLUDE DefaultCharacter
+#INCLUDE SpottingGuard
+
+INIT
+USING DefaultCharacter
+USING SpottingGuard
+CHARACTER:__Me
+CHARACTER:%Goblin = LUC_GoblinGuard5_963413c5-0f3a-4c37-a7e3-111c09d3fde7
+TRIGGER:%Point1 = LUC_PointGoblinMineGuard3_3_053e25d1-9d78-4536-b923-7a5fc25c956a
+INT:%StateVar1 = 0
+INT:%StateVar2 = 0
+
+EVENTS
+	EVENT LookAtGoblin
+		ON
+		OnCharacterEvent(__Me,"LUC_SmartGuyLookGoblin")
+		ACTIONS
+		Set(%StateVar1,1)
+		
+	EVENT LookAtBridge
+		ON
+		OnCharacterEvent(__Me,"LUC_SmartGuyLookBridge")
+		ACTIONS
+		Set(%StateVar2,1)
+		
+BEHAVIOUR
+REACTION LookAtGoblin,1000
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%StateVar1,1)
+ACTIONS
+	CharacterLookAt(%Goblin)
+	Set(%StateVar1,0)
+	
+REACTION LookAtBridge,1000
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%StateVar2,1)
+ACTIONS
+	CharacterLookFrom(%Point1)
+	Set(%StateVar2,0)

@@ -1,0 +1,67 @@
+INIT
+
+ITEM:__Me
+INT:%FlameFX = 0
+INT:%SmokeFX = 0
+INT:%HasBeenWet = 0
+INT:%FireStarted = 0
+FLOAT:%SmokeTimer
+EXTERN STRING:%FXName = "FX_Env_Fire_Homestead_A"
+//------------------------
+
+EVENTS
+	
+EVENT InitTorch
+ON
+	OnInit()
+ACTIONS
+	IF "!c1"
+		IsEqual(%FlameFX,0)
+	THEN
+		ItemPlayLoopEffect(%FlameFX,__Me,%FXName,"Dummy_FX")
+	ENDIF
+
+EVENT WhenRaining
+ON
+	OnItemStatus(__Me,WET)
+ACTIONS
+	IF "c1&c2"
+		IsEqual(%HasBeenWet,0)
+		IsEqual(%FireStarted,1)
+	THEN
+		StopLoopEffect(%FlameFX)
+		Set(%FlameFX,0)
+		ItemPlayLoopEffect(%SmokeFX,__Me,"FX_Env_Smoke_Fire_A","Dummy_FX")
+		Set(%HasBeenWet,1)
+		GetRandomBetween(%SmokeTimer,60,120)
+		StartTimer("SmokeClears",%SmokeTimer,1)
+	ENDIF
+
+EVENT SmokeTimerEnds
+ON
+	OnTimer("SmokeClears")
+ACTIONS
+	StopLoopEffect(%SmokeFX)
+	Set(%SmokeFX,0)
+	
+EVENT OnDestroy
+ON
+	OnShutdown()
+ACTIONS
+	StopLoopEffect(%SmokeFX)
+	Set(%SmokeFX,0)
+	StopLoopEffect(%FlameFX)
+	Set(%FlameFX,0)
+
+EVENT OnStartBurningEvent
+ON
+	OnItemEvent(__Me,"StartFire")
+ACTIONS
+	IF "c1"
+		IsEqual(%FireStarted,0)
+	THEN
+		Set(%FlameFX,0)
+		Set(%SmokeFX,0)
+		Set(%FireStarted,1)
+		ItemPlayLoopEffect(%FlameFX,__Me,%FXName,"Dummy_FX")
+	ENDIF

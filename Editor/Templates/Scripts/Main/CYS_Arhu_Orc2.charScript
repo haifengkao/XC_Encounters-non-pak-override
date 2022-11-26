@@ -1,0 +1,25 @@
+#INCLUDE Base
+
+INIT
+USING Base REACTION CombatFallback,1
+
+CHARACTER:__Me
+
+BEHAVIOUR
+
+REACTION Normal, 1100
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2"
+	CharacterGet(_Target,__Me,null,Random,Distance,Enemy,null,null)
+	CharacterGetWeaponRange(_MinRange,_MaxRange,__Me)
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+	CharacterAttack(_Target)
+	Sleep(1)
+	CharacterEndTurn()
+INTERRUPT
+	Reset()

@@ -1,0 +1,55 @@
+INIT
+
+CHARACTER:__Me									
+
+//------------------------
+EVENTS
+
+EVENT TheVoidDiesNot
+VARS
+ON 
+	OnDie(__Me,_,_,_)
+ACTIONS
+	SetPriority(DisplayText01,0)
+	SetPriority(DisplayText02,0)
+	SetPriority(DisplayText03,0)
+	DisplayText(__Me,"LUC_ShadowFight_11",4)
+
+//------------------------
+BEHAVIOUR
+
+REACTION DisplayText01, 1200
+USAGE ALL
+VARS
+    FLOAT:_hp
+CHECK "c1&c2"
+	CharacterGetStat(_hp,__Me,Vitality)
+	IsLessThen(_hp,0.8)
+ACTIONS
+	DisplayText(__Me,"LUC_ShadowFight_08",3)
+	SetPriority(DisplayText01,0)
+	
+REACTION DisplayText02, 1100
+USAGE ALL
+VARS
+    FLOAT:_hp
+CHECK "c1&c2"
+	CharacterGetStat(_hp,__Me,Vitality)
+	IsLessThen(_hp,0.5)
+ACTIONS
+	DisplayText(__Me,"LUC_ShadowFight_09",3)
+	SetPriority(DisplayText02,0)
+	SetPriority(DisplayText01,0)	
+	
+REACTION DisplayText03, 1000
+USAGE ALL
+VARS
+    FLOAT:_hp
+CHECK "c1&c2"
+	CharacterGetStat(_hp,__Me,Vitality)
+	IsLessThen(_hp,0.3)
+ACTIONS
+	DisplayText(__Me,"LUC_ShadowFight_10",3)
+	SetPriority(DisplayText03,0)
+	SetPriority(DisplayText02,0)
+	SetPriority(DisplayText01,0)	

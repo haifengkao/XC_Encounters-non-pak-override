@@ -1,0 +1,24 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_CustomThreatenDialog(CHARACTER_CYS_Arhu,"Threatened_Arhu");
+DB_CustomThreatenDialog(CHARACTER_LUC_Arhu,"Threatened_Arhu");
+DB_CustomThreatenDialog(CHARACTER_LUC_Arhu_Cat,"Threatened_Arhu");
+DB_CustomThreatenDialog(CHARACTER_DAF_Arhu,"Threatened_Arhu");
+DB_CustomThreatenDialog(CHARACTER_DAF_Arhu_Cat,"Threatened_Arhu");
+DB_CustomThreatenDialog(CHARACTER_CYS_Zixzax,"Threatened_Zixzax");
+DB_CustomThreatenDialog(CHARACTER_CYS_Aureus,"Threatened_Aureus");
+DB_CustomThreatenDialog(CHARACTER_LUC_TrollBridge6,"Threatened_TrollBridge");
+DB_CustomThreatenDialog(CHARACTER_LUC_TrollBridge6Baby,"Threatened_TrollBridgeBaby");
+DB_CustomThreatenDialog(CHARACTER_DAF_Grutilda,"Threatened_Grutilda");
+DB_CustomThreatenDialog(CHARACTER_HOM_Icara,"Threatened_Icara");
+DB_CustomThreatenDialog(CHARACTER_Zandalor,"Threatened_Zandalor");
+
+DB_CustomThreatenGroupDialog("HuntersGlenImmaculate","Threatened_HuntersEdgeImmaculate");
+
+
+KBSECTION
+
+EXITSECTION
+
+ENDEXITSECTION

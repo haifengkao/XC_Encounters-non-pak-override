@@ -1,0 +1,20 @@
+INIT
+	ITEM:__Me
+	FLOAT3:%Look = null
+	CHARACTER:%Dreksis = LUC_M_GoblinPrisoner1_b32bf253-9ae9-4d42-bc1a-e3e8afd89301
+	
+EVENTS
+
+EVENT Rotate
+	ON
+		OnCharacterEvent(%Dreksis, "Rotate")
+	ACTIONS
+		SetPriority("EffectivelyRotate", 1100)
+		
+BEHAVIOUR
+
+REACTION EffectivelyRotate, 0
+USAGE PEACE
+ACTIONS
+	ItemLookAt(%Look, 10000)
+	SetPriority("EffectivelyRotate", 0)

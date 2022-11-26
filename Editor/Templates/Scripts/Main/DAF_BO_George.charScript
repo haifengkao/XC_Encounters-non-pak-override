@@ -1,0 +1,43 @@
+INIT
+
+CHARACTER:__Me
+INT:%State = 0
+
+BEHAVIOUR
+REACTION boast, 1000
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+	FIXEDSTRING:_Text
+	CHARACTER:_Human = DAF_Campfire_Human_4918243d-5cf0-45c2-bccb-c73a03e25d8c
+	CHARACTER:_Orc = DAF_Campfire_Orc_286d39de-bdbc-49ca-bcb0-13fd9448a34a
+	FLOAT:_dist1
+	FLOAT:_dist2
+ACTIONS
+	CharacterMoveTo(TRIGGER:DAF_Point_George1_fafe87c8-385d-41d6-9757-d1f622057a5b,0,0,0,0.5)
+	CharacterLookFrom(TRIGGER:DAF_Point_George1_fafe87c8-385d-41d6-9757-d1f622057a5b)
+	Sleep(10)
+	IF "c1&c2&c3&c4&!c5&!c6"
+		GetDistance(_dist1,__Me,_Human)
+		GetDistance(_dist2,__Me,_Orc)
+		IsLessThen(_dist1,6.0)
+		IsLessThen(_dist2,6.0)
+		IsInDialog(_Human)
+		IsInDialog(_Orc)
+	THEN
+		CharacterLookAt(_Human)
+		DialogStart("DAF_AD_George_Boast",__Me,_Human,_Orc)
+	ENDIF
+	CharacterMoveTo(TRIGGER:DAF_Point_George2_5da95307-546b-4262-8ddb-cee31425ffe8,1,0,0,0.5)
+	CharacterLookFrom(TRIGGER:DAF_Point_George2_5da95307-546b-4262-8ddb-cee31425ffe8)
+	DisplayText(__Me,"DAF_George_Taunt",3)
+	Sleep(3)
+INTERRUPT
+	Reset()
+
+EVENTS
+EVENT CombatStopsDialog
+ON
+	OnCombatStarted()
+ACTIONS
+	DialogRequestStop("DAF_AD_George_Boast")

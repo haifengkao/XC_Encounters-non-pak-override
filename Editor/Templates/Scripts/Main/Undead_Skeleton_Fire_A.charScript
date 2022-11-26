@@ -1,0 +1,28 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter
+CHARACTER:__Me
+CHARACTER:%Enemy
+
+BEHAVIOUR 
+
+REACTION CastFireball, 10
+USAGE COMBAT
+VARS
+	FLOAT:_SkillMinRange=0
+	FLOAT:_SkillMaxRange=0
+CHECK "c1&c2&c3"
+	CharacterCanCast(__Me, Projectile_Fireball)
+	CharacterGetSkillRange(_SkillMinRange,_SkillMaxRange,__Me,Projectile_Fireball)
+	CharacterGet(%Enemy,__Me,null,Lowest,Distance,Enemy)
+ACTIONS
+	CharacterFleeFrom(Enemy, _SkillMinRange)
+	CharacterUseSkill(Projectile_Fireball, %Enemy)
+INTERRUPT
+	Reset()
+
+REACTION Wander, 6
+USAGE PEACE
+ACTIONS
+	CharacterWander(FLOAT:5, 10, 0)

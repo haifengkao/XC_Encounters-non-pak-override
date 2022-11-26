@@ -1,0 +1,584 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+//REGION Dialogue
+DB_Dialogs(CHARACTER_LUC_Bjorn, "LUC_Bjorn");
+DB_Dialogs(CHARACTER_LUC_Mara, "LUC_Mara");
+DB_Dialogs(CHARACTER_LUC_BjornMount, "LUC_BjornMount");
+
+DB_PlayerComment_Trigger(TRIGGER_LUC_Bjorn_CorpseDial_T01,"LUC_Bjorn_CorpseDial");
+DB_PlayerComments("LUC_Bjorn_CorpseDial","LUC_Bjorn_CorpseDial_1_1",1,1);
+DB_PlayerComments("LUC_Bjorn_CorpseDial","LUC_Bjorn_CorpseDial_2_1",2,1);
+DB_PlayerComments("LUC_Bjorn_CorpseDial","LUC_Bjorn_CorpseDial_2_2",2,2);
+//END_REGION
+
+//REGION NPCs
+DB_LUCBjornParty(CHARACTER_LUC_Bjorn);
+DB_LUCBjornParty(CHARACTER_LUC_Mara);
+//END_REGION
+
+//REGION Ambush Waypoints
+DB_LUCBjornPartySpawnPoints("ReachedWaypoint5",CHARACTER_LUC_BjornAmbush_5,TRIGGER_LUC_Point_BjornAmbush_11);
+DB_LUCBjornPartySpawnPoints("ReachedWaypoint5",CHARACTER_LUC_BjornAmbush_6,TRIGGER_LUC_Point_BjornAmbush_10);
+DB_LUCBjornPartySpawnPoints("ReachedWaypoint5",CHARACTER_LUC_BjornAmbush_7,TRIGGER_LUC_Point_BjornAmbush_7);
+DB_LUCBjornPartySpawnPoints("ReachedWaypoint5",CHARACTER_LUC_BjornAmbush_8,TRIGGER_LUC_Point_BjornAmbush_8);
+DB_LUCBjornPartySpawnPoints("ReachedWaypoint5",CHARACTER_LUC_BjornAmbush_9,TRIGGER_LUC_Point_BjornAmbush_9);
+DB_LUCBjornPartySpawnPoints("ReachedWaypoint5",CHARACTER_LUC_BjornAmbush_10,TRIGGER_LUC_Point_BjornAmbush_10);
+DB_LUCBjornPartySpawnPoints("ReachedWaypoint5",CHARACTER_LUC_BjornAmbush_11,TRIGGER_LUC_Point_BjornAmbush_11);
+DB_LUCBjornEscortLastEvent("ReachedWaypoint7");
+DB_LUCBjornEscortHalfPointEvent("ReachedWaypoint4");
+//END_REGION
+
+//REGION Dialog Database
+DB_LUC_Bjorn_Dialogue(CHARACTER_LUC_BjornAmbush_9,"LUC_BjornAmbush_04","LUC_BjornAmbush_4_PlayDial");
+DB_LUC_Bjorn_Dialogue(CHARACTER_LUC_BjornAmbush_7,"LUC_BjornAmbush_05","LUC_BjornAmbush_5_PlayDial");
+DB_LUC_Bjorn_Dialogue(CHARACTER_LUC_BjornAmbush_11,"LUC_BjornAmbush_06","LUC_BjornAmbush_6_PlayDial");
+//END_REGION
+
+CharacterSetHitpointsPercentage(CHARACTER_LUC_BjornMount,15);
+
+DB_IsNotMessingAround(CHARACTER_LUC_BjornMount);
+
+DB_NoInitialTrade(CHARACTER_LUC_BjornMount);
+
+SneakTriggerSpotter(TRIGGER_LUC_BoxBjornEncounter, CHARACTER_LUC_Mara);
+SneakTriggerSpotter(TRIGGER_LUC_BoxBjornEncounter, CHARACTER_LUC_Bjorn);
+KBSECTION
+//REGION Intro
+
+PROC
+ProcHandleSneakSpotted(_Char)
+AND
+CharacterGetVarCharacter(_Char, "SpottedDude", _Player) 
+AND
+DB_LUCBjornParty(_Char)
+THEN
+DialogRequestStopForCharacter(CHARACTER_LUC_Bjorn);
+CharacterPurgeQueue(CHARACTER_LUC_Bjorn);
+ProcDoTwoSpeakerDialog("LUC_Bjorn", CHARACTER_LUC_Bjorn, _Player);
+
+IF
+CharacterDying(CHARACTER_LUC_Mara)
+THEN
+CharacterSetEvent(CHARACTER_LUC_Bjorn,"MaraDead");
+CharacterClearVar(CHARACTER_LUC_Bjorn, "PartyMember1");
+CharacterClearVar(CHARACTER_LUC_BjornMount, "PartyMember2");
+
+IF
+CharacterDying(CHARACTER_LUC_Bjorn)
+THEN
+CharacterSetEvent(CHARACTER_LUC_Mara,"BjornDead");
+CharacterClearVar(CHARACTER_LUC_BjornMount, "PartyMember1");
+
+IF
+GlobalEventSet("LUC_AbandonBjornMount")
+THEN
+CHARACTER_LUC_BjornMount.Abandoned();
+
+IF
+DialogEnded("LUC_Bjorn",_)
+AND
+CHARACTER_LUC_BjornMount.Abandoned()
+THEN
+NOT CHARACTER_LUC_BjornMount.Abandoned();
+GlobalSetEvent("LUC_KillBjornMount");
+
+
+//END_REGION
+
+//REGION Escort
+IF
+GlobalEventSet("LUC_StartEscort")
+THEN
+CHARACTER_LUC_Bjorn.StartEscort();
+
+IF
+DialogEnded("LUC_Bjorn",_)
+AND
+CHARACTER_LUC_Bjorn.StartEscort()
+THEN
+NOT CHARACTER_LUC_Bjorn.StartEscort();
+ProcStartLUCBjornEscortMission();
+
+PROC
+ProcStartLUCBjornEscortMission()
+THEN
+ProcRemoveDialogEntryForSpeaker(CHARACTER_LUC_Bjorn,"LUC_Bjorn");
+ProcRemoveDialogEntryForSpeaker(CHARACTER_LUC_Mara,"LUC_Mara");
+DB_AD_Dialog(CHARACTER_LUC_Bjorn,"LUC_AD_BjornEscort");
+DB_AD_Dialog(CHARACTER_LUC_Mara,"LUC_AD_MaraEscort");
+CharacterSetEvent(CHARACTER_LUC_Bjorn,"EscortStart");
+CharacterSetEvent(CHARACTER_LUC_Mara,"EscortStart");
+CharacterSetVarFixedString(CHARACTER_LUC_Bjorn, "currentState", "State_DoEscort");
+CharacterSetVarFixedString(CHARACTER_LUC_Mara, "currentState", "State_DoEscort");
+DB_LUCStartedEscort(1);
+QuestAdd("LUC_BjornEscort");
+
+PROC
+ProcStartLUCBjornEscortMission()
+AND
+CHARACTER_LUC_BjornMount.isHealed()
+THEN
+CHARACTER_LUC_BjornMount.NeedsEscorting();
+CharacterSetEvent(CHARACTER_LUC_BjornMount,"EscortStart");
+DB_LUCBjornParty(CHARACTER_LUC_BjornMount);
+DB_AD_Dialog(CHARACTER_LUC_BjornMount,"LUC_AD_BjornMountEscort");
+ProcRemoveDialogEntryForSpeaker(CHARACTER_LUC_BjornMount,"LUC_BjornMount");
+CharacterSetVarFixedString(CHARACTER_LUC_BjornMount, "currentState", "State_DoEscort");
+QuestUpdate("LUC_BjornEscort","StartEscortAll");
+ProcLUCInformEnemiesOfMountPresence();
+
+PROC
+ProcStartLUCBjornEscortMission()
+AND
+NOT CHARACTER_LUC_BjornMount.isHealed()
+THEN
+CharacterSetFaction(CHARACTER_LUC_BjornMount,"Animal");
+
+PROC
+ProcLUCInformEnemiesOfMountPresence()
+AND
+DB_LUCBjornPartySpawnPoints(_,_Char,_)
+THEN
+CharacterSetVarInteger(_Char,"mountIsValidTarget",1);
+
+PROC
+ProcStartLUCBjornEscortMission()
+AND
+NOT CHARACTER_LUC_BjornMount.isHealed()
+THEN
+QuestUpdate("LUC_BjornEscort","StartEscortHumans");
+
+IF
+CharacterEvent(_Char,_Event)
+AND
+DB_LUCBjornParty(_Char)
+THEN
+ProcSpawnBjornAmbushEnemies(_Event);
+ProcDoHalfPointComment(_Event,_Char);
+
+PROC
+ProcDoHalfPointComment((STRING)_Event,(CHARACTER)_Char)
+AND
+DB_LUCBjornEscortHalfPointEvent(_Event)
+AND
+_Char!=CHARACTER_LUC_BjornMount
+AND
+NOT DB_DidHalfPointComment(1)
+THEN
+DB_DidHalfPointComment(1);
+CharacterDisplayText(_Char,"LUC_BjornEscort_HalfPoint");
+
+PROC
+ProcSpawnBjornAmbushEnemies((STRING)_Event)
+AND
+DB_LUCBjornPartySpawnPoints(_Event,_Char,_Trigger)
+THEN
+ProcLUCMoveBjornAmbushEnemy(_Char,_Trigger);
+NOT DB_LUCBjornPartySpawnPoints(_Event,_Char,_Trigger);
+
+PROC
+ProcLUCMoveBjornAmbushEnemy((CHARACTER)_Char,(TRIGGER)_Trigger)
+AND
+DB_LUC_Bjorn_Dialogue(_Char,_,_DialEvent)
+THEN
+CharacterAppear(_Char,0);
+ProcCharacterMoveToTrigger(_Char,_Trigger,1,_DialEvent);
+
+PROC
+ProcLUCMoveBjornAmbushEnemy((CHARACTER)_Char,(TRIGGER)_Trigger)
+AND
+NOT DB_LUC_Bjorn_Dialogue(_Char,_,_)
+THEN
+CharacterAppear(_Char,0);
+ProcCharacterMoveToTrigger(_Char,_Trigger,1,"");
+
+
+IF
+CharacterEvent(_Char,_DialEvent)
+AND
+DB_LUC_Bjorn_Dialogue(_Char,_Dialogue,_Event)
+THEN
+CharacterDisplayText(_Char,_Dialogue);
+
+IF
+CharacterDying(CHARACTER_LUC_BjornMount)
+THEN
+NOT CHARACTER_LUC_BjornMount.NeedsEscorting();
+
+//Bjorn is also checked after arriving safely since he's the quest giver
+IF
+CharacterDying(CHARACTER_LUC_Bjorn)
+AND
+NOT DB_LUCBjornParty(CHARACTER_LUC_Bjorn)
+AND
+DB_AD_Dialog(_Char,_Dialog)
+THEN
+NOT DB_AD_Dialog(_Char,_Dialog);
+ProcCheckEscortMissionFailed(CHARACTER_LUC_Bjorn);
+
+IF
+CharacterDying(_Char)
+AND
+DB_LUCBjornParty(_Char)
+AND
+DB_AD_Dialog(_Char,_Dialog)
+THEN
+NOT DB_LUCBjornParty(_Char);
+NOT DB_AD_Dialog(_Char,_Dialog);
+ProcCheckEscortMissionFailed(_Char);
+
+PROC
+ProcCheckEscortMissionFailed(CHARACTER_LUC_Bjorn)
+THEN
+QuestUpdate("LUC_BjornEscort", "BjornKilled");
+
+PROC
+ProcCheckEscortMissionFailed(CHARACTER_LUC_Mara)
+THEN
+QuestUpdate("LUC_BjornEscort", "MaraKilled");
+
+PROC
+ProcCheckEscortMissionFailed(CHARACTER_LUC_BjornMount)
+THEN
+QuestUpdate("LUC_BjornEscort", "MountKilled");
+
+//we check on Bjorn to see if this was successful or not
+//this has the nice side effect of considering the quest as failed even if you kill Bjorn after he's arrived safely
+//while the others were still moving towards the town
+//killing him after everyone has arrived safely shouldn't change the quest status, since it'll be over anyway
+PROC
+ProcCheckEscortMissionFailed(_)
+AND
+NOT DB_LUCBjornParty(_)
+AND
+DB_Dead(CHARACTER_LUC_Bjorn)
+AND
+DB_Dead(CHARACTER_LUC_Mara)		
+AND
+NOT CHARACTER_LUC_BjornMount.NeedsEscorting()
+AND
+NOT DB_LUCBjornEscortDone(1)
+THEN
+QuestClose("LUC_BjornEscort");		
+//everybody dead, so close this
+GoalCompleted;
+
+PROC
+ProcCheckEscortMissionFailed(_)
+AND
+NOT DB_LUCBjornParty(_)
+AND
+NOT DB_LUCBjornEscortDone(1)
+THEN
+ProcCheckEscortMissionComplete(CHARACTER_NULL);
+
+IF
+CharacterEvent(_Char,_Event)
+AND
+DB_LUCBjornParty(_Char)
+AND
+DB_LUCBjornEscortLastEvent(_Event)
+THEN
+NOT DB_LUCBjornParty(_Char);
+ProcSetEscortWaitingDialog(_Char);
+CharacterSetVarFixedString(_Char, "currentState", "State_EscortDone");
+ProcCheckEscortMissionComplete(_Char);
+
+PROC
+ProcSetEscortWaitingDialog((CHARACTER)_Char)
+AND
+DB_AD_Dialog(_Char,_Dialog)
+THEN
+NOT DB_AD_Dialog(_Char,_Dialog);
+
+PROC
+ProcSetEscortWaitingDialog(CHARACTER_LUC_BjornMount)
+THEN
+DB_AD_Dialog(CHARACTER_LUC_BjornMount,"LUC_BjornEscort_EscortMountWaiting");
+
+PROC
+ProcSetEscortWaitingDialog(_Char)
+AND
+_Char!=CHARACTER_LUC_BjornMount
+THEN
+DB_AD_Dialog(_Char,"LUC_BjornEscort_EscortWaiting");
+
+PROC
+ProcCheckEscortMissionComplete(_)
+AND
+NOT DB_LUCBjornParty(_)
+THEN
+ProcGiveLUCBjornQuestReward();
+
+PROC
+ProcGiveAttitutdeToPlayers((CHARACTER)_Char,(INTEGER)_Amount)
+AND
+_Player.DB_IsPlayer()
+THEN
+IncreaseAttitude(_Player,_Char,_Amount);
+
+
+PROC
+ProcGiveLUCBjornQuestReward()
+AND
+NOT DB_Dead(CHARACTER_LUC_Bjorn)
+AND
+DB_Dead(CHARACTER_LUC_Mara)
+AND
+NOT CHARACTER_LUC_BjornMount.NeedsEscorting()	//this gets removed when it dies. Regardless if it was being escorted or not
+THEN
+//only Bjorn made it
+QuestUpdate("LUC_BjornEscort","BjornSoleSurvivor");
+ProcGiveAttitutdeToPlayers(CHARACTER_LUC_Bjorn,-15);
+
+PROC
+ProcGiveLUCBjornQuestReward()
+AND
+NOT DB_Dead(CHARACTER_LUC_Bjorn)
+AND
+DB_Dead(CHARACTER_LUC_Mara)
+AND
+CHARACTER_LUC_BjornMount.NeedsEscorting() //we have this, so it's s till alive
+THEN
+QuestUpdate("LUC_BjornEscort","BjornAndMountSurvive");
+ProcGiveAttitutdeToPlayers(CHARACTER_LUC_Bjorn,-10);
+
+PROC
+ProcGiveLUCBjornQuestReward()
+AND
+NOT DB_Dead(CHARACTER_LUC_Bjorn)
+AND
+NOT DB_Dead(CHARACTER_LUC_Mara)
+AND
+CHARACTER_LUC_BjornMount.NeedsEscorting()	//we have this, so it's s till alive
+THEN
+QuestUpdate("LUC_BjornEscort","BjornMaraMountSurvive");
+ProcGiveAttitutdeToPlayers(CHARACTER_LUC_Bjorn,30);
+
+PROC
+ProcGiveLUCBjornQuestReward()
+AND
+NOT DB_Dead(CHARACTER_LUC_Bjorn)
+AND
+NOT DB_Dead(CHARACTER_LUC_Mara)
+AND
+NOT CHARACTER_LUC_BjornMount.NeedsEscorting()	//this gets removed when it dies. Regardless if it was being escorted or not
+THEN
+QuestUpdate("LUC_BjornEscort","BjornMaraSurvive");
+ProcGiveAttitutdeToPlayers(CHARACTER_LUC_Bjorn,15);
+ProcGiveAttitutdeToPlayers(CHARACTER_LUC_Mara,15);
+
+PROC
+ProcCheckEscortMissionComplete((CHARACTER)_)
+AND
+NOT DB_LUCBjornParty(_)
+THEN
+DB_LUCBjornEscortDone(1);
+
+IF
+DB_LUCBjornPartySpawnPoints(_,_Char,_)
+THEN
+CharacterSetOnStage(_Char,0);
+
+//END_REGION
+
+//REGION Escort done
+
+IF
+DB_LUCBjornEscortDone(1)
+THEN
+DialogRequestStopForCharacter(CHARACTER_LUC_Bjorn);
+DialogRequestStopForCharacter(CHARACTER_LUC_Mara);
+CharacterSetHasDialog(CHARACTER_LUC_Bjorn,0);
+CharacterSetHasDialog(CHARACTER_LUC_Mara,0);
+ProcPrepareMountDialogs();
+GlobalSetEvent("LUC_BjornParty_Escorted");
+DB_OneShotPlayerTrigger(TRIGGER_LUC_BoxBjornArrived);
+
+PROC
+ProcPrepareMountDialogs()
+AND
+CHARACTER_LUC_BjornMount.NeedsEscorting()
+THEN
+DialogRequestStopForCharacter(CHARACTER_LUC_BjornMount);
+CharacterSetHasDialog(CHARACTER_LUC_BjornMount,0);
+
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,TRIGGER_LUC_BoxBjornArrived)
+AND
+NOT DB_Dead(CHARACTER_LUC_Bjorn)
+THEN
+ProcSetBjornDialogEvents();
+PROC_MendatoryDialog("LUC_BjornEscortDone",CHARACTER_LUC_Bjorn,_player);
+
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,TRIGGER_LUC_BoxBjornArrived)
+AND
+DB_Dead(CHARACTER_LUC_Bjorn)
+AND
+NOT DB_Dead(CHARACTER_LUC_Mara)
+THEN
+ProcSetBjornDialogEvents();
+PROC_MendatoryDialog("LUC_MaraEscortDone",CHARACTER_LUC_Mara,_player);
+
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,TRIGGER_LUC_BoxBjornArrived)
+AND
+DB_Dead(CHARACTER_LUC_Bjorn)
+AND
+DB_Dead(CHARACTER_LUC_Mara)
+AND
+CHARACTER_LUC_BjornMount.NeedsEscorting()
+THEN
+PROC_MendatoryDialog("LUC_MountEscortDone",CHARACTER_LUC_BjornMount,_player);
+
+PROC
+ProcSetBjornDialogEvents()
+AND
+DB_Dead(CHARACTER_LUC_Mara)
+THEN
+GlobalSetEvent("LUC_Mara_Dead");
+
+PROC
+ProcSetBjornDialogEvents()
+AND
+DB_Dead(CHARACTER_LUC_BjornMount)
+AND
+CharacterGetVarInteger(CHARACTER_LUC_BjornAmbush_7,"mountIsValidTarget",1)
+THEN
+GlobalSetEvent("LUC_BjornMount_Dead");
+
+PROC
+ProcSetBjornDialogEvents()
+AND
+CharacterGetVarInteger(CHARACTER_LUC_BjornAmbush_7,"mountIsValidTarget",0)
+THEN
+GlobalSetEvent("LUC_BjornMount_LeftBehind");
+
+IF
+DialogEnded("LUC_MaraEscortDone",_)
+THEN
+QuestUpdate("LUC_BjornEscort","MaraNewBlacksmith");
+QuestClose("LUC_BjornEscort");
+CharacterSetVarFixedString(CHARACTER_LUC_Mara, "currentState", "State_AfterEscort");	
+CharacterSetHasDialog(CHARACTER_LUC_Mara,0);
+GlobalSetEvent("LUC_Mara_IsBlackSmith");
+CHARACTER_LUC_Mara.IsBlackSmith();
+ProcGiveAttitutdeToPlayers(CHARACTER_LUC_Mara,-10);
+ProcSetAfterEscortScripts();
+GoalCompleted;
+
+IF
+DialogEnded("LUC_BjornEscortDone",_)
+THEN
+QuestClose("LUC_BjornEscort");
+CharacterSetVarFixedString(CHARACTER_LUC_Bjorn, "currentState", "State_AfterEscort");
+CharacterSetVarFixedString(CHARACTER_LUC_Mara, "currentState", "State_AfterEscort");	
+CharacterSetScriptframe(CHARACTER_LUC_Bjorn,"MoveToSafeSpot");
+DB_LUCBjornAfterScripts(CHARACTER_LUC_Bjorn);
+DB_ProcBjornAfterDialogs(CHARACTER_LUC_Bjorn,"LUC_BjornBlacksmith");
+CharacterSetHasDialog(CHARACTER_LUC_Bjorn,0);
+ProcSetAfterEscortScripts();
+GoalCompleted;
+
+IF
+DialogEnded("LUC_MountEscortDone",_)
+THEN
+QuestUpdate("LUC_BjornEscort","MountEscapesToFreedom");
+QuestClose("LUC_BjornEscort");
+CharacterDisappearOutOfSight(CHARACTER_LUC_BjornMount,0,1,"MountGone",1);
+CharacterSetHasDialog(CHARACTER_LUC_BjornMount,0);
+ProcGiveAttitutdeToPlayers(CHARACTER_LUC_BjornMount,20);
+GoalCompleted;
+
+PROC
+ProcSetAfterEscortScripts()
+AND
+NOT DB_Dead(CHARACTER_LUC_Mara)
+THEN
+CharacterSetScriptframe(CHARACTER_LUC_Mara,"MoveToSafeSpot");
+DB_LUCBjornAfterScripts(CHARACTER_LUC_Mara);
+DB_ProcBjornAfterDialogs(CHARACTER_LUC_Mara,"LUC_MaraBlacksmith");
+CharacterSetHasDialog(CHARACTER_LUC_Mara,0);
+
+PROC
+ProcSetAfterEscortScripts()
+AND
+CharacterGetVarInteger(CHARACTER_LUC_BjornAmbush_7,"mountIsValidTarget",1)
+THEN
+CharacterSetVarFixedString(CHARACTER_LUC_BjornMount, "currentState", "State_AfterEscort");
+CharacterSetEvent(CHARACTER_LUC_KadraskazMount, "AlfieIsHere");	
+
+PROC
+ProcSetAfterEscortScripts()
+AND
+CharacterGetVarInteger(CHARACTER_LUC_BjornAmbush_7,"mountIsValidTarget",1)
+AND
+NOT DB_Dead(CHARACTER_LUC_BjornMount)
+THEN
+CharacterSetScriptframe(CHARACTER_LUC_BjornMount,"MoveToSafeSpot");
+DB_LUCBjornAfterScripts(CHARACTER_LUC_BjornMount);
+DB_ProcBjornAfterDialogs(CHARACTER_LUC_BjornMount,"LUC_BjornMountBlacksmith");
+CharacterSetHasDialog(CHARACTER_LUC_BjornMount,0);
+DB_BigTrader(CHARACTER_LUC_BjornMount);
+
+IF
+SavegameLoaded(_,_,_,_)
+AND
+WasInRegion(_,TRIGGER_LUC_BoxBjornArrived)
+THEN
+ProcCheckBjornSavegameHack();
+
+PROC
+ProcCheckBjornSavegameHack()
+AND
+NOT CHARACTER_LUC_Bjorn.DB_IsInDialog()
+AND
+NOT DB_Dead(CHARACTER_LUC_Bjorn)
+AND
+CharacterGetVarFixedString(CHARACTER_LUC_Bjorn,"currentState",_State)
+AND
+_State!="State_AfterEscort"
+THEN
+DB_OneShotPlayerTrigger(TRIGGER_LUC_BoxBjornArrived);
+
+PROC
+ProcCheckBjornSavegameHack()
+AND
+NOT CHARACTER_LUC_Mara.DB_IsInDialog()
+AND
+NOT DB_Dead(CHARACTER_LUC_Mara)
+AND
+DB_Dead(CHARACTER_LUC_Bjorn)
+AND
+CharacterGetVarFixedString(CHARACTER_LUC_Mara,"currentState",_State)
+AND
+_State!="State_AfterEscort"
+THEN
+DB_OneShotPlayerTrigger(TRIGGER_LUC_BoxBjornArrived);
+
+
+PROC
+ProcCheckBjornSavegameHack()
+AND
+DB_Dead(CHARACTER_LUC_Bjorn)
+AND
+DB_Dead(CHARACTER_LUC_Mara)
+AND
+CHARACTER_LUC_BjornMount.NeedsEscorting()
+AND
+NOT CHARACTER_LUC_BjornMount.DB_IsInDialog()
+AND
+NOT DB_Dead(CHARACTER_LUC_BjornMount)
+THEN
+DB_OneShotPlayerTrigger(TRIGGER_LUC_BoxBjornArrived);
+
+
+//END_REGION
+EXITSECTION
+NOT CHARACTER_LUC_BjornMount.isHealed();
+NOT DB_DidHalfPointComment(1);
+ENDEXITSECTION
+TargetEdge "LUC_BjornAfterQuest"
+ParentTargetEdge "DOSStart"

@@ -1,0 +1,117 @@
+#TEMPLATE "_SKILL_Base" : Rush_EnemyRush
+
+INIT
+CHARACTER:__Me
+FLOAT:%SkillTargetScore_Rush_EnemyRush=-1000000
+// [GLOBAL_VARS]
+INT:%ClassScore_Rush_EnemyRush
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_Rush_EnemyRush
+VARS
+	// [CALC_VARS]
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_Rush_EnemyRush")
+ACTIONS
+	Set(%SkillTargetScore_Rush_EnemyRush, -1000000)
+
+	// [CALC_ACTIONS_PRE]
+	Set(%ClassScore_Rush_EnemyRush, 0)
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	IterateCharactersInCombat(__Me, "CalculateTarget_Rush_EnemyRush", Random, Vitality)
+	IF "!c1"
+		IsEqual(%SkillTargetChar_Rush_EnemyRush, null)
+	THEN
+		Add(%ActionScore_Rush_EnemyRush, %SkillTargetScore_Rush_EnemyRush)
+	ENDIF
+	// [~CALC_ACTIONS]
+
+	
+
+	
+// Calculate the character we should attack
+EVENT CalculateTarget_Rush_EnemyRush
+VARS	
+	CHARACTER:_Char
+	// [CALC_TARGET_VARS]
+	INT:_ClassScore_Rush_EnemyRush
+	FLOAT:_Score
+	FLOAT:_SkillRangeMin
+	FLOAT:_SkillRangeMax
+	FLOAT:_DistanceToChar
+	FLOAT:_DistanceScore
+	// [~CALC_TARGET_VARS]
+ON
+	OnIterateCharacter(_Char, "CalculateTarget_Rush_EnemyRush")	
+ACTIONS
+	// [CALC_CHAR_TARGET_ACTIONS_PRE]
+	Set(_ClassScore_Rush_EnemyRush, %ClassScore_Rush_EnemyRush)
+	Set(_Score, 0.0)
+	// [~CALC_CHAR_TARGET_ACTIONS_PRE]
+	// [CALC_CHAR_TARGET_ACTIONS]
+	IF "(!c1&!c2&!c3)&(c4)&(!(((((c5)|c6)|c7)|c8)|c9))&(c10)&(c11)&(c12)"
+	    CharacterIsDead(_Char) // c1
+	    CharacterHasStatus(_Char, INVISIBLE) // c2
+	    CharacterHasStatus(_Char, SNEAKING) // c3
+	    CharacterIsBetterOrEqualClass(_Char, %ClassScore_Rush_EnemyRush, _ClassScore_Rush_EnemyRush, 5, 4, 2, 5, 3) // c4
+	    CharacterHasStatus(_Char, KNOCKED_DOWN) // c5
+	    CharacterHasStatus(_Char, PETRIFIED) // c6
+	    CharacterHasStatus(_Char, STUNNED) // c7
+	    CharacterHasStatus(_Char, FROZEN) // c8
+	    CharacterHasStatus(_Char, FEAR) // c9
+	    CharacterIsEnemy(__Me, _Char) // c10
+	    CharacterGetSkillRange(_SkillRangeMin, _SkillRangeMax, __Me, Rush_EnemyRush) // c11
+	    GetDistance(_DistanceToChar, __Me, _Char) // c12
+	THEN
+	    Set(%ClassScore_Rush_EnemyRush, _ClassScore_Rush_EnemyRush)
+	    // Hostile count score calculation
+	    Add(_Score, 10.0) // HostileWeight
+	    
+	    // Range score calculation
+	    Set(_DistanceScore, _DistanceToChar)
+	    IF "(c1)"
+	        IsGreaterThen(_DistanceScore, _SkillRangeMax) // c1
+	    THEN
+	        Subtract(_DistanceScore, _SkillRangeMax)
+	        Multiply(_DistanceScore, -1.0)
+	    ELIF "(c1)"
+	        IsLessThen(_DistanceScore, _SkillRangeMin) // c1
+	    THEN
+	        Subtract(_DistanceScore, _SkillRangeMin)
+	        Multiply(_DistanceScore, 1.0)
+	    ELSE 
+	        Set(_DistanceScore, 0.0)
+	    ENDIF
+	    Add(_Score, _DistanceScore)
+	    
+	    // Can see score calculation
+	    IF "!c1"
+	    	CharacterCanSee(__Me, _Char)
+	    THEN
+	    	Add(_Score, -10.0)
+	    ENDIF
+	    
+	    IF "c1"
+	    	IsGreaterThen(_Score, %SkillTargetScore_Rush_EnemyRush)
+	    THEN
+	    	Set(%SkillTargetChar_Rush_EnemyRush, _Char)
+	    	Set(%SkillTargetScore_Rush_EnemyRush, _Score)
+	    ENDIF	
+	ENDIF
+	// [~CALC_CHAR_TARGET_ACTIONS]
+	
+	
+	
+	
+	
+	
+	
+	

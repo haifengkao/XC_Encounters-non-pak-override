@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<palette xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <palettes />
+  <objectids>
+    <guid>eb143051-cb38-46b6-957d-c72e9ab1118e</guid>
+    <guid>480f023e-8f64-4b56-b411-c634a2e901d1</guid>
+    <guid>324174d7-12dd-4ed9-b96b-60b9f2649800</guid>
+    <guid>152c421f-da8e-40d3-9ada-804349893fdc</guid>
+    <guid>457a9bbc-e0e0-48a9-ac55-a3fa5d3c32a6</guid>
+    <guid>686ad74f-f1b4-4aa7-8af1-9f33f563dd9e</guid>
+    <guid>af3983a8-e29d-48e6-ba99-eb1014ebf042</guid>
+    <guid>de5820ca-6258-48ca-9559-7258686c6d54</guid>
+    <guid>0d60b5e1-f78d-40b7-8569-0d4ef3a4e8ff</guid>
+    <guid>ed2f0d94-ffac-4b4b-8d54-d9bd383306a1</guid>
+    <guid>a511f1e0-d770-4bf0-8886-3ae82b2c2421</guid>
+    <guid>7e41b483-3f04-4cb9-a404-12012038f518</guid>
+    <guid>f18c7d7d-3c0c-45c9-a25b-925cf5c7da33</guid>
+    <guid>e6ac3f07-0872-4cc3-88e6-e97080b82df4</guid>
+    <guid>b1ae1fcd-6fb4-468a-a096-c1b6b02e5891</guid>
+    <guid>ca92483a-47b3-432b-bd66-a86a74f1a775</guid>
+    <guid>36ced4a3-de93-4fcc-9158-4ba2c0f52975</guid>
+    <guid>760847e6-bae4-4cb0-a50d-47374ab0cda3</guid>
+    <guid>9e2a8176-ff0d-47ce-ac4c-aed817bb316f</guid>
+    <guid>49ada7d1-612e-4ebb-a183-b4656215324d</guid>
+    <guid>58b6a5c0-577b-4296-92ac-89db3abeaa86</guid>
+    <guid>91fd68ad-8bc5-46bd-8d4f-140297813166</guid>
+    <guid>64b34bc1-beba-4193-a40c-5ee04e50d66d</guid>
+    <guid>b9527762-4cde-4f16-86b2-b5b597e1cf4b</guid>
+    <guid>b95604a0-709a-47bb-990b-e9e3bb1b5ff1</guid>
+    <guid>f312f1b0-c725-48fd-b6dc-cdca877921f0</guid>
+    <guid>f9171bf3-f71a-42c0-8b4f-d3d028bab820</guid>
+    <guid>aa83585e-0003-4e8c-a01c-aab54ee5e2f3</guid>
+    <guid>a3a1209d-d93c-4361-b9be-220be1076080</guid>
+    <guid>a9fbc054-91f3-448f-b96f-a3188f4c424e</guid>
+  </objectids>
+  <name>Cemetery</name>
+</palette>

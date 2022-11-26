@@ -1,0 +1,144 @@
+#TEMPLATE "_SKILL_Base" : Projectile_EnemyFlare
+
+INIT
+CHARACTER:__Me
+FLOAT:%SkillTargetScore_Projectile_EnemyFlare=-1000000
+// [GLOBAL_VARS]
+INT:%ClassScore_Projectile_EnemyFlare
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_Projectile_EnemyFlare
+VARS
+	// [CALC_VARS]
+	FLOAT:_SkillRangeMin
+	FLOAT:_SkillRangeMax
+	FLOAT3:_TargetPos
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_Projectile_EnemyFlare")
+ACTIONS
+	Set(%SkillTargetScore_Projectile_EnemyFlare, -1000000)
+
+	// [CALC_ACTIONS_PRE]
+	Set(%ClassScore_Projectile_EnemyFlare, 0)
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	IF "(c1)&(((c2)|c3)|c4)"
+	    CharacterGetSkillRange(_SkillRangeMin, _SkillRangeMax, __Me, Projectile_EnemyFlare) // c1
+	    FindSurface(_TargetPos, __Me, _SkillRangeMin, _SkillRangeMax, Oil, __Me, 2, 0, 10) // c2
+	    FindSurface(_TargetPos, __Me, _SkillRangeMin, _SkillRangeMax, Ooze, __Me, 2, 0, 10) // c3
+	    FindSurface(_TargetPos, __Me, _SkillRangeMin, _SkillRangeMax, CloudPoison, __Me, 2, 0, 10) // c4
+	THEN
+	    Set(%SkillTargetPos_Projectile_EnemyFlare, _TargetPos)
+	    Add(%ActionScore_Projectile_EnemyFlare, 20.0)
+	ELSE 
+	    IterateCharactersInCombat(__Me, "CalculateTarget_Projectile_EnemyFlare", Random, Vitality)
+	    IF "!c1"
+	    	IsEqual(%SkillTargetChar_Projectile_EnemyFlare, null)
+	    THEN
+	    	Add(%ActionScore_Projectile_EnemyFlare, %SkillTargetScore_Projectile_EnemyFlare)
+	    ENDIF
+	ENDIF
+	// [~CALC_ACTIONS]
+
+	
+
+	
+// Calculate the character we should attack
+EVENT CalculateTarget_Projectile_EnemyFlare
+VARS	
+	CHARACTER:_Char
+	// [CALC_TARGET_VARS]
+	INT:_ClassScore_Projectile_EnemyFlare
+	FLOAT:_StatFireResistance
+	FLOAT:_Score
+	INT:_HostileCount
+	FLOAT:_HostileScore=0
+	FLOAT:_SkillRangeMin
+	FLOAT:_SkillRangeMax
+	FLOAT:_DistanceToChar
+	FLOAT:_DistanceScore
+	// [~CALC_TARGET_VARS]
+ON
+	OnIterateCharacter(_Char, "CalculateTarget_Projectile_EnemyFlare")	
+ACTIONS
+	// [CALC_CHAR_TARGET_ACTIONS_PRE]
+	Set(_ClassScore_Projectile_EnemyFlare, %ClassScore_Projectile_EnemyFlare)
+	Set(_Score, 0.0)
+	// [~CALC_CHAR_TARGET_ACTIONS_PRE]
+	// [CALC_CHAR_TARGET_ACTIONS]
+	IF "(!c1&!c2&!c3)&(((c4))|c5)&(!((((c6&c7))|(c8))|(c9)))&(c10)&(c11)&(c12)&(c13)"
+	    CharacterIsDead(_Char) // c1
+	    CharacterHasStatus(_Char, INVISIBLE) // c2
+	    CharacterHasStatus(_Char, SNEAKING) // c3
+	    CharacterHasStatus(_Char, AGGRO_MARKED) // c4
+	    CharacterIsBetterOrEqualClass(_Char, %ClassScore_Projectile_EnemyFlare, _ClassScore_Projectile_EnemyFlare, 4, 2, 5, 1, 3) // c5
+	    CharacterGetStat(_StatFireResistance, _Char, FireResistance) // c6
+	    IsGreaterThen(_StatFireResistance, 50) // c7
+	    CharacterHasStatus(_Char, BURNING) // c8
+	    CharacterHasStatus(_Char, FROZEN) // c9
+	    CharacterIsEnemy(__Me, _Char) // c10
+	    CharacterGetHostileCount(_HostileCount, _Char) // c11
+	    CharacterGetSkillRange(_SkillRangeMin, _SkillRangeMax, __Me, Projectile_EnemyFlare) // c12
+	    GetDistance(_DistanceToChar, __Me, _Char) // c13
+	THEN
+	    Set(%ClassScore_Projectile_EnemyFlare, _ClassScore_Projectile_EnemyFlare)
+	    IF "((c1))"
+	        CharacterHasStatus(_Char, AGGRO_MARKED) // c1
+	    THEN
+	        Add(_Score, 5.0)
+	    ENDIF
+	    // Hostile count score calculation
+	    IF "(c1)"
+	        IsLessThen(_HostileCount, 3) // c1
+	    THEN
+	        Set(_HostileScore, 10.0)
+	    ENDIF
+	    Add(_Score, _HostileScore)
+	    
+	    // Range score calculation
+	    Set(_DistanceScore, _DistanceToChar)
+	    IF "(c1)"
+	        IsGreaterThen(_DistanceScore, _SkillRangeMax) // c1
+	    THEN
+	        Subtract(_DistanceScore, _SkillRangeMax)
+	        Multiply(_DistanceScore, -1.0)
+	    ELIF "(c1)"
+	        IsLessThen(_DistanceScore, _SkillRangeMin) // c1
+	    THEN
+	        Subtract(_DistanceScore, _SkillRangeMin)
+	        Multiply(_DistanceScore, 1.0)
+	    ELSE 
+	        Set(_DistanceScore, 0.0)
+	    ENDIF
+	    Add(_Score, _DistanceScore)
+	    
+	    // Can see score calculation
+	    IF "!c1"
+	    	CharacterCanSee(__Me, _Char)
+	    THEN
+	    	Add(_Score, -10.0)
+	    ENDIF
+	    
+	    IF "c1"
+	    	IsGreaterThen(_Score, %SkillTargetScore_Projectile_EnemyFlare)
+	    THEN
+	    	Set(%SkillTargetChar_Projectile_EnemyFlare, _Char)
+	    	Set(%SkillTargetScore_Projectile_EnemyFlare, _Score)
+	    ENDIF	
+	ENDIF
+	// [~CALC_CHAR_TARGET_ACTIONS]
+	
+	
+	
+	
+	
+	
+	
+	

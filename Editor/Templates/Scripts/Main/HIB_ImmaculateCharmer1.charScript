@@ -1,0 +1,62 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+EXTERN CHARACTER:%Partner = null
+ITEM:%CampfireCharmer = HIB_ImmaculateCharmer_Campfire_b9c02bcc-6be3-4f2c-8512-97dfc06f986b
+INT:%HIB_AtCamp = 0
+
+BEHAVIOUR
+
+REACTION State_AtCamp, 0
+USAGE PEACE
+VARS
+	FLOAT:_Distance
+	INT:_CampfireOn
+ACTIONS
+	Sleep(8)
+	IF "c1&c2"
+		GetVar(_CampfireOn,%CampfireCharmer,"IsStatusOn")
+		IsEqual(_CampfireOn,0)
+	THEN
+		CharacterLookAt(%CampfireCharmer)
+		CharacterPlayAnimation("Fidget_Low_01")
+		CharacterUseItem(%CampfireCharmer)
+		CharacterPlayAnimation("Warm_Hands_01")
+	ELSE
+		CharacterLookAt(%CampfireCharmer)
+		CharacterPlayAnimation("Warm_Hands_01")
+	ENDIF
+	IF "c1&c2"
+		GetDistance(_Distance,__Me,%Partner)
+		IsLessThen(_Distance,10)
+	THEN
+		CharacterLookAt(%Partner)
+		CharacterEvent(%Partner,"DialogRequest")
+	ENDIF
+
+REACTION State_InForest, 0
+USAGE PEACE
+VARS
+	FLOAT:_Distance
+ACTIONS
+	Sleep(8)
+	IF "c1&c2"
+		GetDistance(_Distance,__Me,%Partner)
+		IsLessThen(_Distance,10)
+	THEN
+		CharacterLookAt(%Partner)
+		CharacterEvent(%Partner,"DialogRequest")
+	ENDIF
+
+EVENTS
+
+EVENT SpottedPlayer
+ON
+	OnCombatStarted()
+VARS
+	FIXEDSTRING:_Text
+ACTIONS
+	GetRandom(_Text,"HIB_CultistSpotsPlayer_1","HIB_CultistSpotsPlayer_2","HIB_CultistSpotsPlayer_3","HIB_CultistSpotsPlayer_4")
+	DisplayText(__Me,_Text,5)

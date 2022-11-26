@@ -1,0 +1,101 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+IF
+DialogEnded(_,_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_BlockedCompanion(_Companion,_Player)
+THEN
+ProcCheckBlockedDialog(_Player);
+
+IF
+DialogEnded(_,_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,2)
+AND
+DB_BlockedCompanion(_Companion,_Player)
+THEN
+ProcCheckBlockedDialog(_Player);
+
+IF
+DialogEnded(_,_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,3)
+AND
+DB_BlockedCompanion(_Companion,_Player)
+THEN
+ProcCheckBlockedDialog(_Player);
+
+IF
+DialogEnded(_Diag,_Inst)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_I_Attack_Dialog(_Player,_Npc,_Diag)
+THEN
+NOT DB_I_Attack_Dialog(_Player,_Npc,_Diag);
+
+IF
+AutomatedDialogEnded(_,_Inst)
+THEN
+ProcClearDialogPlayers(_Inst);
+ProcClearDialogNPCs(_Inst);
+ProcClearDialogCounts(_Inst);
+NOT DB_AutomatedDialog(_Inst);
+
+IF
+DialogEnded(_,_Inst)
+THEN
+ProcClearDialogPlayers(_Inst);
+ProcClearDialogNPCs(_Inst);
+ProcClearDialogCounts(_Inst);
+
+PROC
+ProcClearDialogPlayers((INTEGER)_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,_Index)
+THEN
+NOT DB_DialogPlayers(_Inst,_Player,_Index);
+
+PROC
+ProcClearDialogNPCs((INTEGER)_Inst)
+AND
+DB_DialogNPCs(_Inst,_Player,_Index)
+THEN
+NOT DB_DialogNPCs(_Inst,_Player,_Index);
+
+PROC
+ProcClearDialogCounts((INTEGER)_Inst)
+AND
+DB_DialogNumPlayers(_Inst,_NumPlayers)
+AND
+DB_DialogNumNPCs(_Inst,_NumNPCs)
+THEN
+NOT DB_DialogNumPlayers(_Inst,_NumPlayers);
+NOT DB_DialogNumNPCs(_Inst,_NumNPCs);
+
+IF
+CharacterCreationFinished(_)
+THEN
+NOT DB_InCharacterCreation(1);
+
+PROC
+ProcShowCompanionDismissMessage((CHARACTER)_Player)
+AND
+NOT DB_ShownCompanionDismissMessage(_Player) 
+THEN
+OpenMessageBox(_Player,"GLO_CompanionsLeft");
+
+PROC
+ProcShowCompanionDismissMessage((CHARACTER)_Player)
+THEN
+NOT DB_ShownCompanionDismissMessage(_Player);
+EXITSECTION
+
+ENDEXITSECTION

@@ -1,0 +1,73 @@
+INIT
+	CHARACTER:__Me
+	INT:%Bool_StonesShattered=0
+	EXTERN INT:%ShatterStones_Current=0
+	EXTERN INT:%ShatterStones_Desired=4
+	EXTERN INT:%ShatterStones_Prio=1500
+	ITEM:%Stone1="bfbb4ad5-4308-456a-a0a5-dcc9f2c6ba79"
+	ITEM:%Stone2="9af8ae3f-33f5-4f92-af90-4451381fd45c"
+	CHARACTERTEMPLATE:%EarthCreatureRT="Vaelanna_Earth_Elemental_fa9de4a4-3b9e-48dd-8fcc-4c2edbb2a295"
+
+//------------------------
+BEHAVIOUR
+REACTION Vaelanna_ShatterStones,0
+USAGE COMBAT
+VARS
+	FLOAT:_MyAP
+	FLOAT3:_Stone1_Position
+	FLOAT3:_Stone2_Position
+CHECK "c1&!(c2|c3|c4|c5|c6|c7|c8)&c9&c10"	
+	CharacterGetStat(_MyAP,__Me,ActionPoints)				//c1
+	IsLessThen(_MyAP,4)										//!c2
+	CharacterHasStatus(__Me,"CHARMED")						//!c3
+	CharacterHasStatus(__Me,"FEAR")							//!c4
+	CharacterHasStatus(__Me,"PETRIFIED")					//!c5
+	CharacterHasStatus(__Me,"FROZEN")						//!c6
+	CharacterHasStatus(__Me,"STUNNED")						//!c7
+	CharacterHasStatus(__Me,"KNOCKED_DOWN")					//!c8
+	GetPosition(%Stone1,_Stone1_Position)					//c9
+	GetPosition(%Stone2,_Stone2_Position)					//c10
+ACTIONS
+	Sleep(0.5)
+	DisplayText(__Me,"LUC_VaelannaHadEnough",3)
+	CharacterPlayEffect(__Me,"FX_Creatures_Animals_Spider_Unburrow_A")
+	PlayEffectAt(_Stone1_Position,"FX_Creatures_Undead_Skeleton_Spawn_A")	
+	PlayEffectAt(_Stone1_Position,"FX_Creatures_Undead_Infernal_A_Death")	
+	PlayEffectAt(_Stone2_Position,"FX_Creatures_Undead_Skeleton_Spawn_A")
+	PlayEffectAt(_Stone2_Position,"FX_Creatures_Undead_Infernal_A_Death")
+	Sleep(0.5)
+	ItemDestroy(%Stone1)
+	PlaySound(__Me,"Skill_Script_ValeannaRock")
+	SpawnCharacter(_,%EarthCreatureRT,_Stone1_Position,0)	
+	ItemDestroy(%Stone2)	
+	PlaySound(__Me,"Skill_Script_ValeannaRock")
+	SpawnCharacter(_,%EarthCreatureRT,_Stone2_Position,0)		
+	PlayEffectAt(_Stone1_Position,"FX_Creatures_Summons_ElementalFire_A_Death")
+	PlayEffectAt(_Stone1_Position,"FX_Creatures_Summons_ElementalEarth_A_Death")	
+	CreateSurfaceAt(_Stone1_Position,Fire,1,4)		
+	PlayEffectAt(_Stone2_Position,"FX_Creatures_Summons_ElementalFire_A_Death")
+	PlayEffectAt(_Stone2_Position,"FX_Creatures_Summons_ElementalEarth_A_Death")
+	CreateSurfaceAt(_Stone2_Position,Fire,1,4)
+	CharacterPlayAnimation("cast_shout_cast",0,0)
+	Sleep(1)	
+	PlayEffectAt(_Stone1_Position,"FX_Creatures_Animals_Spider_Unburrow_A")		
+	PlayEffectAt(_Stone2_Position,"FX_Creatures_Animals_Spider_Unburrow_A")	
+	Set(%Bool_StonesShattered,1)
+	CharacterUseActionPoints(__Me,4)
+	CharacterEndTurn()
+	SetPriority("Vaelanna_ShatterStones",0)	
+	
+//------------------------	
+EVENTS
+EVENT SetRockBreakingFrequence
+ON
+	OnTurn()
+ACTIONS
+	IF "c1&c2"
+		IsEqual(%Bool_StonesShattered,0)
+		IsLessThen(%ShatterStones_Current,%ShatterStones_Desired)
+	THEN		
+		Add(%ShatterStones_Current,1)
+	ELSE
+		SetPriority("Vaelanna_ShatterStones",%ShatterStones_Prio)
+	ENDIF

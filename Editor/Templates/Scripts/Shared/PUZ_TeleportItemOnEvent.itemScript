@@ -1,0 +1,19 @@
+INIT
+
+	ITEM:__Me
+	EXTERN STRING:%TeleEvent=null
+	EXTERN ITEM:%Item=null
+	EXTERN TRIGGER:%TargetTrigger=null
+		
+EVENTS
+
+EVENT TeleportOnEvent
+	ON
+		OnCharacterItemEvent(_,_,%TeleEvent)
+	ACTIONS
+		IF "!c1"
+			ItemIsDestroyed(%Item)
+		THEN
+			ItemTeleportTo(%Item,%TargetTrigger)
+			PlayEffectAt(%Item,"FX_GP_TeleportSmoke_A")
+		ENDIF

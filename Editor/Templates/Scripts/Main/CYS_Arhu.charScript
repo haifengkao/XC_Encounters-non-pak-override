@@ -1,0 +1,78 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+TRIGGER:%PointBureau = CYS_PointArhu_6414fb76-e7b1-4ab7-8ae9-2a99c1531fbb
+TRIGGER:%PointMachine = CYS_Point_ArhuMachine_9ff43e46-6f7d-4b3b-87ed-0670ba9cb911
+TRIGGER:%PointZapper = CYS_Point_ArhuZapper_8c50647f-40c4-4a67-a8c0-17eebd9de0b9
+
+CHARACTER:__Me
+
+BEHAVIOUR
+
+REACTION State_Caged_Cat, 0
+USAGE PEACE
+ACTIONS
+	CharacterLookFrom(TRIGGER:DAF_Arhu_Cage_Pos_19ad0037-fdef-46e9-9969-63ceb1833dd4,0)
+	Sleep(5)
+
+REACTION State_UpStairs, 0
+USAGE PEACE
+ACTIONS
+	GetWeightedRandom(%currentAction, "Action_GoToBureau", INT:15, "Action_GoToMachine", INT:5, "Action_GoToZapper", INT:10)
+	SetPriority(%currentAction, 1100)
+
+//I know it's three times the same, but it's all placeholder for better behaviour at the different points (Arhu only has like 2 animations atm)
+
+REACTION Action_GoToBureau, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%PointBureau,0)
+	CharacterLookFrom(%PointBureau)
+	CharacterPlayAnimation("skill_regenerate_cast")
+	Sleep(3)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)
+
+REACTION Action_GoToMachine, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%PointMachine,0)
+	CharacterLookFrom(%PointMachine)
+	CharacterPlayAnimation("skill_regenerate_cast")
+	Sleep(3)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)
+
+REACTION Action_GoToZapper, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%PointZapper,0)
+	CharacterLookFrom(%PointZapper)
+	CharacterPlayAnimation("skill_regenerate_cast")
+	Sleep(3)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)
+
+REACTION State_IdleAtPortal, 0
+USAGE PEACE
+ACTIONS
+	CharacterLookFrom(TRIGGER:HOM_Arhu_AtGate_f3231743-16be-4621-8dc8-820362bc4c10)
+	Sleep(2.0)	
+	
+EVENTS
+	
+EVENT Init
+ON
+	OnInit()
+ACTIONS	
+	CharacterForceUpdate(1)
+
+EVENT Died
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	CharacterForceUpdate(0)

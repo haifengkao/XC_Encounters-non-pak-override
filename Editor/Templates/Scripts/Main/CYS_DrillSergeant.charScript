@@ -1,0 +1,86 @@
+#INCLUDE Base
+
+INIT
+USING Base
+
+CHARACTER:__Me
+CHARACTER:%ShoeGuard = CYS_DrillGuard3_21697c1b-5280-41cc-91b1-ef4a938c3f58
+CHARACTER:%LaughingGuard = CYS_DrillGuard2_e96c2479-6eaa-4e2f-932d-d605bfe2e348
+CHARACTER:%Lighthouse1 = CYS_LighthouseDare1_2f9f9cc7-c9e5-4620-ae50-5ddb5bbff37d
+CHARACTER:%Lighthouse2 = CYS_LighthouseDare2_d5f3aa68-69bb-4afb-81fd-90cae50a5177
+TRIGGER:%Trigger1 = CYS_PointDrillSergeant1_f3a4a49f-18c3-4fb0-b8d8-30615592446b
+TRIGGER:%Trigger2 = CYS_PointDrillSergeant2_edfd35c5-c224-43b6-b3bd-3a164785a940
+TRIGGER:%Trigger3 = CYS_PointDrillSergeant3_e77ab1db-407c-4aca-9f6a-45700e31d675
+INT:%Dialog = 0
+
+FIXEDSTRING:%CurrentAction = "ChooseAction"
+
+BEHAVIOUR
+
+REACTION Dialog,1100
+USAGE PEACE
+CHECK "c1&!c2&!c3&!c4"
+	IsEqual(%Dialog,1)
+	IsInDialog(%Lighthouse1)
+	IsInDialog(%Lighthouse2)
+	IsInDialog(__Me)
+ACTIONS
+	Set(%Dialog,0)
+	CharacterLookAt(%Lighthouse1)
+	DialogStart("CYS_AD_Donovan_Guards",%Lighthouse1,%Lighthouse2,__Me)
+
+REACTION ChooseAction, 1060
+USAGE PEACE
+ACTIONS
+	GetRandom(%CurrentAction,"MakeThemMarch","ControlShoes")
+	SetPriority(%CurrentAction, 1070)
+	
+REACTION MakeThemMarch, 0
+USAGE PEACE
+ACTIONS
+	DisplayText(__Me,"CYS_DrillSergeant_Script_0",4)
+	Sleep(3)
+	DisplayText(__Me,"CYS_DrillSergeant_Script_1",4)
+	GlobalSetEvent("CYS_DrillGuardsShouldTurn")
+	Sleep(4)
+	DisplayText(__Me,"CYS_DrillSergeant_Script_2",4)
+	GlobalSetEvent("CYS_DrillGuardsShouldMarch")
+	Sleep(5)
+	DisplayText(__Me,"CYS_DrillSergeant_Script_3",5)
+	GlobalSetEvent("CYS_DrillGuardsShouldReturn")
+	Sleep(10)	
+	SetPriority("MakeThemMarch", 0)
+INTERRUPT
+	GlobalSetEvent("CYS_DrillGuardsShouldReturn")
+	SetPriority("MakeThemMarch", 0)
+	Reset()
+
+REACTION ControlShoes,0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Trigger1,0)
+	CharacterLookAt(%ShoeGuard)
+	DisplayText(__Me,"CYS_DrillSergeant_Script_4",4)
+	CharacterEvent(%ShoeGuard,"LookAtShoes")
+	Sleep(6)
+		IF "c1"
+			IsRandom(0.5)
+		THEN
+			CharacterMoveTo(%Trigger3,0)
+			CharacterLookAt(%LaughingGuard)
+			DisplayText(__Me,"CYS_DrillSergeant_Script_5",4)
+			Sleep(4)
+			DisplayText(%LaughingGuard,"CYS_DrillSergeant_Script_6",3)
+			Sleep(2)
+		ENDIF
+	CharacterMoveTo(%Trigger2,0)
+	CharacterLookFrom(%Trigger2)	
+	SetPriority("ControlShoes", 0)
+	
+EVENTS
+
+EVENT StartDialog
+ON
+	OnCharacterEvent(__Me,"DialogRequest")
+ACTIONS
+	Set(%Dialog,1)

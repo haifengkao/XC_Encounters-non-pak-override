@@ -1,0 +1,56 @@
+INIT
+	CHARACTER:__Me
+	TRIGGER:%CurrentTrigger = null
+	TRIGGER:%TalkingPoint_1 = CYS_JAH_Wander1_e3a575f1-2a89-49ef-801d-8fc17162cde1
+	TRIGGER:%TalkingPoint_2 = CYS_JAH_Wander2_02f30587-416c-4b6c-b5bf-920d448a752e
+	TRIGGER:%TalkingPoint_3 = CYS_JAH_Wander3_d38ccbef-509d-428e-bbed-56b260a58b25
+	INT:%index = 0
+	INT:%Active = 1
+	
+BEHAVIOUR
+
+REACTION ChooseAction, 1060
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%Active,1)
+ACTIONS
+	GetElement(%CurrentTrigger,%index,%TalkingPoint_1,%TalkingPoint_2,%TalkingPoint_3)
+	SetPriority("GoToSpot", 1070)
+	Add(%index,1)
+	IF "c1"
+		IsEqual(%index,3)
+	THEN
+		Set(%index,0)
+	ENDIF
+	
+REACTION GoToSpot, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%CurrentTrigger, 0)
+	CharacterLookFrom(%CurrentTrigger)
+	CharacterPlayAnimation("Fidget_Forward_01")
+	CharacterPlayAnimation("Stand_Read_01")
+	Sleep(3)
+	DialogStart("CYS_AD_JAH",__Me)
+	SetPriority("GoToSpot", 0)
+INTERRUPT
+	SetPriority("GoToSpot", 0)
+
+REACTION SourceAcademy, 0
+USAGE PEACE
+ACTIONS
+	CharacterWander(TRIGGER:SAC_Behavior_JahanWander_d6c08f03-a5de-4284-9395-c012df1649a5, 3.0)
+	Sleep(3)
+	
+EVENTS
+EVENT Hired
+ON
+	OnCharacterEvent(__Me,"Hired")
+ACTIONS
+	Set(%Active,0)
+	
+EVENT SAC
+ON
+	OnCharacterEvent(__Me, "END")
+ACTIONS
+	SetPriority("SourceAcademy", 1100)

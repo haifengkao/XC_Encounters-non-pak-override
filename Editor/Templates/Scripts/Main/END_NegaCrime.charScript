@@ -1,0 +1,80 @@
+INIT 
+
+CHARACTER:__Me
+
+	FIXEDSTRING:%Anim = ""
+	FLOAT:%Rest = 0
+	EXTERN CHARACTER:%Lover = null
+
+
+BEHAVIOUR
+
+REACTION Idle, 900
+USAGE PEACE
+ACTIONS
+	CallFunction("GetRest")
+	CharacterLookAt(%Lover)
+	CallFunction("GetEmotion")
+	CharacterPlayAnimation(%Anim)
+	Sleep(%Rest)
+	Reset()
+INTERRUPT
+	Reset()
+
+REACTION Door, 0
+USAGE PEACE
+ACTIONS
+	CharacterLookAt(ITEM:END_NegaKingsCrab_CrimeSceneDoor_d5336d29-86e0-46cd-b05b-025af0801e47)
+	SetPriority("Door", 0)
+	
+REACTION DoorDialog, 0
+USAGE PEACE
+ACTIONS
+	CharacterLookAt(ITEM:END_NegaKingsCrab_CrimeSceneDoor_d5336d29-86e0-46cd-b05b-025af0801e47)
+	Sleep(2.0)
+	CharacterLookAt(%Lover)
+	Sleep(.3)
+	DialogStart("END_AD_NegaKingsCrab_ZandalorLeandra_CrimeScene",CHARACTER:END_NegaZandalorCrime_ed853add-52e9-4609-b1d1-ea3843a875af,CHARACTER:END_NegaLeandraCrime_ba9fa52f-8d06-4146-a829-7aa2f67378be)
+	SetPriority("DoorDialog", 0)
+	
+REACTION DoorDialog2, 0
+USAGE PEACE
+ACTIONS
+	CharacterLookAt(ITEM:END_NegaKingsCrab_CrimeSceneDoor_d5336d29-86e0-46cd-b05b-025af0801e47)
+	Sleep(0.3)
+	DialogStart("END_AD_NegaKingsCrab_Leandra_CrimeSceneGoAway",CHARACTER:END_NegaLeandraCrime_ba9fa52f-8d06-4146-a829-7aa2f67378be)
+	SetPriority("DoorDialog2", 0)	
+
+EVENTS
+
+EVENT Emotion
+ON
+	OnFunction("GetEmotion")
+ACTIONS
+	GetRandom(%Anim, "emotion_flirt", "emotion_boasting_bragging", "emotion_normal", "emotion_sly_scheming")
+
+EVENT Rest
+ON
+	OnFunction("GetRest")
+ACTIONS
+	GetRandomBetween(%Rest, 1.0, 3.0)
+	
+	
+EVENT Door
+ON
+	OnCharacterEvent(__Me, "END_NegaCrimeDoor")
+ACTIONS
+	SetPriority("Door", 1100)
+	
+EVENT DoorDialog
+ON
+	OnCharacterEvent(__Me, "END_NegaCrimeDoorDialog")
+ACTIONS
+	SetPriority("DoorDialog", 1100)
+	
+EVENT DoorDialog2
+ON
+	OnCharacterEvent(__Me, "END_NegaCrimeDoorDialog2")
+ACTIONS
+	SetPriority("DoorDialog2", 1100)
+	

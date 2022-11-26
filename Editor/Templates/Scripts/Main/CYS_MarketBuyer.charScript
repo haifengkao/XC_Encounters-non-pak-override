@@ -1,0 +1,43 @@
+#INCLUDE DefaultCharacter
+#INCLUDE State_Manager
+
+INIT
+	USING DefaultCharacter
+	USING State_Manager
+	CHARACTER:__Me
+	FLOAT:%Distance
+	EXTERN TRIGGER:%MarketStandPoint01 = null
+	EXTERN TRIGGER:%MarketStandPoint02 = null
+	EXTERN TRIGGER:%MarketStandPoint03 = null
+	TRIGGER:%CurrentMarketStandPoint = null
+	INT:%PickMarketStand = 1
+
+BEHAVIOUR 
+
+REACTION State_Shopping, 0
+	USAGE PEACE
+	ACTIONS
+		GetRandom(%currentAction, "Action_Shop")
+		SetPriority(%currentAction, 1100)
+
+REACTION Action_Shop, 0
+	USAGE PEACE
+	ACTIONS
+		IF "c1&c2&c3"
+			IsEqual(%PickMarketStand, 0)
+			GetDistance(%Distance, __Me, %CurrentMarketStandPoint)
+			IsLessThen(%Distance, FLOAT:1.0)
+		THEN
+			CharacterLookFrom(%CurrentMarketStandPoint)
+			CharacterPlayAnimation("Fidget_Forward_01")
+			Set(%PickMarketStand, 1)
+		ELIF "c1"
+			IsRandom(0.5)
+		THEN
+			GetRandom(%CurrentMarketStandPoint, %MarketStandPoint01, %MarketStandPoint02, %MarketStandPoint03)
+			CharacterMoveTo(%CurrentMarketStandPoint, 0)
+			Set(%PickMarketStand, 0)
+		ENDIF
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)

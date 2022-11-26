@@ -1,0 +1,27 @@
+INIT
+
+	CHARACTER:__Me
+	
+BEHAVIOUR
+
+REACTION TellStory, 1500
+USAGE PEACE
+VARS
+	STRING:_Story
+CHECK "!c1"
+	IsInDialog(__Me)
+ACTIONS
+	GetRandom(_Story, "LUC_AD_TellerStory1", "LUC_AD_TellerStory2", "LUC_AD_TellerStory3")
+	Sleep(20)
+	DialogStart(_Story, __Me)
+	
+
+EVENTS
+
+EVENT Combatstart
+ON
+	OnCombatStarted()
+ACTIONS
+	DialogRequestStop("LUC_AD_TellerStory1")
+	DialogRequestStop("LUC_AD_TellerStory2")
+	DialogRequestStop("LUC_AD_TellerStory3")

@@ -1,0 +1,255 @@
+#INCLUDE BaseEscortScript
+
+INIT
+	USING BaseEscortScript
+	TRIGGER:%SafePoint1 = LUC_Point_BjornDest1_c4f69a91-68b4-4bde-b4e4-6b6ff16f653f
+	TRIGGER:%SafePoint2 = LUC_Point_BjornDest2_06b7b1aa-e6e4-4e71-acb8-851ad4750c5e
+	TRIGGER:%SafePoint3 = LUC_Point_BjornDest3_baa7bccb-7ecc-4a66-b654-56711e9b8c4b
+	CHARACTER:%Bjorn = LUC_Bjorn_77bdb47f-8e36-47b2-8eac-19c53ca52b6f
+	CHARACTER:%Mount = LUC_BjornMount_7e974707-a22e-4dc7-aad0-c2ec145b62b2
+BEHAVIOUR
+
+REACTION State_Idle, 0
+USAGE PEACE
+ACTIONS
+	GetWeightedRandom(%currentAction,"Action_Idle",INT:2,"Action_Cook",INT:3,"Action_WanderCamp",INT:10)
+	SetPriority(%currentAction, 1100)
+
+
+REACTION State_EscortDone, 0
+USAGE PEACE
+ACTIONS
+	SetPriority("Defend_Yourself", 0)
+	SetPriority("Cower", 0)
+	GetRandom(%currentAction, "Action_WaitingForOthers")
+	SetPriority(%currentAction, 1100)
+	
+REACTION State_AfterEscort, 0
+USAGE PEACE
+ACTIONS
+	GetWeightedRandom(%currentAction, "Action_Wander",INT:5,"Action_BotherBjorn",INT:2)
+	SetPriority(%currentAction, 1100)
+  
+REACTION State_Blacksmith, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, "Action_Wander","Action_Confused")
+	SetPriority(%currentAction, 1100)
+
+//////////////////////////////////////////////////////////////////	
+	
+REACTION Action_MournBjorn, 0
+USAGE ALL
+VARS
+	FLOAT:_Dist
+	FLOAT:_Range
+ACTIONS
+	IF "c1&c2&c3"
+		GetDistance(_Dist,__Me,%Bjorn)
+		CharacterGetSightRange(_Range,__Me)
+		IsLessThen(_Dist,_Range)
+	THEN
+		DisplayText(__Me,"LUC_MaraMournsBjorn",FLOAT:3.0)
+		CharacterPlayAnimation("Crying_01")
+		Sleep(1.0)
+	ENDIF
+	SetPriority("Action_MournBjorn",0)
+INTERRUPT
+	SetPriority("Action_MournBjorn",0)	
+
+REACTION Action_Cook, 0	
+USAGE PEACE
+VARS
+	TRIGGER:_Pot= LUC_BrokenWagonCookingPoint_86196c49-befc-46c4-867a-8e43a5e21135
+ACTIONS
+	CharacterMoveTo(_Pot,0)
+	CharacterLookFrom(_Pot)
+	CharacterPlayAnimation("Cooking_01")
+	Sleep(10)
+	DialogStart("LUC_AD_MaraCooking",__Me)
+	SetPriority(%currentAction, 0)	
+INTERRUPT
+	SetPriority(%currentAction, 0)	
+
+REACTION Action_WanderCamp, 0
+USAGE PEACE
+ACTIONS
+	CharacterWander(FLOAT:2,FLOAT:15,0,%Mount)
+	Sleep(4)
+	DialogStart("LUC_AD_MaraCamp",__Me)
+	SetPriority(%currentAction, 0)	
+INTERRUPT
+	SetPriority(%currentAction, 0)	
+	
+REACTION Action_Confused, 0
+USAGE PEACE
+VARS
+	TRIGGER:_Furnace = LUC_Point_BjornFurnace_9aecafa1-f66f-4ade-bf2c-a222b96246bc 
+	TRIGGER:_Anvil = LUC_Point_BjornAnvil_9032eec2-4f28-4146-ad0d-94da4b814f14
+	FIXEDSTRING:_Animation
+	FLOAT:_Dist
+ACTIONS
+	CharacterMoveTo(_Furnace,0)
+	IF "c1&c2"
+		GetDistance(_Dist,_Furnace,__Me)
+		IsLessThen(_Dist,0.5)
+	THEN
+		CharacterLookFrom(_Furnace)
+		DialogStart("LUC_AD_MaraBlacksmith_Furnace",__Me)
+		GetRandom(_Animation, "Fidget_Forward_01","Fidget_Forward_02")
+		CharacterPlayAnimation(_Animation)
+	ENDIF
+	
+	Sleep(15)
+	
+	IF "c1&c2"
+		GetDistance(_Dist,_Anvil,__Me)
+		IsLessThen(_Dist,0.5)
+	THEN
+		CharacterMoveTo(_Anvil,0)
+		CharacterLookFrom(_Anvil)
+		CharacterPlayAnimation("Blacksmith_01")
+		DialogStart("LUC_AD_MaraBlacksmith",__Me)
+	ENDIF
+	
+	Sleep(1)
+	IF "c1"
+		IsRandom(0.3)
+	THEN
+		CharacterPlayAnimation("Tired_01")
+		Sleep(1)
+	ENDIF
+	SetPriority(%currentAction, 0)	
+	
+	
+REACTION Action_BotherBjorn,0
+USAGE PEACE
+VARS
+	TRIGGER:_Center= LUC_Point_BjornDest3_baa7bccb-7ecc-4a66-b654-56711e9b8c4b
+ACTIONS
+	IF "!c1"
+		CharacterHasStatus(%Bjorn,"DYING")
+	THEN
+		CharacterMoveTo(%Bjorn,0)
+		IF "!c1"
+			IsInDialog(%Bjorn)
+		THEN
+			DialogStart("LUC_AD_BlacksmithMaraBothersBjorn",__Me,%Bjorn)
+		ELSE
+			CharacterPlayAnimation("Attention_02")
+		ENDIF
+	ELSE
+		CharacterWander(FLOAT:2,FLOAT:2,0,_Center)
+	ENDIF
+	Sleep(15)
+	SetPriority(%currentAction, 0)	
+INTERRUPT
+	SetPriority(%currentAction, 0)	
+	
+	
+REACTION Action_Wander, 0
+USAGE PEACE
+VARS
+	TRIGGER:_Center= LUC_Point_BjornDest3_baa7bccb-7ecc-4a66-b654-56711e9b8c4b
+ACTIONS
+	CharacterWander(FLOAT:2,FLOAT:2,0,_Center)
+	Sleep(4)
+	SetPriority(%currentAction, 0)	
+INTERRUPT
+	SetPriority(%currentAction, 0)	
+	
+REACTION Action_WaitingForOthers, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+	FLOAT:_Range
+	FLOAT:_CurDist
+ACTIONS
+	IF "c1&c2&c3&c4"
+		CharacterGetSightRange(_Range,__Me)
+		GetDistance(_CurDist,%Bjorn,__Me)
+		IsLessThen(_CurDist,_Range)
+		IsRandom(0.4)
+	THEN
+		GetRandom(_Animation,"Shout_01","Wave_02")
+	ELSE
+		GetRandom(_Animation,"Dust_Off_01","Tired_01")
+	ENDIF
+	CharacterPlayAnimation(_Animation)
+	Sleep(4)
+	SetPriority(%currentAction, 0)	
+INTERRUPT
+	SetPriority(%currentAction, 0)	
+	
+REACTION Action_Idle, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	GetRandom(_Animation,"Dust_Off_01","Sigh_01","Tired_01","Yawn_01")
+	CharacterPlayAnimation(_Animation)
+	Sleep(8)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)	
+
+REACTION Defend_Yourself,0
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+CHECK "c1&c2"
+	CharacterGet(_Enemy,__Me,null,Lowest,Distance,Enemy)
+	CharacterInWeaponRange(__Me,_Enemy)
+ACTIONS 
+	CharacterLookAt(_Enemy)
+	CharacterAttackWithoutMove(_Enemy)		
+	Sleep(1.0)
+	CharacterEndTurn()
+	
+REACTION Cower,0
+USAGE COMBAT
+VARS
+	FIXEDSTRING:_Animation
+	CHARACTER:_Enemy
+	FIXEDSTRING:_Text
+ACTIONS 
+	IF "c1"
+		CharacterGet(_Enemy,__Me,null,Lowest,Distance,Enemy)
+	THEN
+		CharacterLookAt(_Enemy)
+	ENDIF
+	GetRandom(_Animation,"Cower_01","Cower_02")
+	CharacterPlayAnimation(_Animation)
+	GetRandom(_Text,"LUC_BjornEscort_CombatHelp_1","LUC_BjornEscort_CombatHelp_2","LUC_BjornEscort_CombatHelp_3")
+	DisplayText(__Me,_Text)
+	Sleep(1)
+	CharacterEndTurn()
+
+
+EVENTS 
+
+EVENT BjornDead
+ON
+	OnCharacterEvent(__Me,"BjornDead")
+ACTIONS
+	SetPriority("Action_MournBjorn", 2100)
+	
+EVENT EscortStart
+ON
+	OnCharacterEvent(__Me,"EscortStart")
+ACTIONS
+	SetPriority("Defend_Yourself", 1000)
+	SetPriority("Cower", 995)
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+STORY
+
+SCRIPTFRAME MoveToSafeSpot
+ACTIONS
+	SetPriority("Defend_Yourself",0)
+	SetPriority("Cower",0)
+	CharacterMoveTo(%SafePoint1, 0)
+	CharacterMoveTo(%SafePoint2, 0)
+	CharacterMoveTo(%SafePoint3, 0)
+	
+

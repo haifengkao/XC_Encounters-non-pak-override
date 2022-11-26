@@ -1,0 +1,63 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+/////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+// Functions updating Reputation/2
+//
+//		DecreaseReputation((INTEGER)_Delta)
+//		IncreaseReputation((INTEGER)_Delta)
+//
+
+PROC	
+ClearReputationFacts((CHARACTER)_Player) 
+AND
+DB_UpdateRepAttitude_Handled(_Player,_Npc)
+THEN
+NOT DB_UpdateRepAttitude_Handled(_Player,_Npc);
+
+/////////////////////////////////////////////////////////////////////////////////////
+PROC	
+DecreaseReputation((CHARACTER)_Player,(INTEGER)_Delta) 
+AND
+_Delta < 0 
+AND
+IntegerProduct(_Delta,-1,_MDelta)
+THEN
+IncreaseReputation(_Player,_MDelta);
+
+PROC	
+DecreaseReputation((CHARACTER)_Player,(INTEGER)_Delta) 
+AND
+_Delta > 0 
+AND
+IntegerProduct(-1,_Delta,_Value)
+THEN
+CharacterAddReputation(_Player,_Value);	
+ProcUpdateReputationDialogFlags(_Player);
+ClearReputationFacts(_Player);
+
+//////////////////////////////////////////////////////////////////////////////////////
+PROC	
+IncreaseReputation((CHARACTER)_Player,(INTEGER)_Delta)
+AND
+_Delta < 0 
+AND
+IntegerProduct(_Delta,-1,_MDelta)
+THEN	
+DecreaseReputation(_Player,_MDelta);
+
+PROC	
+IncreaseReputation((CHARACTER)_Player,(INTEGER)_Delta)
+AND
+_Delta > 0
+THEN	
+CharacterAddReputation(_Player,_Delta);	
+ProcUpdateReputationDialogFlags(_Player);
+ClearReputationFacts(_Player);
+EXITSECTION
+
+ENDEXITSECTION

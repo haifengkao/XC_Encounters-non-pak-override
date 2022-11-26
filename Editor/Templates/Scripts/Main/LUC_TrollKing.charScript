@@ -1,0 +1,71 @@
+#INCLUDE State_Manager
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	TRIGGER:%table = LUC_Point_TrollKingTable_400c481d-a3fb-4b14-9ffc-f3db556df613
+	TRIGGER:%Pile01 = 418ec889-451f-4df2-add9-b8d37b340c1a
+	TRIGGER:%Pile02 = e87cfcce-867e-4151-886a-3ceab2161641
+	TRIGGER:%Pile03 = 1b39a833-15aa-4d69-a0b3-9894776354d4
+	TRIGGER:%Pile04 = 7b110990-9fe9-4d2a-98b1-d0016ff42cb5
+	TRIGGER:%Pile05 = 3bf30a80-c75f-4842-a8a3-977f3ef2d4f7
+	FIXEDSTRING:%trollText
+
+//------------------------	
+BEHAVIOUR
+REACTION State_CountGold, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%table,0,0,0.1)
+	CharacterLookAt(%table)
+	DialogStart("LUC_AD_TrollKing_AtTable", __Me)
+	GetRandom(%currentAction,"Action_Pile")
+	SetPriority(%currentAction, 1100)
+
+REACTION Action_Pile, 0
+USAGE PEACE
+VARS
+	TRIGGER:_Pile
+ACTIONS
+	GetRandom(_Pile, %Pile01, %Pile02, %Pile03, %Pile04, %Pile05)
+	CharacterMoveTo(_Pile)
+	CharacterLookAt(_Pile)
+	CharacterPlayAnimation("Counting_01", 1, 1)
+	GetRandom(%trollText,"LUC_TrollKing_01","LUC_TrollKing_02","LUC_TrollKing_03","LUC_TrollKing_04","LUC_TrollKing_05")
+	Sleep(5)
+	DisplayText(__Me,%trollText,3)
+	Sleep(10)
+	SetPriority(%currentAction,0)
+	
+EVENTS
+EVENT OnInit_StartTimerForIterate
+ON
+	OnInit()
+ACTIONS
+	StartTimer("CMB_LUC_TrollKing_IterateForPlayers_Timer",0.5,-1)
+	
+EVENT OnTimer_IterateForPlayersAroundTrollKing
+ON
+	OnTimer("CMB_LUC_TrollKing_IterateForPlayers_Timer")
+ACTIONS
+	IterateParty("CMB_LUC_TrollKing",Lowest,Distance)
+
+EVENT OnIterateCharacter_LookAroundForPartyMembers
+VARS
+	CHARACTER:_Player
+ON
+	OnIterateCharacter(_Player,"CMB_LUC_TrollKing")
+ACTIONS
+	//DebugText(__Me,"Looking around!")
+	IF "!c1&c2"
+		CharacterIsDead(_Player)
+		CharacterCanSee(__Me,_Player)
+	THEN
+		//DebugText(_Player,"Gotcha!")
+		DialogRequestStop("LUC_AD_TrollKing_AtTable")
+	ENDIF
+	
+EVENT OnDie_StopTimer
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	StopTimer("CMB_LUC_TrollKing_IterateForPlayers_Timer")

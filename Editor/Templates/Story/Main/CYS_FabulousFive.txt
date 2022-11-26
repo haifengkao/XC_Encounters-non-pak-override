@@ -1,0 +1,74 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+//REGION DIALOGS
+SneakTriggerSpotter(TRIGGER_CYS_AreaMendiusStartDialog,CHARACTER_CYS_Fab_Mendius);
+DB_Dialogs(CHARACTER_CYS_Fab_Anna,"CYS_Fab_Anna");
+DB_Dialogs(CHARACTER_CYS_Fab_Alistair,"CYS_Fab_Alistair");
+DB_Dialogs(CHARACTER_CYS_Fab_Novak,"CYS_Fab_Novak");
+DB_Dialogs(CHARACTER_CYS_Fab_Mendius,"CYS_Fab_Mendius");
+//END_REGION
+
+//REGION DATABASES
+DB_FabFive(CHARACTER_CYS_Fab_Alistair);
+DB_FabFive(CHARACTER_CYS_Fab_Anna);
+DB_FabFive(CHARACTER_CYS_Fab_Mendius);
+DB_FabFive(CHARACTER_CYS_Fab_Novak);
+//END_REGION
+ItemToContainer(ITEM_LUC_MendiusDeathNote, ITEM_LUC_Mendius,-1);
+ItemSetOnstage(ITEM_LUC_Mendius, 0);
+ItemSetOnstage(ITEM_LUC_Novak, 0);
+ItemToContainer(ITEM_DAF_MaradinoTreasureNote, ITEM_DAF_Alistair,-1);
+ItemSetOnstage(ITEM_DAF_Alistair, 0);
+ItemSetOnstage(ITEM_LUC_Anna, 0);
+ItemSetOnstage(ITEM_LUC_ShovelAnnaDirt, 0);
+ItemToContainer(ITEM_LUC_RamonLoveLetter, ITEM_LUC_Anna, -1);
+DB_ShovelArea(TRIGGER_DAF_ShovelMaradino1, "DAF_ShovelMaradino1", ITEM_DAF_ShovelMaradino1Dirt);
+DB_ShovelArea(TRIGGER_DAF_ShovelMaradino2, "DAF_ShovelMaradino2", ITEM_DAF_ShovelMaradino2Dirt);
+DB_ShovelArea(TRIGGER_DAF_ShovelMaradino3, "DAF_ShovelMaradino3", ITEM_DAF_ShovelMaradino3Dirt);
+
+DB_ShovelRewardItemAppear("DAF_ShovelMaradino1", ITEM_DAF_ShovelMaradino1Chest, TRIGGER_DAF_ShovelMaradino1Point);
+DB_ShovelRewardItemAppear("DAF_ShovelMaradino2", ITEM_DAF_ShovelMaradino2Chest, TRIGGER_DAF_ShovelMaradino2Point);
+DB_ShovelRewardItemAppear("DAF_ShovelMaradino3", ITEM_DAF_ShovelMaradino3Chest, TRIGGER_DAF_ShovelMaradino3Point);
+KBSECTION
+PROC
+ProcCharInTriggerSpotted(_Player,TRIGGER_CYS_AreaMendiusStartDialog)
+THEN
+ProcDoTwoSpeakerDialog("CYS_Fab_Mendius",CHARACTER_CYS_Fab_Mendius, _Player);
+
+//REGION FABULOUS FIVE LEAVE CYSEAL
+IF
+GlobalEventSet("CYS_KilledSkeletons")
+THEN
+CHARACTER_CYS_Fab_Mendius.LeftCyseal();
+PROC_CYS_FabFiveLeave();
+ProcTriggerUnregisterForPlayers(TRIGGER_CYS_AreaMendiusStartDialog);
+
+PROC
+PROC_CYS_FabFiveLeave()
+AND
+DB_FabFive(_Character)
+THEN
+DialogRequestStopForCharacter(_Character);
+CharacterSetHasDialog(_Character,0);
+CharacterDisappearOutOfSight(_Character,0,1,"",1);
+ItemSetOnstage(ITEM_LUC_Mendius, 1);
+ItemSetOnstage(ITEM_LUC_Novak, 1);
+ItemToContainer(ITEM_LUC_Novak, ITEM_LUC_TrollDroppings,-1);
+ItemSetOnstage(ITEM_DAF_Alistair, 1);
+ItemSetOnstage(ITEM_LUC_ShovelAnnaDirt, 1);
+DB_ShovelArea(TRIGGER_LUC_ShovelAnna, "LUC_ShovelAnna", ITEM_LUC_ShovelAnnaDirt);
+DB_ShovelRewardItemAppear("LUC_ShovelAnna", ITEM_LUC_Anna, TRIGGER_LUC_ShovelAnnaPoint);
+
+
+IF
+CharacterUsedItem(_Player, ITEM_LUC_MendiusDeathNote)
+THEN
+AddSecret("LUC_MendiusStash");
+
+
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<save>
+    <header version="2" time="1402840278" />
+    <version major="1" minor="3" revision="0" build="0" />
+    <region id="keywordDialog">
+        <node id="root">
+            <attribute id="KeywordVoiced" value="0" type="19" />
+            <attribute id="keywordAutoImport" value="1" type="19" />
+            <attribute id="keywordName" value="Hey_thief_I_will_teach_you" type="22" />
+            <attribute id="PlayGreeting" value="0" type="19" />
+            <children>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="a91224ff-e3e3-4cb5-8a54-d7533e8afd7b" type="22" />
+                    <attribute id="keywordContentMapValue" value="Greeting" handle="h7f890f24g8572g4902g90b4gd362b7e9bdf2" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="d4bd4dfc-3f57-4041-ae4a-18e38a093281" type="22" />
+                    <attribute id="keywordContentMapValue" value="Did you really think I&apos;d abide the sound of my things jangling in your pockets? Face me, thief!" handle="hb57b7ad8g30efg4072g9e14g8a4edce96b1a" type="28" />
+                </node>
+                <node id="keywordNode">
+                    <attribute id="keywordActions" value="ACTION CallGuards()" type="23" />
+                    <attribute id="keywordConditions" value="" type="23" />
+                    <attribute id="keywordDisplayedText" value="a91224ff-e3e3-4cb5-8a54-d7533e8afd7b" type="22" />
+                    <attribute id="keywordId" value="Greeting" type="22" />
+                    <attribute id="keywordLast" value="0" type="19" />
+                    <attribute id="keywordOwner" value="0" type="4" />
+                    <attribute id="keywordShow" value="0" type="19" />
+                    <attribute id="keywordSource" value="0" type="5" />
+                    <children>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value="" type="23" />
+                            <attribute id="keywordEmotion" value="1" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="d4bd4dfc-3f57-4041-ae4a-18e38a093281" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="keywordSpeakerNames" />
+            </children>
+        </node>
+    </region>
+</save>

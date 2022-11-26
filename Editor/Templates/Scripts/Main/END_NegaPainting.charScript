@@ -1,0 +1,11 @@
+INIT
+
+ITEM:__Me
+
+EVENTS
+
+EVENT Use
+ON
+	OnUseItem(_, __Me)
+ACTIONS
+	DialogStart("END_AD_NegaKingsCrab_Painting", __Me)w

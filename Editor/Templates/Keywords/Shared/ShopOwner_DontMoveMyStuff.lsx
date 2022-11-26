@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<save>
+    <header version="2" time="1417695151" />
+    <version major="1" minor="3" revision="0" build="0" />
+    <region id="keywordDialog">
+        <node id="root">
+            <attribute id="KeywordVoiced" value="0" type="19" />
+            <attribute id="PlayGreeting" value="0" type="19" />
+            <attribute id="keywordAutoImport" value="1" type="19" />
+            <attribute id="keywordName" value="ShopOwner_DontMoveMyStuff" type="22" />
+            <children>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="079b6fbd-047b-44e5-a392-826fc2f1962f" type="22" />
+                    <attribute id="keywordContentMapValue" value="Hey! Buy my wares or buzz off! I hate thieves almost as much as the guards do. Do you understand me?" handle="h496b8b05g3430g45a3ga71bgb0615c5a9c6c" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="23657041-73e0-4a82-a947-c68ce4f94a21" type="22" />
+                    <attribute id="keywordContentMapValue" value="Greeting" handle="h7f890f24g8572g4902g90b4gd362b7e9bdf2" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="3397372a-7f83-4d91-a96f-857bff8f8fa1" type="22" />
+                    <attribute id="keywordContentMapValue" value="" handle="h43e5feb5g60ddg4892g94f6gb7a0bb2b050b" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="487bae64-ef1e-482a-83eb-d32f983ac1a6" type="22" />
+                    <attribute id="keywordContentMapValue" value="Hey there! I&apos;ll thank you not to handle my wares!" handle="hd5611fe2ge116g4d60g9720g91525d4d541e" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="6f7fc1a6-12b8-48e6-8814-92b2143232e7" type="22" />
+                    <attribute id="keywordContentMapValue" value="Well, I never! To be spoken to thusly in my very own shop!" handle="ha310a734g77eeg4ab4gb420gaf9e75521a83" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="8d46cc7f-38fb-47b3-812b-550f450eb19e" type="22" />
+                    <attribute id="keywordContentMapValue" value="I SAID. DON&apos;T. MOVE. MY. STUFF. Got it?" handle="hb902bba2ga737g4267g8564g01cc89c1cc92" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="90f01a9c-3c9b-452d-b0e0-9e9fa0f0f400" type="22" />
+                    <attribute id="keywordContentMapValue" value="I&apos;m just having a look. Settle yourself!" handle="hc74eb535gfeb6g4e4fgaf68gebddf420198d" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="9b089061-9ecf-4f3e-abea-7f19c6b1cf61" type="22" />
+                    <attribute id="keywordContentMapValue" value="Don&apos;t say I didn&apos;t warn you. Guards! GUARDS!! Arrest this thief!" handle="h1ec43556g76dbg4833g9984gea086cc89f10" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="a3a8d211-0c98-40d0-91ec-3c606ca31d1b" type="22" />
+                    <attribute id="keywordContentMapValue" value="There there. Just leave my things where I put them, will you?" handle="hdb4487c1gfb1bg433cg980ag2d21621fc7a2" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="d2447ffc-d2ed-4e1b-b102-bf1d9db7b3dd" type="22" />
+                    <attribute id="keywordContentMapValue" value="Why are you moving my things? Surely you&apos;re not trying to steal, are you?" handle="haad99872g7236g499dg8fd5gae15e297ed83" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="d99dd1d7-5328-41c6-9fcc-d0657297dc2c" type="22" />
+                    <attribute id="keywordContentMapValue" value="That&apos;s enough! GUARDS! Come deal with this cretin!" handle="had5c8d51g4ef9g4904g907bgee5ce8bb7bc5" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="dfbff379-9716-4547-be8d-900ca78ed6ff" type="22" />
+                    <attribute id="keywordContentMapValue" value="Excuse me. My mistake." handle="h7ff15eb5gee28g421cgab7eg0331400fbf17" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="e065918e-2344-4caf-82eb-ec0ce0affd45" type="22" />
+                    <attribute id="keywordContentMapValue" value="I said LEAVE the wares where they are! Next time, I&apos;ll call the guards and have you thrown in jail, understood?!" handle="h35779b83g5c44g4980g8911ga6e1d29d22ac" type="28" />
+                </node>
+                <node id="keywordNode">
+                    <attribute id="keywordActions" value="" type="23" />
+                    <attribute id="keywordConditions" value="" type="23" />
+                    <attribute id="keywordDisplayedText" value="23657041-73e0-4a82-a947-c68ce4f94a21" type="22" />
+                    <attribute id="keywordId" value="Greeting" type="22" />
+                    <attribute id="keywordLast" value="0" type="19" />
+                    <attribute id="keywordOwner" value="-1" type="4" />
+                    <attribute id="keywordShow" value="0" type="19" />
+                    <attribute id="keywordSource" value="0" type="5" />
+                    <children>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsCharacterFlag(&quot;EVENT_shop_moved_stuff_warn_friendly_1&quot;,1,1)&#x0D;&#x0A;CHECK c&#x0D;&#x0A;' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="1" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordSubnode">
+                                    <attribute id="Object" value="Excuse" type="22" />
+                                </node>
+                                <node id="keywordSubnode">
+                                    <attribute id="Object" value="Calm down" type="22" />
+                                </node>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="d2447ffc-d2ed-4e1b-b102-bf1d9db7b3dd" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsCharacterFlag(&quot;EVENT_shop_moved_stuff_warn_friendly_2&quot;,1,1)&#x0D;&#x0A;CHECK c' type="23" />
+                            <attribute id="keywordEmotion" value="1" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="1" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordSubnode">
+                                    <attribute id="Object" value="Excuse" type="22" />
+                                </node>
+                                <node id="keywordSubnode">
+                                    <attribute id="Object" value="Calm down" type="22" />
+                                </node>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="e065918e-2344-4caf-82eb-ec0ce0affd45" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="ACTION CallGuards()" type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsCharacterFlag(&quot;EVENT_shop_moved_stuff_warn_friendly_3&quot;,1,1)&#x0D;&#x0A;CHECK c' type="23" />
+                            <attribute id="keywordEmotion" value="1" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="9b089061-9ecf-4f3e-abea-7f19c6b1cf61" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value='ACTION SetCharacterFlag(&quot;EVENT_call_guards_disturb_peace&quot;,1,1)&#x0D;&#x0A;ACTION SetCharacterFlag(&quot;EVENT_shop_keeper_cooled_down&quot;,1,1)' type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsCharacterFlag(&quot;EVENT_shop_moved_stuff_warn_friendly_3&quot;,1,1)&#x0D;&#x0A;CHECK c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="1" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="3397372a-7f83-4d91-a96f-857bff8f8fa1" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsCharacterFlag(&quot;EVENT_shop_moved_stuff_warn_unfriendly_1&quot;,1,1)&#x0D;&#x0A;CHECK c' type="23" />
+                            <attribute id="keywordEmotion" value="1" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="1" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordSubnode">
+                                    <attribute id="Object" value="Excuse" type="22" />
+                                </node>
+                                <node id="keywordSubnode">
+                                    <attribute id="Object" value="Calm down" type="22" />
+                                </node>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="079b6fbd-047b-44e5-a392-826fc2f1962f" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value='ACTION SetCharacterFlag(&quot;EVENT_call_guards_disturb_peace&quot;,1,1)&#x0D;&#x0A;ACTION SetCharacterFlag(&quot;EVENT_shop_keeper_cooled_down&quot;,1,1)' type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsCharacterFlag(&quot;EVENT_shop_moved_stuff_warn_unfriendly_2&quot;,1,1)&#x0D;&#x0A;CHECK c' type="23" />
+                            <attribute id="keywordEmotion" value="1" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="1" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="d99dd1d7-5328-41c6-9fcc-d0657297dc2c" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsCharacterFlag(&quot;EVENT_shop_moved_stuff_warn_no_guards_1&quot;,1,1)&#x0D;&#x0A;CHECK c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="1" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordSubnode">
+                                    <attribute id="Object" value="Excuse" type="22" />
+                                </node>
+                                <node id="keywordSubnode">
+                                    <attribute id="Object" value="Calm down" type="22" />
+                                </node>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="487bae64-ef1e-482a-83eb-d32f983ac1a6" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsCharacterFlag(&quot;EVENT_shop_moved_stuff_warn_no_guards_2&quot;,1,1)&#x0D;&#x0A;CHECK c' type="23" />
+                            <attribute id="keywordEmotion" value="1" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="1" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordSubnode">
+                                    <attribute id="Object" value="Excuse" type="22" />
+                                </node>
+                                <node id="keywordSubnode">
+                                    <attribute id="Object" value="Calm down" type="22" />
+                                </node>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="8d46cc7f-38fb-47b3-812b-550f450eb19e" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="keywordNode">
+                    <attribute id="keywordActions" value="" type="23" />
+                    <attribute id="keywordConditions" value="" type="23" />
+                    <attribute id="keywordDisplayedText" value="90f01a9c-3c9b-452d-b0e0-9e9fa0f0f400" type="22" />
+                    <attribute id="keywordId" value="Calm down" type="22" />
+                    <attribute id="keywordLast" value="1" type="19" />
+                    <attribute id="keywordOwner" value="-1" type="4" />
+                    <attribute id="keywordShow" value="0" type="19" />
+                    <attribute id="keywordSource" value="0" type="5" />
+                    <children>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value="" type="23" />
+                            <attribute id="keywordEmotion" value="1" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="2" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="6f7fc1a6-12b8-48e6-8814-92b2143232e7" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="keywordNode">
+                    <attribute id="keywordActions" value="" type="23" />
+                    <attribute id="keywordConditions" value="" type="23" />
+                    <attribute id="keywordDisplayedText" value="dfbff379-9716-4547-be8d-900ca78ed6ff" type="22" />
+                    <attribute id="keywordId" value="Excuse" type="22" />
+                    <attribute id="keywordLast" value="1" type="19" />
+                    <attribute id="keywordOwner" value="-1" type="4" />
+                    <attribute id="keywordShow" value="0" type="19" />
+                    <attribute id="keywordSource" value="0" type="5" />
+                    <children>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value="" type="23" />
+                            <attribute id="keywordEmotion" value="11" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="2" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="a3a8d211-0c98-40d0-91ec-3c606ca31d1b" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="keywordSpeakerNames">
+                    <children>
+                        <node id="keywordSpeakerName">
+                            <attribute id="Name" value="GROUP_Shopkeepers" type="23" />
+                        </node>
+                        <node id="keywordSpeakerName">
+                            <attribute id="Name" value="" type="23" />
+                        </node>
+                        <node id="keywordSpeakerName">
+                            <attribute id="Name" value="" type="23" />
+                        </node>
+                        <node id="keywordSpeakerName">
+                            <attribute id="Name" value="" type="23" />
+                        </node>
+                    </children>
+                </node>
+            </children>
+        </node>
+    </region>
+</save>

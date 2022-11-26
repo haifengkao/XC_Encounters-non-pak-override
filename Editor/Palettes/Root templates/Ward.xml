@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<palette xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <palettes />
+  <objectids>
+    <guid>04cb878a-64af-49e8-bcff-3d014d71106a</guid>
+    <guid>7f579ea1-3d04-42b1-9b53-9b3bf21547dd</guid>
+    <guid>5a1de9b2-092f-4669-ae85-8c388e5f1546</guid>
+    <guid>f96dfab8-3a63-4c26-b0d8-962afc236a78</guid>
+    <guid>b7d3ae31-c297-4432-b939-287840ff8979</guid>
+    <guid>5bbe7c19-8a93-4472-af70-4defb336ed19</guid>
+  </objectids>
+  <name>Ward</name>
+</palette>

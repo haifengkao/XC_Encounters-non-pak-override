@@ -1,0 +1,39 @@
+INIT
+	CHARACTER:__Me
+
+//-----------------
+BEHAVIOUR
+REACTION SummonElementals,1500
+USAGE COMBAT
+VARS
+	CHARACTER:_Spawnee
+	CHARACTERTEMPLATE:_EarthElem_RT="Summons_ElementalEarth_ForGoblinShaman_b10da4be-4a79-4d09-b831-d734afbe9e48"
+	TRIGGER:_SpawnTrigger_01="LUC_CMB_GobShamanSummon1_9e0d9144-9686-48ed-b9fa-6f48a94fc084"
+	TRIGGER:_SpawnTrigger_02="LUC_CMB_GobShamanSummon2_504cb3e0-0d27-4972-8d8a-7d05dd58b651"
+	TRIGGER:_SpawnTrigger_03="LUC_CMB_GobShamanSummon3_6e44471e-b1b0-4779-af7b-5ae81ec8ca60"
+	FIXEDSTRING:_MyFaction
+	FLOAT:_MyAP	
+CHECK "c1&!c2&c3"
+	CharacterGetStat(_MyAP,__Me,ActionPoints)
+	IsLessThen(_MyAP,5)
+	CharacterGetFaction(_MyFaction,__Me)	
+ACTIONS
+	CharacterLookAt(_SpawnTrigger_01)
+	CharacterPlayAnimation("cast_target_cast")
+	PlayEffectAt(_SpawnTrigger_01,"FX_Skills_Earth_Summon_Cast_A")
+	SpawnCharacter(_Spawnee,_EarthElem_RT,_SpawnTrigger_01,1)
+	CharacterSetFaction(_Spawnee,_MyFaction)
+	CharacterLookAt(_SpawnTrigger_02)
+	CharacterPlayAnimation("cast_target_cast")
+	PlayEffectAt(_SpawnTrigger_02,"FX_Skills_Earth_Summon_Cast_A")
+	SpawnCharacter(_Spawnee,_EarthElem_RT,_SpawnTrigger_02,1)
+	CharacterSetFaction(_Spawnee,_MyFaction)
+	CharacterLookAt(_SpawnTrigger_03)
+	CharacterPlayAnimation("cast_target_cast")
+	PlayEffectAt(_SpawnTrigger_03,"FX_Skills_Earth_Summon_Cast_A")
+	SpawnCharacter(_Spawnee,_EarthElem_RT,_SpawnTrigger_03,1)
+	CharacterSetFaction(_Spawnee,_MyFaction)
+	CharacterUseActionPoints(__Me,5)
+	SetPriority("SummonElementals",0)
+INTERRUPT
+	Reset()

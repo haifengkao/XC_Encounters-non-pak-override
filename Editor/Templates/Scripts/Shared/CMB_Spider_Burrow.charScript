@@ -1,0 +1,121 @@
+#INCLUDE Base
+INIT
+	USING Base
+	CHARACTER:__Me
+	FLOAT3:%startPosSpider
+	FLOAT:%SpiderSightRange
+	INT:%teleportBack=0
+	EXTERN FLOAT:%burrowAtDistance=4
+	EXTERN INT:%apCostAttackBurrow=4
+	EXTERN INT:%BurrowingStartAt=0
+	EXTERN INT:%BurrowingFrequency=0
+
+//--------------------
+BEHAVIOUR
+REACTION SpiderAttack,0
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&c4"
+	CharacterGet(_Target,__Me,%burrowAtDistance,Lowest,Distance,Enemy)
+	CharacterCanSee(__Me,_Target)
+	CharacterCanCast(__Me,Cone_EnemyArtilleryFlower)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,Cone_EnemyArtilleryFlower)
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+	CharacterUseSkill(Cone_EnemyArtilleryFlower,_Target)
+	CharacterEndTurn()
+	SetPriority("SpiderSurpriseAttackMove",0)
+	SetPriority("SpiderAttack",0)
+INTERRUPT
+ON
+	OnMovementFailed(_)
+ACTIONS
+	CharacterEndTurn()
+	
+REACTION SpiderSurpriseAttackMove,0
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_apAmount
+	FLOAT3:_TargetPosition
+	FLOAT3:_TeleportDestination
+	FLOAT:_distanceTarget
+CHECK "c1&c2&c3&!(c4|c5|c6|c7)&c8"
+	CharacterGet(_Target,__Me,%SpiderSightRange,Highest,Distance,Enemy,null,null,null,__Me)		//c1
+	CharacterIsInParty(_Target)																	//c2
+	CharacterGetStat(_apAmount,__Me,ActionPoints)												//c3
+	IsLessThen(_apAmount,%apCostAttackBurrow)													//!c4
+	CharacterHasStatus(__Me,FROZEN)																//!c5
+	CharacterHasStatus(__Me,STUNNED)															//!c6
+	CharacterHasStatus(__Me,KNOCKED_DOWN)														//!c7
+	CharacterCanSee(__Me,_Target)																//c8
+ACTIONS
+	IF "c1&c2"
+		GetDistance(_distanceTarget,__Me,_Target)
+		IsLessThen(%burrowAtDistance,_distanceTarget)
+	THEN
+		GetRandom(_TeleportDestination,{-2;0;2},{2;0;-2},{2;0;2},{-2;0;-2},{-2;0;0},{2;0;0},{0;0;-2},{0;0;2})
+		GetPosition(_Target,_TargetPosition)
+		Add(_TargetPosition,_TeleportDestination)
+		CharacterPlayAnimation("Burrow",0,1)
+		CharacterTeleportTo(_TargetPosition)
+		CharacterLookAt(_Target,1)
+		CharacterPlayAnimation("Unburrow")
+		Set(%teleportBack,1)
+	ENDIF
+	Set(%BurrowingStartAt,0)
+	SetPriority("SpiderAttack",500)
+	SetPriority("SpiderSurpriseAttackMove",0)
+INTERRUPT
+	Reset()
+
+REACTION TeleportBack,100
+USAGE WAITING
+CHECK "c1"
+	IsEqual(%teleportBack,1)
+ACTIONS
+	CharacterPlayAnimation("Burrow",0,1)
+	CharacterTeleportTo(%startPosSpider)
+	CharacterPlayAnimation("Unburrow")
+	Set(%teleportBack,0)
+
+//--------------------
+EVENTS
+EVENT GetSpiderSightrange
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%SpiderSightRange,__Me,Sight)
+	THEN
+		CharacterAddSkill(Cone_EnemyArtilleryFlower)
+	ENDIF
+	
+EVENT SetStartPosSpiderBurrow
+ON
+	OnCombatStarted()
+ACTIONS
+	GetPosition(__Me,%startPosSpider)
+	
+EVENT GetTeleportBackToPosition
+ON
+	OnTurn()
+ACTIONS
+	GetPosition(__Me,%startPosSpider)
+	SetPriority("SpiderAttack",0)
+	Set(%teleportBack,0)
+
+EVENT OnTurnControlBurrowFrequency
+ON
+	OnTurn()
+ACTIONS
+	IF "c1"
+		IsLessThen(%BurrowingStartAt,%BurrowingFrequency)
+	THEN		
+		Add(%BurrowingStartAt,1)
+	ELSE
+		SetPriority("SpiderSurpriseAttackMove",400)
+	ENDIF	

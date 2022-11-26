@@ -1,0 +1,84 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+//REGION Rat Ambush - Rat database
+DB_HIB_RatAmbush(CHARACTER_HIB_RatAmbush1_Rat01,TRIGGER_HIB_RatAmbush1_T01);
+DB_HIB_RatAmbush(CHARACTER_HIB_RatAmbush1_Rat02,TRIGGER_HIB_RatAmbush1_T01);
+DB_HIB_RatAmbush(CHARACTER_HIB_RatAmbush1_Rat03,TRIGGER_HIB_RatAmbush1_T01);
+DB_HIB_RatAmbush(CHARACTER_HIB_RatAmbush1_Rat04,TRIGGER_HIB_RatAmbush1_T02);
+DB_HIB_RatAmbush(CHARACTER_HIB_RatAmbush1_Rat05,TRIGGER_HIB_RatAmbush1_T02);
+DB_HIB_RatAmbush(CHARACTER_HIB_RatAmbush1_Rat07,TRIGGER_HIB_RatAmbush1_T02);
+DB_HIB_RatAmbush(CHARACTER_HIB_RatAmbush1_Rat06,TRIGGER_HIB_RatAmbush1_T03);
+//END_REGION
+
+//REGION Rats KillCounter
+KillCounter("HIB_KillCount_RatAmbush1",7);
+KillCounterDB(CHARACTER_HIB_RatAmbush1_Rat01,"HIB_KillCount_RatAmbush1");
+KillCounterDB(CHARACTER_HIB_RatAmbush1_Rat02,"HIB_KillCount_RatAmbush1");
+KillCounterDB(CHARACTER_HIB_RatAmbush1_Rat03,"HIB_KillCount_RatAmbush1");
+KillCounterDB(CHARACTER_HIB_RatAmbush1_Rat04,"HIB_KillCount_RatAmbush1");
+KillCounterDB(CHARACTER_HIB_RatAmbush1_Rat05,"HIB_KillCount_RatAmbush1");
+KillCounterDB(CHARACTER_HIB_RatAmbush1_Rat07,"HIB_KillCount_RatAmbush1");
+KillCounterDB(CHARACTER_HIB_RatAmbush1_Rat06,"HIB_KillCount_RatAmbush1");
+KillCounter("HIB_KillCount_RatIntro1",6);
+KillCounterDB(CHARACTER_HIB_RatIntro_Rat01,"HIB_KillCount_RatIntro");
+KillCounterDB(CHARACTER_HIB_RatIntro_Rat02,"HIB_KillCount_RatIntro");
+KillCounterDB(CHARACTER_HIB_RatIntro_Rat03,"HIB_KillCount_RatIntro");
+KillCounterDB(CHARACTER_HIB_RatIntro_Rat04,"HIB_KillCount_RatIntro");
+KillCounterDB(CHARACTER_HIB_RatIntro_Rat05,"HIB_KillCount_RatIntro");
+KillCounterDB(CHARACTER_HIB_RatIntro_Rat06,"HIB_KillCount_RatIntro");
+//END_REGION
+
+//REGION Rats PlayerComments
+DB_PlayerComments("HIB_RatIntro1","HIB_RatIntro1_1_1",1,1);
+DB_PlayerComments("HIB_RatIntro1","HIB_RatIntro1_2_1",2,1);
+DB_PlayerComments("HIB_RatIntro1","HIB_RatIntro1_2_2",2,2);
+DB_PlayerComments("HIB_RatAmbush1","HIB_RatAmbush1_1_1",1,1);
+DB_PlayerComments("HIB_RatAmbush1","HIB_RatAmbush1_2_1",2,1);
+DB_PlayerComments("HIB_RatAmbush1","HIB_RatAmbush1_2_2",2,2);
+//END_REGION
+
+PROC_HIB_RatAmbushInit();
+KBSECTION
+//REGION RatAmbush Init
+PROC
+PROC_HIB_RatAmbushInit()
+AND
+DB_HIB_RatAmbush(_Rat,_)						
+THEN
+CharacterSetOnStage(_Rat,0);					
+//END_REGION
+
+//REGION RatAmbush
+IF
+CharacterUsedItem(_Player,ITEM_HIB_RatAmbush1_Chest01)
+AND
+DB_HIB_RatAmbush(_Rat,_RatAmbushTrigger)		
+THEN	
+CharacterAppear(_Rat,1);						
+ProcCharacterMoveToTrigger(_Rat,_RatAmbushTrigger,1,"");
+CharacterLookAtCharacter(_Rat,_Player,0);
+	NOT DB_HIB_RatAmbush(_Rat,_RatAmbushTrigger);		
+//END_REGION
+
+//REGION RatIntro - PlayerComment
+PROC
+ReactOnKillCounter("HIB_KillCount_RatIntro")
+AND
+CharacterGetClosestPlayer(CHARACTER_HIB_RatIntro_Rat01, _Player)
+THEN
+Launch_PlayerComment(_Player, "HIB_RatIntro1");
+//END_REGION
+
+//REGION RatAmbush1 - PlayerComment
+PROC
+ReactOnKillCounter("HIB_KillCount_RatAmbush1")
+AND
+ItemGetClosestPlayer(ITEM_HIB_RatAmbush1_Chest01, _Player)
+THEN
+Launch_PlayerComment(_Player, "HIB_RatAmbush1");
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

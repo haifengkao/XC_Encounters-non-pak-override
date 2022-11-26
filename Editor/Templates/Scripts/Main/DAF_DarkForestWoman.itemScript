@@ -1,0 +1,47 @@
+INIT
+ITEM:__Me
+INT:%State = 0
+	
+BEHAVIOUR
+
+
+REACTION ReactOnPlayerOutside, 1060
+USAGE PEACE
+VARS
+	CHARACTER:_player
+	FIXEDSTRING:_text
+CHECK "c1"
+	CharacterGet(_player, __Me, 6, Lowest, Distance, Player)
+ACTIONS
+	IF c1
+		IsEqual(%State, 0)
+	THEN
+		GetRandom(_text, "DAF_DarkForestWoman_CallPlayer_01", "DAF_DarkForestWoman_CallPlayer_02", "DAF_DarkForestWoman_CallPlayer_03") 
+	ELSE
+		GetRandom(_text, "DAF_DarkForestWoman_AfterGivingRing_01", "DAF_DarkForestWoman_AfterGivingRing_02", "DAF_DarkForestWoman_AfterGivingRing_03") 
+	ENDIF
+	DisplayText(__Me, _text, 5)
+	Sleep(5)
+INTERRUPT
+	Reset()
+
+REACTION CallForHelp, 1050
+USAGE PEACE
+VARS
+	FIXEDSTRING:_comment
+ACTIONS
+	GetRandom(_comment, "DAF_DarkForestWoman_01", "DAF_DarkForestWoman_02", "DAF_DarkForestWoman_03")
+	DisplayText(__Me,_comment,5)
+	Sleep(5)
+INTERRUPT
+	Reset()
+	
+EVENTS
+
+EVENT ReceiveDamage
+ON
+	OnDamage(_, _, _, _)
+ACTIONS
+	SetPriority("ReactOnPlayerOutside", 0)
+	SetPriority("CallForHelp", 0)
+	GlobalSetEvent("DAF_DarkForestWomanKilled")

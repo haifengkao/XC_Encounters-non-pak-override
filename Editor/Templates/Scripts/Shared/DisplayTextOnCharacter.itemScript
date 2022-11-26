@@ -1,0 +1,14 @@
+INIT
+	ITEM:__Me
+	EXTERN FIXEDSTRING:%DialogKey = null
+	EXTERN FLOAT:%DisplayTime = 5
+
+EVENTS
+
+EVENT OnClick
+	VARS
+		CHARACTER:_Source
+	ON
+		OnUseItem(_Source,__Me)
+	ACTIONS
+		DisplayText(_Source, %DialogKey, %DisplayTime)

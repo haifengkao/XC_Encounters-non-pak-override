@@ -1,0 +1,57 @@
+INIT
+ITEM:__Me
+EXTERN STRING:%EventLightGreen = null
+EXTERN STRING:%EventLightRed = null
+INT:%Handle1 = 0
+INT:%Handle2 = 0
+INT:%InternalSwitch = 2
+
+EVENTS
+
+EVENT Init
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		IsEqual(%InternalSwitch, 2)
+	THEN
+		ItemPlayLoopEffect(%Handle2,__Me,"FX_GP_Light_Red_A","Dummy_CastFX")
+	ELSE
+		ItemPlayLoopEffect(%Handle1,__Me,"FX_GP_Light_Green_A","Dummy_CastFX")
+	ENDIF
+	
+EVENT TurnGreen
+ON
+	OnCharacterItemEvent(_,_,%EventLightGreen)
+ACTIONS
+	IF "c1"
+		IsEqual(%Handle1,0)
+	THEN
+		StopLoopEffect(%Handle2)
+		Set(%Handle2,0)
+		Set(%InternalSwitch,1)
+		ItemPlayLoopEffect(%Handle1,__Me,"FX_GP_Light_Green_A","Dummy_CastFX")
+	ENDIF
+	
+EVENT TurnRed
+ON
+	OnCharacterItemEvent(_,_,%EventLightRed)
+ACTIONS
+	IF "c1"
+		IsEqual(%Handle2,0)
+	THEN
+		StopLoopEffect(%Handle1)
+		Set(%Handle1,0)
+		Set(%InternalSwitch,2)
+		ItemPlayLoopEffect(%Handle2,__Me,"FX_GP_Light_Red_A","Dummy_CastFX")
+	ENDIF
+	
+EVENT ShutDown
+ON
+	OnShutdown()
+ACTIONS
+	StopLoopEffect(%Handle1)
+	StopLoopEffect(%Handle2)
+	Set(%Handle1,0)
+	Set(%Handle2,0)
+	

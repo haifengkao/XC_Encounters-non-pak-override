@@ -1,0 +1,43 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_SkeletonMiner(CHARACTER_LUC_GeneralMiner1);
+DB_SkeletonMiner(CHARACTER_LUC_GeneralMiner2);
+DB_SkeletonMiner(CHARACTER_LUC_GeneralMiner3);
+DB_SkeletonMiner(CHARACTER_LUC_GeneralMiner4);
+DB_SkeletonMiner(CHARACTER_LUC_GeneralMiner5);
+DB_SkeletonMiner(CHARACTER_LUC_GeneralMiner6);
+DB_SkeletonMiner(CHARACTER_LUC_GeneralMiner7);
+DB_SkeletonMiner(CHARACTER_LUC_GeneralMiner8);
+DB_SkeletonMiner(CHARACTER_LUC_GeneralMiner9);
+DB_SkeletonMiner(CHARACTER_LUC_GeneralMiner10);
+DB_SkeletonMiner(CHARACTER_LUC_MinerPlatform);
+DB_SkeletonMiner(CHARACTER_LUC_FuseMiner01);
+DB_SkeletonMiner(CHARACTER_LUC_FuseMiner02);
+DB_SkeletonMiner(CHARACTER_LUC_FuseMiner03);
+
+ItemToContainer(ITEM_LUC_M_BoneTotem,ITEM_LUC_M_BoneTotemCorpse,1);
+KBSECTION
+IF
+DB_SkeletonMiner((CHARACTER)_Miner)
+THEN
+DB_Dialogs(_Miner,"LUC_GeneralMinerUnderControl");
+DB_DisableAttackReaction(_Miner);
+DB_NoCharacterCompanionReplace(_Miner);
+
+
+IF
+DialogEnded("LUC_GeneralMinerUnderControl",_ID)
+AND
+DB_DialogPlayers(_ID,_Player,1)
+AND
+NOT SkeletonsUnresponsive(1)
+AND
+NOT DB_GlobalEvent("LUC_M_Control_Ended")
+THEN
+SkeletonsUnresponsive(1);
+Launch_PlayerComment(_Player,"LUC_CommentMinersNotResponding");
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

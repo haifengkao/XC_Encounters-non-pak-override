@@ -1,0 +1,128 @@
+INIT 
+	CHARACTER:__Me
+	EXTERN FLOAT:%BeforePursuits = 0.3
+	EXTERN FLOAT:%BeforeAttacks = 2.0
+	EXTERN FLOAT:%BeforePlaysForgottenText = 3.0
+	EXTERN FLOAT:%PercentageVisionWhereAttackOnSight0To1 = 0.70
+	INT:%SpottedHandle = 0
+	FLOAT:%Threshold
+	FLOAT:%SightRange
+	FLOAT3:%SpottedLocation
+	EXTERN FIXEDSTRING:%Timer = "LUC_DemonPlains_GenericTimer"
+	
+//------------------------
+BEHAVIOUR
+REACTION EnemySpottedTimer,11000
+USAGE PEACE
+VARS
+	CHARACTER:_Player
+	FIXEDSTRING:_SpottedText
+	FIXEDSTRING:_AggroText		
+	FLOAT:_Distance
+CHECK "!c1&!c2&!c3&!c4&c5&c6&c7"
+	CharacterHasStatus(__Me,DYING)
+	CharacterHasStatus(__Me,STUNNED)
+	CharacterHasStatus(__Me,CHARMED)
+	CharacterHasStatus(__Me,FEAR)
+	CharacterGet(_Player,__Me,%SightRange,Lowest,Distance,Party) //Party = anything player controlled (player chars, companions)
+	CharacterCanSee(__Me,_Player)
+	GetDistance(_Distance,__Me,_Player)
+ACTIONS
+	CharacterLookAt(_Player, 0, 5)
+	GetPosition(_Player,%SpottedLocation)
+	StopTimer("LUC_DemonPlains_ForgottenTimer")
+	IF "c1"
+		IsEqual(%SpottedHandle, 0)
+	THEN
+		CharacterPlayLoopEffect(%SpottedHandle,__Me,"FX_GP_ExclamationMark_B","Dummy_CastFX")
+		StartTimer(%Timer, 1.0, 0)
+	ENDIF
+	IF "c1"
+		IsGreaterThen(_Distance, %Threshold)
+	THEN
+		GetRandom(_SpottedText,"LUC_DemonPlains_Spotted_01","LUC_DemonPlains_Spotted_02","LUC_DemonPlains_Spotted_03","LUC_DemonPlains_Spotted_04","LUC_DemonPlains_Spotted_05")
+		DisplayText(__Me,_SpottedText,3)
+		Sleep(%BeforePursuits)
+		CharacterMoveTo(%SpottedLocation,1,0,0,1.5)
+		Sleep(%BeforeAttacks)
+	ENDIF
+	IF "c1"
+		CharacterCanSee(__Me,_Player)
+	THEN
+		SetPriority("YouCanNowFight",12000)
+	ELSE
+		StartTimer("LUC_DemonPlains_ForgottenTimer",%BeforePlaysForgottenText,0)	
+	ENDIF
+		
+REACTION YouCanNowFight,0	
+USAGE PEACE
+VARS
+	CHARACTER:_Player
+	FIXEDSTRING:_AggroText		
+CHECK "!c1&!c2&!c3&!c4&c5&c6"
+	CharacterHasStatus(__Me,DYING)
+	CharacterHasStatus(__Me,STUNNED)
+	CharacterHasStatus(__Me,CHARMED)
+	CharacterHasStatus(__Me,FEAR)
+	CharacterGet(_Player,__Me,%SightRange,Lowest,Distance,Party)
+	CharacterCanSee(__Me,_Player)
+ACTIONS
+	CharacterLookAt(_Player, 0, 5)
+	GetRandom(_AggroText,"LUC_DemonPlains_Aggro_01","LUC_DemonPlains_Aggro_02","LUC_DemonPlains_Aggro_03")
+	DisplayText(__Me,_AggroText,3)
+	CharacterSetCanFight(__Me,1,1)
+	SetPriority("YouCanNowFight",0)
+		
+//------------------------		
+EVENTS
+EVENT Initialize
+ON
+	OnInit()
+VARS
+	FLOAT:_Range
+ACTIONS
+	Set(%SpottedHandle,0)
+	IF "c1"
+		CharacterGetSightRange(_Range,__Me)
+	THEN
+		CharacterApplyStatus(__Me,VOID_AURA,-1)
+		Set(%Threshold,%PercentageVisionWhereAttackOnSight0To1)
+		Set(%SightRange,_Range)
+		Multiply(%Threshold,_Range)
+		CharacterSetCanFight(__Me,0)
+	ENDIF
+	IF "c1"
+		IsHardcore()
+	THEN
+		Set(%BeforeAttacks,1)
+	ENDIF
+
+EVENT KillExclamationMark
+ON
+	OnTimer(%Timer)
+	OnDeactivate()	
+ACTIONS
+	StopLoopEffect(%SpottedHandle)
+	Set(%SpottedHandle,0)
+
+EVENT PlayForgottenText
+VARS
+	FIXEDSTRING:_ForgottenText
+ON
+	OnTimer("LUC_DemonPlains_ForgottenTimer")
+ACTIONS
+	GetRandom(_ForgottenText,"LUC_DemonPlains_Forgotten_01","LUC_DemonPlains_Forgotten_02","LUC_DemonPlains_Forgotten_03")
+	DisplayText(__Me,_ForgottenText,3)	
+		
+EVENT TakingDamage
+ON
+	OnCharacterEvent(__Me,"LUC_DemonPlains_DemonUnderAttack")
+ACTIONS
+	CharacterSetCanFight(__Me,1,1)
+	
+EVENT ExitCombatDisableCanFight
+ON
+	OnCombatEnded()
+ACTIONS
+	CharacterSetCanFight(__Me,0)
+	SetPriority("YouCanNowFight",0)

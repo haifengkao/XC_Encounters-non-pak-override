@@ -1,0 +1,508 @@
+#INCLUDE Base
+INIT
+	USING Base
+	CHARACTER:__Me
+	CHARACTER:%DialogLookAtChar=null
+	FLOAT3:%PeaceReturnPosition=null
+	FLOAT:%setTargetDefaultBestScore=10000
+	INT:%defaultEvaluateTarget=1
+	INT:%EvaluateScores=0
+
+EVENTS
+
+EVENT TauntedByChar
+VARS
+	CHARACTER:_Char
+ON
+	OnCharacterStatus(__Me,TAUNTED)
+ACTIONS
+	IF "c1"
+		CharacterGetStatusSourceCharacter(__Me,TAUNTED,_Char)
+	THEN
+		Set(%defaultEvaluateTarget,0)
+		CharacterSetEnemy(__Me,_Char)
+	ELSE
+		CharacterRemoveStatus(__Me,TAUNTED)
+	ENDIF
+	
+EVENT TauntedFinished
+ON
+	OnCharacterStatusRemoved(__Me,TAUNTED)
+ACTIONS
+	CharacterSetEnemy(__Me,null)
+	Set(%defaultEvaluateTarget,1)
+
+EVENT FallbackIterateTarget
+VARS
+	CHARACTER:_Char
+	FLOAT:_targetDistance
+	FLOAT:_targetClosestThisScore=0	
+ON
+	OnIterateCharacter(_Char,"FallbackTargetClosestIterator")
+ACTIONS
+	IF "!c1&!c2&c3&!c4&!c5&c6"
+		CharacterIsDead(_Char)
+		IsEqual(__Me,_Char)
+		CharacterIsEnemy(__Me,_Char)
+		CharacterHasStatus(_Char,INVISIBLE)
+		CharacterHasStatus(_Char,SNEAKING)
+		GetDistance(_targetDistance,__Me,_Char)
+	THEN
+		IF "c1&!c2"
+			CharacterHasTalent(_Char,Stench)
+			CharacterHasStatus(_Char,AGGRO_MARKED)
+		THEN
+			Multiply(_targetDistance,4)
+		ENDIF
+		IF "c1&c2"
+			CharacterHasTalent(_Char,Stench)
+			CharacterHasStatus(_Char,AGGRO_MARKED)
+		THEN
+			Multiply(_targetDistance,2)
+		ENDIF
+		Set(_targetClosestThisScore,_targetDistance)
+		IF "!c1"
+			IsGreaterThen(_targetClosestThisScore,%setTargetDefaultBestScore)
+		THEN
+			Set(%setTargetDefaultBestScore,_targetClosestThisScore)
+			CharacterSetEnemy(__Me,_Char)
+		ENDIF
+	ENDIF
+		
+EVENT DefaultIterateSetTarget
+VARS 
+	CHARACTER:_Char
+	CHARACTER:_previousSetTarget
+	FLOAT:_targetDistance
+	INT:_alreadyTargetedBy
+	FLOAT:_targetClosestThisScore=0
+	FLOAT:_movement
+ON
+	OnIterateCharacter(_Char,"DefaultSetTargetClosestIterator")
+ACTIONS
+	IF "!c1&!c2&c3&c4&c5&!c6&!c7"
+		CharacterIsDead(_Char)
+		IsEqual(__Me,_Char)
+		CharacterIsEnemy(__Me,_Char)
+		GetDistance(_targetDistance,__Me,_Char)
+		CharacterGetHostileCount(_alreadyTargetedBy,_Char)
+		CharacterHasStatus(_Char,INVISIBLE)
+		CharacterHasStatus(_Char,SNEAKING)
+	THEN
+		IF "c1&c2"
+			CharacterGetEnemy(_previousSetTarget,__Me)
+			IsEqual(_previousSetTarget,_Char)
+		THEN
+			Multiply(_targetDistance,0.5)
+		ENDIF
+		IF "c1&!c2&!c3"
+			IsInDangerousSurface(_Char)
+			CharacterIsFloating(__Me)
+			CharacterHasStatus(__Me,ETHEREAL_SOLES)
+		THEN
+			Multiply(_targetDistance,2)
+		ENDIF
+		IF "c1&(c2|c3)"
+			IsInDangerousSurface(_Char)
+			CharacterIsFloating(__Me)
+			CharacterHasStatus(__Me,ETHEREAL_SOLES)
+		THEN
+			Multiply(_targetDistance,0.8)
+		ENDIF
+		IF "c1"
+			CharacterIsSummon(_Char)
+		THEN
+			Multiply(_targetDistance,1.5)
+		ENDIF
+		IF "c1"
+			CharacterHasStatus(_Char,AGGRO_MARKED)
+		THEN
+			Multiply(_targetDistance,0.2)
+		ENDIF
+		IF "c1"
+			IsEqual(_alreadyTargetedBy,0)
+		THEN
+			Multiply(_targetDistance,0.5)
+		ENDIF
+		IF "c1"
+			IsEqual(_alreadyTargetedBy,1)
+		THEN
+			Multiply(_targetDistance,0.6)
+		ENDIF
+		IF "c1&!c2"
+			IsGreaterThen(_alreadyTargetedBy,1)
+			CharacterHasStatus(_Char,AGGRO_MARKED)
+		THEN
+			Add(_alreadyTargetedBy,0.6)
+			Multiply(_alreadyTargetedBy,_alreadyTargetedBy)
+			Multiply(_targetDistance,_alreadyTargetedBy)
+		ENDIF
+		IF "c1&!c2"
+			IsGreaterThen(_alreadyTargetedBy,3)
+			CharacterHasStatus(_Char,AGGRO_MARKED)
+		THEN
+			Multiply(_targetDistance,2)
+		ENDIF
+		IF "!c1"
+			CharacterCanSee(__Me,_Char)
+		THEN
+			Multiply(_targetDistance,3)
+		ENDIF
+		IF "c1&!c2"
+			CharacterHasTalent(_Char,Stench)
+			CharacterHasStatus(_Char,AGGRO_MARKED)
+		THEN
+			Multiply(_targetDistance,4)
+		ENDIF
+		IF "c1&c2"
+			CharacterHasTalent(_Char,Stench)
+			CharacterHasStatus(_Char,AGGRO_MARKED)
+		THEN
+			Multiply(_targetDistance,2)
+		ENDIF
+		Set(_targetClosestThisScore,_targetDistance)
+		IF "!c1"
+			IsGreaterThen(_targetClosestThisScore,%setTargetDefaultBestScore)
+		THEN
+			Set(%setTargetDefaultBestScore,_targetClosestThisScore)
+			CharacterSetEnemy(__Me,_Char)
+		ENDIF
+	ENDIF
+
+EVENT StartCombatFetchPos
+ON
+	OnCombatStarted()
+ACTIONS
+	CharacterSetEnemy(__Me,null)
+	Set(%defaultEvaluateTarget,1)
+	IF "c1" 
+		IsEqual(%PeaceReturnPosition,null)
+	THEN
+		GetPosition(__Me,%PeaceReturnPosition)
+		CharacterForceUpdate(1)
+	ENDIF
+	
+EVENT ReturnToPosOnCombatEnded
+ON
+	OnCombatEnded()
+ACTIONS
+	IF "c1|c2" 
+		CharacterIsInParty(__Me)
+		CharacterIsDead(__Me)
+	THEN
+		CharacterEvent(__Me,"ClearPeaceReturn")
+	ELSE
+		SetHealth(__Me,1)
+	ENDIF
+
+EVENT StoryOverridePeaceReturn
+ON 
+	OnStoryOverride()
+	OnCharacterEvent(__Me,"ClearPeaceReturn")
+ACTIONS
+	IF "!c1"
+		IsEqual(%PeaceReturnPosition,null)
+	THEN
+		Set(%PeaceReturnPosition,null)
+		Interrupt("ReturnToPeacePosition")
+		CharacterForceUpdate(0)
+	ENDIF
+	
+EVENT StartEvaluateScore
+ON
+	OnFunction("StartEvaluateScore")
+ACTIONS
+	IF "c1&c2"
+		IsEqual(%EvaluateScores,0)
+		CharacterIsInActiveTurn(__Me)
+	THEN	
+		CallFunction("CalculateScore")
+		StartTimer("CalcScoreTimer",0.2,-1)
+		Set(%EvaluateScores,1)
+	ENDIF
+	
+EVENT StopEvaluateScore
+ON
+	OnFunction("StopEvaluateScore")
+ACTIONS
+	IF "c1"
+		IsEqual(%EvaluateScores,1)
+	THEN
+		StopTimer("CalcScoreTimer")
+		Set(%EvaluateScores,0)
+	ENDIF
+	
+EVENT DontAttackAlliesOrInvisibles // to solve charmed chars getting back to normal but still targeting as if they were charmed
+VARS
+	CHARACTER:_Target
+ON
+	OnTurn()
+ACTIONS
+	IF "c1&(c2|c3)"
+		CharacterGetEnemy(_Target,__Me)
+		CharacterIsAlly(__Me,_Target)
+		CharacterHasStatus(_Target,INVISIBLE)
+	THEN
+		CharacterSetEnemy(__Me,null)
+		Set(%defaultEvaluateTarget,1)
+	ENDIF
+	
+EVENT ClearTauntedWhenTaunterDies
+VARS
+	CHARACTER:_EventChar=null
+	CHARACTER:_Taunter=null
+ON
+	OnDie(_EventChar,_,_,_)
+ACTIONS
+	IF "c1&c2&c3"
+		CharacterHasStatus(__Me,TAUNTED)
+		CharacterGetStatusSourceCharacter(__Me,TAUNTED,_Taunter)
+		IsEqual(_Taunter,_EventChar)
+	THEN
+		CharacterRemoveStatus(__Me,TAUNTED)
+	ENDIF
+	
+EVENT ClearSetEnemy
+VARS
+	CHARACTER:_Char
+	CHARACTER:_EventChar
+ON
+	OnDie(_EventChar,_,_,_)
+	OnCharacterStatus(_EventChar,INVISIBLE)
+	OnCharacterStatus(_EventChar,CHARMED)
+	OnCharacterStatus(_EventChar,SNEAKING)
+ACTIONS
+	IF "c1&c2"
+		CharacterGetEnemy(_Char,__Me)
+		IsEqual(_Char,_EventChar)
+	THEN
+		CharacterSetEnemy(__Me,null)
+		Set(%defaultEvaluateTarget,1)
+	ENDIF	
+
+EVENT ForceNewEnemyWhenCharmed
+ON
+	OnCharacterStatus(__Me,CHARMED)
+ACTIONS
+	CharacterSetEnemy(__Me,null)
+	Set(%defaultEvaluateTarget,1)
+	
+EVENT EvaluateTargets
+ON
+	OnTurn()
+ACTIONS
+	IF "!c1"
+		CharacterHasStatus(__Me,TAUNTED)
+	THEN
+		SetPriority("Combat_DefaultChooseEnemy",9)
+		SetPriority("Combat_NoSetEnemy",6)
+		Set(%setTargetDefaultBestScore,10000)
+		Set(%defaultEvaluateTarget,1)
+		CallFunction("StartEvaluateScore")
+		SetPriority("Combat_WhenInvisible_RunAway",10)
+	ENDIF
+	
+EVENT KillScoreTimer
+ON
+	OnTurnEnded()
+	OnCombatEnded()
+ACTIONS
+	CallFunction("StopEvaluateScore")
+	
+EVENT CalcScoreTimer
+ON
+	OnTimer("CalcScoreTimer")
+ACTIONS
+	CallFunction("CalculateScore")
+
+//----	
+BEHAVIOUR
+REACTION ReturnToPeacePosition,15000
+USAGE PEACE
+CHECK "!c1"
+	IsEqual(%PeaceReturnPosition,null)
+ACTIONS
+	CharacterMoveTo(%PeaceReturnPosition,1,1,1,0)
+	CharacterEvent(__Me,"ClearPeaceReturn")
+
+REACTION Combat_WhenInvisible_RunAway, 10
+USAGE COMBAT
+VARS
+	FLOAT:_MyVitality
+CHECK "c1"
+	CharacterHasStatus(__Me,"INVISIBLE")
+ACTIONS
+	IF "(c1&c2)|c3"
+		CharacterGetStat(_MyVitality,__Me,Vitality)
+		IsLessThen(_MyVitality,0.5)
+		IsRandom(0.5)
+	THEN
+		CharacterFleeFrom(Enemy,10)
+	ELSE
+		SetPriority("Combat_WhenInvisible_RunAway",0)
+	ENDIF
+INTERRUPT
+ON
+	OnMovementFailed(_)
+ACTIONS
+	CharacterEndTurn()	
+	
+REACTION Combat_DefaultChooseEnemy, 9
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+CHECK "c1|!c2"
+	IsEqual(%defaultEvaluateTarget,1)
+	CharacterGetEnemy(_Enemy,__Me)
+ACTIONS
+	Set(%setTargetDefaultBestScore,10000)
+	IterateCharactersInCombat(__Me,"DefaultSetTargetClosestIterator")
+	IF "c1"
+		CharacterGetEnemy(_Enemy,__Me)
+	THEN
+		Set(%defaultEvaluateTarget,0)
+	ELSE
+		SetPriority("Combat_DefaultChooseEnemy",0)
+	ENDIF
+
+REACTION Combat_AttackSetEnemy, 8
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+	FLOAT:_dist
+	FLOAT:_minRange
+	FLOAT:_maxRange
+CHECK "c1&c2&c3&(c4|(c5&!c6&!c7))"
+	CharacterGetEnemy(_Enemy,__Me) // returns false if null
+	CharacterGetWeaponRange(_minRange,_maxRange,__Me)
+	GetInnerDistance(_dist,__Me,_Enemy)
+	CharacterCanSee(__Me,_Enemy)
+	IsLessThen(_dist,_maxRange)
+	CharacterHasWeaponType(__Me,Bow,1)
+	CharacterHasWeaponType(__Me,CrossBow,1)
+ACTIONS
+	CharacterAttack(_Enemy)
+INTERRUPT
+ON
+	OnMovementFailed(_)
+ACTIONS
+	DelayReaction("Combat_AttackSetEnemy",3)
+
+REACTION Combat_AttackSetEnemyWithBowHack, 8
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+	FLOAT:_dist
+	FLOAT:_minRange
+	FLOAT:_maxRange
+CHECK "c1&c2&c3&!c4&c5&(c6|c7)"
+	CharacterGetEnemy(_Enemy,__Me) // returns false if null
+	CharacterGetWeaponRange(_minRange,_maxRange,__Me)
+	GetInnerDistance(_dist,__Me,_Enemy)
+	CharacterCanSee(__Me,_Enemy)
+	IsLessThen(_dist,2)
+	CharacterHasWeaponType(__Me,Bow,1)
+	CharacterHasWeaponType(__Me,CrossBow,1)
+ACTIONS
+	CharacterAttack(_Enemy)
+INTERRUPT
+ON
+	OnMovementFailed(_)
+ACTIONS
+	DelayReaction("Combat_AttackSetEnemyWithBowHack",3)
+
+REACTION Combat_MoveToSetEnemy, 7
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+	FLOAT:_minRange
+	FLOAT:_maxRange
+CHECK "c1&!c2&c3"
+	CharacterGetEnemy(_Enemy,__Me)
+	CharacterCanSee(__Me,_Enemy)
+	CharacterGetWeaponRange(_minRange,_maxRange,__Me)
+ACTIONS	
+	CharacterMoveTo(_Enemy,1,0,0,_minRange,_maxRange)
+INTERRUPT
+ON
+	OnMovementFailed(_)
+ACTIONS
+	DelayReaction("Combat_MoveToSetEnemy",3)
+	
+REACTION Combat_NoSetEnemy, 6
+USAGE COMBAT
+VARS
+	CHARACTER:_Char
+CHECK "!c1"
+	CharacterGetEnemy(_Char,__Me)
+ACTIONS	
+	IterateCharactersInCombat(__Me,"FallbackTargetClosestIterator")
+	IF "!c1"
+		CharacterGetEnemy(_Char,__Me)
+	THEN
+		SetPriority("Combat_NoSetEnemy",0)
+	ENDIF
+	
+REACTION Combat_MoveOutOfSurfaces, 5
+USAGE COMBAT
+CHECK "(c1|c2)&!c3&!c4"
+	IsInSurface(__Me,Oil)
+	IsInDangerousSurface(__Me)
+	CharacterIsFloating(__Me)
+	CharacterHasStatus(__Me,ETHEREAL_SOLES)
+ACTIONS
+	IF "c1"
+		IsInSurface(__Me,Oil)
+	THEN
+		CharacterFleeFromSurface(Oil)
+	ELIF "c1"
+		IsInDangerousSurface(__Me)
+	THEN
+		CharacterFleeFromDangerousSurface()
+	ENDIF
+INTERRUPT
+ON
+	OnException()
+ACTIONS
+	DelayReaction("Combat_MoveOutOfSurfaces",6)
+	
+REACTION Combat_TakeCover, 2
+USAGE COMBAT
+VARS	
+	FLOAT3:_Pos	
+	FLOAT:_Value
+CHECK "c1&c2&c3&c4&c5"	
+	CharacterGetStat(_Value,__Me,Vitality)
+	IsLessThen(_Value,1)
+	FindCover(_Pos,__Me,__Me,20)
+	GetDistance(_Value,_Pos,__Me)
+	IsGreaterThen(_Value,1)
+ACTIONS
+	CharacterPlayEffect(__Me,"FX_GP_QuestionMark_A")
+	CharacterEndTurn()
+INTERRUPT
+ON
+	OnMovementFailed(_)
+ACTIONS
+	DelayReaction("Combat_TakeCover",3)
+	
+REACTION Combat_NoReactionFound, 1
+USAGE COMBAT
+ACTIONS
+	//CharacterPlayEffect(__Me,"FX_GP_QuestionMark_A")
+	CharacterEndTurn()
+	
+REACTION AutomatedDialog_Interrupt, 1700
+USAGE PEACE
+CHECK "c1&!c2"
+	IsInDialog(__Me)
+	CharacterIsPlayer(__Me)
+ACTIONS
+	IF "!c1"
+		IsEqual(%DialogLookAtChar,null)
+	THEN
+		CharacterLookAt(%DialogLookAtChar,0)
+	ENDIF
+	Sleep(2.0)
+INTERRUPT
+	Set(%DialogLookAtChar,null)	

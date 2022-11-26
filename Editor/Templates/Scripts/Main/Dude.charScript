@@ -1,0 +1,10 @@
+INIT
+CHARACTER:__Me
+
+BEHAVIOUR
+REACTION AD, 10000
+USAGE PEACE
+ACTIONS
+	DialogStart("Dude2", __Me)
+	Sleep(5)
+	

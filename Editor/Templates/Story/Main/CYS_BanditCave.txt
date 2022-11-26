@@ -1,0 +1,439 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_PlayerComments("CYS_CommentSkeletonCaveNoSurvivor","CYS_CommentSkeletonCaveNoSurvivor_1_1",1,1);
+DB_PlayerComments("CYS_CommentSkeletonCaveNoSurvivor","CYS_CommentSkeletonCaveNoSurvivor_2_1",2,1);
+DB_PlayerComments("CYS_CommentSkeletonCaveNoSurvivor","CYS_CommentSkeletonCaveNoSurvivor_2_2",2,2);
+DB_PlayerComments("CYS_CommentUniversalControllerNothing","CYS_CommentUniversalControllerNothing_1_1",1,1);
+DB_PlayerComments("CYS_CommentUniversalControllerNothing","CYS_CommentUniversalControllerNothing_2_1",2,1);
+DB_PlayerComments("CYS_CommentUniversalControllerNothing","CYS_CommentUniversalControllerNothing_2_2",2,2);
+DB_RepeatPlayerComment("CYS_CommentUniversalControllerNothing");
+DB_PlayerComments("CYS_CommentUniversalControllerExploded","CYS_CommentUniversalControllerExploded_1_1",1,1);
+DB_PlayerComments("CYS_CommentUniversalControllerExploded","CYS_CommentUniversalControllerExploded_2_1",2,1);
+DB_PlayerComments("CYS_CommentUniversalControllerExploded","CYS_CommentUniversalControllerExploded_2_2",2,2);
+
+DB_CYS_BanditGuards(CHARACTER_CYS_Richardus);
+DB_CYS_BanditGuards(CHARACTER_CYS_Yoranus);
+DB_CYS_BanditGuards(CHARACTER_CYS_Victorus);
+DB_CYS_PeasantsGuards(CHARACTER_CYS_Richard,CHARACTER_CYS_Richardus);
+DB_CYS_PeasantsGuards(CHARACTER_CYS_Yoran,CHARACTER_CYS_Yoranus);
+DB_CYS_PeasantsGuards(CHARACTER_CYS_Victor,CHARACTER_CYS_Victorus);
+KillCounterDB(CHARACTER_CYS_Richard,"CYS_CavePeasant");
+KillCounterDB(CHARACTER_CYS_Yoran,"CYS_CavePeasant");
+KillCounterDB(CHARACTER_CYS_Victor,"CYS_CavePeasant");
+KillCounter("CYS_CavePeasant",3);
+
+DB_CYS_SkeletonCave(CHARACTER_CYS_NorthCaveSkeleton1);
+DB_CYS_SkeletonCave(CHARACTER_CYS_NorthCaveSkeleton2);
+DB_CYS_SkeletonCave(CHARACTER_CYS_NorthCaveSkeleton3);
+DB_CYS_SkeletonCave(CHARACTER_CYS_NorthCaveSkeleton4);
+KillCounterDB(CHARACTER_CYS_NorthCaveSkeleton1,"CYS_CaveSkeleton");
+KillCounterDB(CHARACTER_CYS_NorthCaveSkeleton2,"CYS_CaveSkeleton");
+KillCounterDB(CHARACTER_CYS_NorthCaveSkeleton3,"CYS_CaveSkeleton");
+KillCounterDB(CHARACTER_CYS_NorthCaveSkeleton4,"CYS_CaveSkeleton");
+KillCounter("CYS_CaveSkeleton",4);
+
+CharacterSetOnStage(CHARACTER_CYS_Richardus,0);
+CharacterSetOnStage(CHARACTER_CYS_Yoranus,0);
+CharacterSetOnStage(CHARACTER_CYS_Victorus,0);
+
+ItemToCharacter(ITEM_CYS_UniversalController,CHARACTER_CYS_Arhu);
+
+DB_OneShot_DialogTrigger(TRIGGER_CYS_AreaYoran,"CYS_Yoran",CHARACTER_CYS_Yoran);
+ProcTriggerRegisterForPlayers(TRIGGER_CYS_AreaFightCave);
+
+ItemToCharacter(ITEM_CYS_Key_PrisonTreasureRoom1,CHARACTER_CYS_Prison_TreasureRoomGuard);
+DB_Dialogs(CHARACTER_CYS_Prison_TreasureRoomGuard,"CYS_TreasureRoomGuard");
+ItemToCharacter(ITEM_CYS_Key_PrisonTreasureRoom2,CHARACTER_CYS_Yoranus);
+
+DB_CYS_UniversalController_Effects("Happy","Happy","Happy","Party");
+DB_CYS_UniversalController_Effects("Angry","Happy","Angry","Steam");
+DB_CYS_UniversalController_Effects("Angry","Angry","Sleepy","Discharge");
+DB_CYS_UniversalController_Effects("Sleepy","Sleepy","Happy","DeactWeapons");
+DB_CYS_UniversalController_Effects("Angry","Angry","Angry","Remote");
+
+ProcTriggerRegisterForPlayers(TRIGGER_CYS_PrisonTreasury);
+
+DB_CYS_ControllerInputNumber(1);
+DB_CYS_ControllerInput(1, "null");
+DB_CYS_ControllerInput(2, "null");
+DB_CYS_ControllerInput(3, "null");
+KBSECTION
+IF
+RegionStarted("Cyseal")
+AND
+NOT DB_OnlyOnce("CYS_CMBHC_SparkMaster_InitialTeleport")
+AND
+IsHardcoreMode(1)
+THEN
+DB_OnlyOnce("CYS_CMBHC_SparkMaster_InitialTeleport");
+CharacterTeleportToTrigger(CHARACTER_CYS_NorthCaveSkeleton1,TRIGGER_CYS_HC_NorthCave_SparkMaster_Mech01,"");
+CharacterTeleportToTrigger(CHARACTER_CYS_NorthCaveSkeleton2,TRIGGER_CYS_HC_NorthCave_SparkMaster_Mech02,"");
+CharacterTeleportToTrigger(CHARACTER_CYS_NorthCaveSkeleton3,TRIGGER_CYS_HC_NorthCave_SparkMaster_Mech03,"");
+
+
+//REGION UNIVERSAL CONTROLLER
+IF
+DialogCharacterEventSet("CYS_GetArhuUniversalController",_Player,_)
+THEN
+ItemToCharacter(ITEM_CYS_UniversalController,_Player);
+
+IF
+TextEventSet("CYS_Controller_Close")
+AND
+DB_CYS_ControllerInputNumber(_Step)
+AND
+DB_CYS_ControllerInput(1, _Old1)
+AND
+DB_CYS_ControllerInput(2, _Old2)
+AND
+DB_CYS_ControllerInput(3, _Old3)
+THEN
+PROC_CYS_UniversalControllerCheckIfReady();
+NOT DB_CYS_ControllerInput(1, _Old1);
+NOT DB_CYS_ControllerInput(2, _Old2);
+NOT DB_CYS_ControllerInput(3, _Old3);
+NOT DB_CYS_ControllerInputNumber(_Step);
+DB_CYS_ControllerInputNumber(1);
+DB_CYS_ControllerInput(1, "null");
+DB_CYS_ControllerInput(2, "null");
+DB_CYS_ControllerInput(3, "null");
+
+IF
+TextEventSet("CYS_Controller_Happy")
+AND
+DB_CYS_ControllerInputNumber(_Step)
+AND
+DB_CYS_ControllerInput(_Step, _Old)
+AND
+IntegerSum(_Step, 1, _NewStep)
+THEN
+NOT DB_CYS_ControllerInput(_Step, _Old);
+NOT DB_CYS_ControllerInputNumber(_Step);
+DB_CYS_ControllerInput(_Step, "Happy");
+DB_CYS_ControllerInputNumber(_NewStep);
+
+IF
+TextEventSet("CYS_Controller_Angry")
+AND
+DB_CYS_ControllerInputNumber(_Step)
+AND
+DB_CYS_ControllerInput(_Step, _Old)
+AND
+IntegerSum(_Step, 1, _NewStep)
+THEN
+NOT DB_CYS_ControllerInput(_Step, _Old);
+NOT DB_CYS_ControllerInputNumber(_Step);
+DB_CYS_ControllerInput(_Step, "Angry");
+DB_CYS_ControllerInputNumber(_NewStep);
+
+IF
+TextEventSet("CYS_Controller_Sleepy")
+AND
+DB_CYS_ControllerInputNumber(_Step)
+AND
+DB_CYS_ControllerInput(_Step, _Old)
+AND
+IntegerSum(_Step, 1, _NewStep)
+THEN
+NOT DB_CYS_ControllerInput(_Step, _Old);
+NOT DB_CYS_ControllerInputNumber(_Step);
+DB_CYS_ControllerInput(_Step, "Sleepy");
+DB_CYS_ControllerInputNumber(_NewStep);
+
+PROC
+PROC_CYS_UniversalControllerCheckIfReady()
+AND
+DB_CYS_ControllerInput(1, _Value1)
+AND
+DB_CYS_ControllerInput(2, _Value2)
+AND
+DB_CYS_ControllerInput(3, _Value3)
+AND
+DB_IsPlayer(_Player)
+AND
+ItemIsInCharacterInventory(ITEM_CYS_UniversalController, _Player, 1)
+THEN
+PROC_CYS_UniversalControllerCheckResults(_Value1,_Value2,_Value3,_Player);
+
+PROC
+PROC_CYS_UniversalControllerCheckResults((STRING)_Value1,(STRING)_Value2,(STRING)_Value3,(CHARACTER)_Player)
+AND
+NOT DB_CYS_UniversalController_Effects(_Value1,_Value2,_Value3,_)
+THEN
+Launch_PlayerComment(_Player,"CYS_CommentUniversalControllerNothing");
+
+PROC
+PROC_CYS_UniversalControllerCheckResults((STRING)_Value1,(STRING)_Value2,(STRING)_Value3,(CHARACTER)_Player)
+AND
+DB_CYS_UniversalController_Effects(_Value1,_Value2,_Value3,_Effect)
+THEN
+PROC_CYS_DoUniversalControllerEffect(_Effect,_Player);
+
+PROC
+PROC_CYS_DoUniversalControllerEffect((STRING)_Effect,(CHARACTER)_Player)
+AND
+CharacterGetDistanceToCharacter(_Player,CHARACTER_CYS_NorthCaveSkeleton4,_Distance)
+THEN
+PROC_CYS_UniversalControllerEffect(_Effect,_Player,_Distance);
+
+PROC
+PROC_CYS_UniversalControllerEffect(_Effect,_Player,(REAL)_Distance)
+AND
+_Effect != "Remote"
+AND
+_Distance > 15
+THEN
+CharacterDisplayText(_Player,"CYS_CommentPyramidWrongRegion_2_1");
+
+PROC
+PROC_CYS_UniversalControllerEffect("Party",_Player,(REAL)_Distance)	//PARTY MODE
+AND
+_Distance <= 15
+THEN
+CharacterPlayEffect(CHARACTER_CYS_NorthCaveSkeleton4,"FX_Creatures_Undead_Skeleton_Metal_Confetti_A");
+CharacterDisplayText(CHARACTER_CYS_NorthCaveSkeleton4,"CYS_NorthCave_SparkMaster_PartyTime");
+
+PROC
+PROC_CYS_UniversalControllerEffect("Steam",_Player,(REAL)_Distance)		//VENT STEAM
+AND
+_Distance <= 15
+THEN
+CharacterSetEvent(CHARACTER_CYS_NorthCaveSkeleton4, "CYS_NorthCave_SparkMasterEvent_VentSteam");
+
+PROC
+PROC_CYS_UniversalControllerEffect("DeactWeapons",_Player,(REAL)_Distance)		//DEACTIVATE WEAPONRY FOR 2 ROUNDS
+AND
+_Distance <= 15
+THEN
+CharacterSetEvent(CHARACTER_CYS_NorthCaveSkeleton4, "CYS_NorthCave_SparkMasterEvent_TempDeactWeapons");
+
+PROC
+PROC_CYS_UniversalControllerEffect("Discharge",_Player,(REAL)_Distance)		//DISCHARGE ELECTRICITY
+AND
+_Distance <= 15
+THEN
+CharacterSetEvent(CHARACTER_CYS_NorthCaveSkeleton4, "CYS_NorthCave_SparkMasterEvent_Discharge");
+
+PROC
+PROC_CYS_UniversalControllerEffect("Remote",(CHARACTER)_Player,(REAL)_Distance)
+THEN
+//ItemDrop(ITEM_CYS_UniversalController);
+ItemSetEvent(ITEM_CYS_UniversalController, "blowUp");
+CharacterDisplayText(_Player, "GLO_ObviousActivated");
+//END_REGION
+
+//REGION KILL SKELETONS
+IF
+DialogEnded("CYS_Yoran", _ID)
+AND
+DB_DialogPlayers(_ID,_Player,1)
+THEN
+CHARACTER_CYS_Yoran.followStart();
+CharacterSetFollowCharacter(CHARACTER_CYS_Yoran, _Player);
+CharacterSetFollowCharacter(CHARACTER_CYS_Victor, _Player);
+CharacterSetFollowCharacter(CHARACTER_CYS_Richard, _Player);
+
+IF
+CharacterEnteredCombat(CHARACTER_CYS_Yoran, _)
+THEN
+NOT CHARACTER_CYS_Yoran.followStart();
+CharacterStopFollow(CHARACTER_CYS_Yoran);
+CharacterStopFollow(CHARACTER_CYS_Victor);
+CharacterStopFollow(CHARACTER_CYS_Richard);
+
+IF
+CharacterLeftTrigger(_Player, TRIGGER_CYS_REGION_Tunnel)
+AND
+CHARACTER_CYS_Yoran.followStart()
+THEN
+CharacterStopFollow(CHARACTER_CYS_Yoran);
+CharacterStopFollow(CHARACTER_CYS_Victor);
+CharacterStopFollow(CHARACTER_CYS_Richard);
+
+IF
+CharacterLeftTrigger(_Player, TRIGGER_CYS_REGION_Tunnel)
+AND
+CHARACTER_CYS_Yoran.followStart()
+AND
+CharacterGetOtherPlayer(_Player, _Other)
+AND
+DB_InRegion(_Other, TRIGGER_CYS_REGION_Tunnel)
+THEN
+CharacterSetFollowCharacter(CHARACTER_CYS_Yoran, _Other);
+CharacterSetFollowCharacter(CHARACTER_CYS_Victor, _Other);
+CharacterSetFollowCharacter(CHARACTER_CYS_Richard, _Other);
+
+IF
+CharacterEnteredTrigger(_Player, TRIGGER_CYS_REGION_Tunnel)
+AND
+CHARACTER_CYS_Yoran.followStart()
+AND
+CharacterGetOtherPlayer(_Player, _Other)
+AND
+NOT DB_InRegion(_Other, TRIGGER_CYS_REGION_Tunnel)
+THEN
+CharacterSetFollowCharacter(CHARACTER_CYS_Yoran, _Player);
+CharacterSetFollowCharacter(CHARACTER_CYS_Victor, _Player);
+CharacterSetFollowCharacter(CHARACTER_CYS_Richard, _Player);
+
+PROC
+ReactOnKillCounter("CYS_CaveSkeleton")
+THEN
+GlobalSetEvent("CYS_FabulousFiveGaveQuest");
+
+PROC
+ReactOnKillCounter("CYS_CaveSkeleton")
+AND
+DB_CYS_PeasantsGuards(_Survivor,_)
+THEN
+GlobalSetEvent("CYS_KilledSkeletons");
+QuestUpdate("CYS_FabFive","KilledSkeletons");
+PROC_CYS_CheckSkeletonCaveSurvivors(_Survivor);
+
+PROC
+ReactOnKillCounter("CYS_CaveSkeleton")
+AND
+NOT DB_CYS_PeasantsGuards(_,_)
+THEN
+GlobalSetEvent("CYS_KilledSkeletons");
+QuestUpdate("CYS_FabFive","KilledSkeletons");
+PROC_CYS_CheckSkeletonCaveSurvivors();
+
+PROC
+PROC_CYS_CheckSkeletonCaveSurvivors((CHARACTER)_Survivor)
+AND
+NOT CYS_SkeletonCaveSurvivorTalked(_)
+AND
+NOT DB_Dead(_Survivor)
+AND
+CharacterGetClosestAlivePlayer(_Survivor,_Player)
+THEN
+CYS_SkeletonCaveSurvivorTalked(_Survivor);
+PROC_MendatoryDialog("CYS_SkeletonCaveSurvivor",_Survivor,_Player);
+
+IF
+DB_NoMoreQueued(_Survivor, "CYS_SkeletonCaveSurvivor")
+AND
+DB_CYS_PeasantsGuards(_Survivor,_)
+THEN
+CharacterSetFaction(_Survivor, "Evil NPC");
+
+PROC
+PROC_CYS_CheckSkeletonCaveSurvivors()
+AND
+NOT DB_CYS_PeasantsGuards(_,_)
+AND
+CharacterGetClosestPlayer(CHARACTER_CYS_NorthCaveSkeleton4,_Player)
+THEN
+Launch_PlayerComment(_Player,"CYS_CommentSkeletonCaveNoSurvivor");
+QuestUpdate("CYS_UndeadCave","AllDead");
+QuestClose("CYS_UndeadCave");
+
+IF
+KillCounterCounts("CYS_CavePeasant",2)
+THEN
+GlobalSetEvent("CYS_SkeletonCave_OneSurvivor");
+
+IF
+GlobalEventSet("CYS_ArhuGetController")
+AND
+CHARACTER_CYS_Yoran.followStart()
+THEN
+QuestUpdate("CYS_UndeadCave","GotController");
+
+IF
+GlobalEventSet("CYS_ArhuGetController")
+AND
+NOT 	CHARACTER_CYS_Yoran.followStart()
+THEN
+QuestAdd("CYS_UndeadCave");
+QuestUpdate("CYS_UndeadCave","StartController");
+
+IF
+CharacterDied(_Character)
+AND
+DB_CYS_PeasantsGuards(_Character,_GuardVersion)
+THEN
+NOT DB_CYS_PeasantsGuards(_Character,_GuardVersion);
+GlobalSetEvent("CYS_SkeletonCave_AtLeastOneVictim");
+
+IF
+CharacterDied(CHARACTER_CYS_NorthCaveSkeleton4)
+THEN
+GlobalSetEvent("CYS_KilledArhuFailedExperiment");
+//END_REGION
+
+//REGION SURVIVORS BECOME GUARDS
+IF
+DialogEnded("CYS_SkeletonCaveSurvivor",_)
+THEN
+PROC_CYS_SkeletonCaveSurvivorsLeave();
+
+PROC
+PROC_CYS_SkeletonCaveSurvivorsLeave()
+AND
+DB_CYS_PeasantsGuards(_Survivor,_)
+THEN
+ProcCharacterMoveToTrigger(_Survivor,TRIGGER_CYS_TunnelIn,0,"CYS_SkeletonCaveSurvivorLeft");
+
+IF
+CharacterEvent(_Survivor,"CYS_SkeletonCaveSurvivorLeft")
+AND
+DB_CYS_PeasantsGuards(_Survivor,_Guard)
+THEN
+NOT DB_CYS_PeasantsGuards(_Survivor,_Guard);
+CharacterSetOnStage(_Survivor,0);
+PROC_CYS_SkeletonCaveSurvivorsMainGuard(_Guard);
+
+PROC
+PROC_CYS_SkeletonCaveSurvivorsMainGuard((CHARACTER)_Guard)
+AND
+NOT CYS_SkeletonCaveSurvivorGuardAssigned(_)
+THEN
+CYS_SkeletonCaveSurvivorGuardAssigned(_Guard);
+CharacterAppearAtTrigger(_Guard,TRIGGER_CYS_Point_Prison_TreasureRoomGuard,0);
+DB_Dialogs(_Guard,"CYS_TreasureRoomGuard2");
+ItemToCharacter(ITEM_CYS_Key_PrisonTreasureRoom2,_Guard);
+CharacterDisappearOutOfSight(CHARACTER_CYS_Prison_TreasureRoomGuard,180,0,"",1);
+
+IF
+DialogEnded("CYS_TreasureRoomGuard2",_)
+AND
+CYS_SkeletonCaveSurvivorGuardAssigned(_Guard)
+AND
+CharacterGetVarInteger(_Guard,"CYS_TreasureRoomOpen",1)
+THEN
+ItemUnlockAndOpen(ITEM_CYS_Door_PrisonTreasureRoom);
+TriggerSetItemOwner(TRIGGER_CYS_PrisonTreasury,CHARACTER_NULL);
+
+IF
+Sees(_Guard, _Player)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT CYS_SkeletonCaveSurvivorGuardAssigned(_Guard)
+AND
+DB_CYS_BanditGuards(_Guard)
+AND
+DB_InRegion(_Player, TRIGGER_CYS_PrisonTreasury)
+AND
+NOT _Guard.alreadyDone()
+THEN
+_Guard.alreadyDone();
+CharacterDisplayText(_Guard, "CYS_GuardTreasuryAllow");
+//END_REGION
+
+IF
+TextEventSet("remote")
+THEN
+ItemToCharacter(ITEM_CYS_UniversalController,CHARACTER_Player1);
+
+IF
+GameBookInterfaceClosed(ITEM_CYS_Book_DiaryEvelyn,_)
+THEN
+GlobalSetEvent("CYS_KnowsArhuFailedExperiment");
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

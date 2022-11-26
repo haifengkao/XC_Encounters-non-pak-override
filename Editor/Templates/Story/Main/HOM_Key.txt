@@ -1,0 +1,71 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+IF
+DB_GlobalEvent("CYS_HomesteadKeyGiven")
+THEN
+DB_FirstTimeUse(1);
+SetHomesteadKeyState(2);
+UnlockWaypoint("WAYP_Homestead",TRIGGER_CentralRoomEntry);
+UnlockWaypoint("WAYP_Cyseal_NorthGate",TRIGGER_WAYP_Cyseal_NorthGate_Pos);
+
+IF
+CharacterRequestsHomestead(_Player)
+AND
+DB_FirstTimeUse(1)
+THEN
+NOT DB_FirstTimeUse(1);
+SetHomesteadKeyState(1);
+
+IF
+CharacterLeftRegion(_Character,"Homestead")
+AND
+_Character.DB_IsPlayer()
+THEN
+Proc_CompanionDialog(CHARACTER_Jahan,"JAH_CD_Zixzax",_Character);
+Proc_CompanionDialog(CHARACTER_Madoc,"MAD_CD_Zixzax",_Character);
+
+IF
+CharacterRequestsHomestead(_Player)
+AND
+TeleportingRegionBlock(1)
+THEN
+CharacterDisplayText(_Player,"HOM_KeyFail_Region");
+
+IF
+CharacterRequestsHomestead(_Player)
+AND
+NOT DB_OnlyOnce("LUC_M_DD_TeleportersBroken")
+AND
+TeleportingRegionBlock(1)
+AND
+CharacterGetRegion(_Player,"LUC_Mines")
+THEN
+ProcDefinePartyDialog("LUC_M_DD_TeleportersBroken");
+DB_OnlyOnce("LUC_M_DD_TeleportersBroken");
+
+IF
+CharacterRequestsHomestead(_Player)
+AND
+NOT TeleportingRegionBlock(1)
+AND
+NOT PlayerInPrison(_Player,_)
+THEN
+PROC_CheckPlayTut(_Player,"TUT_HomesteadWaypointMenu");
+OpenWaypointUI(_Player,"",ITEM_NULL);
+
+
+IF
+CharacterRequestsHomestead(_Player)
+AND
+NOT TeleportingRegionBlock(1)
+AND
+PlayerInPrison(_Player,_)
+THEN
+OpenMessageBox(_Player,"GLO_WaypointInJail");
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

@@ -1,0 +1,15 @@
+INIT
+
+	CHARACTER:__Me
+	
+BEHAVIOUR
+
+REACTION Wander, 1100
+	USAGE PEACE
+	VARS
+		FIXEDSTRING:_Anim
+	ACTIONS
+		CharacterWander(FLOAT:10, 15, 0, ITEM:LUC_ChurchDoor_92101fd0-ff96-40f3-a87d-24b63e549796)
+		GetRandom(_Anim, "idle1", "idle2")
+		DisplayText(__Me, "LUC_ArhuSeeksAttention",4)
+		CharacterPlayAnimation(_Anim)

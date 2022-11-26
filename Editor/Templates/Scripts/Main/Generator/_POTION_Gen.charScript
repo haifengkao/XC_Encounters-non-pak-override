@@ -1,0 +1,25 @@
+#TEMPLATE "_POTION_Base" : [ACTION]
+
+INIT
+CHARACTER:__Me
+[GLOBAL_VARS]
+
+EVENTS
+
+[EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_[ACTION]
+VARS
+	[CALC_VARS]
+ON
+	OnFunction("CalculateScore_[ACTION]")
+ACTIONS		
+	[CALC_PRE_ACTIONS]
+
+	[CALC_CHAR_ACTIONS]
+	Add([CHAR_SCORE], %ActionScore_[ACTION])
+	[CALC_CHAR_ACTIONS_END]
+	Cast(%ActionScore_[ACTION], [CHAR_SCORE])
+
+

@@ -1,0 +1,46 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter
+CHARACTER:__Me
+
+EVENTS
+
+BEHAVIOUR
+/*
+REACTION Wander, 60 OVERRIDE
+USAGE PEACE
+ACTIONS
+	CharacterWander(FLOAT:5, 10, 0)
+*/
+REACTION ShootFireballWhenEnemyInSurface,30
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+	FLOAT:_SkillMinRange=0
+	FLOAT:_SkillMaxRange=0
+CHECK "c1&c2&c3"		
+	CharacterCanCast(__Me,Projectile_Fireball)
+	CharacterGetSkillRange(_SkillMinRange,_SkillMaxRange,__Me,Projectile_Fireball)
+	CharacterGet(_Enemy,__Me,50,Lowest,Distance,Enemy,Ooze,null)	
+ACTIONS
+	CharacterMoveInRange(_Enemy,_SkillMinRange,_SkillMaxRange,1)
+	CharacterUseSkill(Projectile_Fireball, _Enemy)
+INTERRUPT
+	Reset()
+	
+REACTION ShootFireballAtLowestFireRes,20
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+	FLOAT:_SkillMinRange=0
+	FLOAT:_SkillMaxRange=0
+CHECK "c1&c2&c3"		
+	CharacterCanCast(__Me,Projectile_Fireball)
+	CharacterGetSkillRange(_SkillMinRange,_SkillMaxRange,__Me,Projectile_Fireball)
+	CharacterGet(_Enemy,__Me,50,Lowest,FireResistance,Enemy,null,null)	
+ACTIONS
+	CharacterMoveInRange(_Enemy,_SkillMinRange,_SkillMaxRange,1)
+	CharacterUseSkill(Projectile_Fireball, _Enemy)
+INTERRUPT
+	Reset()

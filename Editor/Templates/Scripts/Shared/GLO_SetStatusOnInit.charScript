@@ -1,0 +1,13 @@
+INIT
+CHARACTER:__Me
+EXTERN STATUS:%StatusOnInit=DRUNK
+EXTERN INT:%ForceStatusOnInit=1
+
+BEHAVIOUR
+
+EVENTS
+EVENT SetStatus
+ON
+	OnInit()
+ACTIONS
+	CharacterApplyStatus(__Me,%StatusOnInit,-1,%ForceStatusOnInit)

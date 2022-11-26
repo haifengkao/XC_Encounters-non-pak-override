@@ -1,0 +1,36 @@
+INIT
+CHARACTER:__Me
+
+BEHAVIOUR
+REACTION FleeFromPlayer,100
+USAGE PEACE
+VARS
+	CHARACTER:_char
+	CHARACTER:_char2
+CHECK "c1&!c2&!c3"
+	CharacterGet(_char,__Me,5,Random,null,Player)
+	CharacterHasTalent(_char, AnimalEmpathy)
+	CharacterGet(_char2,__Me,10,Random,null,Player,null,null,AnimalEmpathy)
+ACTIONS
+	CharacterLookAt(_char,1)
+	Sleep(0.2)
+	CharacterFleeFrom(Player,10)
+	CharacterLookAt(_char)
+	Sleep(5.0)
+INTERRUPT
+ON
+	OnMovementFailed(_)
+ACTIONS
+	//DebugText(__Me,"MOVING FAILED!")
+	SetPriority("FleeFromPlayer",0)
+	
+REACTION WanderAbout,50
+USAGE PEACE
+VARS
+	FLOAT:_Range=10
+ACTIONS
+	//DebugText(__Me,"Wandering for a bit...")
+	CharacterWander(_Range,4,1)
+	SetPriority("FleeFromPlayer",100)
+INTERRUPT
+	Reset()

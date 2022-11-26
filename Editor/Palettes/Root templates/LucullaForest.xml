@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<palette xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <palettes />
+  <objectids>
+    <guid>ae8a4410-3e4f-4d76-a83f-3b378abbd9a0</guid>
+    <guid>1ee6188d-d023-48e8-8508-bee336c9cea6</guid>
+    <guid>8d60b782-afed-44ce-a19e-d63885de7b72</guid>
+    <guid>46bc07be-bcf9-4828-81a2-9454bb12738c</guid>
+    <guid>b8c30aa7-234e-4214-8adc-23650bd3c4bc</guid>
+    <guid>5cd43b99-faa6-4832-b97e-976cb6be8f8c</guid>
+    <guid>022e4c9b-8c26-422e-b33e-3f165a7b6841</guid>
+    <guid>52384698-df8a-4d34-96ce-ee7847922182</guid>
+    <guid>42535a6b-e4de-440c-9569-3b552a683a7c</guid>
+    <guid>5fa23d51-d870-4aca-8513-3d079fdbcd42</guid>
+    <guid>fe733433-700c-4f6a-bdf4-a9c5edb0f660</guid>
+  </objectids>
+  <name>LucullaForest</name>
+</palette>

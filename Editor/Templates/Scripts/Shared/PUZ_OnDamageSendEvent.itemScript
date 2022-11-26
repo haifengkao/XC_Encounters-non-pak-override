@@ -1,0 +1,26 @@
+INIT
+ITEM:__Me
+EXTERN STRING:%OnDamageEvent=null
+EXTERN INT:%DamageRepeat=0
+INT:%DamageCounter=0
+
+EVENTS
+
+EVENT ItemOnDamage
+	ON
+		OnDamage(_,_,_,_)
+	ACTIONS
+		IF "c1&c2"  //if damaged first time and no repeat
+			IsEqual(%DamageCounter,0)
+			IsEqual(%DamageRepeat,0)
+		THEN
+			CharacterItemEvent(null,__Me,%OnDamageEvent)
+			Add(%DamageCounter,1)
+		ENDIF
+		
+		IF "c1&!c2" //if damaged first time and repeat
+			IsEqual(%DamageCounter,0)
+			IsEqual(%DamageRepeat,0)
+		THEN
+			CharacterItemEvent(null,__Me,%OnDamageEvent)
+		ENDIF

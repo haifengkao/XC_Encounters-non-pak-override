@@ -1,0 +1,9 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+ItemSetOnstage(ITEM_TST_HealingGem,0);
+KBSECTION
+//IF
+EXITSECTION
+
+ENDEXITSECTION

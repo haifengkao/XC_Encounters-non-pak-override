@@ -1,0 +1,17 @@
+INIT
+ITEM:__Me
+EXTERN STRING:%ShootEvent=null
+EXTERN SKILL:%ProjectileSkill=null
+EXTERN INT:%CasterLevel=-1
+EXTERN FLOAT3:%Offset={0;0;0}
+EVENTS
+
+EVENT Shoot
+VARS 
+	FLOAT3:_Dir
+ON
+	OnCharacterItemEvent(_,_,%ShootEvent)
+ACTIONS
+	GetForwardDirection(__Me,_Dir)
+	ShootLocalProjectile(%ProjectileSkill,__Me,%Offset,_Dir,%CasterLevel)
+	ItemEvent(__Me, "fire")

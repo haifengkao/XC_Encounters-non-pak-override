@@ -1,0 +1,35 @@
+INIT
+ITEM:__Me
+EXTERN SKILL:%ExploItem_Projectile=Projectile_TrapOldFireball
+EXTERN INT:%DestroyItem=0
+EXTERN INT:%Repeat=0
+EXTERN INT:%ExplosionLevel = 1
+INT:%Counter=0
+
+EVENTS
+
+EVENT ButtonUse
+VARS
+ON
+	OnUseItem(_,__Me)
+ACTIONS
+	IF "c1&c2"  //if opened first time and no repeat
+		IsEqual(%Counter,0)
+		IsEqual(%Repeat,0)
+	THEN
+	ExplodeAt(__Me,%ExploItem_Projectile,%ExplosionLevel)
+	Add(%Counter,1)
+	ENDIF
+	
+	IF "c1&!c2" //if opened first time and repeat
+		IsEqual(%Counter,0)
+		IsEqual(%Repeat,0)
+	THEN
+	ExplodeAt(__Me,%ExploItem_Projectile,%ExplosionLevel)
+	ENDIF	
+
+	IF "c1"
+		IsEqual(%DestroyItem,1)
+	THEN
+	ItemDie(__Me)
+	ENDIF

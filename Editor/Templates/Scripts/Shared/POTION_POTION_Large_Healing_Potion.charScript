@@ -1,0 +1,41 @@
+#TEMPLATE "_POTION_Base" : POTION_Large_Healing_Potion
+
+INIT
+CHARACTER:__Me
+// [GLOBAL_VARS]
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_POTION_Large_Healing_Potion
+VARS
+	// [CALC_VARS]
+	FLOAT:_StatVitality
+	FLOAT:_Score
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_POTION_Large_Healing_Potion")
+ACTIONS		
+	// [CALC_ACTIONS_PRE]
+	Set(_Score, 0.0)
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	IF "((c1&c2)|c3)"
+	    CharacterGetStat(_StatVitality, __Me, Vitality) // c1
+	    IsLessThen(_StatVitality, 0.6) // c2
+	    IsLessThen(_StatVitality, 0.3) // c3
+	THEN
+	    // Hostile count score calculation
+	    Add(_Score, 10.0) // HostileWeight
+	    
+	    Add(_Score, %ActionScore_POTION_Large_Healing_Potion)
+	ENDIF
+	// [~CALC_ACTIONS]
+
+	Cast(%ActionScore_POTION_Large_Healing_Potion, _Score)
+
+

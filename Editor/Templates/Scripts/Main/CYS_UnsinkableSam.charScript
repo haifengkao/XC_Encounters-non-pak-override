@@ -1,0 +1,24 @@
+#INCLUDE Base
+
+INIT
+CHARACTER:__Me
+USING Base REACTION CombatFallback,1
+INT:%IsRunning = 0
+FIXEDSTRING:%Animation = ""
+
+BEHAVIOUR
+
+REACTION Wander,1
+USAGE ALL
+ACTIONS
+GetRandom(%IsRunning, 0, 1)
+CharacterWander(TRIGGER:CYS_TavernArea_0de9d744-0bdb-4099-bff5-e14dcb20f5e9, 20, %IsRunning)
+GetRandom(%Animation, "idle1", "idle2", "still")
+CharacterPlayAnimation(%Animation)
+Sleep(10)
+
+
+REACTION Waiting, 0
+USAGE PEACE
+ACTIONS
+	Sleep(5)

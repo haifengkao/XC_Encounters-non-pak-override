@@ -1,0 +1,40 @@
+INIT
+
+CHARACTER:__Me
+	
+EVENTS
+
+EVENT LookAtFish
+ON
+	OnCharacterEvent(__Me, "END_FishThief_LookAtFish")
+ACTIONS
+	SetPriority("Look", 1100)
+
+BEHAVIOUR
+
+REACTION Look, 0
+USAGE PEACE
+ACTIONS
+	CharacterLookAt(ITEM:END_NegaBigFish_72592a53-78f2-4c7f-b8e3-6f6e85302f43)
+	CharacterEvent(__Me, "END_FishThief_Dialog1")
+	SetPriority("Look", 0)
+	
+	
+REACTION Wander, 900
+USAGE PEACE
+ACTIONS
+	CharacterWander(TRIGGER:END_Behavior_NegaThiefRobin_cc33e470-e29c-42dd-84ef-4953899f4f7d, 3.0)
+	Sleep(1)
+	
+STORY
+
+SCRIPTFRAME Poof
+ACTIONS
+	CharacterLookAt(ITEM:END_NegaBigFish_72592a53-78f2-4c7f-b8e3-6f6e85302f43, 1)
+	DialogStart("END_AD_NegaFishThief1", __Me)
+	CharacterMoveTo(TRIGGER:END_Point_Behavior_NegaFish1_0f64dff6-c4c6-4409-890e-024f02351b13, 1, 1)
+	CharacterPlayAnimation("use_activate",1,0)
+	DialogStart("END_AD_NegaFishThief2", __Me)
+	ItemEvent(ITEM:END_NegaBigFish_be92fd93-743b-4624-a34d-843eb6c1ec98,"END_NegaThief_PoofFish")
+	DialogStart("END_AD_NegaFishThief3", __Me)
+	CharacterMoveTo(TRIGGER:END_Point_Behavior_NegaFish2_aaf9c34e-dee7-41c3-8444-f1dd8958e8e9, 1, 1)

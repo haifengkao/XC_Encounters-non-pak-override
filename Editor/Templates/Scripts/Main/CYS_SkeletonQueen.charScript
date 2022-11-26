@@ -1,0 +1,84 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	CHARACTER:%SkeletonKing=CYS_SkeletonKing_98373dca-1706-41dc-9f47-1c7b9894c1e9
+	INT:%SpawnSkeletons = 0
+
+//----------------------------
+BEHAVIOUR
+REACTION State_Idle, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, "Action_Idle")
+	SetPriority(%currentAction, 1100)
+
+REACTION Action_Idle, 0
+USAGE PEACE
+ACTIONS
+	IF "!c1&!c2"
+		CharacterHasStatus(__Me,SITTING)
+		IsEqual(%SpawnSkeletons,1)
+	THEN
+		CharacterUseItem(FUR_Skeleton_Throne_A_000_66ba3dc9-b73f-4539-93d6-54fd0a719f04)
+	ENDIF
+	Sleep(1.0)
+	
+REACTION Action_ExitThrone, 0
+USAGE ALL
+ACTIONS
+	CharacterMoveTo(TRIGGER:CYS_SkeletonQueenExit_58a1e43a-3835-4333-b716-5cbfdfddbf36,0,1,0)
+	Sleep(1.0)
+	SetPriority("Action_ExitThrone",0)
+	
+REACTION TalkToKing,0	
+USAGE COMBAT
+VARS
+	FIXEDSTRING:_QueensText
+ACTIONS
+	GetRandom(_QueensText,"CYS_SkeletonKing_Queen_OnTurnText_01","CYS_SkeletonKing_Queen_OnTurnText_02","CYS_SkeletonKing_Queen_OnTurnText_03","CYS_SkeletonKing_Queen_OnTurnText_04")
+	DisplayText(__Me,_QueensText,4)
+	Sleep(4)
+	CharacterEvent(__Me,"CYS_SkeletonKing_QueensText_Event")	
+	SetPriority("TalkToKing",0)
+
+//----------------------------	
+EVENTS
+EVENT OnSpawnSkeletons
+ON
+	OnCharacterEvent(__Me,"ExitThrone")
+ACTIONS
+	Set(%SpawnSkeletons,1)
+	SetPriority("Action_ExitThrone",3000)
+
+EVENT OnTurnTalkToKing
+ON
+	OnTurn()
+ACTIONS
+	IF "!c1&c2"
+		CharacterIsDead(%SkeletonKing)	
+		IsRandom(0.5)
+	THEN	
+		SetPriority("TalkToKing",700)
+	ENDIF
+	
+EVENT ReceiveEvent_QueenHasSpoken
+VARS
+	FIXEDSTRING:_QueensReply
+ON
+	OnCharacterEvent(%SkeletonKing,"CYS_SkeletonKing_KingsText_Event")
+ACTIONS
+	GetRandom(_QueensReply,"CYS_SkeletonKing_QueensReply_01","CYS_SkeletonKing_QueensReply_02","CYS_SkeletonKing_QueensReply_03","CYS_SkeletonKing_QueensReply_04")
+	DisplayText(__Me,_QueensReply,4)	
+
+EVENT KingDiesYouAreSad
+	ON
+		OnDie(%SkeletonKing,_,_,_)
+	ACTIONS
+		IF "!c1" //either this, or assert -_-
+			CharacterIsDead(__Me)
+		THEN
+			DisplayText(__Me,"CYS_SkeletonKing_SadQueen",4)	
+		ENDIF
+	

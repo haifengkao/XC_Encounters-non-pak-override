@@ -1,0 +1,534 @@
+INIT
+	CHARACTER:__Me
+	CHARACTERTEMPLATE:%SeaSpiderling = "Summons_SeaSpider_Spiderling_b65fe247-66f4-403f-baa5-0ccc7af5fdeb"
+	ITEM:%lookTargetWhenPumping = "CYS_BC_SeaSpider_Water_Invisible_03_7f3344a7-9d6a-491d-983a-72030ddf9e4c"	
+	INT:%Bool_UsingCanals = 0
+	INT:%Water_PowerLevel = 0
+	INT:%FXHandle_WaterBubs1 = 0
+	INT:%FXHandle_WaterBubs2 = 0
+	INT:%FXHandle_WaterBubs3 = 0
+	INT:%FXHandle_WaterBubs4 = 0
+	EXTERN INT:%CanalUsage_Current = 0
+	EXTERN INT:%CanalUsage_Desired = 0
+	EXTERN INT:%SpiderSummoning_Current = 1
+	EXTERN INT:%SpiderSummoning_Desired = 0
+	EXTERN INT:%SpiderHyperSummon_Current = 3
+	EXTERN INT:%SpiderHyperSummon_Desired = 2	
+
+//------------------------
+BEHAVIOUR
+REACTION SeaSpider_Suckinganimation, 0
+USAGE WAITING
+USAGE PEACE
+ACTIONS
+	CharacterPlayAnimation("SuckWater_Loop",0,1)
+
+//------ TUTORIAL FLOW
+REACTION SeaSpider_TutorialFlow,700
+USAGE COMBAT
+CHECK "c1&!c2&!c3&!c4"
+	IsEqual(%Water_PowerLevel,0)								//don't draw water if your power level isn't 0
+	CharacterHasStatus(__Me,DYING)
+	CharacterHasStatus(__Me,CHARMED)
+	CharacterHasStatus(__Me,MUTED)
+ACTIONS	
+	Set(%Bool_UsingCanals,1)
+	CharacterLookAt(%lookTargetWhenPumping)
+	CharacterPlayAnimation("SuckWater_Start",0,0)
+	CharacterEvent(__Me,"UsingCanals")
+	CharacterEvent(__Me,"Used_Canal_01")
+	CharacterEvent(__Me,"CYS_BC_SeaSpider_TutorialAD")
+	CombatLogText(__Me,"CYS_BC_Using_Canal_01_log",0,1)
+	SetPriority("SeaSpider_Suckinganimation", 699)
+	CharacterEndTurn()
+	SetPriority("SeaSpider_TutorialFlow",0)
+	
+//------ USE CANALS
+REACTION SeaSpider_UseCanals,0
+USAGE COMBAT
+VARS
+	STRING:_forcedCanal
+	INT:_openCanals
+	INT:_logText
+CHECK "c1&!c2&!c3&!c4"
+	IsEqual(%Water_PowerLevel,0)								//don't draw water if your power level isn't 0
+	CharacterHasStatus(__Me,DYING)
+	CharacterHasStatus(__Me,CHARMED)
+	CharacterHasStatus(__Me,MUTED)
+ACTIONS	
+	Set(_openCanals,0)
+	Set(%Bool_UsingCanals,1)
+	CharacterLookAt(%lookTargetWhenPumping)
+	CharacterEvent(__Me,"UsingCanals")
+	CharacterPlayAnimation("SuckWater_Start",0,0)
+	IF "c1"
+		IsRandom(0.7)
+	THEN
+		CharacterEvent(__Me,"Used_Canal_01")
+		CombatLogText(__Me,"CYS_BC_Using_Canal_01_log",0,1)		
+		Add(_openCanals,1)
+	ENDIF
+	IF "c1"
+		IsRandom(0.7)
+	THEN
+		CharacterEvent(__Me,"Used_Canal_02")
+		CombatLogText(__Me,"CYS_BC_Using_Canal_02_log",0,1)		
+		Add(_openCanals,1)
+	ENDIF
+	IF "c1"
+		IsRandom(0.7)
+	THEN
+		CharacterEvent(__Me,"Used_Canal_03")
+		CombatLogText(__Me,"CYS_BC_Using_Canal_03_log",0,1)				
+		Add(_openCanals,1)
+	ENDIF
+	IF "c1"
+		IsRandom(0.6)
+	THEN
+		CharacterEvent(__Me,"Used_Canal_04")
+		CombatLogText(__Me,"CYS_BC_Using_Canal_04_log",0,1)			
+		Add(_openCanals,1)
+	ENDIF
+	IF "c1"
+		IsEqual(_openCanals,0)
+	THEN
+		GetRandom(_forcedCanal,"Used_Canal_01","Used_Canal_02","Used_Canal_03","Used_Canal_04")
+		CharacterEvent(__Me,_forcedCanal)
+			IF "c1"	//there can be only one _forcedCanal
+				IsEqual(_forcedCanal,"Used_Canal_01")
+			THEN
+				CombatLogText(__Me,"CYS_BC_Using_Canal_01_log",0,1)
+				ELIF "c1"
+					IsEqual(_forcedCanal,"Used_Canal_02")
+				THEN
+					CombatLogText(__Me,"CYS_BC_Using_Canal_02_log",0,1)
+				ELIF "c1"
+					IsEqual(_forcedCanal,"Used_Canal_03")
+				THEN
+					CombatLogText(__Me,"CYS_BC_Using_Canal_03_log",0,1)
+				ELIF "c1"
+					IsEqual(_forcedCanal,"Used_Canal_04")
+				THEN
+					CombatLogText(__Me,"CYS_BC_Using_Canal_04_log",0,1)
+			ENDIF		
+	ENDIF
+	Set(%CanalUsage_Current,0)
+	SetPriority("SeaSpider_Suckinganimation", 699)
+	CharacterEndTurn()
+	SetPriority("SeaSpider_UseCanals",0)		
+
+//------ CAST WATER ATTACKS
+REACTION SeaSpider_Cast_WaterAttack_Alpha,400
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+	FLOAT:_minRange
+	FLOAT:_maxRange
+CHECK "c1&c2&c3&!c4"
+	IsGreaterThen(%Water_PowerLevel,3)
+	CharacterGet(_Enemy,__Me,16,Lowest,Distance,Enemy)
+	CharacterCanCast(__Me,"Cone_SeaSpider_WaterAttack_01")
+	CharacterIsDead(_Enemy)	
+ACTIONS
+	StopLoopEffect(%FXHandle_WaterBubs1)
+	StopLoopEffect(%FXHandle_WaterBubs2)
+	StopLoopEffect(%FXHandle_WaterBubs3)
+	StopLoopEffect(%FXHandle_WaterBubs4)
+	CharacterUseSkill("Cone_SeaSpider_WaterAttack_01",_Enemy)	
+	Set(%Water_PowerLevel,0)
+INTERRUPT
+	Reset()
+	
+REACTION SeaSpider_Cast_WaterAttack_Beta,400
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+	FLOAT:_minRange
+	FLOAT:_maxRange
+CHECK "c1&c2&c3&!c4"
+	IsEqual(%Water_PowerLevel,3)
+	CharacterGet(_Enemy,__Me,12,Lowest,Distance,Enemy)
+	CharacterCanCast(__Me,"Cone_SeaSpider_WaterAttack_02")
+	CharacterIsDead(_Enemy)		
+ACTIONS	
+	StopLoopEffect(%FXHandle_WaterBubs1)
+	StopLoopEffect(%FXHandle_WaterBubs2)
+	StopLoopEffect(%FXHandle_WaterBubs3)
+	StopLoopEffect(%FXHandle_WaterBubs4)
+	CharacterUseSkill("Cone_SeaSpider_WaterAttack_02",_Enemy)
+	Set(%Water_PowerLevel,0)	
+INTERRUPT
+	Reset()
+	
+REACTION SeaSpider_Cast_WaterAttack_Gamma,400
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+	FLOAT:_minRange
+	FLOAT:_maxRange
+CHECK "c1&c2&c3&!c4"
+	IsEqual(%Water_PowerLevel,2)
+	CharacterGet(_Enemy,__Me,10,Lowest,Distance,Enemy)
+	CharacterCanCast(__Me,"Cone_SeaSpider_WaterAttack_03")
+	CharacterIsDead(_Enemy)		
+ACTIONS	
+	StopLoopEffect(%FXHandle_WaterBubs1)
+	StopLoopEffect(%FXHandle_WaterBubs2)
+	StopLoopEffect(%FXHandle_WaterBubs3)
+	StopLoopEffect(%FXHandle_WaterBubs4)
+	CharacterUseSkill("Cone_SeaSpider_WaterAttack_03",_Enemy)
+	Set(%Water_PowerLevel,0)	
+INTERRUPT
+	Reset()
+	
+REACTION SeaSpider_Cast_WaterAttack_Delta,400
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+	FLOAT:_minRange
+	FLOAT:_maxRange
+CHECK "c1&c2&c3&!c4"
+	IsEqual(%Water_PowerLevel,1)
+	CharacterGet(_Enemy,__Me,8,Lowest,Distance,Enemy)
+	CharacterCanCast(__Me,"Cone_SeaSpider_WaterAttack_04")
+	CharacterIsDead(_Enemy)		
+ACTIONS	
+	StopLoopEffect(%FXHandle_WaterBubs1)
+	StopLoopEffect(%FXHandle_WaterBubs2)
+	StopLoopEffect(%FXHandle_WaterBubs3)
+	StopLoopEffect(%FXHandle_WaterBubs4)
+	CharacterUseSkill("Cone_SeaSpider_WaterAttack_04",_Enemy)	
+	Set(%Water_PowerLevel,0)	
+INTERRUPT
+	Reset()
+	
+//------ NO WATER POWER
+REACTION SeaSpider_NoWaterPower_Summon,0
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+CHECK "c1&c2&!c3&!c4"
+	CharacterGet(_Enemy,__Me,50,Highest,Distance,Enemy)
+	CharacterCanCast(__Me,"Summon_SeaSpider_Spiderling")
+	CharacterHasStatus(__Me,CHARMED)
+	CharacterHasStatus(__Me,MUTED)
+ACTIONS
+	CharacterUseSkill("Summon_SeaSpider_Spiderling",_Enemy)
+	
+REACTION SeaSpider_NoWaterPower_CastPoisonHail, 300
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+CHECK "c1&c2&!c3&!c4&!c5&!c6"
+	CharacterCanCast(__Me,"Projectile_Enemy_PoisonHailAttack")
+	CharacterGet(_Enemy,__Me,50,Highest,Distance,Enemy)
+	CharacterIsDead(_Enemy)
+	CharacterHasStatus(__Me,CHARMED)
+	CharacterHasStatus(__Me,FEAR)
+	CharacterHasStatus(__Me,STUNNED)
+ACTIONS
+	CharacterLookAt(_Enemy)
+	CharacterUseSkill("Projectile_Enemy_PoisonHailAttack",_Enemy)
+	
+REACTION SeaSpider_NoWaterPower_CastFreeSpell, 200
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+CHECK "c1&c2&!c3&!c4&!c5&!c6"
+	CharacterCanCast(__Me,"Projectile_EnemyPoisonHair")
+	CharacterGet(_Enemy,__Me,50,Highest,Distance,Enemy)
+	CharacterIsDead(_Enemy)
+	CharacterHasStatus(__Me,CHARMED)
+	CharacterHasStatus(__Me,FEAR)
+	CharacterHasStatus(__Me,STUNNED)
+ACTIONS
+	CharacterLookAt(_Enemy)
+	CharacterUseSkill("Projectile_EnemyPoisonHair",_Enemy)
+	IF "c1"
+		IsRandom(0.4)
+	THEN
+		CharacterEndTurn()
+	ENDIF
+	
+REACTION SeaSpider_EveryoneIsTooFar,0
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+	FLOAT3:_EnemyPosition
+	FLOAT3:_PosOffset
+	FLOAT:_Angle
+	FLOAT:_Dist
+	INT:_Failures=0
+	INT:_Successes=0
+	CHARACTER:_Summon	
+CHECK "!c1&!c2&!c3&!c4&!c5&c6"
+	CharacterHasStatus(__Me,STUNNED)									//c1
+	CharacterHasStatus(__Me,PETRIFIED)									//c2
+	CharacterHasStatus(__Me,FROZEN)										//c3
+	CharacterHasStatus(__Me,CHARMED)									//c4
+	CharacterGet(_Enemy,__Me,8,Highest,Distance,Enemy)					//c5
+	CharacterGet(_Enemy,__Me,20,Highest,Distance,Enemy)					//c6
+ACTIONS
+	CharacterLookAt(_Enemy)
+	CharacterPlayEffect(__Me,"FX_Creatures_Skills_Spider_Summon_Cast_A")
+	CharacterPlayAnimation("cast_ground_cast",1,0)
+	CharacterPlayEffect(__Me,"FX_GP_CameraShake_B")
+	WHILE "c1&c2"
+		IsLessThen(_Successes,2)
+		IsLessThen(_Failures,15)
+	DO
+		IF "c1"
+			GetPosition(_Enemy,_EnemyPosition)
+		THEN
+			Set(_PosOffset,{1.3;0;0}) 
+			GetRandomBetween(_Angle,0,360)
+			GetRandomBetween(_Dist,1,3.5)
+			RotateY(_PosOffset,_Angle)
+			Multiply(_PosOffset,_Dist)	
+			Add(_EnemyPosition,_PosOffset)
+		ENDIF
+		IF "c1&!c2&!c3&!c4&!c5&!c6"
+			FindValidPosition(_EnemyPosition,3)
+			ContainsSurface(_EnemyPosition,1,CloudPoison)
+			ContainsSurface(_EnemyPosition,1,Ooze)
+			ContainsSurface(_EnemyPosition,1,Ice)
+			ContainsSurface(_EnemyPosition,1,CloudStatic)
+			ContainsSurface(_EnemyPosition,1,Electrified)
+		THEN	
+			IF "c1"
+				IsEqual(_Successes,0)
+			THEN
+				SpawnCharacter(_Summon,%SeaSpiderling,_EnemyPosition,1)						
+				Sleep(1)				
+				Add(_Successes,1)
+			ELIF "c1"
+				IsEqual(_Successes,1)
+			THEN			
+				SpawnCharacter(_Summon,%SeaSpiderling,_EnemyPosition,1)		
+				Sleep(0.7)
+				Add(_Successes,1)										
+			ENDIF
+		ELSE
+			 Add(_Failures,1)
+		ENDIF	
+	ENDWHILE
+	IF "c1"
+		IsEqual(_Failures,15)
+	THEN
+		Set(_Failures,0)
+		CharacterEndTurn()
+	ENDIF		
+	Set(_Successes,0)
+	Set(_Failures,0)
+	Set(%SpiderHyperSummon_Current,0)
+	SetPriority("SeaSpider_EveryoneIsTooFar",0)
+INTERRUPT
+	Reset()
+
+REACTION SeaSpider_CastCrawlingInfestation,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&!c4"
+	IsHardcore()																				//c1
+	CharacterCanCast(__Me,"Target_EnemyCrawlingInfestation")									//c2
+	CharacterGet(_ChosenTarget,__Me,30,Lowest,Distance,Enemy)									//c3
+	CharacterHasStatus(_ChosenTarget,CRAWLING_INFESTATION)										//!c4	
+ACTIONS
+	CharacterUseSkill("Target_EnemyCrawlingInfestation",_ChosenTarget)
+	
+REACTION SeaSpider_NoWaterPower_AttackClosest,150
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+CHECK "!c1&!c2&!c3&!c4&c5"
+	CharacterHasStatus(__Me,STUNNED)
+	CharacterHasStatus(__Me,PETRIFIED)
+	CharacterHasStatus(__Me,FROZEN)
+	CharacterHasStatus(__Me,CHARMED)
+	CharacterGet(_Enemy,__Me,5,Lowest,Distance,Enemy)
+ACTIONS
+	CharacterAttack(_Enemy)	
+INTERRUPT
+	Reset()
+
+REACTION SeaSpider_CannotDoAnything, 50
+USAGE COMBAT
+ACTIONS
+	DisplayText(__Me,"CYS_BC_SpiderLaughing",3)
+	Sleep(2)
+	CombatLogText(__Me,"CYS_BC_Spider_CannotAct",0,1)
+	CharacterEndTurn()
+INTERRUPT
+	Reset()
+
+//------------------------
+EVENTS
+//------ GIVING SPELLS
+EVENT OnInit_GiveSpells_SetUpFight
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill("Cone_SeaSpider_WaterAttack_01")
+	CharacterAddSkill("Cone_SeaSpider_WaterAttack_02")
+	CharacterAddSkill("Cone_SeaSpider_WaterAttack_03")
+	CharacterAddSkill("Cone_SeaSpider_WaterAttack_04")
+	CharacterAddSkill("Summon_SeaSpider_Spiderling")
+	CharacterAddSkill("Projectile_Enemy_PoisonHailAttack")
+	CharacterAddSkill("Projectile_EnemyPoisonHair")
+	CharacterAddSkill("Target_EnemyCrawlingInfestation")
+	IF "c1"
+		IsEqual(%Water_PowerLevel,1)
+	THEN
+		CharacterPlayLoopEffect(%FXHandle_WaterBubs1,__Me,"FX_Creatures_Skills_Spider_SpinningWaterBall_C")
+	ELIF "c1"
+		IsEqual(%Water_PowerLevel,2)
+	THEN
+		CharacterPlayLoopEffect(%FXHandle_WaterBubs1,__Me,"FX_Creatures_Skills_Spider_SpinningWaterBall_B")
+	ELIF "c1"
+		IsEqual(%Water_PowerLevel,3)
+	THEN
+		CharacterPlayLoopEffect(%FXHandle_WaterBubs1,__Me,"FX_Creatures_Skills_Spider_SpinningWaterBall_D")
+	ELIF "c1"
+		IsEqual(%Water_PowerLevel,4)
+	THEN
+		CharacterPlayLoopEffect(%FXHandle_WaterBubs1,__Me,"FX_Creatures_Skills_Spider_SpinningWaterBall_A")
+	ENDIF
+	
+//------ CAN USE CANALS? / EMERGENCY SHUTDOWN? / CAN SUMMON SPIDERLING?
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	IF "c1"
+		IsLessThen(%CanalUsage_Current,%CanalUsage_Desired)
+	THEN		
+		Add(%CanalUsage_Current,1)
+	ELSE
+		SetPriority("SeaSpider_UseCanals",500)
+	ENDIF
+	IF "c1"
+		IsLessThen(%SpiderHyperSummon_Current,%SpiderHyperSummon_Desired)
+	THEN		
+		Add(%SpiderHyperSummon_Current,1)
+	ELSE
+		SetPriority("SeaSpider_EveryoneIsTooFar",500)
+	ENDIF	
+	IF "c1"
+		IsLessThen(%SpiderSummoning_Current,%SpiderSummoning_Desired)
+	THEN		
+		Add(%SpiderSummoning_Current,1)
+	ELSE
+		SetPriority("SeaSpider_NoWaterPower_Summon",350)
+	ENDIF	
+	IF "c1"
+		IsEqual(%Bool_UsingCanals,1)
+	THEN
+		CharacterEvent(__Me,"CYS_BC_SeaSpider_ItsMyTurn")	//send emergency shutdown event
+		SetPriority("SeaSpider_Suckinganimation", 0)
+	ENDIF	
+	
+//------ CHARGING POWER LEVEL
+EVENT OnCharacterEvent_SetCanalUsageCharged
+ON
+	OnCharacterEvent(__Me,"CYS_BC_SeaSpider_Charged") 		//for every Charge Event received, add 1 to power level
+ACTIONS
+	Add(%Water_PowerLevel,1)
+	Set(%Bool_UsingCanals,0)
+	IF "!c1"
+		IsEqual(%FXHandle_WaterBubs1,0)
+	THEN
+		StopLoopEffect(%FXHandle_WaterBubs1)
+	ENDIF	
+	IF "!c1"
+		IsEqual(%FXHandle_WaterBubs2,0)
+	THEN
+		StopLoopEffect(%FXHandle_WaterBubs2)
+	ENDIF
+	IF "!c1"
+		IsEqual(%FXHandle_WaterBubs3,0)
+	THEN
+		StopLoopEffect(%FXHandle_WaterBubs3)
+	ENDIF	
+	IF "!c1"
+		IsEqual(%FXHandle_WaterBubs4,0)
+	THEN
+		StopLoopEffect(%FXHandle_WaterBubs4)
+	ENDIF	
+	IF "c1"
+		IsEqual(%Water_PowerLevel,1)
+	THEN
+		CharacterPlayLoopEffect(%FXHandle_WaterBubs1,__Me,"FX_Creatures_Skills_Spider_SpinningWaterBall_C")
+	ELIF "c1"
+		IsEqual(%Water_PowerLevel,2)
+	THEN
+		CharacterPlayLoopEffect(%FXHandle_WaterBubs1,__Me,"FX_Creatures_Skills_Spider_SpinningWaterBall_B")
+	ELIF "c1"
+		IsEqual(%Water_PowerLevel,3)
+	THEN
+		CharacterPlayLoopEffect(%FXHandle_WaterBubs1,__Me,"FX_Creatures_Skills_Spider_SpinningWaterBall_D")
+	ELIF "c1"
+		IsEqual(%Water_PowerLevel,4)
+	THEN
+		CharacterPlayLoopEffect(%FXHandle_WaterBubs1,__Me,"FX_Creatures_Skills_Spider_SpinningWaterBall_A")
+	ENDIF
+	
+//------ KILL ORBITING SPHERES - SECURITY
+EVENT OnTurnEnded_DestroyCanals
+ON
+	OnTurnEnded()
+ACTIONS
+	IF "!c1&c2"
+		IsEqual(%FXHandle_WaterBubs1,0)
+		IsEqual(%Water_PowerLevel,0)
+	THEN
+		StopLoopEffect(%FXHandle_WaterBubs1)
+	ENDIF	
+	IF "!c1&c2"
+		IsEqual(%FXHandle_WaterBubs2,0)
+		IsEqual(%Water_PowerLevel,0)
+	THEN
+		StopLoopEffect(%FXHandle_WaterBubs2)
+	ENDIF
+	IF "!c1&c2"
+		IsEqual(%FXHandle_WaterBubs3,0)
+		IsEqual(%Water_PowerLevel,0)
+	THEN
+		StopLoopEffect(%FXHandle_WaterBubs3)
+	ENDIF	
+	IF "!c1&c2"
+		IsEqual(%FXHandle_WaterBubs4,0)
+		IsEqual(%Water_PowerLevel,0)
+	THEN
+		StopLoopEffect(%FXHandle_WaterBubs4)
+	ENDIF		
+	
+EVENT OnDie_DestroyEffects
+ON
+	OnCombatEnded()
+	OnDeactivate()
+	OnDie(__Me,_,_,_)
+ACTIONS
+	Set(%Water_PowerLevel,0)
+	IF "!c1"
+		IsEqual(%FXHandle_WaterBubs1,0)
+	THEN
+		StopLoopEffect(%FXHandle_WaterBubs1)
+	ENDIF	
+	IF "!c1"
+		IsEqual(%FXHandle_WaterBubs2,0)
+	THEN
+		StopLoopEffect(%FXHandle_WaterBubs2)
+	ENDIF
+	IF "!c1"
+		IsEqual(%FXHandle_WaterBubs3,0)
+	THEN
+		StopLoopEffect(%FXHandle_WaterBubs3)
+	ENDIF	
+	IF "!c1"
+		IsEqual(%FXHandle_WaterBubs4,0)
+	THEN
+		StopLoopEffect(%FXHandle_WaterBubs4)
+	ENDIF		

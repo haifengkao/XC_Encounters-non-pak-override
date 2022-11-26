@@ -1,0 +1,61 @@
+INIT
+ITEM:__Me
+EXTERN STRING:%Event0=null
+EXTERN STRING:%Event1=null
+
+EXTERN INT:%CurrentState = 0
+INT:%WantedState = -1
+CHARACTER:%UsedBy = null
+
+EVENTS
+	
+EVENT InitState
+ON
+	OnInit
+ACTIONS
+	Set(%UsedBy,null)
+	IF "c1"
+		IsEqual(%WantedState,-1)
+	THEN
+		Set(%WantedState,%CurrentState)
+		Set(%CurrentState,-1)
+	ENDIF
+	
+EVENT ButtonUse
+VARS
+CHARACTER:_Char
+ON
+	OnUseItem(_Char,__Me)
+ACTIONS
+	IF "c1"
+		IsEqual(%CurrentState,0)
+	THEN
+		Set(%WantedState,1)
+	ELSE
+		Set(%WantedState,0)
+	ENDIF
+	IF "c1"
+		IsEqual(%UsedBy,null)
+	THEN
+		Set(%UsedBy,_Char)
+	ENDIF
+	
+BEHAVIOUR
+
+REACTION StateChange,10
+CHECK "!c1"
+	IsEqual(%CurrentState,%WantedState)
+ACTIONS
+	IF "c1"
+		IsEqual(%WantedState,0)
+	THEN		
+		ItemPlayAnimationTo("Lever",0)
+		CharacterItemEvent(%UsedBy,__Me,%Event0)		
+		ItemPlayEffect(__Me, "FX_GP_CameraShake_B")
+	ELSE		
+		ItemPlayAnimationTo("Lever",1)
+		CharacterItemEvent(%UsedBy,__Me,%Event1)		
+		ItemPlayEffect(__Me, "FX_GP_CameraShake_B")
+	ENDIF
+	Set(%UsedBy,null)
+	Set(%CurrentState,%WantedState)

@@ -1,0 +1,9 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_LoopEffectDisabledInCombat("FX_GP_ExclamationMark_A");
+KBSECTION
+
+EXITSECTION
+
+ENDEXITSECTION

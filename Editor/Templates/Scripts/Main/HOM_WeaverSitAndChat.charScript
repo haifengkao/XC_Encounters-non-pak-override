@@ -1,0 +1,52 @@
+#INCLUDE State_Manager
+
+INIT
+
+CHARACTER:__Me
+CHARACTER:%Icara = CHARACTER:HOM_Icara_f536c5cf-cf2a-47eb-a148-c6e8ee966fb0
+CHARACTER:%Arhu = CHARACTER:CYS_Arhu_ad261b7d-16e1-4d91-b0af-f55edd588c5d
+CHARACTER:%Zixzax = CHARACTER:CYS_Zixzax_53517245-3121-4190-a1fc-afc36524f165
+ITEM:%Seat = ITEM:HOM_Chair_Weaver_b40444ba-f7fd-4f12-b3ac-1b70c9e4482b
+
+BEHAVIOUR
+	
+REACTION WalkToBench, 150
+	USAGE PEACE
+	VARS
+		FLOAT:_dist
+	CHECK "!c1&c2&c3"
+		IsEqual(%Seat,null)
+		GetDistance(_dist,__Me,%Seat)
+		IsGreaterThen(_dist,2.0)
+	ACTIONS
+		CharacterMoveTo(%Seat)
+		CharacterUseItem(%Seat)
+		
+REACTION Sit, 140
+	USAGE PEACE
+	VARS
+		INT:_dialogtype
+	CHECK "!c1"
+			IsEqual(%Seat,null)
+	ACTIONS
+		IF "!c1&!c2"
+			CharacterHasStatus(__Me,"SITTING")
+			CharacterHasStatus(__Me,"LYING")
+		THEN
+			CharacterUseItem(%Seat)
+		ENDIF
+		Sleep(15)
+		IF "!c1&!c2&!c3&!c4"
+			IsInDialog(__Me)
+			IsInDialog(%Icara)
+			IsInDialog(%Arhu)
+			IsInDialog(%Zixzax)
+		THEN
+			CharacterEvent(__Me,"PlayHomDialog")
+		ENDIF
+
+REACTION State_IdleAtPortal, 0
+USAGE PEACE
+ACTIONS
+	CharacterLookFrom(TRIGGER:HOM_Weaver_AtGate_a4da1666-4d7e-45c1-8f10-a4eb3d9995e9)
+	Sleep(2.0)

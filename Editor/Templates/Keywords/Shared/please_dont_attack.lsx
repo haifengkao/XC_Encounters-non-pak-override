@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<save>
+    <header version="2" time="1417529182" />
+    <version major="1" minor="3" revision="0" build="0" />
+    <region id="keywordDialog">
+        <node id="root">
+            <attribute id="KeywordVoiced" value="0" type="19" />
+            <attribute id="PlayGreeting" value="0" type="19" />
+            <attribute id="keywordAutoImport" value="1" type="19" />
+            <attribute id="keywordName" value="please_dont_attack" type="22" />
+            <children>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="3cfa35d3-9374-421b-8995-bec746c58f76" type="22" />
+                    <attribute id="keywordContentMapValue" value="Oy! Have you been possessed by a Sourcerer? Aim your weapon somewhere else!" handle="hacbbf227g0ecbg4aabg9fa8gde69a28a0244" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="75730a70-1dd4-402e-9027-2d96c55f2607" type="22" />
+                    <attribute id="keywordContentMapValue" value="Hey, that hurt! Please be a bit more careful, would you?" handle="h670ced95g1749g4627g9f17gb5c7cabe09bf" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="84c98236-cca2-447b-8f73-74c89ca264a7" type="22" />
+                    <attribute id="keywordContentMapValue" value="Greeting" handle="h7f890f24g8572g4902g90b4gd362b7e9bdf2" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="ffba35b6-2a57-4ad4-9c5b-499a2f9ba0ed" type="22" />
+                    <attribute id="keywordContentMapValue" value="Ow! What did you do that for? Exercise some caution, why don&apos;t you?" handle="h47ce5bacgdedag4465g89ddgafef43e3799c" type="28" />
+                </node>
+                <node id="keywordNode">
+                    <attribute id="keywordActions" value="" type="23" />
+                    <attribute id="keywordConditions" value="" type="23" />
+                    <attribute id="keywordDisplayedText" value="84c98236-cca2-447b-8f73-74c89ca264a7" type="22" />
+                    <attribute id="keywordId" value="Greeting" type="22" />
+                    <attribute id="keywordLast" value="0" type="19" />
+                    <attribute id="keywordOwner" value="-1" type="4" />
+                    <attribute id="keywordShow" value="0" type="19" />
+                    <attribute id="keywordSource" value="0" type="5" />
+                    <children>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value="" type="23" />
+                            <attribute id="keywordEmotion" value="1" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="1" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="75730a70-1dd4-402e-9027-2d96c55f2607" type="22" />
+                                </node>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="ffba35b6-2a57-4ad4-9c5b-499a2f9ba0ed" type="22" />
+                                </node>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="3cfa35d3-9374-421b-8995-bec746c58f76" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="keywordSpeakerNames" />
+            </children>
+        </node>
+    </region>
+</save>

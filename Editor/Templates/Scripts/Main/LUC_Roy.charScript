@@ -1,0 +1,92 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+TRIGGER:%Point1 = LUC_PointRoy1_e78ac6e5-ca52-4cd3-abf9-a48e84be4889
+TRIGGER:%Point2 = LUC_PointRoy2_77f0d34b-8f97-410a-b917-62db167cf2f4
+TRIGGER:%Point3 = LUC_PointRoy3_7ecc603a-2be4-49f1-aad7-c0e4fa0e0734
+TRIGGER:%Point4 = LUC_PointRoySilverglen_9b44ad5e-10d7-4931-ae81-e3eb86381e82
+CHARACTER:%Timfred = LUC_Timfred_e59f80b7-6de9-41e9-a4c2-f76e17f604fc
+CHARACTER:%Maurice = LUC_Maurice_723d15e1-d8a8-4797-b9a4-d7d4dc271727
+
+BEHAVIOUR
+
+REACTION State_GuardingAnimals, 0
+USAGE PEACE
+ACTIONS
+	GetWeightedRandom(%currentAction,"Action_GoToCows",INT:15,"Action_Wait",INT:5)
+	SetPriority(%currentAction,1100)
+
+REACTION State_StoppingTimfred, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Text
+	FIXEDSTRING:_Animation
+ACTIONS
+	CharacterMoveTo(%Point3,1)
+	CharacterLookAt(%Timfred)
+	GetRandom(_Animation,"Point_01","Halt_01")
+	GetRandom(_Text,"LUC_Roy_1","LUC_Roy_2")
+	CharacterPlayAnimation(_Animation)
+	DisplayText(__Me,_Text,5)
+	Sleep(5)
+	Set(%currentState,"State_GuardingAnimals")
+INTERRUPT
+	Set(%currentState,"State_GuardingAnimals")
+
+REACTION State_InSilverglen, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	CharacterMoveTo(%Point4)
+	CharacterLookFrom(%Point4)
+	GetRandom(_Animation,"Dust_Off_01","Stand_Read_01","Tired_01")
+	CharacterPlayAnimation(_Animation)
+	Sleep(8)
+
+REACTION Action_GoToCows, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Text
+	FIXEDSTRING:_Animation
+ACTIONS
+	CharacterWander(FLOAT:4,3,0,%Point1)
+	Sleep(2)
+	CharacterMoveTo(%Point1)
+	CharacterLookFrom(%Point1)
+	Sleep(1)
+	GetRandom(_Animation,"Sooth_01","No_01","No_02")
+	GetRandom(_Text,"LUC_Roy_3","LUC_Roy_4")
+	DisplayText(__Me,_Text,10)
+	Sleep(10)
+	SetPriority(%currentAction,0)
+INTERRUPT
+	SetPriority(%currentAction,0)
+
+REACTION Action_Wait, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	CharacterMoveTo(%Point2)
+	CharacterLookFrom(%Point2)
+	Sleep(1)
+	GetRandom(_Animation,"Dust_Off_01","Yawn_01","Tired_01")
+	CharacterPlayAnimation(_Animation)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)
+
+EVENTS
+
+EVENT TimfredLeaves
+ON
+	OnCharacterEvent(__Me,"TimfredLeaves")
+ACTIONS
+	IF "!c1"
+		IsInDialog(__Me)
+	THEN
+		Set(%currentState,"State_StoppingTimfred")
+	ENDIF

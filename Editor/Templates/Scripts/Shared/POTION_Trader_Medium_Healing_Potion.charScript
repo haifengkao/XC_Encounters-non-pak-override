@@ -1,0 +1,51 @@
+#TEMPLATE "_POTION_Base" : Trader_Medium_Healing_Potion
+
+INIT
+CHARACTER:__Me
+// [GLOBAL_VARS]
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_Trader_Medium_Healing_Potion
+VARS
+	FLOAT:_Score
+	CHARACTER:_SkillTargetChar_Trader_Medium_Healing_Potion
+	// [CALC_TARGET_VARS]
+	FLOAT:_StatVitality
+	// [~CALC_TARGET_VARS]
+ON
+	OnFunction("CalculateScore_Trader_Medium_Healing_Potion")
+ACTIONS		
+	Set(_Score, 0)
+	Set(_SkillTargetChar_Trader_Medium_Healing_Potion, 0)
+	// [GLOBAL_ACTIONS]
+	// [~GLOBAL_ACTIONS]
+	
+	// [CALC_TARGET_PRE_ACTIONS]
+	// [~CALC_TARGET_PRE_ACTIONS]
+	// [CALC_TARGET_CHECK]
+	IF "((c1&c2)|c3)"
+	    CharacterGetStat(_StatVitality, __Me, Vitality) // c1
+	    IsLessThen(_StatVitality, 0.5) // c2
+	    IsLessThen(_StatVitality, 0.2) // c3
+	THEN
+	    // Hostile count score calculation
+	    Add(_Score, 10.0) // HostileWeight
+	    
+	    Set(_SkillTargetChar_Trader_Medium_Healing_Potion, __Me)
+	ENDIF
+	// [~CALC_TARGET_CHECK]
+	
+	IF "!c1"
+		IsEqual(_SkillTargetChar_Trader_Medium_Healing_Potion, null)
+	THEN
+		Add(%ActionScore_Trader_Medium_Healing_Potion, _Score)
+	ELSE
+		Set(%ActionScore_Trader_Medium_Healing_Potion, 0)
+	ENDIF
+

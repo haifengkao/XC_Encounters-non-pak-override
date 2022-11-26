@@ -1,0 +1,159 @@
+INIT
+	INT:%DamageOnDeath=1
+	INT:%EffectHandle=null
+	INT:%SparkleBlock=0
+	CHARACTER:__Me
+
+//---------------------
+BEHAVIOUR
+REACTION SuicideBomber_MakeSelfExplode, 1001
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+CHECK "c1"
+	CharacterGet(_Enemy,__Me,2,Lowest,Distance,Enemy,null,null)
+ACTIONS
+	IF "!c1&!c2"
+		CharacterHasStatus(__Me, WET)
+		CharacterHasStatus(__Me, FROZEN)
+	THEN
+		CharacterDie(__Me)
+	ELSE
+		DisplayText(__Me,"CMB_BabyBomberCannotExplode",2)
+		CharacterEndTurn()
+	ENDIF
+	
+//---------------------	
+EVENTS
+EVENT DoNoDamageIfWetOrFrozen
+VARS
+	STATUS:_Status
+ON
+	OnCharacterStatus(__Me,_Status)
+ACTIONS
+	IF "c1|c2"
+		IsEqual(_Status,WET)
+		IsEqual(_Status,FROZEN)
+	THEN
+		DisplayText(__Me,CMB_BabyBomberIsWet,2)
+		Set(%DamageOnDeath,0)
+	ENDIF
+
+EVENT ResetDamageIfNoStatus
+VARS
+	STATUS:_Status
+ON
+	OnCharacterStatusRemoved(__Me,_Status)
+ACTIONS
+	IF "(c1|c2)&!c3&!c4"
+		IsEqual(_Status,WET)
+		IsEqual(_Status,FROZEN)
+		CharacterHasStatus(__Me,WET)
+		CharacterHasStatus(__Me,FROZEN)
+	THEN
+		Set(%DamageOnDeath,1)
+	ENDIF
+
+EVENT DieOnDamage
+VARS
+	DAMAGE:_Type
+ON
+	OnDamage(_Type,_,_,_)
+ACTIONS
+	IF "c1"
+		IsEqual(_Type,Fire)
+	THEN
+		CharacterDie(__Me)
+	ENDIF
+	
+EVENT ExplodeOnDeath
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	IF "c1"
+		IsEqual(%DamageOnDeath,1)
+	THEN
+		ExplodeAt(__Me,Projectile_SuicideBomberExplosion)
+	ENDIF
+	StopTimer("startSparks")
+	StopLoopEffect(%EffectHandle)
+	
+EVENT StatusAdd
+VARS
+	STATUS:_Status
+ON
+	OnCharacterStatus(__Me, _Status)
+ACTIONS
+	IF "c1|c2|c3"
+		IsEqual(_Status, STATUS:CHILLED)
+		IsEqual(_Status, STATUS:FROZEN)
+		IsEqual(_Status, STATUS:WET)
+	THEN
+		IF "c1"
+			IsEqual(%SparkleBlock,0)
+		THEN
+			StopTimer("startSparks")
+			StopLoopEffect(%EffectHandle)
+			Set(%EffectHandle,0)
+		ENDIF
+		Add(%SparkleBlock,1)				
+	ENDIF
+	
+EVENT StatusRemoved 
+VARS
+	STATUS:_Status
+ON
+	OnCharacterStatusRemoved(__Me, _Status)
+ACTIONS
+	IF "c1|c2|c3"
+		IsEqual(_Status, STATUS:CHILLED)
+		IsEqual(_Status, STATUS:FROZEN)
+		IsEqual(_Status, STATUS:WET)
+	THEN
+		Subtract(%SparkleBlock,1)
+		IF "c1"
+			IsEqual(%SparkleBlock,0)
+		THEN
+			StartTimer("startSparks", 1, 0)
+		ENDIF
+	ENDIF
+	
+EVENT Timer
+ON
+	OnTimer("startSparks")
+ACTIONS
+	IF "!c1"
+		CharacterIsDead(__Me)
+	THEN
+		CharacterPlayLoopEffect(%EffectHandle, __Me, "FX_GP_Bomber_Sparks", "Bip001 Bomb02")
+	ENDIF
+
+EVENT Initialize
+ON
+	OnInit()
+ACTIONS
+	Set(%EffectHandle,0)
+	IF "c1"
+		IsEqual(%SparkleBlock,0)
+	THEN
+		StartTimer("launcheffect", 1, 0)
+	ENDIF
+
+EVENT launcheffect
+ON
+	OnTimer("launcheffect")
+ACTIONS
+	IF "c1&!c2"
+		IsEqual(%SparkleBlock,0)
+		CharacterIsDead(__Me)
+	THEN
+		CharacterPlayLoopEffect(%EffectHandle, __Me, "FX_GP_Bomber_Sparks", "Bip001 Bomb02")
+	ENDIF
+	
+EVENT ShutDown
+ON
+	OnShutdown()
+ACTIONS
+	StopTimer("startSparks")
+	StopLoopEffect(%EffectHandle)
+	Set(%EffectHandle,0)

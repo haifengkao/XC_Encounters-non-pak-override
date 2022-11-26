@@ -1,0 +1,116 @@
+INIT
+
+	CHARACTER:__Me
+	ITEM:%Totem = LUC_GV_InvisibleTotem_2c6d600e-566c-4a72-a6a4-d972a58d370e
+	EXTERN TRIGGER:%MyPoint = null
+	EXTERN TRIGGER:%MyPointAroundTotem = null
+
+BEHAVIOUR
+
+REACTION GoToTotem, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterMoveTo(%MyPointAroundTotem,0,1)
+		CharacterLookAt(%Totem)
+		ItemEvent(%Totem, "GoblinArrived")
+		SetPriority("GoToTotem", 0)
+		
+REACTION GoToTent, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterMoveTo(%MyPoint,0,1)
+		CharacterLookFrom(%MyPoint)
+		SetPriority("Dance", 0)
+		SetPriority("Die", 0)
+		SetPriority("GetDown", 0)
+		SetPriority("GetUp", 0)
+		SetPriority("GoToTent", 0)
+		
+REACTION Dance, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterPlayAnimation("Dance_01",0,1)
+	INTERRUPT
+		Reset()
+		
+REACTION GetDown, 0
+	USAGE PEACE
+	VARS
+		FLOAT:_Timer
+	ACTIONS
+		GetRandomBetween(_Timer, 0, 0.5)
+		Sleep(_Timer)
+		CharacterPlayAnimation("knockdown_fall",0,1)
+		CharacterPlayAnimation("knockdown_loop",0,0)
+		Label("LoopAnim")
+		Goto("LoopAnim")
+	INTERRUPT
+		Reset()
+	
+REACTION GetUp, 0
+	USAGE PEACE
+	VARS
+		FLOAT:_Timer
+	ACTIONS
+		GetRandomBetween(_Timer, 0, 0.5)
+		Sleep(_Timer)
+		CharacterPlayAnimation("knockdown_getup")
+		SetPriority("GetUp", 0)
+	INTERRUPT
+		Reset()
+		
+REACTION Die, 0
+	USAGE PEACE
+	VARS
+		FLOAT:_Timer
+	ACTIONS
+		GetRandomBetween(_Timer, 0.2, 1)
+		Sleep(_Timer)
+		CharacterPlayAnimation("die_acid", 0, 1)
+		CharacterSetOffStage()
+		
+EVENTS
+
+EVENT GatherAtTotem
+	ON
+		OnItemEvent(%Totem, "gatherRound")
+	ACTIONS
+		SetPriority("GoToTotem", 1000)
+		
+EVENT GoBackAtSpot
+	ON
+		OnItemEvent(%Totem, "goBackTent")
+	ACTIONS
+		SetPriority("GoToTent", 10000)
+
+EVENT Dancing
+	ON
+		OnItemEvent(%Totem, "DanceForMe")
+	ACTIONS
+		SetPriority("Dance", 1000)
+
+EVENT Dying
+	ON
+		OnItemEvent(%Totem, "DieForMe")
+	ACTIONS
+		SetPriority("Die", 1000)
+		
+EVENT GetDown
+	ON
+		OnItemEvent(%Totem, "GetDown")
+	ACTIONS
+		SetPriority("GetDown", 1000)
+		
+EVENT GetUp
+	ON
+		OnItemEvent(%Totem, "GetUp")
+	ACTIONS
+		SetPriority("GetDown", 0)
+		SetPriority("GetUp", 1000)
+
+EVENT Respawn
+	ON
+		OnCharacterEvent(__Me, "Resurected")
+	ACTIONS
+		SetPriority("GoToTent", 10000)
+		SetPriority("Die", 0)

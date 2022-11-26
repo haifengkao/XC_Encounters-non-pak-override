@@ -1,0 +1,31 @@
+INIT 
+CHARACTER:__Me
+EXTERN INT:%IAmASummonedCyclops=1
+CHARACTER:%Eye=null	//this will be used by DAF_Cyclops_Spotter.charscript
+	
+//--------------
+EVENTS
+EVENT OnInitApplyGhostMaterial
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		IsEqual(%IAmASummonedCyclops,0)
+	THEN
+		SetMaterial(__Me,3c7f47ad-4fc2-4e9d-a3c2-b5f9c10b0d4a,-1,1,1,1)
+	ENDIF
+
+EVENT OnDiePlayCoolEffectAndDisappear
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	IF "c1"
+		IsEqual(%IAmASummonedCyclops,1)
+	THEN
+		CharacterEvent(%Eye,"DAF_DarkMarsh_CyclopsDied_Event")
+	ELIF "c1"
+		IsEqual(%IAmASummonedCyclops,0)
+	THEN
+		PlayEffectAt(__Me,"FX_GP_TeleportSmoke_A")
+		CharacterSetOffStage()
+	ENDIF

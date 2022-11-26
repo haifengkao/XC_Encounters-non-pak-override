@@ -1,0 +1,12 @@
+INIT
+
+ITEM:__Me
+
+
+EVENTS
+	
+EVENT OnInit
+ON
+	OnInit()
+ACTIONS
+	SetMaterial(__Me,"11c0f89a-6b41-4e00-947a-6e7ca42c573e",-1,1,1,1,1,0,0)

@@ -1,0 +1,76 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_CYSBraccusBoss(CHARACTER_CYS_Lighthouse_Horror_Braccus,CHARACTER_CYS_LighthouseSkeletonBoss);
+DB_CYSBraccusBoss(CHARACTER_CYS_SkeletonKing_Braccus,CHARACTER_CYS_SkeletonKing);
+DB_CYSBraccusBoss(CHARACTER_CYS_Chimera_Braccus,CHARACTER_CYS_Chimera);
+KBSECTION
+PROC
+ProcCYSSpawnBraccusBoss((CHARACTER)_Char,(TRIGGER)_Trig)
+THEN
+CharacterAppearAtTrigger(_Char,_Trig,1);
+ProcCYSDealWithCysealBraccusBoss(_Char);
+
+PROC
+ProcCYSDealWithCysealBraccusBoss((CHARACTER)_Char)
+AND
+DB_CYSBraccusBoss(_Char,_CysealChar)
+AND
+DB_Dead(_CysealChar)
+THEN
+CharTimer(_Char,"DoBraccusBossComment",1000);
+
+IF
+CharTimerFinished(_Char,"DoBraccusBossComment")
+AND
+NOT DB_Dead(_Char)
+THEN
+DialogStartOneSpeakerDialog("CYS_AD_BraccusBossResurrected",_Char);
+
+PROC
+ProcCYSDealWithCysealBraccusBoss((CHARACTER)_Char)
+AND
+DB_CYSBraccusBoss(_Char,_CysealChar)
+AND
+NOT DB_Dead(_CysealChar)
+THEN
+DialogRequestStopForCharacter(_CysealChar);
+CharacterLeaveCombat(_CysealChar);
+Poof(_CysealChar);
+_CysealChar.DB_DoingBraccusFight();
+
+PROC
+ProcCYSDealWithCysealBraccusBoss(CHARACTER_CYS_SkeletonKing_Braccus)
+AND
+DB_CYSBraccusBoss(CHARACTER_CYS_SkeletonKing_Braccus,_CysealChar)
+AND
+NOT DB_Dead(_CysealChar)
+AND
+NOT DB_CYSSkeletonKingSummoningSkeletons(1)
+AND
+NOT DB_OneShotPlayerTrigger(TRIGGER_CYS_Box_SkeletonKingDialog)
+THEN
+ProcCYSSkeletonKingStartFight();
+
+IF
+DB_Dead(_BraccusBoss)
+AND
+DB_CYSBraccusBoss(_BraccusBoss,_CysealChar)
+AND
+NOT DB_Dead(_CysealChar)
+THEN
+NOT _CysealChar.DB_DoingBraccusFight();
+Foop(_CysealChar);
+
+IF
+CharacterEnteredCombat(_CysealChar,_)
+AND
+DB_CYSBraccusBoss(_BraccusBoss,_CysealChar)
+AND
+DB_Dead(_BraccusBoss)
+THEN
+DialogStartOneSpeakerDialog("CYS_AD_BraccusBossResurrected",_CysealChar);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

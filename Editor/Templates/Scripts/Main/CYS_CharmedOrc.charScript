@@ -1,0 +1,24 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	CHARACTER:%Guard = CYS_CharmedOrcGuard2_5a647c1b-c340-4908-b13f-a5285084dc9f
+
+BEHAVIOUR
+
+REACTION State_Idling, 0
+	USAGE PEACE
+	ACTIONS
+		GetRandom(%currentAction, "Action_Flirt")
+		SetPriority(%currentAction, 1100)
+
+REACTION Action_Flirt, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterLookAt(%Guard)
+		DialogStart("CYS_AD_CharmedOrc",__Me)
+		Sleep(15)
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)

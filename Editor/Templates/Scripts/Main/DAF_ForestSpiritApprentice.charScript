@@ -1,0 +1,20 @@
+INIT
+
+CHARACTER:__Me
+INT:%State = 0
+
+BEHAVIOUR
+REACTION main, 1000
+USAGE PEACE
+ACTIONS
+	Sleep(4)
+	DialogStart("DAF_AD_ForestSpiritApprentice",__Me)
+	CharacterPlayAnimation("unsheath")
+	Sleep(3)
+
+EVENTS
+EVENT CombatStopsDialog
+ON
+	OnCombatStarted()
+ACTIONS
+	DialogRequestStop("DAF_AD_ForestSpiritApprentice")

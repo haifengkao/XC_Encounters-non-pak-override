@@ -1,0 +1,36 @@
+#INCLUDE Base
+
+INIT
+USING Base
+CHARACTER:__Me
+EXTERN STRING:%DialogString = ""
+INT:%IsSelling = 1
+
+BEHAVIOUR
+
+REACTION SellingWares, 1050
+USAGE PEACE
+VARS
+	CHARACTER:_Player
+	FLOAT:_Wait
+CHECK "c1"
+	IsEqual(%IsSelling, 1)
+ACTIONS
+	IF "c1"
+		CharacterGet(_Player,__Me,6,Lowest,Distance,Player)
+	THEN
+		CharacterLookAt(_Player,0)
+	ENDIF
+	IF "c1"
+		IsRandom(0.33)
+	THEN
+		DialogStart(%DialogString, __Me)
+		GetRandomBetween(_Wait,3.0,6.0)
+		Sleep(_Wait)
+	ENDIF
+	
+	Sleep(5)
+
+EVENTS
+	
+STORY

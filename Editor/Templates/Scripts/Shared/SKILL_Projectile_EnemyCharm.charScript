@@ -1,0 +1,124 @@
+#TEMPLATE "_SKILL_Base" : Projectile_EnemyCharm
+
+INIT
+CHARACTER:__Me
+FLOAT:%SkillTargetScore_Projectile_EnemyCharm=-1000000
+// [GLOBAL_VARS]
+INT:%ClassScore_Projectile_EnemyCharm
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_Projectile_EnemyCharm
+VARS
+	// [CALC_VARS]
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_Projectile_EnemyCharm")
+ACTIONS
+	Set(%SkillTargetScore_Projectile_EnemyCharm, -1000000)
+
+	// [CALC_ACTIONS_PRE]
+	Set(%ClassScore_Projectile_EnemyCharm, 0)
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	IterateCharactersInCombat(__Me, "CalculateTarget_Projectile_EnemyCharm", Random, Vitality)
+	IF "!c1"
+		IsEqual(%SkillTargetChar_Projectile_EnemyCharm, null)
+	THEN
+		Add(%ActionScore_Projectile_EnemyCharm, %SkillTargetScore_Projectile_EnemyCharm)
+	ENDIF
+	// [~CALC_ACTIONS]
+
+	
+
+	
+// Calculate the character we should attack
+EVENT CalculateTarget_Projectile_EnemyCharm
+VARS	
+	CHARACTER:_Char
+	// [CALC_TARGET_VARS]
+	INT:_ClassScore_Projectile_EnemyCharm
+	FLOAT:_StatVitality
+	FLOAT:_Score
+	FLOAT:_SkillRangeMin
+	FLOAT:_SkillRangeMax
+	FLOAT:_DistanceToChar
+	FLOAT:_DistanceScore
+	// [~CALC_TARGET_VARS]
+ON
+	OnIterateCharacter(_Char, "CalculateTarget_Projectile_EnemyCharm")	
+ACTIONS
+	// [CALC_CHAR_TARGET_ACTIONS_PRE]
+	Set(_ClassScore_Projectile_EnemyCharm, %ClassScore_Projectile_EnemyCharm)
+	Set(_Score, 0.0)
+	// [~CALC_CHAR_TARGET_ACTIONS_PRE]
+	// [CALC_CHAR_TARGET_ACTIONS]
+	IF "(!c1&!c2&!c3)&(c4)&(!((((((((((c5)|c6)|c7&c8)|c9)|c10)|c11)|c12)|c13)|c14)|c15))&(c16)&(c17)&(c18)"
+	    CharacterIsDead(_Char) // c1
+	    CharacterHasStatus(_Char, INVISIBLE) // c2
+	    CharacterHasStatus(_Char, SNEAKING) // c3
+	    CharacterIsBetterOrEqualClass(_Char, %ClassScore_Projectile_EnemyCharm, _ClassScore_Projectile_EnemyCharm, 5, 4, 1, 3, 2) // c4
+	    CharacterHasStatus(_Char, CHARMED) // c5
+	    CharacterHasStatus(_Char, AGGRO_MARKED) // c6
+	    CharacterGetStat(_StatVitality, _Char, Vitality) // c7
+	    IsLessThen(_StatVitality, 0.2) // c8
+	    IsLessThen(_StatVitality, 0.5) // c9
+	    CharacterHasStatus(_Char, PETRIFIED) // c10
+	    CharacterHasStatus(_Char, FROZEN) // c11
+	    CharacterHasStatus(_Char, FEAR) // c12
+	    CharacterHasStatus(_Char, KNOCKED_DOWN) // c13
+	    CharacterHasStatus(_Char, INFECTIOUS_DISEASED) // c14
+	    CharacterHasStatus(_Char, STUNNED) // c15
+	    CharacterIsEnemy(__Me, _Char) // c16
+	    CharacterGetSkillRange(_SkillRangeMin, _SkillRangeMax, __Me, Projectile_EnemyCharm) // c17
+	    GetDistance(_DistanceToChar, __Me, _Char) // c18
+	THEN
+	    Set(%ClassScore_Projectile_EnemyCharm, _ClassScore_Projectile_EnemyCharm)
+	    // Hostile count score calculation
+	    Add(_Score, 10.0) // HostileWeight
+	    
+	    // Range score calculation
+	    Set(_DistanceScore, _DistanceToChar)
+	    IF "(c1)"
+	        IsGreaterThen(_DistanceScore, _SkillRangeMax) // c1
+	    THEN
+	        Subtract(_DistanceScore, _SkillRangeMax)
+	        Multiply(_DistanceScore, -1.0)
+	    ELIF "(c1)"
+	        IsLessThen(_DistanceScore, _SkillRangeMin) // c1
+	    THEN
+	        Subtract(_DistanceScore, _SkillRangeMin)
+	        Multiply(_DistanceScore, 1.0)
+	    ELSE 
+	        Set(_DistanceScore, 0.0)
+	    ENDIF
+	    Add(_Score, _DistanceScore)
+	    
+	    // Can see score calculation
+	    IF "!c1"
+	    	CharacterCanSee(__Me, _Char)
+	    THEN
+	    	Add(_Score, -10.0)
+	    ENDIF
+	    
+	    IF "c1"
+	    	IsGreaterThen(_Score, %SkillTargetScore_Projectile_EnemyCharm)
+	    THEN
+	    	Set(%SkillTargetChar_Projectile_EnemyCharm, _Char)
+	    	Set(%SkillTargetScore_Projectile_EnemyCharm, _Score)
+	    ENDIF	
+	ENDIF
+	// [~CALC_CHAR_TARGET_ACTIONS]
+	
+	
+	
+	
+	
+	
+	
+	

@@ -1,0 +1,47 @@
+#INCLUDE Prostitute
+
+INIT
+USING Prostitute
+CHARACTER:%Bicky = LUC_Bicky_33b880d2-cd7f-4607-8882-848e3679efa5
+
+BEHAVIOUR
+
+REACTION State_Waiting, 0
+USAGE PEACE
+ACTIONS
+	Sleep(2)
+	IF "!c1"
+		CharacterHasStatus(__Me, SITTING)
+	THEN
+	CharacterUseItem(LUC_BonnieBench_1f2cfdc8-ed16-4412-a65c-4b60f8e02354)
+	ENDIF
+
+REACTION State_Saved, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	Sleep(2)
+	GetRandom(_Animation,"Beg_01","Cower_01","Cower_02")
+	CharacterLookAt(%Bicky)
+	CharacterPlayAnimation(_Animation)
+INTERRUPT
+	Reset()
+
+REACTION State_Panic, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	Sleep(3)
+	IF "c1"
+		IsRandom(0.5)
+	THEN
+		CharacterLookAt(%Bicky)
+		CharacterEvent(%Bicky,"DialogRequest")
+	ELSE
+		GetRandom(_Animation,"Beg_01","Cower_01","Cower_02")
+		CharacterPlayAnimation(_Animation)
+	ENDIF
+INTERRUPT
+	Reset()

@@ -1,0 +1,89 @@
+#INCLUDE Base
+
+INIT
+USING Base
+CHARACTER:__Me
+
+INT:%State = 0
+
+BEHAVIOUR
+
+REACTION ReactOnPlayerOutside, 1060
+USAGE PEACE
+VARS
+	CHARACTER:_player
+CHECK "c1&c2"
+	IsEqual(%State,0)
+	CharacterGet(_player, __Me, 6, COMPARE:Lowest, Distance, Player)
+ACTIONS
+	CharacterLookAt(_player)
+	DialogStart("DAF_AD_JinxikaCat",__Me)
+	Sleep(5)
+
+
+REACTION PatrolOutside,1050
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%State,0)
+ACTIONS
+	CharacterWander(TRIGGER:DAF_Area_JinxikaCatOutsideVillage_468873a1-7075-427b-91a9-925d1e7cb377,5,0,__Me)
+	Sleep(5)
+	
+
+REACTION ReactOnPlayerInside, 1060
+USAGE PEACE
+VARS
+	CHARACTER:_player
+CHECK "c1&c2"
+	IsEqual(%State,1)
+	CharacterGet(_player, __Me, 6, COMPARE:Lowest, Distance, Player)
+ACTIONS
+	CharacterLookAt(_player)
+	Sleep(5)
+
+
+REACTION PatrolInside,1050
+USAGE PEACE
+VARS
+	FLOAT:_Dist
+	TRIGGER:_Trigger = DAF_Area_JinxikaCatInsideVillage_fb39ccb7-810b-40dc-80a8-a0a80390065b
+CHECK "c1"
+	IsEqual(%State,1)
+ACTIONS
+	IF "c1&c2"
+		GetDistance(_Dist,_Trigger,__Me)
+		IsGreaterThen(_Dist,20.0)
+	THEN
+		CharacterMoveTo(_Trigger,1,1,1)
+	ENDIF
+	CharacterWander(_Trigger,5,0,__Me)
+	Sleep(5)
+
+EVENTS
+EVENT JinxIsInVillage
+ON
+	OnGlobalEventSet("DAF_JinxInsideVillage")
+ACTIONS
+	Set(%State,1)
+
+EVENT JinxFollowsPlayerIn
+ON
+	OnGlobalEventSet("DAF_JinxikaLeftForVillage")
+ACTIONS
+	Set(%State,1)
+
+EVENT Init
+ON
+	OnInit()
+ACTIONS
+	CharacterForceUpdate(1)
+
+EVENT Died
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	CharacterForceUpdate(0)
+
+
+
+

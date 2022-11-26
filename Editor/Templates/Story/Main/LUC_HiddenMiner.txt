@@ -1,0 +1,140 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+ProcTriggerRegisterForPlayers(TRIGGER_LUC_BoxMikeTheMiner);
+
+CharacterSetHasDialog(CHARACTER_LUC_MikeTheMiner,0);
+
+HiddenCratesDB(ITEM_LUC_HidingCrate1);
+HiddenCratesDB(ITEM_LUC_HidingCrate2);
+
+DB_PlayerComments("LUC_M_CommentMikeDied","LUC_M_CommentMikeDied_1_1",1,1);
+DB_PlayerComments("LUC_M_CommentMikeDied","LUC_M_CommentMikeDied_2_1",2,1);
+DB_PlayerComments("LUC_M_CommentMikeDied","LUC_M_CommentMikeDied_2_2",2,2);
+
+CharacterSetOnStage(CHARACTER_LUC_MikeTheMiner, 0);
+KBSECTION
+//-----------------------------------------------//
+//------------------ HIDDEN MINER ---------------//
+//-----------------------------------------------//
+
+IF
+CharacterEnteredTrigger(_Player,TRIGGER_LUC_BoxMikeTheMiner)
+AND
+NOT DB_OnlyOnce("LUC_AD_MikeTheMiner")
+THEN
+DialogStartOneSpeakerItemDialog("LUC_AD_MikeTheMiner",ITEM_LUC_HidingCrate1);
+DB_OnlyOnce("LUC_AD_MikeTheMiner");
+
+IF
+ItemMoved(_Crate)
+AND
+HiddenCratesDB(_Crate)
+AND
+NOT isDestroyed(ITEM_LUC_HidingCrate1)
+AND
+NOT DB_OnlyOnce("LUC_M_MeetMike")
+THEN
+isMoved(ITEM_LUC_HidingCrate1);
+CharacterSetOnStage(CHARACTER_LUC_MikeTheMiner, 1);
+DialogRequestStopForItem("LUC_AD_MikeTheMiner",ITEM_LUC_HidingCrate1);
+TimerLaunch("MikeTheMinerDialog",500);
+
+IF
+TimerFinished("MikeTheMinerDialog")
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_LUC_MikeTheMiner,_Player)
+THEN
+CharacterLookAtCharacter(CHARACTER_LUC_MikeTheMiner, _Player);
+PROC_MendatoryDialog("LUC_MikeTheMiner", CHARACTER_LUC_MikeTheMiner, _Player);
+DB_OnlyOnce("LUC_M_MeetMike");
+
+IF
+DB_NoMoreQueued(CHARACTER_LUC_MikeTheMiner, "LUC_MikeTheMiner")
+THEN
+CharacterSetCanFight(CHARACTER_LUC_MikeTheMiner, 1);
+CharacterSetFaction(CHARACTER_LUC_MikeTheMiner, "Evil NPC");
+
+IF
+ItemDestroyed(_Crate)
+AND
+HiddenCratesDB(_Crate)
+AND
+NOT isMoved(ITEM_LUC_HidingCrate1)
+AND
+NOT DB_OnlyOnce("LUC_M_MeetMike")
+THEN
+isDestroyed(ITEM_LUC_HidingCrate1);
+DialogRequestStopForItem("LUC_AD_MikeTheMiner",ITEM_LUC_HidingCrate1);
+TimerLaunch("MikeTheMinerDialog",500);
+CharacterSetOnStage(CHARACTER_LUC_MikeTheMiner, 1);
+
+IF
+GlobalEventSet("LUC_MikeTheMiner_Run")
+THEN
+CHARACTER_LUC_MikeTheMiner.IsLeaving();
+QuestAdd("LUC_HiddenMiner");
+QuestUpdate("LUC_HiddenMiner","Run");
+QuestClose("LUC_HiddenMiner");
+
+IF
+GlobalEventSet("LUC_MikeTheMiner_Hide")
+THEN
+CHARACTER_LUC_MikeTheMiner.IsHiding();
+ProcTriggerRegisterForPlayers(TRIGGER_LUC_Mine_KillMike);
+QuestAdd("LUC_HiddenMiner");
+QuestUpdate("LUC_HiddenMiner","Hide");
+QuestClose("LUC_HiddenMiner");
+
+
+IF
+CharacterLeftTrigger(_Player,TRIGGER_LUC_Mine_KillMike)
+AND
+CharacterGetOtherPlayer(_Player,_Player2)
+AND
+NOT DB_InRegion(_Player2,TRIGGER_LUC_Mine_KillMike)
+AND
+CHARACTER_LUC_MikeTheMiner.IsHiding()
+AND
+NOT DB_OnlyOnce("LUC_M_KillTheMiner")
+THEN
+CharacterSetOnStage(CHARACTER_LUC_MikeTheMiner,1);
+CharacterDie(CHARACTER_LUC_MikeTheMiner,0);
+DB_OnlyOnce("LUC_M_KillTheMiner");
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_Mine_KillMike);
+ItemDestroy(ITEM_LUC_HidingCrate1);
+ItemDestroy(ITEM_LUC_HidingCrate2);
+
+IF
+DialogEnded("LUC_MikeTheMiner",_)
+AND
+CHARACTER_LUC_MikeTheMiner.IsLeaving()
+THEN
+ProcCharacterMoveToTrigger(CHARACTER_LUC_MikeTheMiner,TRIGGER_LUC_PointMikeTheMiner,1,"LUC_MikeTheMinerLeaving");
+
+IF
+DialogEnded("LUC_MikeTheMiner",_)
+AND
+CHARACTER_LUC_MikeTheMiner.IsHiding()
+THEN
+CharacterSetOnStage(CHARACTER_LUC_MikeTheMiner,0);
+
+IF
+CharacterEvent(CHARACTER_LUC_MikeTheMiner,"LUC_MikeTheMinerLeaving")
+THEN
+CharacterSetOnStage(CHARACTER_LUC_MikeTheMiner,0);
+GoalCompleted;
+
+IF
+CharacterEnteredTrigger(_Player,TRIGGER_LUC_BoxMikeTheMiner)
+AND
+NOT DB_OnlyOnce("LUC_M_MikeDied")
+AND
+DB_OnlyOnce("LUC_M_KillTheMiner")
+THEN
+Launch_PlayerComment(_Player,"LUC_M_CommentMikeDied");
+DB_OnlyOnce("LUC_M_MikeDied");
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

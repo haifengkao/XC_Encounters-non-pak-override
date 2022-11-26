@@ -1,0 +1,52 @@
+INIT
+	CHARACTER:__Me
+	INT:%SleepFXHandle
+	INT:%Bool_FXRestore=0
+
+//------------------------	
+BEHAVIOUR
+REACTION Asleep,150
+USAGE PEACE
+ACTIONS
+	CharacterPlayAnimation("knockdown_loop",0,1)
+	IF "c1"
+		IsEqual(%Bool_FXRestore,0)
+	THEN
+		CharacterPlayLoopEffect(%SleepFXHandle,__Me,"FX_GP_Z_A")
+		Set(%Bool_FXRestore,1)
+	ENDIF
+	
+//------------------------	
+EVENTS
+EVENT OnInit_FXRestore
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		IsEqual(%Bool_FXRestore,1)
+	THEN
+		CharacterPlayLoopEffect(%SleepFXHandle,__Me,"FX_GP_Z_A")
+	ENDIF
+	
+EVENT EnteredCombat
+ON
+	OnCombatStarted()
+ACTIONS
+	SetPriority("Asleep",0)
+	StopLoopEffect(%SleepFXHandle)
+	Set(%Bool_FXRestore,0)
+	
+EVENT LeftCombat
+VARS
+	FLOAT:_TimerValue
+ON
+	OnCombatEnded()
+ACTIONS
+	GetRandomBetween(_TimerValue,4,10)
+	StartTimer("LUC_GoblinBridges_VerySleepy",_TimerValue,0)
+
+EVENT TimerEnds
+ON
+	OnTimer("LUC_GoblinBridges_VerySleepy")
+ACTIONS
+	SetPriority("Asleep",150)

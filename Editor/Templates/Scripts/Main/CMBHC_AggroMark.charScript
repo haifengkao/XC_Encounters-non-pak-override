@@ -1,0 +1,90 @@
+/*
+
+	/!\ THIS SCRIPT ISN'T USED ANYMORE /!\
+	
+INIT
+	CHARACTER:__Me
+	CHARACTER:%Target_MarkedForAggro
+	FLOAT:%MySightRange	
+	INT:%EnemyCount=0
+	INT:%AllyCount=0
+	EXTERN INT:%Bool_ShouldDisplayTexts=1	
+
+//----------
+BEHAVIOUR
+REACTION Cast_IronCommand,500
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2"
+	CharacterCanCast(__Me,"Target_EnemyIronCommand")													//c1
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyIronCommand")							//c2
+ACTIONS
+	IF "((c1|c2)&c3)|(!c4&!c5&!c6)"
+		IsEqual(%Target_MarkedForAggro,null)
+		CharacterIsDead(%Target_MarkedForAggro)
+		CharacterGet(%Target_MarkedForAggro,__Me,%MySightRange,Lowest,Vitality,Enemy)
+		IsEqual(%Target_MarkedForAggro,null)
+		CharacterIsDead(%Target_MarkedForAggro)
+		CharacterHasStatus(%Target_MarkedForAggro,"AGGRO_MARKED")
+	THEN
+		Set(%EnemyCount,0)
+		Set(%AllyCount,0)
+		IterateCharactersInCombat(__Me,"IronCommand_ScanForEnemies",Lowest,Distance)
+		IterateCharactersInCombat(__Me,"IronCommand_ScanForAllies",Lowest,Distance)
+	ENDIF
+	IF "c1&c2"
+		IsGreaterThen(%EnemyCount,1)
+		IsGreaterThen(%AllyCount,1)
+	THEN
+		CharacterMoveInRange(%Target_MarkedForAggro,_MinRange,_MaxRange,1)
+		CharacterUseSkill("Target_EnemyIronCommand",%Target_MarkedForAggro)
+	ENDIF
+	SetPriority("Cast_IronCommand",0)
+
+//----------
+EVENTS
+EVENT OnInit_GiveIronCommandSkill
+ON
+	OnInit()
+ACTIONS
+	IF "c1"	
+		CharacterGetStat(%MySightRange,__Me,Sight)		
+	THEN
+		CharacterAddSkill("Target_EnemyIronCommand")
+	ENDIF
+	
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("Cast_IronCommand",500)
+
+EVENT OnIterateCharacter_CountEnemies
+VARS
+	CHARACTER:_Character
+ON
+	OnIterateCharacter(_Character,"IronCommand_ScanForEnemies")
+ACTIONS
+	IF "c1&!c2"
+		CharacterIsEnemy(__Me,_Character)
+		CharacterIsDead(_Character)
+	THEN
+		Add(%EnemyCount,1)
+	ENDIF
+
+EVENT OnIterateCharacter_CountAllies
+VARS
+	CHARACTER:_Character
+ON
+	OnIterateCharacter(_Character,"IronCommand_ScanForAllies")
+ACTIONS
+	IF "c1&!c2"
+		CharacterIsAlly(__Me,_Character)
+		CharacterIsDead(_Character)
+	THEN
+		Add(%AllyCount,1)
+	ENDIF	
+	
+*/	

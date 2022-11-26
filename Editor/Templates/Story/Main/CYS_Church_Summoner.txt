@@ -1,0 +1,177 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Dialogs(CHARACTER_CYS_Church_Summoner,"CYS_Church_Summoner");
+DB_IsNotMessingAround(CHARACTER_CYS_Church_Summoner);
+DB_IsNotMessingAround(CHARACTER_CYS_Bridge_Troll_Zombie);
+DB_IsNotMessingAround(CHARACTER_CYS_Bridge_Troll_Zombie_Slug);
+DB_EvilDude(CHARACTER_CYS_Bridge_Troll_Zombie);
+ItemToCharacter(ITEM_CYS_HumanTrollDictionary, CHARACTER_CYS_Church_Summoner);
+SneakTriggerSpotter(TRIGGER_CYS_TrollTollArea, CHARACTER_CYS_Bridge_Troll_Zombie);
+DB_OneShot_DialogTrigger_NewSystem(TRIGGER_CYS_TrollTollArea, "CYS_ZombieTroll", CHARACTER_CYS_Bridge_Troll_Zombie); 
+SneakTriggerSpotter(TRIGGER_CYS_AreaGardener, CHARACTER_CYS_Church_Summoner);
+DB_OneShot_DialogTrigger_NewSystem(TRIGGER_CYS_AreaGardener, "CYS_Church_Summoner", CHARACTER_CYS_Church_Summoner); 
+DB_Dialogs(CHARACTER_CYS_Bridge_Troll_Zombie, "CYS_ZombieTroll");
+DB_EvilDude(CHARACTER_CYS_Church_Summoner);
+DB_CYS_GardenerSkeleton(CHARACTER_CYS_GardenerBicky1);
+DB_CYS_GardenerSkeleton(CHARACTER_CYS_GardenerBicky2);
+DB_CYS_GardenerSkeleton(CHARACTER_CYS_GardenerBicky3);
+DB_CYS_GardenerSkeleton(CHARACTER_CYS_GardenerBicky4);
+DB_CYS_GardenerSkeleton(CHARACTER_CYS_GardenerBicky5);
+DB_CYS_GardenerSkeleton(CHARACTER_CYS_GardenerBicky6);
+DB_CYS_GardenerSkeleton(CHARACTER_CYS_GardenerBicky7);
+DB_CYS_GardenerSkeleton(CHARACTER_CYS_GardenerBicky8);
+DB_CYS_GardenerSkeleton(CHARACTER_CYS_GardenerBicky9);
+DB_CYS_GardenerSkeleton(CHARACTER_CYS_GardenerBicky10);
+DB_CYS_GardenerSkeleton(CHARACTER_CYS_GardenerBicky11);
+DB_CYS_GardenerSkeleton(CHARACTER_CYS_GardenerBicky12);
+DB_CYS_GardenerSkeleton(CHARACTER_CYS_GardenerBicky13);
+DB_CYS_GardenerSkeleton(CHARACTER_CYS_GardenerBicky14);
+DB_CYS_GardenerSkeleton(CHARACTER_CYS_GardenerBicky15);
+DB_CYS_GardenerSkeleton(CHARACTER_CYS_GardenerBicky16);
+DB_CYS_GardenerSkeleton(CHARACTER_CYS_GardenerBicky17);
+DB_CYS_GardenerSkeleton(CHARACTER_CYS_GardenerBicky18);
+DB_CYS_GardenerSkeleton(CHARACTER_CYS_GardenerBicky19);
+DB_CYS_GardenerSkeleton(CHARACTER_CYS_GardenerBicky20);
+
+DB_CYS_Hardcore_Exploskeletons(CHARACTER_CMBHC_CYS_WaterproofExplo_01);
+DB_CYS_Hardcore_Exploskeletons(CHARACTER_CMBHC_CYS_WaterproofExplo_02);
+DB_CYS_Hardcore_Exploskeletons(CHARACTER_CMBHC_CYS_WaterproofExplo_03);
+DB_CYS_Hardcore_Exploskeletons(CHARACTER_CMBHC_CYS_WaterproofExplo_04);
+KBSECTION
+//REGION Gardener
+IF
+CharacterDied(CHARACTER_CYS_Church_Summoner)
+THEN
+Proc_CompanionDialog(CHARACTER_Jahan,"JAH_CD_Summoner",CHARACTER_CYS_Church_Summoner);
+
+IF
+DB_CYS_GardenerSkeleton(_Bicky)
+THEN
+CharacterSetOnStage(_Bicky, 0);
+
+IF
+DB_CYS_Hardcore_Exploskeletons(_Exploskeleton)
+AND
+IsHardcoreMode(1)
+THEN
+CharacterSetOnStage(_Exploskeleton, 0);
+
+IF
+DialogEnded("CYS_Church_Summoner", _)
+THEN
+CharacterSetFaction(CHARACTER_CYS_Church_Summoner, "Evil NPC");
+CharacterPlayAnimation(CHARACTER_CYS_Church_Summoner, "Cast_Ritual_01", "animationBicky");
+
+IF
+CharacterEvent(CHARACTER_CYS_Church_Summoner, "animationBicky")
+THEN
+CharacterAppear(CHARACTER_CYS_GardenerBicky1, 1);
+CharacterAppear(CHARACTER_CYS_GardenerBicky3, 1);
+CharacterAppear(CHARACTER_CYS_GardenerBicky5, 1);
+CharacterAppear(CHARACTER_CYS_GardenerBicky7, 1);
+CharacterAppear(CHARACTER_CYS_GardenerBicky9, 1);
+CharacterPlayEffect(CHARACTER_CYS_GardenerBicky1,"FX_Creatures_Undead_Skeleton_Spawn_A");
+CharacterPlayEffect(CHARACTER_CYS_GardenerBicky3,"FX_Creatures_Undead_Skeleton_Spawn_A");
+CharacterPlayEffect(CHARACTER_CYS_GardenerBicky5,"FX_Creatures_Undead_Skeleton_Spawn_A");
+CharacterPlayEffect(CHARACTER_CYS_GardenerBicky7,"FX_Creatures_Undead_Skeleton_Spawn_A");
+CharacterPlayEffect(CHARACTER_CYS_GardenerBicky9,"FX_Creatures_Undead_Skeleton_Spawn_A");
+TimerLaunch("CMB_CYS_GarderBickies_Timer_01",400);
+
+IF 
+TimerFinished("CMB_CYS_GarderBickies_Timer_01")
+THEN
+CharacterAppear(CHARACTER_CYS_GardenerBicky2, 1);
+CharacterAppear(CHARACTER_CYS_GardenerBicky4, 1);
+CharacterAppear(CHARACTER_CYS_GardenerBicky6, 1);
+CharacterAppear(CHARACTER_CYS_GardenerBicky8, 1);
+CharacterAppear(CHARACTER_CYS_GardenerBicky10, 1);
+CharacterPlayEffect(CHARACTER_CYS_GardenerBicky2,"FX_Creatures_Undead_Skeleton_Spawn_A");
+CharacterPlayEffect(CHARACTER_CYS_GardenerBicky4,"FX_Creatures_Undead_Skeleton_Spawn_A");
+CharacterPlayEffect(CHARACTER_CYS_GardenerBicky6,"FX_Creatures_Undead_Skeleton_Spawn_A");
+CharacterPlayEffect(CHARACTER_CYS_GardenerBicky8,"FX_Creatures_Undead_Skeleton_Spawn_A");
+CharacterPlayEffect(CHARACTER_CYS_GardenerBicky10,"FX_Creatures_Undead_Skeleton_Spawn_A");
+TimerLaunch("CMB_CYS_GarderBickies_Timer_02",200);
+
+IF 
+TimerFinished("CMB_CYS_GarderBickies_Timer_02")
+THEN
+CharacterAppear(CHARACTER_CYS_GardenerBicky11, 1);
+CharacterAppear(CHARACTER_CYS_GardenerBicky13, 1);
+CharacterAppear(CHARACTER_CYS_GardenerBicky15, 1);
+CharacterAppear(CHARACTER_CYS_GardenerBicky17, 1);
+CharacterPlayEffect(CHARACTER_CYS_GardenerBicky11,"FX_Creatures_Undead_Skeleton_Spawn_A");
+CharacterPlayEffect(CHARACTER_CYS_GardenerBicky13,"FX_Creatures_Undead_Skeleton_Spawn_A");
+CharacterPlayEffect(CHARACTER_CYS_GardenerBicky15,"FX_Creatures_Undead_Skeleton_Spawn_A");
+CharacterPlayEffect(CHARACTER_CYS_GardenerBicky17,"FX_Creatures_Undead_Skeleton_Spawn_A");
+TimerLaunch("CMB_CYS_GarderBickies_Timer_03",400);
+
+IF 
+TimerFinished("CMB_CYS_GarderBickies_Timer_03")
+THEN
+CharacterAppear(CHARACTER_CYS_GardenerBicky12, 1);
+CharacterAppear(CHARACTER_CYS_GardenerBicky14, 1);
+CharacterAppear(CHARACTER_CYS_GardenerBicky16, 1);
+CharacterAppear(CHARACTER_CYS_GardenerBicky18, 1);
+CharacterPlayEffect(CHARACTER_CYS_GardenerBicky12,"FX_Creatures_Undead_Skeleton_Spawn_A");
+CharacterPlayEffect(CHARACTER_CYS_GardenerBicky14,"FX_Creatures_Undead_Skeleton_Spawn_A");
+CharacterPlayEffect(CHARACTER_CYS_GardenerBicky16,"FX_Creatures_Undead_Skeleton_Spawn_A");
+CharacterPlayEffect(CHARACTER_CYS_GardenerBicky18,"FX_Creatures_Undead_Skeleton_Spawn_A");
+TimerLaunch("CMB_CYS_GarderBickies_Timer_04",700);
+
+IF 
+TimerFinished("CMB_CYS_GarderBickies_Timer_02")
+THEN
+CharacterAppear(CHARACTER_CYS_GardenerBicky19, 1);
+CharacterAppear(CHARACTER_CYS_GardenerBicky20, 1);
+CharacterPlayEffect(CHARACTER_CYS_GardenerBicky19,"FX_Creatures_Undead_Skeleton_Spawn_A");
+CharacterPlayEffect(CHARACTER_CYS_GardenerBicky20,"FX_Creatures_Undead_Skeleton_Spawn_A");
+
+IF
+TimerFinished("CMB_CYS_GarderBickies_Timer_02")
+AND
+IsHardcoreMode(1)
+THEN
+CharacterAppear(CHARACTER_CMBHC_CYS_WaterproofExplo_01, 1);
+CharacterAppear(CHARACTER_CMBHC_CYS_WaterproofExplo_04, 1);
+CharacterPlayEffect(CHARACTER_CMBHC_CYS_WaterproofExplo_01,"FX_Creatures_Undead_Skeleton_Spawn_A");
+CharacterPlayEffect(CHARACTER_CMBHC_CYS_WaterproofExplo_04,"FX_Creatures_Undead_Skeleton_Spawn_A");
+CharacterSetFaction(CHARACTER_CMBHC_CYS_WaterproofExplo_01, "Evil NPC");
+CharacterSetFaction(CHARACTER_CMBHC_CYS_WaterproofExplo_04, "Evil NPC");
+
+IF
+TimerFinished("CMB_CYS_GarderBickies_Timer_04")
+AND
+IsHardcoreMode(1)
+THEN
+CharacterAppear(CHARACTER_CMBHC_CYS_WaterproofExplo_02, 1);
+CharacterAppear(CHARACTER_CMBHC_CYS_WaterproofExplo_03, 1);
+CharacterPlayEffect(CHARACTER_CMBHC_CYS_WaterproofExplo_02,"FX_Creatures_Undead_Skeleton_Spawn_A");
+CharacterPlayEffect(CHARACTER_CMBHC_CYS_WaterproofExplo_03,"FX_Creatures_Undead_Skeleton_Spawn_A");
+CharacterSetFaction(CHARACTER_CMBHC_CYS_WaterproofExplo_02, "Evil NPC");
+CharacterSetFaction(CHARACTER_CMBHC_CYS_WaterproofExplo_03, "Evil NPC");
+//END_REGION
+
+//REGION TROLL TOLL
+IF
+DialogEnded("CYS_ZombieTroll", _)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_Bridge_Troll_Zombie, "isAngry", 1)
+THEN
+CharacterSetFaction(CHARACTER_CYS_Bridge_Troll_Zombie, "Evil NPC");
+CharacterSetFaction(CHARACTER_CYS_Bridge_Troll_Zombie_Slug, "Evil NPC");
+
+IF
+CharacterAttackedByCharacter(CHARACTER_CYS_Bridge_Troll_Zombie_Slug, _Player)
+AND
+_Player.DB_IsPlayer()
+AND
+IsHardcoreMode(1)
+THEN
+CharacterSetFaction(CHARACTER_CYS_Bridge_Troll_Zombie, "Evil NPC");
+CharacterSetFaction(CHARACTER_CYS_Bridge_Troll_Zombie_Slug, "Evil NPC");
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

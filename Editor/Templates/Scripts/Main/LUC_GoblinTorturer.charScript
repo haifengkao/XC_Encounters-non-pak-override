@@ -1,0 +1,127 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter
+CHARACTER:__Me
+FIXEDSTRING:%CurrentAction = "ChooseAction"
+INT:%NumberOfAttacks = 1
+INT:%IsOutside = 0
+FIXEDSTRING:%EnterString = "Enter"
+
+BEHAVIOUR
+
+REACTION ChooseAction, 1060
+USAGE PEACE
+ACTIONS
+	IF "c1"
+		IsEqual(%IsOutside, 1)
+	THEN
+		GetRandom(%CurrentAction, "WanderAround", "Wait", %EnterString)
+	ELSE
+		GetRandom(%CurrentAction, "HitGoblin", "Shout", "Exit")
+	ENDIF
+	SetPriority(%CurrentAction, 1070)
+	
+REACTION WanderAround, 0
+USAGE PEACE
+VARS
+	FLOAT:_Duration = 1
+ACTIONS
+	GetRandom(_Duration, 3, 4, 5, 6)
+	CharacterWander(TRIGGER:LUC_PointProstitute3_7b2be461-41ef-40a0-b8fe-e91557822787, _Duration, 0)
+	SetPriority(%CurrentAction, 0)
+INTERRUPT
+	Reset()
+
+REACTION Wait,0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	GetRandom(_Animation,"Bored_01","Bored_02","Bored_03","Annoyed_01","Dust_Off_01","Shrug_01")
+	CharacterPlayAnimation(_Animation)
+	Sleep(7)
+	SetPriority(%CurrentAction, 0)
+INTERRUPT
+	Reset()	
+	
+REACTION Exit, 0
+USAGE PEACE
+VARS
+	FLOAT:_TimerDuration = 20
+ACTIONS
+	CharacterMoveTo(TRIGGER:LUC_OverseerCellar_8ef924df-488c-453a-869b-d215e89e0a5c)
+	CharacterTeleportTo(TRIGGER:LUC_OverseerCellarOut_09ce06e6-75da-4256-9b17-8c4b1bd797dc)
+	Set(%IsOutside, 1)
+	GetRandom(_TimerDuration, 30, 40, 50, 60)
+	StartTimer("ExitTimer", _TimerDuration, 0)
+	Set(%EnterString, "Wander")
+	GlobalClearEvent("LUC_GoblinIsBeingTortured")
+	SetPriority(%CurrentAction, 0)
+	
+REACTION Enter, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(TRIGGER:LUC_OverseerCellarOut_09ce06e6-75da-4256-9b17-8c4b1bd797dc)
+	CharacterTeleportTo(TRIGGER:LUC_OverseerCellar_8ef924df-488c-453a-869b-d215e89e0a5c)
+	Set(%IsOutside, 0)
+	Set(%EnterString, "Wander")
+	GlobalSetEvent("LUC_GoblinIsBeingTortured")
+	SetPriority(%CurrentAction, 0)
+
+REACTION HitGoblin, 0
+USAGE PEACE
+VARS
+	TRIGGER:_MovePoint = LUC_PointTorturedGoblin_841b5932-6a64-4351-a3be-50778e34a744
+ACTIONS
+	CharacterMoveTo(_MovePoint, 0)
+	CharacterLookFrom(_MovePoint)
+	DisplayText(__Me, "LUC_GoblinTorturer_01", 3)
+	GetRandom(%NumberOfAttacks, 1, 2, 3, 4, 5, 6)
+	SetPriority("Attack", 1080)
+INTERRUPT
+	Reset()
+	
+REACTION Attack, 0
+VARS
+	INT:_Counter = 0
+USAGE PEACE
+ACTIONS
+	SetPriority(%CurrentAction, 0)
+	CharacterPlayAnimation("attack1")
+	Add(_Counter, 1)
+	IF "!c1"
+		IsGreaterThen(_Counter, %NumberOfAttacks)
+	THEN
+		Goto("Start")
+	ELSE
+		Set(_Counter, 0)
+		SetPriority("Attack", 0)
+	ENDIF
+	
+REACTION Shout, 0
+USAGE PEACE
+ACTIONS
+	CharacterWander(FLOAT:3, 3, 0, ITEM:LUC_TorturedGoblin_c40fceee-e376-47cf-aec8-e64ae863a768)
+	CharacterLookAt(ITEM:LUC_TorturedGoblin_c40fceee-e376-47cf-aec8-e64ae863a768)
+	DisplayText(__Me, "LUC_GoblinTorturer_02", 3)
+	CharacterPlayAnimation("Intimidate_02")
+	DisplayText(__Me, "LUC_GoblinTorturer_03", 3)
+	CharacterPlayAnimation("Shout_01")
+	SetPriority(%CurrentAction, 0)
+INTERRUPT
+	Reset()
+	
+EVENTS
+EVENT CanEnter
+ON
+	OnTimer("ExitTimer")
+ACTIONS
+	Set(%EnterString, "Enter")
+	
+EVENT Init
+ON
+	OnInit()
+ACTIONS
+	CharacterForceUpdate(1)
+	

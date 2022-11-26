@@ -1,0 +1,89 @@
+INIT
+	CHARACTER:__Me
+	EXTERN SKILL:%SelfCast_1="Target_EnemyHaste"
+	EXTERN SKILL:%SelfCast_2="Target_InvisibilityTarget"
+	EXTERN SKILL:%SelfCast_3="Shout_EnemyInvulnerability"
+	EXTERN SKILL:%SelfCast_Hardcore="Target_EnemyDarkAvenger"
+	EXTERN INT:%SelfCast1_Priority=1000
+	EXTERN INT:%SelfCast2_Priority=0
+	EXTERN INT:%SelfCast3_Priority=0
+	EXTERN INT:%SelfCastHC_Priority=0
+	EXTERN STATUS:%StatusNotCondition1="HASTED"
+	EXTERN STATUS:%StatusNotCondition2="INVISIBLE"
+	EXTERN STATUS:%StatusNotCondition3="INVULNERABLE"
+	EXTERN STATUS:%StatusNotConditionHC="DARK_AVENGER"
+
+//-------------------------	
+BEHAVIOUR
+REACTION Character_CastOnSelf_1,0
+USAGE COMBAT
+CHECK "c1&!(c2|c3|c4|c5|c6|c7|c8)"
+	CharacterCanCast(__Me,%SelfCast_1)
+	CharacterHasStatus(__Me,%StatusNotCondition1)	
+	CharacterHasStatus(__Me,"CHARMED")
+	CharacterHasStatus(__Me,"FEAR")
+	CharacterHasStatus(__Me,"STUNNED")
+	CharacterHasStatus(__Me,"KNOCKED_DOWN")
+	CharacterHasStatus(__Me,"INVISIBLE")
+	CharacterHasStatus(__Me,"MUTED")
+ACTIONS	
+	CharacterUseSkill(%SelfCast_1,__Me)
+	
+REACTION Character_CastOnSelf_2,0
+USAGE COMBAT
+CHECK "c1&!(c2|c3|c4|c5|c6|c7|c8)"
+	CharacterCanCast(__Me,%SelfCast_2)
+	CharacterHasStatus(__Me,%StatusNotCondition2)	
+	CharacterHasStatus(__Me,"CHARMED")
+	CharacterHasStatus(__Me,"FEAR")
+	CharacterHasStatus(__Me,"STUNNED")
+	CharacterHasStatus(__Me,"KNOCKED_DOWN")
+	CharacterHasStatus(__Me,"INVISIBLE")
+	CharacterHasStatus(__Me,"MUTED")
+ACTIONS	
+	CharacterUseSkill(%SelfCast_2,__Me)
+	
+REACTION Character_CastOnSelf_3,0
+USAGE COMBAT
+CHECK "c1&!(c2|c3|c4|c5|c6|c7|c8)"
+	CharacterCanCast(__Me,%SelfCast_3)
+	CharacterHasStatus(__Me,%StatusNotCondition3)	
+	CharacterHasStatus(__Me,"CHARMED")
+	CharacterHasStatus(__Me,"FEAR")
+	CharacterHasStatus(__Me,"STUNNED")
+	CharacterHasStatus(__Me,"KNOCKED_DOWN")
+	CharacterHasStatus(__Me,"INVISIBLE")
+	CharacterHasStatus(__Me,"MUTED")
+ACTIONS	
+	CharacterUseSkill(%SelfCast_3,__Me)
+	
+REACTION Character_CastSpellOnSelf_HC,0
+USAGE COMBAT
+CHECK "c1&c2&!(c3|c4|c5|c6|c7|c8|c9)"
+	CharacterCanCast(__Me,%SelfCast_Hardcore)
+	IsHardcore()
+	CharacterHasStatus(__Me,%StatusNotConditionHC)	
+	CharacterHasStatus(__Me,"CHARMED")
+	CharacterHasStatus(__Me,"FEAR")
+	CharacterHasStatus(__Me,"STUNNED")
+	CharacterHasStatus(__Me,"KNOCKED_DOWN")
+	CharacterHasStatus(__Me,"INVISIBLE")
+	CharacterHasStatus(__Me,"MUTED")
+ACTIONS	
+	CharacterUseSkill(%SelfCast_Hardcore,__Me)
+	
+//-------------------------	
+EVENTS
+EVENT OnInit_GiveSpells_ForSelf
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill(%SelfCast_1)
+	CharacterAddSkill(%SelfCast_2)
+	CharacterAddSkill(%SelfCast_3)
+	CharacterAddSkill(%SelfCast_Hardcore)
+	SetPriority("Character_CastOnSelf_1",%SelfCast1_Priority)
+	SetPriority("Character_CastOnSelf_2",%SelfCast2_Priority)
+	SetPriority("Character_CastOnSelf_3",%SelfCast3_Priority)
+	SetPriority("Character_CastSpellOnSelf_HC",%SelfCastHC_Priority)
+	

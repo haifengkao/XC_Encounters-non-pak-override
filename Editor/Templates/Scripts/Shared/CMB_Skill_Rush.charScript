@@ -1,0 +1,52 @@
+INIT
+CHARACTER:__Me
+EXTERN COMPARE:%TeleportStatCompareHow=Highest
+EXTERN COMPAREFUNC:%TeleportStatCompareWhat=Distance
+
+//----------------
+BEHAVIOUR 
+REACTION UseRushSkill,400
+USAGE COMBAT
+VARS
+	CHARACTER:_Player
+	FLOAT3:_HarmfulSurface
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+	FLOAT:_DistanceBetwMeAndTarget
+CHECK "c1&c2&c3&!(c4|c5|c6|c7|c8|c9|c10|c11)&c12&c13&!c14"
+	CharacterCanCast(__Me,"Rush_EnemyRush",1)															//c1	
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Rush_EnemyRush")									//c2
+	CharacterGet(_Player,__Me,_MaxRange,%TeleportStatCompareHow,%TeleportStatCompareWhat,Enemy,None)	//c3
+	CharacterIsDead(_Player)																			//c4
+	CharacterHasStatus(_Player,"INVISIBLE")																//!c5
+	CharacterHasStatus(_Player,"SNEAKING")																//!c6
+	CharacterHasStatus(_Player,"KNOCKED_DOWN")															//!c7
+	CharacterHasStatus(_Player,"PETRIFIED")																//!c8
+	CharacterHasStatus(_Player,"STUNNED") 																//!c9
+	CharacterHasStatus(_Player,"FROZEN")																//!c10
+	CharacterHasStatus(_Player,"FEAR") 																	//!c11
+	GetDistance(_DistanceBetwMeAndTarget,__Me,_Player)													//c12
+	IsGreaterThen(_DistanceBetwMeAndTarget,4)															//c13	
+	IsInDangerousSurface(_Player)																		//!c14
+ACTIONS 
+	CharacterMoveInRange(_Player,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Rush_EnemyRush",_Player)
+INTERRUPT
+ON
+	OnMovementFailed(_)
+ACTIONS
+	SetPriority("UseRushSkill",0)
+	
+//----------------
+EVENTS
+EVENT OnInit_GiveRushSkill
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill("Rush_EnemyRush")
+	
+EVENT OnTurn_ResetPrio
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("UseRushSkill",400)

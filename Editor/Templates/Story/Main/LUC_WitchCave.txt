@@ -1,0 +1,450 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Dialogs(CHARACTER_LUC_WitchCave_Boar,"LUC_WitchCave_Boar");
+
+ItemToCharacter(ITEM_LUC_WitchCave_LakeSpell,CHARACTER_LUC_WitchCave_Cultist9);
+ItemToCharacter(ITEM_LUC_VaelannaOrder,CHARACTER_LUC_WitchCave_Cultist9);
+ItemToContainer(ITEM_LUC_WitchCave_HintBook,ITEM_LUC_WitchCave_HintCupboard,-1);
+ItemSetCanInteract(ITEM_LUC_WitchCave_Rift,0);
+ItemSetOnstage(ITEM_LUC_WC_Bubbles, 0);
+DB_LUC_WitchCave_SpiritSpots(TRIGGER_LUC_AreaWitchCaveSpirit1,TRIGGER_LUC_PointWitchCaveSpirit1,"LUC_WitchCave_SpiritSpot1");
+DB_LUC_WitchCave_SpiritSpots(TRIGGER_LUC_AreaWitchCaveSpirit2,TRIGGER_LUC_PointWitchCaveSpirit2,"LUC_WitchCave_SpiritSpot2");
+DB_LUC_WitchCave_SpiritSpots(TRIGGER_LUC_AreaWitchCaveSpirit3,TRIGGER_LUC_PointWitchCaveSpirit3,"LUC_WitchCave_SpiritSpot3");
+DB_LUC_WitchCave_SpiritSpots(TRIGGER_LUC_AreaWitchCaveSpirit4,TRIGGER_LUC_PointWitchCaveSpirit4,"LUC_WitchCave_SpiritSpot4");
+DB_LUC_WitchCave_SpiritSpots(TRIGGER_LUC_AreaWitchCaveSpirit6,TRIGGER_LUC_PointWitchCaveSpirit6,"LUC_WitchCave_SpiritSpot6");
+
+DB_ShovelArea(TRIGGER_LUC_ShovelWitchCave,"LUC_ShovelWitchCave",ITEM_LUC_ShovelWitchCaveDirt);
+DB_ShovelRewardItemAppear("LUC_ShovelWitchCave",ITEM_LUC_ShovelWitchCaveChest,TRIGGER_LUC_ShovelWitchCavePoint);
+DB_ShovelRewardEvent("LUC_ShovelWitchCave","LUC_WitchCave_SpiritSpot5");
+DB_ShovelArea(TRIGGER_LUC_ShovelWitchCave1,"LUC_ShovelWitchCave1",ITEM_LUC_ShovelWitchCave1Dirt);
+DB_ShovelArea(TRIGGER_LUC_ShovelWitchCave2,"LUC_ShovelWitchCave2",ITEM_LUC_ShovelWitchCave2Dirt);
+DB_ShovelArea(TRIGGER_LUC_ShovelWitchCave3,"LUC_ShovelWitchCave3",ITEM_LUC_ShovelWitchCave3Dirt);
+DB_ShovelArea(TRIGGER_LUC_ShovelWitchCave4,"LUC_ShovelWitchCave4",ITEM_LUC_ShovelWitchCave4Dirt);
+DB_ShovelRewardItemAppear("LUC_ShovelWitchCave1",ITEM_LUC_ShovelWitchCave1Mush1,TRIGGER_LUC_ShovelWitchCavePoint1);
+DB_ShovelRewardItemAppear("LUC_ShovelWitchCave1",ITEM_LUC_ShovelWitchCave1Mush2,TRIGGER_LUC_ShovelWitchCavePoint1_000);
+DB_ShovelRewardItemAppear("LUC_ShovelWitchCave2",ITEM_LUC_ShovelWItchCaveDirt2Mush1,TRIGGER_LUC_ShovelWitchCavePoint2);
+DB_ShovelRewardItemAppear("LUC_ShovelWitchCave2",ITEM_LUC_ShovelWItchCaveDirt2Mush2,TRIGGER_LUC_ShovelWitchCavePoint2_000);
+DB_ShovelRewardItemAppear("LUC_ShovelWitchCave2",ITEM_LUC_ShovelWItchCaveDirt2Mush3,TRIGGER_LUC_ShovelWitchCavePoint2_001);
+DB_ShovelRewardItemAppear("LUC_ShovelWitchCave2",ITEM_LUC_ShovelWItchCaveDirt2Mush4,TRIGGER_LUC_ShovelWitchCavePoint2_002);
+DB_ShovelRewardItemAppear("LUC_ShovelWitchCave2",ITEM_LUC_ShovelWItchCaveDirt2Mush5,TRIGGER_LUC_ShovelWitchCavePoint2_003);
+DB_ShovelRewardItemAppear("LUC_ShovelWitchCave3",ITEM_LUC_ShovelWitchCave3Mush,TRIGGER_LUC_ShovelWitchCavePoint3);
+DB_ShovelRewardItemAppear("LUC_ShovelWitchCave3",ITEM_LUC_ShovelWitchCave3Mush_000,TRIGGER_LUC_ShovelWitchCavePoint3_000);
+DB_ShovelRewardItemAppear("LUC_ShovelWitchCave3",ITEM_LUC_ShovelWitchCave3Mush_001,TRIGGER_LUC_ShovelWitchCavePoint3_001);
+DB_ShovelRewardItemAppear("LUC_ShovelWitchCave3",ITEM_LUC_ShovelWitchCave3Mush_002,TRIGGER_LUC_ShovelWitchCavePoint3_002);
+DB_ShovelRewardItemAppear("LUC_ShovelWitchCave3",ITEM_LUC_ShovelWitchCave3Mush_003,TRIGGER_LUC_ShovelWitchCavePoint3_003);
+DB_ShovelRewardItemAppear("LUC_ShovelWitchCave3",ITEM_LUC_ShovelWitchCave3Mush_004,TRIGGER_LUC_ShovelWitchCavePoint3_004);
+DB_ShovelRewardItemAppear("LUC_ShovelWitchCave3",ITEM_LUC_ShovelWitchCave3Mush_005,TRIGGER_LUC_ShovelWitchCavePoint3_005);
+DB_ShovelRewardItemAppear("LUC_ShovelWitchCave3",ITEM_LUC_ShovelWitchCave3Mush_006,TRIGGER_LUC_ShovelWitchCavePoint3_006);
+DB_ShovelRewardItemAppear("LUC_ShovelWitchCave4",ITEM_LUC_ShovelWitchCave4Mush,TRIGGER_LUC_ShovelWitchCavePoint4);
+
+KillCounter("LUC_WitchCave",5);
+KillCounterDB(CHARACTER_LUC_WitchCave_Cultist6,"LUC_WitchCave");
+KillCounterDB(CHARACTER_LUC_WitchCave_Cultist7,"LUC_WitchCave");
+KillCounterDB(CHARACTER_LUC_WitchCave_Cultist8,"LUC_WitchCave");
+KillCounterDB(CHARACTER_LUC_WitchCave_Cultist9,"LUC_WitchCave");
+KillCounterDB(CHARACTER_LUC_WitchCave_Cultist10,"LUC_WitchCave");
+
+KillCounter("LUC_WitchCave_Boar",3);
+KillCounterDB(CHARACTER_LUC_WitchCave_Cultist1,"LUC_WitchCave_Boar");
+KillCounterDB(CHARACTER_LUC_WitchCave_Cultist2,"LUC_WitchCave_Boar");
+KillCounterDB(CHARACTER_LUC_WitchCave_Cultist3,"LUC_WitchCave_Boar");
+KillCounterDB(CHARACTER_LUC_WitchCave_Cultist4,"LUC_WitchCave_Boar");
+
+ProcTriggerRegisterForPlayers(TRIGGER_LUC_AreaWitchCaveSpiritLake);
+
+DB_PlayerComments("LUC_CommentWitchCellar","LUC_CommentWitchCellar_1_1",1,1);
+DB_PlayerComments("LUC_CommentWitchCellar","LUC_CommentWitchCellar_2_1",2,1);
+DB_PlayerComments("LUC_CommentWitchCellar","LUC_CommentWitchCellar_2_2",2,2);
+DB_PlayerComment_Trigger(TRIGGER_LUC_CommentWitchCellar,"LUC_CommentWitchCellar");
+DB_PlayerComments("LUC_CommentWitchCaveCarnage","LUC_CommentWitchCaveCarnage_1_1",1,1);
+DB_PlayerComments("LUC_CommentWitchCaveCarnage","LUC_CommentWitchCaveCarnage_2_1",2,1);
+DB_PlayerComments("LUC_CommentWitchCaveCarnage","LUC_CommentWitchCaveCarnage_2_2",2,2);
+DB_PlayerComment_Trigger(TRIGGER_LUC_CommentWitchCaveCarnage,"LUC_CommentWitchCaveCarnage");
+DB_PlayerComments("LUC_CommentLakeSpellWorked","LUC_CommentLakeSpellWorked_1_1",1,1);
+DB_PlayerComments("LUC_CommentLakeSpellWorked","LUC_CommentLakeSpellWorked_2_1",2,1);
+DB_PlayerComments("LUC_CommentLakeSpellWorked","LUC_CommentLakeSpellWorked_2_2",2,2);
+DB_PlayerComments("LUC_CommentEnterWitchCave","LUC_CommentEnterWitchCave_1_1",1,1);
+DB_PlayerComments("LUC_CommentEnterWitchCave","LUC_CommentEnterWitchCave_2_1",2,1);
+DB_PlayerComments("LUC_CommentEnterWitchCave","LUC_CommentEnterWitchCave_2_2",2,2);
+DB_PlayerComment_Trigger(TRIGGER_LUC_CommentEnterWitchCave,"LUC_CommentEnterWitchCave");
+DB_PlayerComments("LUC_CommentAfterFirstPuddle","LUC_CommentAfterFirstPuddle_1_1",1,1);
+DB_PlayerComments("LUC_CommentAfterFirstPuddle","LUC_CommentAfterFirstPuddle_2_1",2,1);
+DB_PlayerComments("LUC_CommentAfterFirstPuddle","LUC_CommentAfterFirstPuddle_2_2",2,2);
+DB_PlayerComments("LUC_CommentAfterWitchBook","LUC_CommentAfterWitchBook_1_1",1,1);
+DB_PlayerComments("LUC_CommentAfterWitchBook","LUC_CommentAfterWitchBook_2_1",2,1);
+DB_PlayerComments("LUC_CommentAfterWitchBook","LUC_CommentAfterWitchBook_2_2",2,2);
+
+DB_LUC_WitchCaveBoarPoints(TRIGGER_LUC_ShovelWitchCavePoint1,"LUC_WitchBoarAtPoint1",TRIGGER_LUC_ShovelWitchCavePoint4,TRIGGER_LUC_ShovelWitchCavePoint2,TRIGGER_LUC_ShovelWitchCave1);
+DB_LUC_WitchCaveBoarPoints(TRIGGER_LUC_ShovelWitchCavePoint2,"LUC_WitchBoarAtPoint2",TRIGGER_LUC_ShovelWitchCavePoint1,TRIGGER_LUC_ShovelWitchCavePoint3,TRIGGER_LUC_ShovelWitchCave2);
+DB_LUC_WitchCaveBoarPoints(TRIGGER_LUC_ShovelWitchCavePoint3,"LUC_WitchBoarAtPoint3",TRIGGER_LUC_ShovelWitchCavePoint4,TRIGGER_LUC_ShovelWitchCavePoint5,TRIGGER_LUC_ShovelWitchCave3);
+DB_LUC_WitchCaveBoarPoints(TRIGGER_LUC_ShovelWitchCavePoint4,"LUC_WitchBoarAtPoint4",TRIGGER_LUC_ShovelWitchCavePoint3,TRIGGER_LUC_ShovelWitchCavePoint1,TRIGGER_LUC_ShovelWitchCave4);
+
+DB_LUC_Vaelanna(CHARACTER_LUC_WitchCave_Cultist9);
+DB_LUC_Vaelanna(CHARACTER_LUC_WitchCave_Cultist6);
+DB_LUC_Vaelanna(CHARACTER_LUC_WitchCave_Cultist7);
+DB_LUC_Vaelanna(CHARACTER_LUC_WitchCave_Cultist8);
+DB_LUC_Vaelanna(CHARACTER_LUC_WitchCave_Cultist10);
+DB_LUC_Vaelanna(CHARACTER_LUC_WitchCave_Dog03);
+
+SneakTriggerSpotter(TRIGGER_LUC_WC_VaelanaDialog, CHARACTER_LUC_WitchCave_Cultist6);
+SneakTriggerSpotter(TRIGGER_LUC_WC_VaelanaDialog, CHARACTER_LUC_WitchCave_Cultist7);
+SneakTriggerSpotter(TRIGGER_LUC_WC_VaelanaDialog, CHARACTER_LUC_WitchCave_Cultist8);
+SneakTriggerSpotter(TRIGGER_LUC_WC_VaelanaDialog, CHARACTER_LUC_WitchCave_Cultist9);
+SneakTriggerSpotter(TRIGGER_LUC_WC_VaelanaDialog, CHARACTER_LUC_WitchCave_Cultist10);
+
+CharacterSetOnStage(CHARACTER_LUC_WitchCave_Cultist4_Boar,0);
+CharacterSetOnStage(CHARACTER_LUC_WitchCave_Cultist4_Wolf,0);
+CharacterSetOnStage(CHARACTER_LUC_WitchCave_Cultist4_Dog,0);
+CharacterSetOnStage(CHARACTER_CMBHC_LUC_WitchCavePyros_FlameChampion_01,0);
+CharacterSetOnStage(CHARACTER_CMBHC_LUC_WitchCavePyros_FlameChampion_02,0);
+
+SneakTriggerSpotter(TRIGGER_LUC_WitchCave_Imp_Sneak, CHARACTER_LUC_WitchCave_Imp);
+DB_Dialogs(CHARACTER_LUC_WitchCave_Imp,"LUC_Exhausted_Imp");
+KBSECTION
+//REGION CHANDELIER
+IF
+CharacterItemEvent(_ ,ITEM_LUC_WitchCaveChandelier, "openTheGate")
+AND
+NOT ITEM_LUC_WitchCaveFakeWall.LUC_WitchCaveDisappeared()
+THEN
+ITEM_LUC_WitchCaveFakeWall.LUC_WitchCaveDisappeared();
+ItemSetOnstage(ITEM_LUC_WitchCaveFakeWall,0);
+PlayEffectAtItem("FX_GP_TeleportSmoke_A",ITEM_LUC_WitchCaveFakeWall);
+QuestUpdate("HOM_Starstones", "EnterTheCaveOfWhiteWitch");
+//END_REGION
+
+//REGION CAVE SPIRIT COMMENTS
+IF
+DB_LUC_WitchCave_SpiritSpots(_Area,_,_)
+THEN
+DB_OneShotPlayerTrigger(_Area);
+
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,(TRIGGER)_Area)
+AND
+DB_LUC_WitchCave_SpiritSpots(_Area,_Point,_Comment)
+THEN
+ItemTeleportToTrigger(ITEM_LUC_WitchCave_Spirit,_Point);
+TimerLaunch(_Comment,500);
+
+IF
+TimerFinished(_Comment)
+AND
+DB_LUC_WitchCave_SpiritSpots(_Area,_Point,_Comment)
+THEN
+NOT DB_LUC_WitchCave_SpiritSpots(_Area,_Point,_Comment);
+ItemDisplayText(ITEM_LUC_WitchCave_Spirit,_Comment);
+
+IF
+GlobalEventSet("LUC_WitchCave_SpiritSpot5")
+THEN
+ItemTeleportToTrigger(ITEM_LUC_WitchCave_Spirit,TRIGGER_LUC_PointWitchCaveSpirit5);
+TimerLaunch("LUC_WitchCave_SpiritSpot5",1000);
+
+IF
+TimerFinished("LUC_WitchCave_SpiritSpot5")
+THEN
+ItemDisplayText(ITEM_LUC_WitchCave_Spirit,"LUC_WitchCave_SpiritSpot5");
+
+IF
+ItemDisplayTextEnded(ITEM_LUC_WitchCave_Spirit,_)
+AND
+NOT ITEM_LUC_WitchCave_Spirit.LUC_GaveFirstPuddleComment()
+AND
+ItemGetClosestPlayer(ITEM_LUC_WitchCave_Spirit,_Player)
+THEN
+ITEM_LUC_WitchCave_Spirit.LUC_GaveFirstPuddleComment();
+Launch_PlayerComment(_Player,"LUC_CommentAfterFirstPuddle");
+QuestAdd("LUC_Apprentice");
+QuestUpdate("LUC_Apprentice", "Start");
+//END_REGION
+
+//REGION THE BOAR
+IF
+CharacterEnteredCombat(CHARACTER_LUC_WitchCave_Cultist3, _)
+THEN
+CharacterDisplayText(CHARACTER_LUC_WitchCave_Cultist3, "LUC_WC_BoarCultist");
+CharacterSetCanFight(CHARACTER_LUC_WitchCave_Boar, 1);
+
+IF
+CharacterEvent(CHARACTER_LUC_WitchCave_Cultist4,"CMB_LUC_WitchCave_NecroSummon_Boar")
+THEN
+CharacterSetOnStage(CHARACTER_LUC_WitchCave_Cultist4_Boar,1);
+
+IF
+CharacterEvent(CHARACTER_LUC_WitchCave_Cultist4,"CMB_LUC_WitchCave_NecroSummon_Wolf")
+THEN
+CharacterSetOnStage(CHARACTER_LUC_WitchCave_Cultist4_Wolf,1);
+
+IF
+CharacterEvent(CHARACTER_LUC_WitchCave_Cultist4,"CMB_LUC_WitchCave_NecroSummon_Dog")
+THEN
+CharacterSetOnStage(CHARACTER_LUC_WitchCave_Cultist4_Dog,1);
+
+IF
+CharacterEnteredCombat(_Character,_)
+AND
+KillCounterDB(_Character,"LUC_WitchCave_Boar")
+THEN
+DialogStartOneSpeakerDialog("LUC_AD_WitchCave_Boar",CHARACTER_LUC_WitchCave_Boar);
+CharacterSetFaction(CHARACTER_LUC_WitchCave_Boar,"Good NPC");
+
+PROC
+ReactOnKillCounter("LUC_WitchCave_Boar")
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_LUC_WitchCave_Boar,_Player)
+THEN
+PROC_MendatoryDialog("LUC_WitchCave_Boar",CHARACTER_LUC_WitchCave_Boar,_Player);
+
+IF
+GameBookInterfaceClosed(ITEM_LUC_WitchCave_HintBook,_Player)
+THEN
+Launch_PlayerComment(_Player,"LUC_CommentAfterWitchBook");
+GlobalSetEvent("LUC_KnowsWitchChest");
+
+IF
+DB_NoMoreQueued(CHARACTER_LUC_WitchCave_Boar,"LUC_WitchCave_Boar")
+THEN
+CharacterSetCanFight(CHARACTER_LUC_WitchCave_Boar, 1);
+
+IF
+DialogEnded("LUC_WitchCave_Boar",_)
+AND
+CharacterGetVarInteger(CHARACTER_LUC_WitchCave_Boar,"LUC_WitchBoar_GoSniff",1)
+THEN
+CharacterSetVarInteger(CHARACTER_LUC_WitchCave_Boar,"LUC_WitchBoar_GoSniff",0);
+ProcCharacterMoveToTrigger(CHARACTER_LUC_WitchCave_Boar,TRIGGER_LUC_ShovelWitchCavePoint1,1,"LUC_WitchBoarAtPoint1");
+CharacterSetHasDialog(CHARACTER_LUC_WitchCave_Boar,0);
+CharacterSetVarTrigger(CHARACTER_LUC_WitchCave_Boar,"PointShovel",TRIGGER_LUC_ShovelWitchCavePoint1);
+CharacterSetVarFixedString(CHARACTER_LUC_WitchCave_Boar,"currentState","State_LookingForTreasure");
+LUC_WitchCaveBoarCurrent(TRIGGER_LUC_ShovelWitchCavePoint1,"LUC_WitchBoarAtPoint1",TRIGGER_LUC_ShovelWitchCavePoint4,TRIGGER_LUC_ShovelWitchCavePoint2,TRIGGER_LUC_ShovelWitchCave1);
+
+IF
+CharacterEvent(CHARACTER_LUC_WitchCave_Boar,_Event)
+AND
+DB_LUC_WitchCaveBoarPoints(_Trigger,_Event,_,_,_Shovel)
+THEN
+CharacterSetVarTrigger(CHARACTER_LUC_WitchCave_Boar,"PointShovel",_Trigger);
+CHARACTER_LUC_WitchCave_Boar.LUC_WaitingAtShovel(_Shovel);
+CharacterSetHasDialog(CHARACTER_LUC_WitchCave_Boar,1);
+
+IF
+Sees(CHARACTER_LUC_WitchCave_Boar,_Player)
+AND
+CHARACTER_LUC_WitchCave_Boar.LUC_WaitingAtShovel(_Shovel)
+THEN
+NOT CHARACTER_LUC_WitchCave_Boar.LUC_WaitingAtShovel(_Shovel);
+PROC_LUC_WitchCaveBoarCheck(_Shovel);
+
+PROC
+PROC_LUC_WitchCaveBoarCheck((TRIGGER)_Shovel)
+AND
+DB_ShovelArea(_Shovel,_,_)
+THEN
+CharacterDisplayText(CHARACTER_LUC_WitchCave_Boar,"LUC_WitchCaveBoar_Something");
+
+PROC
+PROC_LUC_WitchCaveBoarCheck((TRIGGER)_Shovel)
+AND
+NOT DB_ShovelArea(_Shovel,_,_)
+THEN
+CharacterDisplayText(CHARACTER_LUC_WitchCave_Boar,"LUC_WitchCaveBoar_Nothing");
+
+IF
+DialogEnded("LUC_WitchCave_Boar",_)
+AND
+CharacterGetVarInteger(CHARACTER_LUC_WitchCave_Boar,"LUC_WitchBoar_GoLeft",1)
+AND
+LUC_WitchCaveBoarCurrent(_Trigger,_Event,_Left,_Right,_Shovel)
+THEN
+CharacterSetVarInteger(CHARACTER_LUC_WitchCave_Boar,"LUC_WitchBoar_GoLeft",0);
+NOT LUC_WitchCaveBoarCurrent(_Trigger,_Event,_Left,_Right,_Shovel);
+PROC_LUC_WitchCaveBoarNextPoint(_Left);
+
+IF
+DialogEnded("LUC_WitchCave_Boar",_)
+AND
+CharacterGetVarInteger(CHARACTER_LUC_WitchCave_Boar,"LUC_WitchBoar_GoRight",1)
+AND
+LUC_WitchCaveBoarCurrent(_Trigger,_Event,_Left,_Right,_Shovel)
+THEN
+CharacterSetVarInteger(CHARACTER_LUC_WitchCave_Boar,"LUC_WitchBoar_GoRight",0);
+NOT LUC_WitchCaveBoarCurrent(_Trigger,_Event,_Left,_Right,_Shovel);
+PROC_LUC_WitchCaveBoarNextPoint(_Right);
+
+PROC
+PROC_LUC_WitchCaveBoarNextPoint((TRIGGER)_Trigger)
+AND
+DB_LUC_WitchCaveBoarPoints(_Trigger,_Event,_Left,_Right,_Shovel)
+THEN
+LUC_WitchCaveBoarCurrent(_Trigger,_Event,_Left,_Right,_Shovel);
+ProcCharacterMoveToTrigger(CHARACTER_LUC_WitchCave_Boar,_Trigger,1,_Event);
+CharacterSetHasDialog(CHARACTER_LUC_WitchCave_Boar,0);
+
+PROC
+PROC_LUC_WitchCaveBoarNextPoint(TRIGGER_LUC_ShovelWitchCavePoint5)
+THEN
+ProcCharacterMoveToTrigger(CHARACTER_LUC_WitchCave_Boar,TRIGGER_LUC_ShovelWitchCavePoint5,1,"LUC_WitchBoar_FoundChest");
+CharacterSetHasDialog(CHARACTER_LUC_WitchCave_Boar,0);
+
+IF
+CharacterEvent(CHARACTER_LUC_WitchCave_Boar,"LUC_WitchBoar_FoundChest")
+THEN
+CharacterSetHasDialog(CHARACTER_LUC_WitchCave_Boar,1);
+CharacterSetVarInteger(CHARACTER_LUC_WitchCave_Boar,"LUC_WitchBoar_FoundChest",1);
+CharacterSetVarTrigger(CHARACTER_LUC_WitchCave_Boar,"PointShovel",TRIGGER_LUC_ShovelWitchCavePoint5);
+PROC_LUC_WitchCaveBoarCheck(TRIGGER_LUC_ShovelWitchCave);
+
+IF
+CharacterEnteredCombat(CHARACTER_LUC_WitchCave_Boar,_)
+AND
+LUC_WitchCaveBoarCurrent(_,_,_,_,_)
+THEN
+CharacterPurgeQueue(CHARACTER_LUC_WitchCave_Boar);
+
+IF
+CharacterLeftCombat(CHARACTER_LUC_WitchCave_Boar,_)
+AND
+LUC_WitchCaveBoarCurrent(_Trigger,_Event,_,_,_)
+THEN
+ProcCharacterMoveToTrigger(CHARACTER_LUC_WitchCave_Boar,_Trigger,1,_Event);
+
+//END_REGION
+
+//REGION ENTERING THE LAKE
+PROC
+ProcCharInTriggerSpotted(_Player, TRIGGER_LUC_WC_VaelanaDialog)
+AND
+DB_LUC_Vaelanna(_Dude)
+THEN
+CharacterSetVarFixedString(_Dude, "currentState", "");
+
+PROC
+ProcCharInTriggerSpotted(_Player, TRIGGER_LUC_WC_VaelanaDialog)
+THEN
+PROC_MendatoryDialog("LUC_WC_Vaelana", CHARACTER_LUC_WitchCave_Cultist9, _Player);
+
+IF
+CharacterAttackedByCharacter(_Dude, _)
+AND
+DB_LUC_Vaelanna(_Dude)
+AND
+CharacterCanFight(_Dude, 0)
+THEN
+PROC_LUC_VaelanaFight();
+DialogRequestStopForCharacter(CHARACTER_LUC_WitchCave_Cultist9);
+IF
+DialogEnded("LUC_WC_Vaelana", _)
+THEN
+PROC_LUC_VaelanaFight();
+
+PROC
+PROC_LUC_VaelanaFight()
+AND
+DB_LUC_Vaelanna(_Enemy)
+THEN
+CharacterSetCanFight(_Enemy, 1);
+
+PROC
+ReactOnKillCounter("LUC_WitchCave")
+AND
+ItemGetPosition(ITEM_LUC_WC_Bubbles, _X, _Y, _Z)
+AND
+RealSum(_Y, 2.5, _Y2)
+THEN
+PROC_LUC_WitchCaveDisableSpiritSpots();
+ItemSetOnstage(ITEM_LUC_WC_Bubbles, 1);
+ItemTeleportToPosition(ITEM_LUC_WitchCave_Spirit,_X, _Y2, _Z);
+TimerLaunch("LUC_WitchCave_SpiritSpot7",100);
+
+IF
+TimerFinished("LUC_WitchCave_SpiritSpot7")
+AND
+ItemGetClosestPlayer(ITEM_LUC_WitchCave_Spirit,_Player)
+THEN
+ProcDoTwoSpeakerItemDialog("LUC_WitchCave_Spirit",_Player,ITEM_LUC_WitchCave_Spirit);
+
+IF
+DialogEnded("LUC_WitchCave_Spirit",_)
+THEN
+QuestUpdate("LUC_Apprentice","AtLake");
+ItemSetOnstage(ITEM_LUC_WitchCave_Spirit, 0);
+
+PROC
+PROC_LUC_WitchCaveDisableSpiritSpots()
+AND
+DB_LUC_WitchCave_SpiritSpots(_Area,_Point,_Comment)
+THEN
+ProcTriggerUnregisterForPlayers(_Area);
+NOT DB_OneShotPlayerTrigger(_Area);
+NOT DB_LUC_WitchCave_SpiritSpots(_Area,_Point,_Comment);
+
+IF
+GameBookInterfaceClosed(ITEM_LUC_WitchCave_LakeSpell, _Player)
+THEN
+PROC_LUC_WitchCaveCheckSpell(_Player);
+
+PROC
+PROC_LUC_WitchCaveCheckSpell((CHARACTER)_Player)
+AND
+NOT DB_InRegion(_Player,TRIGGER_LUC_AreaWitchCaveSpiritLake)
+THEN
+CharacterDisplayText(_Player,"LUC_WitchCave_LakeSpellFailed");
+
+PROC
+PROC_LUC_WitchCaveCheckSpell((CHARACTER)_Player)
+AND
+DB_InRegion(_Player,TRIGGER_LUC_AreaWitchCaveSpiritLake)
+THEN
+Launch_PlayerComment(_Player,"LUC_CommentLakeSpellWorked");
+PlayEffectAtItem("FX_GP_Hiberheim_Spell_A", ITEM_LUC_WitchCave_Spirit);
+ItemSetCanInteract(ITEM_LUC_WitchCave_Rift,1);
+GlobalSetEvent("LUC_WitchCave_RiftOpened");
+//END_REGION
+
+//REGION EXHAUSTED IMP
+PROC
+ProcCharInTriggerSpotted(_Player, TRIGGER_LUC_WitchCave_Imp_Sneak)
+AND
+NOT DB_OnlyOnce("LUC_Exhausted_Imp_SpottedPlayer")
+THEN
+DB_OnlyOnce("LUC_Exhausted_Imp_SpottedPlayer");
+DB_LUC_ExhaustedImpChar(_Player);
+CharacterMoveToCharacter(CHARACTER_LUC_WitchCave_Imp,_Player,1,"LUC_Exhausted_Imp_Arrived",1);
+
+IF
+CharacterEvent(CHARACTER_LUC_WitchCave_Imp,"LUC_Exhausted_Imp_Arrived")
+AND
+DB_LUC_ExhaustedImpChar(_Player)
+THEN
+ProcDoTwoSpeakerDialog("LUC_Exhausted_Imp",CHARACTER_LUC_WitchCave_Imp,_Player);
+NOT DB_LUC_ExhaustedImpChar(_Player);
+
+IF
+DialogEnded("LUC_Exhausted_Imp",_)
+THEN
+ProcRemoveDialogEntryForSpeaker(CHARACTER_LUC_WitchCave_Imp, "LUC_Exhausted_Imp");
+CharacterDisappearOutOfSight(CHARACTER_LUC_WitchCave_Imp,0,1,"",1);
+QuestUpdate("LUC_WhiteWitch", "Update4");
+//END_REGION
+
+IF
+CharacterEnteredCombat(CHARACTER_LUCS_Cultist_Wizard_001,_)
+THEN
+TimerLaunch("CMBHC_LUC_WitchCavePyros_FlameChampion1_Timer",1500);
+
+IF
+TimerFinished("CMBHC_LUC_WitchCavePyros_FlameChampion1_Timer")
+THEN
+CharacterAppear(CHARACTER_CMBHC_LUC_WitchCavePyros_FlameChampion_01,1);
+TimerLaunch("CMBHC_LUC_WitchCavePyros_FlameChampion2_Timer",600);
+
+IF
+TimerFinished("CMBHC_LUC_WitchCavePyros_FlameChampion2_Timer")
+THEN
+CharacterAppear(CHARACTER_CMBHC_LUC_WitchCavePyros_FlameChampion_02,1);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

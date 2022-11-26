@@ -1,0 +1,349 @@
+#INCLUDE BaseEscortScript
+
+INIT
+	USING BaseEscortScript
+	TRIGGER:%SafePoint1 = LUC_Point_BjornDest1_c4f69a91-68b4-4bde-b4e4-6b6ff16f653f
+	TRIGGER:%SafePoint2 = LUC_Point_BjornDest2_06b7b1aa-e6e4-4e71-acb8-851ad4750c5e
+	TRIGGER:%SafePoint3 = LUC_Point_BjornDest3_baa7bccb-7ecc-4a66-b654-56711e9b8c4b
+	CHARACTER:%Mara = LUC_Mara_7174eb04-dd44-4b7a-a698-6bb135b98964
+	CHARACTER:%Mount = LUC_BjornMount_7e974707-a22e-4dc7-aad0-c2ec145b62b2
+	INT:%HasMount = 0
+	CHARACTER:%introTarget = null
+BEHAVIOUR
+
+REACTION State_Idle, 0
+USAGE PEACE
+VARS
+	CHARACTER:_Player
+	FLOAT:_Dist
+ACTIONS
+	GetWeightedRandom(%currentAction,"Action_Idle",INT:2,"Action_InspectMount",INT:3,"Action_CheckOnMara",INT:4,"Action_LookForHelp",INT:6)
+	SetPriority(%currentAction, 1100)
+
+REACTION State_EscortDone, 0
+USAGE PEACE
+ACTIONS
+	SetPriority("Defend_Yourself", 0)
+	SetPriority("Cower", 0)
+	GetRandom(%currentAction, "Action_WaitingForOthers")
+	SetPriority(%currentAction, 1100)
+	
+REACTION State_AfterEscort, 0
+USAGE PEACE
+ACTIONS
+	IF "c1"
+		IsEqual(%HasMount,1)
+	THEN
+		GetRandom(%currentAction, "Action_Smithing","Action_CheckInventory","Action_CheckOnMount")
+	ELSE
+		GetRandom(%currentAction, "Action_Smithing","Action_CheckInventory")
+	ENDIF
+	SetPriority(%currentAction, 1100)
+  
+/////////////////////////////////////////////////////////
+
+REACTION Action_LookForHelp, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+	CHARACTER:_Player
+	FLOAT:_Dist
+	TRIGGER:_Point1 = LUC_BjornLookoutPoint1_2e0a85b7-0c35-44e8-9757-9df54de1a878
+	TRIGGER:_Point2 = LUC_BjornLookoutPoint2_f197d4c3-3cbc-4a78-8d9f-a0283361820a
+	TRIGGER:_DestPoint = null
+ACTIONS
+	CharacterMoveTo(%Mara,0)
+	IF "c1&c2&c3"
+		CharacterGet(_Player,__Me,null,Lowest,Distance,Player)
+		GetDistance(_Dist,_Player,__Me)
+		IsLessThen(_Dist,4.0)
+	THEN
+		CharacterLookAt(_Player)
+		Sleep(15)
+		DialogStart("LUC_AD_BjornRequestsHelpFromPlayer",__Me)
+	ELSE
+		GetRandom(_DestPoint,_Point1,_Point2)
+		CharacterMoveTo(_DestPoint,0)
+		CharacterLookFrom(_DestPoint)
+		GetRandom(_Animation,"Look_Left_Long_01","Look_Right_Long_01","Think_01")
+		CharacterPlayAnimation(_Animation)
+		IF "c1"
+			IsRandom(0.3)
+		THEN
+			Sleep(15)
+			DialogStart("LUC_AD_BjornLookingForHelp",__Me)
+		ENDIF
+	ENDIF
+	Sleep(2.0)
+	SetPriority(%currentAction, 0)	
+INTERRUPT
+	SetPriority(%currentAction, 0)	
+
+
+REACTION Action_CheckOnMara, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	CharacterMoveTo(%Mara,0)
+	IF "!c1"
+		CharacterHasStatus(%Mara,"DYING")
+	THEN
+		CharacterLookAt(%Mara)
+		IF "!c1"
+			IsInDialog(%Mara)
+		THEN
+			Sleep(8)
+			DialogStart("LUC_AD_BjornChecksOnMara",__Me,%Mara)
+		ELSE
+			CharacterPlayAnimation("Sigh_01")
+		ENDIF
+	ELSE
+		GetRandom(_Animation,"Sigh_01","Depressed_01","Crying_01")
+		CharacterPlayAnimation(_Animation)
+	ENDIF
+	Sleep(2.0)
+	SetPriority(%currentAction, 0)	
+INTERRUPT
+	SetPriority(%currentAction, 0)	
+
+
+REACTION Action_InspectMount, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	CharacterMoveTo(%Mount,0)
+	IF "!c1"
+		CharacterHasStatus(%Mount,"DYING")
+	THEN
+		CharacterLookAt(%Mount)
+		Sleep(7)
+		IF "!c1"
+			IsInDialog(%Mount)
+		THEN
+			DialogStart("LUC_AD_BjornInspectsMount",__Me,%Mount)
+		ENDIF
+	ENDIF
+	GetRandom(_Animation,"Sigh_01","Depressed_01")
+	CharacterPlayAnimation(_Animation)
+	Sleep(2.0)
+	SetPriority(%currentAction, 0)	
+INTERRUPT
+	SetPriority(%currentAction, 0)	
+
+REACTION Action_CheckOnMount, 0
+USAGE PEACE
+VARS
+	TRIGGER:_MountLook = LUC_Point_BjornMountLook_b81cd070-6d84-4b0a-bf9e-670f3fb4aa6e
+	FIXEDSTRING:_Animation
+ACTIONS
+	CharacterMoveTo(_MountLook,0)
+	IF "!c1"
+		CharacterHasStatus(%Mount,"DYING")
+	THEN
+		CharacterLookAt(%Mount)
+		IF "!c1"
+			IsInDialog(%Mount)
+		THEN
+			Sleep(8)
+			DialogStart("LUC_AD_BlacksmithBjornMount",__Me)
+		ENDIF
+	ELSE
+		GetRandom(_Animation,"Sigh_01","Depressed_01")
+		CharacterPlayAnimation(_Animation)
+	ENDIF
+	Sleep(2.0)
+	SetPriority(%currentAction, 0)	
+INTERRUPT
+	SetPriority(%currentAction, 0)	
+
+
+REACTION Action_CheckInventory, 0
+USAGE PEACE
+VARS
+	TRIGGER:_Desk = LUC_Point_BjornDesk_c6a1a407-8e2a-466f-9d46-92c62ca56940
+	TRIGGER:_Shelves = LUC_Point_BjornShelves_df293005-f7a0-4f33-a93d-9db45ce5ad71
+	FIXEDSTRING:_Animation
+ACTIONS
+	CharacterMoveTo(_Desk,0)
+	CharacterLookFrom(_Desk)
+	IF "c1"
+		IsEqual(%HasMount,1)
+	THEN
+		GetRandom(_Animation,"Yes_01","Yes_02","Yes_03")	
+	ELSE
+		GetRandom(_Animation,"No_01","No_02","No_03")
+	ENDIF	
+	CharacterPlayAnimation(_Animation)
+	Sleep(2.0)
+	CharacterMoveTo(_Shelves,0)
+	CharacterLookFrom(_Shelves)
+	GetRandom(_Animation,"Fidget_Forward_02","Fidget_Forward_01","Look_Up_Short_01","Look_Up_Long_01")	
+	CharacterPlayAnimation(_Animation)
+	Sleep(1.0)
+	SetPriority(%currentAction, 0)	
+INTERRUPT
+	SetPriority(%currentAction, 0)	
+
+REACTION Action_Smithing, 0
+USAGE PEACE
+VARS
+	TRIGGER:_Furnace = LUC_Point_BjornFurnace_9aecafa1-f66f-4ade-bf2c-a222b96246bc 
+	TRIGGER:_Anvil = LUC_Point_BjornAnvil_9032eec2-4f28-4146-ad0d-94da4b814f14
+	FLOAT:_Dist
+ACTIONS
+	CharacterMoveTo(_Furnace,0)
+	IF "c1&c2"
+		GetDistance(_Dist,_Furnace,__Me)
+		IsLessThen(_Dist,0.5)
+	THEN
+		CharacterLookAt(_Furnace)
+		CharacterPlayAnimation("Blacksmith_02")
+	ENDIF
+	Sleep(1)
+	CharacterMoveTo(_Anvil,0)
+	IF "c1&c2"
+		GetDistance(_Dist,_Anvil,__Me)
+		IsLessThen(_Dist,0.5)
+	THEN
+		CharacterLookAt(_Anvil)
+		CharacterPlayAnimation("Blacksmith_01")
+	ENDIF
+	Sleep(1)
+	IF "c1"
+		IsRandom(0.3)
+	THEN
+		CharacterPlayAnimation("Tired_01")
+		Sleep(1)
+	ENDIF
+	SetPriority(%currentAction, 0)	
+INTERRUPT
+	SetPriority(%currentAction, 0)	
+	
+
+REACTION Action_WaitingForOthers, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+	FLOAT:_Range
+	FLOAT:_CurDist
+ACTIONS
+	IF "c1&c2&c3&c4"
+		CharacterGetSightRange(_Range,__Me)
+		GetDistance(_CurDist,%Mara,__Me)
+		IsLessThen(_CurDist,_Range)
+		IsRandom(0.4)
+	THEN
+		GetRandom(_Animation,"Shout_01","Wave_02")
+	ELSE
+		GetRandom(_Animation,"Dust_Off_01","Tired_01")
+	ENDIF
+	CharacterPlayAnimation(_Animation)
+	Sleep(4)
+	SetPriority(%currentAction, 0)	
+INTERRUPT
+	SetPriority(%currentAction, 0)	
+	
+REACTION Action_MournMara, 0
+USAGE ALL
+VARS
+	FLOAT:_Dist
+	FLOAT:_Range
+ACTIONS
+	IF "c1&c2&c3"
+		GetDistance(_Dist,__Me,%Mara)
+		CharacterGetSightRange(_Range,__Me)
+		IsLessThen(_Dist,_Range)
+	THEN
+		DisplayText(__Me,"LUC_BjornMournsMara",FLOAT:3.0)
+		CharacterPlayAnimation("Crying_01")
+		Sleep(1.0)
+	ENDIF
+	SetPriority("Action_MournMara",0)
+INTERRUPT
+	SetPriority("Action_MournMara",0)
+
+
+REACTION Action_Idle, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	GetRandom(_Animation,"Dust_Off_01","Sigh_01","Tired_01","Yawn_01")
+	CharacterPlayAnimation(_Animation)
+	Sleep(8)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)	
+
+REACTION Defend_Yourself,0
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+CHECK "c1&c2"
+	CharacterGet(_Enemy,__Me,null,Lowest,Distance,Enemy)
+	CharacterInWeaponRange(__Me,_Enemy)
+ACTIONS 
+	CharacterLookAt(_Enemy)
+	CharacterAttackWithoutMove(_Enemy)		
+	Sleep(1.0)
+	CharacterEndTurn()
+	
+REACTION Cower,0
+USAGE COMBAT
+VARS
+	FIXEDSTRING:_Animation
+	CHARACTER:_Enemy
+	FIXEDSTRING:_Text
+ACTIONS 
+	IF "c1"
+		CharacterGet(_Enemy,__Me,null,Lowest,Distance,Enemy)
+	THEN
+		CharacterLookAt(_Enemy)
+	ENDIF
+	GetRandom(_Animation,"Cower_01","Cower_02")
+	CharacterPlayAnimation(_Animation)
+	GetRandom(_Text,"LUC_BjornEscort_CombatHelp_1","LUC_BjornEscort_CombatHelp_2","LUC_BjornEscort_CombatHelp_3")
+	DisplayText(__Me,_Text)
+	Sleep(1)
+	CharacterEndTurn()
+
+EVENTS 
+
+EVENT MaraDead
+ON
+	OnCharacterEvent(__Me,"MaraDead")
+ACTIONS
+	SetPriority("Action_MournMara", 2100)
+
+EVENT EscortStart
+ON
+	OnCharacterEvent(__Me,"EscortStart")
+ACTIONS
+	SetPriority("Defend_Yourself", 1000)
+	SetPriority("Cower", 995)
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+STORY
+
+SCRIPTFRAME MoveToSafeSpot
+ACTIONS
+	SetPriority("Defend_Yourself",0)
+	SetPriority("Cower",0)
+	CharacterMoveTo(%SafePoint1, 0)
+	CharacterMoveTo(%SafePoint2, 0)
+	CharacterMoveTo(%SafePoint3, 0)
+
+SCRIPTFRAME LUC_MoveToPlayer
+VARS
+	FLOAT3:_Position
+ACTIONS
+	IF "!c1&c2"
+		IsEqual(%introTarget, null)
+		GetPosition(%introTarget,_Position)
+	THEN	
+		CharacterMoveInRange(_Position,2.5,4.0,1)
+		CharacterLookAt(%introTarget)
+	ENDIF
+	

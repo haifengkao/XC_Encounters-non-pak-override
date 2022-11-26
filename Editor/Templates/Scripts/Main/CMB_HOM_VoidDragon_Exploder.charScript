@@ -1,0 +1,33 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%Astarte2="HOM_Astarte_SecondFight_bd1ae42b-e714-49e7-9103-cd6d0379e760"
+
+
+//-------
+BEHAVIOUR
+REACTION EndFight_Exploder_WalkToAstarte_Peace,500
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Astarte2,0,0,1)
+
+REACTION EndFight_Exploder_WalkToAstarte_Combat,500
+USAGE COMBAT
+ACTIONS
+	CharacterMoveTo(%Astarte2,0,0,1)
+	CharacterDie(__Me,"Explode")
+
+//-------	
+EVENTS
+EVENT OnInit_OverrideDefChar
+ON
+	OnInit()
+ACTIONS
+	SetPriority("Combat_AttackSetEnemy",0)
+	SetPriority("Combat_MoveToSetEnemy",0)	
+	
+EVENT OnDie_Explode
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	ExplodeAt(__Me,"Projectile_SuicideBomberExplosion",-1,__Me)
+	//DebugText(__Me,"Boom!")

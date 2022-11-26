@@ -1,0 +1,57 @@
+INIT
+CHARACTER:__Me
+CHARACTER:%Friend = DAF_Wollocks_Bard_936f1ca9-6505-4d12-a7aa-e979041e9c8c
+
+BEHAVIOUR
+
+REACTION Listening, 1000
+USAGE PEACE
+VARS
+	FLOAT:_Time = 0
+	FIXEDSTRING:_Animation = ""
+	FIXEDSTRING:_Text = ""
+ACTIONS
+	GetRandom(_Text,"DAF_WollockCampfire_Listener_01","DAF_WollockCampfire_Listener_02")
+	DisplayText(__Me,_Text,5)
+	CharacterLookAt(%Friend)
+	GetRandom(_Animation,"Clap_02","Clap_03")
+	CharacterPlayAnimation(_Animation)
+	GetRandom(_Time,8,11,17,22,35)
+	Sleep(_Time)
+INTERRUPT
+		Reset()
+		
+		
+REACTION ReactOnFemale, 2100
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Text
+	FIXEDSTRING:_Reaction
+CHECK "c1"
+	CharacterInTouchRange(__Me, Player2_a0af7520-57ac-4f1c-b9d7-197bceebeade)
+ACTIONS
+	GetRandom(_Text,"DAF_WollocksVillager_Female_01","DAF_WollockCampfire_Listener_04")
+	DisplayText(__Me,_Text,5)
+	Sleep(4)
+INTERRUPT
+		Reset()
+
+		
+REACTION ReactOnMale, 2000
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Reaction
+	FIXEDSTRING:_Text
+CHECK "c1"
+		CharacterInTouchRange(__Me, Player1_dac1443f-a866-4ab3-b240-e705c0b20ec5)
+ACTIONS
+	GetRandom(_Reaction, "DAF_WollockCampfire_Listener_03")
+	DisplayText(__Me, _Reaction, 3)
+	Sleep(6)
+INTERRUPT
+		Reset()
+	
+		
+
+
+	

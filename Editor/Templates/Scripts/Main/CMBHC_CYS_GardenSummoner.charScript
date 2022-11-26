@@ -1,0 +1,131 @@
+
+
+	//!\\ This script isn't used anymore (17/07/2015) //!\\ 
+	
+/*
+INIT
+	CHARACTER:__Me
+	CHARACTERTEMPLATE:%WaterproofExploskeleton=Undead_SkeletonBaby_C_094ed4e2-5b4f-4538-9466-4b1b2a68df94
+	FLOAT:%GardenerSightRange
+	INT:%HyperSummon=0
+	EXTERN INT:%HyperSummon_OccursAt=2
+	EXTERN INT:%HyperSummon_StartsAt=2	
+	
+BEHAVIOUR
+REACTION BombSummoner_WaterproofHypersummon,1000
+USAGE COMBAT
+VARS
+	INT:_FailedHowManyTimes=0
+	INT:_HyperSummonStatus=0
+	INT:_BossSummonStatus=0
+	CHARACTER:_Player
+	FLOAT3:_PosOffset
+	FLOAT3:_MyPosition
+	FLOAT:_Angle
+	FLOAT:_Dist
+CHECK "c1&!c2&!c3&!c4&!c5&!c6"
+	CharacterGet(_Player,__Me,%GardenerSightRange,Lowest,Distance,Enemy)	//c1
+	CharacterHasStatus(__Me,CHARMED)										//c2
+	CharacterHasStatus(__Me,PETRIFIED)										//c3
+	CharacterHasStatus(__Me,FEAR)											//c4
+	CharacterHasStatus(__Me,STUNNED)										//c5
+	CharacterHasStatus(__Me,MUTED)											//c6
+ACTIONS
+	CharacterLookAt(_Player)
+	CharacterSetCombatTimeout(__Me,90.0)	
+	CharacterPlayEffect(__Me,"FX_Skills_Rogue_WindUpToy_Prepare_A")
+	CharacterPlayAnimation("Clap_04",1,1)			
+	CharacterPlayEffect(__Me,"FX_Skills_Rogue_WindUpToy_Cast_A")
+	WHILE "c1&c2"
+		IsLessThen(_HyperSummonStatus,4)
+		IsLessThen(_FailedHowManyTimes,30)
+	DO
+		IF "c1"
+			GetPosition(__Me,_MyPosition)
+		THEN
+			Set(_PosOffset,{1.3;0;0}) 
+			GetRandomBetween(_Angle,-270,90)
+			GetRandomBetween(_Dist,1,3.5)
+			RotateY(_PosOffset,_Angle)
+			Multiply(_PosOffset,_Dist)	
+			Add(_MyPosition,_PosOffset)
+		ENDIF
+		IF "c1&!c2&!c3&!c4&!c5"
+			FindValidPosition(_MyPosition,3)
+			ContainsSurface(_MyPosition,1,Fire)
+			ContainsSurface(_MyPosition,1,Ice)
+			ContainsSurface(_MyPosition,1,CloudStatic)
+			ContainsSurface(_MyPosition,1,Electrified)
+		THEN	
+			IF "c1"
+				IsEqual(_HyperSummonStatus,0)
+			THEN	
+				PlayEffectAt(_MyPosition,"FX_Skills_Rogue_WindUpToy_Summon_A")
+				SpawnCharacter(_,%WaterproofExploskeleton,_MyPosition,1)						
+				Add(_HyperSummonStatus,1)
+			ELIF "c1"
+				IsEqual(_HyperSummonStatus,1)
+			THEN			
+				PlayEffectAt(_MyPosition,"FX_Skills_Rogue_WindUpToy_Summon_A")
+				SpawnCharacter(_,%WaterproofExploskeleton,_MyPosition,1)	
+				Add(_HyperSummonStatus,1)					
+			ELIF "c1"
+				IsEqual(_HyperSummonStatus,2)
+			THEN					
+				Sleep(0.5)		
+				PlayEffectAt(_MyPosition,"FX_Skills_Rogue_WindUpToy_Summon_A")	
+				SpawnCharacter(_,%WaterproofExploskeleton,_MyPosition,1)
+				Add(_HyperSummonStatus,1)					
+			ELIF "c1"
+				IsEqual(_HyperSummonStatus,3)
+			THEN									
+				PlayEffectAt(_MyPosition,"FX_Skills_Rogue_WindUpToy_Summon_A")
+				SpawnCharacter(_,%WaterproofExploskeleton,_MyPosition,1)
+				Add(_HyperSummonStatus,1)							
+			ELSE
+				Add(_FailedHowManyTimes,1)
+			ENDIF
+		ELSE
+			 Add(_FailedHowManyTimes,1)
+		ENDIF
+	ENDWHILE
+	IF "c1"
+		IsEqual(_FailedHowManyTimes,50)
+	THEN
+		Set(_FailedHowManyTimes,0)
+		SetPriority("BombSummoner_WaterproofHypersummon",0)
+	ENDIF	
+	Set(_HyperSummonStatus,0)
+	Set(%HyperSummon_StartsAt,0)	
+	SetPriority("BombSummoner_WaterproofHypersummon",0)
+INTERRUPT
+	Reset()
+	
+EVENTS
+EVENT OnInit_GetSightRange
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%GardenerSightRange,__Me,Sight)
+	THEN
+	ENDIF
+	
+EVENT OnTurn_IncreaseHyperSummon_Frequency
+ON
+	OnTurn()
+ACTIONS
+	IF "c1"
+		IsLessThen(%HyperSummon_StartsAt,%HyperSummon_OccursAt)
+	THEN		
+		Add(%HyperSummon_StartsAt,1)
+	ELSE
+		SetPriority("BombSummoner_WaterproofHypersummon",500)
+	ENDIF	
+	
+EVENT OnCombatEnded_RestoreHypersummonPriority
+ON
+	OnCombatEnded()
+ACTIONS
+	SetPriority("BombSummoner_WaterproofHypersummon",1000)
+*/	

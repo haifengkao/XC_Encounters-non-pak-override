@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<palette xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <palettes>
+    <EntityPalette>
+      <palettes />
+      <objectids>
+        <guid>53615ab4-2690-4960-9522-2958fdcc4fe0</guid>
+        <guid>11a6befa-5a8b-486d-81f0-f637de052df5</guid>
+      </objectids>
+      <name>Humans</name>
+    </EntityPalette>
+    <EntityPalette>
+      <palettes />
+      <objectids>
+        <guid>d1b05e31-2478-4e14-a686-5f008672af90</guid>
+        <guid>033f9d08-5d4a-4e68-9747-09d51d173845</guid>
+        <guid>5b4fca89-a4ad-4580-a2d2-d5c09c5d53bc</guid>
+        <guid>ea528959-3d01-42df-b97d-2a72f9e8edc5</guid>
+        <guid>0548e1ed-314b-4d49-8285-2cf32f8be641</guid>
+        <guid>3ac79861-c439-491a-9824-ee93e398033e</guid>
+        <guid>ab34c67d-d28c-4b9d-8943-62c2419fd10e</guid>
+        <guid>67ff3af5-a3ef-4933-b290-79524a0aeec7</guid>
+        <guid>4e646f25-af18-47b1-84c7-1e2736bf85fa</guid>
+        <guid>04a3cc62-33b1-453c-82d7-00930638c564</guid>
+        <guid>821230c8-f8d7-499c-9693-dd9bbe48b52a</guid>
+        <guid>e766442d-d2c1-4a4e-9aba-2ea26cd281e9</guid>
+        <guid>60877217-ec37-4dfd-9a01-9d1d96e74acf</guid>
+        <guid>fbca40f8-3f13-4018-8c84-7f93ddc1059c</guid>
+        <guid>f20309b3-d636-4c10-ae4a-88617a17f397</guid>
+        <guid>5d98058e-b5bb-4f11-b7f8-08ab78c1e1ce</guid>
+        <guid>f728e576-0c80-43a8-a903-3e905b30725e</guid>
+        <guid>5fb26fe9-0ff0-447f-ac8f-37b647abb01c</guid>
+        <guid>6edc9961-2d03-44ac-833c-0c7c41ebfdbc</guid>
+        <guid>fb3c1ca3-c21d-4399-b7a9-fc4ab51a48cd</guid>
+        <guid>d5d66f18-0f85-45a2-85a3-5f9527914ae0</guid>
+        <guid>06dee6f3-8072-4891-9e87-142a2f4b48c9</guid>
+        <guid>41ea294a-9457-4bf7-8639-30c104c9768b</guid>
+        <guid>9184edc5-b184-4aec-99df-3016b064664d</guid>
+        <guid>da7f871e-1cbf-4b71-b1a1-b45f68f72698</guid>
+        <guid>198da6ba-bd7c-4139-a01e-01aafcf8a096</guid>
+        <guid>b544fd69-51bc-4787-a51e-ecdf5d70b8a4</guid>
+        <guid>a8ae62cd-4937-4a48-8458-5466d1baf71d</guid>
+        <guid>03af8f6b-e4d3-4c98-952c-d43d7c59f70a</guid>
+        <guid>a567376c-6ebf-4a03-813b-f38d87aa914b</guid>
+        <guid>73fd1e48-37d7-400a-9193-b14cbef6b332</guid>
+        <guid>d1a612b2-0198-41dc-b450-f0602845ca08</guid>
+        <guid>ff75ac37-f544-462b-af12-acd3f166b873</guid>
+        <guid>8d089a20-0810-471c-898e-204725ee7e1b</guid>
+      </objectids>
+      <name>Lizards</name>
+    </EntityPalette>
+  </palettes>
+  <objectids />
+  <name>Buildings</name>
+</palette>

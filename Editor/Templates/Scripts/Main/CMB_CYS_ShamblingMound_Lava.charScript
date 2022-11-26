@@ -1,0 +1,217 @@
+INIT
+	CHARACTER:__Me
+	INT:%FXHandle
+	FLOAT:%MoundSightRange
+	CHARACTER:%Target_PurifyingFire
+	CHARACTERTEMPLATE:%Summon_Fire_Rock_RT="CYS_ShMoundLava_FireRockSummon_cb8b8fe4-d7ff-47cd-9a34-a4e1ade95327"
+	EXTERN INT:%HyperSummon_Current=2
+	EXTERN INT:%HyperSummon_Desired=3
+
+//------------------------------
+BEHAVIOUR
+REACTION ShamblingMound_Hypersummon,500
+USAGE COMBAT
+VARS
+	FLOAT:_MyAP
+	INT:_Failures=0
+	INT:_Successes=0
+	INT:_BossSummonStatus=0
+	CHARACTER:_Player
+	CHARACTER:_Summon
+	FLOAT3:_PosOffset
+	FLOAT3:_MyPosition
+	FLOAT:_Angle
+	FLOAT:_Dist
+CHECK "c1&c2&!(c3|c4|c5|c6|c7|c8|c9)"
+	CharacterGet(_Player,__Me,%MoundSightRange,Lowest,Distance,Enemy)	//c1
+	CharacterGetStat(_MyAP,__Me,ActionPoints)							//c2
+	IsLessThen(_MyAP,4)													//!c3
+	CharacterHasStatus(__Me,"CHARMED")									//!c4
+	CharacterHasStatus(__Me,"PETRIFIED")								//!c5
+	CharacterHasStatus(__Me,"FEAR")										//!c6
+	CharacterHasStatus(__Me,"STUNNED")									//!c7
+	CharacterHasStatus(__Me,"MUTED")									//!c8
+	CharacterHasStatus(__Me,"FROZEN")									//!c9
+ACTIONS
+	CharacterLookAt(_Player)	
+	CharacterSetCombatTimeout(__Me,90.0)
+	CharacterPlayAnimation("cast_ground_loop",1,0)
+	CharacterPlayEffect(__Me,"FX_Skills_Fire_Summon_Prepare_A")
+	WHILE "c1&c2"
+		IsLessThen(_Successes,3)
+		IsLessThen(_Failures,15)
+	DO
+		IF "c1"
+			GetPosition(__Me,_MyPosition)
+		THEN
+			Set(_PosOffset,{1;0;0}) 
+			GetRandomBetween(_Angle,0,360)
+			GetRandomBetween(_Dist,2,3)
+			RotateY(_PosOffset,_Angle)
+			Multiply(_PosOffset,_Dist)	
+			Add(_MyPosition,_PosOffset)
+		ENDIF
+		IF "c1&!(c2|c3)"
+			FindValidPosition(_MyPosition,3)				//c1
+			ContainsSurface(_MyPosition,1,"CloudPoison")	//!c2
+			ContainsSurface(_MyPosition,1,"CloudStatic")	//!c3
+		THEN
+			PlayLoopEffectAt(%FXHandle,_MyPosition,"FX_GP_LightPillarOrange_A")
+			PlayEffectAt(_MyPosition,"FX_Skills_Fire_Summon_Cast_A")
+			SpawnCharacter(_Summon,%Summon_Fire_Rock_RT,_MyPosition,1)
+			StopLoopEffect(%FXHandle)
+			Add(_Successes,1)
+		ELSE
+			Add(_Failures,1)
+		ENDIF
+	ENDWHILE
+	IF "c1"
+		IsEqual(_Failures,30)
+	THEN
+		SetPriority("CastHasteOnMyself",450)	
+		SetPriority("ShamblingMound_Hypersummon",0)
+	ENDIF	
+	Set(_Successes,0)
+	Set(_Failures,0)
+	CharacterUseActionPoints(__Me,4)
+	Set(%HyperSummon_Current,0)	
+	SetPriority("ShamblingMound_Hypersummon",0)
+INTERRUPT
+	Reset()
+	
+REACTION ShamblingMound_CastFireball,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Character
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&!c4&c5"
+	CharacterCanCast(__Me,"Projectile_EnemyFireball")										//c1
+	CharacterGet(_Character,__Me,20,Lowest,FireResistance,Enemy)							//c2
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyFireball")				//c3
+	CharacterHasStatus(_Character,"FROZEN")													//!c4
+	IsRandom(0.4)																			//c5
+ACTIONS
+	CharacterMoveInRange(_Character,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_EnemyFireball",_Character)
+	
+REACTION ShamblingMound_CastFlare,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Character
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&!c4&c5"
+	CharacterCanCast(__Me,"Projectile_EnemyFlare")											//c1
+	CharacterGet(_Character,__Me,20,Lowest,FireResistance,Enemy)							//c2
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyFlare")				//c3
+	CharacterHasStatus(_Character,"FROZEN")													//!c4
+	IsRandom(0.4)																			//c5
+ACTIONS
+	CharacterMoveInRange(_Character,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_EnemyFlare",_Character)
+	
+REACTION ShamblingMound_PurifyingFire,1500
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3"
+	IsHardcore()
+	CharacterCanCast(__Me,"Target_EnemyPurifyingFire")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyPurifyingFire")
+ACTIONS
+	Set(%Target_PurifyingFire,null)
+	IterateCharacters("Iterate_CharactersWithShieldsOrHealing",Lowest,Distance)
+		IF "!c1"
+			IsEqual(%Target_PurifyingFire,null)
+		THEN
+			CharacterMoveInRange(%Target_PurifyingFire,_MinRange,_MaxRange,1)
+			CharacterUseSkill(Target_EnemyPurifyingFire,%Target_PurifyingFire)
+		ENDIF
+	SetPriority("ShamblingMound_PurifyingFire",0)	
+INTERRUPT
+	Reset()
+	
+//------------------------------
+EVENTS	
+EVENT OnInit_GetSightRange_GiveSkills
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%MoundSightRange,__Me,Sight)
+	THEN
+		CharacterAddSkill("Target_EnemyPurifyingFire")
+		CharacterAddSkill("Projectile_EnemyStaffOfMagusFire")
+		CharacterAddSkill("Projectile_EnemyFireball")
+		CharacterAddSkill("Projectile_EnemyFlare")	
+	ENDIF
+	
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	IF "c1"
+		IsLessThen(%HyperSummon_Current,%HyperSummon_Desired)
+	THEN		
+		Add(%HyperSummon_Current,1)
+	ELSE
+		SetPriority("ShamblingMound_Hypersummon",500)
+	ENDIF
+	
+EVENT OnIterateCharacter_ScanForChars_HealOrShield
+VARS
+	CHARACTER:_Character
+ON
+	OnIterateCharacter(_Character,"Iterate_CharactersWithShieldsOrHealing")
+ACTIONS
+	IF "!c1&(c2|c3)"
+		CharacterIsDead(_Character)
+		CharacterHasStatus(_Character,"HEALING")
+		CharacterHasStatus(_Character,"SHIELD")
+	THEN
+		Set(%Target_PurifyingFire,_Character)
+		Set(_Character,null)
+	ENDIF
+
+EVENT OnDie_Actions
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	StopLoopEffect(%FXHandle)	
+	IF "c1"
+		IsHardcore()
+	ACTIONS
+		ExplodeAt(__Me,"Projectile_SuicideBomberExplosion",500)
+		CreateSurfaceAt(__Me,Lava,2,4)
+	ENDIF
+	
+EVENT OnCombatEnded_CleanUp
+ON
+	OnCombatEnded()
+ACTIONS
+	IterateCharacters("Iterate_Characters_Cleanup",Lowest,Distance)
+	StopLoopEffect(%FXHandle)
+	Set(%HyperSummon_Current,2)
+	
+EVENT OnIterateCharacter_CleanUp
+VARS
+	CHARACTER:_Character
+	CHARACTERTEMPLATE:_CharacterTemplate
+ON
+	OnIterateCharacter(_Character,"Iterate_Characters_Cleanup")
+ACTIONS
+	IF "!c1&c2&c3"
+		CharacterIsDead(_Character)
+		CharacterGetTemplate(_Character,_CharacterTemplate)
+		IsEqual(_CharacterTemplate,%Summon_Fire_Rock_RT)
+	THEN
+		CharacterDie(_Character)
+	ENDIF	
+	
+EVENT OnDeactivate_StopLoopFX
+ON
+	OnDeactivate()
+ACTIONS
+	StopLoopEffect(%FXHandle)	

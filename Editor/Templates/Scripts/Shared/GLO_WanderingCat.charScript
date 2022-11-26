@@ -1,0 +1,58 @@
+INIT
+	CHARACTER:__Me
+	EXTERN TRIGGER:%WanderZone = null
+	INT:%SafeTime = 0
+	INT:%Chased = 0
+
+BEHAVIOUR
+
+REACTION WanderAround, 1000
+	USAGE PEACE	
+	ACTIONS
+		CharacterWander(%WanderZone, 20)
+
+
+REACTION RunFromDog, 1100
+	USAGE PEACE
+	VARS
+		CHARACTER:_Dog
+	CHECK "c1&c2&c3&c4"
+		IsEqual(%SafeTime, 0)
+		CharacterGet(_Dog, __Me, 6, Random, Vitality, Ally)
+		IsTagged(_Dog, "StrayDog")
+		GetVar(CHARACTER:null, _Dog, "CatChased")
+	ACTIONS
+		IF "c1"
+			IsEqual(%Chased, 0)
+		THEN
+			StartTimer("beeingChased", 10, 0)
+			SetVar(_Dog, "CatChased", __Me)
+			CharacterEvent(_Dog, "startTheChase")
+		ENDIF
+		Set(%Chased, 1)
+		CharacterFleeFrom(Ally, 8)
+		
+
+REACTION FinalFlee, 0
+	USAGE PEACE
+	ACTIONS
+		Set(%SafeTime, 1)
+		CharacterFleeFrom(Ally, 10)
+		StartTimer("backInTheGame", 5, 0)
+		SetPriority(FinalFlee, 0)
+
+EVENTS
+
+EVENT endChase
+	ON
+		OnTimer("beeingChased")
+	ACTIONS
+		CharacterEvent(__Me, "endChase")
+		SetPriority(FinalFlee, 1200)
+		
+EVENT BackNormal
+	ON
+		OnTimer("backInTheGame")
+	ACTIONS
+		Set(%Chased, 0)
+		Set(%SafeTime, 0)

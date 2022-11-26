@@ -1,0 +1,118 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+SneakTriggerSpotter(TRIGGER_CYS_FishTheftTrigger, CHARACTER_CYS_MarketFishThief);
+SneakTriggerSpotter(TRIGGER_CYS_FishTheftTrigger, CHARACTER_CYS_MarketFishBuyer2);
+KBSECTION
+PROC
+ProcCharInTriggerSpotted(_Player,TRIGGER_CYS_FishTheftTrigger)
+THEN
+PROC_MendatoryDialogThreeSpeaker("CYS_AD_FishBuyers",CHARACTER_CYS_MarketFishThief,CHARACTER_CYS_MarketFishBuyer2, _Player);
+
+IF
+GlobalEventSet("CYS_FishThief_LeaveFish")
+THEN
+CHARACTER_CYS_MarketFishThief.isLeavingFish();
+IncreaseAttitude(CHARACTER_Player1,CHARACTER_CYS_FishSeller,25);
+IncreaseAttitude(CHARACTER_Player2,CHARACTER_CYS_FishSeller,25);
+
+IF
+GlobalEventSet("CYS_FishThief_GuardComes")
+THEN
+CHARACTER_CYS_MarketFishThief.isTakingFish();
+DecreaseAttitude(CHARACTER_Player1,CHARACTER_CYS_FishSeller,25);
+DecreaseAttitude(CHARACTER_Player2,CHARACTER_CYS_FishSeller,25);
+
+IF
+DialogEnded("CYS_AD_FishBuyers",_)
+AND
+CHARACTER_CYS_MarketFishThief.isTakingFish()
+THEN
+NOT CHARACTER_CYS_MarketFishThief.isTakingFish();
+CharacterPlayAnimation(CHARACTER_CYS_MarketFishThief,"USE_LOOT","");
+DialogRequestStopForCharacter(CHARACTER_CYS_FishSeller);
+CharacterDisplayText(CHARACTER_CYS_FishSeller,"CYS_FishSeller_Shout");
+CharacterMoveToCharacter(CHARACTER_CYS_FishThiefGuard,CHARACTER_CYS_MarketFishThief,1,"CYS_FishThief_GuardOnSite",0);
+
+IF
+DialogEnded("CYS_AD_FishBuyers",_)
+AND
+CHARACTER_CYS_MarketFishThief.isLeavingFish()
+THEN
+NOT CHARACTER_CYS_MarketFishThief.isLeavingFish();
+DialogStartOneSpeakerDialog("CYS_AD_FishThiefLeave", CHARACTER_CYS_MarketFishThief);
+CharacterDisappearOutOfSight(CHARACTER_CYS_MarketFishThief,240,0,"",1);
+DB_Dialogs(CHARACTER_CYS_MarketFishBuyer2,"CYS_MarketFishBuyer");
+GlobalSetEvent("CYS_FishThiefOver");
+
+
+IF
+CharacterEvent(CHARACTER_CYS_FishThiefGuard,"CYS_FishThief_GuardOnSite")
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_CYS_MarketFishThief,_Player)
+THEN
+PROC_CYS_CheckFishThiefDistance(_Player);
+
+PROC
+PROC_CYS_CheckFishThiefDistance((CHARACTER)_Player)
+AND
+DB_InRegion(_Player,TRIGGER_CYS_FishTheftTrigger)
+THEN  
+PROC_MendatoryDialogThreeSpeaker("CYS_FishThiefScenario",CHARACTER_CYS_FishThiefGuard,CHARACTER_CYS_MarketFishThief,_Player);
+MakePlayerActive(_Player);
+
+PROC
+PROC_CYS_CheckFishThiefDistance((CHARACTER)_Player)
+AND
+NOT DB_InRegion(_Player,TRIGGER_CYS_FishTheftTrigger)
+THEN
+DB_OneShot_DialogTrigger(TRIGGER_CYS_FishTheftTrigger,"CYS_FishThiefScenario",CHARACTER_CYS_FishThiefGuard,CHARACTER_CYS_MarketFishThief);
+
+IF
+GlobalEventSet("CYS_HelpFishThief")
+THEN
+CHARACTER_CYS_MarketFishThief.helpedThief();
+
+IF
+DialogEnded("CYS_FishThiefScenario",_)
+AND
+CHARACTER_CYS_MarketFishThief.helpedThief()
+THEN
+CharacterDisappearOutOfSight(CHARACTER_CYS_MarketFishThief,240,0,"",1);
+CharacterDisappearOutOfSight(CHARACTER_CYS_FishThiefGuard,0,0,"",1);
+CharacterSetHasDialog(CHARACTER_CYS_FishThiefGuard,0);
+DB_Dialogs(CHARACTER_CYS_MarketFishBuyer2,"CYS_MarketFishBuyer");
+QuestUpdate("CYS_Thief","Update3");
+GlobalSetEvent("CYS_FishThiefOver");
+QuestClose("CYS_Thief");
+
+IF
+GlobalEventSet("CYS_HelpFishGuard")
+THEN
+CHARACTER_CYS_FishThiefGuard.helpedGuard();
+
+IF
+DialogEnded("CYS_FishThiefScenario",_)
+AND
+CHARACTER_CYS_FishThiefGuard.helpedGuard()
+THEN
+CharacterSetHasDialog(CHARACTER_CYS_FishThiefGuard,0);
+CharacterDisappearOutOfSight(CHARACTER_CYS_MarketFishThief,0,0,"CYS_FishThief_JailTime",1);
+CharacterDisappearOutOfSight(CHARACTER_CYS_FishThiefGuard,0,0,"",1);
+DB_Dialogs(CHARACTER_CYS_MarketFishBuyer2,"CYS_MarketFishBuyer");
+GlobalSetEvent("CYS_FishThiefOver");
+QuestUpdate("CYS_Thief","Update4");
+QuestClose("CYS_Thief");
+
+IF
+CharacterEvent(CHARACTER_CYS_MarketFishThief,"CYS_FishThief_JailTime")
+THEN
+DB_Dialogs(CHARACTER_CYS_MarketFishThief, "CYS_FishThief");
+CharacterSetOnStage(CHARACTER_CYS_MarketFishThief,1);
+CharacterSetVarInteger(CHARACTER_CYS_MarketFishThief, "inJail", 1);
+CharacterTeleportToTrigger(CHARACTER_CYS_MarketFishThief,TRIGGER_CYS_FishThiefJailtime,"");
+CharacterSetCanFight(CHARACTER_CYS_MarketFishThief, 0);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

@@ -1,0 +1,57 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	TRIGGER:%Cell1=LUC_Point_Cell1_ba5b388d-fbb9-42fe-8e3c-decc35d53246
+	TRIGGER:%Cell2=LUC_Point_Cell2_16f5a299-b8ed-46c9-98e8-5a5b21a9eb08
+	TRIGGER:%Cell3=LUC_Point_Cell3_f2b74253-acdd-477a-9f0f-eba0d6fbdcd2
+	
+	TRIGGER:%OrcCell=LUC_Point_Cell3_f2b74253-acdd-477a-9f0f-eba0d6fbdcd2
+	TRIGGER:%PlayerCell=LUC_Point_Cell2_16f5a299-b8ed-46c9-98e8-5a5b21a9eb08
+	TRIGGER:%PreviousCell = null
+	
+	INT:%PlayerInJail=0
+	
+	CHARACTER:%Orc=LUC_IV_OrcPrisoner_e26a9e8b-55dc-48e0-b08d-3ea5977c7d11
+	INT:%OrcInJail=1
+	
+BEHAVIOUR
+
+REACTION State_InspectPrisoners, 0
+USAGE PEACE
+ACTIONS
+	Set(%currentAction,"Action_WanderJail")
+	SetPriority(%currentAction, 1100)
+	
+	
+REACTION Action_WanderJail, 0
+USAGE PEACE
+VARS
+	TRIGGER:_Target
+ACTIONS
+	GetRandom(_Target,%Cell1,%Cell2,%Cell3)
+	IF "c1"
+		IsEqual(_Target,%PreviousCell)
+	THEN
+		Goto("Start")
+	ENDIF
+	Set(%PreviousCell,_Target)
+	CharacterMoveTo(_Target)
+	CharacterLookFrom(_Target)
+	IF "c1&c2&c3"
+		IsEqual(_Target,%PlayerCell)
+		IsRandom(0.3)
+		IsEqual(%PlayerInJail,1)
+	THEN
+		DialogStart("LUC_AD_PrisonGuardPlayerTaunt",__Me)
+	ELIF "c1&c2&c3&!c4"
+		IsEqual(_Target,%OrcCell)
+		IsRandom(0.3)
+		IsEqual(%OrcInJail,1)
+		CharacterIsDead(%Orc)
+	THEN
+		DialogStart("LUC_AD_PrisonGuardOrcTaunt",__Me,%Orc)
+	ENDIF
+	Sleep(2.0)
+	SetPriority(%currentAction, 0)

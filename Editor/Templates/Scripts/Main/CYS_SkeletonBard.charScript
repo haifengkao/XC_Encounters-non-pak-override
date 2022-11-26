@@ -1,0 +1,43 @@
+INIT
+
+CHARACTER:__Me
+CHARACTER:%SkeletonKing=CYS_SkeletonKing_98373dca-1706-41dc-9f47-1c7b9894c1e9
+CHARACTER:%SkeletonQueen=CYS_SkeletonQueen_38d5e375-b8b2-4400-bb21-049c41cc9915
+
+//-----------------------
+
+EVENTS
+EVENT OnTurnSaySomethingCool
+	VARS
+		FIXEDSTRING:_BardText
+	ON
+		OnTurn()
+	ACTIONS
+		GetRandom(_BardText,"CYS_SkeletonKing_Bard_Taunt01","CYS_SkeletonKing_Bard_Taunt02","CYS_SkeletonKing_Bard_Taunt03","CYS_SkeletonKing_Bard_Taunt04","CYS_SkeletonKing_Bard_Taunt05","CYS_SkeletonKing_Bard_Taunt06","CYS_SkeletonKing_Bard_Taunt07")
+		DisplayText(__Me,_BardText,4)
+		
+EVENT KingDiesYouAreSad
+	ON
+		OnDie(%SkeletonKing,_,_,_)
+	ACTIONS
+		IF "!c1"
+			CharacterIsDead(__Me)
+		THEN
+			DisplayText(__Me,"CYS_SkeletonKing_Bard_Sad01",4)	
+		ENDIF
+		
+EVENT QueenDiesYouAreSad
+	ON
+		OnDie(%SkeletonQueen,_,_,_)
+	ACTIONS
+		IF "!c1"
+			CharacterIsDead(__Me)
+		THEN
+			DisplayText(__Me,"CYS_SkeletonKing_Bard_Sad02",4)
+		ENDIF			
+		
+EVENT SaySomethingWhenYouDie
+	ON
+		OnDie(__Me,_,_,_)
+	ACTIONS
+		DisplayText(__Me,"CYS_SkeletonKing_Bard_Argh01",4)	

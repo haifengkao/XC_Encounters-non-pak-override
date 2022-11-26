@@ -1,0 +1,458 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+//REGION INIT
+DB_HIB_Sentinels(CHARACTER_HIB_Sentinel_Cave);
+DB_HIB_Sentinels(CHARACTER_HIB_Sentinel_Entrance1);
+DB_HIB_Sentinels(CHARACTER_HIB_Sentinel_Entrance2);
+DB_HIB_Sentinels(CHARACTER_HIB_Sentinel_Entrance3);
+DB_HIB_Sentinels(CHARACTER_HIB_Sentinel_Entrance4);
+//DB_HIB_Sentinels(CHARACTER_HIB_Sentinel_TelekinesisRoom);
+//DB_HIB_Sentinels(CHARACTER_HIB_Sentinel_TreasureCorridor1);
+//DB_HIB_Sentinels(CHARACTER_HIB_Sentinel_TreasureCorridor2);
+//DB_HIB_Sentinels(CHARACTER_HIB_Sentinel_TreasureCorridor3);
+//DB_HIB_Sentinels(CHARACTER_HIB_Sentinel_TreasureCorridor4);
+//END_REGION
+
+//REGION FIRST SENTINEL SPOTTING
+DB_PlayerComments("HIB_CommentOnSentinelSpotting","HIB_CommentOnSentinelSpotting_1_1",1,1);
+DB_PlayerComments("HIB_CommentOnSentinelSpotting","HIB_CommentOnSentinelSpotting_2_1",2,1);
+DB_PlayerComments("HIB_CommentOnSentinelSpotting","HIB_CommentOnSentinelSpotting_2_2",2,2);
+//END_REGION
+
+//REGION CASTLE ENTRANCE
+DB_HIB_Sentinels_Entrance(CHARACTER_HIB_Sentinel_Entrance1,TRIGGER_HIB_Point_AlarmEntrance1);
+DB_HIB_Sentinels_Entrance(CHARACTER_HIB_Sentinel_Entrance2,TRIGGER_HIB_Point_AlarmEntrance1);
+DB_HIB_Sentinels_Entrance(CHARACTER_HIB_Sentinel_Entrance3,TRIGGER_HIB_Point_AlarmEntrance2);
+DB_HIB_Sentinels_Entrance(CHARACTER_HIB_Sentinel_Entrance4,TRIGGER_HIB_Point_AlarmEntrance2);
+DB_HIB_Sentinels_Entrance_Guardians(CHARACTER_HIB_BoreasCastle_EntranceGuardian1,TRIGGER_HIB_Point_AlarmEntrance1);
+DB_HIB_Sentinels_Entrance_Guardians(CHARACTER_HIB_BoreasCastle_EntranceGuardian2,TRIGGER_HIB_Point_AlarmEntrance1);
+DB_HIB_Sentinels_Entrance_Guardians(CHARACTER_HIB_BoreasCastle_EntranceGuardian3,TRIGGER_HIB_Point_AlarmEntrance1);
+DB_HIB_Sentinels_Entrance_Guardians(CHARACTER_HIB_BoreasCastle_EntranceGuardian4,TRIGGER_HIB_Point_AlarmEntrance2);
+DB_HIB_Sentinels_Entrance_Guardians(CHARACTER_HIB_BoreasCastle_EntranceGuardian5,TRIGGER_HIB_Point_AlarmEntrance2);
+DB_HIB_Sentinels_Entrance_Guardians(CHARACTER_HIB_BoreasCastle_EntranceGuardian6,TRIGGER_HIB_Point_AlarmEntrance2);
+//END_REGION
+
+//REGION BOREAS CASTLE - SENTINEL KILLCOUNTS
+KillCounter("HIB_KillCount_BoreasCastleSentinels_KC01",3);
+KillCounterDB(CHARACTER_HIB_BoreasCastle_EntranceGuardian1,"HIB_KillCount_BoreasCastleSentinels_KC01");
+KillCounterDB(CHARACTER_HIB_BoreasCastle_EntranceGuardian2,"HIB_KillCount_BoreasCastleSentinels_KC01");
+KillCounterDB(CHARACTER_HIB_BoreasCastle_EntranceGuardian3,"HIB_KillCount_BoreasCastleSentinels_KC01");
+KillCounter("HIB_KillCount_BoreasCastleSentinels_KC02",3);
+KillCounterDB(CHARACTER_HIB_BoreasCastle_EntranceGuardian4,"HIB_KillCount_BoreasCastleSentinels_KC02");
+KillCounterDB(CHARACTER_HIB_BoreasCastle_EntranceGuardian5,"HIB_KillCount_BoreasCastleSentinels_KC02");
+KillCounterDB(CHARACTER_HIB_BoreasCastle_EntranceGuardian6,"HIB_KillCount_BoreasCastleSentinels_KC02");
+//END_REGION
+
+/*
+//REGION TREASURE CORRIDOR
+DB_HIB_Sentinels_TreasureCorridor(CHARACTER_HIB_Sentinel_TreasureCorridor1);
+DB_HIB_Sentinels_TreasureCorridor(CHARACTER_HIB_Sentinel_TreasureCorridor2);
+DB_HIB_Sentinels_TreasureCorridor(CHARACTER_HIB_Sentinel_TreasureCorridor3);
+DB_HIB_Sentinels_TreasureCorridor(CHARACTER_HIB_Sentinel_TreasureCorridor4);
+TriggerCreateSurface(TRIGGER_HIB_Point_Sentinel_TreasureCorridor4,"Water",4.0);
+TriggerCreateSurface(TRIGGER_HIB_Point_Sentinel_TreasureCorridor5,"Water",4.0);
+ItemOpen(ITEM_HIB_TreasureCorridor_Gate1);
+ItemSetCanInteract(ITEM_HIB_TreasureCorridor_Gate1,0);
+ItemSetCanInteract(ITEM_HIB_TreasureCorridor_Gate2,0);
+
+DB_HIB_Sentinels_TreasureGate(CHARACTER_HIB_Sentinel_TreasureCorridor3);
+DB_HIB_Sentinels_TreasureGate(CHARACTER_HIB_Sentinel_TreasureCorridor4);
+DB_HIB_TreasureGate_Lever(ITEM_HIB_TreasureCorridor_Lever1);
+DB_HIB_TreasureGate_Lever(ITEM_HIB_TreasureCorridor_Lever2);
+ProcTriggerRegisterForPlayers(TRIGGER_HIB_Area_Sentinel_TreasureCorridor);
+//END_REGION
+*/
+
+//REGION PRISON
+ProcTriggerRegisterForPlayers(TRIGGER_HIB_Area_Sentinel_Prison1);
+//END_REGION
+
+/*
+//REGION WELL
+DB_HIB_Sentinels_Well(CHARACTER_HIB_Sentinel_WellLeft1,ITEM_HIB_PressurePlate_WishingWellRight1,1,"HIB_Sentinels_WellLeft1");
+DB_HIB_Sentinels_Well(CHARACTER_HIB_Sentinel_WellRight1,ITEM_HIB_PressurePlate_WishingWellLeft1,1,"HIB_Sentinels_WellRight1");
+DB_HIB_Sentinels_Well(CHARACTER_HIB_Sentinel_WellLeft2,ITEM_HIB_PressurePlate_WishingWellLeft2,0,"");
+DB_HIB_Sentinels_Well(CHARACTER_HIB_Sentinel_WellRight2,ITEM_HIB_PressurePlate_WishingWellRight2,0,"");
+
+DB_HIB_Sentinels_WellAreas(TRIGGER_HIB_Area_Sentinel_WellLeft);
+DB_HIB_Sentinels_WellAreas(TRIGGER_HIB_Area_Sentinel_WellRight);
+PROC_HIB_Sentinels_WellAreas_Init();
+//END_REGION
+*/
+
+PROC_HIB_Sentinels_Init();
+PROC_HIB_Init_BoreasCastle_Entrance();
+
+DB_PrisonSentinels(CHARACTER_HIB_Sentinel_Prison1);
+DB_PrisonSentinels(CHARACTER_HIB_Sentinel_Prison2);
+DB_PrisonSentinels(CHARACTER_HIB_Sentinel_Prison3);
+DB_PrisonSentinels(CHARACTER_HIB_Sentinel_Prison4);
+KBSECTION
+//REGION INIT
+PROC
+PROC_HIB_Sentinels_Init()
+AND
+DB_HIB_Sentinels(_Sentinel)
+THEN
+DB_NoDefaultBehavior(_Sentinel);
+
+PROC
+PROC_HIB_Init_BoreasCastle_Entrance()
+AND
+DB_HIB_Sentinels_Entrance_Guardians(_Guardian,_)
+THEN
+CharacterSetOnStage(_Guardian,0);
+//END_REGION
+
+//REGION FIRST SENTINEL SPOTTING
+IF
+CharacterItemEvent(_Sentinel,_,"HIB_SentinelSpotted")
+AND
+CharacterGetClosestPlayer(_Sentinel,_Player)
+THEN
+Launch_PlayerComment(_Player,"HIB_CommentOnSentinelSpotting");
+
+IF
+CharacterItemEvent(CHARACTER_HIB_Sentinel_Cave,_,"HIB_SentinelSpotted")
+AND
+NOT CHARACTER_HIB_Sentinel_Cave.HIB_Activated()
+THEN
+CHARACTER_HIB_Sentinel_Cave.HIB_Activated();
+ItemSetVarInteger(ITEM_HIB_GardenTurret1,"IsOn",1);
+ItemSetVarInteger(ITEM_HIB_GardenTurret2,"IsOn",1);
+//END_REGION
+
+/*
+//REGION TELEKINESIS ROOM
+IF
+ItemOpened(ITEM_HIB_Chest_TelekinesisRoom)
+THEN
+CharacterItemSetEvent(CHARACTER_HIB_Sentinel_TelekinesisRoom,ITEM_HIB_Chest_TelekinesisRoom,"HIB_SentinelActive");
+
+IF
+CharacterItemEvent(CHARACTER_HIB_Sentinel_TelekinesisRoom,_,"HIB_SentinelSpotted")
+AND
+NOT CHARACTER_HIB_Sentinel_TelekinesisRoom.HIB_Activated()
+THEN
+CHARACTER_HIB_Sentinel_TelekinesisRoom.HIB_Activated();
+TriggerCreateSurface(TRIGGER_HIB_PointPit_TelekinesisRoom1,"Lava",5.0);
+//END_REGION
+*/
+
+//REGION CASTLE ENTRANCE
+IF
+CharacterItemEvent(_Sentinel,_,"HIB_SentinelSpotted")
+AND
+DB_HIB_Sentinels_Entrance(_Sentinel,_Trigger)
+THEN
+PROC_HIB_Clear_Sentinels_Entrance(_Trigger);
+PROC_HIB_Spawn_Wardens_Entrance(_Trigger);
+TriggerCreatePuddle(_Trigger,"Ice",130,180,10,20,0.3);
+
+PROC
+PROC_HIB_Clear_Sentinels_Entrance((TRIGGER)_Trigger)
+AND
+DB_HIB_Sentinels_Entrance(_Sentinel,_Trigger)
+THEN
+NOT DB_HIB_Sentinels_Entrance(_Sentinel,_Trigger);
+
+PROC
+PROC_HIB_Spawn_Wardens_Entrance((TRIGGER)_Trigger)
+AND
+DB_HIB_Sentinels_Entrance_Guardians(_Guardian,_Trigger)
+THEN
+NOT DB_HIB_Sentinels_Entrance_Guardians(_Guardian,_Trigger);
+CharacterAppear(_Guardian,1);
+
+IF
+KillCounterCounts("HIB_KillCount_BoreasCastleSentinels_KC01",3)
+THEN
+CharacterDie(CHARACTER_HIB_Sentinel_Entrance1,0);
+CharacterDie(CHARACTER_HIB_Sentinel_Entrance2,0);
+
+IF
+KillCounterCounts("HIB_KillCount_BoreasCastleSentinels_KC02",3)
+THEN
+CharacterDie(CHARACTER_HIB_Sentinel_Entrance3,0);
+CharacterDie(CHARACTER_HIB_Sentinel_Entrance4,0);
+//END_REGION
+
+/*
+//REGION WELL
+PROC
+PROC_HIB_Sentinels_WellAreas_Init()
+AND
+DB_HIB_Sentinels_WellAreas(_Trigger)
+THEN
+ProcTriggerRegisterForPlayers(_Trigger);
+
+IF
+CharacterItemEvent(_,_Pressure,"HIB_PressurePlate_Well_On")
+AND
+DB_HIB_Sentinels_Well(_Sentinel,_Pressure,_,_)
+AND
+NOT ITEM_HIB_TreasureRoom_AmuletChest.HIB_Well_PuzzleDone()
+AND
+NOT ITEM_HIB_TreasureRoom_AmuletChest.HIB_Well_PuzzleAlarm()
+THEN
+CharacterItemSetEvent(_Sentinel,_Pressure,"HIB_SentinelInactive");
+PROC_HIB_Sentinels_Well_CommentCheck(_Pressure);
+PROC_HIB_Sentinels_Well_Check();
+
+PROC
+PROC_HIB_Sentinels_Well_CommentCheck((ITEM)_Pressure)
+AND
+DB_HIB_Sentinels_Well(_,_Pressure,1,_Comment)
+AND
+ItemGetClosestPlayer(_Pressure,_Player)
+AND
+NOT ITEM_HIB_TreasureRoom_AmuletChest.HIB_Well_PuzzleDone()
+AND
+NOT ITEM_HIB_TreasureRoom_AmuletChest.HIB_Well_PuzzleAlarm()
+THEN
+CharacterDisplayText(_Player,_Comment);
+
+IF
+CharacterItemEvent(_,_Pressure,"HIB_PressurePlate_Well_Off")
+AND
+DB_HIB_Sentinels_Well(_Sentinel,_Pressure,_,_)
+AND
+NOT ITEM_HIB_TreasureRoom_AmuletChest.HIB_Well_PuzzleDone()
+AND
+NOT ITEM_HIB_TreasureRoom_AmuletChest.HIB_Well_PuzzleAlarm()
+THEN
+CharacterItemSetEvent(_Sentinel,_Pressure,"HIB_SentinelActive");
+
+PROC
+PROC_HIB_Sentinels_Well_Check()
+AND
+CharacterGetVarInteger(CHARACTER_HIB_Sentinel_WellLeft1,"Active",0)
+AND
+CharacterGetVarInteger(CHARACTER_HIB_Sentinel_WellRight1,"Active",0)
+AND
+CharacterGetVarInteger(CHARACTER_HIB_Sentinel_WellLeft2,"Active",0)
+AND
+CharacterGetVarInteger(CHARACTER_HIB_Sentinel_WellRight2,"Active",0)
+AND
+ItemGetClosestPlayer(ITEM_HIB_TreasureRoom_AmuletChest,_Player)
+THEN
+PROC_HIB_Sentinels_Well_Destroy();
+ITEM_HIB_TreasureRoom_AmuletChest.HIB_Well_PuzzleDone();
+ItemUnLock(ITEM_HIB_TreasureRoom_AmuletChest);
+GlobalClearEvent("HIB_KnowsAmuletChest");
+CharacterDisplayText(_Player,"HIB_Sentinels_WellFinished");
+NOT DB_HIB_Sentinels_WellAreas(TRIGGER_HIB_Area_Sentinel_WellLeft);
+NOT DB_HIB_Sentinels_WellAreas(TRIGGER_HIB_Area_Sentinel_WellRight);
+
+IF
+CharacterItemEvent(_Sentinel,_,"HIB_SentinelSpotted")
+AND
+DB_HIB_Sentinels_Well(_Sentinel,_,_,_)
+THEN
+PROC_HIB_Sentinels_Well_Alarm();
+ITEM_HIB_TreasureRoom_AmuletChest.HIB_Well_PuzzleAlarm();
+
+PROC
+PROC_HIB_Sentinels_Well_Alarm()
+AND
+DB_HIB_Sentinels_Well(_Sentinel,_Pressure,_,_)
+THEN
+CharacterItemSetEvent(_Sentinel,_Pressure,"HIB_SentinelAlarm");
+
+IF
+CharacterLeftTrigger(_Player,_Trigger)
+AND
+DB_HIB_Sentinels_WellAreas(_Trigger)
+AND
+NOT DB_InRegion(_,TRIGGER_HIB_Area_Sentinel_WellLeft)
+AND
+NOT DB_InRegion(_,TRIGGER_HIB_Area_Sentinel_WellRight)
+THEN
+PROC_HIB_Sentinels_Well_Reset();
+NOT ITEM_HIB_TreasureRoom_AmuletChest.HIB_Well_PuzzleAlarm();
+
+PROC
+PROC_HIB_Sentinels_Well_Reset()
+AND
+DB_HIB_Sentinels_Well(_Sentinel,_Pressure,_,_)
+THEN
+CharacterItemSetEvent(_Sentinel,_Pressure,"HIB_SentinelActive");
+
+PROC
+PROC_HIB_Sentinels_Well_Destroy()
+AND
+DB_HIB_Sentinels_Well(_Sentinel,_Pressure,_HasComment,_Comment)
+THEN
+NOT DB_HIB_Sentinels_Well(_Sentinel,_Pressure,_HasComment,_Comment);
+CharacterDie(_Sentinel,0);
+//END_REGION
+*/
+
+//REGION PRISON
+IF
+CharacterLeftTrigger(_Player,TRIGGER_HIB_Area_Sentinel_Prison1)
+THEN
+ProcHIBCheckPrisonReset();
+
+IF
+CharacterDied(_Player)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_PrisonSentinelsDone(1)
+THEN
+ProcHIBCheckPrisonReset();
+
+PROC
+ProcHIBCheckPrisonReset()
+AND
+DB_InRegion(_Player,TRIGGER_HIB_Area_Sentinel_Prison1)
+AND
+NOT DB_Dead(_Player)
+THEN
+DB_HIBPRisonSentinelPlayer(1);
+
+PROC
+ProcHIBCheckPrisonReset()
+AND
+NOT DB_HIBPRisonSentinelPlayer(1)
+THEN
+PROC_HIB_Sentinels_Prison1_Reset();
+
+PROC
+ProcHIBCheckPrisonReset()
+THEN
+NOT DB_HIBPRisonSentinelPlayer(1);
+
+PROC
+PROC_HIB_Sentinels_Prison1_Reset()
+THEN
+CharacterItemSetEvent(CHARACTER_HIB_Sentinel_Prison1,ITEM_HIB_SentinelManager_Prison,"HIB_SentinelActive");
+CharacterItemSetEvent(CHARACTER_HIB_Sentinel_Prison2,ITEM_HIB_SentinelManager_Prison,"HIB_SentinelActive");
+CharacterItemSetEvent(CHARACTER_HIB_Sentinel_Prison3,ITEM_HIB_SentinelManager_Prison,"HIB_SentinelActive");
+CharacterItemSetEvent(CHARACTER_HIB_Sentinel_Prison4,ITEM_HIB_SentinelManager_Prison,"HIB_SentinelActive");
+CharacterItemSetEvent(CHARACTER_HIB_Sentinel_Prison1,ITEM_HIB_SentinelManager_Prison,"HIB_SentinelManager_Prison_Off");
+ItemSetVarInteger(ITEM_HIB_SentinelManager_Prison,"Triggered",0);
+ItemSetVarCharacter(ITEM_HIB_SentinelManager_Prison,"CurrentActive",CHARACTER_HIB_Sentinel_Prison1);
+CharacterItemSetEvent(CHARACTER_NULL,ITEM_HIB_PrisonGasPit_001,"HIB_SentinelManager_Restart");
+
+IF
+CharacterUsedItem(_,ITEM_HIB_Prison_Lever1)
+AND
+DB_PrisonSentinels(_Sent)
+THEN
+DB_PrisonSentinelsDone(1);
+CharacterDie(_Sent, 0);
+NOT DB_PrisonSentinels(_Sent);
+CharacterItemSetEvent(CHARACTER_NULL,ITEM_HIB_PrisonGasPit_001,"HIB_SentinelManager_Restart");
+
+IF
+CharacterItemEvent(_Sent,_,"HIB_SentinelSpotted")
+AND
+DB_PrisonSentinels(_Sent)
+THEN
+CharacterItemSetEvent(_Sent,ITEM_HIB_PrisonGasPit_001,"HIB_SentinelPrisonSpotted");
+//END_REGION
+
+//REGION PRISON 2
+IF
+CharacterItemEvent(CHARACTER_HIB_Sentinel_Prison5,_,"HIB_SentinelSpotted")
+THEN
+CharacterItemSetEvent(CHARACTER_HIB_Sentinel_Prison5,ITEM_HIB_Prison_GasPit1,"HIB_Prison_GasPit1_On");
+CharacterItemSetEvent(CHARACTER_HIB_Sentinel_Prison5,ITEM_HIB_Prison_GasPit2,"HIB_Prison_GasPit2_On");
+//END_REGION
+
+/*
+//REGION TREASURE CORRIDOR
+IF
+CharacterUsedItem(_Player,_Lever)
+AND
+DB_HIB_TreasureGate_Lever(_Lever)
+AND
+NOT ITEM_HIB_TreasureCorridor_Gate2.HIB_TreasureCorridor_PuzzleDone()
+THEN
+CharacterDisplayText(_Player,"HIB_TreasureCorridor_Deactivated");
+ITEM_HIB_TreasureCorridor_Gate2.HIB_TreasureCorridor_PuzzleDone();
+PROC_HIB_Sentinels_TreasureCorridor_Deactivate();
+PROC_HIB_Sentinels_TreasureCorridor_OpenGates(ITEM_HIB_TreasureCorridor_Gate1);
+PROC_HIB_Sentinels_TreasureCorridor_OpenGates(ITEM_HIB_TreasureCorridor_Gate2);
+PROC_HIB_Sentinels_TreasureCorridor_TrapsReset();
+ProcTriggerUnregisterForPlayers(TRIGGER_HIB_Area_Sentinel_TreasureCorridor);
+
+PROC
+PROC_HIB_Sentinels_TreasureCorridor_OpenGates((ITEM)_Gate)
+AND
+ItemIsClosed(_Gate,1)
+THEN
+ItemOpen(_Gate);
+
+IF
+CharacterItemEvent(CHARACTER_HIB_Sentinel_TreasureCorridor1,_,"HIB_SentinelSpotted")
+THEN
+CharacterItemSetEvent(CHARACTER_HIB_Sentinel_TreasureCorridor1,ITEM_HIB_TreasureCorridor_GasPit1,"HIB_TreasureCorridor_GasPit1_On");
+
+IF
+CharacterItemEvent(CHARACTER_HIB_Sentinel_TreasureCorridor2,_,"HIB_SentinelSpotted")
+THEN
+CharacterItemSetEvent(CHARACTER_HIB_Sentinel_TreasureCorridor2,ITEM_HIB_Turret_TreasureCorridor3_Invisible,"HIB_Turret_TreasureCorridor3_On");
+
+IF
+CharacterItemEvent(_Sentinel,_,"HIB_SentinelSpotted")
+AND
+DB_HIB_Sentinels_TreasureGate(_Sentinel)
+THEN
+ItemClose(ITEM_HIB_TreasureCorridor_Gate1);
+PROC_HIB_Sentinels_TreasureCorridor_CloseGate();
+
+PROC
+PROC_HIB_Sentinels_TreasureCorridor_CloseGate()
+AND
+DB_HIB_Sentinels_TreasureGate(_Sentinel)
+THEN
+CharacterItemSetEvent(_Sentinel,ITEM_HIB_TreasureCorridor_Gate1,"HIB_SentinelAlarm");
+
+IF
+CharacterLeftTrigger(_Player,TRIGGER_HIB_Area_Sentinel_TreasureCorridor)
+AND
+NOT DB_InRegion(_,TRIGGER_HIB_Area_Sentinel_TreasureCorridor)
+AND
+NOT ITEM_HIB_TreasureCorridor_Gate2.HIB_TreasureCorridor_PuzzleDone()
+THEN
+ItemOpen(ITEM_HIB_TreasureCorridor_Gate1);
+PROC_HIB_Sentinels_TreasureCorridor_TrapsReset();
+PROC_HIB_Sentinels_TreasureCorridor_Reset();
+
+PROC
+PROC_HIB_Sentinels_TreasureCorridor_TrapsReset()
+THEN
+CharacterItemSetEvent(CHARACTER_HIB_Sentinel_TreasureCorridor2,ITEM_HIB_Turret_TreasureCorridor3_Invisible,"HIB_Turret_TreasureCorridor3_Off");
+CharacterItemSetEvent(CHARACTER_HIB_Sentinel_TreasureCorridor1,ITEM_HIB_TreasureCorridor_GasPit1,"HIB_TreasureCorridor_GasPit1_Off");
+
+PROC
+PROC_HIB_Sentinels_TreasureCorridor_Reset()
+AND
+DB_HIB_Sentinels_TreasureCorridor(_Sentinel)
+THEN
+CharacterItemSetEvent(_Sentinel,ITEM_HIB_TreasureCorridor_Gate1,"HIB_SentinelActive");
+
+PROC
+PROC_HIB_Sentinels_TreasureCorridor_Deactivate()
+AND
+DB_HIB_Sentinels_TreasureCorridor(_Sentinel)
+THEN
+NOT DB_HIB_Sentinels_TreasureCorridor(_Sentinel);
+CharacterItemSetEvent(_Sentinel,ITEM_HIB_TreasureCorridor_Gate1,"HIB_SentinelInactive");
+//END_REGION
+*/
+
+//REGION MALFUNCTIONING SENTINEL
+IF
+ItemDestroyed(ITEM_HIB_SentinelMalfunctioning)
+THEN
+ItemSetOnstage(ITEM_HIB_SentinelMalfunctioning_Invisible,0);
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

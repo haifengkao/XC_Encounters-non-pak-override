@@ -1,0 +1,128 @@
+INIT
+	CHARACTER:__Me
+	CHARACTERTEMPLATE:%FireMushroom="Env_Evil_Mushroom_B_Summon_Fire_c7087e6b-745f-4150-9c94-99131692cc85"
+	CHARACTERTEMPLATE:%WaterMushroom="Env_Evil_Mushroom_B_Summon_Water_c94de303-d3d1-4d09-b4ef-870624feef67"
+	CHARACTERTEMPLATE:%AirMushroom="Env_Evil_Mushroom_B_Summon_Air_aabfa6f5-5dd1-4e4e-b72b-a2faf20a9c5b"
+	CHARACTERTEMPLATE:%PoisonMushroom="Env_Evil_Mushroom_B_Summon_Poison_056fe4f6-8483-4261-87fd-105572fdc124"
+	INT:%SpellSwitch=0	
+	EXTERN SKILL:%Spell1="Projectile_EnemySmallDeadlySpores"
+	EXTERN SKILL:%Spell2="Target_EnemyTargetedCurse"
+	EXTERN INT:%Bool_Summon=0	
+
+//---------	
+BEHAVIOUR
+REACTION Mushroom_CastSpells,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+	FLOAT:_CurrentHP
+ACTIONS
+	IF "c1"
+		IsEqual(%SpellSwitch,0)
+	THEN
+		IF "c1&c2&c3"
+			CharacterCanCast(__Me,%Spell1)
+			CharacterGetSkillRange(_MinRange,_MaxRange,__Me,%Spell1)
+			CharacterGet(_Target,__Me,_MaxRange,Lowest,Distance,Enemy)
+		THEN
+			CharacterUseSkill(%Spell1,_Target)
+		ENDIF
+		Set(%SpellSwitch,1)
+	ELSE
+		IF "c1&c2&c3"
+			CharacterCanCast(__Me,%Spell2)
+			CharacterGetSkillRange(_MinRange,_MaxRange,__Me,%Spell2)
+			CharacterGet(_Target,__Me,_MaxRange,Lowest,Distance,Enemy)
+		THEN
+			CharacterUseSkill(%Spell2,_Target)
+		ENDIF
+		Set(%SpellSwitch,0)
+	ENDIF
+	CharacterEndTurn()
+
+REACTION Failsafe, 100
+USAGE COMBAT
+ACTIONS
+	CharacterEndTurn()
+	
+//---------
+EVENTS
+EVENT OnInit_AddSkill
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill(%Spell1)
+	CharacterAddSkill(%Spell2)
+
+EVENT OnDamage_SpawnMushrooms
+VARS
+	CHARACTER:_Player
+	CHARACTER:_ShroomSummon	
+	CHARACTERTEMPLATE:_MyTemplate
+	FLOAT3:_Position
+	FLOAT:_XPos
+	FLOAT:_ZPos
+	FLOAT:_XNew
+	FLOAT:_ZNew	
+	DAMAGE:_Type
+	FIXEDSTRING:_Faction
+ON
+	OnDamage(_Type,_,_Player,_)
+ACTIONS
+	IF "c1&!(c2|c3|c4|c5)&(c6|c7|c8|c9)&c10&c11&c12&c13&c14"
+		CharacterGetTemplate(__Me,_MyTemplate)			//c1
+		IsEqual(_MyTemplate,%FireMushroom)				//!c2
+		IsEqual(_MyTemplate,%WaterMushroom)				//!c3
+		IsEqual(_MyTemplate,%AirMushroom)				//!c4
+		IsEqual(_MyTemplate,%PoisonMushroom)			//!c5
+		IsEqual(_Type,DAMAGE:Fire)						//c6
+		IsEqual(_Type,DAMAGE:Water)						//c7
+		IsEqual(_Type,DAMAGE:Air)						//c8
+		IsEqual(_Type,DAMAGE:Poison)					//c9
+		CharacterIsPlayer(_Player)						//c10
+		GetPosition(__Me,_Position)						//c11
+		GetX(_Position,_XPos)							//c12
+		GetZ(_Position,_ZPos)							//c13
+		CharacterGetFaction(_Faction,__Me)				//c14
+	THEN
+		GetRandomBetween(_XNew,-5,5)
+		GetRandomBetween(_ZNew,-5,5)
+		Add(_XPos,_XNew)
+		Add(_ZPos,_ZNew)
+		SetX(_Position,_XPos)
+		SetZ(_Position,_ZPos)
+		IF "c1"
+			IsEqual(_Type,DAMAGE:Fire)
+		THEN
+			PlayEffectAt(_Position,"FX_Skills_Fire_Fireball_Cast_Dummy_A")
+			SpawnCharacter(_ShroomSummon,%FireMushroom,_Position,1)
+		ELIF "c1"
+			IsEqual(_Type,DAMAGE:Water)
+		THEN
+			PlayEffectAt(_Position,"FX_Skills_Water_IceShard_Cast_A")
+			SpawnCharacter(_ShroomSummon,%WaterMushroom,_Position,1)
+		ELIF "c1"
+			IsEqual(_Type,DAMAGE:Air)
+		THEN
+			PlayEffectAt(_Position,"FX_Skills_Air_BlitzBolt_Cast_Dummy_A")
+			SpawnCharacter(_ShroomSummon,%AirMushroom,_Position,1)	
+		ELSE
+			PlayEffectAt(_Position,"FX_Skills_Earth_PoisonDart_Cast_A")
+			SpawnCharacter(_ShroomSummon,%PoisonMushroom,_Position,1)
+		ENDIF			
+		CharacterSetFaction(_ShroomSummon,_Faction)
+		CombatLogText(__Me,"LUC_CMB_ShroomSummonMushroom",0,1)
+	ENDIF
+	
+EVENT OnCombatEnded_IfSummon_Die
+ON
+	OnCombatEnded()
+	OnDeactivate()
+ACTIONS
+	IF "c1"
+		IsEqual(%Bool_Summon,1)
+	THEN
+		CharacterDie(__Me)
+	ENDIF

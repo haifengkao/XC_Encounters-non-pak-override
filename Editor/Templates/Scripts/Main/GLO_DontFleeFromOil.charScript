@@ -1,0 +1,13 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter
+CHARACTER:__Me
+
+BEHAVIOUR
+REACTION MoveAwayFromOilSurface,0 OVERRIDE
+USAGE PEACE
+CHECK "c1"
+	IsInSurface(__Me,Oil)
+ACTIONS
+	CharacterFleeFromSurface(Oil)

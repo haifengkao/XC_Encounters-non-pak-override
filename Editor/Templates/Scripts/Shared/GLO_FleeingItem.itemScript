@@ -1,0 +1,40 @@
+INIT
+ITEM:__Me
+INT:%State = 1
+EXTERN FLOAT:%Distance = 4.0
+INT:%Away = 0
+
+BEHAVIOUR
+
+REACTION Open, 1000
+USAGE ALL
+VARS
+	CHARACTER:_player
+CHECK "!c1&c2"
+	CharacterGet(_player, __Me, %Distance, Lowest, Distance, Player)
+	IsEqual(%Away, 1)
+ACTIONS
+	IF "c1"
+		IsEqual(%Away, 1)
+	THEN
+		ItemPlayAnimation("close")
+		Set(%Away, 0)
+	ENDIF
+	Set(%State, 1)
+
+
+REACTION ReactOnPlayer, 2000
+USAGE ALL
+VARS
+	CHARACTER:_player
+CHECK "c1&c2"
+	CharacterGet(_player, __Me, %Distance, Lowest, Distance, Player)
+	IsEqual(%Away, 0)
+ACTIONS
+	IF "c1"
+		IsEqual(%Away, 0)
+	THEN
+		ItemPlayAnimation("open")
+		Set(%Away, 1)
+	ENDIF
+	Set(%State, 0)

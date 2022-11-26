@@ -1,0 +1,112 @@
+#TEMPLATE "_SKILL_Base" : Projectile_EnemyLowStunBlitzBolt
+
+INIT
+CHARACTER:__Me
+FLOAT:%SkillTargetScore_Projectile_EnemyLowStunBlitzBolt=-1000000
+// [GLOBAL_VARS]
+INT:%ClassScore_Projectile_EnemyLowStunBlitzBolt
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_Projectile_EnemyLowStunBlitzBolt
+VARS
+ON
+	OnFunction("CalculateScore_Projectile_EnemyLowStunBlitzBolt")
+ACTIONS
+	Set(%SkillTargetScore_Projectile_EnemyLowStunBlitzBolt, -1000000)
+	// [GLOBAL_ACTIONS]
+	// [~GLOBAL_ACTIONS]
+	// [CALC_CHECK]
+	Set(%ClassScore_Projectile_EnemyLowStunBlitzBolt, 0)
+	IterateCharactersInCombat(__Me, "CalculateTarget_Projectile_EnemyLowStunBlitzBolt", Random, Vitality)
+	// [~CALC_CHECK]
+	IF "!c1"
+		IsEqual(%SkillTargetChar_Projectile_EnemyLowStunBlitzBolt, null)
+	THEN
+		Add(%ActionScore_Projectile_EnemyLowStunBlitzBolt, %SkillTargetScore_Projectile_EnemyLowStunBlitzBolt)
+	ELSE
+		Set(%ActionScore_Projectile_EnemyLowStunBlitzBolt, 0)
+	ENDIF
+	
+// Calculate the character we should attack
+EVENT CalculateTarget_Projectile_EnemyLowStunBlitzBolt
+VARS	
+	CHARACTER:_Char
+	FLOAT:_Score=0
+	// [CALC_TARGET_VARS]
+	INT:_ClassScore_Projectile_EnemyLowStunBlitzBolt
+	FLOAT:_DistanceToChar
+	FLOAT:_MinSkillRange
+	FLOAT:_MaxSkillRange
+	FLOAT:_DistanceScore
+	CHARACTERTEMPLATE:_Temp	
+	// [~CALC_TARGET_VARS]
+ON
+	OnIterateCharacter(_Char, "CalculateTarget_Projectile_EnemyLowStunBlitzBolt")	
+ACTIONS
+	Set(_Score, 0)
+	// [CALC_TARGET_PRE_ACTIONS]
+	// [~CALC_TARGET_PRE_ACTIONS]
+	
+	// [CALC_TARGET_CHECK]
+	IF "(!c1&!c2&!c3)&(c4)&(!(((((c5)|c6)|c7)|c8)|c9))&(c10)&(c11&c12)&c13&!(c14|c15|c16|c17|c18)"
+	    CharacterIsDead(_Char) // c1
+	    CharacterHasStatus(_Char, INVISIBLE) // c2
+	    CharacterHasStatus(_Char, SNEAKING) // c3
+	    CharacterIsBetterOrEqualClass(_Char, %ClassScore_Projectile_EnemyLowStunBlitzBolt, _ClassScore_Projectile_EnemyLowStunBlitzBolt, 5, 3, 4, 4, 5) // c4
+	    CharacterHasStatus(_Char, STUNNED) // c5
+	    CharacterHasStatus(_Char, KNOCKED_DOWN) // c6
+	    CharacterHasStatus(_Char, PETRIFIED) // c7
+	    CharacterHasStatus(_Char, FROZEN) // c8
+	    CharacterHasStatus(_Char, FEAR) // c9
+	    CharacterIsEnemy(__Me, _Char) // c10
+	    CharacterGetSkillRange(_MinSkillRange, _MaxSkillRange, __Me, Projectile_EnemyLowStunBlitzBolt) // c11
+	    GetDistance(_DistanceToChar, __Me, _Char) // c12
+		CharacterGetTemplate(_Char, _Temp) //c13
+		IsEqual(_Temp, CHARACTERTEMPLATE:Env_Evil_Mushroom_B_e3f8248f-be02-4a55-a610-628fe0132971) //c14
+		IsEqual(_Temp, CHARACTERTEMPLATE:Env_Evil_Mushroom_B_Summon_Air_aabfa6f5-5dd1-4e4e-b72b-a2faf20a9c5b) //c15
+		IsEqual(_Temp, CHARACTERTEMPLATE:Env_Evil_Mushroom_B_Summon_Fire_c7087e6b-745f-4150-9c94-99131692cc85) //c16
+		IsEqual(_Temp, CHARACTERTEMPLATE:Env_Evil_Mushroom_B_Summon_Poison_056fe4f6-8483-4261-87fd-105572fdc124) //c17
+		IsEqual(_Temp, CHARACTERTEMPLATE:Env_Evil_Mushroom_B_Summon_Water_c94de303-d3d1-4d09-b4ef-870624feef67) //c18
+	THEN
+	    Set(%ClassScore_Projectile_EnemyLowStunBlitzBolt, _ClassScore_Projectile_EnemyLowStunBlitzBolt)
+	    // Hostile count score calculation
+	    Add(_Score, 10.0) // HostileWeight
+	    
+	    // Range score calculation
+	    Set(_DistanceScore, _DistanceToChar)
+	    IF "(c1)"
+	        IsGreaterThen(_DistanceScore, _MaxSkillRange) // c1
+	    THEN
+	        Subtract(_DistanceScore, _MaxSkillRange)
+	        Multiply(_DistanceScore, -1.0)
+	    ELIF "(c1)"
+	        IsLessThen(_DistanceScore, _MinSkillRange) // c1
+	    THEN
+	        Subtract(_DistanceScore, _MinSkillRange)
+	        Multiply(_DistanceScore, 1.0)
+	    ELSE 
+	        Set(_DistanceScore, 0.0)
+	    ENDIF
+	    Add(_Score, _DistanceScore)
+	    
+	    // Can see score calculation
+	    IF "!c1"
+	    	CharacterCanSee(__Me, _Char)
+	    THEN
+	    	Add(_Score, -10.0)
+	    ENDIF
+	    
+	    IF "c1"
+	    	IsGreaterThen(_Score, %SkillTargetScore_Projectile_EnemyLowStunBlitzBolt)
+	    THEN
+	    	Set(%SkillTargetChar_Projectile_EnemyLowStunBlitzBolt, _Char)
+	    	Set(%SkillTargetScore_Projectile_EnemyLowStunBlitzBolt, _Score)
+	    ENDIF	
+	ENDIF
+	// [~CALC_TARGET_CHECK]

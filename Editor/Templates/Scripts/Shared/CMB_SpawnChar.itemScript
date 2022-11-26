@@ -1,0 +1,17 @@
+INIT
+EXTERN CHARACTERTEMPLATE:%charSpawn=Animals_Spider_A_20af6dd6-957b-4e5f-86f5-535bb04ca90e
+CHARACTER:%char
+ITEM:__Me
+
+EVENTS
+EVENT OnUseSpawn
+VARS
+	FLOAT3:_pos
+ON
+	OnItemStatus(__Me,DYING)
+ACTIONS
+	IF "c1"
+		GetPosition(__Me,_pos)
+	THEN
+		SpawnCharacter(%char,%charSpawn,_pos,1)
+	ENDIF

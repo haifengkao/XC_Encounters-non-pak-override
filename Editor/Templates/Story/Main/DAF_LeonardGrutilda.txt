@@ -1,0 +1,163 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Dialogs(CHARACTER_DAF_Leonard,CHARACTER_DAF_Grutilda,"DAF_LeonardGrutilda");
+DB_Dialogs(CHARACTER_DAF_GrutildaGoblin,"DAF_Resk");
+
+DB_DAF_LeoGrut_HatchUseCounter(0);
+DB_ItemOwnerShipTriggers("DarkForest",TRIGGER_DAF_Area_OwnershipGrutilda,CHARACTER_DAF_Grutilda);
+ItemSetCanInteract(ITEM_DAF_SecretEntranceGrutilda,0);
+
+ProcTriggerRegisterForPlayers(TRIGGER_DAF_Area_LeonardGrutilda2);
+SneakTriggerSpotter(TRIGGER_DAF_Area_LeonardGrutilda2,CHARACTER_DAF_Leonard);
+SneakTriggerSpotter(TRIGGER_DAF_Area_LeonardGrutilda2,CHARACTER_DAF_Grutilda);
+DB_OneShotPlayerTrigger(TRIGGER_DAF_Area_LeonardGrutilda1);
+
+DB_DAF_GrutildaWarningItems(ITEM_DAF_SecretEntranceGrutilda);
+DB_DAF_GrutildaWarningItems(ITEM_DAF_SecretEntranceTorch);
+KBSECTION
+//REGION Ragnar Story
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,TRIGGER_DAF_Area_LeonardGrutilda1)
+THEN
+DialogStartTwoSpeakerDialog("DAF_AD_LeonardGrutilda",CHARACTER_DAF_Leonard,CHARACTER_DAF_Grutilda);
+
+PROC
+ProcCharInTriggerSpotted((CHARACTER)_Player,TRIGGER_DAF_Area_LeonardGrutilda2)
+THEN
+PROC_MendatoryDialogThreeSpeaker("DAF_LeonardGrutilda",CHARACTER_DAF_Leonard,CHARACTER_DAF_Grutilda,_Player);
+
+IF
+DialogEnded("DAF_LeonardGrutilda",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+NOT DB_GlobalEvent("DAF_LeonardGrutilda_War")
+THEN
+ItemOpen(ITEM_DAF_VillageTavernDoor);
+ProcCharacterMoveToTrigger(CHARACTER_DAF_Grutilda,TRIGGER_DAF_PointGrutilda1,0,"");
+CharTimer(_Player,"Start_DAF_Leonard",1);
+ProcRemoveDialogEntryForSpeaker(CHARACTER_DAF_Leonard,"DAF_LeonardGrutilda");
+DB_Dialogs(CHARACTER_DAF_Leonard,"DAF_Leonard");
+DB_Dialogs(CHARACTER_DAF_Grutilda,"DAF_Grutilda");
+
+IF
+CharTimerFinished(_Player,"Start_DAF_Leonard")
+THEN
+PROC_MendatoryDialog("DAF_Leonard",CHARACTER_DAF_Leonard,_Player);
+
+
+IF
+DialogEnded("DAF_LeonardGrutilda",_)
+AND
+DB_GlobalEvent("DAF_LeonardGrutilda_War")
+THEN
+SetRelationFactionToPlayers("DAF_VillageBO_Orc",0);
+SetRelationFactionToPlayers("DAF_VillageBO_Human",0);
+DAF_War(1);
+
+IF
+DialogEnded("DAF_Leonard",_)
+AND
+NOT DAF_LeonardIsAtHisOffice(CHARACTER_DAF_Leonard)
+THEN
+DAF_LeonardIsAtHisOffice(CHARACTER_DAF_Leonard);
+CharacterSetHasDialog(CHARACTER_DAF_Leonard,0);
+ProcCharacterMoveToTrigger(CHARACTER_DAF_Leonard,TRIGGER_DAF_Point_LeonardOffice,0,"DAF_LeonardIsMovingToOffice");
+QuestAdd("DAF_War");
+QuestUpdate("DAF_War","MetJahrl");
+
+IF
+DialogEnded("DAF_Leonard",_)
+AND
+NOT DAF_LeonardIsAtHisOffice(CHARACTER_DAF_Leonard)
+THEN
+DAF_LeonardIsAtHisOffice(CHARACTER_DAF_Leonard);
+CharacterSetHasDialog(CHARACTER_DAF_Leonard,0);
+ProcCharacterMoveToTrigger(CHARACTER_DAF_Leonard,TRIGGER_DAF_Point_LeonardOffice,0,"DAF_LeonardIsMovingToOffice");
+
+IF
+DialogEnded("DAF_Leonard",_)
+AND
+DB_GlobalEvent("DAF_LeonardMentionsZandalor")
+AND
+DB_DialogPlayers(_ID,_Player,1)
+THEN
+Launch_Playercomment(_Player,"DAF_Comment_JahrlMentionsZandalor");
+
+IF
+CharacterEvent(CHARACTER_DAF_Leonard,"DAF_LeonardIsMovingToOffice")
+THEN
+CharacterSetHasDialog(CHARACTER_DAF_Leonard,1);
+CharacterUseItem(CHARACTER_DAF_Leonard,ITEM_DAF_Chair_Leonard,"");
+
+//END_REGION
+
+//REGION Grutilda reacts if you use torch or secret cellar entrance
+
+IF
+CharacterSpottedItemUsed_Redhanded(_player, _Spotter, CHARACTER_DAF_Grutilda, _item,_)
+AND
+DB_DAF_GrutildaWarningItems(_item)
+AND
+_player.DB_IsPlayer()
+AND
+DB_DAF_LeoGrut_HatchUseCounter(_count)
+AND
+IntegerSum(_count, 1, _new)
+THEN
+NOT DB_DAF_LeoGrut_HatchUseCounter(_count);
+DB_DAF_LeoGrut_HatchUseCounter(_new);
+Proc_DAF_Grutilda_HatchUsed(_Spotter,_new);
+CannotUseHatchDB(_player);
+TimerLaunch("Undo_CannotUseHatchDB",1000);
+CharacterLookAtCharacter(CHARACTER_DAF_Grutilda, _player,0);
+
+IF
+TimerFinished("Undo_CannotUseHatchDB")
+AND
+CannotUseHatchDB(_player)
+THEN
+NOT CannotUseHatchDB(_player);
+
+PROC
+Proc_DAF_Grutilda_HatchUsed((CHARACTER)_Spotter,3)
+THEN
+SetRelationFactionToPlayers("DAF_VillageBO_Orc",0);
+SetRelationFactionToPlayers("DAF_VillageBO_Human",0);
+SetRelationFactionToPlayers("DAF_VillageBO_Torturers",0);
+
+//END_REGION
+
+//REGION Grutildas Secret Cellar Entrance
+
+IF
+CharacterUsedItem(_player, ITEM_DAF_SecretEntranceTorch)
+AND
+_player.DB_IsPlayer()
+AND
+NOT CannotUseHatchDB(_player)
+THEN
+ItemMoveToTrigger(ITEM_DAF_GrutildaSecretCellarCupboard, TRIGGER_DAF_Point_GrutildaSecretCupboard,1.0,0.2,0);
+ItemSetEvent(ITEM_DAF_SecretEntranceGrutilda,"StoryReveal");
+ItemSetCanInteract(ITEM_DAF_SecretEntranceGrutilda,1);
+
+IF
+CharacterUsedItem(_player, ITEM_DAF_SecretEntranceGrutilda)
+AND
+_player.DB_IsPlayer()
+AND
+NOT CannotUseHatchDB(_player)
+THEN
+CharacterTeleportToTrigger(_player, TRIGGER_DAF_Point_GrutildaSecretCellarIN,"");
+
+//END_REGION
+
+IF
+GlobalEventSet("LORE_DAF_Druid")
+THEN
+QuestUpdate("HOM_Starstones", "DiscoveredAboutDruidInHuntersEdge");
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

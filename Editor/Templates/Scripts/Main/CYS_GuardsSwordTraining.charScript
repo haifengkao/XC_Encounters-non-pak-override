@@ -1,0 +1,99 @@
+#INCLUDE Base
+
+INIT
+USING Base
+
+CHARACTER:__Me
+EXTERN CHARACTER:%SparringPartner = null
+EXTERN INT:%ReturnAction = 1
+INT:%StartHit
+EXTERN ITEM:%Seat = CYS_SparringDudeBench_bf7928ea-ef51-4f65-85fe-5c4829d13d1e
+EXTERN TRIGGER:%Point = null
+
+BEHAVIOUR
+
+REACTION TrainingAttack, 1000
+USAGE PEACE
+VARS 
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2"
+	IsEqual(%ReturnAction,1)
+	CharacterGetWeaponRange(_MinRange,_MaxRange,__Me)
+ACTIONS
+	Set(%ReturnAction,0)
+	CharacterMoveInRange(%SparringPartner,_MinRange,_MaxRange)
+	CharacterAttack(%SparringPartner)
+	CharacterEvent(%SparringPartner,"CYS_AttackToBeAnswered")
+	Sleep(2)
+INTERRUPT
+	Reset()
+	Set(%ReturnAction,1)
+
+REACTION UnSheath, 1001
+USAGE PEACE
+CHECK "c1&!c2"
+	IsEqual(%ReturnAction,0)
+	CharacterHasStatus(__Me,UNSHEATHED)
+ACTIONS
+	CharacterApplyStatus(__Me,UNSHEATHED)
+
+REACTION SitAndHeal, 1200
+USAGE PEACE
+VARS
+	FLOAT:_VitMe
+	FLOAT:_VitYou
+CHECK "(c1&c2)|(c3&c4)"
+	CharacterGetStat(_VitMe, __Me, Vitality)
+	IsLessThen(_VitMe, 0.5)
+	CharacterGetStat(_VitYou, %SparringPartner, Vitality)
+	IsLessThen(_VitYou, 0.5)
+ACTIONS
+	SetPriority("TrainingAttack", 0)
+	CharacterUseItem(%Seat)
+	SetPriority("Wait", 1201)
+	
+REACTION Wait, 0
+USAGE PEACE
+ACTIONS	
+	Sleep(2)
+
+REACTION GoBack, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Point)
+	CharacterLookFrom(%Point)
+	ItemEvent(%Seat, "back")
+	SetPriority("Wait", 1203)
+	SetPriority("GoBack", 0)
+INTERRUPT
+	Reset()
+
+EVENTS
+EVENT Strikeback
+	ON
+	OnCharacterEvent(__Me,"CYS_AttackToBeAnswered")
+	ACTIONS
+	Set(%ReturnAction,1)
+	
+EVENT ResumeSparring
+	ON
+	OnItemEvent(%Seat, "ResumeSparring")
+	ACTIONS
+	Set(%ReturnAction,%StartHit)
+	SetPriority("Wait", 0)
+	SetPriority("GoBack", 0)
+	SetPriority("TrainingAttack", 1000)
+	
+EVENT Initialize
+	ON
+		OnInit()
+	ACTIONS
+		Set(%StartHit, %ReturnAction)
+
+EVENT ResumeFight
+	ON
+		OnVitalityChanged(1)
+	ACTIONS
+		SetPriority("Wait", 0)
+		SetPriority("GoBack", 1202)

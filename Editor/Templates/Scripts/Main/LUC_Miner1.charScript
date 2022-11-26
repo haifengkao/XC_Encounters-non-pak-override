@@ -1,0 +1,39 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+EXTERN CHARACTER:%Friend = LUC_Miner2_ad81367e-7fa9-4e22-adb3-850851f4ce9d
+
+BEHAVIOUR
+
+REACTION State_Waiting, 0
+USAGE PEACE
+ACTIONS
+	GetWeightedRandom(%currentAction,"Action_TalkToFriend",FLOAT:1,"Action_Wait",FLOAT:10)
+	SetPriority(%currentAction,1100)
+	
+REACTION Action_Wait, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+	FLOAT:_Time
+ACTIONS
+	CharacterLookAt(%Friend)
+	GetRandom(_Animation,"Bored_01","Bored_02","Bored_03","Annoyed_01","Dust_Off_01","Shrug_01")
+	GetRandom(_Time,3,4,5,6,7,8)
+	Sleep(_Time)
+	CharacterPlayAnimation(_Animation)
+	SetPriority(%currentAction,0)
+INTERRUPT
+	SetPriority(%currentAction,0)
+
+REACTION Action_TalkToFriend, 0
+USAGE PEACE
+ACTIONS
+	CharacterLookAt(%Friend)
+	CharacterEvent(%Friend,"DialogRequest")
+	Sleep(5)
+	SetPriority(%currentAction,0)
+INTERRUPT
+	SetPriority(%currentAction,0)

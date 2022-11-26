@@ -1,0 +1,118 @@
+#TEMPLATE "_SKILL_Base" : Projectile_EnemyPoisonHair
+
+INIT
+CHARACTER:__Me
+FLOAT:%SkillTargetScore_Projectile_EnemyPoisonHair=-1000000
+// [GLOBAL_VARS]
+INT:%ClassScore_Projectile_EnemyPoisonHair
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_Projectile_EnemyPoisonHair
+VARS
+	// [CALC_VARS]
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_Projectile_EnemyPoisonHair")
+ACTIONS
+	Set(%SkillTargetScore_Projectile_EnemyPoisonHair, -1000000)
+
+	// [CALC_ACTIONS_PRE]
+	Set(%ClassScore_Projectile_EnemyPoisonHair, 0)
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	IterateCharactersInCombat(__Me, "CalculateTarget_Projectile_EnemyPoisonHair", Random, Vitality)
+	IF "!c1"
+		IsEqual(%SkillTargetChar_Projectile_EnemyPoisonHair, null)
+	THEN
+		Add(%ActionScore_Projectile_EnemyPoisonHair, %SkillTargetScore_Projectile_EnemyPoisonHair)
+	ENDIF
+	// [~CALC_ACTIONS]
+
+	
+
+	
+// Calculate the character we should attack
+EVENT CalculateTarget_Projectile_EnemyPoisonHair
+VARS	
+	CHARACTER:_Char
+	// [CALC_TARGET_VARS]
+	INT:_ClassScore_Projectile_EnemyPoisonHair
+	FLOAT:_Score
+	FLOAT:_SkillRangeMin
+	FLOAT:_SkillRangeMax
+	FLOAT:_DistanceToChar
+	FLOAT:_DistanceScore
+	// [~CALC_TARGET_VARS]
+ON
+	OnIterateCharacter(_Char, "CalculateTarget_Projectile_EnemyPoisonHair")	
+ACTIONS
+	// [CALC_CHAR_TARGET_ACTIONS_PRE]
+	Set(_ClassScore_Projectile_EnemyPoisonHair, %ClassScore_Projectile_EnemyPoisonHair)
+	Set(_Score, 0.0)
+	// [~CALC_CHAR_TARGET_ACTIONS_PRE]
+	// [CALC_CHAR_TARGET_ACTIONS]
+	IF "(!c1&!c2&!c3)&((c4)|c5)&(c6)&(c7)&(c8)"
+	    CharacterIsDead(_Char) // c1
+	    CharacterHasStatus(_Char, INVISIBLE) // c2
+	    CharacterHasStatus(_Char, SNEAKING) // c3
+	    CharacterHasStatus(_Char, AGGRO_MARKED) // c4
+	    CharacterIsBetterOrEqualClass(_Char, %ClassScore_Projectile_EnemyPoisonHair, _ClassScore_Projectile_EnemyPoisonHair, 3, 4, 5, 4, 5) // c5
+	    CharacterIsEnemy(__Me, _Char) // c6
+	    CharacterGetSkillRange(_SkillRangeMin, _SkillRangeMax, __Me, Projectile_EnemyPoisonHair) // c7
+	    GetDistance(_DistanceToChar, __Me, _Char) // c8
+	THEN
+	    Set(%ClassScore_Projectile_EnemyPoisonHair, _ClassScore_Projectile_EnemyPoisonHair)
+	    IF "(c1)"
+	        CharacterHasStatus(_Char, AGGRO_MARKED) // c1
+	    THEN
+	        Add(_Score, 5.0)
+	    ENDIF
+	    // Hostile count score calculation
+	    Add(_Score, 10.0) // HostileWeight
+	    
+	    // Range score calculation
+	    Set(_DistanceScore, _DistanceToChar)
+	    IF "(c1)"
+	        IsGreaterThen(_DistanceScore, _SkillRangeMax) // c1
+	    THEN
+	        Subtract(_DistanceScore, _SkillRangeMax)
+	        Multiply(_DistanceScore, -1.0)
+	    ELIF "(c1)"
+	        IsLessThen(_DistanceScore, _SkillRangeMin) // c1
+	    THEN
+	        Subtract(_DistanceScore, _SkillRangeMin)
+	        Multiply(_DistanceScore, 1.0)
+	    ELSE 
+	        Set(_DistanceScore, 0.0)
+	    ENDIF
+	    Add(_Score, _DistanceScore)
+	    
+	    // Can see score calculation
+	    IF "!c1"
+	    	CharacterCanSee(__Me, _Char)
+	    THEN
+	    	Add(_Score, -10.0)
+	    ENDIF
+	    
+	    IF "c1"
+	    	IsGreaterThen(_Score, %SkillTargetScore_Projectile_EnemyPoisonHair)
+	    THEN
+	    	Set(%SkillTargetChar_Projectile_EnemyPoisonHair, _Char)
+	    	Set(%SkillTargetScore_Projectile_EnemyPoisonHair, _Score)
+	    ENDIF	
+	ENDIF
+	// [~CALC_CHAR_TARGET_ACTIONS]
+	
+	
+	
+	
+	
+	
+	
+	

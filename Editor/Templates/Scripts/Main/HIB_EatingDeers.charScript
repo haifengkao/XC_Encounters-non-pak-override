@@ -1,0 +1,60 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+
+	CHARACTER:__Me
+	EXTERN ITEM:%DeliciousBush = null
+	INT:%CloseToBush = 1
+	
+//------------------------
+BEHAVIOUR
+
+REACTION State_Eating, 0
+	USAGE PEACE
+CHECK "c1"
+	IsEqual(%CloseToBush,1)
+ACTIONS
+	CharacterLookAt(%DeliciousBush,0)
+	GetWeightedRandom(%currentAction,"Action_Eat",INT:5,"Action_Idle",INT:1)
+	SetPriority(%currentAction, 1100)
+
+REACTION Action_Eat, 0
+	USAGE PEACE
+ACTIONS
+	CharacterPlayAnimation(use_eat)
+	SetPriority(%currentAction,0)
+
+REACTION Action_Idle, 0
+	USAGE PEACE
+VARS
+	FIXEDSTRING:_anim
+ACTIONS
+	GetRandom(_anim,"idle1","idle2","idle3")
+	CharacterPlayAnimation(_anim)
+	SetPriority(%currentAction,0)
+		
+REACTION FleeFromPlayer,1200
+	USAGE PEACE
+VARS
+	CHARACTER:_char
+CHECK "c1&!c2"
+	CharacterGet(_char,__Me,6,Random,null,Player)
+	CharacterHasTalent(_char, AnimalEmpathy)
+ACTIONS
+	Set(%CloseToBush,0)
+	CharacterFleeFrom(Player,20)
+	SetPriority(BackToEating,1150)
+	
+REACTION BackToEating,1150
+	USAGE PEACE
+VARS
+	FLOAT:_isitsafe
+ACTIONS
+	Set(%CloseToBush,1)
+	GetRandomBetween(_isitsafe,3.0,8.0)
+	Sleep(_isitsafe)
+	CharacterMoveTo(%DeliciousBush,0)
+	SetPriority(BackToEating,0)
+INTERRUPT
+	Reset()

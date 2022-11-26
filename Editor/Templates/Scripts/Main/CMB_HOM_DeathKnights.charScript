@@ -1,0 +1,330 @@
+#INCLUDE DefaultCharacter
+INIT
+	USING DefaultCharacter	//required for OVERRIDE below
+	CHARACTER:__Me
+	CHARACTER:%Wandbearer=null	
+	CHARACTER:%MeleeAlly=null	
+	CHARACTERTEMPLATE:%RegularDK_Template="DarkMinions_Eden_DeathKnight_93c3e196-d5be-4b25-9da0-d58a17e0a02c"
+	CHARACTERTEMPLATE:%OrangeDK_Template="DarkMinions_Eden_OrangeKnight_59293e32-f8db-4868-bd8f-c49149843d76"
+	CHARACTERTEMPLATE:%GreenDK_Template="DarkMinions_Eden_GreenKnight_ddc485de-a551-4765-9b38-4e6297780eb8"
+	CHARACTERTEMPLATE:%PinkDK_Template="DarkMinions_Eden_PinkKnight_5712610b-eb73-40d1-a7a6-5ec74de011e7"
+	CHARACTERTEMPLATE:%BlueDK_Template="DarkMinions_Eden_BlueKnight_cfdc6869-502d-4516-8d3a-74c22d4e0876"
+	INT:%PinkDK_Charm_Current=2
+	INT:%PinkDK_Charm_Desired=2
+	
+//------
+BEHAVIOUR
+REACTION RangedKnights_KillDefaultCharacter,0
+USAGE COMBAT
+ACTIONS
+	Set(%MeleeAlly,null)
+	IterateCharactersInCombat(__Me,"CMB_HOM_DeathKnights_ScanForMeleeAllies",Lowest,Distance)
+	IF "c1"
+		IsEqual(%MeleeAlly,null)
+	THEN
+		SetPriority("Combat_AttackSetEnemy",7)
+		SetPriority("Combat_MoveToSetEnemy",6)
+		SetPriority("RangedKnights_CastStaffOfMagus",0)
+	ELSE
+		SetPriority("Combat_AttackSetEnemy",0)
+		SetPriority("Combat_MoveToSetEnemy",0)
+		SetPriority("RangedKnights_CastStaffOfMagus",50)
+	ENDIF
+	SetPriority("RangedKnights_KillDefaultCharacter",0)
+INTERRUPT
+	Reset()
+
+REACTION PinkKnight_CharmWandBearer,0
+USAGE COMBAT
+VARS
+	CHARACTERTEMPLATE:_DKTemplate
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2"
+	CharacterGetTemplate(__Me,_DKTemplate)
+	IsEqual(_DKTemplate,%PinkDK_Template)
+ACTIONS
+	IterateCharactersInCombat(__Me,"CMB_HOM_DeathKnights_ScanForWandBearer",Lowest,Distance)
+	IF "c1"
+		IsEqual(%Wandbearer,null)
+	THEN
+		//DebugText(__Me,"Wandbearer not found!")
+		SetPriority("PinkKnight_CharmWandBearer",0)
+	ELIF "!(c1|c2|c3|c4|c5|c6|c7)&c8&c9"
+		IsEqual(%Wandbearer,null)														//!c1
+		CharacterHasStatus(%Wandbearer,"CHARMED")										//!c2
+		CharacterHasStatus(%Wandbearer,"INVISIBLE")										//!c3
+		CharacterHasStatus(%Wandbearer,"SNEAKING")										//!c4
+		CharacterHasStatus(%Wandbearer,"FROZEN")										//!c5
+		CharacterHasStatus(%Wandbearer,"STUNNED")										//!c6
+		CharacterHasStatus(%Wandbearer,"PETRIFIED")										//!c7
+		CharacterCanCast(__Me,"Projectile_EnemyCharm")									//c8
+		CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyCharm")		//c9
+	THEN
+		//DebugText(__Me,"Wandbearer found!")
+		CharacterUseSkill("Projectile_EnemyCharm",%Wandbearer)
+		Set(%PinkDK_Charm_Current,0)
+		SetPriority("PinkKnight_CharmWandBearer",0)
+	ENDIF
+INTERRUPT
+	Reset()
+
+REACTION RangedKnights_CastStaffOfMagus,50
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+	CHARACTERTEMPLATE:_MyTemplate
+	CHARACTERTEMPLATE:_OrangeDKTemplate="DarkMinions_Eden_OrangeKnight_59293e32-f8db-4868-bd8f-c49149843d76"
+	CHARACTERTEMPLATE:_GreenDKTemplate="DarkMinions_Eden_GreenKnight_ddc485de-a551-4765-9b38-4e6297780eb8"
+	CHARACTERTEMPLATE:_BlueDKTemplate="DarkMinions_Eden_BlueKnight_cfdc6869-502d-4516-8d3a-74c22d4e0876"
+CHECK "c1&(c2|c3)&c4"
+	CharacterGetTemplate(__Me,_MyTemplate)				//c1
+	IsEqual(_MyTemplate,_OrangeDKTemplate)				//c2
+	IsEqual(_MyTemplate,_GreenDKTemplate)				//c3
+	CharacterGet(_Enemy,__Me,20,Lowest,Vitality,Enemy)
+ACTIONS
+	IF "c1"
+		IsEqual(_MyTemplate,_OrangeDKTemplate)
+	THEN
+		CharacterUseSkill("Projectile_EnemyStaffOfMagusFire",_Enemy)
+	ELIF "c1"
+		IsEqual(_MyTemplate,_GreenDKTemplate)
+	THEN
+		CharacterUseSkill("Projectile_EnemyStaffOfMagusEarth",_Enemy)
+	ENDIF
+	CharacterEndTurn()
+INTERRUPT
+	Reset()
+
+//------
+EVENTS
+EVENT DefaultIterateSetTarget OVERRIDE 					//the wandbearer is more interesting
+VARS 
+	CHARACTER:_Char
+	CHARACTER:_previousSetTarget
+	FLOAT:_targetDistance
+	INT:_alreadyTargetedBy
+	FLOAT:_targetClosestThisScore=0
+	FLOAT:_movement
+	ITEM:_Wand="END_DeathKnightKillWand_841299de-a661-477a-9a99-290c102acd93"
+ON
+	OnIterateCharacter(_Char,"DefaultSetTargetClosestIterator")
+ACTIONS
+	IF "!c1&!c2&c3&c4&c5&!c6&!c7"
+		CharacterIsDead(_Char)
+		IsEqual(__Me,_Char)
+		CharacterIsEnemy(__Me,_Char)
+		GetDistance(_targetDistance,__Me,_Char)
+		CharacterGetHostileCount(_alreadyTargetedBy,_Char)
+		CharacterHasStatus(_Char,"INVISIBLE")
+		CharacterHasStatus(_Char,"SNEAKING")
+	THEN
+		IF "c1&c2"
+			CharacterGetEnemy(_previousSetTarget,__Me)
+			IsEqual(_previousSetTarget,_Char)
+		THEN
+			Multiply(_targetDistance,0.8)
+		ENDIF
+		IF "c1"
+			IsEqual(_alreadyTargetedBy,0)
+		THEN
+			Multiply(_targetDistance,0.5)
+		ENDIF
+		IF "c1"
+			ItemIsInCharacterInventory(_Wand,_Char)
+		THEN
+			Multiply(_targetDistance,0.5)
+		ENDIF
+		IF "c1"
+			IsEqual(_alreadyTargetedBy,1)
+		THEN
+			Multiply(_targetDistance,0.6)
+		ENDIF
+		IF "c1"
+			CharacterIsSummon(_Char)
+		THEN
+			Multiply(_targetDistance,1.5)
+		ENDIF	
+		IF "c1&!c2"
+			IsGreaterThen(_alreadyTargetedBy,1)
+			CharacterHasStatus(_Char,AGGRO_MARKED)
+		THEN
+			Add(_alreadyTargetedBy,0.6)
+			Multiply(_alreadyTargetedBy,_alreadyTargetedBy)
+			Multiply(_targetDistance,_alreadyTargetedBy)
+		ENDIF
+		IF "c1&c2"
+			IsGreaterThen(_alreadyTargetedBy,3)
+			CharacterHasStatus(_Char,AGGRO_MARKED)
+		THEN
+			Multiply(_targetDistance,2)
+		ENDIF
+		IF "!c1"
+			CharacterCanSee(__Me,_Char)
+		THEN
+			Multiply(_targetDistance,3)
+		ENDIF
+		IF "c1&!c2"
+			CharacterHasTalent(_Char,Stench)
+			CharacterHasStatus(_Char,AGGRO_MARKED)
+		THEN
+			Multiply(_targetDistance,4)
+		ENDIF
+		IF "c1&c2"
+			CharacterHasTalent(_Char,Stench)
+			CharacterHasStatus(_Char,AGGRO_MARKED)
+		THEN
+			Multiply(_targetDistance,2)
+		ENDIF
+		Set(_targetClosestThisScore,_targetDistance)
+		IF "!c1"
+			IsGreaterThen(_targetClosestThisScore,%setTargetDefaultBestScore)
+		THEN
+			Set(%setTargetDefaultBestScore,_targetClosestThisScore)
+			CharacterSetEnemy(__Me,_Char)
+		ENDIF
+	ENDIF
+	
+EVENT OnInit_GiveSpells
+VARS
+	CHARACTERTEMPLATE:_DKTemplate
+ON
+	OnInit()
+ACTIONS
+	IF "c1&c2"
+		CharacterGetTemplate(__Me,_DKTemplate)
+		IsEqual(_DKTemplate,%OrangeDK_Template)
+	THEN
+		CharacterAddSkill("Projectile_EnemyStaffOfMagusFire")
+		SetPriority("Combat_AttackSetEnemy",0)
+		SetPriority("Combat_MoveToSetEnemy",0)
+	ELIF "c1&c2"
+		CharacterGetTemplate(__Me,_DKTemplate)
+		IsEqual(_DKTemplate,%GreenDK_Template)
+	THEN
+		CharacterAddSkill("Projectile_EnemyStaffOfMagusEarth")
+		SetPriority("Combat_AttackSetEnemy",0)
+		SetPriority("Combat_MoveToSetEnemy",0)	
+	ELIF "c1&c2"
+		CharacterGetTemplate(__Me,_DKTemplate)
+		IsEqual(_DKTemplate,%PinkDK_Template)
+	THEN	
+		CharacterAddSkill("Projectile_EnemyCharm")		
+	ENDIF
+
+EVENT OnTurn_GeneralControl
+VARS
+	CHARACTERTEMPLATE:_DKTemplate
+ON
+	OnTurn()
+ACTIONS
+	IF "c1&(c2|c3)"
+		CharacterGetTemplate(__Me,_DKTemplate)
+		IsEqual(_DKTemplate,%OrangeDK_Template)
+		IsEqual(_DKTemplate,%GreenDK_Template)
+	THEN		
+		SetPriority("RangedKnights_KillDefaultCharacter",1600)
+	ENDIF
+	IF "c1&c2"
+		CharacterGetTemplate(__Me,_DKTemplate)
+		IsEqual(_DKTemplate,%PinkDK_Template)
+	THEN
+		IF "c1"
+			IsLessThen(%PinkDK_Charm_Current,%PinkDK_Charm_Desired)
+		THEN	
+			Add(%PinkDK_Charm_Current,1)
+		ELSE		
+			SetPriority("PinkKnight_CharmWandBearer",500)
+		ENDIF
+	ENDIF
+	
+EVENT OnCharacterStatusRemoved_Invulnerable_ApplyAuras
+VARS
+	CHARACTERTEMPLATE:_DKTemplate
+ON
+	OnCharacterStatusRemoved(__Me,"INVULNERABLE")
+ACTIONS
+	IF "c1&c2"
+		CharacterGetTemplate(__Me,_DKTemplate)
+		IsEqual(_DKTemplate,%OrangeDK_Template)
+	THEN
+		CharacterApplyStatus(__Me,"FIRE_IMMUNITY_AURA",-1)
+	ELIF "c1&c2"
+		CharacterGetTemplate(__Me,_DKTemplate)
+		IsEqual(_DKTemplate,%GreenDK_Template)
+	THEN
+		CharacterApplyStatus(__Me,"EARTH_IMMUNITY_AURA",-1)
+	ELIF "c1&c2"
+		CharacterGetTemplate(__Me,_DKTemplate)
+		IsEqual(_DKTemplate,%PinkDK_Template)
+	THEN
+		CharacterApplyStatus(__Me,"IMPROVED_INITIATIVE_AURA",-1)
+	ELIF "c1&c2"
+		CharacterGetTemplate(__Me,_DKTemplate)
+		IsEqual(_DKTemplate,%BlueDK_Template)
+	THEN
+		CharacterApplyStatus(__Me,"WATER_IMMUNITY_AURA",-1)		
+	ENDIF
+
+EVENT OnCharacterStatus_Invulnerable_KillAuras
+VARS
+	CHARACTERTEMPLATE:_DKTemplate
+ON
+	OnCharacterStatus(__Me,"INVULNERABLE")
+ACTIONS
+	IF "c1&c2&c3"
+		CharacterGetTemplate(__Me,_DKTemplate)
+		IsEqual(_DKTemplate,%OrangeDK_Template)
+		CharacterHasStatus(__Me,"FIRE_IMMUNITY_AURA")
+	THEN
+		CharacterRemoveStatus(__Me,"FIRE_IMMUNITY_AURA")		
+	ELIF "c1&c2&c3"
+		CharacterGetTemplate(__Me,_DKTemplate)
+		IsEqual(_DKTemplate,%GreenDK_Template)
+		CharacterHasStatus(__Me,"EARTH_IMMUNITY_AURA")
+	THEN
+		CharacterRemoveStatus(__Me,"EARTH_IMMUNITY_AURA")			
+	ELIF "c1&c2&c3"
+		CharacterGetTemplate(__Me,_DKTemplate)
+		IsEqual(_DKTemplate,%PinkDK_Template)
+		CharacterHasStatus(__Me,"IMPROVED_INITIATIVE_AURA")
+	THEN
+		CharacterRemoveStatus(__Me,"IMPROVED_INITIATIVE_AURA")	
+	ELIF "c1&c2&c3"
+		CharacterGetTemplate(__Me,_DKTemplate)
+		IsEqual(_DKTemplate,%BlueDK_Template)
+		CharacterHasStatus(__Me,"WATER_IMMUNITY_AURA")
+	THEN
+		CharacterRemoveStatus(__Me,"WATER_IMMUNITY_AURA")
+	ENDIF
+
+EVENT OnIterateCharacter_ScanForWandbearer
+VARS
+	CHARACTER:_Character
+	ITEM:_Wand="END_DeathKnightKillWand_841299de-a661-477a-9a99-290c102acd93"
+ON
+	OnIterateCharacter(_Character,"CMB_HOM_DeathKnights_ScanForWandBearer")
+ACTIONS
+	IF "c1&c2"
+		CharacterIsEnemy(__Me,_Character)
+		ItemIsInCharacterInventory(_Wand,_Character)
+	THEN
+		Set(%Wandbearer,_Character)
+	ENDIF
+
+EVENT OnIterateCharacter_ScanForMeleeAlly
+VARS
+	CHARACTER:_Ally
+	CHARACTERTEMPLATE:_AllyTemplate
+	CHARACTERTEMPLATE:_RegularDKTemplate="DarkMinions_Eden_DeathKnight_93c3e196-d5be-4b25-9da0-d58a17e0a02c"
+	CHARACTERTEMPLATE:_PinkDKTemplate="DarkMinions_Eden_PinkKnight_5712610b-eb73-40d1-a7a6-5ec74de011e7"	
+ON
+	OnIterateCharacter(_Ally,"CMB_HOM_DeathKnights_ScanForMeleeAllies")
+ACTIONS
+	IF "c1&(c2|c3)"
+		CharacterGetTemplate(_Ally,_AllyTemplate)
+		IsEqual(_AllyTemplate,_RegularDKTemplate)
+		IsEqual(_AllyTemplate,_PinkDKTemplate)
+	THEN
+		Set(%MeleeAlly,_Ally)
+	ENDIF

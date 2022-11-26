@@ -1,0 +1,266 @@
+INIT
+
+ITEM:__Me
+EXTERN STATUS:%Status = BURNING
+EXTERN FLOAT:%Range = 5.0
+EXTERN FLOAT:%Delay = 18.0
+FLOAT:%MitigatedDelay = null
+FIXEDSTRING:%MyEvent = ""
+STRING:%MyStringEvent = ""
+EXTERN INT:%Turn = 2
+EXTERN STRING:%EventOn = null
+EXTERN STRING:%EventOff = null
+EXTERN INT:%StartActive = 0
+EXTERN INT:%TargetEnemies = 1
+EXTERN INT:%TargetAllies = 1
+EXTERN INT:%TargetNeutrals = 1
+EXTERN INT:%TargetParty = 1
+FIXEDSTRING:%StartingTimer = null
+INT:%TimerInitialized = 0
+
+EVENTS
+
+EVENT Initialize
+ON
+	OnInit()
+	OnItemEvent(__Me, "Activated")
+ACTIONS
+	IF "!c1&c2"
+		ItemIsDestroyed(__Me)
+		IsEqual(%TimerInitialized,0)
+	THEN
+		Set(%MitigatedDelay, %Delay)
+		IF "c1"
+			IsEqual(%StartActive, 1)
+		THEN
+			IF "c1"
+				IsGreaterThen(%Delay, 10.0)
+			THEN
+				Subtract(%MitigatedDelay, 10.0)
+				Set(%StartingTimer, "Countdown10")
+			ELSE
+				IF "c1"
+					IsGreaterThen(%Delay, 9.0)
+				THEN
+					Subtract(%MitigatedDelay, 9.0)
+					Set(%StartingTimer, "Countdown9")
+				ELIF "c1"
+					IsGreaterThen(%Delay, 8.0)
+				THEN
+					Subtract(%MitigatedDelay, 8.0)
+					Set(%StartingTimer, "Countdown8")
+				ELIF "c1"
+					IsGreaterThen(%Delay, 7.0)
+				THEN
+					Subtract(%MitigatedDelay, 7.0)
+					Set(%StartingTimer, "Countdown7")
+				ELIF "c1"
+					IsGreaterThen(%Delay, 6.0)
+				THEN
+					Subtract(%MitigatedDelay, 6.0)
+					Set(%StartingTimer, "Countdown6")
+				ELIF "c1"
+					IsGreaterThen(%Delay, 5.0)
+				THEN
+					Subtract(%MitigatedDelay, 5.0)
+					Set(%StartingTimer, "Countdown5")
+				ELIF "c1"
+					IsGreaterThen(%Delay, 4.0)
+				THEN
+					Subtract(%MitigatedDelay, 4.0)
+					Set(%StartingTimer, "Countdown4")
+				ELIF "c1"
+					IsGreaterThen(%Delay, 3.0)
+				THEN
+					Subtract(%MitigatedDelay, 3.0)
+					Set(%StartingTimer, "Countdown3")
+				ELIF "c1"
+					IsGreaterThen(%Delay, 2.0)
+				THEN
+					Subtract(%MitigatedDelay, 2.0)
+					Set(%StartingTimer, "Countdown2")
+				ELIF "c1"
+					IsGreaterThen(%Delay, 1.0)
+				THEN
+					Subtract(%MitigatedDelay, 1.0)
+					Set(%StartingTimer, "Countdown1")
+				ELSE
+					Set(%StartingTimer, "ApplyStatus")
+				ENDIF
+			ENDIF
+		StartTimer(%StartingTimer, %MitigatedDelay, 0)
+		ENDIF
+		Print(%MyStringEvent, "EventFrom_[1]", __Me)
+		Cast(%MyEvent, %MyStringEvent)
+		Set(%TimerInitialized, 1)
+	ENDIF
+	
+EVENT Shutdown
+ON
+	OnShutdown()
+	OnItemDestroyed(__Me)
+ACTIONS
+	StopTimer("ApplyStatus")
+	StopTimer("Countdown10")
+	StopTimer("Countdown9")
+	StopTimer("Countdown8")
+	StopTimer("Countdown7")
+	StopTimer("Countdown6")
+	StopTimer("Countdown5")
+	StopTimer("Countdown4")
+	StopTimer("Countdown3")
+	StopTimer("Countdown2")
+	StopTimer("Countdown2")
+	StopTimer("Countdown1")
+	Set(%TimerInitialized, 0)
+
+EVENT ShutdownHACK
+VARS
+	FLOAT:_Per
+ON
+	OnVitalityChanged(_Per)
+ACTIONS
+	IF "c1"
+		IsEqual(_Per, 0)
+	THEN
+		StopTimer("ApplyStatus")
+		StopTimer("Countdown10")
+		StopTimer("Countdown9")
+		StopTimer("Countdown8")
+		StopTimer("Countdown7")
+		StopTimer("Countdown6")
+		StopTimer("Countdown5")
+		StopTimer("Countdown4")
+		StopTimer("Countdown3")
+		StopTimer("Countdown2")
+		StopTimer("Countdown2")
+		StopTimer("Countdown1")
+		Set(%TimerInitialized, 0)
+	ENDIF
+	
+EVENT Timers
+VARS
+	FIXEDSTRING:_Timer
+ON
+	OnTimer(_Timer)
+ACTIONS
+	IF "c1"
+		IsEqual(_Timer, "Countdown10")
+	THEN		
+		DisplayText(__Me, "GLO_Countdown10", 0.8)
+		StartTimer("Countdown9", 1.0, 0)
+	ELIF "c1"
+		IsEqual(_Timer, "Countdown9")
+	THEN		
+		DisplayText(__Me, "GLO_Countdown9", 0.8)
+		StartTimer("Countdown8", 1.0, 0)
+	ELIF "c1"
+		IsEqual(_Timer, "Countdown8")
+	THEN		
+		DisplayText(__Me, "GLO_Countdown8", 0.8)
+		StartTimer("Countdown7", 1.0, 0)
+	ELIF "c1"
+		IsEqual(_Timer, "Countdown7")
+	THEN		
+		DisplayText(__Me, "GLO_Countdown7", 0.8)
+		StartTimer("Countdown6", 1.0, 0)
+	ELIF "c1"
+		IsEqual(_Timer, "Countdown6")
+	THEN		
+		DisplayText(__Me, "GLO_Countdown6", 0.8)
+		StartTimer("Countdown5", 1.0, 0)
+	ELIF "c1"
+		IsEqual(_Timer, "Countdown5")
+	THEN		
+		DisplayText(__Me, "GLO_Countdown5", 0.8)
+		StartTimer("Countdown4", 1.0, 0)
+	ELIF "c1"
+		IsEqual(_Timer, "Countdown4")
+	THEN		
+		DisplayText(__Me, "GLO_Countdown4", 0.8)
+		StartTimer("Countdown3", 1.0, 0)
+	ELIF "c1"
+		IsEqual(_Timer, "Countdown3")
+	THEN		
+		DisplayText(__Me, "GLO_Countdown3", 0.8)
+		StartTimer("Countdown2", 1.0, 0)
+	ELIF "c1"
+		IsEqual(_Timer, "Countdown2")
+	THEN		
+		DisplayText(__Me, "GLO_Countdown2", 0.8)
+		StartTimer("Countdown1", 1.0, 0)
+	ELIF "c1"
+		IsEqual(_Timer, "Countdown1")
+	THEN		
+		DisplayText(__Me, "GLO_Countdown1", 0.8)
+		StartTimer("ApplyStatus", 1.0, 0)
+	ELIF "c1"
+		IsEqual(_Timer, "ApplyStatus")
+	THEN
+		IF "c1"
+			IsEqual(%Status, BURNING)
+		THEN
+			ItemPlayEffect(__Me, "FX_GP_Wollocks_Totem_Cast_A_Burn")
+		ELSE
+			ItemPlayEffect(__Me, "FX_GP_Wollocks_Totem_Cast_A")			
+		ENDIF
+		IterateCharactersNear(__Me, %Range, %MyEvent)
+		StartTimer(%StartingTimer, %MitigatedDelay, 0)
+	ENDIF
+	
+EVENT IteratorCharacter
+VARS
+	CHARACTER:_Char
+ON
+	OnIterateCharacter(_Char, %MyEvent)
+ACTIONS
+	IF "(c1&c2)|(c3&c4&!c1)|(c5&c6)|(c7&c8)"
+		CharacterIsInParty(_Char)
+		IsEqual(%TargetParty, 1)
+		CharacterIsAlly(Player1_dac1443f-a866-4ab3-b240-e705c0b20ec5, _Char)
+		IsEqual(%TargetAllies, 1)
+		CharacterIsEnemy(Player1_dac1443f-a866-4ab3-b240-e705c0b20ec5, _Char)
+		IsEqual(%TargetEnemies, 1)
+		CharacterIsNeutral(Player1_dac1443f-a866-4ab3-b240-e705c0b20ec5, _Char)
+		IsEqual(%TargetNeutrals, 1)
+	THEN
+		IF "c1"
+			IsEqual(%Status, BURNING)
+		THEN
+			CharacterPlayEffect(_Char, "FX_GP_Wollocks_Totem_Impact_A_Burn")
+		ELSE
+			CharacterPlayEffect(_Char, "FX_GP_Wollocks_Totem_Impact_A")
+		ENDIF
+		CharacterApplyStatus(_Char, %Status, %Turn, 1)
+	ENDIF
+	
+EVENT setActive
+ON
+	OnCharacterItemEvent(_ ,_ , %EventOn)
+ACTIONS
+	IF "c1"
+		IsEqual(%StartActive, 0)
+	THEN
+		Set(%StartActive, 1)
+		ItemEvent(__Me, "Activated")
+	ENDIF
+	
+EVENT setInactive
+ON
+	OnCharacterItemEvent(_ ,_ , %EventOff)
+ACTIONS
+	Set(%StartActive, 0)
+	StopTimer("ApplyStatus")
+	StopTimer("Countdown10")
+	StopTimer("Countdown9")
+	StopTimer("Countdown8")
+	StopTimer("Countdown7")
+	StopTimer("Countdown6")
+	StopTimer("Countdown5")
+	StopTimer("Countdown4")
+	StopTimer("Countdown3")
+	StopTimer("Countdown2")
+	StopTimer("Countdown2")
+	StopTimer("Countdown1")
+	Set(%TimerInitialized, 0)
+	

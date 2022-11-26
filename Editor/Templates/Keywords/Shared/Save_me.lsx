@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<save>
+    <header version="2" time="1417693496" />
+    <version major="1" minor="3" revision="0" build="0" />
+    <region id="keywordDialog">
+        <node id="root">
+            <attribute id="KeywordVoiced" value="0" type="19" />
+            <attribute id="PlayGreeting" value="0" type="19" />
+            <attribute id="keywordAutoImport" value="1" type="19" />
+            <attribute id="keywordName" value="Save_me" type="22" />
+            <children>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="177ef3f3-c013-415c-9a9e-49a1f844b267" type="22" />
+                    <attribute id="keywordContentMapValue" value="HELP! Anybody! Please HELP ME!" handle="hdcb66a64g4f51g48d6gbe27gc47ca671b990" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="83570ad6-91e2-4593-b928-5d49fc833e4f" type="22" />
+                    <attribute id="keywordContentMapValue" value="GUARDS!! Save me!" handle="h8658a2edg7f77g4561gbb28g2faf4bcf8dbc" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="91790276-598d-42e5-a339-3495be4b989f" type="22" />
+                    <attribute id="keywordContentMapValue" value="Aahhh! HELP ME! Please!" handle="h3d1acbbbg7fbfg4543g81eag5c7bcbc90320" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="b6695294-aa16-4514-9330-cef54ea5f2f4" type="22" />
+                    <attribute id="keywordContentMapValue" value="Greeting" handle="h7f890f24g8572g4902g90b4gd362b7e9bdf2" type="28" />
+                </node>
+                <node id="keywordNode">
+                    <attribute id="keywordActions" value="" type="23" />
+                    <attribute id="keywordConditions" value="" type="23" />
+                    <attribute id="keywordDisplayedText" value="b6695294-aa16-4514-9330-cef54ea5f2f4" type="22" />
+                    <attribute id="keywordId" value="Greeting" type="22" />
+                    <attribute id="keywordLast" value="0" type="19" />
+                    <attribute id="keywordOwner" value="-1" type="4" />
+                    <attribute id="keywordShow" value="0" type="19" />
+                    <attribute id="keywordSource" value="0" type="5" />
+                    <children>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsCharacterFlag(&quot;EVENT_in_guarded_area&quot;,1,1)&#x0D;&#x0A;CHECK !c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="177ef3f3-c013-415c-9a9e-49a1f844b267" type="22" />
+                                </node>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="91790276-598d-42e5-a339-3495be4b989f" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="ACTION CallGuards()" type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsCharacterFlag(&quot;EVENT_in_guarded_area&quot;,1,1)&#x0D;&#x0A;CHECK c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="83570ad6-91e2-4593-b928-5d49fc833e4f" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value="" type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="1" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                        </node>
+                    </children>
+                </node>
+                <node id="keywordSpeakerNames">
+                    <children>
+                        <node id="keywordSpeakerName">
+                            <attribute id="Name" value="GROUP_All_NoAnimals_NoObjects" type="23" />
+                        </node>
+                        <node id="keywordSpeakerName">
+                            <attribute id="Name" value="" type="23" />
+                        </node>
+                        <node id="keywordSpeakerName">
+                            <attribute id="Name" value="" type="23" />
+                        </node>
+                        <node id="keywordSpeakerName">
+                            <attribute id="Name" value="" type="23" />
+                        </node>
+                    </children>
+                </node>
+            </children>
+        </node>
+    </region>
+</save>

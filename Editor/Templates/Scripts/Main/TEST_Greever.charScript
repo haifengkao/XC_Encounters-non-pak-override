@@ -1,0 +1,17 @@
+INIT
+CHARACTER:__Me
+TRIGGER:%Point1 = Greever_Jahan_770f6e25-06f2-44cf-b722-ddabd39d7f67
+TRIGGER:%Point2 = Test_HiddenTreasure_Box_aa073d65-70f1-49e1-8e3b-5dac171ae2db
+
+BEHAVIOUR
+REACTION Main, 500
+USAGE PEACE
+ACTIONS
+	IF "c1"
+		GlobalGetEvent("tjeu")
+	THEN
+		CharacterMoveTo(%Point1)
+	ELSE
+		CharacterMoveTo(%Point2)
+	ENDIF
+	Sleep(3)

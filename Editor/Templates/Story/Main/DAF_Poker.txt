@@ -1,0 +1,37 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Pokerwins(0);
+
+DB_Dialogs(CHARACTER_DAF_BO_GarrickGuard_01,"DAF_PokerPlayer");
+DB_Dialogs(CHARACTER_DAF_BO_GarrickGuard_02,"DAF_PokerPlayer");
+DB_Dialogs(CHARACTER_DAF_BO_GarrickGuard_03,"DAF_PokerPlayer");
+KBSECTION
+IF
+CharacterUsedItem(_Player,ITEM_DAF_Pokerchair)
+AND
+_Player.DB_IsPlayer()
+AND
+DB_GlobalEvent("DAF_PokerAvailable")
+THEN
+ProcDoTwoSpeakerDialog("DAF_Join_Poker",CHARACTER_DAF_BO_GarrickGuard_03,_Player);
+
+IF
+GlobalEventSet("WonAtPoker")
+AND
+DB_Pokerwins(_Old)
+AND
+IntegerSum(_Old,1,_New)
+THEN
+NOT DB_Pokerwins(_Old);
+DB_Pokerwins(_New);
+GlobalClearEvent("WonAtPoker");
+
+IF
+DB_PokerWins(5)
+THEN
+GlobalSetEvent("PokerBrokeTheBank");
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

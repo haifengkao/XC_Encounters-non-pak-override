@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<palette xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <palettes />
+  <objectids>
+    <guid>4e6b6ae4-1b80-4bdc-9238-87ef7bd1f5f8</guid>
+    <guid>6f66bf81-7f05-407b-be52-b3c3c3a53cbf</guid>
+    <guid>7a65e15d-6032-4de8-97ff-0fae2517d3b4</guid>
+    <guid>14447a77-451a-4f2d-b9d0-c5c479570f0c</guid>
+    <guid>eb5965be-682b-4318-beeb-dcce8dd5a7fb</guid>
+    <guid>a907777f-1338-4a2b-85fb-d15946170453</guid>
+    <guid>14e4ce40-e17f-451d-95d5-c50163003b57</guid>
+    <guid>178f9a28-8073-4b91-99c6-606d96b9fa26</guid>
+    <guid>87ee0b66-8f2a-4f4f-9c0b-f9f83ce66f1d</guid>
+    <guid>ea92faa7-9b7d-4502-bbbf-a15825630382</guid>
+    <guid>4f3be153-c7c0-4d9d-a18f-a56117047160</guid>
+    <guid>f096e4bc-584b-402a-b47a-a9009d4e88e2</guid>
+    <guid>81638d29-bade-46a9-be7b-67452c937971</guid>
+    <guid>6462210e-8c7d-4770-9e86-ab6743b0daca</guid>
+    <guid>d3044652-41bf-4e68-a03e-d07bc8d1ab05</guid>
+    <guid>8928414b-4d3b-4825-9c22-f44be5124d5b</guid>
+    <guid>9f15b4c7-4f6e-4ed3-9f62-15d1198687e2</guid>
+    <guid>ae30a360-d0c8-4d92-8b4e-4f31c5669ce4</guid>
+    <guid>8057a250-d6fb-46f9-b3d5-8ef7dddf1c9b</guid>
+    <guid>ccc93517-a178-472a-a92a-2c93bfd73476</guid>
+    <guid>6ff0235e-7d72-46a4-a0c4-680b070f7ca7</guid>
+    <guid>169348a3-82cd-4ad6-be65-9897a5c373ef</guid>
+    <guid>9b6e016b-a281-4ff6-ba76-cec2773a90b3</guid>
+  </objectids>
+  <name>Skeletons</name>
+</palette>

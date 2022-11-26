@@ -1,0 +1,36 @@
+INIT
+	CHARACTER:__Me
+	INT:%IsInvulnerable = 1	INT:%Counter = 0
+//--------
+EVENTSEVENT Initialization
+	ON
+		OnInit()
+	ACTIONS
+		IF "c1&!c2"
+			IsEqual(%IsInvulnerable, 1)
+			CharacterHasStatus(__Me, INVULNERABLE)
+		THEN
+			CharacterApplyStatus(__Me, INVULNERABLE, -1)
+		ENDIF
+EVENT StatusRemoved
+	ON
+		OnCharacterStatusRemoved(__Me, INVULNERABLE)
+	ACTIONS
+		Set(%IsInvulnerable, 0)
+		
+EVENT RedoStatus
+	ON
+		OnTurn()
+	ACTIONS
+		IF "c1"
+			IsEqual(%IsInvulnerable, 0)
+		THEN
+			Add(%Counter, 1)
+			IF "c1"
+				IsEqual(%Counter, 4)
+			THEN
+				CharacterApplyStatus(__Me, INVULNERABLE, -1)
+				Set(%IsInvulnerable, 1)
+				Set(%Counter, 0)
+			ENDIF
+		ENDIF

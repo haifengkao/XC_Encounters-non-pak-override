@@ -1,0 +1,155 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+INT:%IAmHappy = 0
+FIXEDSTRING:%animation
+TRIGGER:%Point_UpStairs_01 = CYS_Point_Charlene_Upstairs_01_ff19b98a-ea44-4721-970d-1650b45c8e63
+TRIGGER:%Point_UpStairs_02 = CYS_Point_Charlene_Upstairs_02_cebfba92-b03e-4d34-8cc2-363d5a394af8
+TRIGGER:%Point_UpStairs_03 = CYS_Point_Charlene_Upstairs_03_2def6645-9ef1-44ae-a1d2-bb8d7b7baefa
+TRIGGER:%Point_UpStairs_04 = CYS_Point_Charlene_Upstairs_04_e72fe858-06b3-4cf8-9fbd-395a5bade3f0
+TRIGGER:%Point_DownStairs_01 = CYS_Point_Charlene_Downstairs_01_354c2586-825a-40a6-9285-85ac3ef39f8d
+TRIGGER:%Point_DownStairs_02 = CYS_Point_Charlene_Downstairs_02_35a6bf31-d3e0-48d5-a0ce-b86c1f85107b
+CHARACTER:%Victoria = CYS_OrcLibrarian_6a429053-8eb7-48d1-94cc-7292449487d7
+
+BEHAVIOUR
+	
+REACTION State_DownStairs, 0
+USAGE PEACE
+ACTIONS
+	GetWeightedRandom(%currentAction, "Action_General_Cry", INT:15, "Action_GoUpStairs", INT:5, "Action_Down_CleanAtPoints", INT:10)
+	SetPriority(%currentAction, 1100)
+	
+REACTION State_UpStairs, 0
+USAGE PEACE
+ACTIONS
+	GetWeightedRandom(%currentAction, "Action_General_Cry", INT:15, "Action_Up_CleanAtPoints", INT:10, "Action_GoDownStairs", INT:5)
+	SetPriority(%currentAction, 1100)
+	
+REACTION Action_General_Cry, 0
+USAGE PEACE
+ACTIONS
+	IF "c1"
+		IsEqual(%IAmHappy, 0)
+	THEN
+		GetRandom(%animation, "Crying_01", "emotion_sad")
+	ELSE
+		GetRandom(%animation, "Laugh_01", "emotion_thankful")
+	ENDIF
+	CharacterPlayAnimation(%animation)
+	Sleep(3)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)
+	
+REACTION Action_Up_CleanAtPoints, 0
+USAGE PEACE
+VARS
+	TRIGGER:_point
+	FIXEDSTRING:_animation
+	INT:_loopCount
+ACTIONS
+	GetRandom(_loopCount, 1, 2, 3, 4)
+	Label("loopStart")
+	IF "!c1"
+		IsEqual(_loopCount, 0)
+	THEN
+		GetRandom(_point, %Point_UpStairs_01, %Point_UpStairs_02, %Point_UpStairs_03, %Point_UpStairs_04)
+		CharacterMoveTo(_point, 0)
+		CharacterLookFrom(_point)
+		IF "c1|c2"
+			IsEqual(_point, %Point_UpStairs_01)
+			IsEqual(_point, %Point_UpStairs_03)
+		THEN
+			Set(_animation, "WipeTable_01")
+		ELIF "c1|c2"
+			IsEqual(_point, %Point_UpStairs_02)
+			IsEqual(_point, %Point_UpStairs_04)
+		THEN
+			GetRandom(_animation, "Fidget_Forward_01", "Fidget_Forward_02", "Fidget_High_01", "Fidget_High_02", "Fidget_Low_01", "Fidget_Low_02", "Fidget_Low_03")
+		ENDIF
+		CharacterPlayAnimation(_animation)
+		Subtract(_loopCount, 1)
+		Goto("loopStart")
+	ENDIF
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)
+	
+REACTION Action_Down_CleanAtPoints, 0
+USAGE PEACE
+VARS
+	TRIGGER:_point
+	FIXEDSTRING:_animation
+	INT:_loopCount
+ACTIONS
+	GetRandom(_loopCount, 1, 2, 3, 4)
+	Label("loopStart")
+	IF "!c1"
+		IsEqual(_loopCount, 0)
+	THEN
+		GetRandom(_point, %Point_DownStairs_01, %Point_DownStairs_02)
+		CharacterMoveTo(_point, 0)
+		CharacterLookFrom(_point)
+		IF "c1"
+			IsEqual(_point, %Point_DownStairs_01)
+		THEN
+			Set(_animation, "WipeTable_01")
+		ELIF "c1"
+			IsEqual(_point, %Point_DownStairs_02)
+		THEN
+			GetRandom(_animation, "Fidget_Forward_01", "Fidget_Forward_02", "Fidget_Low_01", "Fidget_Low_02", "Fidget_Low_03")
+		ENDIF
+		CharacterPlayAnimation(_animation)
+		Subtract(_loopCount, 1)
+		Goto("loopStart")
+	ENDIF
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)
+		
+REACTION Action_GoUpStairs, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(TRIGGER:CYS_Point_Cecil_GoDown_dd607c26-f2fb-4ac0-a6ee-0bad169652ce, 0)
+	CharacterTeleportTo(TRIGGER:CYS_Point_Cecil_GoUp_7dccf5a4-9a68-4b10-9871-fa5d607bd478)
+	Set(%currentState, "State_UpStairs")
+INTERRUPT
+	Reset()
+	
+REACTION Action_GoDownStairs, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(TRIGGER:CYS_Point_Cecil_GoUp_7dccf5a4-9a68-4b10-9871-fa5d607bd478, 0)
+	CharacterTeleportTo(TRIGGER:CYS_Point_Cecil_GoDown_dd607c26-f2fb-4ac0-a6ee-0bad169652ce)
+	Set(%currentState, "State_DownStairs")
+INTERRUPT
+	Reset()
+	
+REACTION State_VictoriaDead, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	CharacterMoveTo(%Victoria,1)
+	CharacterLookAt(%Victoria)
+	GetWeightedRandom(_Animation,"Crying_01",FLOAT:15,"Kneel_01",FLOAT:10,"Kneel_02",FLOAT:10,"Depressed_01",FLOAT:5)
+	CharacterPlayAnimation(_Animation)
+	Sleep(4)
+	DialogStart("CYS_AD_CecilMourning",__Me)
+
+	
+EVENTS
+	
+EVENT Init
+ON
+	OnInit()
+ACTIONS	
+	CharacterForceUpdate(1)
+	
+EVENT BeHappy
+ON
+	OnGlobalEventSet("CYS_LieCharlene")
+ACTIONS	
+	Set(%IAmHappy, 1)

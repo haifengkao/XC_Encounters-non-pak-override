@@ -1,0 +1,429 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%VoidDragon="HOM_AstralDragon_fd8e91d7-843e-46fc-9b2e-965b3de76a7e"
+	CHARACTER:%Icandra="END_Icandra_99e3ff72-410f-489f-bd28-8cc0ed3d947c"
+	CHARACTER:%Zandalor="Zandalor_2535a516-8e0f-4c00-abe6-285e545fdc9b"
+	CHARACTER:%Target_Resurrection
+	CHARACTER:%Target_Regenerate
+	CHARACTER:%Target_PurifyingFire
+	INT:%AmountOfEnemies
+	ITEM:%GodBox="HOM_GodBox_8ecaea45-ae64-412e-a538-d892d2389c93"
+	FLOAT:%AstarteSightRange
+	
+	//CMB_HOM_Astarte isn't used anymore. This is the only Astarte script now.
+
+//------------------------	
+BEHAVIOUR
+REACTION Astarte2_FaceGodBoxAndPlayAnimation,500
+USAGE WAITING
+VARS
+	FLOAT:_SleepValue
+ACTIONS
+	CharacterLookAt(%GodBox)
+	CharacterPlayAnimation("loop_cast_loop",1,1)
+	GetRandomBetween(_SleepValue,3,6)
+	Sleep(_SleepValue)
+	
+REACTION Astarte2_CastNullRes_WithoutMoving,1000
+USAGE COMBAT
+VARS
+	FLOAT:_MaxRange
+CHECK "c1&c2"
+	CharacterCanCast(__Me,"Shout_EnemyNullResistance_Astarte")
+	CharacterGetSkillRange(_,_MaxRange,__Me,"Shout_EnemyNullResistance_Astarte")
+ACTIONS
+	DebugText(__Me,"NullRes: scanning!")
+	Set(%AmountOfEnemies,0)	
+	IterateCharactersNear(__Me,_MaxRange"Iterate_EnemiesToNullRes",Lowest,Distance)
+	IF "c1"
+		IsGreaterThen(%AmountOfEnemies,1)
+	THEN		
+		DebugText(__Me,"Found: [1]! NULLRES!",%AmountOfEnemies)
+		CharacterUseSkill("Shout_EnemyNullResistance_Astarte",__Me)
+	ELSE
+		SetPriority("Astarte2_CastNullRes_WithoutMoving",0)	
+	ENDIF
+INTERRUPT
+	Reset()
+	
+REACTION Astarte2_CastResurrect_WithoutMoving,900
+USAGE COMBAT
+VARS
+	FLOAT:_MaxRange
+	FLOAT:_MinRange
+	FLOAT:_DistanceBetwMeAndTarget
+CHECK "c1"
+	CharacterCanCast(__Me,"Target_Enemy_AstarteResurrect")
+ACTIONS
+	Set(%Target_Resurrection,null)	
+	IterateCharacters("Iterate_DeadAllies",Lowest,Distance)
+	IF "!c1&c2&c3&!c4"
+		IsEqual(%Target_Resurrection,null)
+		CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_Enemy_AstarteResurrect")
+		GetDistance(_DistanceBetwMeAndTarget,__Me,%Target_Resurrection)
+		IsGreaterThen(_DistanceBetwMeAndTarget,_MaxRange)
+	THEN
+		DisplayText(__Me,"HOM_End_Astarte_Cast_Resurrect",2)		
+		CharacterUseSkill("Target_Enemy_AstarteResurrect",%Target_Resurrection)
+	ELSE
+		SetPriority("Astarte2_CastResurrect_WithoutMoving",0)	
+	ENDIF
+INTERRUPT
+	Reset()
+
+REACTION Astarte2_CastRegenerate_WithoutMoving,800
+USAGE COMBAT
+VARS
+	FLOAT:_MaxRange
+	FLOAT:_MinRange
+	FLOAT:_DistanceBetwMeAndTarget
+CHECK "c1&c2"
+	CharacterCanCast(__Me,"Heal_EnemyRegenerate_Astarte")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Heal_EnemyRegenerate_Astarte")	
+ACTIONS
+	Set(%Target_Regenerate,null)	
+	IterateCharacters("Iterate_WoundedAllies",Lowest,Distance)
+	IF "!c1&c2"
+		IsEqual(%Target_Regenerate,null)
+		GetDistance(_DistanceBetwMeAndTarget,__Me,%Target_Regenerate)
+	THEN
+		IF "!c1"
+			IsGreaterThen(_DistanceBetwMeAndTarget,_MaxRange)
+		THEN
+			DisplayText(__Me,"HOM_End_Astarte_Cast_Regenerate",2)	
+			CharacterUseSkill("Heal_EnemyRegenerate_Astarte",%Target_Regenerate)
+		ELSE
+			CharacterLookAt(%Target_Regenerate)
+			DisplayText(__Me,"HOM_End_Astarte_PlayerTooFar_Heal",3)
+			Sleep(3)
+			SetPriority("Astarte2_CastRegenerate_WithoutMoving",0)
+		ENDIF
+	ELSE
+		SetPriority("Astarte2_CastRegenerate_WithoutMoving",0)
+	ENDIF
+INTERRUPT
+	Reset()
+	
+REACTION Astarte2_CastPurifyingFire_WithoutMoving,700
+USAGE COMBAT
+VARS
+	FLOAT:_MaxRange
+	FLOAT:_MinRange
+	FLOAT:_DistanceBetwMeAndTarget
+CHECK "c1&c2"
+	CharacterCanCast(__Me,Target_EnemyPurifyingFire)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,Target_EnemyPurifyingFire)	
+ACTIONS
+	Set(%Target_PurifyingFire,null)	
+	IterateCharacters("Iterate_AlliesWithStatuses",Lowest,Distance)
+	IF "!c1&c2&!c3"
+		IsEqual(%Target_PurifyingFire,null)
+		GetDistance(_DistanceBetwMeAndTarget,__Me,%Target_PurifyingFire)
+		IsGreaterThen(_DistanceBetwMeAndTarget,_MaxRange)
+	THEN		
+		CharacterUseSkill(Target_EnemyPurifyingFire,%Target_PurifyingFire)
+	ELSE
+		SetPriority("Astarte2_CastPurifyingFire_WithoutMoving",0)	
+	ENDIF
+INTERRUPT
+	Reset()
+
+REACTION Astarte2_Cast_BlessedEarth,600
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+CHECK "c1&c2"
+	CharacterCanCast(__Me,"Shout_EnemyBlessedEarth")
+	CharacterGet(_Target,__Me,14,Lowest,Distance,Ally)
+ACTIONS	
+	CharacterUseSkill("Shout_EnemyBlessedEarth",__Me)
+	
+REACTION Astarte2_Cast_Bless_WithoutMoving,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&!(c4|c5|c6|c7|c8)&c9"
+	CharacterCanCast(__Me,"Target_EnemyTargetedBless")								//c1
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyTargetedBless")	//c2
+	CharacterGet(_Target,__Me,_MaxRange,Highest,Strength,Ally)						//c3
+	CharacterIsSummon(_Target)														//!c4
+	CharacterHasStatus(_Target,"FROZEN")											//!c5
+	CharacterHasStatus(_Target,"PETRIFIED")											//!c6
+	CharacterHasStatus(_Target,"CHARMED")											//!c7
+	CharacterHasStatus(_Target,"BLESSED")											//!c8
+	IsRandom(0.5)																	//c9	
+ACTIONS
+	DisplayText(__Me,"HOM_End_Astarte_Cast_Bless",2)	
+	CharacterUseSkill("Target_EnemyTargetedBless",_Target)
+
+REACTION Astarte2_Cast_PerceptionBoost_WithoutMoving,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&!(c4|c5|c6|c7|c8|c9|c10)&c11"
+	CharacterCanCast(__Me,"Target_EnemyTargetedPerception")								//c1
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyTargetedPerception")	//c2
+	CharacterGet(_Target,__Me,_MaxRange,Highest,Dexterity,Ally)							//c3
+	CharacterIsSummon(_Target)															//!c4
+	IsEqual(_Target,%Zandalor)															//!c5
+	CharacterHasStatus(_Target,"FROZEN")												//!c6
+	CharacterHasStatus(_Target,"PETRIFIED")												//!c7
+	CharacterHasStatus(_Target,"CHARMED")												//!c8
+	CharacterHasStatus(_Target,"BLIND")													//!c9
+	CharacterHasStatus(_Target,"WARM")													//!c10
+	IsRandom(0.5)																		//c11	
+ACTIONS
+	DisplayText(__Me,"HOM_End_Astarte_Cast_PerceptionBoost",2)	
+	CharacterUseSkill("Target_EnemyTargetedPerception",_Target)
+
+REACTION Astarte2_Cast_Haste_WithoutMoving,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&!(c4|c5|c6|c7|c8|c9|c10)&c11"
+	CharacterCanCast(__Me,"Target_EnemyHaste")										//c1
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyHaste")			//c2
+	CharacterGet(_Target,__Me,_MaxRange,Highest,Speed,Ally)							//c3
+	CharacterIsSummon(_Target)														//!c4
+	IsEqual(_Target,%Zandalor)														//!c5
+	CharacterHasStatus(_Target,"FROZEN")											//!c6
+	CharacterHasStatus(_Target,"PETRIFIED")											//!c7
+	CharacterHasStatus(_Target,"CHARMED")											//!c8
+	CharacterHasStatus(_Target,"HASTED")											//!c9
+	CharacterHasStatus(_Target,"WARM")												//!c10
+	IsRandom(0.5)																	//c11
+ACTIONS
+	DisplayText(__Me,"HOM_End_Astarte_Cast_Hasten",2)	
+	CharacterUseSkill("Target_EnemyHaste",_Target)
+	
+REACTION Astarte2_Cast_Fortify_WithoutMoving,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&!(c4|c5|c6|c7|c8|c9|c10)&c11"
+	CharacterCanCast(__Me,"Target_EnemyFortify")									//c1
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyFortify")			//c2
+	CharacterGet(_Target,__Me,_MaxRange,Lowest,Constitution,Ally)					//c3
+	CharacterIsSummon(_Target)														//!c4
+	IsEqual(_Target,%Zandalor)														//!c5
+	CharacterHasStatus(_Target,"FORTIFIED")											//!c6
+	CharacterHasStatus(_Target,"FROZEN")											//!c7
+	CharacterHasStatus(_Target,"PETRIFIED")											//!c8
+	CharacterHasStatus(_Target,"CHARMED")											//!c9
+	CharacterHasStatus(_Target,"FORTIFIED")											//!c10
+	IsRandom(0.5)																	//c11
+ACTIONS
+	DisplayText(__Me,"HOM_End_Astarte_Cast_Fortify",2)	
+	CharacterUseSkill("Target_EnemyFortify",_Target)
+
+REACTION Astarte2_IfNoPlayerClose_TellsThemToGetCloser,50
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+ACTIONS
+	IF "!c1"
+		CharacterGet(_Target,__Me,10,Lowest,Distance,Ally)
+	THEN	
+		IF "c1"
+			CharacterGet(_Target,__Me,%AstarteSightRange,Lowest,Distance,Ally)
+		THEN
+			CharacterLookAt(_Target)
+			DisplayText(__Me,"HOM_End_Astarte_TellsPlayerToStayClose",3)	
+			CharacterPlayAnimation("emotion_greeting",1,1)		
+		ENDIF
+	ENDIF
+	CharacterEndTurn()
+INTERRUPT
+	Reset()
+
+//------------ COMMENTS
+REACTION VoidDragonIsWoundedComment1,3200
+USAGE ALL
+VARS
+	FLOAT:_VoidDragonVitality
+CHECK "c1&c2&c3"
+	CharacterGetStat(_VoidDragonVitality,%VoidDragon,Vitality)
+	IsLessThen(_VoidDragonVitality,0.7)
+	IsGreaterThen(_VoidDragonVitality,0.5)
+ACTIONS
+	DisplayText(__Me,"HOM_End_AstarteWin1",3)
+	Sleep(3)
+	SetPriority("VoidDragonIsWoundedComment1",0)
+		
+REACTION VoidDragonIsWoundedComment2,3100
+USAGE ALL
+VARS
+	FLOAT:_VoidDragonVitality
+CHECK "c1&c2&c3"
+	CharacterGetStat(_VoidDragonVitality,%VoidDragon,Vitality)
+	IsLessThen(_VoidDragonVitality,0.5)
+	IsGreaterThen(_VoidDragonVitality,0.3)
+ACTIONS
+	DisplayText(__Me,"HOM_End_AstarteWin2",3)
+	Sleep(3)
+	SetPriority("VoidDragonIsWoundedComment1",0)
+	SetPriority("VoidDragonIsWoundedComment2",0)
+
+		
+REACTION VoidDragonIsWoundedComment3,3000
+USAGE ALL
+VARS
+	FLOAT:_VoidDragonVitality
+CHECK "c1&c2&c3"
+	CharacterGetStat(_VoidDragonVitality,%VoidDragon,Vitality)
+	IsLessThen(_VoidDragonVitality,0.3)
+	IsGreaterThen(_VoidDragonVitality,0.1)
+ACTIONS
+	DisplayText(__Me,"HOM_End_AstarteWin3",3)
+	Sleep(3)
+	SetPriority("VoidDragonIsWoundedComment1",0)
+	SetPriority("VoidDragonIsWoundedComment2",0)
+	SetPriority("VoidDragonIsWoundedComment3",0)
+	
+REACTION Astarte2IsWoundedComment1,3200
+USAGE COMBAT
+VARS
+	FLOAT:_MyVitality
+CHECK "c1&c2&c3"
+	CharacterGetStat(_MyVitality,__Me,Vitality)
+	IsLessThen(_MyVitality,0.7)
+	IsGreaterThen(_MyVitality,0.5)
+ACTIONS
+	DisplayText(__Me,"HOM_End_AstarteLose1",3)
+	Sleep(3)
+	SetPriority("Astarte2IsWoundedComment1",0)
+		
+REACTION Astarte2IsWoundedComment2,3100
+USAGE COMBAT
+VARS
+	FLOAT:_MyVitality
+CHECK "c1&c2&c3"
+	CharacterGetStat(_MyVitality,__Me,Vitality)
+	IsLessThen(_MyVitality,0.5)
+	IsGreaterThen(_MyVitality,0.3)
+ACTIONS
+	DisplayText(__Me,"HOM_End_AstarteLose2",3)
+	Sleep(3)
+	SetPriority("Astarte2IsWoundedComment1",0)
+	SetPriority("Astarte2IsWoundedComment2",0)
+		
+REACTION Astarte2IsWoundedComment3,3000
+USAGE COMBAT
+VARS
+	FLOAT:_MyVitality
+CHECK "c1&c2&c3"
+	CharacterGetStat(_MyVitality,__Me,Vitality)
+	IsLessThen(_MyVitality,0.3)
+	IsGreaterThen(_MyVitality,0.1)
+ACTIONS
+	DisplayText(__Me,"HOM_End_AstarteLose3",3)
+	Sleep(3)
+	SetPriority("Astarte2IsWoundedComment2",0)
+	SetPriority("Astarte2IsWoundedComment1",0)
+	SetPriority("Astarte2IsWoundedComment3",0)
+		
+//------------------------
+EVENTS
+EVENT Astarte2_AddSkill
+ON
+	OnInit()
+ACTIONS
+	SetPriority("Combat_AttackSetEnemy",0)
+	SetPriority("Combat_MoveToSetEnemy",0)
+	CharacterAddSkill("Target_Enemy_AstarteResurrect")	
+	CharacterAddSkill("Heal_EnemyRegenerate_Astarte")
+	CharacterAddSkill("Target_EnemyPurifyingFire")	
+	CharacterAddSkill("Shout_EnemyBlessedEarth")
+	CharacterAddSkill("Target_EnemyTargetedBless")
+	CharacterAddSkill("Target_EnemyTargetedPerception")
+	CharacterAddSkill("Shout_EnemyNullResistance_Astarte")
+	CharacterAddSkill("Target_EnemyHaste")
+	CharacterAddSkill("Target_EnemyFortify")
+
+EVENT OnTurn_ResetPriorities
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("Astarte2_CastNullRes_WithoutMoving",1000)
+	SetPriority("Astarte2_CastResurrect_WithoutMoving",900)
+	SetPriority("Astarte2_CastRegenerate_WithoutMoving",800)
+	SetPriority("Astarte2_CastPurifyingFire_WithoutMoving",700)
+	
+EVENT OnIterate_ScanForAllyToResurrect
+VARS
+	CHARACTER:_Character
+ON
+	OnIterateCharacter(_Character,"Iterate_DeadAllies")
+ACTIONS
+	IF "c1&c2&!(c3|c4|c5)"
+		CharacterIsDead(_Character)
+		CharacterIsAlly(__Me,_Character)
+		CharacterIsSummon(_Character)
+		IsEqual(_Character,%Zandalor)
+		IsEqual(_Character,%Icandra)		
+	THEN
+		Set(%Target_Resurrection,_Character)
+	ENDIF
+	
+EVENT OnIterate_ScanForAllyToHeal
+VARS
+	CHARACTER:_Character
+	FLOAT:_CharactersVitality
+ON
+	OnIterateCharacter(_Character,"Iterate_WoundedAllies")
+ACTIONS
+	IF "c1&!(c2|c3|c4|c5|c6)&c7&c8"
+		CharacterIsAlly(__Me,_Character)										//c1
+		CharacterIsDead(_Character)												//!c2
+		IsEqual(_Character,%Zandalor)											//!c3
+		IsEqual(_Character,__Me)												//!c4
+		CharacterIsSummon(_Character)											//!c5
+		CharacterHasTalent(_Character,"Zombie")									//!c6		//added by Edouard on 07/3/2016
+		CharacterGetStat(_CharactersVitality,_Character,Vitality)				//c7
+		IsLessThen(_CharactersVitality,0.6)										//c8
+	THEN
+		Set(%Target_Regenerate,_Character)
+	ENDIF	
+		
+EVENT OnIterate_ScanForAllyToCureFromStatus
+VARS
+	CHARACTER:_Character
+ON
+	OnIterateCharacter(_Character,"Iterate_AlliesWithStatuses")
+ACTIONS
+	IF "!c1&c2&!c3&(c4|c5|c6|c7|c8)"
+		CharacterIsDead(_Character)						//!c1
+		CharacterIsAlly(__Me,_Character)				//c2
+		CharacterIsSummon(_Character)					//!c3
+		CharacterHasStatus(_Character,"BURNING")		//c4
+		CharacterHasStatus(_Character,"STUNNED")		//c5
+		CharacterHasStatus(_Character,"FROZEN")			//c6
+		CharacterHasStatus(_Character,"CHARMED")		//c7
+		CharacterHasStatus(_Character,"PETRIFIED")		//c8
+	THEN
+		Set(%Target_PurifyingFire,_Character)
+	ENDIF
+	
+EVENT OnIterate_ScanForEnemiesToNullifyResistance
+VARS
+	CHARACTER:_Character
+	FLOAT:_AirResistance
+ON
+	OnIterateCharacter(_Character,"Iterate_EnemiesToNullRes")
+ACTIONS
+	IF "!c1&c2&c3&!c4"
+		CharacterIsDead(_Character)										//!c1
+		CharacterIsEnemy(__Me,_Character)								//c2
+		CharacterGetStat(_AirResistance,_Character,"AirResistance")		//c3
+		IsLessThen(_AirResistance,100)									//!c4
+	THEN
+		Add(%AmountOfEnemies,1)
+	ENDIF	

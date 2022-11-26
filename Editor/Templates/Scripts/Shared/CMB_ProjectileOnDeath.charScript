@@ -1,0 +1,74 @@
+#INCLUDE Base
+
+INIT
+USING Base
+CHARACTER:__Me
+CHARACTER:%ProjectileTarget
+EXTERN SKILL:%chooseProjectile="Projectile_EnemyFireball"
+EXTERN INT:%chooseProjectileLevel=3
+EXTERN STRING:%targetSelf=1
+EXTERN STRING:%targetClosestEnemy=0
+EXTERN STRING:%targetClosestIncAllies=0
+EXTERN FLOAT:%lookForClosestTarget=5.5
+
+EVENTS
+EVENT ProjectileOnDeath
+VARS
+	CHARACTER:_closestEnemy
+	CHARACTER:_closestTarget
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	IF "c1"
+		IsEqual(%targetSelf,1)
+	THEN
+		ExplodeAt(__Me,%chooseProjectile,%chooseProjectileLevel)
+	ELIF "c1|c2"
+		IsEqual(%targetClosestEnemy,1)
+		IsEqual(%targetClosestIncAllies,1)
+	THEN
+		IterateCharactersInCombat(__Me,"ProjOnDeathClosest")
+		IF "c1"
+			IsEqual(%ProjectileTarget,null)
+		THEN
+			ExplodeAt(__Me,%chooseProjectile,%chooseProjectileLevel,__Me)
+		ELSE
+			ExplodeAt(%ProjectileTarget,%chooseProjectile,%chooseProjectileLevel,__Me)
+		ENDIF
+	ELSE
+		ExplodeAt(__Me,%chooseProjectile,%chooseProjectileLevel,__Me)
+	ENDIF
+
+EVENT ProjOnDeathClosestIterate
+VARS
+	CHARACTER:_Char
+	FLOAT:_Distance
+ON
+	OnIterateCharacter(_Char,"ProjOnDeathClosest")
+ACTIONS
+	IF "c1"
+		IsEqual(%targetClosestEnemy,1)
+	THEN
+		IF "!c1&c2&c3&c4&!c5"
+			CharacterIsDead(_Char)
+			CharacterIsEnemy(__Me, _Char)
+			GetDistance(_Distance, _Char, __Me)
+			IsLessThen(_Distance, %lookForClosestTarget)
+			IsEqual(_Char,__Me)
+		THEN
+			Set(%lookForClosestTarget, _Distance)
+			Set(%ProjectileTarget,_Char)
+		ENDIF
+	ELIF "c1"
+		IsEqual(%targetClosestIncAllies,1)
+	THEN
+		IF "!c1&c2&c3&!c4"
+			CharacterIsDead(_Char)
+			GetDistance(_Distance, _Char, __Me)
+			IsLessThen(_Distance, %lookForClosestTarget)
+			IsEqual(_Char,__Me)
+		THEN
+			Set(%lookForClosestTarget, _Distance)
+			Set(%ProjectileTarget,_Char)
+		ENDIF
+	ENDIF

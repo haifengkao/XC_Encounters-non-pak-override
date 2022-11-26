@@ -1,0 +1,38 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_TriggerGivesPartyDialog(TRIGGER_DFD_IS_Mirror,"DFD_IS_DD_Mirror");
+DB_TriggerGivesPartyDialog(TRIGGER_DFD_IS_AfterPuzzle,"DFD_IS_DD_AfterPuzzle");
+
+DB_ShovelArea(TRIGGER_DFD_IS_ShovelStarStone,"DFD_IS_Starstone",ITEM_DFD_IS_StarstonePile);
+DB_ShovelRewardItemAppear("DFD_IS_Starstone",ITEM_DFD_IS_Starstone,TRIGGER_DFD_IS_ShovelStarStone_Appear);
+DB_ShovelArea(TRIGGER_DFD_IS_ShovelDiggingSpot1,"DFD_IS_DiggingSpot1",ITEM_DFD_IS_ShovelDiggingSpot1Pile);
+DB_ShovelRewardItemAppear("DFD_IS_DiggingSpot1",ITEM_DFD_IS_ShovelDiggingSpot1Chest,TRIGGER_DFD_IS_ShovelDiggingSpot1Point);
+DB_ShovelArea(TRIGGER_DFD_IS_ShovelDiggingMound2,"DFD_IS_DiggingSpot2",ITEM_DFD_IS_ShovelDiggingMound2Pile);
+DB_ShovelRewardItemAppear("DFD_IS_DiggingSpot2",ITEM_DAF_IS_ShovelDiggingMound2Chest,TRIGGER_DFD_IS_ShovelDiggingMound2Point);
+KBSECTION
+IF
+CharacterUsedItem(_,ITEM_DFD_IS_EntranceButton)
+AND
+NOT DB_OnlyOnce("DFD_IS_EntranceButton")
+AND
+ItemGetPosition(ITEM_DFD_IS_EntranceRock,_X,_Y,_Z)
+THEN
+ItemSetOnstage(ITEM_DFD_IS_EntranceRock,0);
+PlayEffectAtPosition("FX_GP_TeleportSmoke_A",_X,_Y,_Z);
+DB_OnlyOnce("DFD_IS_EntranceButton");
+
+IF
+RegionStarted("DAF_Inner_Sanctum")
+THEN
+QuestAdd("DFD_InnerSanctum");
+QuestUpdate("DFD_InnerSanctum","Start");
+
+IF
+CharacterEnteredTrigger(_,TRIGGER_DFD_IS_Mirror)
+THEN
+QuestUpdate("DFD_InnerSanctum","MirrorBroken");
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

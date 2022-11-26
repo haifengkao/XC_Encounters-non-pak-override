@@ -1,0 +1,13 @@
+INIT 
+
+ITEM:__Me
+
+EVENTS
+
+EVENT Use
+VARS
+	CHARACTER:_Char
+ON
+	OnUseItem(_Char, __Me)
+ACTIONS
+	CharacterEvent(_Char, "END_NegaNaugtyChairUse")

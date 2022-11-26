@@ -1,0 +1,225 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+//REGION Small cemetery
+DB_ShovelArea(TRIGGER_CYS_ShovelTomb01,"CYS_ShovelTomb01",ITEM_CYS_ShovelTomb01Dirt);
+DB_ShovelArea(TRIGGER_CYS_ShovelTomb11,"CYS_ShovelTomb11",ITEM_CYS_ShovelTomb11Dirt);
+DB_ShovelArea(TRIGGER_CYS_ShovelTomb14,"CYS_ShovelTomb14",ITEM_CYS_ShovelTomb14Dirt);
+DB_ShovelArea(TRIGGER_CYS_ShovelTomb06,"CYS_ShovelTomb06",ITEM_CYS_ShovelTomb06Dirt);
+DB_ShovelArea(TRIGGER_CYS_ShovelTomb05,"CYS_ShovelTomb05",ITEM_CYS_ShovelTomb05Dirt);
+DB_ShovelArea(TRIGGER_CYS_ShovelTomb07,"CYS_ShovelTomb07",ITEM_CYS_ShovelTomb07Dirt);
+DB_ShovelArea(TRIGGER_CYS_ShovelTomb04,"CYS_ShovelTomb04",ITEM_CYS_ShovelTomb04Dirt);
+DB_ShovelArea(TRIGGER_CYS_ShovelTomb08,"CYS_ShovelTomb08",ITEM_CYS_ShovelTomb08Dirt);
+DB_ShovelArea(TRIGGER_CYS_ShovelTomb02,"CYS_ShovelTomb02",ITEM_CYS_ShovelTomb02Dirt);
+DB_ShovelArea(TRIGGER_CYS_ShovelTomb03,"CYS_ShovelTomb03",ITEM_CYS_ShovelTomb03Dirt);
+DB_ShovelArea(TRIGGER_CYS_ShovelTomb13,"CYS_ShovelTomb13",ITEM_CYS_ShovelTomb13Dirt);
+DB_ShovelArea(TRIGGER_CYS_ShovelNemris,"CYS_ShovelNemris",ITEM_CYS_ShovelNemrisDirt);
+DB_ShovelArea(TRIGGER_CYS_ShovelCemeteryTunnel,"CYS_ShovelTunnel",ITEM_CYS_ShovelCemeteryTunnelDirt);
+
+DB_ShovelRewardCharacterAppear("CYS_ShovelTomb01",CHARACTER_CYS_ShovelTomb01Skeleton);
+DB_ShovelRewardCharacterAppear("CYS_ShovelTomb03",CHARACTER_CYS_ShovelTomb03Skeleton);
+DB_ShovelRewardCharacterAppear("CYS_ShovelTomb14",CHARACTER_CYS_ShovelTomb14Zombie);
+DB_ShovelRewardCharacterAppear("CYS_ShovelNemris",CHARACTER_CYS_BC_Nemris);
+DB_ShovelRewardItemSpawn("CYS_ShovelTunnel",ITEM_CYS_ShovelCemeteryTunnelHole);
+DB_ShovelRewardItemAppear("CYS_ShovelTomb11",ITEM_CYS_ShovelTomb11Bones, TRIGGER_CYS_ShovelTomb11Point);
+DB_ShovelRewardItemAppear("CYS_ShovelTomb13",ITEM_CYS_ShovelTomb13Bones, TRIGGER_CYS_ShovelTomb13Point);
+DB_ShovelRewardItemAppear("CYS_ShovelTomb06",ITEM_CYS_ShovelTomb06Bones, TRIGGER_CYS_ShovelTomb06Point);
+DB_ShovelRewardItemAppear("CYS_ShovelTomb05",ITEM_CYS_ShovelTomb05Bones, TRIGGER_CYS_ShovelTomb05Point);
+DB_ShovelRewardItemAppear("CYS_ShovelTomb04",ITEM_CYS_ShovelTomb04Bones, TRIGGER_CYS_ShovelTomb04Point);
+DB_ShovelRewardItemAppear("CYS_ShovelTomb08",ITEM_CYS_ShovelTomb08Bones, TRIGGER_CYS_ShovelTomb08Point);
+DB_ShovelRewardItemAppear("CYS_ShovelTomb02",ITEM_CYS_ShovelTomb02Bones, TRIGGER_CYS_ShovelTomb02Point);
+DB_ShovelRewardItemAppear("CYS_ShovelTomb07",ITEM_CYS_ShovelTomb07Pie, TRIGGER_CYS_ShovelTomb07Point);
+//END_REGION
+
+//REGION Big Cemetery
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb01, "CYS_CC_Tomb01");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb02, "CYS_CC_Tomb02");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb03, "CYS_CC_Tomb03");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb04, "CYS_CC_Tomb04");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb05, "CYS_CC_Tomb05");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb06, "CYS_CC_Tomb06");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb07, "CYS_CC_Tomb07");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb08, "CYS_CC_Tomb08");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb09, "CYS_CC_Tomb09");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb10, "CYS_CC_Tomb10");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb11, "CYS_CC_Tomb11");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb12, "CYS_CC_Tomb12");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb13, "CYS_CC_Tomb13");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb14, "CYS_CC_Tomb14");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb15, "CYS_CC_Tomb15");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb16, "CYS_CC_Tomb16");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb17, "CYS_CC_Tomb17");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb18, "CYS_CC_Tomb18");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb19, "CYS_CC_Tomb19");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb20, "CYS_CC_Tomb20");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb21, "CYS_CC_Tomb21");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb22, "CYS_CC_Tomb22");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb23, "CYS_CC_Tomb23");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb24, "CYS_CC_Tomb24");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb25, "CYS_CC_Tomb25");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb26, "CYS_CC_Tomb26");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb27, "CYS_CC_Tomb27");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb28, "CYS_CC_Tomb28");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb29, "CYS_CC_Tomb29");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb30, "CYS_CC_Tomb30");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb31, "CYS_CC_Tomb31");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb32, "CYS_CC_Tomb32");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb33, "CYS_CC_Tomb33");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb34, "CYS_CC_Tomb34");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb35, "CYS_CC_Tomb35");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb36, "CYS_CC_Tomb36");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb37, "CYS_CC_Tomb37");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb38, "CYS_CC_Tomb38");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb39, "CYS_CC_Tomb39");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb40, "CYS_CC_Tomb40");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb41, "CYS_CC_Tomb41");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb42, "CYS_CC_Tomb42");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb43, "CYS_CC_Tomb43");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb44, "CYS_CC_Tomb44");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb45, "CYS_CC_Tomb45");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Tomb46, "CYS_CC_Tomb46");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Mausoleum01, "CYS_CC_Mausoleum01");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Mausoleum02, "CYS_CC_Mausoleum02");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Mausoleum03, "CYS_CC_Mausoleum03");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Mausoleum04, "CYS_CC_Mausoleum04");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Mausoleum05, "CYS_CC_Mausoleum05");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Mausoleum06, "CYS_CC_Mausoleum06");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Mausoleum07, "CYS_CC_Mausoleum07");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Mausoleum08, "CYS_CC_Mausoleum08");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Mausoleum09, "CYS_CC_Mausoleum09");
+DB_Global_ItemDescriptions(ITEM_CYS_CC_Mausoleum10, "CYS_CC_Mausoleum10");
+DB_Global_ItemDescriptions(ITEM_CYS_DFW_Tomb_01, "CYS_CC_Mausoleum11");
+DB_Global_ItemDescriptions(ITEM_CYS_DFW_Tomb_02, "CYS_CC_Mausoleum12");
+DB_Global_ItemDescriptions(ITEM_CYS_DFW_Tomb_03, "CYS_CC_Mausoleum13");
+DB_Global_ItemDescriptions(ITEM_CYS_DFW_Tomb_04, "CYS_CC_Mausoleum14");
+DB_Global_ItemDescriptions(ITEM_CYS_DFW_Tomb_05, "CYS_CC_Mausoleum15");
+DB_Global_ItemDescriptions(ITEM_CYS_DFW_Tomb_06, "CYS_CC_Mausoleum16");
+
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb01,"CYS_CC_ShovelTomb01",ITEM_CYS_CC_ShovelTomb01Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb02,"CYS_CC_ShovelTomb02",ITEM_CYS_CC_ShovelTomb02Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb03,"CYS_CC_ShovelTomb03",ITEM_CYS_CC_ShovelTomb03Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb04,"CYS_CC_ShovelTomb04",ITEM_CYS_CC_ShovelTomb04Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb05,"CYS_CC_ShovelTomb05",ITEM_CYS_CC_ShovelTomb05Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb06,"CYS_CC_ShovelTomb06",ITEM_CYS_CC_ShovelTomb06Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb07,"CYS_CC_ShovelTomb07",ITEM_CYS_CC_ShovelTomb07Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb08,"CYS_CC_ShovelTomb08",ITEM_CYS_CC_ShovelTomb08Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb09,"CYS_CC_ShovelTomb09",ITEM_CYS_CC_ShovelTomb09Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb10,"CYS_CC_ShovelTomb10",ITEM_CYS_CC_ShovelTomb10Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb11,"CYS_CC_ShovelTomb11",ITEM_CYS_CC_ShovelTomb11Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb12,"CYS_CC_ShovelTomb12",ITEM_CYS_CC_ShovelTomb12Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb13,"CYS_CC_ShovelTomb13",ITEM_CYS_CC_ShovelTomb13Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb14,"CYS_CC_ShovelTomb14",ITEM_CYS_CC_ShovelTomb14Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb15,"CYS_CC_ShovelTomb15",ITEM_CYS_CC_ShovelTomb15Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb16,"CYS_CC_ShovelTomb16",ITEM_CYS_CC_ShovelTomb16Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb17,"CYS_CC_ShovelTomb17",ITEM_CYS_CC_ShovelTomb17Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb18,"CYS_CC_ShovelTomb18",ITEM_CYS_CC_ShovelTomb18Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb19,"CYS_CC_ShovelTomb19",ITEM_CYS_CC_ShovelTomb19Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb20,"CYS_CC_ShovelTomb20",ITEM_CYS_CC_ShovelTomb20Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb21,"CYS_CC_ShovelTomb21",ITEM_CYS_CC_ShovelTomb21Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb22,"CYS_CC_ShovelTomb22",ITEM_CYS_CC_ShovelTomb22Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb23,"CYS_CC_ShovelTomb23",ITEM_CYS_CC_ShovelTomb23Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb24,"CYS_CC_ShovelTomb24",ITEM_CYS_CC_ShovelTomb24Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb25,"CYS_CC_ShovelTomb25",ITEM_CYS_CC_ShovelTomb25Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb26,"CYS_CC_ShovelTomb26",ITEM_CYS_CC_ShovelTomb26Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb27,"CYS_CC_ShovelTomb27",ITEM_CYS_CC_ShovelTomb27Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb28,"CYS_CC_ShovelTomb28",ITEM_CYS_CC_ShovelTomb28Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb29,"CYS_CC_ShovelTomb29",ITEM_CYS_CC_ShovelTomb29Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb30,"CYS_CC_ShovelTomb30",ITEM_CYS_CC_ShovelTomb30Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb31,"CYS_CC_ShovelTomb31",ITEM_CYS_CC_ShovelTomb31Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb32,"CYS_CC_ShovelTomb32",ITEM_CYS_CC_ShovelTomb32Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb33,"CYS_CC_ShovelTomb33",ITEM_CYS_CC_ShovelTomb33Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb34,"CYS_CC_ShovelTomb34",ITEM_CYS_CC_ShovelTomb34Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb35,"CYS_CC_ShovelTomb35",ITEM_CYS_CC_ShovelTomb35Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb36,"CYS_CC_ShovelTomb36",ITEM_CYS_CC_ShovelTomb36Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb37,"CYS_CC_ShovelTomb37",ITEM_CYS_CC_ShovelTomb37Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb38,"CYS_CC_ShovelTomb38",ITEM_CYS_CC_ShovelTomb38Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb39,"CYS_CC_ShovelTomb39",ITEM_CYS_CC_ShovelTomb39Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb40,"CYS_CC_ShovelTomb40",ITEM_CYS_CC_ShovelTomb40Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb41,"CYS_CC_ShovelTomb41",ITEM_CYS_CC_ShovelTomb41Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb42,"CYS_CC_ShovelTomb42",ITEM_CYS_CC_ShovelTomb42Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb43,"CYS_CC_ShovelTomb43",ITEM_CYS_CC_ShovelTomb43Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb44,"CYS_CC_ShovelTomb44",ITEM_CYS_CC_ShovelTomb44Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb45,"CYS_CC_ShovelTomb45",ITEM_CYS_CC_ShovelTomb45Dirt);
+DB_ShovelArea(TRIGGER_CYS_CC_ShovelTomb46,"CYS_CC_ShovelTomb46",ITEM_CYS_CC_ShovelTomb46Dirt);
+
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb01",ITEM_CYS_CC_ShovelTomb01Bones, TRIGGER_CYS_CC_ShovelTomb01Point);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb02",ITEM_CYS_CC_ShovelTomb02Bones, TRIGGER_CYS_CC_ShovelTomb02Point);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb03",ITEM_CYS_CC_ShovelTomb03Bones, TRIGGER_CYS_CC_ShovelTomb03Point);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb04",ITEM_CYS_CC_ShovelTomb04Bones, TRIGGER_CYS_CC_ShovelTomb04Point);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb05",ITEM_CYS_CC_ShovelTomb05Bones, TRIGGER_CYS_CC_ShovelTomb05Point);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb06",ITEM_CYS_CC_ShovelTomb06Bones, TRIGGER_CYS_CC_ShovelTomb06Point);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb07",ITEM_CYS_CC_ShovelTomb07Bones, TRIGGER_CYS_CC_ShovelTomb07Point);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb08",ITEM_CYS_CC_ShovelTomb08Bones, TRIGGER_CYS_CC_ShovelTomb08Point);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb09",ITEM_CYS_CC_ShovelTomb09Bones, TRIGGER_CYS_CC_ShovelTomb09Point);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb10",ITEM_CYS_CC_ShovelTomb10Bones, TRIGGER_CYS_CC_ShovelTomb10Point);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb11",ITEM_CYS_CC_ShovelTomb11Bones, TRIGGER_CYS_CC_ShovelTomb11Point);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb12",ITEM_CYS_CC_ShovelTomb12Bones, TRIGGER_CYS_CC_ShovelTomb12Point);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb13",ITEM_CYS_CC_ShovelTomb13Bones, TRIGGER_CYS_CC_ShovelTomb13Point);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb14",ITEM_CYS_CC_ShovelTomb14Bones, TRIGGER_CYS_CC_ShovelTomb14Point);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb15",ITEM_CYS_CC_ShovelTomb15Bones, TRIGGER_CYS_CC_ShovelTomb15Point);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb16",ITEM_CYS_CC_ShovelTomb16Bones, TRIGGER_CYS_CC_ShovelTomb16Point);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb17",ITEM_CYS_CC_ShovelTomb17Bones, TRIGGER_CYS_CC_ShovelTomb17Point);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb18",ITEM_CYS_CC_ShovelTomb18Bones, TRIGGER_CYS_CC_ShovelTomb18Point);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb19",ITEM_CYS_CC_ShovelTomb19Bones, TRIGGER_CYS_CC_ShovelTomb19Point);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb20",ITEM_CYS_CC_ShovelTomb20Bones, TRIGGER_CYS_CC_ShovelTomb20Point);
+DB_ShovelRewardCharacterAppear("CYS_CC_ShovelTomb21",CHARACTER_CYS_CC_ShovelTomb21Enemy);
+DB_ShovelRewardCharacterAppear("CYS_CC_ShovelTomb22",CHARACTER_CYS_CC_ShovelTomb22Enemy);
+DB_ShovelRewardCharacterAppear("CYS_CC_ShovelTomb23",CHARACTER_CYS_CC_ShovelTomb23Enemy);
+DB_ShovelRewardCharacterAppear("CYS_CC_ShovelTomb24",CHARACTER_CYS_CC_ShovelTomb24Enemy);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb25",ITEM_CYS_CC_ShovelTomb25Key, TRIGGER_CYS_CC_ShovelTomb25);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb26",ITEM_CYS_CC_ShovelTomb26Chest, TRIGGER_CYS_CC_ShovelTomb26Point);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb27",ITEM_CYS_CC_ShovelTomb27Chest, TRIGGER_CYS_CC_ShovelTomb27Point);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb28",ITEM_CYS_CC_ShovelTomb28Chest, TRIGGER_CYS_CC_ShovelTomb28Point);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb29",ITEM_CYS_CC_ShovelTomb29Chest, TRIGGER_CYS_CC_ShovelTomb29Point);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb30",ITEM_CYS_CC_ShovelTomb30Chest, TRIGGER_CYS_CC_ShovelTomb30Point);
+ItemToContainer(ITEM_CYS_CC_ShovelTomb26Key, ITEM_CYS_CC_ShovelTomb26Chest,-1);
+ItemToContainer(ITEM_CYS_CC_ShovelTomb27Key, ITEM_CYS_CC_ShovelTomb27Chest,-1);
+ItemToContainer(ITEM_CYS_CC_ShovelTomb28Key, ITEM_CYS_CC_ShovelTomb28Chest,-1);
+ItemToContainer(ITEM_CYS_CC_ShovelTomb29Key, ITEM_CYS_CC_ShovelTomb29Chest,-1);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb31",ITEM_CYS_CC_ShovelTomb31Item, TRIGGER_CYS_CC_ShovelTomb31Point);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb32",ITEM_CYS_CC_ShovelTomb32Item, TRIGGER_CYS_CC_ShovelTomb32Point);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb33",ITEM_CYS_CC_ShovelTomb33Item, TRIGGER_CYS_CC_ShovelTomb33Point);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb34",ITEM_CYS_CC_ShovelTomb34Item, TRIGGER_CYS_CC_ShovelTomb34Point);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb35",ITEM_CYS_CC_ShovelTomb35Item, TRIGGER_CYS_CC_ShovelTomb35Point);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb36",ITEM_CYS_CC_ShovelTomb36Item, TRIGGER_CYS_CC_ShovelTomb36Point);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb37",ITEM_CYS_CC_ShovelTomb37Item, TRIGGER_CYS_CC_ShovelTomb37Point);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb38",ITEM_CYS_CC_ShovelTomb38Item, TRIGGER_CYS_CC_ShovelTomb38Point);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb39",ITEM_CYS_CC_ShovelTomb39Item, TRIGGER_CYS_CC_ShovelTomb39Point);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb40",ITEM_CYS_CC_ShovelTomb40Item, TRIGGER_CYS_CC_ShovelTomb40Point);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb42",ITEM_CYS_CC_ShovelTomb42Trap, TRIGGER_CYS_CC_ShovelTomb42);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb44",ITEM_CYS_CC_ShovelTomb44Trap, TRIGGER_CYS_CC_ShovelTomb44);
+DB_ShovelRewardItemAppear("CYS_CC_ShovelTomb46",ITEM_CYS_CC_ShovelTomb46Trap, TRIGGER_CYS_CC_ShovelTomb46);
+DB_ShovelRewardSurface("CYS_CC_ShovelTomb41", TRIGGER_CYS_CC_ShovelTomb41, "Ooze", 5.0);
+DB_ShovelRewardSurface("CYS_CC_ShovelTomb43", TRIGGER_CYS_CC_ShovelTomb43, "Fire", 5.0);
+DB_ShovelRewardSurface("CYS_CC_ShovelTomb45", TRIGGER_CYS_CC_ShovelTomb45, "CloudExplosion", 5.0);
+
+//END_REGION
+KBSECTION
+IF
+ItemMoved(ITEM_CYS_ShovelTomb06Bones)
+THEN
+ProcSetRelationToPlayers(CHARACTER_CYS_GraveyardWidow, 0);
+CharacterDisplayText(CHARACTER_CYS_GraveyardWidow, "CYS_GraveyardWidow");
+
+PROC
+ProcShovelRewards(_Player,"CYS_ShovelTunnel")
+AND
+NOT DB_OnlyOnce("CYS_RankTunnelEffect")
+THEN
+DB_OnlyOnce("CYS_RankTunnelEffect");
+
+IF
+CharacterUsedItem(_Player, ITEM_CYS_LadderRankTunnel)
+AND
+NOT DB_OnlyOnce("CYS_RankTunnelEffect")
+THEN
+DB_OnlyOnce("CYS_RankTunnelEffect");
+NOT DB_ShovelArea(TRIGGER_CYS_ShovelCemeteryTunnel,"CYS_ShovelTunnel",ITEM_CYS_ShovelCemeteryTunnelDirt);
+NOT DB_ShovelRewardItemSpawn("CYS_ShovelTunnel",ITEM_CYS_ShovelCemeteryTunnelHole);
+ItemPlayEffect(ITEM_CYS_InvisibleEffectCermetery, "FX_Creatures_Animals_Spider_Unburrow_A");
+ItemSetOnstage(ITEM_CYS_ShovelCemeteryTunnelHole, 1);
+ItemSetOnstage(ITEM_CYS_ShovelCemeteryTunnelDirt, 0);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

@@ -1,0 +1,82 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+ItemSetOnstage(ITEM_CYS_EscapingMinerCorpse,0);
+
+DB_OneShotPlayerTrigger(TRIGGER_LUC_Area_EscapingMiner_1);
+KBSECTION
+//REGION Escaping Miner
+PROC
+ProcOneShotTriggerEntered(_Player, TRIGGER_LUC_Area_EscapingMiner_1)
+THEN
+CharacterMoveToCharacter(CHARACTER_LUC_EscapingMiner, _Player, 1, "arrived",1);
+DB_LUCEscapingMinerRunTarget(_Player);
+CharTimer(CHARACTER_LUC_EscapingMiner,"RunToPlayerTimeout",10000);
+
+IF
+CharTimerFinished(CHARACTER_LUC_EscapingMiner,"RunToPlayerTimeout")
+AND
+DB_LUCEscapingMinerRunTarget(_Player)
+THEN
+NOT DB_LUCEscapingMinerRunTarget(_Player);
+CharacterPurgeQueue(CHARACTER_LUC_EscapingMiner);
+ProcCharacterMoveToTrigger(CHARACTER_LUC_EscapingMiner, TRIGGER_LUC_PointEscapingMiner, 1, "EscapingMinerToCyseal");
+
+IF
+CharacterEvent(CHARACTER_LUC_EscapingMiner,"arrived")
+AND
+DB_LUCEscapingMinerRunTarget(_Player)
+AND
+NOT DB_IsInDialog(_Player)
+AND
+CharacterHasStatus(_Player, "INVISIBLE", 0)
+THEN
+NOT DB_LUCEscapingMinerRunTarget(_Player);
+CharacterPurgeQueue(CHARACTER_LUC_EscapingMiner);
+ProcFaceEachother(CHARACTER_LUC_EscapingMiner,_Player);
+PROC_MendatoryDialog("LUC_RunningMiner",CHARACTER_LUC_EscapingMiner,_Player);
+
+IF
+CharacterEvent(CHARACTER_LUC_EscapingMiner,"arrived")
+AND
+DB_LUCEscapingMinerRunTarget(_Player)
+AND
+DB_IsInDialog(_Player)
+THEN
+NOT DB_LUCEscapingMinerRunTarget(_Player);
+CharacterPurgeQueue(CHARACTER_LUC_EscapingMiner);
+ProcCharacterMoveToTrigger(CHARACTER_LUC_EscapingMiner, TRIGGER_LUC_PointEscapingMiner, 1, "EscapingMinerToCyseal");
+
+IF
+CharacterEvent(CHARACTER_LUC_EscapingMiner,"arrived")
+AND
+DB_LUCEscapingMinerRunTarget(_Player)
+AND
+CharacterHasStatus(_Player, "INVISIBLE", 1)
+THEN
+NOT DB_LUCEscapingMinerRunTarget(_Player);
+CharacterPurgeQueue(CHARACTER_LUC_EscapingMiner);
+ProcCharacterMoveToTrigger(CHARACTER_LUC_EscapingMiner, TRIGGER_LUC_PointEscapingMiner, 1, "EscapingMinerToCyseal");
+
+IF
+DialogEnded("LUC_RunningMiner", _)
+THEN
+ProcCharacterMoveToTrigger(CHARACTER_LUC_EscapingMiner, TRIGGER_LUC_PointEscapingMiner, 1, "EscapingMinerToCyseal");
+
+IF
+GlobalEventSet("LUC_ShowWitchMarker")
+THEN
+ProcShowMarker("SUBREGION_WitchCabin");
+
+IF
+CharacterEvent(CHARACTER_LUC_EscapingMiner, "EscapingMinerToCyseal")
+THEN
+CharacterSetOnStage(CHARACTER_LUC_EscapingMiner, 0);
+ItemSetOnstage(ITEM_CYS_EscapingMinerCorpse,1);
+GoalCompleted;
+
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

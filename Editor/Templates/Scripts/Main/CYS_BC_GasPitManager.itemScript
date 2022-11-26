@@ -1,0 +1,213 @@
+INIT
+
+ITEM:__Me
+EXTERN FLOAT:%TimeOn1 = 1
+EXTERN FLOAT:%TimeOff1 = 6
+EXTERN FLOAT:%DelayTime1 = 0
+
+EXTERN FLOAT:%TimeOn2 = 1
+EXTERN FLOAT:%TimeOff2 = 6
+EXTERN FLOAT:%DelayTime2 = 1
+
+EXTERN FLOAT:%TimeOn3 = 1
+EXTERN FLOAT:%TimeOff3 = 6
+EXTERN FLOAT:%DelayTime3 = 2
+
+EXTERN FLOAT:%TimeOn4 = 1
+EXTERN FLOAT:%TimeOff4 = 6
+EXTERN FLOAT:%DelayTime4 = 3
+
+EXTERN FLOAT:%TimeOn5 = 1
+EXTERN FLOAT:%TimeOff5 = 6
+EXTERN FLOAT:%DelayTime5 = 4
+
+EXTERN FLOAT:%TimeOn6 = 1
+EXTERN FLOAT:%TimeOff6 = 6
+EXTERN FLOAT:%DelayTime6 = 5
+
+EVENTS
+
+EVENT Initialization
+ON
+	OnInit
+ACTIONS
+	IF "!c1"
+		IsEqual(%DelayTime1,0)
+	THEN
+		StartTimer("StartDelay1",%DelayTime1,0)
+	ELSE
+		StartTimer("StopSpewing1",%TimeOn1,0)
+	ENDIF
+	IF "!c1"
+		IsEqual(%DelayTime2,0)
+	THEN
+		StartTimer("StartDelay2",%DelayTime2,0)
+	ELSE
+		StartTimer("StopSpewing2",%TimeOn2,0)
+	ENDIF
+	IF "!c1"
+		IsEqual(%DelayTime3,0)
+	THEN
+		StartTimer("StartDelay3",%DelayTime3,0)
+	ELSE
+		StartTimer("StopSpewing3",%TimeOn3,0)
+	ENDIF
+	IF "!c1"
+		IsEqual(%DelayTime4,0)
+	THEN
+		StartTimer("StartDelay4",%DelayTime4,0)
+	ELSE
+		StartTimer("StopSpewing4",%TimeOn4,0)
+	ENDIF
+	IF "!c1"
+		IsEqual(%DelayTime5,0)
+	THEN
+		StartTimer("StartDelay5",%DelayTime5,0)
+	ELSE
+		StartTimer("StopSpewing5",%TimeOn5,0)
+	ENDIF
+	IF "!c1"
+		IsEqual(%DelayTime6,0)
+	THEN
+		StartTimer("StartDelay6",%DelayTime6,0)
+	ELSE
+		StartTimer("StopSpewing6",%TimeOn6,0)
+	ENDIF
+
+EVENT Shutdown
+ON
+	OnShutdown
+ACTIONS
+	StopTimer("StopSpewing1")
+	StopTimer("LaunchSpewing1")
+	StopTimer("StopSpewing2")
+	StopTimer("LaunchSpewing2")
+	StopTimer("StopSpewing3")
+	StopTimer("LaunchSpewing3")
+	StopTimer("StopSpewing4")
+	StopTimer("LaunchSpewing4")
+	StopTimer("StopSpewing5")
+	StopTimer("LaunchSpewing5")
+	StopTimer("StopSpewing6")
+	StopTimer("LaunchSpewing6")
+
+EVENT LaunchSpewing1
+ON
+	OnTimer("LaunchSpewing1")
+ACTIONS	
+	ItemEvent(CYS_BC_Gaspit1_14f98703-4221-489b-a2dd-9952ae94bde2,"LaunchSpewing")
+	StartTimer("StopSpewing1",%TimeOn1,0)
+		
+EVENT StopSpewing1
+ON
+	OnTimer("StopSpewing1")
+ACTIONS	
+	ItemEvent(CYS_BC_Gaspit1_14f98703-4221-489b-a2dd-9952ae94bde2,"StopSpewing")
+	StartTimer("LaunchSpewing1",%TimeOff1,0)
+
+EVENT StartDelay1
+ON
+	OnTimer("StartDelay1")
+ACTIONS
+	StartTimer("StopSpewing1",%TimeOn1,0)
+	
+EVENT LaunchSpewing2
+ON
+	OnTimer("LaunchSpewing2")
+ACTIONS	
+	ItemEvent(CYS_BC_Gaspit2_f2b90f70-86bb-46c4-911b-030bdd67e48d,"LaunchSpewing")
+	StartTimer("StopSpewing2",%TimeOn2,0)
+		
+EVENT StopSpewing2
+ON
+	OnTimer("StopSpewing2")
+ACTIONS	
+	ItemEvent(CYS_BC_Gaspit2_f2b90f70-86bb-46c4-911b-030bdd67e48d,"StopSpewing")
+	StartTimer("LaunchSpewing2",%TimeOff2,0)
+
+EVENT StartDelay2
+ON
+	OnTimer("StartDelay2")
+ACTIONS
+	StartTimer("StopSpewing2",%TimeOn2,0)
+	
+EVENT LaunchSpewing3
+ON
+	OnTimer("LaunchSpewing3")
+ACTIONS	
+	ItemEvent(CYS_BC_Gaspit3_353c2ab6-8026-430e-ada0-829258343a6d,"LaunchSpewing")
+	StartTimer("StopSpewing3",%TimeOn3,0)
+		
+EVENT StopSpewing3
+ON
+	OnTimer("StopSpewing3")
+ACTIONS	
+	ItemEvent(CYS_BC_Gaspit3_353c2ab6-8026-430e-ada0-829258343a6d,"StopSpewing")
+	StartTimer("LaunchSpewing3",%TimeOff3,0)
+
+EVENT StartDelay3
+ON
+	OnTimer("StartDelay3")
+ACTIONS
+	StartTimer("StopSpewing3",%TimeOn3,0)
+	
+EVENT LaunchSpewing4
+ON
+	OnTimer("LaunchSpewing4")
+ACTIONS	
+	ItemEvent(CYS_BC_Gaspit4_0f7f7892-9976-4b57-b831-39085597cf52,"LaunchSpewing")
+	StartTimer("StopSpewing4",%TimeOn4,0)
+		
+EVENT StopSpewing4
+ON
+	OnTimer("StopSpewing4")
+ACTIONS	
+	ItemEvent(CYS_BC_Gaspit4_0f7f7892-9976-4b57-b831-39085597cf52,"StopSpewing")
+	StartTimer("LaunchSpewing4",%TimeOff4,0)
+
+EVENT StartDelay4
+ON
+	OnTimer("StartDelay4")
+ACTIONS
+	StartTimer("StopSpewing4",%TimeOn4,0)
+	
+EVENT LaunchSpewing5
+ON
+	OnTimer("LaunchSpewing5")
+ACTIONS	
+	ItemEvent(CYS_BC_Gaspit5_3cefb247-3be0-4a93-8cd4-e91c866ae361,"LaunchSpewing")
+	StartTimer("StopSpewing5",%TimeOn5,0)
+		
+EVENT StopSpewing5
+ON
+	OnTimer("StopSpewing5")
+ACTIONS	
+	ItemEvent(CYS_BC_Gaspit5_3cefb247-3be0-4a93-8cd4-e91c866ae361,"StopSpewing")
+	StartTimer("LaunchSpewing5",%TimeOff5,0)
+
+EVENT StartDelay5
+ON
+	OnTimer("StartDelay5")
+ACTIONS
+	StartTimer("StopSpewing5",%TimeOn5,0)
+	
+EVENT LaunchSpewing6
+ON
+	OnTimer("LaunchSpewing6")
+ACTIONS	
+	ItemEvent(CYS_BC_Gaspit6_ba635d1b-8b95-4cf8-a6d4-a4d31cebeb74,"LaunchSpewing")
+	StartTimer("StopSpewing6",%TimeOn6,0)
+		
+EVENT StopSpewing6
+ON
+	OnTimer("StopSpewing6")
+ACTIONS	
+	ItemEvent(CYS_BC_Gaspit6_ba635d1b-8b95-4cf8-a6d4-a4d31cebeb74,"StopSpewing")
+	StartTimer("LaunchSpewing6",%TimeOff6,0)
+
+EVENT StartDelay6
+ON
+	OnTimer("StartDelay6")
+ACTIONS
+	StartTimer("StopSpewing6",%TimeOn6,0)
+	

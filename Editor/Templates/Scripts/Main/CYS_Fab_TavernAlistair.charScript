@@ -1,0 +1,14 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+CHARACTER:%Anna = CYS_Fab_Anna_fd57c387-4f56-40f0-b2b5-dbe706bb40dd
+
+BEHAVIOUR
+
+REACTION State_Waiting, 0
+USAGE PEACE
+ACTIONS
+	Sleep(12)
+	CharacterEvent(%Anna,"DialogRequest")

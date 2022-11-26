@@ -1,0 +1,273 @@
+INIT
+	CHARACTER:__Me
+	EXTERN SKILL:%SelfSpell_1="Target_EnemyHaste"
+	EXTERN SKILL:%SelfSpell_2="Target_InvisibilityTarget"
+	EXTERN SKILL:%SelfSpell_3="Shout_EnemyInvulnerability"
+	EXTERN SKILL:%SelfSpell_Hardcore="Target_EnemyDarkAvenger"
+	EXTERN INT:%Character_SelfCast1_Priority=0
+	EXTERN INT:%Character_SelfCast2_Priority=0
+	EXTERN INT:%Character_SelfCast3_Priority=0
+	EXTERN INT:%Character_SelfCastHC_Priority=0
+	EXTERN STATUS:%StatusCondition1="HASTED"
+	EXTERN STATUS:%StatusCondition2="INVISIBLE"
+	EXTERN STATUS:%StatusCondition3="INVULNERABLE"
+	EXTERN STATUS:%StatusConditionHC="DARK_AVENGER"
+	EXTERN INT:%Bool_OnPhysDam=1
+	EXTERN INT:%Bool_OnFireDam=0
+	EXTERN INT:%Bool_OnWaterDam=0
+	EXTERN INT:%Bool_OnAirDam=0
+	EXTERN INT:%Bool_OnEarthDam=0
+	EXTERN INT:%Bool_CheckHealth=0
+	EXTERN FLOAT:%IfHealthLessThan=0.6
+
+//-------------------------	
+BEHAVIOUR
+REACTION Character_CastSpell1OnSelf,0
+USAGE COMBAT
+CHECK "c1&!(c2|c3|c4|c5|c6|c7|c8)"
+	CharacterCanCast(__Me,%SelfSpell_1)
+	CharacterHasStatus(__Me,%StatusCondition1)	
+	CharacterHasStatus(__Me,"CHARMED")
+	CharacterHasStatus(__Me,"FEAR")
+	CharacterHasStatus(__Me,"STUNNED")
+	CharacterHasStatus(__Me,"KNOCKED_DOWN")
+	CharacterHasStatus(__Me,"INVISIBLE")
+	CharacterHasStatus(__Me,"MUTED")
+ACTIONS	
+	CharacterUseSkill(%SelfSpell_1,__Me)
+	
+REACTION Character_CastSpell2OnSelf,0
+USAGE COMBAT
+CHECK "c1&!(c2|c3|c4|c5|c6|c7|c8)"
+	CharacterCanCast(__Me,%SelfSpell_2)
+	CharacterHasStatus(__Me,%StatusCondition2)	
+	CharacterHasStatus(__Me,"CHARMED")
+	CharacterHasStatus(__Me,"FEAR")
+	CharacterHasStatus(__Me,"STUNNED")
+	CharacterHasStatus(__Me,"KNOCKED_DOWN")
+	CharacterHasStatus(__Me,"INVISIBLE")
+	CharacterHasStatus(__Me,"MUTED")
+ACTIONS	
+	CharacterUseSkill(%SelfSpell_2,__Me)
+	
+REACTION Character_CastSpell3OnSelf,0
+USAGE COMBAT
+CHECK "c1&!(c2|c3|c4|c5|c6|c7|c8)"
+	CharacterCanCast(__Me,%SelfSpell_3)
+	CharacterHasStatus(__Me,%StatusCondition3)	
+	CharacterHasStatus(__Me,"CHARMED")
+	CharacterHasStatus(__Me,"FEAR")
+	CharacterHasStatus(__Me,"STUNNED")
+	CharacterHasStatus(__Me,"KNOCKED_DOWN")
+	CharacterHasStatus(__Me,"INVISIBLE")
+	CharacterHasStatus(__Me,"MUTED")
+ACTIONS	
+	CharacterUseSkill(%SelfSpell_Hardcore,__Me)	
+	
+REACTION Character_CastSpellHCOnSelf,0
+USAGE COMBAT
+CHECK "c1&c2&!(c3|c4|c5|c6|c7|c8|c9)"
+	CharacterCanCast(__Me,%SelfSpell_Hardcore)
+	IsHardcore()
+	CharacterHasStatus(__Me,%StatusConditionHC)	
+	CharacterHasStatus(__Me,"CHARMED")
+	CharacterHasStatus(__Me,"FEAR")
+	CharacterHasStatus(__Me,"STUNNED")
+	CharacterHasStatus(__Me,"KNOCKED_DOWN")
+	CharacterHasStatus(__Me,"INVISIBLE")
+	CharacterHasStatus(__Me,"MUTED")
+ACTIONS	
+	CharacterUseSkill(%SelfSpell_Hardcore,__Me)
+	
+//-------------------------	
+EVENTS
+EVENT OnInit_GiveSpells_ForSelfIf
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill(%SelfSpell_1)
+	CharacterAddSkill(%SelfSpell_2)
+	CharacterAddSkill(%SelfSpell_3)
+	CharacterAddSkill(%SelfSpell_Hardcore)
+
+EVENT OnPhysDamage_IncreasePriority_Slash
+VARS
+	FLOAT:_MyHealth
+ON
+	OnDamage(Slashing,_,_,_)
+ACTIONS
+	IF "c1&c2"
+		IsEqual(%Bool_OnPhysDam,1)
+		IsEqual(%Bool_CheckHealth,0)
+	THEN
+		SetPriority("Character_CastSpell1OnSelf",%Character_SelfCast1_Priority)
+		SetPriority("Character_CastSpell2OnSelf",%Character_SelfCast2_Priority)
+		SetPriority("Character_CastSpell3OnSelf",%Character_SelfCast3_Priority)
+		SetPriority("Character_CastSpellHCOnSelf",%Character_SelfCastHC_Priority)
+	ELIF "c1&c2&c3&c4"
+		IsEqual(%Bool_OnPhysDam,1)
+		IsEqual(%Bool_CheckHealth,1)
+		CharacterGetStat(_MyHealth,__Me,Vitality)		
+		IsLessThen(_MyHealth,%IfHealthLessThan)
+	THEN
+		SetPriority("Character_CastSpell1OnSelf",%Character_SelfCast1_Priority)
+		SetPriority("Character_CastSpell2OnSelf",%Character_SelfCast2_Priority)
+		SetPriority("Character_CastSpell3OnSelf",%Character_SelfCast3_Priority)
+		SetPriority("Character_CastSpellHCOnSelf",%Character_SelfCastHC_Priority)
+	ENDIF
+
+EVENT OnPhysDamage_IncreasePriority_Pierce
+VARS
+	FLOAT:_MyHealth
+ON
+	OnDamage(Piercing,_,_,_)
+ACTIONS
+	IF "c1&c2"
+		IsEqual(%Bool_OnPhysDam,1)
+		IsEqual(%Bool_CheckHealth,0)
+	THEN
+		SetPriority("Character_CastSpell1OnSelf",%Character_SelfCast1_Priority)
+		SetPriority("Character_CastSpell2OnSelf",%Character_SelfCast2_Priority)
+		SetPriority("Character_CastSpell3OnSelf",%Character_SelfCast3_Priority)
+		SetPriority("Character_CastSpellHCOnSelf",%Character_SelfCastHC_Priority)
+	ELIF "c1&c2&c3&c4"
+		IsEqual(%Bool_OnPhysDam,1)
+		IsEqual(%Bool_CheckHealth,1)
+		CharacterGetStat(_MyHealth,__Me,Vitality)		
+		IsLessThen(_MyHealth,%IfHealthLessThan)
+	THEN
+		SetPriority("Character_CastSpell1OnSelf",%Character_SelfCast1_Priority)
+		SetPriority("Character_CastSpell2OnSelf",%Character_SelfCast2_Priority)
+		SetPriority("Character_CastSpell3OnSelf",%Character_SelfCast3_Priority)
+		SetPriority("Character_CastSpellHCOnSelf",%Character_SelfCastHC_Priority)	
+	ENDIF
+	
+EVENT OnPhysDamage_IncreasePriority_Crush
+VARS
+	FLOAT:_MyHealth
+ON
+	OnDamage(Crushing,_,_,_)
+ACTIONS
+	IF "c1&c2"
+		IsEqual(%Bool_OnPhysDam,1)
+		IsEqual(%Bool_CheckHealth,0)
+	THEN
+		SetPriority("Character_CastSpell1OnSelf",%Character_SelfCast1_Priority)
+		SetPriority("Character_CastSpell2OnSelf",%Character_SelfCast2_Priority)
+		SetPriority("Character_CastSpell3OnSelf",%Character_SelfCast3_Priority)
+		SetPriority("Character_CastSpellHCOnSelf",%Character_SelfCastHC_Priority)
+	ELIF "c1&c2&c3&c4"
+		IsEqual(%Bool_OnPhysDam,1)
+		IsEqual(%Bool_CheckHealth,1)
+		CharacterGetStat(_MyHealth,__Me,Vitality)		
+		IsLessThen(_MyHealth,%IfHealthLessThan)
+	THEN
+		SetPriority("Character_CastSpell1OnSelf",%Character_SelfCast1_Priority)
+		SetPriority("Character_CastSpell2OnSelf",%Character_SelfCast2_Priority)
+		SetPriority("Character_CastSpell3OnSelf",%Character_SelfCast3_Priority)
+		SetPriority("Character_CastSpellHCOnSelf",%Character_SelfCastHC_Priority)	
+	ENDIF
+
+EVENT OnMagicDamage_IncreasePriority_Fire	
+VARS
+	FLOAT:_MyHealth
+ON
+	OnDamage(Fire,_,_,_)
+ACTIONS
+	IF "c1&c2"
+		IsEqual(%Bool_OnFireDam,1)
+		IsEqual(%Bool_CheckHealth,0)
+	THEN
+		SetPriority("Character_CastSpell1OnSelf",%Character_SelfCast1_Priority)
+		SetPriority("Character_CastSpell2OnSelf",%Character_SelfCast2_Priority)
+		SetPriority("Character_CastSpell3OnSelf",%Character_SelfCast3_Priority)
+		SetPriority("Character_CastSpellHCOnSelf",%Character_SelfCastHC_Priority)
+	ELIF "c1&c2&c3&c4"
+		IsEqual(%Bool_OnFireDam,1)
+		IsEqual(%Bool_CheckHealth,1)
+		CharacterGetStat(_MyHealth,__Me,Vitality)		
+		IsLessThen(_MyHealth,%IfHealthLessThan)
+	THEN
+		SetPriority("Character_CastSpell1OnSelf",%Character_SelfCast1_Priority)
+		SetPriority("Character_CastSpell2OnSelf",%Character_SelfCast2_Priority)
+		SetPriority("Character_CastSpell3OnSelf",%Character_SelfCast3_Priority)
+		SetPriority("Character_CastSpellHCOnSelf",%Character_SelfCastHC_Priority)
+	ENDIF
+
+EVENT OnMagicDamage_IncreasePriority_Water
+VARS
+	FLOAT:_MyHealth
+ON
+	OnDamage(Water,_,_,_)
+ACTIONS
+	IF "c1&c2"
+		IsEqual(%Bool_OnWaterDam,1)
+		IsEqual(%Bool_CheckHealth,0)
+	THEN
+		SetPriority("Character_CastSpell1OnSelf",%Character_SelfCast1_Priority)
+		SetPriority("Character_CastSpell2OnSelf",%Character_SelfCast2_Priority)
+		SetPriority("Character_CastSpell3OnSelf",%Character_SelfCast3_Priority)
+		SetPriority("Character_CastSpellHCOnSelf",%Character_SelfCastHC_Priority)
+	ELIF "c1&c2&c3&c4"
+		IsEqual(%Bool_OnWaterDam,1)
+		IsEqual(%Bool_CheckHealth,1)
+		CharacterGetStat(_MyHealth,__Me,Vitality)		
+		IsLessThen(_MyHealth,%IfHealthLessThan)
+	THEN
+		SetPriority("Character_CastSpell1OnSelf",%Character_SelfCast1_Priority)
+		SetPriority("Character_CastSpell2OnSelf",%Character_SelfCast2_Priority)
+		SetPriority("Character_CastSpell3OnSelf",%Character_SelfCast3_Priority)
+		SetPriority("Character_CastSpellHCOnSelf",%Character_SelfCastHC_Priority)			
+	ENDIF	
+	
+EVENT OnMagicDamage_IncreasePriority_Air
+VARS
+	FLOAT:_MyHealth
+ON
+	OnDamage(Air,_,_,_)
+ACTIONS
+	IF "c1&c2"
+		IsEqual(%Bool_OnAirDam,1)
+		IsEqual(%Bool_CheckHealth,0)
+	THEN
+		SetPriority("Character_CastSpell1OnSelf",%Character_SelfCast1_Priority)
+		SetPriority("Character_CastSpell2OnSelf",%Character_SelfCast2_Priority)
+		SetPriority("Character_CastSpell3OnSelf",%Character_SelfCast3_Priority)
+		SetPriority("Character_CastSpellHCOnSelf",%Character_SelfCastHC_Priority)
+	ELIF "c1&c2&c3&c4"
+		IsEqual(%Bool_OnAirDam,1)
+		IsEqual(%Bool_CheckHealth,1)
+		CharacterGetStat(_MyHealth,__Me,Vitality)		
+		IsLessThen(_MyHealth,%IfHealthLessThan)
+	THEN
+		SetPriority("Character_CastSpell1OnSelf",%Character_SelfCast1_Priority)
+		SetPriority("Character_CastSpell2OnSelf",%Character_SelfCast2_Priority)
+		SetPriority("Character_CastSpell3OnSelf",%Character_SelfCast3_Priority)
+		SetPriority("Character_CastSpellHCOnSelf",%Character_SelfCastHC_Priority)			
+	ENDIF	
+
+EVENT OnMagicDamage_IncreasePriority_Earth
+VARS
+	FLOAT:_MyHealth
+ON
+	OnDamage(Earth,_,_,_)
+ACTIONS
+	IF "c1&c2"
+		IsEqual(%Bool_OnEarthDam,1)
+		IsEqual(%Bool_CheckHealth,0)		
+	THEN
+		SetPriority("Character_CastSpell1OnSelf",%Character_SelfCast1_Priority)
+		SetPriority("Character_CastSpell2OnSelf",%Character_SelfCast2_Priority)
+		SetPriority("Character_CastSpell3OnSelf",%Character_SelfCast3_Priority)
+		SetPriority("Character_CastSpellHCOnSelf",%Character_SelfCastHC_Priority)
+	ELIF "c1&c2&c3&c4"
+		IsEqual(%Bool_OnEarthDam,1)
+		IsEqual(%Bool_CheckHealth,1)
+		CharacterGetStat(_MyHealth,__Me,Vitality)		
+		IsLessThen(_MyHealth,%IfHealthLessThan)
+	THEN
+		SetPriority("Character_CastSpell1OnSelf",%Character_SelfCast1_Priority)
+		SetPriority("Character_CastSpell2OnSelf",%Character_SelfCast2_Priority)
+		SetPriority("Character_CastSpell3OnSelf",%Character_SelfCast3_Priority)
+		SetPriority("Character_CastSpellHCOnSelf",%Character_SelfCastHC_Priority)		
+	ENDIF		

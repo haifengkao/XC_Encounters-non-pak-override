@@ -1,0 +1,54 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	CHARACTER:%barTender = CYS_Wilbur_235f5270-9913-4a15-929b-2fe8ebe54c77
+	TRIGGER:%Point1 = CYS_Point_TavernTable_01_b6a15722-0951-47c7-a53e-4f65cca0de1e
+	TRIGGER:%Point2 = CYS_Point_TavernTable_02_6ecdc992-a58c-4733-ad6e-3374ebd1e7c3
+	TRIGGER:%Fire = CYS_WilburFireBar_6aaf3d62-f1b3-4139-bdf0-5e79146c7433
+BEHAVIOUR
+
+REACTION State_Working, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, "Action_WipeTable", "Action_CheckFire", "Action_GoToBar")
+	SetPriority(%currentAction, 1100)
+	
+REACTION Action_WipeTable, 0
+USAGE PEACE
+VARS
+	TRIGGER:_trigger
+	FIXEDSTRING:_animation
+ACTIONS
+	GetRandom(_trigger, %Point1, %Point2)
+	CharacterMoveTo(_trigger, 0)
+	CharacterLookFrom(_trigger)
+	GetRandom(_animation, "Fidget_Forward_01", "WipeTable_01")
+	CharacterPlayAnimation(_animation)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	Reset()
+	
+REACTION Action_CheckFire, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Fire, 0)
+	CharacterLookFrom(%Fire)
+	CharacterPlayAnimation("Fidget_Low_02")
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	Reset()
+	
+REACTION Action_GoToBar, 0
+USAGE PEACE
+VARS
+	TRIGGER:_bar = CYS_Point_TavernBar_01_1944faab-c48f-4c38-aef8-aab776acae27
+ACTIONS
+	CharacterMoveTo(_bar, 0)
+	CharacterLookFrom(_bar)	
+	CharacterPlayAnimation("Fidget_Forward_01")
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	Reset()
+	

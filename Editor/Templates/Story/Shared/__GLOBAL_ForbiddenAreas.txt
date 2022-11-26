@@ -1,0 +1,664 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+PROC
+ProcClearForbiddenArea((STRING)_ID)
+AND
+DB_ForbiddenArea(_ID,_Owner)
+THEN
+NOT DB_ForbiddenArea(_ID,_Owner);
+
+PROC
+ProcClearForbiddenArea((STRING)_ID)
+AND
+DB_ForbiddenAreaTriggers(_ID,_Trigger,_ExitTrigger)
+THEN
+NOT DB_ForbiddenAreaTriggers(_ID,_Trigger,_ExitTrigger);
+ProcTriggerUnregisterForPlayers(_Trigger);
+
+PROC
+ProcClearForbiddenArea((STRING)_ID)
+AND
+DB_ForbiddenDoors(_ID,_Door)
+THEN
+ItemSetOnlyOwnerCanUse(_Door,0);
+ItemClearOwner(_Door);
+NOT DB_ForbiddenDoors(_ID,_Door);
+
+
+IF
+DB_ForbiddenAreaTriggers((STRING)_,(TRIGGER)_Trigger,(TRIGGER)_)
+THEN
+ProcTriggerRegisterForPlayers(_Trigger);
+
+IF
+DB_ForbiddenDoors((STRING)_ID,(ITEM)_Door)
+AND
+DB_ForbiddenArea(_ID,(CHARACTER)_Owner)
+THEN
+ItemSetOwner(_Door,_Owner);
+ItemSetOnlyOwnerCanUse(_Door,1);
+
+IF
+CharacterDied(_Char)
+AND
+DB_ForbiddenArea(_ID,_Char)
+THEN
+ProcCheckOtherForbiddenOwners(_ID);
+ProcCheckToClearOwnerDoorFlags(_ID);
+
+PROC
+ProcCheckToClearOwnerDoorFlags((STRING)_ID)
+AND
+NOT DB_TempForbiddenOwnerAlive(_ID)
+AND
+DB_ForbiddenDoors(_ID,_Door)
+THEN
+ItemSetOnlyOwnerCanUse(_Door,0);
+
+PROC
+ProcCheckToClearOwnerDoorFlags((STRING)_ID)
+THEN
+NOT DB_TempForbiddenOwnerAlive(_ID);
+
+PROC
+ProcCheckOtherForbiddenOwners()
+AND
+DB_ForbiddenArea(_ID,_Char)
+AND
+CharacterIsDead(_Char,0)
+THEN
+DB_TempForbiddenOwnerAlive(_ID);
+
+IF
+CharacterUsedItemFailed(_Character,_Door)
+AND
+_Character.DB_IsPlayer()
+AND
+DB_ForbiddenDoors(_ID,_Door)
+AND
+NOT DB_Combat(_Character,_)
+THEN
+ProcCheckForbiddenareaOwnersCanSee(_ID,_Character);
+ProcCheckForbiddenGuardsCanSee(_Character);
+ProcToggleForbiddenDoorStateIfUnseen(_Door,_Character);
+
+PROC
+ProcCheckForbiddenareaOwnersCanSee((STRING)_ID,(CHARACTER)_Character)
+AND
+DB_ForbiddenArea(_ID,_Owner)
+AND
+CharacterCanSeeCharacter(_Owner,_Character,1)
+THEN
+DB_ForbiddenAreaSeen(_Character);
+
+PROC
+ProcCheckForbiddenGuardsCanSee((CHARACTER)_Character)
+AND
+NOT DB_ForbiddenAreaSeen(_Character)
+AND
+DB_GuardSummonPool(_,_Guard,_)
+AND
+CharacterIsDead(_Guard,0)
+AND
+NOT _Guard.DB_IsInDialog()
+AND
+CharacterCanSeeCharacter(_Guard,_Character,1)
+THEN
+DB_ForbiddenAreaGuardsSeen(_Character);
+ProcSetForbiddenGuardToReact(_Character,_Guard);
+
+PROC
+ProcSetForbiddenGuardToReact((CHARACTER)_Character,(CHARACTER)_Guard)
+AND
+NOT DB_ForbiddenAreaGuardSpotter(_Character,_)
+THEN
+DB_ForbiddenAreaGuardSpotter(_Character,_Guard);
+
+PROC
+ProcToggleForbiddenDoorStateIfUnseen((ITEM)_Door,(CHARACTER)_Character)
+AND
+NOT DB_ForbiddenAreaSeen(_Character)
+AND
+NOT DB_ForbiddenAreaGuardsSeen(_Character)
+THEN
+ProcToggleForbiddenDoorState(_Character,_Door);
+
+PROC
+ProcToggleForbiddenDoorStateIfUnseen((ITEM)_Door,(CHARACTER)_Character)
+AND
+DB_ForbiddenAreaSeen(_Character)
+THEN
+ProcSelectForbiddenDoorOwnerToReact(_Door,_Character);
+ProcReactOnForbiddenDoorUse(_Door,_Character);
+
+PROC
+ProcToggleForbiddenDoorStateIfUnseen((ITEM)_Door,(CHARACTER)_Character)
+AND
+DB_ForbiddenAreaGuardsSeen(_Character)
+AND
+DB_ForbiddenAreaGuardSpotter(_Character,_Guard)
+THEN
+NOT DB_ForbiddenAreaGuardSpotter(_Character,_Guard);
+DoRevenge(_Character,_Guard,5);
+
+PROC
+ProcSelectForbiddenAreaOwnerToReact((STRING)_ID,(CHARACTER)_Character,(INTEGER)_IgnoreDialogs)
+AND
+DB_ForbiddenArea(_ID,_Owner)
+AND
+CharacterCanSeeCharacter(_Owner,_Character,1)
+AND
+NOT DB_Combat(_Owner,_)
+AND
+CharacterIsDead(_Owner,0)
+AND
+NOT DB_SelectedForbiddenOwner(_,_Character)
+AND
+NOT DB_NoDefaultBehavior(_Owner)
+THEN
+DialogRequestStopForCharacter(_Owner);
+NOT DB_IsInDialog(_Owner);
+ProcSelectForbiddenOwner(_Owner,_Character,_IgnoreDialogs);
+
+PROC
+ProcSelectForbiddenOwner((CHARACTER)_Owner,(CHARACTER)_Character,0)
+AND
+NOT _Owner.DB_IsInDialog()
+THEN
+//TODO: do we care about selecting the closest owner if they can both see him?
+DB_SelectedForbiddenOwner(_Owner,_Character);
+
+PROC
+ProcSelectForbiddenOwner((CHARACTER)_Owner,(CHARACTER)_Character,1)
+THEN
+//TODO: do we care about selecting the closest owner if they can both see him?
+DB_SelectedForbiddenOwner(_Owner,_Character);
+
+PROC
+ProcSelectForbiddenDoorOwnerToReact((ITEM)_Door,(CHARACTER)_Character)
+AND
+DB_ForbiddenDoors(_ID,_Door)
+THEN
+ProcSelectForbiddenAreaOwnerToReact(_ID,_Character,0);
+
+PROC
+ProcReactOnForbiddenDoorUse((ITEM)_Door,(CHARACTER)_Character)
+AND
+DB_UseForbiddenDoor(_Door,_Character)
+THEN
+NOT DB_UseForbiddenDoor(_Door,_Character);
+
+PROC
+ProcReactOnForbiddenDoorUse((ITEM)_Door,(CHARACTER)_Character)
+AND
+DB_SelectedForbiddenOwner(_Owner,_Character)
+THEN
+DB_UseForbiddenDoor(_Door,_Character);
+NOT DB_SelectedForbiddenOwner(_Owner,_Character);
+ProcSetDoorEvent(_Door,_Owner);
+ProcProcessForbiddenZoneInfraction_2(_Character,_Owner,1);
+
+PROC
+ProcToggleForbiddenDoorStateIfUnseen(_,(CHARACTER)_Character)
+THEN
+NOT DB_ForbiddenAreaSeen(_Character);
+NOT DB_ForbiddenAreaGuardsSeen(_Character);
+
+PROC
+ProcToggleForbiddenDoorState((CHARACTER)_Character,(ITEM)_Door)
+THEN
+ItemSetOnlyOwnerCanUse(_Door,0);
+DB_CharacterUsingForbiddenDoor(_Character,_Door);
+CharacterUseItem(_Character,_Door,"ForbiddenDoorUsed");
+ItemSetCanInteract(_Door,0);
+
+IF
+CharacterEvent(_Character,"ForbiddenDoorUsed")
+AND
+DB_CharacterUsingForbiddenDoor(_Character,_Door)
+THEN
+ItemSetOnlyOwnerCanUse(_Door,1);
+NOT DB_CharacterUsingForbiddenDoor(_Character,_Door);
+ItemSetCanInteract(_Door,1);
+
+PROC
+ProcSetDoorEvent((ITEM)_Door,(CHARACTER)_Owner)
+AND
+ItemIsOpened(_Door,1)
+THEN
+DialogSetCharacterEvent("EVENT_Forbidden_Door_Open",_Owner,0);
+
+PROC
+ProcSetDoorEvent((ITEM)_Door,(CHARACTER)_Owner)
+AND
+ItemIsOpened(_Door,0)
+THEN
+DialogClearCharacterEvent("EVENT_Forbidden_Door_Open",_Owner,0);
+
+PROC
+ProcProcessForbiddenZoneInfraction_2((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_)
+AND
+DB_CrimeInProgress(_,_Npc,_)
+THEN
+DB_InfractionHandled(1);
+NOT _Npc.PlayerStaysInForbiddenArea();
+NOT _Npc.PlayerLeavesForbiddenArea();
+ProcHandleCrimeInterrupt(_Player,_Npc);
+
+PROC
+ProcProcessForbiddenZoneInfraction_2((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Reason)
+AND
+NOT DB_CrimeInProgress(_,_Npc,_)
+AND
+NOT DB_InfractionHandled(1)
+THEN
+ProcProcessForbiddenZoneInfraction(_Player,_Npc,_Reason);
+
+PROC
+ProcProcessForbiddenZoneInfraction_2(_,_,_)
+THEN
+NOT DB_InfractionHandled(1);
+
+PROC
+ProcProcessForbiddenZoneInfraction((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_)
+THEN
+DB_CrimeInProgress(_Player,_Npc,"Trespassing");
+
+PROC
+ProcProcessForbiddenZoneInfraction((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_)
+THEN
+ProcWarnPlayerAboutForbiddenArea(_Player,_Npc);
+
+PROC
+ProcProcessForbiddenZoneInfraction((CHARACTER)_Player,(CHARACTER)_Npc,1)
+AND
+NOT DB_CustomForbiddenDoorDialog((CHARACTER)_Npc,(STRING)_)
+THEN
+ProcLaunchOverheadDialogReplacement(_Npc);
+SetAndStartDialog_DisableDialogsCausedByGenericRules(_Player,_Npc,"default_forbidden_door");
+
+PROC
+ProcProcessForbiddenZoneInfraction((CHARACTER)_Player,(CHARACTER)_Npc,1)
+AND
+DB_CustomForbiddenDoorDialog(_Npc,_Dialog)
+THEN
+SetAndStartDialog_DisableDialogsCausedByGenericRules(_Player,_Npc,_Dialog);
+
+PROC
+ProcWarnPlayerAboutForbiddenArea((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT DB_PlayerWarnings(_Npc,_Player,_)
+THEN
+DB_PlayerWarnings(_Npc,_Player,0);
+
+PROC
+ProcWarnPlayerAboutForbiddenArea((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_PlayerWarnings(_Npc,_Player,_Old)
+AND
+IntegerSum(_Old,1,_New)
+THEN
+NOT DB_PlayerWarnings(_Npc,_Player,_Old);
+DB_PlayerWarnings(_Npc,_Player,_New);
+
+IF
+DialogCharacterEventSet("event_players_enter_forbidden_zone",_Npc,_Inst)
+THEN
+_Npc.PlayerEntersForbiddenArea();
+DialogClearCharacterEvent("event_players_enter_forbidden_zone",_Npc,0);
+
+
+IF
+DialogEnded(_Dialog,_Inst)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+AND
+DB_CustomForbiddenDoorDialog(_Npc,_Dialog)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_CrimeInProgress(_Player,_Npc,"Trespassing")
+AND
+DB_PlayerWarnings(_Npc,_Player,_Warnings)
+AND
+IntegerProduct(_Warnings,10,_Att)
+THEN
+DecreaseAttitude(_Player,_Npc,_Att);
+
+IF
+DialogEnded("default_forbidden_door",_Inst)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_PlayerWarnings(_Npc,_Player,_Warnings)
+AND
+IntegerProduct(_Warnings,10,_Att)
+THEN
+DecreaseAttitude(_Player,_Npc,_Att);
+
+IF
+DialogEnded("default_forbidden_door",_Inst)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+NOT _Npc.PlayerEntersForbiddenArea()
+THEN
+NOT DB_CrimeInProgress(_Player,_Npc,"Trespassing");
+
+IF
+DialogEnded(_Dialog,_Inst)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+AND
+DB_CustomForbiddenDoorDialog(_Npc,_Dialog)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_CrimeInProgress(_Player,_Npc,"Trespassing")
+AND
+NOT _Npc.PlayerEntersForbiddenArea()
+THEN
+NOT DB_CrimeInProgress(_Player,_Npc,"Trespassing");
+
+IF
+DialogEnded(_Dialog,_Inst)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+AND
+DB_CustomForbiddenDoorDialog(_Npc,_Dialog)
+AND
+_Npc.PlayerEntersForbiddenArea()
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_PlayerWarnings(_Npc,_Player,_Warnings)
+AND
+IntegerProduct(_Warnings,20,_Intensity)
+THEN
+ProcHandlePlayerEnteringForbiddenDoor(_Player,_Npc,_Intensity);
+
+IF
+DialogEnded("default_forbidden_door",_Inst)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+AND
+_Npc.PlayerEntersForbiddenArea()
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_PlayerWarnings(_Npc,_Player,_Warnings)
+AND
+IntegerProduct(_Warnings,20,_Intensity)
+THEN
+ProcHandlePlayerEnteringForbiddenDoor(_Player,_Npc,_Intensity);
+
+PROC
+ProcHandlePlayerEnteringForbiddenDoor((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Intensity)
+THEN
+ProcCheckIfHostile(_Player,_Npc);
+
+PROC
+ProcHandlePlayerEnteringForbiddenDoor((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Intensity)
+AND
+DB_IsHostile(_Player,_Npc)
+THEN
+NOT _Npc.PlayerEntersForbiddenArea();
+DoRevenge(_Player,_Npc,5);	//5 so he'll go on the attack
+
+PROC
+ProcHandlePlayerEnteringForbiddenDoor((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Intensity)
+AND
+NOT DB_IsHostile(_Player,_Npc)
+THEN
+NOT _Npc.PlayerEntersForbiddenArea();
+ActNegatively(_Player,_Npc,_Intensity,6);
+
+IF
+DB_InRegion(_Player,_Trigger)
+AND
+DB_ForbiddenAreaTriggers(_ID,_Trigger,_)
+THEN
+ProcCheckToReactToPlayerInForbiddenArea(_Player,_ID);
+
+IF
+CharacterSawCharacter(_Player,_Npc)
+AND
+DB_InRegion(_Player,_Trigger)
+AND
+DB_ForbiddenAreaTriggers(_ID,_Trigger,_)
+THEN
+ProcCheckToReactToPlayerInForbiddenArea(_Player,_ID);
+
+PROC
+ProcCheckToReactToPlayerInForbiddenArea((CHARACTER)_Player,(STRING)_ID)
+AND
+NOT DB_Combat(_Player,_)
+THEN
+ProcDoForbiddenCheckIfNotAlreadyBusy(_ID,_Player);//we get double sees events sometimes, this would trigger the guards/NPC to attack on sight
+
+PROC
+ProcDoForbiddenCheckIfNotAlreadyBusy((STRING)_ID,(CHARACTER)_Player)
+AND
+NOT DB_CrimeInProgress(_Player,_,"Trespassing")	
+THEN
+ProcCheckForbiddenareaOwnersCanSee(_ID,_Player);
+ProcCheckForbiddenGuardsCanSee(_Player);
+ProcCheckForbiddenAreaInfractionIfSeen(_ID,_Player);
+
+PROC
+ProcCheckForbiddenAreaInfractionIfSeen((STRING)_ID,(CHARACTER)_Player)
+AND
+DB_ForbiddenAreaSeen(_Player)
+THEN
+//Caught in the forbidden area!
+ProcSelectForbiddenAreaOwnerToReact(_ID,_Player,1);
+ProcHandleForbiddenAreaInfraction(_ID,_Player);
+
+PROC
+ProcCheckForbiddenAreaInfractionIfSeen((STRING)_ID,(CHARACTER)_Player)
+AND
+DB_ForbiddenAreaGuardsSeen(_Player)
+AND
+DB_ForbiddenAreaGuardSpotter(_Player,_Guard)
+THEN
+NOT DB_ForbiddenAreaGuardSpotter(_Player,_Guard);
+DoRevenge(_Player,_Guard,5);
+
+PROC
+ProcCheckForbiddenAreaInfractionIfSeen(_,(CHARACTER)_Character)
+THEN
+NOT DB_ForbiddenAreaSeen(_Character);
+NOT DB_ForbiddenAreaGuardsSeen(_Character);
+
+PROC
+ProcHandleForbiddenAreaInfraction((STRING)_ID,(CHARACTER)_Player)
+AND
+DB_SelectedForbiddenOwner(_Owner,_Player)
+THEN
+NOT DB_SelectedForbiddenOwner(_Owner,_Player);
+ProcProcessForbiddenZoneInfraction_2(_Player,_Owner,2);
+
+IF
+CharacterEnteredTrigger(_Player,_Trigger)
+AND
+_Player.DB_IsPlayer()
+AND
+DB_ForbiddenAreaTriggers(_ID,_Trigger,_)
+THEN
+DB_PlayerInForbiddenArea(_Player,_ID);
+
+IF
+CharacterLeftTrigger(_Player,_Trigger)
+AND
+_Player.DB_IsPlayer()
+AND
+DB_ForbiddenAreaTriggers(_ID,_Trigger,_)
+THEN
+NOT DB_PlayerInForbiddenArea(_Player,_ID);
+
+PROC
+ProcProcessForbiddenZoneInfraction((CHARACTER)_Player,(CHARACTER)_Npc,2)
+THEN
+ProcDecreaseForbiddenAttitude(_Player,_Npc);
+
+PROC
+ProcProcessForbiddenZoneInfraction((CHARACTER)_Player,(CHARACTER)_Npc,2)
+AND
+DB_TrespassingShortCircuit(_AreaID,_Npc)
+THEN
+DB_ForbiddenInfraction_Handled(1);
+
+PROC
+ProcProcessForbiddenZoneInfraction((CHARACTER)_Player,(CHARACTER)_Npc,2)
+AND
+DB_ForbiddenArea(_AreaID,_Npc)
+AND
+DB_PlayerInForbiddenArea(_OtherPlayer,_AreaID)
+AND
+_OtherPlayer!=_Player
+AND
+NOT DB_ForbiddenInfraction_Handled(1)
+AND
+NOT DB_TrespassingShortCircuit(_AreaID,_Npc)
+THEN
+DB_ForbiddenInfraction_Handled(1);
+//Just go Hostile!
+DB_TrespassingShortCircuit(_AreaID,_Npc);
+DB_AlignmentChangedByStory(_Player,_Npc);
+DB_GoHostileAfterDialog(_Npc,_Player);
+DoRevenge(_Player,_Npc,5);	//5 so he'll go on the attack
+NOT DB_CrimeInProgress(_Player,_Npc,"Trespassing");
+
+IF
+CharacterLeftCombat(_Char,_)
+AND
+DB_ForbiddenArea(_ID,_Char)
+AND
+DB_TrespassingShortCircuit(_ID,_Char)
+THEN
+NOT DB_TrespassingShortCircuit(_ID,_Char);
+
+PROC
+ProcProcessForbiddenZoneInfraction((CHARACTER)_Player,(CHARACTER)_Npc,2)
+AND
+NOT DB_IsHostile(_Player,_Npc)
+AND
+NOT DB_ForbiddenInfraction_Handled(1)
+THEN
+DB_ForbiddenInfraction_Handled(1);
+ProcLaunchOverheadDialogReplacement(_Npc);
+SetAndStartDialog_DisableDialogsCausedByGenericRules(_Player,_Npc,"default_leave_forbidden_area");
+
+PROC
+ProcProcessForbiddenZoneInfraction((CHARACTER)_Player,(CHARACTER)_Npc,2)
+AND
+DB_IsHostile(_Player,_Npc)
+AND
+NOT DB_ForbiddenInfraction_Handled(1)
+THEN
+DoRevenge(_Player,_Npc,5);	//5 so he'll go on the attack
+
+DB_ForbiddenInfraction_Handled(1);
+NOT DB_CrimeInProgress(_Player,_Npc,"Trespassing");
+
+PROC
+ProcProcessForbiddenZoneInfraction((CHARACTER)_,(CHARACTER)_,2)
+THEN
+NOT DB_ForbiddenInfraction_Handled(1);
+
+PROC
+ProcDecreaseForbiddenAttitude((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_PlayerWarnings(_Npc,_Player,_Warnings)
+AND
+IntegerProduct(_Warnings,10,_Att)
+THEN
+DecreaseAttitude(_Player,_Npc,_Att);
+
+IF
+DialogCharacterEventSet("event_player_stays_in_forbidden_area",_Npc,_)
+THEN
+_Npc.PlayerStaysInForbiddenArea();
+DialogClearCharacterEvent("event_player_stays_in_forbidden_area",_Npc,0);
+
+IF
+DialogCharacterEventSet("event_player_leaves_in_forbidden_area",_Npc,_)
+THEN
+_Npc.PlayerLeavesForbiddenArea();
+DialogClearCharacterEvent("event_player_leaves_in_forbidden_area",_Npc,0);
+
+IF
+DialogEnded("default_leave_forbidden_area",_Inst)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+AND
+_Npc.PlayerLeavesForbiddenArea()
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_ForbiddenArea(_ID,_Npc)
+THEN
+ProcClearTrespassingCrimeForPlayer(_Player,_Npc,_ID);
+
+PROC
+ProcClearTrespassingCrimeForPlayer((CHARACTER)_Player,(CHARACTER)_Npc,(STRING)_ID)
+AND
+DB_ForbiddenAreaTriggers(_ID,_Area,_Teleport)
+AND
+DB_InRegion(_Player,_Area) 
+THEN
+CharacterTeleportToTrigger(_Player,_Teleport,"");
+
+PROC
+ProcClearTrespassingCrimeForPlayer((CHARACTER)_Player,(CHARACTER)_Npc,(STRING)_)
+THEN
+NOT _Npc.PlayerLeavesForbiddenArea();
+NOT DB_CrimeInProgress(_Player,_Npc,"Trespassing");
+
+IF
+DialogEnded("default_leave_forbidden_area",_Inst)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+AND
+_Npc.PlayerStaysInForbiddenArea()
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+THEN
+NOT _Npc.PlayerStaysInForbiddenArea();
+ActNegatively(_Player,_Npc,100,6);		//full intensity since this dude is in your sanctuary
+
+PROC
+DoDisgustedAction(_Player,_Npc)
+AND
+DB_CrimeInProgress(_Player,_Npc,"Trespassing")
+THEN
+NOT DB_CrimeInProgress(_Player,_Npc,"Trespassing");
+
+IF
+CharacterEnteredTrigger(_Player,_Trigger)
+AND
+DB_ForbiddenAreaTriggers(_ID,_Trigger,_)
+AND
+DB_ForbiddenArea(_ID,_Owner)
+THEN
+CharacterSetVarInteger(_Player,"InOwnedArea",1);
+CharacterSetVarCharacter(_Player,"OwnedAreaOwner",_Owner);
+
+IF
+CharacterLeftTrigger(_Player,_Trigger)
+AND
+DB_ForbiddenAreaTriggers(_,_Trigger,_)
+THEN
+CharacterSetVarInteger(_Player,"InOwnedArea",0);
+
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "__Start"

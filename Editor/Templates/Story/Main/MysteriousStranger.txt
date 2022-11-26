@@ -1,0 +1,75 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_NoDefaultBehavior(CHARACTER_Mysterious_Stranger);
+
+DB_CurrentMysteriousPos(0);
+DB_Dialogs(CHARACTER_Mysterious_Stranger,"CYS_CodexStranger");
+DB_MysteriousDestinations(0,TRIGGER_NULL,"CYS_CodexStranger");
+DB_MysteriousDestinations(1,TRIGGER_LUC_MysteriousStranger,"LUC_CodexStranger");
+DB_MysteriousDestinations(2,TRIGGER_HOM_MysteriousStranger,"HOM_CodexStranger");
+
+DB_Dialogs(CHARACTER_LUC_DrogRabbit,"LUC_DrogRabbit");
+DB_Dialogs(CHARACTER_CYS_Zandalon,"CYS_Zandalon");
+DB_Dialogs(CHARACTER_HIB_Dhruin,"HIB_Dhruin");
+
+KBSECTION
+IF
+CharacterAttackedByCharacter(CHARACTER_Mysterious_Stranger,_Source)
+AND
+CharacterGetRegion(CHARACTER_Mysterious_Stranger,_Region)
+AND
+CharacterGetRegion(_Source,_Region)
+AND
+NOT DB_IsInDialog(CHARACTER_Mysterious_Stranger)
+THEN
+ProcMoveMysteriousStrangertoNextRegion();
+
+IF
+DialogEnded(_Dialog,_)
+AND
+DB_MysteriousDestinations(_Pos,_Trig,_Dialog)
+THEN
+NOT DB_MysteriousDestinations(_Pos,_Trig,_Dialog);
+ProcMoveMysteriousStrangertoNextRegion();
+
+PROC
+ProcMoveMysteriousStrangertoNextRegion()
+AND
+DB_CurrentMysteriousPos(_Pos)
+AND
+IntegerSum(_Pos,1,_Next)
+THEN
+ProcDoMysteriousStrangerMove(_Next);
+
+PROC
+ProcDoMysteriousStrangerMove((INTEGER)_Next)
+AND
+NOT DB_MysteriousDestinations(_Next,_,_)
+THEN
+Poof(CHARACTER_Mysterious_Stranger);
+
+PROC
+ProcDoMysteriousStrangerMove((INTEGER)_Next)
+AND
+DB_MysteriousDestinations(_Next,_Trigger,_Dialog)
+AND
+DB_CurrentMysteriousPos(_Pos)
+THEN
+NOT DB_CurrentMysteriousPos(_Pos);
+DB_CurrentMysteriousPos(_Next);
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_Mysterious_Stranger);
+DB_Dialogs(CHARACTER_Mysterious_Stranger,_Dialog);
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A",CHARACTER_Mysterious_Stranger);
+CharacterTeleportToTrigger(CHARACTER_Mysterious_Stranger,_Trigger,"");
+
+IF
+CharacterEnteredTrigger(_,TRIGGER_DAF_AnguishDemon_AD)
+THEN
+DialogRequestStopForCharacter(CHARACTER_Mysterious_Stranger);
+Poof(CHARACTER_Mysterious_Stranger);
+GoalCompleted;
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

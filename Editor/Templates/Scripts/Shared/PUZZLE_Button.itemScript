@@ -1,0 +1,52 @@
+INIT
+ITEM:__Me
+EXTERN STRING:%Event=null
+
+INT:%CurrentState = 0
+INT:%WantedState = 0
+CHARACTER:%UsedBy = null
+
+EVENTS
+
+EVENT ButtonUse
+VARS
+CHARACTER:_Char
+ON
+	OnUseItem(_Char,__Me)
+ACTIONS
+	Set(%WantedState,1)
+	IF "c1"
+		IsEqual(%UsedBy,null)
+	THEN
+		Set(%UsedBy,_Char)
+	ENDIF
+	
+	
+BEHAVIOUR
+
+REACTION GoOn,10
+CHECK "c1&!c2"
+	IsEqual(%WantedState,1)
+	IsEqual(%CurrentState,%WantedState)
+ACTIONS	
+	ItemPlayAnimation("On")
+	Set(%CurrentState,%WantedState)
+	CharacterItemEvent(%UsedBy,__Me,%Event)
+	ItemPlayEffect(__Me, "FX_GP_CameraShake_B")
+	Set(%UsedBy,null)
+	
+REACTION AutoTurnOff,1
+CHECK "c1"
+	IsEqual(%CurrentState,1)
+ACTIONS
+	Set(%WantedState,0)
+	
+REACTION GoOff,5
+CHECK "c1&!c2"
+	IsEqual(%WantedState,0)
+	IsEqual(%CurrentState,%WantedState)
+ACTIONS
+	Set(%CurrentState,%WantedState)
+	ItemPlayAnimation("Off")	
+INTERRUPT
+	Reset()

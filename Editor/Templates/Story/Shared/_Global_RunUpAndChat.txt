@@ -1,0 +1,135 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+//Run up to a character from off screen and talk to him. After the dialog the character disappears out of sight (and is left off stage)
+//Returns a succesevent if succeeded, failevent if dialog was not completed.
+
+PROC
+Proc_RunUpAndChat((CHARACTER)_Character,(CHARACTER)_Player,(STRING)_Dialog,(INTEGER)_Direction,(STRING)_FailEvent,(STRING)_SuccesEvent)
+AND
+CharacterGetUUID(_Character,_UUID)
+AND
+StringConcatenate(_UUID,"_RUAC1",_AppearEvent)
+THEN
+CharacterMakeStoryNpc(_Character,1);
+CharacterAppearOutOfSightTo(_Character,_Player,_Direction,0,_AppearEvent);
+DB_RUAC_Appearing(_Character,_Player,_AppearEvent,_Dialog,_FailEvent,_SuccesEvent,_Direction);
+
+//EXCEPTION 1: Regionswap while finding position to start
+IF
+RegionEnded(_)
+AND
+DB_RUAC_Appearing(_Character,_Player,_AppearEvent,_Dialog,_FailEvent,_SuccesEvent,_Direction)
+THEN
+NOT DB_RUAC_Appearing(_Character,_Player,_AppearEvent,_Dialog,_FailEvent,_SuccesEvent,_Direction);
+CharacterSetEvent(_Character,_FailEvent);
+CharacterMakeStoryNpc(_Character,1);
+
+IF
+CharacterEvent(_Character,_AppearEvent)
+AND
+DB_RUAC_Appearing(_Character,_Player,_AppearEvent,_Dialog,_FailEvent,_SuccesEvent,_Direction)
+AND
+CharacterGetUUID(_Character,_UUID)
+AND
+StringConcatenate(_UUID,"_RUAC2",_ArrivedEvent)
+THEN
+CharacterMoveToCharacter(_Character,_Player,1,_ArrivedEvent,1);
+NOT DB_RUAC_Appearing(_Character,_Player,_AppearEvent,_Dialog,_FailEvent,_SuccesEvent,_Direction);
+DB_RUAC_Moving(_Character,_Player,_ArrivedEvent,_Dialog,_FailEvent,_SuccesEvent,_Direction);
+
+//EXCEPTION 2: Regionswap while running to player
+IF
+RegionEnded(_)
+AND
+DB_RUAC_Moving(_Character,_Player,_ArrivedEvent,_Dialog,_FailEvent,_SuccesEvent,_Direction)
+THEN
+NOT DB_RUAC_Moving(_Character,_Player,_ArrivedEvent,_Dialog,_FailEvent,_SuccesEvent,_Direction);
+CharacterSetEvent(_Character,_FailEvent);
+SetStoryNpcStatus(_Character);
+
+IF
+CharacterEvent(_Character,_ArrivedEvent)
+AND
+DB_RUAC_Moving(_Character,_Player,_ArrivedEvent,_Dialog,_FailEvent,_SuccesEvent,_Direction)
+AND
+_Dialog != ""
+THEN
+PROC_MendatoryDialog(_Dialog,_Character,_Player);
+
+IF
+CharacterEvent(_Character,_ArrivedEvent)
+AND
+DB_RUAC_Moving(_Character,_Player,_ArrivedEvent,"",_FailEvent,_SuccesEvent,_Direction)
+THEN
+NOT DB_RUAC_Moving(_Character,_Player,_ArrivedEvent,"",_FailEvent,_SuccesEvent,_Direction);
+CharacterSetEvent(_Character,_SuccesEvent);
+SetStoryNpcStatus(_Character);
+
+IF
+CharacterEvent(_Character,_ArrivedEvent)
+AND
+DB_RUAC_Moving(_Character,_Player,_ArrivedEvent,_Dialog,_FailEvent,_SuccesEvent,_Direction)
+AND
+_Character.DB_IsInDialog()
+THEN
+NOT DB_RUAC_Moving(_Character,_Player,_ArrivedEvent,_Dialog,_FailEvent,_SuccesEvent,_Direction);
+DB_RUAC_RunAwayAfterDialog(_Character,_Dialog,_SuccesEvent,_Direction);
+
+IF
+DialogEnded(_Dialog,_)
+AND
+DB_RUAC_RunAwayAfterDialog(_Character,_Dialog,_SuccesEvent,_Direction)
+THEN
+NOT DB_RUAC_RunAwayAfterDialog(_Character,_Dialog,_SuccesEvent,_Direction);
+CharacterMakeStoryNpc(_Character,1);
+DB_RUAC_Disappear(_Character,_SuccesEvent);
+CharacterDisappearOutOfSight(_Character,_Direction,1,_SuccesEvent,1);
+
+IF
+CharacterEvent(_Character,_ArrivedEvent)
+AND
+DB_RUAC_Moving(_Character,_Player,_ArrivedEvent,_Dialog,_FailEvent,_SuccesEvent,_Direction)
+AND
+DB_QueuedDialog(_Character,_)
+THEN
+NOT DB_RUAC_Moving(_Character,_Player,_ArrivedEvent,_Dialog,_FailEvent,_SuccesEvent,_Direction);
+DB_RUAC_RunAwayAfterDialog(_Character,_Dialog,_SuccesEvent,_Direction);
+
+IF
+CharacterEvent(_Character,_ArrivedEvent)
+AND
+DB_RUAC_Moving(_Character,_Player,_ArrivedEvent,_Dialog,_FailEvent,_SuccesEvent,_Direction)
+AND
+NOT _Character.DB_IsInDialog()
+AND
+_FailEvent != ""
+AND
+NOT DB_QueuedDialog(_Character,_)
+AND
+NOT DB_BlockedCompanionDialog(_Dialog,_,_Character,_)
+THEN
+NOT DB_RUAC_Moving(_Character,_Player,_ArrivedEvent,_Dialog,_FailEvent,_SuccesEvent,_Direction);
+DB_RUAC_Disappear(_Character,_FailEvent);
+CharacterDisappearOutOfSight(_Character,_Direction,1,_FailEvent,1);
+
+IF
+CharacterEvent(_Character,_Event)
+AND
+DB_RUAC_Disappear(_Character,_Event)
+THEN
+NOT DB_RUAC_Disappear(_Character,_Event);
+SetStoryNpcStatus(_Character);
+
+IF
+DB_NoMoreQueued(_Character, _Dialog)
+AND
+DB_RUAC_RunAwayAfterDialog(_Character,_Dialog,_SuccesEvent,_Direction)
+THEN
+DB_QueuedDialog(_Character, _Dialog);
+NOT DB_NoMoreQueued(_Character, _Dialog);
+EXITSECTION
+
+ENDEXITSECTION

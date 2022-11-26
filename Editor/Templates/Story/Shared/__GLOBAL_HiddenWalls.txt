@@ -1,0 +1,147 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+HiddenWallCount(0);
+KBSECTION
+//REGION Use event to open hidden wall
+
+IF
+GlobalEventSet(_flag)
+AND
+HiddenWallEventDB((STRING)_flag, (INTEGER)_wallIndex)
+THEN
+PROC_OpenWall(_WallIndex);
+
+//END_REGION
+
+//REGION Action When Player Uses Item To Open Wall
+
+IF
+CharacterUsedItem(_Player, _Item)
+AND
+_Player.DB_IsPlayer()
+AND
+HiddenWallItemDB((ITEM)_Item, (INTEGER)_WallIndex)
+THEN
+PROC_CommentHiddenEffect(_Player);
+PROC_OpenWall(_WallIndex);
+
+//END_REGION
+
+//REGION Action When Player Uses Trigger To Open Wall
+
+IF
+HiddenWallTriggerDB(_trigger, _)
+THEN
+DB_HW_CharCountInTrigger(_trigger, 0);
+
+IF
+CharacterEnteredTrigger(_, _trigger)
+AND
+HiddenWallTriggerDB((TRIGGER)_trigger, (INTEGER)_wallIndex)
+AND
+DB_HW_CharCountInTrigger(_trigger, _current)
+AND
+IntegerSum(_current, 1, _new)
+THEN
+NOT DB_HW_CharCountInTrigger(_trigger, _current);
+DB_HW_CharCountInTrigger(_trigger, _new);
+
+IF
+CharacterLeftTrigger(_, _trigger)
+AND
+HiddenWallTriggerDB((TRIGGER)_trigger, (INTEGER)_wallIndex)
+AND
+DB_HW_CharCountInTrigger(_trigger, _current)
+AND
+IntegerSubtract(_current, 1, _new)
+THEN
+NOT DB_HW_CharCountInTrigger(_trigger, _current);
+DB_HW_CharCountInTrigger(_trigger, _new);
+
+IF
+DB_HW_CharCountInTrigger(_trigger, _current)
+AND
+_current < 0
+THEN
+NOT DB_HW_CharCountInTrigger(_trigger, _current);
+DB_HW_CharCountInTrigger(_trigger, 0);
+
+IF
+DB_HW_CharCountInTrigger(_trigger, _current)
+AND
+_current > 0
+AND
+HiddenWallTriggerDB(_trigger, _wallIndex)
+THEN
+PROC_OpenWall(_wallIndex);
+
+IF
+DB_HW_CharCountInTrigger(_trigger, _current)
+AND
+_current == 0
+AND
+HiddenWallTriggerDB(_trigger, _wallIndex)
+THEN
+PROC_CloseWall(_wallIndex);
+
+
+//END_REGION
+
+//REGION Action When Player Uses Skills To Open Wall
+
+IF
+ItemEvent(_Wall, "Open")
+AND
+HiddenWallDB(_WallIndex, _Wall)
+THEN
+PROC_OpenWall(_WallIndex);
+
+//END_REGION
+
+//REGION Registering all the hidden walls 
+
+PROC
+PROC_RegisterHiddenWall((ITEM)_Wall)
+AND
+NOT HiddenWallDB(_, (ITEM)_Wall)
+AND
+HiddenWallCount(_Current)
+AND
+IntegerSum(_Current, 1, _New)
+THEN
+NOT HiddenWallCount(_Current);
+HiddenWallCount(_New);
+HiddenWallDB((INTEGER)_New, (ITEM)_Wall);
+DB_HW_ClosedWalls(_New);
+
+//END_REGION
+
+//REGION Open/Close Hidden walls
+
+PROC
+PROC_OpenWall((INTEGER)_WallIndex)
+AND
+DB_HW_ClosedWalls(_WallIndex)
+AND
+HiddenWallDB(_WallIndex, _Wall)
+THEN
+NOT DB_HW_ClosedWalls(_WallIndex);
+PlayEffectAtItem("FX_GP_TeleportSmoke_A", _Wall);
+ItemSetOnstage(_Wall, 0);
+
+PROC
+PROC_CloseWall((INTEGER)_WallIndex)
+AND
+NOT DB_HW_ClosedWalls(_WallIndex)
+AND
+HiddenWallDB(_WallIndex, _Wall)
+THEN
+DB_HW_ClosedWalls(_WallIndex);
+PlayEffectAtItem("FX_GP_TeleportSmoke_A", _Wall);
+ItemSetOnstage(_Wall, 1);
+
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION

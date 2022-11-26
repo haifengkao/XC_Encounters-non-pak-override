@@ -1,0 +1,139 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_GuardDialogs("GUARD_TYPE_WATCH_CYSEAL","Default_Guard");
+DB_GuardDialogs("GUARD_TYPE_WATCH_LUCULLA","Default_LucullaGuard");
+DB_GuardDialogs("GUARD_TYPE_WATCH_CYSEAL_PRISON","Default_Guard");
+DB_GuardDialogs("GUARD_TYPE_WATCH_LUCULLA_PRISON","Default_LucullaGuard");
+
+// Guard_Type, Timer ID, alignment and map of the guards:
+GuardTypeData("GUARD_TYPE_ROYAL_SWORD","Guards tim 1","RoyalGuard","TestLevel");
+GuardTypeData("GUARD_TYPE_ROYAL_HALBRED","Guards tim 2","RoyalGuard","TestLevel");
+GuardTypeData("GUARD_TYPE_WATCH_RIVERTOWN_LANCE","Guards tim 3","RoyalGuard","TestLevel");
+
+/*
+TODO
+// special guard type data: used to define groups in goal "npc follows alignment"
+// not to be used for the guard behavior (no npcs are defined to create a patrol)
+GuardTypeData(GUARD_TYPE_WATCH_RIVERTOWN,"","WatchGuardRivertown",MAP_RIVERTOWN);
+GuardTypeData(GUARD_TYPE_GATE_QAREA,"","WatchGuardPoor",MAP_RIVERTOWN);
+GuardTypeData(GUARD_TYPE_BESIEGED_VILLAGE,"","Soldier2",MAP_RIVERTOWN);
+*/
+// Guard_Type, npc, move to hero script and index:
+
+// Remove the guards to unreachable at the beginning of the game:
+
+
+
+// List all the alignments of the guards:
+IsGuardAlignment("WatchGuardRivertown");		// guards at the watch
+IsGuardAlignment("WatchGuardPoor");				// guards at the quarantined area
+IsGuardAlignment("CityGuardRivertown");		// cityguards elsewhere on map 1
+IsGuardAlignment("CityGuardVerdistis");		// cityguards on map 2
+IsGuardAlignment("Soldier");							// barracks
+IsGuardAlignment("Soldier2");						// besieged village
+IsGuardAlignment("RoyalGuard");						// SF castle
+IsGuardAlignment("Knight");							// warrior's guild
+IsGuardAlignment("CYS_Guard");
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//Cyseal guards
+ArrestThiefDialog(CHARACTER_CYS_TownGuard1,"Thievery_PayFine");
+ArrestThiefDialog(CHARACTER_CYS_TownGuard2,"Thievery_PayFine");
+ArrestThiefDialog(CHARACTER_CYS_TownGuard3,"Thievery_PayFine");
+ArrestThiefDialog(CHARACTER_CYS_TownGuard4,"Thievery_PayFine");
+ArrestThiefDialog(CHARACTER_CYS_TownGuard5,"Thievery_PayFine");
+GuardTypeData("GUARD_TYPE_WATCH_CYSEAL","Guards tim 4","CYS_Guard","Cyseal");
+GuardTypeData("GUARD_TYPE_WATCH_CYSEAL_PRISON","Guards tim 5","CYS_Guard","Cyseal");
+
+GuardTeleportDest("Cyseal",TRIGGER_CYS_Point_GuardPos);
+
+GuardTypeNpc("GUARD_TYPE_WATCH_CYSEAL",CHARACTER_CYS_TownGuard1,"Guard_1_to_hero",1);
+GuardTypeNpc("GUARD_TYPE_WATCH_CYSEAL",CHARACTER_CYS_TownGuard2,"Guard_1_to_hero",2);
+GuardTypeNpc("GUARD_TYPE_WATCH_CYSEAL",CHARACTER_CYS_TownGuard3,"Guard_1_to_hero",3);
+GuardTypeNpc("GUARD_TYPE_WATCH_CYSEAL",CHARACTER_CYS_TownGuard4,"Guard_1_to_hero",4);
+GuardTypeNpc("GUARD_TYPE_WATCH_CYSEAL",CHARACTER_CYS_TownGuard5,"Guard_1_to_hero",5);
+DB_NumGuards("GUARD_TYPE_WATCH_CYSEAL",5);
+
+// Remove the guards to unreachable at the beginning of the game:
+DB_RemoveNpc(CHARACTER_CYS_TownGuard1);
+DB_RemoveNpc(CHARACTER_CYS_TownGuard2);
+DB_RemoveNpc(CHARACTER_CYS_TownGuard3);
+DB_RemoveNpc(CHARACTER_CYS_TownGuard4);
+DB_RemoveNpc(CHARACTER_CYS_TownGuard5);
+//DB_NoDefaultBehavior(CHARACTER_CYS_TownGuard1);
+//DB_NoDefaultBehavior(CHARACTER_CYS_TownGuard2);
+
+GuardedRegion(TRIGGER_CYS_BoxGuardedArea,TRIGGER_CYS_BoxGuardedArea,"GUARD_TYPE_WATCH_CYSEAL","PRISON_CYSEAL");
+
+DB_IsGuard(CHARACTER_CYS_Prison_Guard);
+DB_IsGuard(CHARACTER_CYS_WarehouseGuard1);
+DB_IsGuard(CHARACTER_CYS_WarehouseGuard2);
+DB_IsGuard(CHARACTER_CYS_WarehouseSergeant);
+DB_IsGuard(CHARACTER_CYS_Prison_TreasureRoomGuard);
+
+DB_IsGuard(CHARACTER_CYS_CityGuard1);
+DB_IsGuard(CHARACTER_CYS_CityGuard2);
+DB_IsGuard(CHARACTER_CYS_CityGuard3);
+DB_IsGuard(CHARACTER_CYS_CityGuard4);
+DB_IsGuard(CHARACTER_CYS_CityGuard5);
+DB_IsGuard(CHARACTER_CYS_CityGuard6);
+DB_IsGuard(CHARACTER_CYS_CityGuard7);
+DB_IsGuard(CHARACTER_CYS_CityGuard8);
+DB_IsGuard(CHARACTER_CYS_CityGuard9);
+DB_IsGuard(CHARACTER_CYS_CityGuard10);
+DB_IsGuard(CHARACTER_CYS_CityGuard11);
+DB_IsGuard(CHARACTER_CYS_CityGuard12);
+DB_IsGuard(CHARACTER_CYS_SparringPartner1);
+DB_IsGuard(CHARACTER_CYS_SparringPartner2);
+DB_IsGuard(CHARACTER_CYS_VillageGuard01);
+DB_IsGuard(CHARACTER_CYS_VillageGuard02);
+DB_IsGuard(CHARACTER_CYS_VillageGuard03);
+DB_IsGuard(CHARACTER_CYS_VillageGuard07);
+DB_IsGuard(CHARACTER_CYS_VillageGuard08);
+DB_IsGuard(CHARACTER_CYS_VillageGuard09);
+DB_IsGuard(CHARACTER_CYS_Selenia);
+
+DB_IsGuard(CHARACTER_LUC_ImmaculateGateGuard1);
+DB_IsGuard(CHARACTER_LUC_ImmaculateGateGuard2);
+DB_IsGuard(CHARACTER_LUC_ImmaculateGateGuard3);
+DB_IsGuard(CHARACTER_LUC_ImmaculateGateGuard4);
+DB_IsGuard(CHARACTER_LUC_ImmaculateGateGuard5);
+DB_IsGuard(CHARACTER_LUC_ImmaculateGateGuard6);
+DB_IsGuard(CHARACTER_LUC_ImmaculateGateGuard7);
+DB_IsGuard(CHARACTER_LUC_IV_GateGuard);
+DB_IsGuard(CHARACTER_LUC_IV_SecondGuard);
+DB_IsGuard(CHARACTER_LUC_IV_PatrolFollow);
+DB_IsGuard(CHARACTER_LUC_IV_PatrolLead);
+
+ArrestThiefDialog(CHARACTER_LUC_TownGuard1,"Thievery_PayFine");
+ArrestThiefDialog(CHARACTER_LUC_TownGuard2,"Thievery_PayFine");
+ArrestThiefDialog(CHARACTER_LUC_TownGuard3,"Thievery_PayFine");
+ArrestThiefDialog(CHARACTER_LUC_TownGuard4,"Thievery_PayFine");
+ArrestThiefDialog(CHARACTER_LUC_TownGuard5,"Thievery_PayFine");
+ArrestThiefDialog(CHARACTER_LUC_TownGuard6,"Thievery_PayFine");
+GuardTypeData("GUARD_TYPE_WATCH_LUCULLA","Guards tim 6","LUC_SummonedGuard","LucullaForest");
+GuardTypeData("GUARD_TYPE_WATCH_LUCULLA_PRISON","Guards tim 7","LUC_PrisonGuard","LucullaForest");
+GuardTeleportDest("LucullaForest",TRIGGER_LUC_TrollBridgeReward);
+
+GuardedRegion(TRIGGER_LUC_Area_Silverglen,TRIGGER_LUC_Area_Silverglen,"GUARD_TYPE_WATCH_LUCULLA","PRISON_LUCULLA");
+GuardTypeNpc("GUARD_TYPE_WATCH_LUCULLA",CHARACTER_LUC_TownGuard1,"Guard_1_to_hero",1);
+GuardTypeNpc("GUARD_TYPE_WATCH_LUCULLA",CHARACTER_LUC_TownGuard2,"Guard_1_to_hero",2);
+GuardTypeNpc("GUARD_TYPE_WATCH_LUCULLA",CHARACTER_LUC_TownGuard3,"Guard_1_to_hero",3);
+GuardTypeNpc("GUARD_TYPE_WATCH_LUCULLA",CHARACTER_LUC_TownGuard4,"Guard_1_to_hero",4);
+GuardTypeNpc("GUARD_TYPE_WATCH_LUCULLA",CHARACTER_LUC_TownGuard5,"Guard_1_to_hero",5);
+GuardTypeNpc("GUARD_TYPE_WATCH_LUCULLA",CHARACTER_LUC_TownGuard6,"Guard_1_to_hero",6);
+DB_NumGuards("GUARD_TYPE_WATCH_LUCULLA",6);
+DB_RemoveNpc(CHARACTER_LUC_TownGuard1);
+DB_RemoveNpc(CHARACTER_LUC_TownGuard2);
+DB_RemoveNpc(CHARACTER_LUC_TownGuard3);
+DB_RemoveNpc(CHARACTER_LUC_TownGuard4);
+DB_RemoveNpc(CHARACTER_LUC_TownGuard5);
+DB_RemoveNpc(CHARACTER_LUC_TownGuard6);
+
+KBSECTION
+
+EXITSECTION
+
+ENDEXITSECTION

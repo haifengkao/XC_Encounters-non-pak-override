@@ -1,0 +1,31 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter
+CHARACTER:__Me
+
+EVENTS
+
+EVENT ZombieAddSkill
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill(Barf_Ooze)
+	
+BEHAVIOUR
+
+REACTION AttackBarfEnemy,500
+USAGE COMBAT 
+VARS
+	CHARACTER:_Enemy
+	FLOAT:_SkillMinRange
+	FLOAT:_SkillMaxRange
+CHECK "c1&c2&c3"	
+	CharacterCanCast(__Me,Barf_Ooze)
+	CharacterGetSkillRange(_SkillMinRange,_SkillMaxRange,__Me,Barf_Ooze)
+	CharacterGet(_Enemy,__Me,null,Lowest,Distance,Enemy,null,null)
+ACTIONS
+	CharacterMoveInRange(_Enemy,_SkillMinRange,_SkillMaxRange,1)
+	CharacterUseSkill(Barf_Ooze, _Enemy)
+INTERRUPT
+	Reset()

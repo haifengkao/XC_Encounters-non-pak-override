@@ -1,0 +1,50 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+FLOAT:%MySightRange
+CHARACTER:%TrollFriend=LUC_BrokenBridgeTroll02_ec9f5796-130f-457b-8e3c-82ed58fe8b99
+ITEM:%GoblinCorpse = COR_Goblins_Grunt_A_002_188e4555-b7af-4da0-a91c-f5b7dc44ddd0
+
+//------------------------
+BEHAVIOUR
+REACTION State_Eating, 0
+USAGE PEACE
+ACTIONS
+	CharacterLookAt(%GoblinCorpse,0)
+	GetWeightedRandom(%currentAction,"Action_Eat",INT:6,"Action_Idle",INT:1,"Action_Wait",INT:1)
+	SetPriority(%currentAction, 1100)
+
+REACTION Action_Eat, 0
+USAGE PEACE
+ACTIONS
+	StartTimer("LUC_CMB_TrollToll_Boar_Blood_Timer",4.5,0)
+	CharacterPlayAnimation("use_eat")
+	SetPriority(%currentAction,0)
+
+REACTION Action_Idle, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_anim
+ACTIONS
+	GetRandom(_anim,"idle1","idle2","idle3")
+	CharacterPlayAnimation(_anim)
+	SetPriority(%currentAction,0)
+		
+REACTION Action_Wait, 0
+USAGE PEACE
+VARS
+	FLOAT:_SleepValue
+ACTIONS
+	GetRandomBetween(_SleepValue,0,2)
+	Sleep(_SleepValue)
+	SetPriority(%currentAction,0)
+	
+//------------------------------
+EVENTS	
+EVENT OnTimer_PlayBloodEffectOnCorpse
+ON
+	OnTimer("LUC_CMB_TrollToll_Boar_Blood_Timer")
+ACTIONS
+	PlayEffectAt(%GoblinCorpse,"FX_GP_Hit_Blood_A_Medium")

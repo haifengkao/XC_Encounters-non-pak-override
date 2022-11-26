@@ -1,0 +1,71 @@
+INIT
+
+	CHARACTER:__Me
+	CHARACTER:%ConversationOrigin=null	
+	EXTERN INT:%IsATalker=0
+	EXTERN INT:%IsAListener=0
+
+//-----------------------
+EVENTS
+
+EVENT CanITalkToPeople
+ON
+	OnTimer("LUC_GoblinBridges_ConversationTimer")
+ACTIONS
+	IF "c1"
+		IsEqual(%IsATalker,1)
+	THEN
+		SetPriority("DetectFriendAndTalk",1200)
+	ENDIF
+	
+EVENT ConversationEventReceived
+ON
+	OnCharacterEvent(%ConversationOrigin,"LUC_GoblinBridges_ConversationEvent")
+ACTIONS
+	IF "c1"
+		IsEqual(%IsAListener,1)
+	THEN
+		SetPriority("FaceConversationPartner",1200)
+	ENDIF	
+
+	
+//-----------------------
+BEHAVIOUR
+
+REACTION DetectFriendAndTalk, 1200
+	USAGE PEACE
+	VARS
+		CHARACTER:_ConversationTarget
+		FIXEDSTRING:_ConversationOpening
+		FIXEDSTRING:_ConversationFollowUp
+	CHECK "!c1&c2&c3&c4&!c5"
+		CharacterHasStatus(__Me,DYING)
+		IsEqual(%IsATalker,1)	
+		CharacterGet(_ConversationTarget,__Me,4,Lowest,Distance,Ally)
+		CharacterCanSee(__Me,_ConversationTarget)	
+		CharacterIsPlayer(_ConversationTarget)	
+	ACTIONS
+		GetRandom(_ConversationOpening,"LUC_GoblinBridges_ConvOpen_01","LUC_GoblinBridges_ConvOpen_02","LUC_GoblinBridges_ConvOpen_03","LUC_GoblinBridges_ConvOpen_04","LUC_GoblinBridges_ConvOpen_05","LUC_GoblinBridges_ConvOpen_06")
+		CharacterLookAt(_ConversationTarget,0)
+		DisplayText(__Me,_ConversationOpening,4)
+		CharacterEvent(__Me,"LUC_GoblinBridges_ConversationEvent")	
+		Sleep(3)	
+		GetRandom(_ConversationFollowUp,"LUC_GoblinBridges_ConvFU_01","LUC_GoblinBridges_ConvFU_02","LUC_GoblinBridges_ConvFU_03","LUC_GoblinBridges_ConvFU_04","LUC_GoblinBridges_ConvFU_05","LUC_GoblinBridges_ConvFU_06")
+		DisplayText(_ConversationTarget,_ConversationFollowUp,4)
+		Sleep(3)
+		StartTimer("LUC_GoblinBridges_ConversationTimer",14.0,0)
+		SetPriority("DetectFriendAndTalk",0)
+	
+REACTION FaceConversationPartner, 0
+	USAGE PEACE
+	CHECK "!c1&c2&c3&c4&!c5"
+		CharacterHasStatus(__Me,DYING)
+		IsEqual(%IsAListener,1)
+		CharacterGet(%ConversationOrigin,__Me,4,Lowest,Distance,Ally)
+		CharacterCanSee(__Me,%ConversationOrigin)
+		CharacterIsPlayer(%ConversationOrigin)
+	ACTIONS
+		CharacterLookAt(%ConversationOrigin)
+		Sleep(4)
+		SetPriority("FaceConversationPartner",0)
+	

@@ -1,0 +1,227 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+//REGION CELLS
+DB_PlayerComments("HIB_CommentInsidePrison","HIB_CommentInsidePrison_1_1",1,1);
+DB_PlayerComments("HIB_CommentInsidePrison","HIB_CommentInsidePrison_2_1",2,1);
+DB_PlayerComments("HIB_CommentInsidePrison","HIB_CommentInsidePrison_2_2",2,2);
+DB_PlayerComment_Trigger(TRIGGER_HIB_CommentInsidePrison,"HIB_CommentInsidePrison");
+
+ItemSetOnstage(ITEM_HIB_ShovelJailCellHole,0);
+DB_ShovelArea(TRIGGER_HIB_ShovelJailCell,"HIB_ShovelJailCell",ITEM_HIB_ShovelJailCellDirt);
+DB_ShovelRewardEvent("HIB_ShovelJailCell","HIB_JailCellHoleRevealed");
+
+DB_HIB_PrisonDoors(ITEM_HIB_PrisonDoor1,ITEM_HIB_PrisonDoorHandle1);
+DB_HIB_PrisonDoors(ITEM_HIB_PrisonDoor2,ITEM_HIB_PrisonDoorHandle2);
+DB_HIB_PrisonDoors(ITEM_HIB_PrisonDoor3,ITEM_HIB_PrisonDoorHandle3);
+DB_HIB_PrisonDoors(ITEM_HIB_PrisonDoor4,ITEM_HIB_PrisonDoorHandle4);
+PROC_HIB_PrisonDoorsInit();
+ItemOpen(ITEM_HIB_PrisonDoor2);
+//END_REGION
+
+//REGION RAT
+ItemTemplateAddToCharacter("CON_Food_Cheese_A_dba0453f-f5bc-49ba-ab7f-7e989a745de4",CHARACTER_Player2,2);
+DB_Dialogs(CHARACTER_HIB_PrisonRat,"HIB_PrisonRat");
+
+ProcTriggerRegisterForPlayers(TRIGGER_HIB_Area_InJail);
+DB_OneShotPlayerTrigger(TRIGGER_HIB_Area_OutOfJail);
+//END_REGION
+
+//REGION ICARA
+CharacterApplyStatus(CHARACTER_HIB_Icara,"FROZEN",-1.0, 1);
+CharacterFreeze(CHARACTER_HIB_Icara);
+IsStoryNpc(CHARACTER_HIB_Icara);
+SetStoryNpcStatus(CHARACTER_HIB_Icara);
+DB_NoDefaultBehavior(CHARACTER_HIB_Icara);
+
+DB_PlayerComments("HIB_CommentIcaraFrozen","HIB_CommentIcaraFrozen_1_1",1,1);
+DB_PlayerComments("HIB_CommentIcaraFrozen","HIB_CommentIcaraFrozen_2_1",2,1);
+DB_PlayerComments("HIB_CommentIcaraFrozen","HIB_CommentIcaraFrozen_2_2",2,2);
+DB_RepeatPlayerComment("HIB_CommentIcaraFrozen");
+
+ProcTriggerRegisterForPlayers(TRIGGER_HIB_Area_Icara);
+//END_REGION
+
+ItemSetOnstage(ITEM_HIB_BloodStone_IronMaiden,0);
+KBSECTION
+//REGION CELLS
+IF
+CharacterDisplayTextEnded(_Player,"HIB_CommentInsidePrison_1_1")
+THEN
+QuestUpdate("LUC_WhiteWitch","EnteredPrison");
+
+IF
+CharacterDisplayTextEnded(_Player,"HIB_CommentInsidePrison_2_2")
+THEN
+QuestUpdate("LUC_WhiteWitch","EnteredPrison");
+
+PROC
+PROC_HIB_PrisonDoorsInit()
+AND
+DB_HIB_PrisonDoors(_Door,_)
+THEN
+ItemSetCanInteract(_Door,0);
+
+IF
+CharacterUsedItem(_Player,_Handle)
+AND
+DB_HIB_PrisonDoors(_Door,_Handle)
+THEN
+PROC_HIB_PrisonDoorsOpenClose(_Door);
+
+PROC
+PROC_HIB_PrisonDoorsOpenClose((ITEM)_Door)
+AND
+ItemIsClosed(_Door,1)
+AND
+NOT DB_HIB_PrisonDoorInUse(_Door)
+THEN
+ItemOpen(_Door);
+DB_HIB_PrisonDoorInUse(_Door);
+
+PROC
+PROC_HIB_PrisonDoorsOpenClose((ITEM)_Door)
+AND
+ItemIsOpened(_Door,1)
+AND
+NOT DB_HIB_PrisonDoorInUse(_Door)
+THEN
+ItemClose(_Door);
+DB_HIB_PrisonDoorInUse(_Door);
+
+PROC
+PROC_HIB_PrisonDoorsOpenClose((ITEM)_Door)
+AND
+DB_HIB_PrisonDoorInUse(_Door)
+THEN
+NOT DB_HIB_PrisonDoorInUse(_Door);
+
+IF
+GlobalEventSet("HIB_JailCellHoleRevealed")
+THEN
+ItemSetOnstage(ITEM_HIB_ShovelJailCellHole,1);
+
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,TRIGGER_HIB_Area_OutOfJail)
+THEN
+GlobalSetEvent("HIB_GotOutOfJail");
+CharacterSetVarFixedString(CHARACTER_HIB_PrisonRat,"currentState","State_Wander");
+//END_REGION
+
+//REGION RAT
+IF
+GlobalEventSet("HIB_CheckIFPlayerHasCheese")
+AND
+DB_DialogNPCs(_ID, CHARACTER_HIB_PrisonRat, _)
+AND
+DB_DialogPlayers(_ID, _Player, _)
+AND
+ItemTemplateIsInPartyInventory(_Player, "CON_Food_Cheese_A_dba0453f-f5bc-49ba-ab7f-7e989a745de4", 0, _Int)
+AND
+_Int > 0
+THEN
+GlobalSetEvent("HIB_PlayerHaveCheese");
+GlobalClearEvent("HIB_CheckIFPlayerHasCheese");
+
+IF
+GlobalEventSet("HIB_CheckIFPlayerHasCheese")
+AND
+DB_DialogNPCs(_ID, CHARACTER_HIB_PrisonRat, _)
+AND
+DB_DialogPlayers(_ID, _Player, _)
+AND
+DB_CheeseTemplate(_Template)
+AND
+ItemTemplateIsInPartyInventory(_Player, _Template, 0, _Int)
+AND
+_Int > 0
+THEN
+GlobalSetEvent("HIB_PlayerHaveCheese");
+GlobalClearEvent("HIB_CheckIFPlayerHasCheese");
+
+IF
+GlobalEventSet("HIB_TakeCheese")
+AND
+DB_DialogNPCs(_ID, CHARACTER_HIB_PrisonRat, _)
+AND
+DB_DialogPlayers(_ID, _Player, _)
+AND
+DB_CheeseTemplate(_Template)
+AND
+ItemTemplateIsInPartyInventory(_Player, _Template, 1,_Int)
+AND
+_Int > 0
+AND
+NOT DB_OnlyOnce("TookCheese")
+THEN
+DB_OnlyOnce("TookCheese");
+ItemTemplateRemoveFromCharacter(_Template, _Player, 1);
+ItemTemplateAddToCharacter(_Template, CHARACTER_HIB_PrisonRat, 1);
+
+IF
+DialogEnded("HIB_PrisonRat",_)
+THEN
+NOT DB_OnlyOnce("TookCheese");
+GlobalClearEvent("HIB_CheckIFPlayerHasCheese");
+GlobalClearEvent("HIB_TakeCheese");
+GlobalClearEvent("HIB_PlayerHaveCheese");
+
+IF
+DialogEnded("HIB_PrisonRat",_)
+AND
+CharacterGetVarInteger(CHARACTER_HIB_PrisonRat,"HIB_RatGoesToLever",1)
+THEN
+CharacterSetHasDialog(CHARACTER_HIB_PrisonRat,0);
+ProcCharacterMoveToTrigger(CHARACTER_HIB_PrisonRat,TRIGGER_HIB_Point_PrisonRat1,1,"HIB_PrisonRatAtLever");
+
+IF
+CharacterEvent(CHARACTER_HIB_PrisonRat,"HIB_PrisonRatAtLever")
+THEN
+CharacterLookAtItem(CHARACTER_HIB_PrisonRat,ITEM_HIB_PrisonDoorHandle4,1);
+CharacterPlayAnimation(CHARACTER_HIB_PrisonRat,"idle1","HIB_PrisonRatFailedLever1");
+
+IF
+CharacterEvent(CHARACTER_HIB_PrisonRat,"HIB_PrisonRatFailedLever1")
+THEN
+CharacterLookAtItem(CHARACTER_HIB_PrisonRat,ITEM_HIB_PrisonDoorHandle4,1);
+CharacterPlayAnimation(CHARACTER_HIB_PrisonRat,"use_eat","HIB_PrisonRatFailedLever2");
+
+IF
+CharacterEvent(CHARACTER_HIB_PrisonRat,"HIB_PrisonRatFailedLever2")
+THEN
+ProcCharacterMoveToTrigger(CHARACTER_HIB_PrisonRat,TRIGGER_HIB_Point_PrisonRat2,1,"HIB_PrisonRatBackFromLever");
+CharacterSetHasDialog(CHARACTER_HIB_PrisonRat,1);
+
+IF
+CharacterEvent(CHARACTER_HIB_PrisonRat,"HIB_PrisonRatBackFromLever")
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_HIB_PrisonRat,_Player)
+AND
+DB_InRegion(_Player,TRIGGER_HIB_Area_InJail)
+THEN
+PROC_MendatoryDialog("HIB_PrisonRat",CHARACTER_HIB_PrisonRat,_Player);
+
+IF
+DB_NoMoreQueued(CHARACTER_HIB_PrisonRat, "HIB_PrisonRat")
+THEN
+CharacterDie(CHARACTER_HIB_PrisonRat, 0);
+
+IF
+DialogEnded("HIB_PrisonRat",_)
+AND
+CharacterGetVarInteger(CHARACTER_HIB_PrisonRat,"HIB_RatLeaves",1)
+THEN
+CharacterSetHasDialog(CHARACTER_HIB_PrisonRat,0);
+CharacterDisappearOutOfSight(CHARACTER_HIB_PrisonRat,0,1,"",1);
+//END_REGION
+
+IF
+ItemDestroyed(ITEM_HIB_IronMaiden)
+THEN
+PlayEffectAtItem("FX_GP_TeleportSmoke_A",ITEM_HIB_IronMaiden_Corpse);
+ItemSetOnstage(ITEM_HIB_IronMaiden_Corpse,0);
+ItemSetOnstage(ITEM_HIB_BloodStone_IronMaiden,1);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

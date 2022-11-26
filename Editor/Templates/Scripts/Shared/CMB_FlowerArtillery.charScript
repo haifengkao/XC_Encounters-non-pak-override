@@ -1,0 +1,52 @@
+#INCLUDE Base
+
+INIT
+USING Base
+EXTERN INT:%ShouldIUseInfect=0
+EXTERN INT:%ShouldIUseDrainWillpower=0
+CHARACTER:__Me
+
+//------------------------
+EVENTS
+EVENT ArtilFlowerAddSkill
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill(Projectile_EnemySmallDeadlySpores)
+	CharacterAddSkill(Target_EnemyInfect)
+	
+//------------------------	
+BEHAVIOUR
+REACTION UseDeadlySpores,300
+VARS
+	CHARACTER:_char
+	FLOAT:_minRange
+	FLOAT:_maxRange
+USAGE COMBAT
+CHECK "c1&c2&c3&c4"
+	CharacterCanCast(__Me,Projectile_EnemySmallDeadlySpores)
+	CharacterGetSkillRange(_minRange,_maxRange,__Me,Projectile_EnemySmallDeadlySpores)
+	CharacterGet(_char,__Me,_maxRange,Lowest,Distance,Enemy)
+	CharacterCanSee(__Me,_char)
+ACTIONS
+	CharacterUseSkill(Projectile_EnemySmallDeadlySpores,_char)
+	
+REACTION UseInfect,300
+VARS
+	CHARACTER:_char
+	FLOAT:_minRange
+	FLOAT:_maxRange
+USAGE COMBAT
+CHECK "c1&c2&c3&c4&c5"
+	IsEqual(%ShouldIUseInfect,1)
+	CharacterCanCast(__Me,Target_EnemyInfect)
+	CharacterGetSkillRange(_minRange,_maxRange,__Me,Target_EnemyInfect)
+	CharacterGet(_char,__Me,_maxRange,Lowest,Distance,Enemy)
+	CharacterCanSee(__Me,_char)
+ACTIONS
+	CharacterUseSkill(Target_EnemyInfect,_char)	
+	
+REACTION CannotMoveSoEndTurn,200
+USAGE COMBAT
+ACTIONS
+	CharacterEndTurn()

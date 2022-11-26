@@ -1,0 +1,60 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter
+CHARACTER:__Me
+TRIGGER:%CurrentSpot = ""
+
+TRIGGER:%PreviousSpot = ""
+
+INT:%NumberOfAnimations = 1
+
+FIXEDSTRING:%CurrentAnimation = ""
+
+EXTERN TRIGGER:%MiningSpot1 = null
+
+EXTERN TRIGGER:%MiningSpot2 = null
+
+
+BEHAVIOUR
+
+REACTION ChooseAction, 1060
+USAGE PEACE
+ACTIONS
+	CharacterSwitchWeaponType(OneHanded)
+	CharacterApplyStatus(__Me,UNSHEATHED,-1)
+	GetRandom(%CurrentSpot,%MiningSpot1,%MiningSpot2)
+	GotoIfEqual(%PreviousSpot, %CurrentSpot, "Start")
+	Set(%PreviousSpot, %CurrentSpot)
+	SetPriority("MinePoint", 1070)
+
+REACTION MinePoint, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%CurrentSpot, 0)
+	CharacterLookFrom(%CurrentSpot)
+	GetRandom(%NumberOfAnimations, 2, 2, 2)
+	Set(%CurrentAnimation, "Mining_01")
+	SetPriority("LoopAnimation", 1070)
+INTERRUPT
+	Reset()
+
+REACTION LoopAnimation, 0
+VARS
+	INT:_Counter = 0
+
+USAGE PEACE
+ACTIONS
+	SetPriority("MinePoint", 0)
+	CharacterPlayAnimation(%CurrentAnimation)
+	Add(_Counter, 1)
+	IF "!c1"
+		IsGreaterThen(_Counter, %NumberOfAnimations)
+	THEN
+		Goto("Start")
+	ELSE
+		Set(_Counter, 0)
+		SetPriority("LoopAnimation", 0)
+	ENDIF
+INTERRUPT
+	SetPriority("LoopAnimation", 0)

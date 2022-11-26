@@ -1,0 +1,9 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+ItemApplyStatus(ITEM_SL_ShrineAura,"VOID_AURA",-1.0,1);
+KBSECTION
+
+EXITSECTION
+
+ENDEXITSECTION

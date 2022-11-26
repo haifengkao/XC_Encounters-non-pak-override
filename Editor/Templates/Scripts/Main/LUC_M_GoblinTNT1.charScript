@@ -1,0 +1,26 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter
+CHARACTER:__Me
+CHARACTER:%Miner1 = LUC_FuseMiner01_8125b705-0837-4b99-bec3-b0a075428ca0
+CHARACTER:%Miner2 = LUC_FuseMiner02_551207e7-5b05-4540-8a83-ac15b31fa3cb
+CHARACTER:%Miner3 = LUC_FuseMiner03_96501f2c-dcd9-40c9-b404-254c2e70b299
+
+BEHAVIOUR
+
+REACTION PatrolMiners,1050
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Text
+	CHARACTER:_Miner
+ACTIONS
+	GetRandom(_Miner,%Miner1,%Miner2,%Miner3)
+	CharacterMoveTo(_Miner)
+	CharacterLookAt(_Miner)
+	Sleep(1)
+	GetRandom(_Text,"LUC_M_GoblinTNT_1","LUC_M_GoblinTNT_2")
+	DisplayText(__Me,_Text,5)
+	Sleep(15)
+INTERRUPT
+	Reset()

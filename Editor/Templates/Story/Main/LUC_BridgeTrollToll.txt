@@ -1,0 +1,294 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Dialogs(CHARACTER_LUC_BrokenBridgeTroll01,"LUC_TrollBridge1");
+DB_Dialogs(CHARACTER_LUC_BrokenBridgeTroll02,"LUC_TrollBridge2");
+DB_Dialogs(CHARACTER_LUC_TrollBridge6,CHARACTER_LUC_TrollBridge6Baby,"LUC_TrollBridge6");
+
+DB_Trolls6(CHARACTER_LUC_TrollBridge6);
+DB_Trolls6(CHARACTER_LUC_TrollBridge6Baby);
+
+ProcTriggerRegisterForPlayers(TRIGGER_LUC_AreaTrollBridge6);
+ProcTriggerRegisterForPlayers(TRIGGER_LUC_AreaTrollBridge6_Fight);
+
+
+DB_IsNotMessingAround(CHARACTER_LUC_BrokenBridgeTroll01);
+DB_IsNotMessingAround(CHARACTER_LUC_BrokenBridgeTroll02);
+DB_IsNotMessingAround(CHARACTER_LUC_TrollBridge6);
+DB_IsNotMessingAround(CHARACTER_LUC_TrollBridge6_PoisonSlug_01);
+DB_IsNotMessingAround(CHARACTER_LUC_TrollBridge6_PoisonSlug_02);
+DB_IsNotMessingAround(CHARACTER_LUC_TrollBridge6_PoisonSlug_03);
+DB_NoDefaultBehavior(CHARACTER_LUC_TrollBridge6Baby);
+
+SneakTriggerSpotter(TRIGGER_LUC_AreaTrollBridge2, CHARACTER_LUC_BrokenBridgeTroll02);
+SneakTriggerSpotter(TRIGGER_LUC_AreaTrollBridge1, CHARACTER_LUC_BrokenBridgeTroll01);
+
+PROC_LUC_TrollToll2_Ambush_Init();
+KBSECTION
+//REGION TROLL 1 - BROKEN BRIDGE
+
+IF
+CharacterEvent(CHARACTER_LUC_BrokenBridgeTroll01, "GLO_SpotterSneaker")
+AND
+CharacterGetVarCharacter(CHARACTER_LUC_BrokenBridgeTroll01, "SpottedDude", _Player)
+THEN
+PROC_MendatoryDialog("LUC_TrollBridge1",CHARACTER_LUC_BrokenBridgeTroll01,_Player);
+
+IF
+DB_Combat(CHARACTER_LUC_BrokenBridgeTroll01,_Comb)
+AND
+DB_Combat(_Player,_Comb)
+AND
+_Player.DB_IsPlayer()
+THEN
+//ProcTriggerUnregisterForPlayers(TRIGGER_LUC_AreaTrollBridge1);
+ProcRemoveDialogEntryForSpeaker(CHARACTER_LUC_BrokenBridgeTroll01,"LUC_TrollBridge1");
+CharacterSetHasDialog(CHARACTER_LUC_BrokenBridgeTroll01,0);
+
+IF
+GlobalEventSet("LUC_BrokenBridge01_Refuse")
+THEN
+CHARACTER_LUC_BrokenBridgeTroll01.DB_IsHostile();
+CHARACTER_LUC_BrokenBridgeTroll01_Boar1.DB_IsHostile();
+CHARACTER_LUC_BrokenBridgeTroll01_Boar2.DB_IsHostile();
+CHARACTER_LUC_BrokenBridgeTroll01_Boar3.DB_IsHostile();
+
+IF
+GlobalEventSet("LUC_BrokenBridge01_TollPaid")
+THEN
+CHARACTER_LUC_BrokenBridgeTroll01.IsPeaceful();
+CHARACTER_LUC_BrokenBridgeTroll01_Boar1.IsPeaceful();
+CHARACTER_LUC_BrokenBridgeTroll01_Boar2.IsPeaceful();
+CHARACTER_LUC_BrokenBridgeTroll01_Boar3.IsPeaceful();
+
+IF
+DialogEnded("LUC_TrollBridge1",_)
+AND
+CHARACTER_LUC_BrokenBridgeTroll01.DB_IsHostile()
+THEN
+NOT CHARACTER_LUC_BrokenBridgeTroll01.DB_IsHostile();
+NOT CHARACTER_LUC_BrokenBridgeTroll01_Boar1.DB_IsHostile();
+NOT CHARACTER_LUC_BrokenBridgeTroll01_Boar2.DB_IsHostile();
+NOT CHARACTER_LUC_BrokenBridgeTroll01_Boar3.DB_IsHostile();
+ProcSetRelationToPlayers(CHARACTER_LUC_BrokenBridgeTroll01,0);
+ProcSetRelationToPlayers(CHARACTER_LUC_BrokenBridgeTroll01_Boar1,0);
+ProcSetRelationToPlayers(CHARACTER_LUC_BrokenBridgeTroll01_Boar2,0);
+ProcSetRelationToPlayers(CHARACTER_LUC_BrokenBridgeTroll01_Boar3,0);
+
+IF
+DialogEnded("LUC_TrollBridge1",_)
+AND
+CHARACTER_LUC_BrokenBridgeTroll01.IsPeaceful()
+THEN
+NOT CHARACTER_LUC_BrokenBridgeTroll01.IsPeaceful();
+NOT CHARACTER_LUC_BrokenBridgeTroll01_Boar1.IsPeaceful();
+NOT CHARACTER_LUC_BrokenBridgeTroll01_Boar2.IsPeaceful();
+NOT CHARACTER_LUC_BrokenBridgeTroll01_Boar3.IsPeaceful();
+ProcCharacterMoveToTrigger(CHARACTER_LUC_BrokenBridgeTroll01,TRIGGER_LUC_PointBrokenBridge01_Pass,0,"");
+
+IF
+CharacterDied(CHARACTER_LUC_BrokenBridgeTroll01)
+THEN
+QuestUpdate("LUC_AngryTroll", "Dead");
+QuestClose("LUC_AngryTroll");
+//END_REGION
+
+//REGION TROLL 2 - WANTS A COMPANION
+PROC
+PROC_LUC_TrollToll2_Ambush_Init()
+THEN
+CharacterSetOnStage(CHARACTER_LUC_BrokenBridgeTroll02_Rogue_Elemental_01,0);
+CharacterSetOnStage(CHARACTER_LUC_BrokenBridgeTroll02_Rogue_Elemental_02,0);
+CharacterSetOnStage(CHARACTER_LUC_BrokenBridgeTroll02_Rogue_Elemental_03,0);
+
+IF
+CharacterEvent(CHARACTER_LUC_BrokenBridgeTroll02, "GLO_SpotterSneaker")
+AND
+CharacterGetVarCharacter(CHARACTER_LUC_BrokenBridgeTroll02, "SpottedDude", _Player)
+THEN
+PROC_MendatoryDialog("LUC_TrollBridge2",CHARACTER_LUC_BrokenBridgeTroll02,_Player);
+
+IF
+DB_Combat(CHARACTER_LUC_BrokenBridgeTroll02,_Comb)
+AND
+DB_Combat(_Player,_Comb)
+AND
+_Player.DB_IsPlayer()
+THEN
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_AreaTrollBridge2);
+ProcRemoveDialogEntryForSpeaker(CHARACTER_LUC_BrokenBridgeTroll02,"LUC_TrollBridge2");
+CharacterSetHasDialog(CHARACTER_LUC_BrokenBridgeTroll02,0);
+CHARACTER_LUC_BrokenBridgeTroll02_Ward_Air_01.DB_IsHostile();
+TimerLaunch("LUC_BrokenBridgeTroll02_FightStarted_Timer01",600);
+
+IF
+TimerFinished("LUC_BrokenBridgeTroll02_FightStarted_Timer01")
+THEN
+CharacterAppear(CHARACTER_LUC_BrokenBridgeTroll02_Rogue_Elemental_01,1);
+TimerLaunch("LUC_BrokenBridgeTroll02_FightStarted_Timer02",600);
+
+IF
+TimerFinished("LUC_BrokenBridgeTroll02_FightStarted_Timer02")
+THEN
+CharacterAppear(CHARACTER_LUC_BrokenBridgeTroll02_Rogue_Elemental_02,1);
+CharacterAppear(CHARACTER_LUC_BrokenBridgeTroll02_Rogue_Elemental_03,1);
+
+IF
+CharacterDied(CHARACTER_LUC_BrokenBridgeTroll02)
+THEN
+GlobalSetEvent("LUC_GateGuardTrollDied");
+GlobalClearEvent("LUC_TrollRequestedGirl");
+
+IF
+DialogEnded("LUC_TrollBridge2", _Handle)
+AND
+DB_DialogPlayers(_Handle,_Player,1)
+AND
+CharacterGetVarInteger(CHARACTER_LUC_BrokenBridgeTroll02, "willKillItself", 1)
+THEN
+ProcRemoveDialogEntryForSpeaker(CHARACTER_LUC_BrokenBridgeTroll02,"LUC_TrollBridge2");
+ItemTemplateAddToCharacter("WPN_Human_Normal_Mace_A_c70cbf4b-f2b5-4d03-b46e-365bfc2e943e",_Player, 1);
+CharacterDie(CHARACTER_LUC_BrokenBridgeTroll02,0);
+
+//END_REGION
+
+//REGION TROLL 6 - FATHER & SON
+IF
+CharacterEvent(_Char, "GLO_SpotterSneaker1")
+AND
+NOT TRIGGER_LUC_AreaTrollBridge6.hadChat()
+AND
+DB_Trolls6(_Char)
+AND
+CharacterGetVarCharacter(_Char, "SpottedDude1", _Player) 
+THEN
+TRIGGER_LUC_AreaTrollBridge6.hadChat();
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_AreaTrollBridge6);
+ProcDoThreeSpeakerDialog("LUC_TrollBridge6",CHARACTER_LUC_TrollBridge6,CHARACTER_LUC_TrollBridge6Baby,_Player);
+
+IF
+GlobalEventSet("LUC_TrollToll6NotPaid")
+THEN
+CHARACTER_LUC_TrollBridge6.DB_IsHostile();
+
+IF
+GlobalEventSet("LUC_BridgeTroll06_TollPaid")
+THEN
+CHARACTER_LUC_TrollBridge6.IsPeaceful();
+
+IF
+DialogEnded("LUC_TrollBridge6",_)
+AND
+CHARACTER_LUC_TrollBridge6.DB_IsHostile()
+THEN
+NOT CHARACTER_LUC_TrollBridge6.DB_IsHostile();
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_AreaTrollBridge6_Fight);
+SetRelationFactionToPlayers("LUC_TrollDaddy",0);
+
+IF
+GlobalEventSet("LUC_TrollTollBabyHostile")
+THEN
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_AreaTrollBridge6_Fight);
+SetRelationFactionToPlayers("LUC_TrollDaddy",0);
+
+IF
+DB_Combat(CHARACTER_LUC_TrollBridge6,_Comb)
+AND
+DB_Combat(_Player,_Comb)
+AND
+_Player.DB_IsPlayer()
+THEN
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_AreaTrollBridge6);
+CharacterSetVarFixedString(CHARACTER_LUC_TrollBridge6Baby,"currentState","State_CheeringForDaddy");
+ProcRemoveDialogEntryForSpeaker(CHARACTER_LUC_TrollBridge6,"LUC_TrollBridge6");
+CharacterSetHasDialog(CHARACTER_LUC_TrollBridge6,0);
+CharacterSetHasDialog(CHARACTER_LUC_TrollBridge6Baby,0);
+
+IF
+DialogEnded("LUC_TrollBridge6",_)
+AND
+CHARACTER_LUC_TrollBridge6.IsPeaceful()
+THEN
+NOT CHARACTER_LUC_TrollBridge6.IsPeaceful();
+CHARACTER_LUC_TrollBridge6.leavePlayer();
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_AreaTrollBridge6_Fight);
+ProcCharacterMoveToTrigger(CHARACTER_LUC_TrollBridge6,TRIGGER_LUC_PointTrollBridge6_Pass,0,"TrollArrived");
+ProcCharacterMoveToTrigger(CHARACTER_LUC_TrollBridge6Baby,TRIGGER_LUC_PointTrollBridge6Baby_Pass,0,"TrollArrived");
+
+IF
+CharacterDied(CHARACTER_LUC_TrollBridge6)
+THEN
+CharacterSetVarFixedString(CHARACTER_LUC_TrollBridge6Baby,"currentState","State_CryingForDaddy");
+QuestUpdate("LUC_DaddyTroll", "Dead");
+QuestClose("LUC_DaddyTroll");
+
+IF
+CharacterEvent(_Char, "GLO_SpotterSneaker2")
+AND
+DB_Trolls6(_Char)
+AND
+NOT CHARACTER_LUC_TrollBridge6.leavePlayer()
+THEN
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_AreaTrollBridge6_Fight);
+SetRelationFactionToPlayers("LUC_TrollDaddy",0);
+
+IF
+CharacterAttackedByCharacter(CHARACTER_LUC_TrollBridge6Baby,_Player)
+AND
+NOT DB_Dead(CHARACTER_LUC_TrollBridge6)
+AND
+NOT DB_Combat(_Player,_)
+THEN
+ProcLuc_MakeDeadAndSonTrollHostile(_Player);
+
+IF
+CharacterKilledByCharacter(CHARACTER_LUC_TrollBridge6Baby,_Player)
+AND
+NOT DB_Dead(CHARACTER_LUC_TrollBridge6)
+AND
+NOT DB_Combat(_Player,_)
+THEN
+ProcLuc_MakeDeadAndSonTrollHostile(_Player);
+
+PROC
+ProcLuc_MakeDeadAndSonTrollHostile((CHARACTER)_Player)
+THEN
+ProcMakeNPCHostile(_Player,CHARACTER_LUC_TrollBridge6);
+ProcMakeNPCHostile(_Player,CHARACTER_LUC_TrollBridge6_PoisonSlug_01);
+ProcMakeNPCHostile(_Player,CHARACTER_LUC_TrollBridge6_PoisonSlug_02);
+ProcMakeNPCHostile(_Player,CHARACTER_LUC_TrollBridge6_PoisonSlug_03);
+
+IF
+GlobalEventSet("ArchibaldKing")
+THEN
+CHARACTER_LUC_TrollBridge6.willLeave();
+UnlockAchievement("quest19");
+
+IF
+DialogEnded("LUC_TrollBridge6", _)
+AND
+CHARACTER_LUC_TrollBridge6.willLeave()
+THEN
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_AreaTrollBridge6_Fight);
+CharacterSetHasDialog(CHARACTER_LUC_TrollBridge6, 0);
+CharacterSetHasDialog(CHARACTER_LUC_TrollBridge6Baby, 0);
+CHARACTER_LUC_TrollBridge6.leavePlayer();
+ProcRewardQuestBig(TRIGGER_LUC_TrollBridgeReward);
+CharacterDisappearOutOfSight(CHARACTER_LUC_TrollBridge6, 180, 0, "", 1);
+CharacterDisappearOutOfSight(CHARACTER_LUC_TrollBridge6Baby, 180, 0, "", 1);
+QuestUpdate("LUC_DaddyTroll", "TrollKing");
+QuestClose("LUC_DaddyTroll");
+
+IF
+CharacterAttackedByCharacter(_Troll, _Player)
+AND
+DB_Trolls6(_Troll)
+AND
+DB_Trolls6(_DoTroll)
+THEN
+CharacterPurgeQueue(_DoTroll);
+//END_REGION
+EXITSECTION
+NOT CHARACTER_DAF_TrollBridge.isAwake();
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

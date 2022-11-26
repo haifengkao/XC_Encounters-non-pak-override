@@ -1,0 +1,170 @@
+INIT
+CHARACTER:__Me
+CHARACTER:%Human1 = DAF_BO_ArmoryKeyGuard_7e27579f-3bc5-4dee-964a-00ff07804fe0
+CHARACTER:%Human2 = DAF_BO_FamilyHouseGuard_01_a5e7891a-2ad9-460c-bf00-6587c3f1a05f
+CHARACTER:%Human3 = DAF_BO_FamilyHouseGuard_02_7012cac9-4051-4b59-b451-cb1d8f0d8bc6
+CHARACTER:%Human4 = DAF_BO_GarrickGuard_01_c4b3a63c-b456-4be3-a5b8-8c157a4bad46
+CHARACTER:%Human5 = DAF_BO_GarrickGuard_02_159cb173-0d69-4f8e-be64-5ac2232af0b8
+CHARACTER:%Human6 = DAF_BO_GarrickGuard_03_e999a3ca-f8b4-4b43-a918-8489145e106d
+CHARACTER:%Human7 = DAF_HumanGuard1_5c6bbe9f-abf8-4b2e-bb6d-146e74b8dbdf
+CHARACTER:%Human8 = DAF_HumanGuard2_5614b193-7886-4732-a0a1-e017d827351d
+CHARACTER:%Human9 = DAF_BO_GateGuard1_e1c986bf-bff0-41ae-b71f-62cf740bbf85
+CHARACTER:%Human10 = DAF_BO_GateGuard2_24189e62-aa40-403d-adba-9c98ca78f131
+CHARACTER:%Human11 = DAF_BO_GateGuard3_bd251eb7-c3e4-458b-919e-c81fa953a9b7
+CHARACTER:%Human12 = DAF_BO_George_cdae11a3-20de-4665-8ee3-82a3684f2035
+CHARACTER:%Human13 = DAF_Human_Lover_e1e3bd51-c965-4db1-bf03-9984eb7d3214
+CHARACTER:%Human14 = DAF_Campfire_Human_4918243d-5cf0-45c2-bccb-c73a03e25d8c
+CHARACTER:%Human15 = DAF_BO_Human_Male_A_003_09d4ff53-faea-40a1-a35a-159c4a5402e3
+CHARACTER:%Human16 = DAF_BO_PrisonGuard1_fca21780-747d-41a4-9bbc-e23b1d76877d
+CHARACTER:%Human17 = DAF_Leonard_3e60eaa9-a33f-4b53-b8f7-81bc93672dd9
+CHARACTER:%Human18 = DAF_BeggingPriest_5d1f9b56-b3fb-4f0a-a17a-48bf6ab50a21
+CHARACTER:%Human19 = DAF_BO_Human_Patrol_8b14127c-928b-46c8-b97a-35f4dc71fd80
+CHARACTER:%Human20 = DAF_Human_ZandalorHouse1_5614b193-7886-4732-a0a1-e017d827351d
+CHARACTER:%Human21 = DAF_Human_ZandalorHouse2_62168459-59ec-44e7-ab59-4ba3214ebb0c
+CHARACTER:%Human22 = DAF_WarehouseGuard_0adda3ff-1160-49ed-aadb-72c7e5590b22
+CHARACTER:%Human23 = DAF_WarehouseGuard2_67edf51a-6606-459f-a059-776a0efee9bb
+
+BEHAVIOUR
+
+REACTION NearlyAtWar, 0
+VARS
+	FLOAT:_dist
+USAGE PEACE
+ACTIONS
+	Sleep(3)
+		
+REACTION SearchAndDestroy, 0
+USAGE PEACE
+VARS
+	CHARACTER:_HumanToHunt1
+	CHARACTER:_HumanToHunt2
+	CHARACTER:_HumanToHunt3
+	CHARACTER:_HumanToHunt
+ACTIONS
+	GetRandom(_HumanToHunt1,%Human1,%Human2,%Human3,%Human4,%Human5,%Human6,%Human7)
+	GetRandom(_HumanToHunt2,%Human8,%Human9,%Human10,%Human11,%Human12,%Human13,%Human14,%Human23)
+	GetRandom(_HumanToHunt3,%Human15,%Human16,%Human17,%Human18,%Human19,%Human20,%Human21,%Human22)
+	GetRandom(_HumanToHunt,_HumanToHunt1,_HumanToHunt2,_HumanToHunt3)
+	IF "!c1"
+		CharacterIsDead(_HumanToHunt)
+	THEN
+		CharacterMoveTo(_HumanToHunt,1,0,1)
+	ELIF "!c1"
+		CharacterIsDead(_HumanToHunt1)
+	THEN
+		CharacterMoveTo(_HumanToHunt1,1,0,1)
+	ELIF "!c1"
+		CharacterIsDead(_HumanToHunt2)
+	THEN
+		CharacterMoveTo(_HumanToHunt2,1,0,1)
+	ELIF "!c1"
+		CharacterIsDead(_HumanToHunt3)
+	THEN
+		CharacterMoveTo(_HumanToHunt3,1,0,1)
+	ELIF "!c1"
+		CharacterIsDead(%Human1)
+	THEN
+		CharacterMoveTo(%Human1,1,0,1)
+	ELIF "!c1"
+		CharacterIsDead(%Human2)
+	THEN
+		CharacterMoveTo(%Human2,1,0,1)
+	ELIF "!c1"
+		CharacterIsDead(%Human3)
+	THEN
+		CharacterMoveTo(%Human3,1,0,1)
+	ELIF "!c1"
+		CharacterIsDead(%Human4)
+	THEN
+		CharacterMoveTo(%Human4,1,0,1)
+	ELIF "!c1"
+		CharacterIsDead(%Human5)
+	THEN
+		CharacterMoveTo(%Human5,1,0,1)
+	ELIF "!c1"
+		CharacterIsDead(%Human6)
+	THEN
+		CharacterMoveTo(%Human6,1,0,1)
+	ELIF "!c1"
+		CharacterIsDead(%Human7)
+	THEN
+		CharacterMoveTo(%Human7,1,0,1)
+	ELIF "!c1"
+		CharacterIsDead(%Human8)
+	THEN
+		CharacterMoveTo(%Human8,1,0,1)
+	ELIF "!c1"
+		CharacterIsDead(%Human9)
+	THEN
+		CharacterMoveTo(%Human9,1,0,1)
+	ELIF "!c1"
+		CharacterIsDead(%Human10)
+	THEN
+		CharacterMoveTo(%Human10,1,0,1)
+	ELIF "!c1"
+		CharacterIsDead(%Human11)
+	THEN
+		CharacterMoveTo(%Human11,1,0,1)
+	ELIF "!c1"
+		CharacterIsDead(%Human12)
+	THEN
+		CharacterMoveTo(%Human12,1,0,1)
+	ELIF "!c1"
+		CharacterIsDead(%Human13)
+	THEN
+		CharacterMoveTo(%Human13,1,0,1)
+	ELIF "!c1"
+		CharacterIsDead(%Human14)
+	THEN
+		CharacterMoveTo(%Human14,1,0,1)
+	ELIF "!c1"
+		CharacterIsDead(%Human15)
+	THEN
+		CharacterMoveTo(%Human15,1,0,1)
+	ELIF "!c1"
+		CharacterIsDead(%Human16)
+	THEN
+		CharacterMoveTo(%Human16,1,0,1)
+	ELIF "!c1"
+		CharacterIsDead(%Human17)
+	THEN
+		CharacterMoveTo(%Human17,1,0,1)
+	ELIF "!c1"
+		CharacterIsDead(%Human18)
+	THEN
+		CharacterMoveTo(%Human18,1,0,1)
+	ELIF "!c1"
+		CharacterIsDead(%Human19)
+	THEN
+		CharacterMoveTo(%Human19,1,0,1)
+	ELIF "!c1"
+		CharacterIsDead(%Human20)
+	THEN
+		CharacterMoveTo(%Human20,1,0,1)
+	ELIF "!c1"
+		CharacterIsDead(%Human21)
+	THEN
+		CharacterMoveTo(%Human21,1,0,1)
+	ELIF "!c1"
+		CharacterIsDead(%Human22)
+	THEN
+		CharacterMoveTo(%Human22,1,0,1)
+	ELIF "!c1"
+		CharacterIsDead(%Human23)
+	THEN
+		CharacterMoveTo(%Human23,1,0,1)
+	ENDIF
+	Sleep(5)
+
+EVENTS
+EVENT PreWar
+ON
+	OnCharacterEvent(__Me,"prewar")
+ACTIONS
+	SetPriority("NearlyAtWar",1600)
+	
+EVENT War
+ON
+	OnCharacterEvent(__Me,"war")
+ACTIONS
+	SetPriority("SearchAndDestroy",1601)

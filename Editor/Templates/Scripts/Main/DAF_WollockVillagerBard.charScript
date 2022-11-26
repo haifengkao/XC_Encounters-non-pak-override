@@ -1,0 +1,59 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter
+CHARACTER:__Me
+CHARACTER:%Friend = DAF_WollockListener_02_939f28b8-8916-4f0c-9263-42c8ad11ba46
+CHARACTER:%Female = Player2_a0af7520-57ac-4f1c-b9d7-197bceebeade
+
+BEHAVIOUR
+
+REACTION Preach, 1900
+USAGE PEACE
+VARS
+	FLOAT:_Time = 0
+	FIXEDSTRING:_Animation = ""
+	FIXEDSTRING:_Text = ""
+ACTIONS
+	DialogStart("DAF_AD_WollockPreacher", __Me)
+	CharacterLookAt(%Friend)
+	GetRandom(_Time,3,11,17,22,35)
+	Sleep(_Time)
+INTERRUPT
+		Reset()
+		
+
+REACTION ReactOnFemale, 2100
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Text
+	FIXEDSTRING:_Reaction
+CHECK "c1"
+	CharacterInTouchRange(__Me, Player2_a0af7520-57ac-4f1c-b9d7-197bceebeade)
+ACTIONS
+	CharacterLookAt(%Female)
+	Sleep(6)
+	CharacterLookAt(%Friend)
+INTERRUPT
+	SetPriority("ReactOnFemale",2000)
+	Reset()
+	
+	
+	
+REACTION ReactOnMale, 2200
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Reaction
+	FIXEDSTRING:_Text
+	FIXEDSTRING:_AnimationStop = ""
+CHECK "c1"
+		CharacterInTouchRange(__Me, Player1_dac1443f-a866-4ab3-b240-e705c0b20ec5)
+ACTIONS
+	GetRandom(_Text,"DAF_Temp_WollocksVillager_Male_01","DAF_WollockCampfire_Listener_03")
+	DisplayText(__Me,_Text,5)
+	GetRandom(_AnimationStop,"StopGuitar")
+	CharacterPlayAnimation(_AnimationStop)
+	Sleep(4)
+INTERRUPT
+	Reset()
+

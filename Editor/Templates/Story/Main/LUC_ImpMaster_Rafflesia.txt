@@ -1,0 +1,35 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+//REGION Dialogue
+DB_PlayerComments("LUC_IM_CommentGarden","LUC_IM_CommentGarden_1_1",1,1);
+DB_PlayerComments("LUC_IM_CommentGarden","LUC_IM_CommentGarden_2_1",2,1);
+DB_PlayerComments("LUC_IM_CommentGarden","LUC_IM_CommentGarden_2_2",2,2);
+//END_REGION
+
+CharacterSetOnStage(CHARACTER_LUC_Rafflesia_Boss_01,0);
+AmbushTrigger(TRIGGER_LUC_Rafflesia_Boss_Initial, ITEM_LUC_RafflesiaAmbushInvisible);
+KBSECTION
+PROC
+ProcLaunchAmbush(TRIGGER_LUC_Rafflesia_Boss_Initial, _player)	
+THEN
+CharacterPlayAnimation(CHARACTER_LUC_Rafflesia_Boss_01,"FX_GP_Earthquake_Prepare","");
+CharacterAppear(CHARACTER_LUC_Rafflesia_Boss_01,1);
+CharacterPlayEffect(CHARACTER_LUC_Rafflesia_Boss_01,"FX_Creatures_Animals_Zombie_Spawn_A");
+CharacterPlayEffect(_Player,"FX_GP_CameraShake_A");
+TimerLaunch("LUC_Rafflesia_Boss_Comment_Timer",5500);
+
+IF
+TimerFinished("LUC_Rafflesia_Boss_Comment_Timer")
+AND
+CharacterGetClosestPlayer(CHARACTER_LUC_Rafflesia_Boss_01,_player)
+AND
+CharacterGetDistanceToCharacter(CHARACTER_LUC_Rafflesia_Boss_01,_player,_playerDistance)
+AND
+_playerDistance<10
+THEN
+Launch_PlayerComment(_Player,"LUC_IM_CommentGarden");
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

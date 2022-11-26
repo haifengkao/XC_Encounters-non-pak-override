@@ -1,0 +1,131 @@
+INIT
+
+ITEM:__Me
+INT:%DoDialog = 1
+INT:%IsOnPedestal = 1
+INT:%IsInBlackCove = 0
+INT:%IsInCellar = 0
+CHARACTER:%Reginald = CYS_Reginald_21e65c11-91d3-424e-8a34-0f997944d3c8
+CHARACTER:%Nick = CYS_BC_HeadlessNick_5fd05542-dcc2-4b2b-b9aa-f0014dcb3904
+
+BEHAVIOUR
+
+REACTION TellStory, 1050
+USAGE PEACE
+VARS
+	FLOAT:_Dist
+ACTIONS
+	IF "!c1&c2&c3&c4&!c5"
+		IsInDialog(__Me)
+		CanSee(__Me, %Nick)
+		GetDistance(_Dist, __Me, %Nick)
+		IsLessThen(_Dist, 10.0)
+		CharacterIsDead(%Nick)
+	THEN
+		DialogStart("CYS_AD_NickHeadSeesBody",__Me)
+	ELIF "!c1&c2&c3&c4&c5"
+		IsInDialog(__Me)
+		CanSee(__Me, %Nick)
+		GetDistance(_Dist, __Me, %Nick)
+		IsLessThen(_Dist, 10.0)
+		CharacterIsDead(%Nick)
+	THEN
+		DialogStart("CYS_AD_NickHeadSeesDeadBody",__Me)
+		Sleep(5)
+		PlayEffectAt(__Me, "FX_GP_TeleportSmoke_A")
+		ItemSetOnStage(__Me, 0)
+	ELIF "!c1&!c2&!c3&c4"
+		IsInDialog(__Me)
+		CharacterIsDead(%Reginald)
+		IsInDialog(%Reginald)
+		IsEqual(%IsOnPedestal, 1)
+	THEN
+		DialogStart("CYS_AD_NickHeadShow",__Me)
+	ELIF "!c1&c2&c3"
+		IsInDialog(__Me)
+		CharacterIsDead(%Reginald)
+		IsEqual(%IsOnPedestal, 1)
+	THEN
+		DialogStart("CYS_AD_NickHeadOnPedestalRegiDead", __Me)
+	ELIF "!c1&c2&c3&c4"
+		IsInDialog(__Me)
+		IsEqual(%IsInBlackCove, 0)
+		IsEqual(%IsOnPedestal, 0)
+		IsEqual(%IsInCellar, 0)
+	THEN
+		DialogStart("CYS_AD_NickHeadOutsideBlackCove", __Me)
+	ELIF "!c1&c2"
+		IsInDialog(__Me)
+		IsEqual(%IsInCellar, 1)
+	THEN
+		DialogStart("CYS_AD_NickHeadInCellar", __Me)
+	ELIF "!c1&c2"
+		IsInDialog(__Me)
+		IsEqual(%IsInBlackCove, 1)
+	THEN
+		DialogStart("CYS_AD_NickHeadInBlackCove", __Me)
+	ENDIF
+	Sleep(15)
+	
+REACTION OnSurface, 1100
+USAGE PEACE
+CHECK "c1|c2|c3|c4|c5|c6|c7|c8"
+	IsInSurface(__Me, SURFACE:BloodElectrified)
+	IsInSurface(__Me, SURFACE:CloudExplosion)
+	IsInSurface(__Me, SURFACE:CloudPoison)
+	IsInSurface(__Me, SURFACE:CloudStatic)
+	IsInSurface(__Me, SURFACE:Electrified)
+	IsInSurface(__Me, SURFACE:Fire)
+	IsInSurface(__Me, SURFACE:Lava)
+	IsInSurface(__Me, SURFACE:Ooze)
+ACTIONS
+	DialogStart("CYS_AD_NickHeadInSurface", __Me)
+	Sleep(10)
+	
+EVENTS
+
+EVENT attacked
+ON
+	OnDamage(_,_,_,_)
+ACTIONS
+	IF "c1"
+		IsEqual(%IsOnPedestal, 0)
+	THEN
+		DialogStart("CYS_AD_HeadlessNickHurt", __Me)
+	ENDIF
+
+EVENT onPedestal
+ON
+	OnGlobalEventCleared("CYS_HN_HeadOnPedestal")
+ACTIONS
+	Set(%IsOnPedestal, 0)
+	
+EVENT offPedestal
+ON
+	OnGlobalEventSet("CYS_HN_HeadOnPedestal")
+ACTIONS
+	Set(%IsOnPedestal, 1)
+	
+EVENT onBlackCove
+ON
+	OnGlobalEventCleared("GLO_PlayerInBlackCove")
+ACTIONS
+	Set(%IsInBlackCove, 0)
+	
+EVENT offBlackCove
+ON
+	OnGlobalEventSet("GLO_PlayerInBlackCove")
+ACTIONS
+	Set(%IsInBlackCove, 1)
+
+EVENT onCellar
+ON
+	OnGlobalEventCleared("CYS_HN_HeadAtCellar")
+ACTIONS
+	Set(%IsInCellar, 0)
+	
+EVENT offCellar
+ON
+	OnGlobalEventSet("CYS_HN_HeadAtCellar")
+ACTIONS
+	Set(%IsInCellar, 1)

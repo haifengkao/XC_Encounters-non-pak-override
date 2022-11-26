@@ -1,0 +1,118 @@
+#TEMPLATE "_SKILL_Base" : Target_EnemyShockingTouch
+
+INIT
+CHARACTER:__Me
+FLOAT:%SkillTargetScore_Target_EnemyShockingTouch=-1000000
+// [GLOBAL_VARS]
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_Target_EnemyShockingTouch
+VARS
+ON
+	OnFunction("CalculateScore_Target_EnemyShockingTouch")
+ACTIONS
+	Set(%SkillTargetScore_Target_EnemyShockingTouch, -1000000)
+	// [GLOBAL_ACTIONS]
+	// [~GLOBAL_ACTIONS]
+	// [CALC_CHECK]
+	IterateCharactersInCombat(__Me, "CalculateTarget_Target_EnemyShockingTouch", Random, Vitality)
+	// [~CALC_CHECK]
+	IF "!c1"
+		IsEqual(%SkillTargetChar_Target_EnemyShockingTouch, null)
+	THEN
+		Add(%ActionScore_Target_EnemyShockingTouch, %SkillTargetScore_Target_EnemyShockingTouch)
+	ELSE
+		Set(%ActionScore_Target_EnemyShockingTouch, 0)
+	ENDIF
+	
+// Calculate the character we should attack
+EVENT CalculateTarget_Target_EnemyShockingTouch
+VARS	
+	CHARACTER:_Char
+	FLOAT:_Score=0
+	// [CALC_TARGET_VARS]
+	FLOAT:_DistanceToChar
+	FLOAT:_MinWeaponRange
+	FLOAT:_MaxWeaponRange
+	FLOAT:_DistanceScore
+	CHARACTERTEMPLATE:_Temp	
+	// [~CALC_TARGET_VARS]
+ON
+	OnIterateCharacter(_Char, "CalculateTarget_Target_EnemyShockingTouch")	
+ACTIONS
+	Set(_Score, 0)
+	// [CALC_TARGET_PRE_ACTIONS]
+	// [~CALC_TARGET_PRE_ACTIONS]
+	
+	// [CALC_TARGET_CHECK]
+	IF "(!c1&!c2&!c3)&(!((((c4)|c5)|c6)|c7))&(c8)&(c9&c10)&c11&!(c12|c13|c14|c15|c16)"
+	    CharacterIsDead(_Char) // c1
+	    CharacterHasStatus(_Char, INVISIBLE) // c2
+	    CharacterHasStatus(_Char, SNEAKING) // c3
+	    CharacterHasStatus(_Char, KNOCKED_DOWN) // c4
+	    CharacterHasStatus(_Char, PETRIFIED) // c5
+	    CharacterHasStatus(_Char, STUNNED) // c6
+	    CharacterHasStatus(_Char, FROZEN) // c7
+	    CharacterIsEnemy(__Me, _Char) // c8
+	    CharacterGetWeaponRange(_MinWeaponRange, _MaxWeaponRange, __Me) // c9
+	    GetDistance(_DistanceToChar, __Me, _Char) // c10
+		CharacterGetTemplate(_Char, _Temp) //c9
+		IsEqual(_Temp, CHARACTERTEMPLATE:Env_Evil_Mushroom_B_e3f8248f-be02-4a55-a610-628fe0132971) //c10
+		IsEqual(_Temp, CHARACTERTEMPLATE:Env_Evil_Mushroom_B_Summon_Air_aabfa6f5-5dd1-4e4e-b72b-a2faf20a9c5b) //c11
+		IsEqual(_Temp, CHARACTERTEMPLATE:Env_Evil_Mushroom_B_Summon_Fire_c7087e6b-745f-4150-9c94-99131692cc85) //c12
+		IsEqual(_Temp, CHARACTERTEMPLATE:Env_Evil_Mushroom_B_Summon_Poison_056fe4f6-8483-4261-87fd-105572fdc124) //c13
+		IsEqual(_Temp, CHARACTERTEMPLATE:Env_Evil_Mushroom_B_Summon_Water_c94de303-d3d1-4d09-b4ef-870624feef67) //c14			
+	THEN
+	    IF "(c1)"
+	        CharacterHasStatus(_Char, WET) // c1
+	    THEN
+	        Add(_Score, 5.0)
+	    ENDIF
+	    // Hostile count score calculation
+	    Add(_Score, 10.0) // HostileWeight
+	    
+	    // Range score calculation
+	    Set(_DistanceScore, _DistanceToChar)
+	    IF "(c1)"
+	        IsGreaterThen(_DistanceScore, _MaxWeaponRange) // c1
+	    THEN
+	        Subtract(_DistanceScore, _MaxWeaponRange)
+	        Multiply(_DistanceScore, -1.0)
+	    ELIF "(c1)"
+	        IsLessThen(_DistanceScore, _MinWeaponRange) // c1
+	    THEN
+	        Subtract(_DistanceScore, _MinWeaponRange)
+	        Multiply(_DistanceScore, 1.0)
+	    ELSE 
+	        Set(_DistanceScore, 0.0)
+	    ENDIF
+	    Add(_Score, _DistanceScore)
+	    
+	    // Can see score calculation
+	    IF "!c1"
+	    	CharacterCanSee(__Me, _Char)
+	    THEN
+	    	Add(_Score, -10.0)
+	    ENDIF
+	    
+	    IF "c1"
+	    	IsGreaterThen(_Score, %SkillTargetScore_Target_EnemyShockingTouch)
+	    THEN
+	    	Set(%SkillTargetChar_Target_EnemyShockingTouch, _Char)
+	    	Set(%SkillTargetScore_Target_EnemyShockingTouch, _Score)
+	    ENDIF	
+	ENDIF
+	// [~CALC_TARGET_CHECK]
+	
+	
+	
+	
+	
+	
+	

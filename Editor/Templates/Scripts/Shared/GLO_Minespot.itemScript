@@ -1,0 +1,44 @@
+INIT
+ITEM:__Me
+EXTERN INT:%Amount=5
+EXTERN STRING:%Ore = "LOOT_Ore_BlackRock_A_b9db80ea-0844-4b89-8074-a036b5034ab8"
+EXTERN FIXEDSTRING:%OreMinedText = "GEN_BlackOreReceived"
+CHARACTER:%Miner=null
+
+
+EVENTS
+
+EVENT Mine
+VARS
+CHARACTER:_Char
+ON
+	OnUseItem(_Char,__Me)
+ACTIONS
+	IF "c1"
+		IsLessThen(%Amount,1)
+	THEN
+		DisplayText(__Me,"GLO_MinespotDepleted",3)
+	ELIF "c1"
+		IsEqual(%Miner,null)
+	THEN
+		CharacterItemEvent(_Char,__Me,"MinespotUsed")
+		Set(%Miner,_Char)
+	ELIF "!c1"
+		IsEqual(%Miner,_Char)
+	THEN
+		DisplayText(__Me,"GLO_MinespotInUse",3)
+	ENDIF
+	
+EVENT MineCompletedSuccesfully
+ON
+	OnItemEvent(__Me,"MineCompletedSuccesfully")
+ACTIONS
+	Subtract(%Amount,1)
+	DisplayText(%Miner,%OreMinedText,2)
+	Set(%Miner,null)
+	
+EVENT MineFailed
+ON
+	OnItemEvent(__Me,"MineFailed")
+ACTIONS
+	Set(%Miner,null)

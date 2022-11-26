@@ -1,0 +1,123 @@
+#TEMPLATE "_SKILL_Base" : Heal_RegenerateStart
+
+INIT
+CHARACTER:__Me
+FLOAT:%SkillTargetScore_Heal_RegenerateStart=-1000000
+// [GLOBAL_VARS]
+INT:%ClassScore_Heal_RegenerateStart
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_Heal_RegenerateStart
+VARS
+	// [CALC_VARS]
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_Heal_RegenerateStart")
+ACTIONS
+	Set(%SkillTargetScore_Heal_RegenerateStart, -1000000)
+
+	// [CALC_ACTIONS_PRE]
+	Set(%ClassScore_Heal_RegenerateStart, 0)
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	IterateCharactersInCombat(__Me, "CalculateTarget_Heal_RegenerateStart", Random, Vitality)
+	IF "!c1"
+		IsEqual(%SkillTargetChar_Heal_RegenerateStart, null)
+	THEN
+		Add(%ActionScore_Heal_RegenerateStart, %SkillTargetScore_Heal_RegenerateStart)
+	ENDIF
+	// [~CALC_ACTIONS]
+
+	
+
+	
+// Calculate the character we should attack
+EVENT CalculateTarget_Heal_RegenerateStart
+VARS	
+	CHARACTER:_Char
+	// [CALC_TARGET_VARS]
+	INT:_ClassScore_Heal_RegenerateStart
+	FLOAT:_StatVitality
+	FLOAT:_Score
+	FLOAT:_SkillRangeMin
+	FLOAT:_SkillRangeMax
+	FLOAT:_DistanceToChar
+	FLOAT:_DistanceScore
+	// [~CALC_TARGET_VARS]
+ON
+	OnIterateCharacter(_Char, "CalculateTarget_Heal_RegenerateStart")	
+ACTIONS
+	// [CALC_CHAR_TARGET_ACTIONS_PRE]
+	Set(_ClassScore_Heal_RegenerateStart, %ClassScore_Heal_RegenerateStart)
+	Set(_Score, 0.0)
+	// [~CALC_CHAR_TARGET_ACTIONS_PRE]
+	// [CALC_CHAR_TARGET_ACTIONS]
+	IF "(!c1&!c2&!c3&!c4&!c5)&(c6)&(((c7&c8))|(c9&c10))&(!((((c11&c12))|(c13))|(c14)))&(c15)&(c16)&(c17)"
+	    CharacterIsDead(_Char) // c1
+	    CharacterHasStatus(_Char, INVISIBLE) // c2
+	    CharacterHasStatus(_Char, SNEAKING) // c3
+	   	CharacterHasStatus(_Char, CHARMED) // c4			ADDED BY EDOUARD ON 19/6/2015 PLEASE DO NOT OVERWRITE
+	    CharacterHasTalent(_Char, Zombie)	//c5			ADDED BY EDOUARD ON 02/6/2015 PLEASE DO NOT OVERWRITE
+	    CharacterIsBetterOrEqualClass(_Char, %ClassScore_Heal_RegenerateStart, _ClassScore_Heal_RegenerateStart, 5, 1, 3, 4, 2) // c6
+	    CharacterGetStat(_StatVitality, _Char, Vitality) // c7
+	    IsLessThen(_StatVitality, 0.6) // c8
+	    CharacterGetStat(_StatVitality, _Char, Vitality) // c9
+	    IsLessThen(_StatVitality, 0.3) // c10
+	    CharacterGetStat(_StatVitality, _Char, Vitality) // c11
+	    IsGreaterThen(_StatVitality, 0.8) // c12
+	    CharacterHasStatus(_Char, HEALING) // c13
+	    CharacterHasStatus(_Char, CHARMED) // c14
+	    CharacterIsAlly(__Me, _Char) // c15
+	    CharacterGetSkillRange(_SkillRangeMin, _SkillRangeMax, __Me, Heal_RegenerateStart) // c16
+	    GetDistance(_DistanceToChar, __Me, _Char) // c17
+	THEN
+	    Set(%ClassScore_Heal_RegenerateStart, _ClassScore_Heal_RegenerateStart)
+	    // Hostile count score calculation
+	    Add(_Score, 10.0) // HostileWeight
+	    
+	    // Range score calculation
+	    Set(_DistanceScore, _DistanceToChar)
+	    IF "(c1)"
+	        IsGreaterThen(_DistanceScore, _SkillRangeMax) // c1
+	    THEN
+	        Subtract(_DistanceScore, _SkillRangeMax)
+	        Multiply(_DistanceScore, -1.0)
+	    ELIF "(c1)"
+	        IsLessThen(_DistanceScore, _SkillRangeMin) // c1
+	    THEN
+	        Subtract(_DistanceScore, _SkillRangeMin)
+	        Multiply(_DistanceScore, 1.0)
+	    ELSE 
+	        Set(_DistanceScore, 0.0)
+	    ENDIF
+	    Add(_Score, _DistanceScore)
+	    
+	    // Can see score calculation
+	    IF "!c1"
+	    	CharacterCanSee(__Me, _Char)
+	    THEN
+	    	Add(_Score, -10.0)
+	    ENDIF
+	    
+	    IF "c1"
+	    	IsGreaterThen(_Score, %SkillTargetScore_Heal_RegenerateStart)
+	    THEN
+	    	Set(%SkillTargetChar_Heal_RegenerateStart, _Char)
+	    	Set(%SkillTargetScore_Heal_RegenerateStart, _Score)
+	    ENDIF	
+	ENDIF
+	// [~CALC_CHAR_TARGET_ACTIONS]
+	
+	
+	
+	
+	
+	
+	
+	

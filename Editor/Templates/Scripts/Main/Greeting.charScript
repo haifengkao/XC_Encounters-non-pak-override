@@ -1,0 +1,21 @@
+#INCLUDE Base
+INIT
+USING Base
+
+BEHAVIOUR
+
+REACTION Greeting,1000
+USAGE ALL
+ACTIONS
+	DisplayText(CHARACTER:Greeting_B_56cc927e-a9d1-4a7f-a077-9d7ebdcd2d5b,"LOOK AT ME")
+	CharacterLookAt(CHARACTER:Greeting_B_56cc927e-a9d1-4a7f-a077-9d7ebdcd2d5b)
+	Sleep(3)
+	DisplayText(ITEM:CONT_Crate_A_000_e487b0d3-3dd4-4297-b6d2-b05c9aeecc99,"LOOK AT ME")
+	CharacterLookAt(ITEM:CONT_Crate_A_000_e487b0d3-3dd4-4297-b6d2-b05c9aeecc99)
+	Sleep(3)
+	CharacterLookAt(TRIGGER:Point_000_f46bcd8b-d65c-47c1-b24a-529fa98acc3f)	
+	Sleep(3)
+	DialogStart("Greeting_AD",CHARACTER:Greeting_A_aa6deb90-e9dd-4677-8b2e-5529225404d8,CHARACTER:Greeting_A_aa6deb90-e9dd-4677-8b2e-5529225404d8,CHARACTER:Greeting_A_aa6deb90-e9dd-4677-8b2e-5529225404d8)	
+	Sleep(5)
+	DialogStart("Greeting_AD",CHARACTER:Greeting_A_aa6deb90-e9dd-4677-8b2e-5529225404d8,CHARACTER:Greeting_B_56cc927e-a9d1-4a7f-a077-9d7ebdcd2d5b,CHARACTER:Greeting_C_c7da6d8f-260a-4784-8521-6a23b9481402)
+	CharacterPlayAnimation("idle1")	

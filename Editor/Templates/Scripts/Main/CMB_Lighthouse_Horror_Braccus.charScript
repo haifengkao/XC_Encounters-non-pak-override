@@ -1,0 +1,60 @@
+#INCLUDE Base
+
+INIT
+USING Base
+CHARACTER:__Me
+CHARACTER:%persTarget
+FLOAT3:%startPos
+//INT:%teleportBack = 0
+INT:%gaveLHReaction = 0
+
+BEHAVIOUR
+
+// attack but only if anyone comes too close
+
+REACTION AttackNearest,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+CHECK "c1"
+	CharacterGet(_Target,__Me,4,Lowest,Vitality,Enemy,null,null,null,__Me)		
+ACTIONS
+	CharacterAttack(_Target)
+
+REACTION AttackWhenDying,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_hp
+	FLOAT:_minRange
+	FLOAT:_maxRange
+CHECK "c1&c2&c3&c4&c5"
+	CharacterGetStat(_hp,__Me,Vitality)
+	IsLessThen(_hp,0.4)
+	CharacterCanCast(__Me,Projectile_EnemyPoisonball,1)
+	CharacterGet(_Target,__Me,50,Lowest,Vitality,Enemy,null,null,null,__Me)
+	CharacterGetSkillRange(_minRange,_maxRange,_Target,Projectile_EnemyPoisonball)
+ACTIONS
+	IF "c1|c2"
+		IsEqual(%persTarget,null)
+		CharacterIsDead(%persTarget)
+	THEN
+		Set(%persTarget,_Target)
+	ENDIF
+	IF "c1"
+		CharacterCanCast(__Me,Projectile_EnemyPoisonball,0)
+	THEN
+		CharacterMoveInRange(%persTarget,0,_maxRange)
+		CharacterUseSkill(Projectile_EnemyPoisonball,%persTarget)
+	ENDIF
+	CharacterEndTurn()
+INTERRUPT
+	Reset()
+	
+EVENTS
+EVENT LighthouseHorrorAddSkill
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill(Projectile_EnemyPoisonball)
+	GetPosition(__Me,%startPos)

@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<palette xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <palettes />
+  <objectids>
+    <guid>4150dfc4-55df-4733-ad6a-ed3076e2e313</guid>
+    <guid>7cab2526-85f1-46bb-819a-57072cc49980</guid>
+    <guid>cf78422b-aa06-4312-8f92-d95d9fa841f1</guid>
+    <guid>651ddb97-cb8a-402f-a76e-86f096085740</guid>
+    <guid>a46861cc-5573-4f46-a23b-aa52c1baec98</guid>
+    <guid>dfbb4f32-3875-4a36-adc7-52e31a59fb1f</guid>
+    <guid>5163b12b-6e2c-4de3-bcd4-59e3b931bf5a</guid>
+    <guid>7eb1a99a-a286-45f9-b579-88948f01320e</guid>
+    <guid>7d686da4-749d-4034-a7b0-a044436051f7</guid>
+    <guid>0d05720b-4bbf-434e-ac1f-e00974b67f9a</guid>
+    <guid>6766ae13-4de6-46be-a6a1-faaffebf4a6a</guid>
+    <guid>d8c5bb06-83ad-42ab-856c-0f253342c28b</guid>
+  </objectids>
+  <name>Atmosphere</name>
+</palette>

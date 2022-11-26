@@ -1,0 +1,370 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+ItemSetOnstage(ITEM_CYS_MD_Red1Air,0);
+ItemSetOnstage(ITEM_CYS_MD_Red1Water,0);
+ItemSetOnstage(ITEM_CYS_MD_Red1Earth,0);
+ItemSetOnstage(ITEM_CYS_MD_Red1Fire,0);
+ItemSetOnstage(ITEM_CYS_MD_Red2Air,0);
+ItemSetOnstage(ITEM_CYS_MD_Red2Water,0);
+ItemSetOnstage(ITEM_CYS_MD_Red2Earth,0);
+ItemSetOnstage(ITEM_CYS_MD_Red2Fire,0);
+ItemSetOnstage(ITEM_CYS_MD_Hatch1,0);
+ItemSetOnstage(ITEM_CYS_MD_Hatch2,0);
+CharacterSetOnStage(CHARACTER_CYS_MD_MirrorPlayer1,0);
+CharacterSetOnStage(CHARACTER_CYS_MD_MirrorPlayer2,0);
+ItemToCharacter(ITEM_Quest_CYS_QueenPendant_000, CHARACTER_CYS_MD_MirrorPlayer2);
+ItemToCharacter(ITEM_Quest_CYS_KingPendant_000, CHARACTER_CYS_MD_MirrorPlayer1);
+ProcTriggerRegisterForPlayers(TRIGGER_CYS_MD_FirstDungeonComment);
+ProcTriggerRegisterForPlayers(TRIGGER_CYS_MD_SecondDungeonComment);
+DB_CYS_MD_CheckUpdate(TRIGGER_CYS_MD_SecondDungeonComment);
+DB_CYS_MD_CheckUpdate(TRIGGER_CYS_MD_FirstDungeonComment);
+DB_CYS_MD_FirstStep(0);
+DB_CYS_MD_SecondStep(0);
+DB_OneShotPlayerTrigger(TRIGGER_CYS_MirrorDungeonStartQuest);
+DB_OneShotPlayerTrigger(TRIGGER_CYS_MirrorDungeonStartQuest2);
+DB_CYS_MirrorDungeonStartQuest(TRIGGER_CYS_MirrorDungeonStartQuest);
+DB_CYS_MirrorDungeonStartQuest(TRIGGER_CYS_MirrorDungeonStartQuest2);
+
+DB_CYS_MD_FirstLight(ITEM_CYS_MD_Red1Air, ITEM_CYS_MD_Green1Air, 3);
+DB_CYS_MD_FirstLight(ITEM_CYS_MD_Red1Water, ITEM_CYS_MD_Green1Water, 2);
+DB_CYS_MD_FirstLight(ITEM_CYS_MD_Red1Earth, ITEM_CYS_MD_Green1Earth, 0);
+DB_CYS_MD_FirstLight(ITEM_CYS_MD_Red1Fire, ITEM_CYS_MD_Green1Fire, 1);
+
+DB_CYS_MD_SecondLight(ITEM_CYS_MD_Red2Air, ITEM_CYS_MD_Green2Air, 1);
+DB_CYS_MD_SecondLight(ITEM_CYS_MD_Red2Water, ITEM_CYS_MD_Green2Water, 0);
+DB_CYS_MD_SecondLight(ITEM_CYS_MD_Red2Earth, ITEM_CYS_MD_Green2Earth, 3);
+DB_CYS_MD_SecondLight(ITEM_CYS_MD_Red2Fire, ITEM_CYS_MD_Green2Fire, 2);
+
+DB_CYS_MD_FirstPlatform(ITEM_CYS_MD_Lever2Fire, 3, ITEM_CYS_MD_Hatch1);
+DB_CYS_MD_FirstPlatform(ITEM_CYS_MD_Lever2Air, 2, ITEM_CYS_MD_Hatch1);
+DB_CYS_MD_FirstPlatform(ITEM_CYS_MD_Lever2Water, 0, ITEM_CYS_MD_Hatch1);
+DB_CYS_MD_FirstPlatform(ITEM_CYS_MD_Lever2Earth, 1, ITEM_CYS_MD_Hatch1);
+
+DB_CYS_MD_SecondPlatform(ITEM_CYS_MD_Lever1Earth, 0, ITEM_CYS_MD_Hatch2);
+DB_CYS_MD_SecondPlatform(ITEM_CYS_MD_Lever1Water, 1, ITEM_CYS_MD_Hatch2);
+DB_CYS_MD_SecondPlatform(ITEM_CYS_MD_Lever1Fire, 3, ITEM_CYS_MD_Hatch2);
+DB_CYS_MD_SecondPlatform(ITEM_CYS_MD_Lever1Air, 2, ITEM_CYS_MD_Hatch2);
+
+DB_CYS_MD_Turret1(ITEM_CYS_MD_Gargoyle1Air);
+DB_CYS_MD_Turret1(ITEM_CYS_MD_Gargoyle1Water);
+DB_CYS_MD_Turret1(ITEM_CYS_MD_Gargoyle1Earth);
+DB_CYS_MD_Turret1(ITEM_CYS_MD_Gargoyle1Fire);
+
+DB_CYS_MD_Turret2(ITEM_CYS_MD_Gargoyle2Air);
+DB_CYS_MD_Turret2(ITEM_CYS_MD_Gargoyle2Water);
+DB_CYS_MD_Turret2(ITEM_CYS_MD_Gargoyle2Earth);
+DB_CYS_MD_Turret2(ITEM_CYS_MD_Gargoyle2Fire);
+
+TriggerRegisterForItems(TRIGGER_CYS_MD_Pendant1Place_000);
+TriggerRegisterForItems(TRIGGER_CYS_MD_Pendant2Place);
+
+DB_CYS_MD_Pedestal(ITEM_CYS_MD_Pedestal1,ITEM_Quest_CYS_QueenPendant_000, TRIGGER_CYS_MD_Pendant1Place_000);
+DB_CYS_MD_Pedestal(ITEM_CYS_MD_Pedestal2,ITEM_Quest_CYS_KingPendant_000, TRIGGER_CYS_MD_Pendant2Place);
+KBSECTION
+IF
+CharacterUsedSkill(CHARACTER_Player1, _Skill, _)
+AND
+NOT DB_Dead(CHARACTER_CYS_MD_MirrorPlayer1)
+AND
+NOT	DB_CYS_MD_SkillsMirror1((STRING)_Skill)
+THEN
+CharacterAddSkill(CHARACTER_CYS_MD_MirrorPlayer1, _Skill);
+DB_CYS_MD_SkillsMirror1(_Skill);
+
+IF
+CharacterUsedSkill(CHARACTER_Player2, _Skill, _)
+AND
+NOT DB_Dead(CHARACTER_CYS_MD_MirrorPlayer2)
+AND
+NOT	DB_CYS_MD_SkillsMirror2((STRING)_Skill)
+THEN
+CharacterAddSkill(CHARACTER_CYS_MD_MirrorPlayer2, _Skill);
+DB_CYS_MD_SkillsMirror2(_Skill);
+
+IF
+CharacterItemEvent(_Player, _Item, _String)
+AND
+DB_CYS_MD_FirstPlatform(_Item, _Step, _Hatch)
+AND
+DB_CYS_MD_FirstLight(_Red, _Green, _Step)
+AND
+NOT _Hatch.isOver()
+AND
+DB_CYS_MD_FirstStep(_CurrentStep)
+AND
+_Step != _CurrentStep
+THEN
+Proc_CYS_MD_SwitchFirstLight(_CurrentStep);
+NOT DB_CYS_MD_FirstStep(_CurrentStep);
+DB_CYS_MD_FirstStep(0);
+PROC_CommentHiddenEffect(_Player);
+
+IF
+CharacterItemEvent(_Player, _Item, _String)
+AND
+DB_CYS_MD_FirstPlatform(_Item, _Step, _Hatch)
+AND
+DB_CYS_MD_FirstLight(_Red, _Green, _Step)
+AND
+NOT _Hatch.isOver()
+AND
+DB_CYS_MD_FirstStep(_CurrentStep)
+AND
+_Step == _CurrentStep
+AND
+IntegerSum(_CurrentStep, 1, _NewStep)
+THEN
+ItemSetOnstage(_Red, 1);
+ItemSetOnstage(_Green, 0);
+NOT DB_CYS_MD_FirstStep(_CurrentStep);
+DB_CYS_MD_FirstStep(_NewStep);
+Proc_CYS_MD_CheckIfFirstDone();
+PROC_CommentHiddenEffect(_Player);
+
+PROC
+Proc_CYS_MD_CheckIfFirstDone()
+AND
+DB_CYS_MD_FirstStep(_CurrentStep)
+AND
+_CurrentStep == 4
+THEN
+ITEM_CYS_MD_Hatch1.isOver();
+CharacterAppear(CHARACTER_CYS_MD_MirrorPlayer1, 1);
+
+IF
+CharacterDied(CHARACTER_CYS_MD_MirrorPlayer1)
+THEN
+ItemSetOnstage(ITEM_CYS_MD_Hatch1,1);
+
+
+PROC
+Proc_CYS_MD_SwitchFirstLight((INTEGER)_Treshold)
+AND
+DB_CYS_MD_FirstLight(_Red, _Green, _Step)
+AND
+_Step < _Treshold
+THEN
+ItemSetOnstage(_Red, 0);
+ItemSetOnstage(_Green, 1);
+
+IF
+CharacterItemEvent(_Player, _Item, _String)
+AND
+DB_CYS_MD_SecondPlatform(_Item, _Step, _Hatch)
+AND
+DB_CYS_MD_SecondLight(_Red, _Green, _Step)
+AND
+NOT _Hatch.isOver()
+AND
+DB_CYS_MD_SecondStep(_CurrentStep)
+AND
+_Step != _CurrentStep
+THEN
+Proc_CYS_MD_SwitchSecondLight(_CurrentStep);
+NOT DB_CYS_MD_SecondStep(_CurrentStep);
+DB_CYS_MD_SecondStep(0);
+PROC_CommentHiddenEffect(_Player);
+
+IF
+CharacterItemEvent(_Player, _Item, _String)
+AND
+DB_CYS_MD_SecondPlatform(_Item, _Step, _Hatch)
+AND
+DB_CYS_MD_SecondLight(_Red, _Green, _Step)
+AND
+NOT _Hatch.isOver()
+AND
+DB_CYS_MD_SecondStep(_CurrentStep)
+AND
+_Step == _CurrentStep
+AND
+IntegerSum(_CurrentStep, 1, _NewStep)
+THEN
+ItemSetOnstage(_Red, 1);
+ItemSetOnstage(_Green, 0);
+NOT DB_CYS_MD_SecondStep(_CurrentStep);
+DB_CYS_MD_SecondStep(_NewStep);
+Proc_CYS_MD_CheckIfSecondDone();
+PROC_CommentHiddenEffect(_Player);
+
+PROC
+Proc_CYS_MD_CheckIfSecondDone()
+AND
+DB_CYS_MD_SecondStep(_CurrentStep)
+AND
+_CurrentStep == 4
+THEN
+ITEM_CYS_MD_Hatch2.isOver();
+CharacterAppear(CHARACTER_CYS_MD_MirrorPlayer2, 1);
+
+IF
+CharacterDied(CHARACTER_CYS_MD_MirrorPlayer2)
+THEN
+ItemSetOnstage(ITEM_CYS_MD_Hatch2,1);
+
+IF
+CharacterUsedItem(_Player,_Pedestal)
+AND
+DB_CYS_MD_Pedestal(_Pedestal, _Pendant, _Trigger)
+AND
+ItemIsInPartyInventory(_Pendant,_Player,1,1)
+AND
+ItemGetHandle(_Pendant,_PendantHandle)
+AND
+TriggerGetPosition(_Trigger,_X,_Y,_Z)
+THEN
+ItemHandleToTransform(_PendantHandle,_X,_Y,_Z,0.0,0.0,0.0,1,CHARACTER_NULL);
+PROC_CheckMirrorDungeonPendants();
+
+IF
+ItemEnteredTrigger(_Pendant, _Trigger, _)
+AND
+DB_CYS_MD_Pedestal(_Pedestal, _Pendant, _Trigger)
+THEN
+PROC_CheckMirrorDungeonPendants();
+
+PROC
+PROC_CheckMirrorDungeonPendants()
+AND
+ItemIsInTrigger(ITEM_Quest_CYS_QueenPendant_000, TRIGGER_CYS_MD_Pendant1Place_000, 1)
+AND
+ItemIsInTrigger(ITEM_Quest_CYS_KingPendant_000, TRIGGER_CYS_MD_Pendant2Place, 1)
+THEN
+ItemSetEvent(ITEM_CYS_MD_MagicWall1A, "shutDown");
+ItemSetEvent(ITEM_CYS_MD_MagicWall2A, "shutDown");
+QuestUpdate("CYS_MirrorDungeon", "Close");
+QuestClose("CYS_MirrorDungeon");
+
+PROC
+PROC_CheckMirrorDungeonPendants()
+AND
+ItemIsInTrigger(ITEM_Quest_CYS_KingPendant_000, TRIGGER_CYS_MD_Pendant2Place, 1)
+AND
+NOT DB_CYS_MD_KingHandle(_)
+AND
+ItemPlayLoopEffect(ITEM_Quest_CYS_KingPendant_000, "FX_GP_GoldSparkles_A", _Handle)
+THEN
+DB_CYS_MD_KingHandle(_Handle);
+
+PROC
+PROC_CheckMirrorDungeonPendants()
+AND
+ItemIsInTrigger(ITEM_Quest_CYS_QueenPendant_000, TRIGGER_CYS_MD_Pendant1Place_000, 1)
+AND
+NOT DB_CYS_MD_QueenHandle(_)
+AND
+ItemPlayLoopEffect(ITEM_Quest_CYS_QueenPendant_000, "FX_GP_GoldSparkles_A", _Handle)
+THEN
+DB_CYS_MD_QueenHandle(_Handle);
+
+IF
+ItemLeftTrigger(ITEM_Quest_CYS_QueenPendant_000, TRIGGER_CYS_MD_Pendant1Place_000, _)
+AND
+DB_CYS_MD_QueenHandle(_Handle)
+THEN
+StopLoopEffect(_Handle);
+NOT DB_CYS_MD_QueenHandle(_Handle);
+
+IF
+ItemLeftTrigger(ITEM_Quest_CYS_KingPendant_000, TRIGGER_CYS_MD_Pendant2Place, _)
+AND
+DB_CYS_MD_KingHandle(_Handle)
+THEN
+StopLoopEffect(_Handle);
+NOT DB_CYS_MD_KingHandle(_Handle);
+
+PROC
+Proc_CYS_MD_SwitchFirstLight((INTEGER)_Treshold)
+AND
+DB_CYS_MD_FirstLight(_Red, _Green, _Step)
+AND
+_Step < _Treshold
+THEN
+ItemSetOnstage(_Red, 0);
+ItemSetOnstage(_Green, 1);	
+
+IF
+ItemEvent(_Turret, "fire")
+AND
+DB_CYS_MD_Turret1(_Turret)
+AND
+DB_InRegion(_Player, TRIGGER_CYS_MD_FirstDungeonComment)
+AND	
+_Player.DB_IsPlayer()
+THEN
+CharacterDisplayText(_Player, "GLO_SomeoneActivated");
+
+IF
+ItemEvent(_Turret, "fire")
+AND
+DB_CYS_MD_Turret2(_Turret)
+AND
+DB_InRegion(_Player, TRIGGER_CYS_MD_SecondDungeonComment)
+AND	
+_Player.DB_IsPlayer()
+THEN
+CharacterDisplayText(_Player, "GLO_SomeoneActivated");
+
+PROC
+ProcOneShotTriggerEntered(_Player,_Trigger)
+AND
+DB_CYS_MirrorDungeonStartQuest(_Trigger)
+THEN
+NOT DB_OneShotPlayerTrigger(TRIGGER_CYS_MirrorDungeonStartQuest);
+NOT DB_OneShotPlayerTrigger(TRIGGER_CYS_MirrorDungeonStartQuest2);
+QuestAdd("CYS_MirrorDungeon");
+QuestUpdate("CYS_MirrorDungeon", "StartNoSkeletons");
+
+IF
+CharacterEnteredTrigger(_Player, _Trigger)
+AND
+DB_CYS_MD_CheckUpdate(_Trigger)
+AND
+DB_OnlyOnce("CYS_MirrorDungeonStartDiscovery")
+THEN
+QuestUpdate("CYS_MirrorDungeon", "SecondTomb");
+
+IF
+CharacterEnteredTrigger(_Player, _Trigger)
+AND
+DB_CYS_MD_CheckUpdate(_Trigger)
+AND
+NOT DB_OnlyOnce("CYS_MirrorDungeonStartDiscovery")
+THEN
+DB_OnlyOnce("CYS_MirrorDungeonStartDiscovery");
+NOT DB_CYS_MD_CheckUpdate(_Trigger);
+QuestUpdate("CYS_MirrorDungeon", "StartDiscovery");
+
+IF
+ItemAddedToCharacter(ITEM_Quest_CYS_KingPendant_000, _Player)
+AND
+DB_IsPlayer(_Player)
+AND
+NOT DB_OnlyOnce("DB_CYS_MD_King")
+THEN
+DB_OnlyOnce("DB_CYS_MD_King");
+PROC_CYS_MD_CheckPendantUpdate();
+
+IF
+ItemAddedToCharacter(ITEM_Quest_CYS_QueenPendant_000, _Player)
+AND
+DB_IsPlayer(_Player)
+AND
+NOT DB_OnlyOnce("DB_CYS_MD_Queen")
+THEN
+DB_OnlyOnce("DB_CYS_MD_Queen");
+PROC_CYS_MD_CheckPendantUpdate();
+
+PROC
+PROC_CYS_MD_CheckPendantUpdate()
+AND
+DB_OnlyOnce("DB_CYS_MD_King")
+AND
+DB_OnlyOnce("DB_CYS_MD_Queen")
+THEN
+QuestUpdate("CYS_MirrorDungeon", "Pendants");
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

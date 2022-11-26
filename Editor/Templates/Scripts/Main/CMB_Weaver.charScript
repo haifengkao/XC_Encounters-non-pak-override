@@ -1,0 +1,42 @@
+INIT
+	CHARACTER:__Me
+	INT:%FXHandle_01
+	
+//-----------
+BEHAVIOUR
+REACTION KillPlayer, 200
+USAGE COMBAT
+VARS
+	CHARACTER:_target
+	FLOAT:_minRange
+	FLOAT:_maxRange
+CHECK "c1&c2&c3&c4"
+	CharacterCanCast(__Me,"Projectile_WeaverKillingSpell")
+	CharacterGetSkillRange(_minRange,_maxRange,__Me,"Projectile_WeaverKillingSpell")
+	CharacterGet(_target,__Me,null,Lowest,Distance,Enemy)
+	CharacterIsPlayer(_target)
+ACTIONS
+	CharacterMoveInRange(_target,_minRange,_maxRange,0)
+	CharacterUseSkill("Projectile_WeaverKillingSpell",_target)
+
+//-----------
+EVENTS 
+EVENT OnInit_AddKillingSpell
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill("Projectile_WeaverKillingSpell")
+	StartTimer("HOM_Weaver_SetMaterial_Timer",0.2,0)
+
+EVENT OnTimer_PlayFX
+ON
+	OnTimer("HOM_Weaver_SetMaterial_Timer")
+ACTIONS
+	CharacterPlayLoopEffect(%FXHandle_01,__Me,"Fx_Creatures_NPC_Weaver_Aura_A")
+
+EVENT OnDeactivate_StopLoopFX
+ON
+	OnDie(__Me,_,_,_)
+	OnDeactivate()
+ACTIONS
+	StopLoopEffect(%FXHandle_01)

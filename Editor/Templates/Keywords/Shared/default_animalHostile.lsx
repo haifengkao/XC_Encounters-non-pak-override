@@ -1,0 +1,561 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<save>
+    <header version="2" time="1418218084" />
+    <version major="1" minor="3" revision="0" build="0" />
+    <region id="keywordDialog">
+        <node id="root">
+            <attribute id="KeywordVoiced" value="0" type="19" />
+            <attribute id="PlayGreeting" value="0" type="19" />
+            <attribute id="keywordAutoImport" value="0" type="19" />
+            <attribute id="keywordName" value="default_animalHostile" type="22" />
+            <children>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="048a2395-3c2c-443d-bce2-8adce0242c1a" type="22" />
+                    <attribute id="keywordContentMapValue" value="Think you can pull the wool over my eyes, do you? I know for a fact you&apos;re a threat to the herd! Away with you - I&apos;ve nothing more to say!" handle="he7972371gccf9g452agbcc7gcd299bc2be01" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="0b923072-a726-42d0-b466-1157856b6a64" type="22" />
+                    <attribute id="keywordContentMapValue" value="Away with you, you dog-faced brute! The very sight of you churns my stomach.  I think *retch* I feel a hairball coming!" handle="h2651165fg4ed2g455dg9f2dg2dd2806f5d60" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="112f01dc-d9c0-49ea-9ed8-9289a6d410bf" type="22" />
+                    <attribute id="keywordContentMapValue" value="Moo! Delicious, but that doesn&apos;t mean we&apos;ll be chewing the cud whenever you so please." handle="hfe5c1db7gd473g4082gbe9cgaf88a3b40d3a" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="12ec773b-1f7c-4b76-94ce-3870936dbdc2" type="22" />
+                    <attribute id="keywordContentMapValue" value="Bock! Thanks for the feed, but don&apos;t think you can go scratching around here if you keep up that bad behaviour!" handle="h6e30fa63g47efg4ac8g96eeg3ebe9f0c3eda" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="1bcdd5b7-6e28-4d38-8147-02e21f9b6216" type="22" />
+                    <attribute id="keywordContentMapValue" value="B-A-A-A-A-A-A-A-A-A! *snort*" handle="h946ee127g0be5g4a8dg865ag148da96dc455" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="202e5b6a-f576-4a6b-9376-3c3350e3f967" type="22" />
+                    <attribute id="keywordContentMapValue" value="Woof! *lick*" handle="h06b2bd5fg9c3cg4b2dga69cg46814fb7a627" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="273cccb9-c9a0-41b2-90d6-f8c60e5feb85" type="22" />
+                    <attribute id="keywordContentMapValue" value="Greeting" handle="h7f890f24g8572g4902g90b4gd362b7e9bdf2" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="3311447e-e464-45d9-8c54-5b158190a080" type="22" />
+                    <attribute id="keywordContentMapValue" value="Let me offer you a bite to eat. Call it a peace offering." handle="h66f92fbcgd807g4cc9gbe33g1ee8d93660ff" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="3af1636e-8497-4646-a60a-8dc1406b7971" type="22" />
+                    <attribute id="keywordContentMapValue" value="Bock!" handle="h1cc0355fg1e25g4546ga475g798529d7e8d2" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="573f90b2-8217-4ae9-9637-0d32c97ae992" type="22" />
+                    <attribute id="keywordContentMapValue" value="What makes you think a noble creature of the land would want to associate with a devil like you?" handle="ha87b8ed2ga382g4efagbc9ag6fa6db73aee3" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="64635b7d-7e03-428d-96d3-a4fc3e0a2066" type="22" />
+                    <attribute id="keywordContentMapValue" value="BOOOOOOCK! *scratch*" handle="hcf47276age12ag4ab0g84e5g6b9a93214e94" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="64e0fa25-14e6-4d1d-a4d0-473f7370d4a9" type="22" />
+                    <attribute id="keywordContentMapValue" value="M-O-O-O-O-O-O! *stamp*" handle="h05aab872g099fg4a83ga278gf5d9c00bc7d7" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="76728ad4-6b19-4eca-9a2d-943e3645fb0a" type="22" />
+                    <attribute id="keywordContentMapValue" value="Mooooooove on, churl! You may think you&apos;re the big cheese, but you won&apos;t milk any information out of me!" handle="h5431cdfdg946cg4a28g99cag4b9281c87b8f" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="83eb4cfb-28ed-44ff-98c1-94dd349a22cf" type="22" />
+                    <attribute id="keywordContentMapValue" value="Baa! Baa!" handle="h8b650e6dg5850g4ef0g996bg4ff05f5047d2" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="8cad9776-5df9-4e8a-9705-fafa1af409b8" type="22" />
+                    <attribute id="keywordContentMapValue" value="RRIAOW! Hiss!" handle="hc11c6552gaff6g465eg8134g3ac9603d9899" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="91f7cd54-9b40-492a-88fb-b26722a21532" type="22" />
+                    <attribute id="keywordContentMapValue" value="Woof! You&apos;re on the ball, but don&apos;t think I&apos;ve forgotten a thing!" handle="h2a22300dg48d4g4ceegab4bgaa12787b348e" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="9d697ac9-9cc4-4db6-a6ac-dee8b6332930" type="22" />
+                    <attribute id="keywordContentMapValue" value="Man&apos;s best friend, my tail! You&apos;re as wicked as a washtub, and I won&apos;t go barking up your tree any time soon." handle="hb5fd3d10g9a57g434fg99aeg40fc729308d9" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="a4645252-5423-4aaa-a236-d0328eb1555f" type="22" />
+                    <attribute id="keywordContentMapValue" value="Moo! Moo!" handle="h2fb6087fg6ad0g4df5g9990gb4af48d8b3a6" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="a86b0f33-8fa0-4f21-b645-a59127a701a5" type="22" />
+                    <attribute id="keywordContentMapValue" value="I&apos;ll take my leave." handle="h5d76f117g2200g43fdga4c7gc708cbd3edfc" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="ac92ebdf-3516-4ba3-9fd0-095f0aaab0d3" type="22" />
+                    <attribute id="keywordContentMapValue" value="Miaow! I admit I&apos;m licking my chops, but don&apos;t think I&apos;ll be curling up in your lap any time soon!" handle="h480649bfg0419g4efag9ef6g397e29b44e2d" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="b0d559c9-f823-4b4b-8cca-3086b50f7ae1" type="22" />
+                    <attribute id="keywordContentMapValue" value="Miaow! *purr*" handle="hca4d6b8ag4816g4313gb6f0g683e03d8b4f8" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="b175c8d6-fee3-4779-9ecd-c4fe88e182f0" type="22" />
+                    <attribute id="keywordContentMapValue" value="Grrrrrrrrrrrr..." handle="h77a1a5a6gad79g42e0gb44fg1210400c1d67" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="c211f71a-2476-45b4-abec-634506f9b9b7" type="22" />
+                    <attribute id="keywordContentMapValue" value="Baa! Quite tasty, but don&apos;t think I&apos;m welcoming you to the flock just yet!" handle="hf4718b20g0677g453cg89bbg41f84015cd27" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="ea7af798-667c-4f49-8474-20ddee8b47af" type="22" />
+                    <attribute id="keywordContentMapValue" value="*The beast has a wild look in its eye; it seems tense and bristles at the sight of you.*" handle="h5096d380g0b1ag4685ga955g283cdeba0c59" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="f3fc0fd3-6e3e-4635-a99f-d7f4c925e311" type="22" />
+                    <attribute id="keywordContentMapValue" value="Why are you egging me on? You&apos;re a villain and a cad, and I won&apos;t let you coop me up in conversation a moment longer... so cluck off!" handle="h79ba2f17g4ee5g485ag8a9cg02e1b1135f4c" type="28" />
+                </node>
+                <node id="keywordNode">
+                    <attribute id="keywordActions" value="" type="23" />
+                    <attribute id="keywordConditions" value="" type="23" />
+                    <attribute id="keywordDisplayedText" value="273cccb9-c9a0-41b2-90d6-f8c60e5feb85" type="22" />
+                    <attribute id="keywordId" value="Greeting" type="22" />
+                    <attribute id="keywordLast" value="0" type="19" />
+                    <attribute id="keywordOwner" value="-1" type="4" />
+                    <attribute id="keywordShow" value="0" type="19" />
+                    <attribute id="keywordSource" value="0" type="5" />
+                    <children>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value='ACTION SetLocalFlag(&quot;SelectedAnimalNode&quot;,1)' type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsInGroup(&quot;Dog&quot;)&#x0D;&#x0A;CONDITION HasTalent(1,&quot;AnimalEmpathy&quot;)&#x0D;&#x0A;CHECK c&amp;c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="CYS_Animal_Dog_M;CYS_Animal_Dog_Murphy_M;GEN_Animal_Dog_M;GEN_Animal_Dog_Zombie_M" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="9d697ac9-9cc4-4db6-a6ac-dee8b6332930" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value='ACTION SetLocalFlag(&quot;SelectedAnimalNode&quot;,1)' type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsInGroup(&quot;Dog&quot;)&#x0D;&#x0A;CONDITION HasTalent(1,&quot;AnimalEmpathy&quot;)&#x0D;&#x0A;CHECK c&amp;!c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="CYS_Animal_Dog_M;CYS_Animal_Dog_Murphy_M;GEN_Animal_Dog_M;GEN_Animal_Dog_Zombie_M" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="b175c8d6-fee3-4779-9ecd-c4fe88e182f0" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value='ACTION SetLocalFlag(&quot;SelectedAnimalNode&quot;,1)' type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsInGroup(&quot;Cat&quot;)&#x0D;&#x0A;CONDITION HasTalent(1,&quot;AnimalEmpathy&quot;)&#x0D;&#x0A;CHECK c&amp;c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="CYS_Animal_CatInLove_Sam_M;CYS_Animal_PoshCat_Maxine_F;DAF_Animal_Cat_Jinxika_F;DAF_Animal_EntrancedCat_F;GEN_Animal_Cat_F;GEN_Animal_Cat_M" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="0b923072-a726-42d0-b466-1157856b6a64" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value='ACTION SetLocalFlag(&quot;SelectedAnimalNode&quot;,1)' type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsInGroup(&quot;Cat&quot;)&#x0D;&#x0A;CONDITION HasTalent(1,&quot;AnimalEmpathy&quot;)&#x0D;&#x0A;CHECK c&amp;!c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="CYS_Animal_CatInLove_Sam_M;CYS_Animal_PoshCat_Maxine_F;DAF_Animal_Cat_Jinxika_F;DAF_Animal_EntrancedCat_F;GEN_Animal_Cat_F;GEN_Animal_Cat_M" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="8cad9776-5df9-4e8a-9705-fafa1af409b8" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value='ACTION SetLocalFlag(&quot;SelectedAnimalNode&quot;,1)' type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsInGroup(&quot;Sheep&quot;)&#x0D;&#x0A;CONDITION HasTalent(1,&quot;AnimalEmpathy&quot;)&#x0D;&#x0A;CHECK c&amp;c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="DAF_Animal_DeadSheep_Weresheep_F;GEN_Animal_Sheep_F;GEN_Animal_Sheep_WereSheep_F;LUC_Animal_HornySheep_Bruce_M;LUC_Animal_Sheep_Bruce_M" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="048a2395-3c2c-443d-bce2-8adce0242c1a" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value='ACTION SetLocalFlag(&quot;SelectedAnimalNode&quot;,1)' type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsInGroup(&quot;Sheep&quot;)&#x0D;&#x0A;CONDITION HasTalent(1,&quot;AnimalEmpathy&quot;)&#x0D;&#x0A;CHECK c&amp;!c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="DAF_Animal_DeadSheep_Weresheep_F;GEN_Animal_Sheep_F;GEN_Animal_Sheep_WereSheep_F;LUC_Animal_HornySheep_Bruce_M;LUC_Animal_Sheep_Bruce_M" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="1bcdd5b7-6e28-4d38-8147-02e21f9b6216" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value='ACTION SetLocalFlag(&quot;SelectedAnimalNode&quot;,1)' type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsInGroup(&quot;Cow&quot;)&#x0D;&#x0A;CONDITION HasTalent(1,&quot;AnimalEmpathy&quot;)&#x0D;&#x0A;CHECK c&amp;c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="GEN_Animal_Cow_F;LUC_Animal_MilkCow_Doreen_F" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="76728ad4-6b19-4eca-9a2d-943e3645fb0a" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value='ACTION SetLocalFlag(&quot;SelectedAnimalNode&quot;,1)' type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsInGroup(&quot;Cow&quot;)&#x0D;&#x0A;CONDITION HasTalent(1,&quot;AnimalEmpathy&quot;)&#x0D;&#x0A;CHECK c&amp;!c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="GEN_Animal_Cow_F;LUC_Animal_MilkCow_Doreen_F" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="64e0fa25-14e6-4d1d-a4d0-473f7370d4a9" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value='ACTION SetLocalFlag(&quot;SelectedAnimalNode&quot;,1)' type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsInGroup(&quot;Chicken&quot;)&#x0D;&#x0A;CONDITION HasTalent(1,&quot;AnimalEmpathy&quot;)&#x0D;&#x0A;CHECK c&amp;c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="CYS_Animal_Rooster_FidgetyJack_M;CYS_Animal_RoosterModel_Rooster_M;GEN_Animal_Chicken_F;HIB_Animal_Rooster_MechaRooster_M" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="f3fc0fd3-6e3e-4635-a99f-d7f4c925e311" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value='ACTION SetLocalFlag(&quot;SelectedAnimalNode&quot;,1)' type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsInGroup(&quot;Chicken&quot;)&#x0D;&#x0A;CONDITION HasTalent(1,&quot;AnimalEmpathy&quot;)&#x0D;&#x0A;CHECK c&amp;!c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="CYS_Animal_Rooster_FidgetyJack_M;CYS_Animal_RoosterModel_Rooster_M;GEN_Animal_Chicken_F;HIB_Animal_Rooster_MechaRooster_M" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="64635b7d-7e03-428d-96d3-a4fc3e0a2066" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsLocalFlag(&quot;SelectedAnimalNode&quot;,1)&#x0D;&#x0A;CONDITION HasTalent(1,&quot;AnimalEmpathy&quot;)&#x0D;&#x0A;CHECK !c&amp;!c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="ea7af798-667c-4f49-8474-20ddee8b47af" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsLocalFlag(&quot;SelectedAnimalNode&quot;,1)&#x0D;&#x0A;CONDITION HasTalent(1,&quot;AnimalEmpathy&quot;)&#x0D;&#x0A;CHECK !c&amp;c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="573f90b2-8217-4ae9-9637-0d32c97ae992" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="keywordNode">
+                    <attribute id="keywordActions" value='ACTION SetCharacterFlag(&quot;GEN_PlayerGivesFood&quot;,1,1)&#x0D;&#x0A;ACTION SetLocalFlag(&quot;SelectedAnimalNode&quot;,0)' type="23" />
+                    <attribute id="keywordConditions" value='CONDITION IsCharacterFlag(&quot;GEN_HasAnimalFood&quot;,1,1)&#x0D;&#x0A;CHECK c' type="23" />
+                    <attribute id="keywordDisplayedText" value="3311447e-e464-45d9-8c54-5b158190a080" type="22" />
+                    <attribute id="keywordId" value="GiveFood" type="22" />
+                    <attribute id="keywordLast" value="0" type="19" />
+                    <attribute id="keywordOwner" value="-1" type="4" />
+                    <attribute id="keywordShow" value="1" type="19" />
+                    <attribute id="keywordSource" value="0" type="5" />
+                    <children>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsInGroup(&quot;Dog&quot;)&#x0D;&#x0A;CONDITION HasTalent(1,&quot;AnimalEmpathy&quot;)&#x0D;&#x0A;CHECK c&amp;c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="91f7cd54-9b40-492a-88fb-b26722a21532" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsInGroup(&quot;Dog&quot;)&#x0D;&#x0A;CONDITION HasTalent(1,&quot;AnimalEmpathy&quot;)&#x0D;&#x0A;CHECK c&amp;!c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="202e5b6a-f576-4a6b-9376-3c3350e3f967" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsInGroup(&quot;Cat&quot;)&#x0D;&#x0A;CONDITION HasTalent(1,&quot;AnimalEmpathy&quot;)&#x0D;&#x0A;CHECK c&amp;c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="ac92ebdf-3516-4ba3-9fd0-095f0aaab0d3" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsInGroup(&quot;Cat&quot;)&#x0D;&#x0A;CONDITION HasTalent(1,&quot;AnimalEmpathy&quot;)&#x0D;&#x0A;CHECK c&amp;!c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="b0d559c9-f823-4b4b-8cca-3086b50f7ae1" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsInGroup(&quot;Sheep&quot;)&#x0D;&#x0A;CONDITION HasTalent(1,&quot;AnimalEmpathy&quot;)&#x0D;&#x0A;CHECK c&amp;c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="c211f71a-2476-45b4-abec-634506f9b9b7" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsInGroup(&quot;Sheep&quot;)&#x0D;&#x0A;CONDITION HasTalent(1,&quot;AnimalEmpathy&quot;)&#x0D;&#x0A;CHECK c&amp;!c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="83eb4cfb-28ed-44ff-98c1-94dd349a22cf" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsInGroup(&quot;Cow&quot;)&#x0D;&#x0A;CONDITION HasTalent(1,&quot;AnimalEmpathy&quot;)&#x0D;&#x0A;CHECK c&amp;c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="112f01dc-d9c0-49ea-9ed8-9289a6d410bf" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsInGroup(&quot;Cow&quot;)&#x0D;&#x0A;CONDITION HasTalent(1,&quot;AnimalEmpathy&quot;)&#x0D;&#x0A;CHECK c&amp;!c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="a4645252-5423-4aaa-a236-d0328eb1555f" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsInGroup(&quot;Chicken&quot;)&#x0D;&#x0A;CONDITION HasTalent(1,&quot;AnimalEmpathy&quot;)&#x0D;&#x0A;CHECK c&amp;c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="12ec773b-1f7c-4b76-94ce-3870936dbdc2" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsInGroup(&quot;Chicken&quot;)&#x0D;&#x0A;CONDITION HasTalent(1,&quot;AnimalEmpathy&quot;)&#x0D;&#x0A;CHECK c&amp;!c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="3af1636e-8497-4646-a60a-8dc1406b7971" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="keywordNode">
+                    <attribute id="keywordActions" value="" type="23" />
+                    <attribute id="keywordConditions" value="" type="23" />
+                    <attribute id="keywordDisplayedText" value="a86b0f33-8fa0-4f21-b645-a59127a701a5" type="22" />
+                    <attribute id="keywordId" value="Leave" type="22" />
+                    <attribute id="keywordLast" value="1" type="19" />
+                    <attribute id="keywordOwner" value="-1" type="4" />
+                    <attribute id="keywordShow" value="1" type="19" />
+                    <attribute id="keywordSource" value="0" type="5" />
+                    <children>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value='ACTION SetLocalFlag(&quot;SelectedAnimalNode&quot;,0)' type="23" />
+                            <attribute id="keywordConditions" value="" type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="1" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="2" type="6" />
+                        </node>
+                    </children>
+                </node>
+                <node id="keywordSpeakerNames" />
+            </children>
+        </node>
+    </region>
+</save>

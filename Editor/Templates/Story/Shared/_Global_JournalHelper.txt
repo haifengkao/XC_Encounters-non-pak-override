@@ -1,0 +1,82 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+//REGION Init
+IF
+DB_QuestDef_State((STRING)_QuestName,(STRING)_QuestState)
+AND
+NOT DB_QuestDef_AddEvent(_QuestName,_)
+AND
+StringConcatenate("QuestAdd_",_QuestName,_AddEvent)
+AND
+StringConcatenate("QuestClose_",_QuestName,_CloseEvent)
+THEN
+DB_QuestDef_AddEvent(_QuestName,_AddEvent);
+DB_QuestDef_CloseEvent(_QuestName,_CloseEvent);
+
+IF
+DB_QuestDef_State((STRING)_QuestName,(STRING)_QuestState)
+AND
+StringConcatenate("QuestUpdate_",_QuestName,_String1)
+AND
+StringConcatenate(_String1,"_",_String2)
+AND
+StringConcatenate(_String2,_QuestState,_UpdateEvent)
+THEN
+DB_QuestDef_UpdateEvent(_QuestName,_QuestState,_UpdateEvent);
+//END_REGION
+
+//REGION Unlocking quests
+IF
+GlobalEventSet(_QuestAddEvent)
+AND
+DB_QuestDef_AddEvent(_QuestName,_QuestAddEvent)
+THEN
+NOT DB_QuestDef_AddEvent(_QuestName,_QuestAddEvent);
+QuestAdd(_QuestName);
+
+IF
+GlobalEventSet(_QuestUpdateEvent)
+AND
+DB_QuestDef_UpdateEvent(_QuestName,_QuestState,_QuestUpdateEvent)
+THEN
+NOT DB_QuestDef_UpdateEvent(_QuestName,_QuestState,_QuestUpdateEvent);
+QuestUpdate(_QuestName,_QuestState);
+
+IF
+GlobalEventSet(_QuestCloseEvent)
+AND
+DB_QuestDef_CloseEvent(_QuestName,_QuestCloseEvent)
+THEN
+NOT DB_QuestDef_CloseEvent(_QuestName,_QuestCloseEvent);
+QuestClose(_QuestName);
+//END_REGION
+
+//REGION Lore quest (forced order quests)
+PROC
+Proc_LoreQuest_Update((STRING)_Quest,1,(STRING)_Update)
+THEN
+QuestAdd(_Quest);
+DB_LorequestIndex(_Quest,1);
+
+PROC
+Proc_LoreQuest_Update((STRING)_Quest,(INTEGER)_Index,(STRING)_Update)
+THEN
+DB_LoreQuest_UpdateUnlocked(_Quest,_Index,_Update);
+
+IF
+DB_LoreQuest_UpdateUnlocked(_Quest,_Index,_Update)
+AND
+DB_LorequestIndex(_Quest,_Index)
+AND
+IntegerSum(_Index,1,_NewIndex)
+THEN
+QuestUpdate(_Quest,_Update);
+NOT DB_LorequestIndex(_Quest,_Index);
+DB_LorequestIndex(_Quest,_NewIndex);
+NOT DB_LoreQuest_UpdateUnlocked(_Quest,_Index,_Update);
+EXITSECTION
+
+ENDEXITSECTION

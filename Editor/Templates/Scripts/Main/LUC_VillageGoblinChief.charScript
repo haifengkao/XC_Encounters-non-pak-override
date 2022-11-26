@@ -1,0 +1,74 @@
+#INCLUDE State_Manager
+
+INIT
+
+USING State_Manager
+CHARACTER:__Me
+
+BEHAVIOUR
+
+REACTION State_ActionManager, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, "Action_CheckFire", "Action_Idle","Action_CheckCorpses")
+	Set(%previousAction, %currentAction)
+	SetPriority(%currentAction, 1100)
+	
+REACTION Action_Idle, 0
+USAGE PEACE
+VARS
+	FLOAT:_Sleep
+	FIXEDSTRING:_Animation
+	TRIGGER:_Center = LUC_Point_GoblinVillageLookout_d641c444-84ef-4b0d-b2ed-6f90c878c5b7
+ACTIONS
+	CharacterMoveTo(_Center,0)
+	CharacterLookFrom(_Center)
+	GetRandom(_Animation,"idle1","idle2","idle3","still")
+	CharacterPlayAnimation(_Animation)
+	GetRandom(_Sleep,2,4,5)
+	Sleep(_Sleep)
+	SetPriority(%currentAction, 0)
+	
+REACTION Action_CheckFire, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+	FLOAT:_Dist
+	TRIGGER:_Fire = LUC_Point_GoblinVillageFire_748afacb-b23e-441a-8bf0-603d1a1ad2f4
+ACTIONS
+	CharacterMoveTo(_Fire, 0)
+	IF "c1&c2"
+		GetDistance(_Dist,__Me,_Fire)
+		IsLessThen(_Dist,FLOAT:2.0)
+	THEN
+		CharacterLookFrom(_Fire)
+	ENDIF
+	GetRandom(_Animation,"idle1","idle2","idle3","still")
+	CharacterPlayAnimation(_Animation)
+	Sleep(5)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)
+	
+REACTION Action_CheckCorpses, 0
+USAGE PEACE
+VARS
+	FLOAT:_Dist
+	TRIGGER:_Corpses = LUC_Point_GoblinVillageCorpses_244b52ff-41bc-4084-b6d7-8cd693a305d3
+	FIXEDSTRING:_Animation
+ACTIONS
+	CharacterMoveTo(_Corpses, 0)
+	IF "c1&c2"
+		GetDistance(_Dist,__Me,_Corpses)
+		IsLessThen(_Dist,FLOAT:2.0)
+	THEN
+		CharacterLookFrom(_Corpses)
+	ENDIF
+	GetRandom(_Animation,"idle1","idle2","idle3","still")
+	CharacterPlayAnimation(_Animation)
+	Sleep(5)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)
+	
+	

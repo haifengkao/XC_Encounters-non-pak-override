@@ -1,0 +1,33 @@
+INIT
+CHARACTER:__Me
+
+BEHAVIOUR
+
+REACTION Wander,1
+USAGE ALL
+ACTIONS
+	CharacterWander(FLOAT:5,5)
+	Sleep(1)
+	CharacterWander(FLOAT:3,3)
+	Sleep(0.5)
+	Goto(Start)
+
+REACTION FleeFromNeutral,3
+USAGE ALL
+VARS
+	CHARACTER:_char
+	FLOAT:_dist
+CHECK "c1"
+	CharacterGet(_char,__Me,4,Lowest,Distance,Neutral,null,null)
+ACTIONS
+	CharacterFleeFrom(Neutral,8)
+
+REACTION FleeFromEnemy,5
+USAGE ALL
+VARS
+	CHARACTER:_char
+	FLOAT:_dist
+CHECK "c1"
+	CharacterGet(_char,__Me,4,Lowest,Distance,Enemy,null,null)
+ACTIONS
+	CharacterFleeFrom(Enemy,8)

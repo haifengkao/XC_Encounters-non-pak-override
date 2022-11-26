@@ -1,0 +1,219 @@
+INIT
+CHARACTER:__Me
+FLOAT:%MySightRange
+CHARACTERTEMPLATE:%Summon_Air_Rock=CYSBC_AirSummon_Rock_19de4e67-af0a-4aec-adbc-ce43830faaee
+EXTERN INT:%HyperSummon_StartsAt=3
+EXTERN INT:%HyperSummon_OccursAt=3
+
+//------------------------------
+BEHAVIOUR
+REACTION WindHuntress_AttacksStunnedTarget,550
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+CHECK "c1"
+	CharacterGet(_Target,__Me,%MySightRange,Lowest,Distance,Enemy,null,STUNNED)
+ACTIONS
+	CharacterAttack(_Target)
+	
+REACTION WindHuntress_Hypersummon,500
+USAGE COMBAT
+VARS
+	INT:_FailedHowManyTimes=0
+	INT:_HyperSummonStatus=0
+	INT:_BossSummonStatus=0
+	CHARACTER:_Player
+	FLOAT3:_PosOffset
+	FLOAT3:_MyPosition
+	FLOAT:_Angle
+	FLOAT:_Dist
+	CHARACTER:_Summon
+CHECK "c1&!c2&!c3&!c4&!c5&!c6&!c7"
+	CharacterGet(_Player,__Me,%MySightRange,Lowest,Distance,Enemy)	//c1
+	CharacterHasStatus(__Me,CHARMED)								//c2
+	CharacterHasStatus(__Me,PETRIFIED)								//c3
+	CharacterHasStatus(__Me,FEAR)									//c4
+	CharacterHasStatus(__Me,STUNNED)								//c5
+	CharacterHasStatus(__Me,MUTED)									//c6
+	CharacterHasStatus(__Me,FEAR)									//c7
+ACTIONS
+	CharacterLookAt(_Player)	
+	CharacterSetCombatTimeout(__Me,90.0)	
+	CharacterPlayAnimation("cast_ground_loop",0,0)		
+	CharacterPlayEffect(__Me,"FX_Skills_Fire_Summon_Prepare_A")		
+	WHILE "c1&c2"
+		IsLessThen(_HyperSummonStatus,3)
+		IsLessThen(_FailedHowManyTimes,30)
+	DO
+		IF "c1"
+			GetPosition(__Me,_MyPosition)
+		THEN
+			Set(_PosOffset,{1.3;0;0}) 
+			GetRandomBetween(_Angle,-270,90)
+			GetRandomBetween(_Dist,1,3.5)
+			RotateY(_PosOffset,_Angle)
+			Multiply(_PosOffset,_Dist)	
+			Add(_MyPosition,_PosOffset)
+		ENDIF
+		IF "c1&!c2&!c3&!c4&!c5&!c6"
+			FindValidPosition(_MyPosition,3)
+			ContainsSurface(_MyPosition,1,CloudPoison)
+			ContainsSurface(_MyPosition,1,Ooze)
+			ContainsSurface(_MyPosition,1,Ice)
+			ContainsSurface(_MyPosition,1,CloudStatic)
+			ContainsSurface(_MyPosition,1,Electrified)
+		THEN	
+			IF "c1"
+				IsEqual(_HyperSummonStatus,0)
+			THEN	
+				PlayEffectAt(_MyPosition,"FX_Skills_Fire_Summon_Cast_A")
+				SpawnCharacter(_Summon,%Summon_Air_Rock,_MyPosition,1)						
+				Sleep(1)
+				Add(_HyperSummonStatus,1)
+			ELIF "c1"
+				IsEqual(_HyperSummonStatus,1)
+			THEN	
+				CharacterPlayAnimation("cast_self_cast",0,0)
+				PlayEffectAt(_MyPosition,"FX_Skills_Fire_Summon_Cast_A")
+				CharacterPlayAnimation("Talk_Angry_01",0,0)
+				SpawnCharacter(_Summon,%Summon_Air_Rock,_MyPosition,1)	
+				Sleep(0.7)
+				Add(_HyperSummonStatus,1)					
+			ELIF "c1"
+				IsEqual(_HyperSummonStatus,2)
+			THEN					
+				PlayEffectAt(_MyPosition,"FX_Skills_Fire_Summon_Cast_A")
+				Sleep(0.5)					
+				SpawnCharacter(_Summon,%Summon_Air_Rock,_MyPosition,1)
+				Sleep(1)				
+				Add(_HyperSummonStatus,1)
+			ELSE
+				Add(_FailedHowManyTimes,1)
+			ENDIF
+		ELSE
+			 Add(_FailedHowManyTimes,1)
+		ENDIF
+	ENDWHILE
+	IF "c1"
+		IsEqual(_FailedHowManyTimes,30)
+	THEN
+		Set(_FailedHowManyTimes,0)
+		SetPriority("WindHuntress_Hypersummon",0)
+	ENDIF	
+	Set(_HyperSummonStatus,0)
+	Set(%HyperSummon_StartsAt,0)		
+	SetPriority("WindHuntress_Hypersummon",0)
+	
+REACTION WindHuntress_Blink,0
+USAGE COMBAT
+CHECK "c1"
+	CharacterCanCast(__Me,Shout_EnemyBlink)
+ACTIONS
+	CharacterUseSkill(Shout_EnemyBlink,__Me)
+	SetPriority("WindHuntress_Blink",0)
+
+REACTION CastBlitzBoltOnEnemy,400
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&c4"
+	CharacterCanCast(__Me,Projectile_EnemyBlitzBolt)
+	CharacterGet(_ChosenTarget,__Me,%MySightRange,Lowest,AirResistance,Enemy)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,Projectile_EnemyBlitzBolt)
+	IsRandom(0.2)	
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)			
+	CharacterUseSkill(Projectile_EnemyBlitzBolt,_ChosenTarget)
+
+REACTION CastHeadviceOnEnemy,350
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&c4"
+	CharacterCanCast(__Me,Target_EnemyInstantPressure)
+	CharacterGet(_ChosenTarget,__Me,%MySightRange,Lowest,AirResistance,Enemy)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,Target_EnemyInstantPressure)
+	IsRandom(0.2)	
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill(Target_EnemyInstantPressure,_ChosenTarget)
+	
+REACTION CastBlindOnEnemy,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&c4"
+	CharacterCanCast(__Me,Target_EnemyBlind)
+	CharacterGet(_ChosenTarget,__Me,%MySightRange,Highest,Dexterity,Enemy)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,Target_EnemyBlind)
+	IsRandom(0.2)	
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill(Target_EnemyBlind,_ChosenTarget)	
+
+REACTION CastCurseOnEnemy,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&c4"
+	CharacterCanCast(__Me,Target_EnemyTargetedCurse)
+	CharacterGet(_ChosenTarget,__Me,%MySightRange,Highest,Strength,Enemy)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,Target_EnemyTargetedCurse)	
+	IsRandom(0.2)
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill(Target_EnemyTargetedCurse,_ChosenTarget)	
+	
+//------------------------------
+EVENTS	
+EVENT OnInit_GetSightRange_GiveSkills
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%MySightRange,__Me,Sight)
+	THEN
+		CharacterAddSkill(Projectile_EnemyBlitzBolt)
+		CharacterAddSkill(Target_EnemyInstantPressure)
+		CharacterAddSkill(Shout_EnemyBlink)
+		CharacterAddSkill(Target_EnemyBlind)
+		CharacterAddSkill(Target_EnemyTargetedCurse)		
+	ENDIF
+
+EVENT OnTurn_IncreaseHyperSummon_Frequency
+ON
+	OnTurn()
+ACTIONS
+	IF "c1"
+		IsLessThen(%HyperSummon_StartsAt,%HyperSummon_OccursAt)
+	THEN		
+		Add(%HyperSummon_StartsAt,1)
+	ELSE
+		SetPriority("WindHuntress_Hypersummon",500)
+	ENDIF
+
+EVENT GetHit_IncreaseBlinkPriority_Slashing
+ON
+	OnDamage(Slashing,_,_,_)
+ACTIONS
+	SetPriority("WindHuntress_Blink",400)
+	
+EVENT GetHit_IncreaseBlinkPriority_Piercing
+ON
+	OnDamage(Piercing,_,_,_)
+ACTIONS
+	SetPriority("WindHuntress_Blink",400)
+
+EVENT GetHit_IncreaseBlinkPriority_Crushing
+ON
+	OnDamage(Crushing,_,_,_)
+ACTIONS
+	SetPriority("WindHuntress_Blink",400)

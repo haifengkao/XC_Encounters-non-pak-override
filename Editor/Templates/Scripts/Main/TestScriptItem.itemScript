@@ -1,0 +1,55 @@
+INIT
+ITEM:__Me
+INT:%Fx = 0
+
+EVENTS
+
+EVENT OutputCharacterItemEvents
+VARS
+CHARACTER:_Char
+ITEM:_Item
+STRING:_Event
+ON
+	OnCharacterItemEvent(_Char,_Item,_Event)
+ACTIONS
+	DebugText(__Me,"CharacterItemEvent: ([1])([2])([3])",_Char,_Item,_Event)
+	
+EVENT TestEventOpen
+ON
+	OnCharacterItemEvent(_,_,"TestOpen")
+ACTIONS
+	DebugText(__Me,"Open")
+	ItemOpen(__Me)
+
+EVENT TestEventClose
+ON
+	OnCharacterItemEvent(_,_,"TestClose")
+ACTIONS
+	DebugText(__Me,"Close")
+	ItemClose(__Me)
+
+
+EVENT TestEvent1
+ON
+	OnCharacterItemEvent(_,_,"Test1")
+ACTIONS
+	StopLoopEffect(%Fx)
+	Set(%Fx,0)
+	ItemPlayLoopEffect(%Fx,__Me,"FX_GP_GoldSparkles_A")
+
+EVENT TestEvent2
+ON
+	OnCharacterItemEvent(_,_,"Test2")
+ACTIONS
+	StopLoopEffect(%Fx)	
+	Set(%Fx,0)
+
+EVENT TestEvent3
+ON
+	OnCharacterItemEvent(_,_,"Test3")
+ACTIONS
+	StopLoopEffect(%Fx)
+	Set(%Fx,0)
+	ItemPlayLoopEffect(%Fx,__Me,"FX_GP_Burning_A")
+	
+BEHAVIOUR

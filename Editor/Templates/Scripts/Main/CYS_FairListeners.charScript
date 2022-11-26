@@ -1,0 +1,4 @@
+#INCLUDE CYS_FairPeople
+
+INIT
+USING CYS_FairPeople

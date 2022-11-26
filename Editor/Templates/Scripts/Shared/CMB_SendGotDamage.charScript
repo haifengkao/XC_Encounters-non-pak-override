@@ -1,0 +1,17 @@
+/*
+
+Use this script on allies within a combat group
+They will send an event when they get damage + attacker
+
+*/
+
+INIT
+EXTERN STRING:%gotdamage=null
+EVENTS
+EVENT GotDamage
+VARS
+	CHARACTER:_char
+ON
+	OnDamage(_,_,_char,_)
+ACTIONS
+	CharacterEvent(_char,%gotdamage)

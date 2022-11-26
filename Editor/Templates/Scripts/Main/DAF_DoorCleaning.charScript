@@ -1,0 +1,21 @@
+INIT
+CHARACTER:__Me
+TRIGGER:%Point1 = DAF_Point_DoorCleaning1_f9323f73-ee98-4466-8889-1cf46bb1e7fb
+TRIGGER:%Point2 = DAF_Point_DoorCleaning2_0bf07b9c-ec1a-41cf-a19b-d4f3f4d93552
+
+BEHAVIOUR
+
+REACTION Main, 500
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Point1)
+	CharacterLookFrom(%Point1)
+	CharacterPlayAnimation("Fidget_Low_02")
+	DialogStart("DAF_AD_DoorCleaning",__Me)
+	CharacterPlayAnimation("Fidget_Low_01")
+	Sleep(3)
+	
+	CharacterMoveTo(%Point2)
+	CharacterLookFrom(%Point2)
+	CharacterPlayAnimation("Fidget_Forward_02")
+	Sleep(1)

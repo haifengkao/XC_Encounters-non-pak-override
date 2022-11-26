@@ -1,0 +1,75 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	TRIGGER:%WanderZone = LUC_IV_AttenberahWander_bb6fd505-b47c-4034-abd7-48025372d108
+	TRIGGER:%Desk = LUC_IV_AttenberahDesk_b2846a70-5d98-499a-9433-448c7d6bc230
+	TRIGGER:%Hole = LUC_IV_AttenberahHole_b1e3d916-6283-4efe-a2c2-31b7240d58e5
+	TRIGGER:%Book = LUC_IV_AttenberahBook_3eacac1d-6314-4b2d-9bce-2294b1a33a31
+	CHARACTER:%Apprentice = LUC_IV_GeomancerApprentice_0514c81c-0b88-4799-ab0f-ea06057d1673
+	
+//-----------	
+BEHAVIOUR
+REACTION State_InHouse, 0
+USAGE PEACE
+ACTIONS
+	GetWeightedRandom(%currentAction, "Action_GoAtBook", INT:1, "Action_GoAtHole", INT:1, "Action_GoAtDesk", INT:1, "Action_Wandering", INT:3)
+	SetPriority(%currentAction, 1100)
+	
+REACTION Action_Wandering, 0
+USAGE PEACE
+ACTIONS
+	CharacterWander(%WanderZone, 5, 0)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)
+		
+REACTION Action_GoAtDesk, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Desk, 0)
+	CharacterLookFrom(%Desk)
+	CharacterPlayAnimation("Think_02")
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)		
+		
+REACTION Action_GoAtBook, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Book, 0)
+	CharacterLookFrom(%Book)
+	CharacterPlayAnimation("Fidget_Low_01")
+	CharacterPlayAnimation("Stand_Read_01")
+	CharacterPlayAnimation("Fidget_Low_03")
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)
+		
+REACTION Action_GoAtHole, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Hole, 0)
+	CharacterLookFrom(%Hole)
+	CharacterPlayAnimation("Look_Down_Long_01")
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)
+		
+REACTION Action_KillApprentice, 0
+USAGE PEACE
+ACTIONS
+	CharacterUseSkill(Target_AttenberahKillingSpell,%Apprentice)
+	SetPriority(Action_KillApprentice, 0)
+INTERRUPT
+	SetPriority(Action_KillApprentice, 0)
+
+//-----------	
+EVENTS
+EVENT KillTheApprentice
+ON
+	OnCharacterEvent(__Me, "killTheApprentice")
+ACTIONS
+	CharacterAddSkill(Target_AttenberahKillingSpell)
+	SetPriority(Action_KillApprentice, 10000)

@@ -1,0 +1,11 @@
+INIT
+
+ITEM:__Me
+
+EVENTS
+
+EVENT ExplodeOnDeath
+ON
+	OnItemEvent(__Me, "explode")
+ACTIONS
+	ExplodeAt(__Me,Projectile_EnemyFireball, 15)

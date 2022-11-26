@@ -1,0 +1,69 @@
+INIT
+ITEM:__Me
+EXTERN FLOAT:%MaxWeight=50
+
+FLOAT:%CurrentPercentage=0
+FLOAT:%PreviousPercentage=0
+FLOAT:%NewWeight=0
+
+EVENTS
+
+EVENT Initialize
+ON
+	OnInit()
+ACTIONS
+	StartTimer("UpdateMine",0.1,-1)
+
+EVENT Shutdown
+ON
+	OnShutdown()
+ACTIONS
+	StopTimer("UpdateMine")
+
+EVENT Update
+VARS
+	FLOAT:_PreviousWeight
+ON
+	OnTimer("UpdateMine")
+ACTIONS
+	IF "!c1"
+		ItemIsMoving(__Me)
+	THEN
+		Set(%NewWeight,0)
+		IterateCharactersOnObject(__Me,"MineCheck")
+		IterateItemsOnObject(__Me,"MineCheck")
+		Set(%PreviousPercentage,%CurrentPercentage)
+		Set(%CurrentPercentage,%NewWeight)
+		Divide(%CurrentPercentage,%MaxWeight)
+		Clamp(%CurrentPercentage,0,1)
+		IF "!c1"
+			IsEqual(%CurrentPercentage,%PreviousPercentage)
+		THEN
+			ItemEvent(__Me,"MineChange")
+		ENDIF
+	ENDIF
+	
+EVENT WeightCalc
+VARS
+CHARACTER:_Char
+ITEM:_Item
+FLOAT:_Weight
+ON
+	OnIterateCharacter(_Char,"MineCheck")
+	OnIterateItem(_Item,"MineCheck")
+ACTIONS
+	IF "(!c1&c2&!c3&!c4&(!c5|!c6))|(!c7&!c8&!c9&c10&!c11)"
+		IsEqual(_Char,null)
+		CharacterGetStat(_Weight,_Char,Weight)
+		CharacterIsFloating(_Char)
+		CharacterIsDead(_Char)
+		CharacterAvoidsTraps(_Char)
+		IsVisible(__Me)
+		IsEqual(_Item,null)
+		ItemIsMoving(_Item)
+		ItemIsDestroyed(_Item)
+		ItemGetStat(_Weight,_Item,Weight)
+		ItemIsFalling(_Item)
+	THEN
+		Add(%NewWeight,_Weight)
+	ENDIF

@@ -1,0 +1,147 @@
+INIT
+
+	CHARACTER:__Me
+	FLOAT3:%myStartingPosition
+	INT:%teleportBack=0
+	FLOAT:%Distance
+	FLOAT:%MySightRange	
+	EXTERN INT:%UseShadowStep=0
+	EXTERN INT:%ShadowStepStartAt=0
+	EXTERN INT:%ShadowStepFrequency=1
+	EXTERN INT:%BackstabbingStartAt=0
+	EXTERN INT:%BackstabbingFrequency=0
+	EXTERN WEAPON:%TeleportBackWeaponType=CrossBow
+	
+//---------------------------------
+BEHAVIOUR
+REACTION ShadowStep,0
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_APAmount
+	FLOAT3:_TargetPosition
+	FLOAT3:_BackwDirection
+	FLOAT3:_TeleportDestinationOffset
+	FLOAT:_DistanceTarget
+CHECK "!c1&!c2&!c3&c4&!c5&c6&!c7"
+	CharacterHasStatus(__Me,FROZEN)
+	CharacterHasStatus(__Me,STUNNED)
+	CharacterHasStatus(__Me,KNOCKED_DOWN)	
+	CharacterGetStat(_APAmount,__Me,ActionPoints)
+	IsLessThen(_APAmount,4)	
+	CharacterGet(_Target,__Me,%MySightRange,Lowest,Vitality,Enemy,null,null,null,__Me)
+	CharacterHasStatus(_Target,INVISIBLE)
+ACTIONS
+	CharacterSwitchWeaponType(SmallWeapons)	//doesn't work yet (march, 6) - waiting for animation set
+	IF "c1&c2"
+		GetDistance(_DistanceTarget,__Me,_Target)
+		IsLessThen(4,_DistanceTarget)
+	THEN
+		GetPosition(_Target,_TargetPosition)
+		GetForwardDirection(_Target,_BackwDirection)
+		RotateY(_BackwDirection,180)
+		Add(_TargetPosition,_BackwDirection)		
+		CharacterPlayEffect(__Me,"FX_GP_TeleportSmoke_A")
+		CharacterTeleportTo(_TargetPosition)
+		CharacterPlayEffect(__Me,"FX_GP_TeleportSmoke_A")
+		Set(%teleportBack,1)
+	ENDIF
+	SetPriority("AssassinAttack",500)
+	SetPriority("ShadowStep",0)
+	
+REACTION ManualBackstab,0
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_APAmount
+	FLOAT3:_TargetPosition
+	FLOAT3:_BackwDirection
+	FLOAT3:_TeleportDestinationOffset
+	FLOAT:_DistanceTarget
+CHECK "c1&!c2&!c3&!c4&c5&!c6&c7&c8&c9&!c10"
+	IsEqual(%UseShadowStep,0)
+	CharacterHasStatus(__Me,FROZEN)
+	CharacterHasStatus(__Me,STUNNED)
+	CharacterHasStatus(__Me,KNOCKED_DOWN)
+	CharacterGetStat(_APAmount,__Me,ActionPoints)
+	IsLessThen(_APAmount,4)
+	CharacterGet(_Target,__Me,%MySightRange,Lowest,Distance,Enemy,null,null,null,__Me)
+	GetDistance(%Distance,__Me,_Target)
+	IsLessThen(%Distance,10)
+	CharacterHasStatus(_Target,INVISIBLE)
+ACTIONS
+	GetPosition(_Target,_TargetPosition)
+	GetForwardDirection(_Target,_BackwDirection)
+	RotateY(_BackwDirection,180)
+	Add(_TargetPosition,_BackwDirection)		
+	CharacterMoveTo(_TargetPosition,1,0,0,0.5)
+	SetPriority("AssassinAttack",500)
+INTERRUPT
+	Reset()
+	
+REACTION AssassinAttack,0
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+CHECK "c1"
+	CharacterGet(_Target,__Me,null,Lowest,Distance,Enemy)
+ACTIONS
+	CharacterAttack(_Target)
+	CharacterEndTurn()
+	SetPriority("AssassinAttack",0)	
+
+REACTION TeleportBack,100
+USAGE WAITING
+CHECK "c1&c2"
+	IsEqual(%teleportBack,1)
+	IsEqual(%UseShadowStep,1)
+ACTIONS
+	CharacterPlayEffect(__Me,"FX_GP_TeleportSmoke_A")
+	CharacterTeleportTo(%myStartingPosition)
+	CharacterPlayEffect(__Me,"FX_GP_TeleportSmoke_A")
+	CharacterSwitchWeaponType(CrossBow)
+	Set(%ShadowStepStartAt,0)
+	Set(%teleportBack,0)
+
+
+//---------------------------------		
+EVENTS
+EVENT GetSightRange
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetSightRange(%MySightRange,__Me)
+	THEN
+	ENDIF
+	
+EVENT SetStartingPosition
+ON
+	OnCombatStarted()
+ACTIONS
+	GetPosition(__Me,%myStartingPosition)
+	
+EVENT GetTeleportBackToPosition
+ON
+	OnTurn()
+ACTIONS
+	GetPosition(__Me,%myStartingPosition)
+	SetPriority("AssassinAttack",0)
+	Set(%teleportBack,0)
+	IF "c1&c2"
+		IsEqual(%UseShadowStep,1)
+		IsLessThen(%ShadowStepStartAt,%ShadowStepFrequency)
+	THEN		
+		Add(%ShadowStepStartAt,1)
+	ELIF "c1"
+		IsEqual(%UseShadowStep,1)
+	THEN
+		SetPriority("ShadowStep",400)
+	ENDIF
+	IF "c1"
+		IsLessThen(%BackstabbingStartAt,%BackstabbingFrequency)
+	THEN		
+		Add(%BackstabbingStartAt,1)
+	ELSE
+		SetPriority("ManualBackstab",400)
+	ENDIF	

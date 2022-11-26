@@ -1,0 +1,46 @@
+#INCLUDE Base
+
+INIT
+USING Base
+CHARACTER:__Me
+TRIGGER:%PointWall = CYS_PathSamson1_9708e0e9-43d8-415c-b51c-465bdc2ed506
+TRIGGER:%PointStairs = CYS_PathSamson2_4778b14c-80c9-464e-bb63-953aa28741c2
+TRIGGER:%PointSkeleton = CYS_PathSamson3_2a25fc7e-600d-4b75-95ab-c48d4ea96bc4
+
+BEHAVIOUR
+
+REACTION WalkAround,1050
+USAGE PEACE
+VARS
+	TRIGGER:_Point
+ACTIONS
+	GetRandom(_Point,%PointWall,%PointSkeleton,%PointStairs)
+	CharacterMoveTo(_Point,0)
+	CharacterLookFrom(_Point)
+	IF "c1&c2"
+		IsEqual(_Point,%PointWall)
+		IsRandom(0.3)
+	THEN
+		DisplayText(__Me,"CYS_Samson_1",5)
+		CharacterPlayAnimation("idle2")
+	ELIF "c1&c2"
+		IsEqual(_Point,%PointSkeleton)
+		IsRandom(0.3)
+	THEN
+		DisplayText(__Me,"CYS_Samson_2",5)
+		CharacterPlayAnimation("LookDownLong")
+	ELIF "c1&c2"
+		IsEqual(_Point,%PointStairs)
+		IsRandom(0.3)
+	THEN
+		DisplayText(__Me,"CYS_Samson_3",5)
+		CharacterPlayAnimation("LookUpLong")
+	ENDIF
+	Sleep(2)
+INTERRUPT
+	Reset()
+	
+REACTION Waiting,0
+USAGE PEACE
+ACTIONS
+	Sleep(2)

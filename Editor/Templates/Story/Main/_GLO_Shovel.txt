@@ -1,0 +1,18 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_ShovelArea(TRIGGER_CYS_ShovelCecilia,"CYS_ShovelCecilia",ITEM_CYS_ShovelCeciliaDirt);
+DB_ShovelArea(TRIGGER_LUC_IM_ShovelMaradinoKey,"LUC_IM_MaradinosKey",ITEM_LUC_IM_ShovelMaradinoKeyDirt);
+DB_ShovelArea(TRIGGER_LUC_ShovelWitchHut,"LUC_HiddenShovelWitch",ITEM_LUC_ShovelWitchHutDirt);
+
+DB_ShovelRewardComment("CYS_ShovelCecilia","CYS_ShovelCecilia");
+DB_ShovelRewardItemAppear("CYS_ShovelCecilia",ITEM_CYS_CeciliaChest,TRIGGER_CYS_ShovelCecilia);
+
+DB_ShovelRewardItemAppear("LUC_IM_MaradinosKey",ITEM_LUC_IM_MaradinosKey,TRIGGER_LUC_IM_MaradinosKeyPoint);
+DB_ShovelRewardItemAppear("LUC_HiddenShovelWitch",ITEM_LUC_ShovelWitchHutChest,TRIGGER_LUC_ShovelWitchHutPoint);
+KBSECTION
+
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

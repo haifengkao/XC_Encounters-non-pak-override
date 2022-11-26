@@ -1,0 +1,101 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+ProcDeclareCounter("StealCount");
+ProcDeclareCounter("KillCount");
+
+DB_TargetCounts("StealCount",1);
+DB_TargetCounts("KillCount",1);
+
+DB_ReflectionDialogs("StealCount","GLO_DD_ReflectionStealing");
+DB_ReflectionDialogs("KillCount","GLO_DD_ReflectionKilling");
+KBSECTION
+IF
+DB_EvilDude((CHARACTER)_Npc)
+THEN
+NoReflectionDialogOnKill(_Npc);
+
+PROC
+CreateDefaultTradeStats((CHARACTER)_Npc)
+AND
+CharacterIsTagged(_Npc, "Animal", 1)
+THEN
+NoReflectionDialogOnKill(_Npc);
+
+PROC
+RegisterTheft((CHARACTER)_Player)
+AND
+NOT DB_Companion(_Player) 
+THEN
+ProcIncreaseCounter("StealCount");
+ProcCheckReflectionDialog(_Player,"StealCount");
+
+PROC
+RegisterKilling((CHARACTER)_Npc,(CHARACTER)_Player)
+AND
+NOT NoReflectionDialogOnKill(_Npc)
+AND
+NOT DB_CustomKillDialog((CHARACTER)_Npc,_)
+AND
+NOT DB_Companion(_Player) 
+THEN
+ProcIncreaseCounter("KillCount");
+ProcCheckReflectionDialog(_Player,"KillCount");
+
+PROC
+RegisterKilling((CHARACTER)_Npc,(CHARACTER)_Player)
+AND
+NOT NoReflectionDialogOnKill(_Npc)
+AND
+DB_CustomKillDialog((CHARACTER)_Npc,(STRING)_Dialog)
+AND
+NOT DB_Companion(_Player) 
+THEN
+NOT DB_CustomKillDialog(_Npc,_Dialog);
+ProcIncreaseCounter("KillCount");
+ProcDefinePartyDialog(_Dialog);
+
+PROC
+ProcCheckReflectionDialog((CHARACTER)_SrcPlayer,(STRING)_Type)
+AND
+DB_GlobalCounter(_Type,_Count)
+AND
+DB_TargetCounts(_Type,_Count)
+THEN
+ProcBackOffReflectionDialog(_Type);
+ProcDoReflectionDialog(_SrcPlayer,_Type);
+
+PROC
+ProcBackOffReflectionDialog((STRING)_Type)
+AND
+DB_TargetCounts(_Type,_Target)
+AND
+IntegerProduct(_Target,2,_NewTarget)
+THEN
+//ProcDeclareCounter(_Type); //resets the counter
+NOT DB_TargetCounts(_Type,_Target); //David says only once, so that's what we're doing! 
+//DB_TargetCounts(_Type,_NewTarget);
+
+PROC
+ProcSetPartyDialogSrc((CHARACTER)_SrcPlayer,(STRING)_Dialog)
+AND
+DB_PartyDialogSrc(_Player,_Dialog)
+THEN
+NOT DB_PartyDialogSrc(_Player,_Dialog);
+
+PROC
+ProcSetPartyDialogSrc((CHARACTER)_SrcPlayer,(STRING)_Dialog)
+THEN
+DB_PartyDialogSrc(_SrcPlayer,_Dialog);
+
+PROC
+ProcDoReflectionDialog((CHARACTER)_SrcPlayer,(STRING)_Type)
+AND
+DB_ReflectionDialogs(_Type,_Dialog)
+THEN
+ProcSetPartyDialogSrc(_SrcPlayer,_Dialog);
+ProcDefinePartyDialog(_Dialog);
+
+EXITSECTION
+
+ENDEXITSECTION

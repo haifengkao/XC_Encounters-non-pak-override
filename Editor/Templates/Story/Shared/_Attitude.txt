@@ -1,0 +1,1447 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_AttitudePrice(1,20);
+DB_AttitudePrice(2,20);
+DB_AttitudePrice(3,20);
+DB_AttitudePrice(4,20);
+DB_AttitudePrice(5,20);
+DB_AttitudePrice(6,50);
+DB_AttitudePrice(7,50);
+DB_AttitudePrice(8,50);
+DB_AttitudePrice(9,50);
+DB_AttitudePrice(10,50);
+DB_AttitudePrice(11,100);
+DB_AttitudePrice(12,100);
+DB_AttitudePrice(13,100);
+DB_AttitudePrice(14,100);
+DB_AttitudePrice(15,100);
+DB_AttitudePrice(16,200);
+DB_AttitudePrice(17,200);
+DB_AttitudePrice(18,200);
+DB_AttitudePrice(19,200);
+DB_AttitudePrice(20,200);
+DB_AttitudePrice(21,300);
+DB_AttitudePrice(22,300);
+DB_AttitudePrice(23,300);
+DB_AttitudePrice(24,300);
+DB_AttitudePrice(25,300);
+DB_AttitudePrice(26,500);
+DB_AttitudePrice(27,500);
+DB_AttitudePrice(28,500);
+DB_AttitudePrice(29,500);
+DB_AttitudePrice(30,500);
+
+DB_CustomGroupWarningDialog("Orc","Orcs_please_dont_attack");
+DB_CustomGroupWarningDialog("Goblin","Goblins_please_dont_attack");
+KBSECTION
+/////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////
+// Functions updating RepAttitude/2
+//
+//		DecreaseAttitude((NPC)_Npc,(INTEGER)_Delta)
+//		IncreaseAttitude((NPC)_Npc,(INTEGER)_Delta)
+//		ApplyTradeBalanceToAttitude((NPC)_Npc): to be called whenever the trade balance changes
+//
+
+//////////////////////////////////////////////////////////////////////////////////////
+// Set attitude to at least
+PROC	
+SetAttitudeToAtLeast((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_MinAtt)
+AND
+CharacterGetAttitudeTowardsPlayer(_Npc,_Player,_Att) 
+AND
+ _MinAtt > _Att
+AND
+IntegerSubtract(_MinAtt,_Att,_Diff)
+THEN	
+CharacterAddAttitudeTowardsPlayer(_Npc,_Player,_Diff);
+
+// Set attitude to at maximum
+PROC	
+SetAttitudeToAtMax((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_MaxAtt)
+AND
+CharacterGetAttitudeTowardsPlayer(_Npc,_Player,_Att) 
+AND
+_Att > _MaxAtt
+AND
+IntegerSubtract(_Att,_MaxAtt,_Diff)
+AND
+IntegerProduct(_Diff, -1, _Mul)
+THEN	
+CharacterAddAttitudeTowardsPlayer(_Npc,_Player,_Mul);
+
+// Set repattitude to at least
+PROC
+SetRepAttitudeToAtLeast((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_MinRepAtt)
+AND
+CharacterGetAttitudeTowardsPlayer(_Npc,_Player,_Att) 
+AND
+CharacterGetReputation(_Player,_Rep)
+AND
+IntegerSum(_Att,_Rep,_RepAtt) 
+AND
+_RepAtt < _MinRepAtt 
+AND
+IntegerSubtract(_MinRepAtt,_Rep,_MinAtt)
+AND
+IntegerSubtract(_MinAtt,_Att,_Diff)
+THEN
+CharacterAddAttitudeTowardsPlayer(_Npc,_Player,_Diff);
+
+//////////////////////////////////////////////////////////////////////////////////////
+// If a best friend is confronted with something bad, the friend
+// sort of disbeliefs this and only subtracts 1/10th of _Delta.
+// So, e.g. even if the player steals the own belongings of the _Npc (_Delta = 100)
+// or steals the most famous object in the world (_Delta = 100), then still,
+// attitude will drop only by 10.
+PROC	
+DecreaseAttitude((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Delta)
+AND
+_Delta < 0 
+AND
+IntegerProduct(_Delta,-1,_MDelta)
+THEN
+IncreaseAttitude(_Player,_Npc,_MDelta);
+
+PROC	
+DecreaseAttitude((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Delta) 
+AND
+_Delta > 0
+AND
+CharacterGetAttitudeTowardsPlayer(_Npc,_Player,_A) 
+AND
+_A >= 90		//TODO define ATTITUDE_BEST_FRIEND
+AND
+IntegerDivide(_Delta,10,_D) 
+AND
+IntegerProduct(_D,-1,_Diff)
+THEN
+CharacterAddAttitudeTowardsPlayer(_Npc,_Player,_Diff);
+
+PROC
+DecreaseAttitude((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Delta) 
+AND
+_Delta > 0 
+AND
+CharacterGetAttitudeTowardsPlayer(_Npc,_Player,_A)  
+AND
+_A <  90		//TODO define ATTITUDE_BEST_FRIEND 
+AND
+IntegerProduct(_Delta,-1,_Diff)
+THEN
+CharacterAddAttitudeTowardsPlayer(_Npc,_Player,_Diff);
+
+//////////////////////////////////////////////////////////////////////////////////////
+PROC
+IncreaseAttitude((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Delta)
+AND
+_Delta < 0 
+AND
+IntegerProduct(_Delta,-1,_MDelta)
+THEN	
+DecreaseAttitude(_Player,_Npc,_MDelta);
+
+PROC	
+IncreaseAttitude((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Delta)
+AND
+_Delta > 0
+THEN
+CharacterAddAttitudeTowardsPlayer(_Npc,_Player,_Delta);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// Rules to determine the players "total attitude", hir rep attitude (reputation + attitude)
+// 		RepAttitude(_Npc) == Attitude(_Npc) + player's reputation
+//
+
+// DIRK 26/10/2001:
+// a reputation change causes the following rule to "join" with all attitude/2 facts asserted
+// This creates a performance dip. Hence, we spread the update of RepAttitude by updating only
+// for the npcs in sight range. This means that from now on, we cannot trigger things anymore
+// depending on an attitude change only, for npcs that are out of sight.
+// (This was not needed anyway.)
+//
+// The data:
+// base data:
+//		Attitude(_Npc,_Att):	the _Npc's attitude towards the player
+//		Reputation(_Rep):		the player's reputation
+// derived data:
+//		RepAttitude(_Npc,_RepAttitude): the result to show on screen in the game and to use to determine actions
+//
+
+// Ignore attitude if DB_EvilDude or so instructed:
+IF
+DB_EvilDude(_Npc)
+THEN
+CharacterEnableReputationEffects(_Npc,0);
+DB_EvilDudeRepCheck(_Npc);
+
+IF
+DB_EvilDudeRepCheck(_Npc)
+AND
+NOT DB_EvilDude(_Npc)
+THEN
+CharacterEnableReputationEffects(_Npc,1);
+
+//////////////////////////////////////////////////////////////////////////////////////
+// ApplyTradeBalanceToAttitude((NPC)_Npc)
+//
+//		Set attitude, but takes trade balance into account
+//		This allows by giving gifts to NPCs to get them back to deal with you.
+//
+PROC
+ProcModifyAttitudeForGold((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_ValuePlayer,(INTEGER)_ValueNpc)
+AND
+NOT DB_TempTradeBalance(_Player,_Npc,_)
+THEN
+DB_TempTradeBalance(_Player,_Npc,0);
+
+PROC
+ProcModifyAttitudeForGold((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_ValuePlayer,(INTEGER)_ValueNpc)
+AND
+IntegerSubtract(_ValuePlayer,_ValueNPC,_Delta)
+AND
+_Delta>0
+AND
+DB_TempTradeBalance(_Player,_Npc,_OldBalance)
+AND
+IntegerSum(_Delta,_OldBalance,_NewBalance)
+AND
+CharacterGetLevel(_Npc,_NpcLevel)
+AND
+DB_AttitudePrice(_NpcLevel,_Price)
+AND
+IntegerDivide(_NewBalance,_Price,_Q)
+AND
+IntegerProduct(_Q,_Price,_TotalSubtracted)
+AND
+IntegerSubtract(_NewBalance,_TotalSubtracted,_Remainder)
+THEN
+NOT DB_TempTradeBalance(_Player,_Npc,_OldBalance);
+DB_TempTradeBalance(_Player,_Npc,_Remainder);
+DB_AttitudeAdjustMent(_Player,_Npc,_Q);
+
+
+PROC	
+ApplyTradeBalanceToAttitude((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT DB_LastTradeBalanceUsed(_Player,_Npc,_)
+THEN
+DB_LastTradeBalanceUsed(_Player,_Npc,0);
+
+PROC	
+ApplyTradeBalanceToAttitude((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_LastTradeBalanceUsed(_Player,_Npc,(INTEGER)_LastTB) 
+AND
+TradeBalance(_Player,_Npc,(INTEGER)_TB) 
+AND
+_TB > _LastTB
+AND
+IntegerSubtract(_TB,_LastTB,_Delta) 
+AND
+CharacterGetLevel(_Npc,_NpcLevel)
+AND
+DB_AttitudePrice(_NpcLevel,_Price)
+AND
+IntegerDivide(_Delta,_Price,_Q)
+AND
+_Q > 0
+THEN
+NOT DB_LastTradeBalanceUsed(_Player,_Npc,_LastTB);
+DB_LastTradeBalanceUsed(_Player,_Npc,_TB);
+IncreaseAttitude(_Player,_Npc,_Q);
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+
+IF
+DialogCharacterEventSet("EVENT_npc_attitude_up",_Npc,_Instance)
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+THEN
+SetDialogEvent(_Npc,"EVENT_npc_attitude_up",0);
+IncreaseAttitude(_Player,_Npc,10);
+
+IF	
+DialogCharacterEventSet("EVENT_npc_attitude_down",_Npc,_Instance)
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+THEN	
+SetDialogEvent(_Npc,"EVENT_npc_attitude_down",0);
+DecreaseAttitude(_Player,_Npc,10);
+
+IF
+DialogCharacterEventSet("EVENT_npc_attitude_up_25",_Npc,_Instance)
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+THEN
+SetDialogEvent(_Npc,"EVENT_npc_attitude_up_25",0);
+IncreaseAttitude(_Player,_Npc,25);
+
+IF	
+DialogCharacterEventSet("EVENT_npc_attitude_down_25",_Npc,_Instance)
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+THEN
+SetDialogEvent(_Npc,"EVENT_npc_attitude_down_25",0);
+DecreaseAttitude(_Player,_Npc,25);
+
+IF
+DialogCharacterEventSet("EVENT_npc_attitude_up_50",_Npc,_Instance)
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+THEN	
+SetDialogEvent(_Npc,"EVENT_npc_attitude_up_50",0);
+IncreaseAttitude(_Player,_Npc,50);
+
+IF	
+DialogCharacterEventSet("EVENT_npc_attitude_down_50",_Npc,_Instance)
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+THEN	
+SetDialogEvent(_Npc,"EVENT_npc_attitude_down_50",0);
+DecreaseAttitude(_Player,_Npc,50);
+
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+
+
+//////////////////////////////////////////////////////////////////////////////////////
+// Keep track with fighting, Attack/2 calls, etc...
+
+//We put this here because of the changed event flow
+IF
+CharacterRelationChangedTo(_Npc,_Player,_)
+AND
+_Player.DB_IsPlayer()
+THEN
+NOT DB_AlignmentChangedByStory(_Player,_Npc);
+
+IF
+CharacterRelationChangedTo(_Npc,_Player,_Value)
+AND
+_Player.DB_IsPlayer()
+THEN	
+NOT DB_EngineTriggersIsHostile(_Player,_Npc);
+
+
+
+///////////////////////////////////////////////////////////////////////////////////:
+
+// Omitting the 2nd parameter (_Reason of the alignment drop) defaults to a cautious reaction:
+PROC	
+CheckIfGeneralStoryRulesMayInstructNpcToAttack((CHARACTER)_Player,(CHARACTER)_Npc)
+THEN	
+CheckIfGeneralStoryRulesMayInstructNpcToAttack(_Player,_Npc,0);  //TODO define ACTION_UNSPECIFIED
+
+// Clear stuff:
+PROC
+CheckIfGeneralStoryRulesMayInstructNpcToAttack((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_)
+THEN
+NOT GeneralStoryRulesMayInstructNpcToAttack(_Player,_Npc);
+
+PROC	
+CheckIfGeneralStoryRulesMayInstructNpcToAttack((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_)
+AND
+DB_NextDoRevengeDialog(_Player,_Npc,(STRING)_Dialog)
+THEN	
+NOT DB_NextDoRevengeDialog(_Player,_Npc,_Dialog);
+
+// Npcs NEVER attack because of story rules if
+//		- IsStoryNpc
+//		- MustNotBecomeHostile
+//		- the npc cannot fight
+PROC	
+CheckIfGeneralStoryRulesMayInstructNpcToAttack((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Reason)
+AND
+NOT IsStoryNpc(_Npc) 
+AND						// Storynpcs must not fight
+NOT MustNotBecomeHostile(_Npc)	
+AND		// These npcs must not fight either
+CharacterCanFight(_Npc,1)										// Npcs that cannot fight look silly when "fighting" (they run away)
+THEN	
+CheckIfGeneralStoryRulesMayInstructNpcToAttack_1((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Reason);
+
+// Attacking the npc always allows him to attack:
+PROC	
+CheckIfGeneralStoryRulesMayInstructNpcToAttack_1((CHARACTER)_Player,(CHARACTER)_Npc,5) //TODO define ACTION_ALIGNMENT_CHANGE_TO_ENEMY
+THEN	
+GeneralStoryRulesMayInstructNpcToAttack(_Player,_Npc);
+
+// Other reasons that cause an npc to drop his attitude cause him to attack too,
+// unless MustNotBecomeHostile_UnlessAttacked(_Npc)
+PROC	
+CheckIfGeneralStoryRulesMayInstructNpcToAttack_1((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_)
+AND
+NOT MustNotBecomeHostile_UnlessAttacked(_Npc)
+THEN	
+GeneralStoryRulesMayInstructNpcToAttack(_Player,_Npc);
+
+// EvilDudes always attack:
+PROC	
+CheckIfGeneralStoryRulesMayInstructNpcToAttack_1((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_)
+AND
+DB_EvilDude(_Npc)
+THEN	
+GeneralStoryRulesMayInstructNpcToAttack(_Player,_Npc);
+
+PROC	
+CheckIfGeneralStoryRulesMayInstructNpcToAttack_1((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Reason) 
+AND
+MustNotBecomeHostile_UnlessAttacked(_Npc) 
+AND
+_Reason < 5		//TODO define ACTION_ALIGNMENT_CHANGE_TO_ENEMY
+THEN	
+SetWarningDialogToPlay(_Player,_Npc);
+
+PROC	
+SetWarningDialogToPlay((CHARACTER)_Player,_Npc)
+AND
+WarningDialog(_Npc,_Dialog)
+THEN	
+NextDoRevengeDialogIsWarning(_Player,_Npc,_Dialog);		// Define that npc will issue a warning
+SetWarningDialogToPlay_Done(_Player,_Npc);
+
+PROC	
+SetWarningDialogToPlay((CHARACTER)_Player,_Npc)
+AND
+NOT SetWarningDialogToPlay_Done(_Player,_Npc)
+THEN
+NextDoRevengeDialogIsWarning(_Player,_Npc,"Default_Warning");
+
+PROC	
+SetWarningDialogToPlay((CHARACTER)_Player,(CHARACTER)_Npc)
+THEN	
+NOT SetWarningDialogToPlay_Done(_Player,_Npc);
+
+// If the dialog is played, we remove the block that prevents the npc from attacking, so next time, the npc
+// WILL attack!
+IF	
+DialogEnded(_Dialog,_Instance)
+AND
+DB_DialogNPCs(_Instance,_Npc,1)
+AND 
+WarningDialog(_Npc,_Dialog)
+THEN	
+NOT MustNotBecomeHostile_UnlessAttacked(_Npc); 
+
+IF	
+DialogEnded("Default_Warning",_Instance)
+AND
+DB_DialogNPCs(_Instance,_Npc,1)
+THEN	
+NOT MustNotBecomeHostile_UnlessAttacked(_Npc); 
+
+///////////////////////////////////////////////////////////////////////////////////:
+// DB_IsHostile(_Npc)
+//
+// A hostile _Npc fights when he can. If not, he has a hostile dialog.
+// DB_IsHostile is set if the player attacks the npc. (The engine signals that the alignment changed, the story set DB_IsHostile.)
+// DB_IsHostile is set also if the story sets the attitude/reputation below _MinAtt using SetHatredAlignmentWithHero
+//
+// NOTE! It is very important to take into account the reputation + personal attitude.
+//				This means that when the player's attitude decreases, some npc's state changes to hostile,
+//				or when the reputation increases, they become "un"hostile again.
+//				Regardless of this fact, the rule CheckSetHatredAlignmentWithHero below forces StoryNpcs and the likes
+//				to remain calm an not attack the player.
+//
+
+// Npc becoming hostile:
+// (note: this rule should come AFTER rule ($1$) above
+// such that consecutive changes of RepAttitude are reported to the engine in the correct order)
+
+IF
+CharacterAttitudeTowardsPlayerChanged(_Npc,_Player,_Att)
+THEN
+NOT DB_UpdateRepAttitude_Handled(_Player,_Npc);
+
+IF
+CharacterAttitudeTowardsPlayerChanged(_Npc,_Player,_Att)
+AND
+DB_HostileAtt(_Npc,_HostileAtt)
+AND
+_Att <= _HostileAtt 
+AND
+NOT DB_IsHostile(_Player,_Npc)
+THEN	
+ShouldBecomeHostile(_Player,_Npc);
+
+IF
+CharacterAttitudeTowardsPlayerChanged(_Npc,_Player,_Att)
+AND
+DB_HostileAtt(_Npc,_HostileAtt)
+AND
+_Att > _HostileAtt 
+AND
+DB_IsHostile(_Player,_Npc)
+THEN	
+NOT DB_IsHostile(_Player,_Npc);
+
+// ShouldBecomeHostile checks if _Npc can become hostile.
+// - if engine triggered the npc to become hostile, then there is no discussion
+// - if the story wants the npc to become hostile, we check whether it can be done for this npc
+PROC	
+ShouldBecomeHostile((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND 
+DB_EngineTriggersIsHostile(_Player,_Npc)
+THEN
+DB_IsHostile(_Player,_Npc);
+
+PROC	
+ShouldBecomeHostile((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT DB_EngineTriggersIsHostile(_Player,_Npc)
+THEN	
+ShouldBecomeHostile_1(_Player,_Npc);
+
+PROC	
+ShouldBecomeHostile_1((CHARACTER)_Player,(CHARACTER)_Npc)
+THEN	
+CheckIfGeneralStoryRulesMayInstructNpcToAttack(_Player,_Npc);
+
+PROC	
+ShouldBecomeHostile_1((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+GeneralStoryRulesMayInstructNpcToAttack(_Player,_Npc)
+THEN	
+DB_IsHostile(_Player,_Npc);
+
+// Of the npcs that must not become hostile, change attitude such that he stays at _MinAtt:
+PROC
+ShouldBecomeHostile_1((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT GeneralStoryRulesMayInstructNpcToAttack(_Player,_Npc)
+AND
+DB_HostileAtt(_Npc,_HostileAtt)
+AND
+IntegerSum(_HostileAtt,1,_MinAtt)
+THEN	
+SetRepAttitudeToAtLeast(_Player,_Npc,_MinAtt);
+
+PROC	
+ShouldBecomeHostile_1((CHARACTER)_Player,(CHARACTER)_Npc)
+THEN	
+NOT GeneralStoryRulesMayInstructNpcToAttack(_Player,_Npc);
+
+//ignore if it's a player attacking himself or another player
+//ignore if the NPC is already in combat
+
+IF
+CharacterAttackedByCharacter(_Npc,_Player)
+AND
+_Npc!=_Player
+AND
+CharacterGetRelationToCharacter(_Player,_Npc,_Rel)
+AND
+_Rel>=25
+AND
+CharacterIsDead(_Player,0)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT _Npc.DB_IsPlayer()
+AND
+CharacterIsDead(_Npc,0)
+AND
+NOT DB_Combat(_Npc,_)
+AND
+NOT DB_DisableAttackReaction(_Npc)
+AND
+NOT DB_GenericsBlockedFor(_Player)
+AND
+NOT DB_IsGuard(_Npc)
+AND
+NOT _Npc.DB_IsInDialog()
+AND
+NOT DB_IsNotMessingAround(_Npc)
+AND
+NOT DB_Pets(_Npc,_)
+THEN	
+WarnPlayerOfAttack(_Npc,_Player);
+
+IF
+CharacterAttackedByCharacter(_Npc,_Player)
+AND
+_Npc!=_Player
+AND
+CharacterGetRelationToCharacter(_Player,_Npc,_Rel)
+AND
+_Rel>=25
+AND
+CharacterIsDead(_Player,0)
+AND
+_Player.DB_IsPlayer()
+AND
+DB_Companion(_Npc)
+AND
+CharacterIsDead(_Npc,0)
+AND
+NOT DB_Combat(_Npc,_)
+AND
+NOT DB_GenericsBlockedFor(_Player)
+AND
+NOT _Npc.DB_IsInDialog()
+THEN	
+WarnPlayerOfAttack(_Npc,_Player);
+
+IF
+CharacterAttackedByCharacter(_Npc,_Player)
+AND
+_Npc!=_Player
+AND
+CharacterGetRelationToCharacter(_Player,_Npc,_Rel)
+AND
+_Rel>=25
+AND
+CharacterIsDead(_Player,0)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT _Npc.DB_IsPlayer()
+AND
+CharacterIsDead(_Npc,0)
+AND
+DB_Combat(_Npc,_)
+AND
+NOT DB_GenericsBlockedFor(_Player)
+AND
+CharacterHasStatus(_Npc,"CHARMED",0)
+AND
+CharacterHasStatus(_Player,"CHARMED",0)
+AND
+NOT DB_Pets(_Npc,_)
+AND
+NOT DB_DisableAttackReaction(_Npc)
+THEN	
+ProcDoCombatWarning(_Player,_Npc);
+
+PROC
+ProcDoCombatWarning((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT DB_IsGuard(_Npc)
+THEN
+CombatWarnPlayerOfAttack(_Npc);
+
+
+PROC
+ProcDoCombatWarning((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_IsGuard(_Npc)
+THEN
+ProcDoGuardCombatWarning(_Player,_Npc);
+
+PROC
+ProcDoGuardCombatWarning((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT DB_WarnedPlayerOfAttack(_Npc,_)
+THEN
+DB_WarnedPlayerOfAttack(_Npc,0);
+
+PROC
+ProcDoGuardCombatWarning((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_WarnedPlayerOfAttack(_Npc,_Num)
+AND
+IntegerSum(_Num,1,_New)
+THEN
+NOT DB_WarnedPlayerOfAttack(_Npc,_Num);
+DB_WarnedPlayerOfAttack(_Npc,_New);
+
+
+PROC
+ProcDoGuardCombatWarning((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_WarnedPlayerOfAttack(_Npc,_Num)
+AND
+_Num<3
+AND
+DB_Combat(_Npc,_ID)
+THEN
+ProcCheckIfWeNeedToJoinEnemyInCombat(_Npc,_Player,_ID);
+
+PROC
+ProcDoGuardCombatWarning((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_WarnedPlayerOfAttack(_Npc,_Num)
+AND
+_Num>=3
+THEN
+ProcMakeNPCHostile(_Player,_Npc);
+
+IF
+CharacterAttackedByCharacter(_Npc,_Player)
+AND
+_Npc!=_Player
+AND
+DB_IsGuard(_Npc)
+AND
+CharacterIsDead(_Player,0)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT _Npc.DB_IsPlayer()
+AND
+CharacterIsDead(_Npc,0)
+AND
+NOT DB_Combat(_Npc,_)
+AND
+NOT DB_GenericsBlockedFor(_Player)
+AND
+NOT _Npc.DB_IsInDialog()
+AND
+NOT DB_IsNotMessingAround(_Npc)
+AND
+NOT DB_DisableAttackReaction(_Npc)
+THEN	
+DoRevengeOnAttack(_Npc,_Player);
+
+IF
+CharacterAttackedByCharacter(_Npc,_Player)
+AND
+_Npc!=_Player
+AND
+CharacterGetRelationToCharacter(_Player,_Npc,_Rel)
+AND
+_Rel>=25
+AND
+CharacterIsDead(_Player,0)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT _Npc.DB_IsPlayer()
+AND
+CharacterIsDead(_Npc,0)
+AND
+DB_Combat(_Npc,_ID)
+AND
+NOT DB_GenericsBlockedFor(_Player)
+AND
+CharacterHasStatus(_Npc,"CHARMED",0)
+AND
+CharacterHasStatus(_Player,"CHARMED",0)
+AND
+NOT DB_Pets(_Npc,_)
+AND
+DB_DisableAttackReaction(_Npc)
+THEN	
+ProcCheckIfWeNeedToJoinEnemyInCombat(_Npc,_Player,_ID);
+
+PROC
+ProcCheckIfWeNeedToJoinEnemyInCombat((CHARACTER)_Npc,(CHARACTER)_Player,(INTEGER)_ID)
+AND
+DB_Combat(_OtherPlayer,_ID)
+AND
+_OtherPlayer.DB_IsPlayer()
+AND
+_OtherPlayer!=_Player
+AND
+CharacterGetRelationToCharacter(_OtherPlayer,_Npc,_Rel)
+AND
+_Rel<25
+THEN
+ProcMakeNPCHostile(_Player,_Npc);
+
+
+PROC
+RegisterKilling((CHARACTER)_Npc,(CHARACTER)_Player)
+THEN
+DB_Noop(1);
+
+IF
+CharacterKilledByCharacter(_Npc,_Player)
+THEN
+DB_Dead(_Npc);
+
+IF
+CharacterKilledByCharacter(_Npc,_Player)
+AND
+CharacterIsDead(_Player,0)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT _Npc.DB_IsPlayer()
+AND
+CharacterGetRelationToCharacter(_Player,_Npc,_Rel)
+AND
+_Rel>=25
+AND
+NOT DB_GoHostileAfterDialog(_Npc,_)
+AND
+NOT DB_Combat(_Npc,_)
+AND
+NOT DB_GenericsBlockedFor(_Player)
+THEN
+RegisterKilling(_Npc,_Player);
+ProcDoRevengeForKill(_Npc,_Player);
+
+PROC
+ProcDoRevengeForKill((CHARACTER)_Npc,(CHARACTER)_Player)
+AND
+CharacterGetClosestAllyWhoSeesMeAndMyAttackerAndCanFight(_Npc,_Player,_Ally)
+THEN
+DoRevengeOnAttack(_Ally,_Player);
+
+//REGION pets
+IF
+CharacterAttackedByCharacter(_Npc,_Player)
+AND
+_Npc!=_Player
+AND
+DB_Pets(_Npc,_Owner)
+AND
+CharacterIsDead(_Player,0)
+AND
+_Player.DB_IsPlayer()
+AND
+CharacterIsDead(_Npc,0)
+AND
+NOT DB_Combat(_Npc,_)
+AND
+NOT DB_AttackedPet(_,_Npc)
+THEN
+ProcReactOnAttackedPet(_Npc,_Owner,_Player);
+
+PROC
+ProcReactOnAttackedPet((CHARACTER)_Npc,(CHARACTER)_Owner,(CHARACTER)_Player)
+AND
+CharacterCanSeeCharacter(_Owner,_Player,0)
+THEN	
+DialogRequestStopForCharacter(_Npc);
+ProcMakeNPCHostile(_Player,_Npc);
+
+PROC
+ProcReactOnAttackedPet((CHARACTER)_Npc,(CHARACTER)_Owner,(CHARACTER)_Player)
+AND
+CharacterCanSeeCharacter(_Owner,_Player,1)
+THEN	
+DB_AttackedPet(_Player,_Npc);
+DialogRequestStopForCharacter(_Owner);
+ProcCheckPetAttackDialog(_Player,_Owner);
+
+PROC
+ProcCheckPetAttackDialog((CHARACTER)_Player,(CHARACTER)_Owner)
+AND
+DoNotStartDialogsDueToGenericRules(_Player,1)
+AND
+DB_AttackedPet(_Player,_Pet)
+THEN
+NOT DB_AttackedPet(_Player,_Pet);
+ProcMakeNPCHostile(_Player,_Pet);
+ProcMakeNPCHostile(_Player,_Owner);
+Story_CallGuards(_Player,5);	//call guards if we can	
+
+
+PROC
+ProcCheckPetAttackDialog((CHARACTER)_Player,(CHARACTER)_Owner)
+AND
+NOT DoNotStartDialogsDueToGenericRules(_Player,1)
+THEN
+ProcLaunchOverheadDialogReplacement(_Owner);
+SetAndStartDialog_DisableDialogsCausedByGenericRules(_Player,_Owner,"Default_AttackPet");
+
+PROC
+PreStartDialog((CHARACTER)_Player,(CHARACTER)_Npc,"Default_AttackPet")
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_CallingGuards",0);
+
+PROC
+PreStartDialog((CHARACTER)_Player,(CHARACTER)_Npc,"Default_AttackPet")
+AND
+DB_InRegion(_Player,_Region)
+AND
+GuardedRegion(_Region,_,_,_) 
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_CallingGuards",1);
+
+IF
+DialogEnded("Default_AttackPet",_Inst)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_AttackedPet(_Player,_Pet)
+THEN
+ProcMakePetHostile(_Player,_Pet);
+NOT DB_AttackedPet(_Player,_Pet);
+ProcMakeNPCHostile(_Player,_Npc);
+Story_CallGuards(_Player,5);	//call guards if we can	
+
+PROC
+ProcMakePetHostile((CHARACTER)_Player,(CHARACTER)_Pet)
+AND
+CharacterCanFight(_Pet,1)
+THEN
+ProcMakeNPCHostile(_Player,_Pet);
+
+//END_REGION
+
+
+//REGION
+IF
+CharacterAttackedByCharacter(_Npc,_Player)
+AND
+_Npc!=_Player
+AND
+DB_IsNotMessingAround(_Npc)
+AND
+CharacterIsDead(_Player,0)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT _Npc.DB_IsPlayer()
+AND
+CharacterIsDead(_Npc,0)
+AND
+NOT DB_Combat(_Npc,_)
+AND
+NOT _Npc.DB_IsInDialog()
+THEN	
+ProcRegisterKillingIfFriendly(_Npc,_Player);
+DialogRequestStopForCharacter(_Npc);
+ProcMakeNPCHostile(_Player,_Npc);
+
+IF
+CharacterSpottedItemTemplateUsed_Redhanded(_Player,_Npc,_Owner,_Temp,_CrimeID)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT PlayerInPrison(_Player,_)
+AND
+NOT NoStealingReaction(_Npc)
+AND
+DB_IsNotMessingAround(_Npc)
+AND
+CharacterIsTagged(_Npc,"Animal",0)
+AND
+NOT DB_Combat(_Npc,_)
+AND
+NOT DB_CrimeHandled(_Player,_CrimeID)
+AND
+ItemTemplateCanSitOn(_Temp,0)
+THEN
+DB_CrimeHandled(_Player,_CrimeID);
+DialogRequestStopForCharacter(_Npc);
+ProcMakeNPCHostile(_Player,_Npc);
+
+IF
+CharacterSpottedItemTheft_Redhanded(_Player,_Npc,_,_,_,_,_CrimeID,_,_,_,_,_,_,_)
+AND
+NOT NoStealingReaction(_Npc)
+AND
+DB_IsNotMessingAround(_Npc)
+AND
+CharacterIsTagged(_Npc,"Animal",0)
+AND
+CharacterIsDead(_Player,0)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT _Npc.DB_IsPlayer()
+AND
+CharacterIsDead(_Npc,0)
+AND
+NOT DB_Combat(_Npc,_)
+AND
+NOT DB_CrimeHandled(_Player,_CrimeID)
+THEN	
+DB_CrimeHandled(_Player,_CrimeID);
+DialogRequestStopForCharacter(_Npc);
+ProcMakeNPCHostile(_Player,_Npc);
+
+IF
+CharacterSpottedItemTemplateTheft_Redhanded(_Player,_Npc,_,_,_,_,_,_CrimeID,_,_,_,_,_,_,_)
+AND
+NOT NoStealingReaction(_Npc)
+AND
+DB_IsNotMessingAround(_Npc)
+AND
+CharacterIsTagged(_Npc,"Animal",0)
+AND
+CharacterIsDead(_Player,0)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT _Npc.DB_IsPlayer()
+AND
+CharacterIsDead(_Npc,0)
+AND
+NOT DB_Combat(_Npc,_)
+AND
+NOT DB_CrimeHandled(_Player,_CrimeID)
+THEN	
+DB_CrimeHandled(_Player,_CrimeID);
+DialogRequestStopForCharacter(_Npc);
+ProcMakeNPCHostile(_Player,_Npc);
+
+IF
+CharacterSpottedItemTemplateAttacked_Redhanded(_Player,_Npc,_,_,_,_,_,_CrimeID,_Handle)
+AND
+NOT NoStealingReaction(_Npc)
+AND
+DB_IsNotMessingAround(_Npc)
+AND
+CharacterIsTagged(_Npc,"Animal",0)
+AND
+CharacterIsDead(_Player,0)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT _Npc.DB_IsPlayer()
+AND
+CharacterIsDead(_Npc,0)
+AND
+NOT DB_Combat(_Npc,_)
+AND
+NOT DB_CrimeHandled(_Player,_CrimeID)
+AND
+ItemHandleGetHealthPoints(_Handle,_HP)
+AND
+_HP>0
+THEN	
+DB_CrimeHandled(_Player,_CrimeID);
+DialogRequestStopForCharacter(_Npc);
+ProcMakeNPCHostile(_Player,_Npc);
+
+IF
+CharacterSpottedItemTemplateDestroyed_Redhanded(_Player,_Npc,_,_,_,_,_CrimeID)
+AND
+NOT NoStealingReaction(_Npc)
+AND
+DB_IsNotMessingAround(_Npc)
+AND
+CharacterIsTagged(_Npc,"Animal",0)
+AND
+CharacterIsDead(_Player,0)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT _Npc.DB_IsPlayer()
+AND
+CharacterIsDead(_Npc,0)
+AND
+NOT DB_Combat(_Npc,_)
+AND
+NOT DB_CrimeHandled(_Player,_CrimeID)
+THEN	
+DB_CrimeHandled(_Player,_CrimeID);
+DialogRequestStopForCharacter(_Npc);
+ProcMakeNPCHostile(_Player,_Npc);
+
+IF
+CharacterSpottedItemTemplateMoved_Redhanded(_Player,_Npc,_,_,_CrimeID)
+AND
+NOT NoStealingReaction(_Npc)
+AND
+DB_IsNotMessingAround(_Npc)
+AND
+CharacterIsTagged(_Npc,"Animal",0)
+AND
+CharacterIsDead(_Player,0)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT _Npc.DB_IsPlayer()
+AND
+CharacterIsDead(_Npc,0)
+AND
+NOT DB_Combat(_Npc,_)
+AND
+NOT DB_CrimeHandled(_Player,_CrimeID)
+THEN	
+DB_CrimeHandled(_Player,_CrimeID);
+DialogRequestStopForCharacter(_Npc);
+ProcMakeNPCHostile(_Player,_Npc);
+//END_REGION
+
+PROC
+CombatWarnPlayerOfAttack((CHARACTER)_Npc)
+AND
+CharacterIsTagged(_Npc,"Animal",0)
+AND
+CharacterGetFaction(_Npc,_Faction)
+AND
+NOT DB_CustomCombatWarningDialog((STRING)_Faction,(STRING)_)
+THEN
+ProcLaunchOverheadDialogReplacement(_Npc);
+DialogStartOneSpeakerDialog("please_dont_attack_combat",_Npc);
+
+PROC
+CombatWarnPlayerOfAttack((CHARACTER)_Npc)
+AND
+CharacterIsTagged(_Npc,"Animal",0)
+AND
+CharacterGetFaction(_Npc,_Faction)
+AND
+DB_CustomCombatWarningDialog((STRING)_Faction,_Dialog)
+THEN
+DialogStartOneSpeakerDialog(_Dialog,_Npc);
+
+PROC
+WarnPlayerOfAttack((CHARACTER)_Npc,(CHARACTER)_Player)
+AND
+NOT DB_WarnedPlayerOfAttack(_Npc,_)
+THEN
+DB_WarnedPlayerOfAttack(_Npc,0);
+
+//go hostile if your health is low
+PROC
+WarnPlayerOfAttack((CHARACTER)_Npc,(CHARACTER)_Player)
+AND
+CharacterGetHitpointsPercentage(_Npc,_Percentage)
+AND
+_Percentage <=35
+AND
+DB_WarnedPlayerOfAttack(_Npc,_count)
+THEN 
+NOT DB_WarnedPlayerOfAttack(_Npc,_count);
+DB_WarnedPlayerOfAttack(_Npc,666);	//make sure he attacks
+
+PROC
+WarnPlayerOfAttack((CHARACTER)_Npc,(CHARACTER)_Player)
+AND
+CharacterGetRepAttitudeTowardsPlayer(_Npc,_Player,_Att)
+AND 
+_Att < 0
+AND
+NOT DB_EvilDude(_Npc)
+AND
+NOT DB_Companion(_Npc)
+THEN
+WarnPlayerOfAttack(_Npc,_Player,2);
+
+PROC
+WarnPlayerOfAttack((CHARACTER)_Npc,(CHARACTER)_Player)
+AND
+CharacterGetRepAttitudeTowardsPlayer(_Npc,_Player,_Att)
+AND 
+_Att >= 0
+AND
+NOT DB_EvilDude(_Npc)
+AND
+NOT DB_Companion(_Npc)
+THEN
+WarnPlayerOfAttack(_Npc,_Player,3);
+
+PROC
+WarnPlayerOfAttack((CHARACTER)_Npc,(CHARACTER)_Player)
+AND
+DB_Companion(_Npc)
+THEN
+WarnPlayerOfAttack(_Npc,_Player,3);
+
+PROC
+WarnPlayerOfAttack((CHARACTER)_Npc,(CHARACTER)_Player)
+AND
+DB_EvilDude(_Npc)
+THEN
+WarnPlayerOfAttack(_Npc,_Player,0);
+
+PROC
+WarnPlayerOfAttack((CHARACTER)_Npc,(CHARACTER)_Player,(INTEGER)_Max)
+AND
+DB_Combat(_Player,_)
+THEN
+CombatWarnPlayerOfAttack(_Npc);
+
+
+PROC
+WarnPlayerOfAttack((CHARACTER)_Npc,(CHARACTER)_Player,(INTEGER)_Max)
+AND
+NOT DB_Combat(_Player,_)
+AND
+DB_WarnedPlayerOfAttack(_Npc,_count)
+AND
+_count>=_Max
+THEN
+DoRevengeOnAttack(_Npc,_Player);
+
+PROC
+WarnPlayerOfAttack((CHARACTER)_Npc,(CHARACTER)_Player,(INTEGER)_Max)
+AND
+NOT DB_Combat(_Player,_)
+AND
+DB_WarnedPlayerOfAttack(_Npc,_count)
+AND
+_count<_Max
+THEN
+NPCDoWarning(_Npc,_Player);
+
+PROC
+NPCDoWarning((CHARACTER)_Npc,(CHARACTER)_Player)
+AND
+DB_WarnedPlayerOfAttack(_Npc,_count)
+AND
+IntegerSum(_count,1,_new)
+THEN
+NOT DB_WarnedPlayerOfAttack(_Npc,_count);
+DB_WarnedPlayerOfAttack(_Npc,_new);
+DecreaseAttitude(_Player,_Npc,5);
+ProcLaunchOverheadDialogReplacement(_Npc);
+StartWarningDialog(_Npc,_Player);
+
+PROC
+StartWarningDialog((CHARACTER)_Npc,(CHARACTER)_Player)
+AND
+NOT DB_IsHostile(_Player,_Npc)
+AND
+NOT DB_GoHostileAfterDialog(_Npc,_Player)
+AND
+NOT DoNotStartDialogsDueToGenericRules(_Player,1)
+AND
+DB_CustomWarningDialog(_Npc,(STRING)_Dialog)
+THEN
+DB_FoundWarningDialog(_Player);
+SetAndStartDialog_DisableDialogsCausedByGenericRules(_Player,_Npc,_Dialog);
+
+PROC
+StartWarningDialog((CHARACTER)_Npc,(CHARACTER)_Player)
+AND
+NOT DB_IsHostile(_Player,_Npc)
+AND
+CharacterGetFaction(_Npc,_Faction)
+AND
+DB_CustomFactionWarningDialog(_Faction,(STRING)_Dialog)
+AND
+NOT DB_GoHostileAfterDialog(_Npc,_Player)
+AND
+NOT DoNotStartDialogsDueToGenericRules(_Player,1)
+AND
+NOT DB_FoundWarningDialog(_Player)
+THEN
+DB_FoundWarningDialog(_Player);
+SetAndStartDialog_DisableDialogsCausedByGenericRules(_Player,_Npc,_Dialog);
+
+PROC
+StartWarningDialog((CHARACTER)_Npc,(CHARACTER)_Player)
+AND
+NOT DB_IsHostile(_Player,_Npc)
+AND
+NOT DB_GoHostileAfterDialog(_Npc,_Player)
+AND
+NOT DoNotStartDialogsDueToGenericRules(_Player,1)
+AND
+DB_CustomGroupWarningDialog(_Group,_Dialog)
+AND
+CharacterIsTagged(_Npc,_Group,1)
+AND
+NOT DB_FoundWarningDialog(_Player)
+THEN
+DB_FoundWarningDialog(_Player);
+SetAndStartDialog_DisableDialogsCausedByGenericRules(_Player,_Npc,_Dialog);
+
+PROC
+StartWarningDialog((CHARACTER)_Npc,(CHARACTER)_Player)
+AND
+NOT DB_IsHostile(_Player,_Npc)
+AND
+NOT DB_GoHostileAfterDialog(_Npc,_Player)
+AND
+NOT DoNotStartDialogsDueToGenericRules(_Player,1)
+AND
+NOT DB_FoundWarningDialog(_Player)
+THEN
+DB_FoundWarningDialog(_Player);
+SetAndStartDialog_DisableDialogsCausedByGenericRules(_Player,_Npc,"please_dont_attack");
+
+PROC
+StartWarningDialog((CHARACTER)_Npc,(CHARACTER)_Player)
+THEN
+NOT DB_FoundWarningDialog(_Player);
+
+PROC
+DoRevengeOnAttack((CHARACTER)_Npc,(CHARACTER)_Player)
+AND
+NOT DB_GoHostileAfterDialog(_,_Player)	//block area of effect spells from calling this multiple times
+AND
+NOT DB_Companion(_Npc)
+AND
+NOT DB_NoDefaultBehavior(_Npc) 
+THEN
+DB_AlignmentChangedByStory(_Player,_Npc);
+DB_GoHostileAfterDialog(_Npc,_Player);
+DB_AttackedNPC(_Npc,_Player);
+DoRevenge(_Player,_Npc,5);	
+
+PROC
+DoRevengeOnAttack((CHARACTER)_Npc,(CHARACTER)_Player)
+AND
+NOT DB_GoHostileAfterDialog(_,_Player)	//block area of effect spells from calling this multiple times
+AND
+NOT DB_Companion(_Npc)
+AND
+DB_NoDefaultBehavior(_Npc) 
+THEN
+ProcMakeNPCHostile(_Player,_Npc);
+
+PROC
+DoRevengeOnAttack((CHARACTER)_Npc,(CHARACTER)_Player)
+AND
+DB_Companion(_Npc)
+AND
+DB_AttackDialog(_Npc,(STRING)_Dialog)
+THEN
+ProcDoTwoSpeakerDialog(_Dialog,_Npc,_Player);
+
+PROC
+DoRevengeOnAttack((CHARACTER)_Npc,(CHARACTER)_Player)
+AND
+DB_Companion(_Npc)
+AND
+_Npc.isHenchMan()
+THEN
+ProcDoTwoSpeakerDialog("Henchman_LeavesParty",_Npc,_Player);
+
+IF
+DialogEnded("Henchman_LeavesParty",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Npc,1)
+AND
+DB_Companion(_Npc)
+THEN
+ProcDismissHenchman(_Npc);
+ProcResetAttackWarningsForNPC(_Npc);
+
+IF
+DialogEnded(_Dialog,_Inst)
+AND
+DB_DialogPlayers(_Inst,_Npc,1)
+AND
+DB_AttackDialog(_Npc,(STRING)_Dialog)
+AND
+DB_Companion(_Npc)
+AND
+DB_DismissEvent((CHARACTER)_Npc,(STRING)_Event)
+THEN
+GlobalSetEvent(_Event);
+ProcDoDismissOfCompanion(_Npc);
+ProcResetAttackWarningsForNPC(_Npc);
+
+PROC
+ProcResetAttackWarningsForNPC((CHARACTER)_Npc)
+AND
+DB_WarnedPlayerOfAttack(_Npc,_count)
+THEN
+NOT DB_WarnedPlayerOfAttack(_Npc,_count);
+
+IF
+CharacterLeftCombat(_Npc,_)
+AND
+DB_AttackedNPC(_Npc,_Player)
+THEN
+NOT DB_AttackedNPC(_Npc,_Player);
+
+IF
+CharacterDying(_Npc)
+AND
+DB_AttackedNPC(_Npc,_Player)
+THEN
+NOT DB_AttackedNPC(_Npc,_Player);
+RegisterKilling(_Npc,_Player);
+
+PROC
+ProcRegisterKillingIfFriendly((CHARACTER)_Npc,(CHARACTER)_Player)
+AND
+CharacterGetRelationToCharacter(_Player,_Npc,_Rel)
+AND
+_Rel>=25
+THEN
+DB_AttackedNPC(_Npc,_Player);
+
+PROC
+ProcMakeNPCHostile((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+CharacterIsDead(_Npc,0)
+THEN
+DB_AlignmentChangedByStory(_Player,_Npc);
+CharacterSetTemporaryHostileRelation(_Npc,_Player);
+
+PROC
+SetHostileAtt((CHARACTER)_Npc,_)
+AND
+DB_HostileAtt(_Npc,_Old)
+THEN
+NOT DB_HostileAtt(_Npc,_Old);
+
+PROC
+SetHostileAtt((CHARACTER)_Npc,(INTEGER)_Att)
+THEN
+DB_HostileAtt(_Npc,_Att);
+
+IF
+DialogEnded(_,_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+AttackAfterDialog(_Player,_Npc)
+THEN
+NOT AttackAfterDialog(_Player,_Npc);
+ProcCheckDialogAttack(_Player,_Npc,_Inst);
+
+PROC
+ProcCheckDialogAttack((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_)
+AND
+DB_NoDefaultBehavior(_Npc)
+THEN
+ProcMakeNPCHostile(_Player,_Npc);
+
+PROC
+ProcCheckDialogAttack((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_Inst)
+AND
+NOT DB_NoDefaultBehavior(_Npc)
+THEN
+DB_AttackSrcDialog(_Inst);
+DoRevenge(_Player,_Npc,5);
+
+IF
+DB_IsNotMessingAround(_Npc)
+THEN
+DB_NoDefaultBehavior(_Npc);
+
+IF
+DB_Pets(_Npc,_Owner)
+THEN
+DB_NoDefaultBehavior(_Npc);
+
+IF
+DB_NoDefaultBehavior(_Npc)
+THEN
+DB_NoDefaultBehavior_2(_Npc);
+DB_DisableAttackReaction(_Npc);
+
+IF
+DB_NoDefaultBehavior_2(_Npc)
+AND
+NOT DB_NoDefaultBehavior(_Npc)
+THEN
+NOT DB_NoDefaultBehavior_2(_Npc);
+NOT DB_DisableAttackReaction(_Npc);
+
+IF
+CharacterAttitudeTowardsPlayerChanged(_Char,_Player,_)
+AND
+CharacterGetRepAttitudeTowardsPlayer(_Char,_Player,_Rep)
+AND
+_Rep <= -100
+THEN	
+_Char.DoesNotWantToTrade(_Player);
+
+IF
+CharacterAttitudeTowardsPlayerChanged(_Char,_Player,_)
+AND
+CharacterGetRepAttitudeTowardsPlayer(_Char,_Player,_Rep)
+AND
+_Rep >= -99
+THEN	
+NOT _Char.DoesNotWantToTrade(_Player);
+
+IF
+CharacterPickpocketFailed(_Player,_Npc)
+THEN
+DoRevenge(_Player,_Npc,5);
+EXITSECTION
+
+ENDEXITSECTION

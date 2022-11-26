@@ -1,0 +1,121 @@
+#TEMPLATE "_SKILL_Base" : Target_DrainWillpower
+
+INIT
+CHARACTER:__Me
+FLOAT:%SkillTargetScore_Target_DrainWillpower=-1000000
+// [GLOBAL_VARS]
+INT:%ClassScore_Target_DrainWillpower
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_Target_DrainWillpower
+VARS
+	// [CALC_VARS]
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_Target_DrainWillpower")
+ACTIONS
+	Set(%SkillTargetScore_Target_DrainWillpower, -1000000)
+
+	// [CALC_ACTIONS_PRE]
+	Set(%ClassScore_Target_DrainWillpower, 0)
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	IterateCharactersInCombat(__Me, "CalculateTarget_Target_DrainWillpower", Random, Vitality)
+	IF "!c1"
+		IsEqual(%SkillTargetChar_Target_DrainWillpower, null)
+	THEN
+		Add(%ActionScore_Target_DrainWillpower, %SkillTargetScore_Target_DrainWillpower)
+	ENDIF
+	// [~CALC_ACTIONS]
+
+	
+
+	
+// Calculate the character we should attack
+EVENT CalculateTarget_Target_DrainWillpower
+VARS	
+	CHARACTER:_Char
+	// [CALC_TARGET_VARS]
+	INT:_AbilityWillpower
+	INT:_ClassScore_Target_DrainWillpower
+	FLOAT:_Score
+	FLOAT:_SkillRangeMin
+	FLOAT:_SkillRangeMax
+	FLOAT:_DistanceToChar
+	FLOAT:_DistanceScore
+	// [~CALC_TARGET_VARS]
+ON
+	OnIterateCharacter(_Char, "CalculateTarget_Target_DrainWillpower")	
+ACTIONS
+	// [CALC_CHAR_TARGET_ACTIONS_PRE]
+	Set(_ClassScore_Target_DrainWillpower, %ClassScore_Target_DrainWillpower)
+	Set(_Score, 0.0)
+	// [~CALC_CHAR_TARGET_ACTIONS_PRE]
+	// [CALC_CHAR_TARGET_ACTIONS]
+	IF "(!c1&!c2&!c3)&(((c4&c5))|c6)&(c7)&(c8)&(c9)"
+	    CharacterIsDead(_Char) // c1
+	    CharacterHasStatus(_Char, INVISIBLE) // c2
+	    CharacterHasStatus(_Char, SNEAKING) // c3
+	    CharacterGetAbility(_AbilityWillpower, _Char, Willpower) // c4
+	    IsGreaterThen(_AbilityWillpower, 3) // c5
+	    CharacterIsBetterOrEqualClass(_Char, %ClassScore_Target_DrainWillpower, _ClassScore_Target_DrainWillpower, 3, 3, 5, 4, 3) // c6
+	    CharacterIsEnemy(__Me, _Char) // c7
+	    CharacterGetSkillRange(_SkillRangeMin, _SkillRangeMax, __Me, Target_DrainWillpower) // c8
+	    GetDistance(_DistanceToChar, __Me, _Char) // c9
+	THEN
+	    Set(%ClassScore_Target_DrainWillpower, _ClassScore_Target_DrainWillpower)
+	    IF "((c1&c2))"
+	        CharacterGetAbility(_AbilityWillpower, _Char, Willpower) // c1
+	        IsGreaterThen(_AbilityWillpower, 3) // c2
+	    THEN
+	        Add(_Score, 5.0)
+	    ENDIF
+	    // Hostile count score calculation
+	    Add(_Score, 10.0) // HostileWeight
+	    
+	    // Range score calculation
+	    Set(_DistanceScore, _DistanceToChar)
+	    IF "(c1)"
+	        IsGreaterThen(_DistanceScore, _SkillRangeMax) // c1
+	    THEN
+	        Subtract(_DistanceScore, _SkillRangeMax)
+	        Multiply(_DistanceScore, -1.0)
+	    ELIF "(c1)"
+	        IsLessThen(_DistanceScore, _SkillRangeMin) // c1
+	    THEN
+	        Subtract(_DistanceScore, _SkillRangeMin)
+	        Multiply(_DistanceScore, 1.0)
+	    ELSE 
+	        Set(_DistanceScore, 0.0)
+	    ENDIF
+	    Add(_Score, _DistanceScore)
+	    
+	    // Can see score calculation
+	    IF "!c1"
+	    	CharacterCanSee(__Me, _Char)
+	    THEN
+	    	Add(_Score, -10.0)
+	    ENDIF
+	    
+	    IF "c1"
+	    	IsGreaterThen(_Score, %SkillTargetScore_Target_DrainWillpower)
+	    THEN
+	    	Set(%SkillTargetChar_Target_DrainWillpower, _Char)
+	    	Set(%SkillTargetScore_Target_DrainWillpower, _Score)
+	    ENDIF	
+	ENDIF
+	// [~CALC_CHAR_TARGET_ACTIONS]
+	
+	
+	
+	
+	
+	
+	
+	

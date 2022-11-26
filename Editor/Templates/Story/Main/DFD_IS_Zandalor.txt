@@ -1,0 +1,254 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_OneShotPlayerOnlyTrigger(TRIGGER_DFD_IS_WakeZandalor);
+DB_NoDefaultBehavior(CHARACTER_Zandalor);
+DB_NoHostileDialog(CHARACTER_Zandalor);
+DB_NoCharacterCompanionReplace(CHARACTER_Zandalor);
+KBSECTION
+IF
+CharacterDied(CHARACTER_HIB_Icara)
+AND
+NOT DB_OnlyOnce("ZandyWakes")
+THEN
+CharacterSetHasDialog(CHARACTER_Zandalor, 0);
+QuestUpdate("HOM_Starstones", "IcaraDied"); 
+
+IF
+CharacterDied(CHARACTER_HOM_Icara)
+AND
+NOT DB_OnlyOnce("ZandyWakes")
+THEN
+CharacterSetHasDialog(CHARACTER_Zandalor, 0);
+QuestUpdate("HOM_Starstones", "IcaraDied"); 
+
+IF
+DialogCharacterEventSet("HOM_GiveZandalorRing",_Player,_)
+THEN
+ItemToCharacter(ITEM_DAF_IcaraRing,_Player);
+
+IF
+RegionStarted("DAF_Inner_Sanctum")
+THEN
+QuestUpdate("DAF_Zandalor","Temple");
+
+IF
+TimerFinished("ZandyReactsToStarStone")
+THEN
+NOT DB_NoDefaultBehavior(CHARACTER_Zandalor);
+CharacterPlayAnimation(CHARACTER_Zandalor,"knockdown_getup");
+CharacterSetVarInteger(CHARACTER_Zandalor,"State",0);
+DialogStartOneSpeakerDialog("DFD_IS_AD_ZandalorWakes",CHARACTER_Zandalor);
+DB_Dialogs(CHARACTER_Zandalor,"DFD_IS_Zandalor");
+
+IF
+CharacterEnteredTrigger(_Character,TRIGGER_DFD_IS_WakeZandalor)
+AND
+NOT DB_OnlyOnce("ZandyWakes")
+AND
+NOT DB_Dead(CHARACTER_HIB_Icara)
+AND
+NOT DB_Dead(CHARACTER_HOM_Icara)
+AND
+NOT DB_GlobalEvent("DFD_IS_ZandalorIcaraFree")
+THEN
+DB_OnlyOnce("ZandyWakes");
+TimerLaunch("ZandyReactsToStarStone",4000);
+NOT DB_NoCharacterCompanionReplace(CHARACTER_Zandalor);
+
+IF
+CharacterEnteredTrigger(_Character,TRIGGER_DFD_IS_WakeZandalor)
+THEN
+PROC_StarstoneZappingByCharacter(_Character,CHARACTER_Zandalor);
+
+IF
+TimerFinished("zandygetsup")
+THEN
+CharacterPlayAnimation(CHARACTER_Zandalor,"Resurrect_02");
+CharacterSetVarInteger(CHARACTER_Zandalor,"State",0);
+
+IF
+DialogStartRequested(CHARACTER_Zandalor, _Player)
+AND
+NOT DB_OnlyOnce("ZandyWakes")
+AND
+DB_IsPlayer(_Player)
+AND
+NOT DB_Companion(_Player)
+THEN
+DB_OnlyOnce("ZandyWakes");
+CharacterDisplayText(_Player, "DFD_IS_ZandyIsDead");
+CharacterSetHasDialog(CHARACTER_Zandalor, 0);
+NOT DB_NoCharacterCompanionReplace(CHARACTER_Zandalor);
+
+IF
+CharacterDisplayTextEnded(_Player, "DFD_IS_ZandyIsDead")
+THEN
+CharacterSetHasDialog(CHARACTER_HOM_Icara, 0);
+PlayEffectAtTrigger("FX_GP_StarStone_Down_B", TRIGGER_DAF_IS_IcaraSpawn);
+TimerLaunch("END_IcaraAppear", 200);
+TimerLaunch("END_IcaraAppear2", 2000);
+
+IF
+TimerFinished("END_IcaraAppear")
+THEN
+CharacterSetVarItem(CHARACTER_HOM_Icara,"Seat",ITEM_NULL);
+CharacterRemoveStatus(CHARACTER_HOM_Icara, "SITTING");
+CharacterAppearAtTrigger(CHARACTER_HOM_Icara, TRIGGER_DAF_IS_IcaraSpawn, 0);
+CharacterLookFromTrigger(CHARACTER_HOM_Icara, TRIGGER_DAF_IS_IcaraSpawn, 1);
+
+IF
+TimerFinished("END_IcaraAppear2")
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_HOM_Icara,_Player)
+THEN
+PROC_MendatoryDialog("DFD_IS_IcaraBeforeRez",CHARACTER_HOM_Icara,_Player);
+
+IF
+DialogEnded("DFD_IS_IcaraBeforeRez",_)
+THEN
+TimerLaunch("END_IcaraAppear3", 1000);
+
+IF
+TimerFinished("END_IcaraAppear3")
+THEN
+CharacterSetScriptframe(CHARACTER_HOM_Icara, "resZandy");
+TimerLaunch("zandygetsup", 3000);
+
+IF
+CharacterEvent(CHARACTER_HOM_Icara, "ZandyResurrected")
+THEN
+TimerLaunch("DFD_IS_IcaraZandyDialog", 100);
+
+IF
+TimerFinished("DFD_IS_IcaraZandyDialog")
+AND
+NOT DB_CurrentLevel("DAF_Inner_Sanctum")
+THEN
+Proc_FinishSourceTemple();
+CharacterSetVarItem(CHARACTER_HOM_Icara,"Seat",ITEM_HOM_Chair_Icara);
+Poof(CHARACTER_HOM_Icara);
+CharacterSetHasDialog(CHARACTER_HOM_Icara, 1);
+
+IF
+TimerFinished("DFD_IS_IcaraZandyDialog")
+AND
+DB_CurrentLevel("DAF_Inner_Sanctum")
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_Zandalor,_Player)
+THEN
+PROC_MendatoryDialogThreeSpeaker("DFD_IS_ZandalorIcara", CHARACTER_Zandalor, CHARACTER_HOM_Icara, _Player);
+
+IF
+DialogStartRequested(CHARACTER_Zandalor, _Player)
+AND
+NOT DB_OnlyOnce("ZandyWakes")
+AND
+DB_IsPlayer(_Player)
+AND
+DB_Companion(_Player)
+THEN
+ItemDisplayText(ITEM_DFD_IS_ZandalorCompanion, "DFD_IS_ZandalorIsDeadComp");
+
+IF
+DialogEnded("DFD_IS_ZandalorIcara",_)
+THEN
+Proc_FinishSourceTemple();
+CharacterSetVarItem(CHARACTER_HOM_Icara,"Seat",ITEM_HOM_Chair_Icara);
+Poof(CHARACTER_HOM_Icara);
+CharacterSetHasDialog(CHARACTER_HOM_Icara, 1);
+
+IF
+DialogEnded("DFD_IS_Zandalor",_)
+AND
+NOT DB_GlobalEvent("HOM_IcaraInHomestead")
+THEN
+Proc_FinishSourceTemple();
+
+PROC
+Proc_FinishSourceTemple()
+THEN
+Poof(CHARACTER_Zandalor);
+NOT DB_NoDefaultBehavior(CHARACTER_Zandalor);
+PROC_LUC_BG_HideAttacker();
+ProcEnableEndgamePortal();
+QuestUpdate("DAF_Zandalor","Zandalor");
+UnlockAchievement("quest37");
+QuestClose("DAF_Zandalor");
+ProcDefinePartyDialog("DFD_IS_DD_Zandalor");
+NotifyGameProgress(97.0);
+
+//REGION Resurrect Zandalor 
+IF
+CharacterDied(CHARACTER_Zandalor)
+AND
+DB_CurrentLevel("DAF_Inner_Sanctum")
+THEN
+ProcFreezeParty();
+ProcStartMovie("EndMovieLose.bik");
+
+IF
+CharacterDied(CHARACTER_SAC_Zandy)
+AND
+DB_CurrentLevel("SAC_SourceAcademy_Main")
+THEN
+ProcFreezeParty();
+ShowGameOverMenu();
+
+IF
+DB_WasInCombat(CHARACTER_Zandalor,_ID)
+AND
+DB_Dead(CHARACTER_Zandalor)
+AND
+NOT DB_Combat(_,_ID)
+THEN
+GlobalSetEvent("ZandalorKilled");
+Poof(CHARACTER_Zandalor);
+TimerLaunch("HOM_ResZandalor",500);
+
+IF
+TimerFinished("HOM_ResZandalor")
+THEN
+Foop(CHARACTER_Zandalor);
+CharacterResurrect(CHARACTER_Zandalor);
+
+IF
+CharacterResurrected(CHARACTER_Zandalor)
+AND
+DB_AD_Dialog(CHARACTER_Zandalor,_AD)
+THEN
+DB_AD_Dialog_Zandalor_Queue(_AD);
+NOT DB_AD_Dialog(CHARACTER_Zandalor,_AD);
+
+IF
+CharacterResurrected(CHARACTER_Zandalor)
+THEN
+CharacterPlayAnimation(CHARACTER_Zandalor,"still","");
+NOT DB_Dead(CHARACTER_Zandalor);
+PROC_LoopEffectAtCharacter("FX_GP_ExclamationMark_A",CHARACTER_Zandalor,"ExclamationMark","__ANY__");
+DB_Dialogs(CHARACTER_Zandalor,"Zandalor_Resurrected");
+
+IF
+DialogEnded("Zandalor_Resurrected",_)
+THEN
+ProcRemoveDialogEntryForSpeaker(CHARACTER_Zandalor,"Zandalor_Resurrected");
+NOT DB_Dialogs(CHARACTER_Zandalor,"Zandalor_Resurrected");
+PROC_StopEffectAtCharacter(CHARACTER_Zandalor,"ExclamationMark");
+
+IF
+DialogEnded("Zandalor_Resurrected",_)
+AND
+DB_AD_Dialog_Zandalor_Queue(_AD)
+THEN
+NOT DB_AD_Dialog_Zandalor_Queue(_AD);
+DB_AD_Dialog(CHARACTER_Zandalor,_AD);
+//END_REGION
+
+IF
+ItemDestroyed(ITEM_DA_IS_TeleportDoor)
+THEN
+ItemSetVarInteger(ITEM_WAYP_InnerSanctum_Vault,"IgnoreSight",1);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

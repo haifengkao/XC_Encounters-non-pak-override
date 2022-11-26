@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<palette xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <palettes>
+    <EntityPalette>
+      <palettes />
+      <objectids>
+        <guid>c346b6aa-7a7d-4161-9810-3616757414aa</guid>
+      </objectids>
+      <name>Effects_Eric_Tmp</name>
+    </EntityPalette>
+  </palettes>
+  <objectids>
+    <guid>db7069a9-e426-45cc-b21c-f359a61bbdad</guid>
+    <guid>dc3b89c7-d3f1-49d1-9489-f0b479af2094</guid>
+    <guid>73c94433-653b-44ce-abac-6d650efa8c2d</guid>
+  </objectids>
+  <name>Test_Effects</name>
+</palette>

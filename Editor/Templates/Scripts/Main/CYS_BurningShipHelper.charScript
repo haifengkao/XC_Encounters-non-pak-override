@@ -1,0 +1,72 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+FIXEDSTRING:%animation
+
+BEHAVIOUR
+
+REACTION State_Animation, 0
+USAGE PEACE
+VARS 
+	INT:_loopCount
+ACTIONS
+	GetRandomBetween(_loopCount, 1, 3)
+	Label("Loop_Begin")
+	IF "c1"
+		IsEqual(_loopCount, 0)
+	THEN
+		CharacterEvent(__Me, "returnToTrigger")
+	ELSE
+		CharacterPlayAnimation(%animation)
+		Subtract(_loopCount, 1)
+		Goto("Loop_Begin")
+	ENDIF
+	
+REACTION State_Happy, 0
+USAGE PEACE
+ACTIONS
+	//Set(%currentHearState, "Hearing_State_ResetToDefaults")
+	GetRandom(%animation, "Clap_01", "Clap_02", "Clap_03", "Clap_04", "Cheer_01", "Cheer_02", "Cheer_03")	
+	CharacterForceUpdate(0)
+	Set(%currentState, "State_Animation")
+	
+REACTION State_Sad, 0
+USAGE PEACE
+ACTIONS	
+	//Set(%currentHearState, "Hearing_State_ResetToDefaults")
+	GetRandom(%animation, "No_01", "No_02", "No_03", "No_04")
+	CharacterForceUpdate(0)
+	Set(%currentState, "State_Animation")
+	
+REACTION State_ExtinguishingBoat,0
+VARS
+	FIXEDSTRING:_Text
+	FLOAT3:_shipPosition
+	FLOAT:_Rest
+USAGE PEACE
+CHECK "c1"
+	GetPosition(ITEM:CYS_BurningShip_815313cf-e65c-4e03-a3c9-e9db1948fad2, _shipPosition)
+ACTIONS
+	//Set(%reactionOnCharacterCasting, "Hearing_State_ReactOnMagic")
+	CharacterLookAt(_shipPosition)
+	GetRandom(_Text, "CYS_Helpers_Script_0", "CYS_Helpers_Script_1", "CYS_Helpers_Script_2", "CYS_Helpers_Script_4", "CYS_HelpersPuttingOutFire_01", "CYS_HelpersPuttingOutFire_02", "CYS_HelpersPuttingOutFire_03", "CYS_HelpersPuttingOutFire_04")
+	IF "c1"
+		IsRandom(0.2)
+	THEN
+		DisplayText(__Me, _Text, 3)
+	ENDIF
+	GetRandomBetween(_Rest, 0.0, 5.0)
+	CharacterPlayAnimation("Throw_Water_01")
+	Sleep(_Rest)
+INTERRUPT
+	Reset()
+
+EVENTS
+
+EVENT Start
+ON
+	OnInit()
+ACTIONS	
+	CharacterForceUpdate(1)

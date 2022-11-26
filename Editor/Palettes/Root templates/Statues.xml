@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<palette xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <palettes />
+  <objectids>
+    <guid>7b69dbbb-ea81-4355-bf02-cb4693aed08a</guid>
+    <guid>bdc74dd2-46e1-43ec-8fb1-74094abb4338</guid>
+    <guid>ade097b8-2ee1-43ec-8fa7-ac9160c8fb6d</guid>
+    <guid>7ecb1b5b-dd03-4139-9fc8-4bf806081565</guid>
+    <guid>f838d4ea-bc99-4775-9cd6-8531e86fe675</guid>
+    <guid>73672c33-bae6-4f02-93e8-79b2315f5a77</guid>
+    <guid>6dbfbd04-7305-4253-8328-5c71c83bf635</guid>
+    <guid>0ad49e89-7ed6-49ef-91c9-3dfacc97bfa5</guid>
+    <guid>cc94b09e-733a-4dd8-bb67-628ad3b91ba8</guid>
+    <guid>3bd5d38f-6883-4f3b-98b4-a4acf7ede1c3</guid>
+    <guid>2119a5c4-e96e-42e5-8e02-2df5594a8b71</guid>
+    <guid>bdfc63da-04a7-4a51-85b0-db4c0fef2499</guid>
+    <guid>fd4fe2cf-2751-4e90-89f8-875378fa6045</guid>
+    <guid>cf0a860f-83c4-4c21-9515-d72291520c60</guid>
+    <guid>a4e4a8b9-9c1f-40d6-b5e2-538788561040</guid>
+    <guid>10ad1981-3672-4642-bf27-af356f8e19f6</guid>
+    <guid>ba7771a1-a576-46b5-9f67-849c9d5686a9</guid>
+    <guid>5dabace5-9a44-4d7c-b2a8-10945321f2d8</guid>
+    <guid>411545bf-9141-4ff9-bc6f-e0e36257f7cf</guid>
+    <guid>55fbb3e6-af15-4a35-9e0b-f899f0749fb8</guid>
+    <guid>c1a30623-8dd3-48ae-97ab-f2c747afdc03</guid>
+    <guid>a972f51d-b6dc-41b1-ace9-79a53930780b</guid>
+    <guid>1fe68450-a9ed-4798-838d-13e29b39b3e3</guid>
+    <guid>48e9363a-d6cb-4637-96e3-0ff5f65d4fcd</guid>
+    <guid>8f83e977-490c-47ad-8784-c5e1655a8c54</guid>
+    <guid>9efb3af9-4d13-4e98-8e62-67603159bd6d</guid>
+    <guid>0925194e-c334-48bf-8a77-f4cfdec5420e</guid>
+    <guid>4dffae2f-51d2-4696-9a2a-d16c62bc5f1c</guid>
+    <guid>b646830c-86c3-4f69-94fc-fb89ee5792d0</guid>
+    <guid>bbedd793-e29f-40e2-a17d-0aaaaa31a34c</guid>
+    <guid>553809f6-5b1d-42c4-a075-89a9d9713590</guid>
+  </objectids>
+  <name>Statues</name>
+</palette>

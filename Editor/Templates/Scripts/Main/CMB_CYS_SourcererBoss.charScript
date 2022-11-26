@@ -1,0 +1,307 @@
+INIT
+	CHARACTER:__Me
+	FLOAT:%MySightRange
+	CHARACTERTEMPLATE:%Summon_Golem_Melee="CYS_Sourcerer_UndeadMelee_Summon_942b5997-fe24-4480-847b-1583070f06e6"
+	CHARACTERTEMPLATE:%Summon_Golem_Mage="CYS_Sourcerer_UndeadMage_Summon_6c04b1e4-5a32-478b-b873-9e7cb1d90785"
+	CHARACTERTEMPLATE:%Summon_Golem_Ranged="CYS_Sourcerer_UndeadArcher_Summon_cb9723e5-142d-4c0d-b904-b6069f4332e5"
+	CHARACTERTEMPLATE:%Summon_Golem_Shambling="CYS_Sourcerer_ShamblingTank_Summon_6f462400-6528-48ce-9395-d184640eeb74"
+	INT:%Golems_CurrentCount=0
+	EXTERN INT:%HyperSummon_Desired=2
+	EXTERN INT:%HyperSummon_Current=2
+
+//------------------------------
+BEHAVIOUR
+REACTION Sourcerer_HyperSummon,500
+USAGE COMBAT
+VARS
+	INT:_Failures=0
+	INT:_Successes=0
+	CHARACTER:_Player
+	FLOAT:_MyAP
+	FLOAT3:_PosOffset
+	FLOAT3:_MyPosition
+	FLOAT:_Angle
+	FLOAT:_Dist
+	CHARACTER:_Summon
+CHECK "c1&c2&!(c3|c4|c5|c6|c7|c8)"
+	CharacterGet(_Player,__Me,30,Highest,Distance,Enemy)			//c1
+	CharacterGetStat(_MyAP,__Me,ActionPoints)						//c2
+	IsLessThen(_MyAP,5)												//!c3
+	CharacterHasStatus(__Me,"CHARMED")								//!c4
+	CharacterHasStatus(__Me,"PETRIFIED")							//!c5
+	CharacterHasStatus(__Me,"FEAR")									//!c6
+	CharacterHasStatus(__Me,"STUNNED")								//!c7
+	CharacterHasStatus(__Me,"MUTED")								//!c8
+ACTIONS
+	IF "c1"
+		CharacterHasStatus(__Me,INVISIBLE)
+	THEN
+		CharacterRemoveStatus(__Me,INVISIBLE)
+	ENDIF	
+	CharacterLookAt(_Player)
+	CharacterSwitchWeaponType(Unarmed)	
+	CharacterSetCombatTimeout(__Me,90.0)	
+	CharacterPlayAnimation("Chicken_01",0,0)			
+	CharacterPlayEffect(__Me,"FX_Skills_WitchCraft_Summon_Prepare_A")		
+	WHILE "c1&c2"
+		IsLessThen(_Successes,5)
+		IsLessThen(_Failures,30)
+	DO
+		IF "c1"
+			GetPosition(__Me,_MyPosition)
+		THEN
+			Set(_PosOffset,{1.3;0;0}) 
+			GetRandomBetween(_Angle,-270,90)
+			GetRandomBetween(_Dist,3,5)
+			RotateY(_PosOffset,_Angle)
+			Multiply(_PosOffset,_Dist)	
+			Add(_MyPosition,_PosOffset)
+		ENDIF
+		IF "c1&!(c2|c3|c4|c5|c6)"
+			FindValidPosition(_MyPosition,3)
+			ContainsSurface(_MyPosition,1,CloudPoison)
+			ContainsSurface(_MyPosition,1,Ooze)
+			ContainsSurface(_MyPosition,1,Ice)
+			ContainsSurface(_MyPosition,1,CloudStatic)
+			ContainsSurface(_MyPosition,1,Electrified)
+		THEN	
+			IF "c1"
+				IsEqual(_Successes,0)
+			THEN	
+				SpawnCharacter(_Summon,%Summon_Golem_Melee,_MyPosition,1)						
+				Sleep(1)
+				PlayEffectAt(_MyPosition,"FX_Skills_WitchCraft_Generic_A_Cast_A")
+				Add(_Successes,1)
+			ELIF "c1"
+				IsEqual(_Successes,1)
+			THEN			
+				SpawnCharacter(_Summon,%Summon_Golem_Ranged,_MyPosition,1)	
+				Sleep(0.7)
+				PlayEffectAt(_MyPosition,"FX_Skills_WitchCraft_Generic_A_Cast_A")
+				Add(_Successes,1)					
+			ELIF "c1"
+				IsEqual(_Successes,2)
+			THEN					
+				Sleep(0.5)					
+				SpawnCharacter(_Summon,%Summon_Golem_Ranged,_MyPosition,1)
+				Sleep(1)
+				PlayEffectAt(_MyPosition,"FX_Skills_WitchCraft_Generic_A_Cast_A")				
+				Add(_Successes,1)					
+			ELIF "c1"
+				IsEqual(_Successes,3)
+			THEN									
+				PlayEffectAt(_MyPosition,"FX_Skills_WitchCraft_Generic_A_Cast_A")
+				SpawnCharacter(_Summon,%Summon_Golem_Mage,_MyPosition,1)
+				Add(_Successes,1)					
+			ELIF "c1"
+				IsEqual(_Successes,4)
+			THEN
+				Sleep(0.6)															
+				IF "c1"
+					GetPosition(__Me,_MyPosition)
+				THEN
+					Add(_MyPosition,{0;0;4})	
+					PlayEffectAt(_MyPosition,"FX_Skills_WitchCraft_Generic_A_Cast_A")
+					Sleep(0.2)						
+					SpawnCharacter(_Summon,%Summon_Golem_Shambling,_MyPosition,1)
+					Add(_Successes,1)				
+				ENDIF
+			ELSE
+				Add(_Failures,1)
+			ENDIF
+		ELSE
+			 Add(_Failures,1)
+		ENDIF
+	ENDWHILE
+	IF "c1"
+		IsEqual(_Failures,50)
+	THEN
+		Set(_Failures,0)
+		SetPriority("Sourcerer_CastInvisibilityOnMyself",450)	
+		SetPriority("Sourcerer_HyperSummon",0)
+	ENDIF	
+	Set(_Successes,0)
+	Set(%HyperSummon_Current,0)
+	CharacterSwitchWeaponType(OneHanded)	
+	SetPriority("Sourcerer_CastInvisibilityOnMyself",450)		
+	SetPriority("Sourcerer_HyperSummon",0)
+INTERRUPT
+	Reset()
+
+REACTION Sourcerer_CastCharm_IfEnemyTooClose,400
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+CHECK "!c1&c2&c3"
+	CharacterHasStatus(__Me,INVISIBLE)							//!c1
+	CharacterCanCast(__Me,"Projectile_EnemyCharm")				//c2
+	CharacterGet(_Target,__Me,4,Lowest,Distance,Enemy)			//c3
+ACTIONS
+	CharacterUseSkill("Projectile_EnemyCharm",_Target)
+	
+REACTION Sourcerer_CastInvisibilityOnMyself,0
+USAGE COMBAT
+CHECK "!c1&c2"
+	CharacterHasStatus(__Me,INVISIBLE)
+	CharacterCanCast(__Me,"Target_EnemyInvisibilityTarget")
+ACTIONS
+	CharacterUseSkill("Target_EnemyInvisibilityTarget",__Me)
+	CharacterResetCombatTimeout(__Me)	
+	SetPriority("Sourcerer_CastInvisibilityOnMyself",0)
+
+REACTION Sourcerer_CastBoostOnAlly,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "!c1&c2&c3&!c4&c5&c6"
+	CharacterHasStatus(__Me,INVISIBLE)															//c1
+	CharacterCanCast(__Me,"Target_EnemyTargetedDamageBoost")									//c2
+	CharacterGet(_ChosenTarget,__Me,%MySightRange,Highest,Strength,Ally)						//c3
+	CharacterHasStatus(_ChosenTarget,BOOST)														//!c4
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyTargetedDamageBoost")			//c5
+	IsRandom(0.2)																				//c6
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Target_EnemyTargetedDamageBoost",_ChosenTarget)
+
+REACTION Sourcerer_CastBlindOnEnemy,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "!c1&!c2&c3&c4&!c5&c6&c7"
+	IsCasual()																					//!c1	
+	CharacterHasStatus(__Me,INVISIBLE)															//!c2
+	CharacterCanCast(__Me,"Target_EnemyBlind")													//c3
+	CharacterGet(_ChosenTarget,__Me,%MySightRange,Highest,Dexterity,Enemy)						//c4
+	CharacterHasStatus(_ChosenTarget,BLIND)														//!c5	
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyBlind")						//c6
+	IsRandom(0.2)																				//c7
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Target_EnemyBlind",_ChosenTarget)	
+
+REACTION Sourcerer_CastCurseOnEnemy,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "!c1&c2&c3&!c4&c5&c6"
+	CharacterHasStatus(__Me,INVISIBLE)															//c1
+	CharacterCanCast(__Me,"Target_EnemyTargetedCurse")											//c2
+	CharacterGet(_ChosenTarget,__Me,%MySightRange,Highest,Strength,Enemy)						//c3
+	CharacterHasStatus(_ChosenTarget,CURSED)													//!c4	
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyTargetedCurse")				//c5
+	IsRandom(0.2)																				//c6
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Target_EnemyTargetedCurse",_ChosenTarget)			
+	
+//------------------------------
+EVENTS	
+EVENT OnInit_GetSightRange_GiveSkills
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%MySightRange,__Me,Sight)
+	THEN
+		CharacterAddSkill("Target_EnemyInvisibilityTarget")
+		CharacterAddSkill("Target_EnemyTargetedDamageBoost")
+		CharacterAddSkill("Target_EnemyBlind")
+		CharacterAddSkill("Target_EnemyTargetedCurse")
+		CharacterAddSkill("Projectile_EnemyCharm")
+	ENDIF
+	
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	Set(%Golems_CurrentCount,0)
+	IterateCharacters("CMB_CYS_SourcererBoss_CheckForActiveSandGolems",Lowest,Distance)
+	//DebugText(__Me,"[1] golem(s) found!",%Golems_CurrentCount)
+	IF "!c1&c2"
+		IsGreaterThen(%Golems_CurrentCount,1)
+		IsLessThen(%HyperSummon_Current,%HyperSummon_Desired)
+	THEN		
+		Add(%HyperSummon_Current,1)
+	ELIF "!c1&c2"
+		IsGreaterThen(%Golems_CurrentCount,1)
+		IsEqual(%HyperSummon_Current,%HyperSummon_Desired)
+	THEN
+		SetPriority("Sourcerer_HyperSummon",500)
+	ENDIF
+	
+EVENT OnStatusInvisible_DeactivateDefaultAttack
+ON
+	OnCharacterStatus(__Me,INVISIBLE)
+ACTIONS
+	IF "c1"
+		IsRandom(0.5)
+	THEN
+		SetPriority("Combat_AttackSetEnemy",0)
+	ELSE
+		SetPriority("Combat_AttackSetEnemy",7)		
+	ENDIF
+	
+EVENT OnStatusInvisibleRemoved_ReactivateDefaultAttack
+ON
+	OnCharacterStatusRemoved(__Me,INVISIBLE)
+ACTIONS
+	SetPriority("Combat_AttackSetEnemy",7)	
+
+EVENT OnIterateCharacter_CheckForActiveGolems
+VARS
+	CHARACTER:_Ally
+	CHARACTERTEMPLATE:_AllyTemplate
+	CHARACTERTEMPLATE:_GolemTemplate_Tank="CYS_Sourcerer_ShamblingTank_Summon_6f462400-6528-48ce-9395-d184640eeb74"
+	CHARACTERTEMPLATE:_GolemTemplate_Melee="CYS_Sourcerer_UndeadMelee_Summon_942b5997-fe24-4480-847b-1583070f06e6"
+	CHARACTERTEMPLATE:_GolemTemplate_Archer="CYS_Sourcerer_UndeadArcher_Summon_cb9723e5-142d-4c0d-b904-b6069f4332e5"
+	CHARACTERTEMPLATE:_GolemTemplate_Mage="CYS_Sourcerer_UndeadMage_Summon_6c04b1e4-5a32-478b-b873-9e7cb1d90785"
+ON
+	OnIterateCharacter(_Ally,"CMB_CYS_SourcererBoss_CheckForActiveSandGolems")
+ACTIONS
+	IF "!c1&c2&(c3|c4|c5|c6)"
+		CharacterIsDead(_Ally)
+		CharacterGetTemplate(_Ally,_AllyTemplate)
+		IsEqual(_AllyTemplate,_GolemTemplate_Tank)
+		IsEqual(_AllyTemplate,_GolemTemplate_Melee)
+		IsEqual(_AllyTemplate,_GolemTemplate_Archer)
+		IsEqual(_AllyTemplate,_GolemTemplate_Mage)
+	THEN
+		//DebugText(_Ally,"Ok!")
+		Add(%Golems_CurrentCount,1)
+	ENDIF
+	
+EVENT OnIterateCharacter_CleanUp
+VARS
+	CHARACTER:_Ally
+	CHARACTERTEMPLATE:_AllyTemplate
+	CHARACTERTEMPLATE:_GolemTemplate_Tank="CYS_Sourcerer_ShamblingTank_Summon_6f462400-6528-48ce-9395-d184640eeb74"
+	CHARACTERTEMPLATE:_GolemTemplate_Melee="CYS_Sourcerer_UndeadMelee_Summon_942b5997-fe24-4480-847b-1583070f06e6"
+	CHARACTERTEMPLATE:_GolemTemplate_Archer="CYS_Sourcerer_UndeadArcher_Summon_cb9723e5-142d-4c0d-b904-b6069f4332e5"
+	CHARACTERTEMPLATE:_GolemTemplate_Mage="CYS_Sourcerer_UndeadMage_Summon_6c04b1e4-5a32-478b-b873-9e7cb1d90785"
+ON
+	OnIterateCharacter(_Ally,"CMB_CYS_SourcererBoss_CleanUp")
+ACTIONS
+	IF "!c1&c2&(c3|c4|c5|c6)"
+		CharacterIsDead(_Ally)
+		CharacterGetTemplate(_Ally,_AllyTemplate)
+		IsEqual(_AllyTemplate,_GolemTemplate_Tank)
+		IsEqual(_AllyTemplate,_GolemTemplate_Melee)
+		IsEqual(_AllyTemplate,_GolemTemplate_Archer)
+		IsEqual(_AllyTemplate,_GolemTemplate_Mage)
+	THEN
+		CharacterDie(_Ally)
+	ENDIF	
+	
+EVENT OnCombatEnded_CleanUp
+ON
+	OnCombatEnded()
+ACTIONS
+	IterateCharacters("CMB_CYS_SourcererBoss_CleanUp",Lowest,Distance)
+	SetPriority("Sourcerer_HyperSummon",500)

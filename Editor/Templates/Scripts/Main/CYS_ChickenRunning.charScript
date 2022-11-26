@@ -1,0 +1,65 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+CHARACTER:%Cook = CYS_CookMorris_b1a86606-585b-4669-9f94-0c520647ec37
+TRIGGER:%Point1 = c43098ea-d4df-4e08-913c-b9a3f7e2ad6f
+TRIGGER:%Point2 = 73e67afa-49aa-4b6e-9735-50c438a8976a
+TRIGGER:%Point3 = bfd7565b-4c38-477d-867c-deea89fe5036
+TRIGGER:%Point4 = f1424219-d41c-4f44-9a0a-cb57f61d02fa
+TRIGGER:%Point5 = 05916e77-ca90-4f80-ba69-9c9625214072
+
+BEHAVIOUR
+REACTION State_RunAround, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Point1,1)
+	IF "!c1"
+		IsInCombat(%Cook)
+	THEN
+		DisplayText(%Cook,"CYS_ChickenRunning_Script_0",3)
+	ENDIF
+	CharacterMoveTo(%Point2,1)
+	CharacterMoveTo(%Point3,1)
+	IF "!c1"
+		IsInCombat(%Cook)
+	THEN
+		DisplayText(%Cook,"CYS_ChickenRunning_Script_1",3)
+	ENDIF
+	CharacterMoveTo(%Point4,1)
+
+REACTION State_RunAway, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Point5,1)
+	CharacterDisappear(50)
+	SetPriority(%currentState, 0)
+
+REACTION State_ReactOnDeath, 0
+USAGE PEACE
+VARS
+	CHARACTER:_PetPaler
+ACTIONS
+	IF "c1"
+		CharacterGet(_PetPaler,__Me, 10, Lowest, Distance,null,null,null,AnimalEmpathy)
+	THEN
+		DisplayText(__Me, "CYS_CookMorrisTurkey_01", 3)
+	ELSE
+		DisplayText(__Me, "CYS_ChickenCookNoPetPal", 3)
+	ENDIF
+	SetPriority(%currentState, 0)
+
+EVENTS
+
+EVENT poof
+ON
+	OnCharacterEvent(%Cook, "removeChicken")
+ACTIONS
+	CharacterSetOffStage()
+	
+EVENT CookDied
+ON
+	OnDie(%Cook, _, _, _)
+ACTIONS
+	SetPriority(State_RunAway, 500000)

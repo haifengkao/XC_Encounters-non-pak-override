@@ -1,0 +1,49 @@
+
+
+INIT
+	CHARACTER:__Me
+	EXTERN ITEM:%Bed = null
+
+BEHAVIOUR
+
+REACTION Custom_AutomatedDialog_Interrupt, 1701
+USAGE PEACE
+CHECK "c1"
+	IsInDialog(__Me)
+ACTIONS
+	Sleep(2.0)
+	
+REACTION WalkToBed, 150
+	VARS
+		FLOAT:_dist
+	USAGE PEACE
+	CHECK "!c1&c2&c3"
+		IsEqual(%Bed,null)
+		GetDistance(_dist,__Me,%Bed)
+		IsGreaterThen(_dist,2.0)
+	ACTIONS
+		CharacterMoveTo(%Bed)
+		CharacterUseItem(%Bed)
+		
+REACTION Lie, 140
+	USAGE PEACE
+	ACTIONS
+		IF "!c1&!c2"
+			CharacterHasStatus(__Me,"SITTING")
+			CharacterHasStatus(__Me,"LYING")
+		THEN
+			CharacterUseItem(%Bed)
+		ENDIF
+		Sleep(3)
+		
+EVENTS 
+
+EVENT FightStart
+ON
+	OnCombatStarted()
+ACTIONS
+	IF "c1"
+		CharacterHasStatus(__Me, LYING)
+	THEN
+		CharacterRemoveStatus(__Me, LYING)
+	ENDIF

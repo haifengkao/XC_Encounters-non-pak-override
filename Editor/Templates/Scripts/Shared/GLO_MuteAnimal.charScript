@@ -1,0 +1,15 @@
+INIT
+CHARACTER:__Me
+EXTERN TRIGGER:%Anchor = null
+
+BEHAVIOUR
+
+REACTION Wander,2500
+USAGE PEACE
+VARS
+	FLOAT:_Wander
+ACTIONS
+	GetRandomBetween(_Wander, 8, 20)
+	CharacterWander(FLOAT:5,_Wander,0,%Anchor)
+	DisplayText(__Me, "GLO_MuteAnimal", 3)
+	Sleep(3)

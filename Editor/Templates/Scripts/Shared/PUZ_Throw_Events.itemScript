@@ -1,0 +1,108 @@
+#INCLUDE PressurePlate
+
+INIT
+USING PressurePlate
+ITEM:__Me
+
+EXTERN STRING:%Event1On=null
+EXTERN STRING:%Event2On=null
+EXTERN STRING:%Event3On=null
+EXTERN STRING:%Event4On=null
+
+EVENTS
+
+EVENT PlateChange
+ON
+	OnItemEvent(__Me,"PressurePlateChange")
+ACTIONS
+	IF "c1&(!c2|!c3|!c4|!c5)"
+		IsEqual(%CurrentPercentage,1)
+		IsEqual(%Event1On,null)
+		IsEqual(%Event2On,null)
+		IsEqual(%Event3On,null)
+		IsEqual(%Event4On,null)
+	THEN
+		PlaySound(__Me, "Items_Puzzle_PressurePlate")
+		ItemPlayEffect(__Me, "FX_GP_CameraShake_B")
+		DisplayText(__Me,"GLO_PressurePlateActivated",2.0)
+		
+		IF "!c1"
+			IsEqual(%Event1On,null)
+		THEN
+			CharacterItemEvent(null, __Me, %Event1On)
+		ENDIF
+		IF "!c1"
+			IsEqual(%Event2On,null)
+		THEN
+			CharacterItemEvent(null, __Me, %Event2On)
+		ENDIF
+		IF "!c1"
+			IsEqual(%Event3On,null)
+		THEN
+			CharacterItemEvent(null, __Me, %Event3On)
+		ENDIF
+		IF "!c1"
+			IsEqual(%Event4On,null)
+		THEN
+			CharacterItemEvent(null, __Me, %Event4On)
+		ENDIF
+	ENDIF
+	// Start Reaction to change animation
+	Interrupt(PercentageChance)
+	SetPriority(PercentageChance,100)
+
+BEHAVIOUR
+
+REACTION PercentageChance,0
+ACTIONS
+	ItemPlayAnimationTo("PressurePlate",%CurrentPercentage,5)
+	IF "c1"
+		IsEqual(%CurrentPercentage, FLOAT:0.0)
+	THEN
+		DebugText(__Me, "0%")
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:0.1)
+	THEN
+		DebugText(__Me, "1%")
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:0.2)
+	THEN
+		DebugText(__Me, "10%")
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:0.3)
+	THEN
+		DebugText(__Me, "20%")
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:0.4)
+	THEN
+		DebugText(__Me, "30%")
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:0.5)
+	THEN
+		DebugText(__Me, "40%")
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:0.6)
+	THEN
+		DebugText(__Me, "50%")
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:0.7)
+	THEN
+		DebugText(__Me, "60%")
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:0.8)
+	THEN
+		DebugText(__Me, "70%")
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:0.9)
+	THEN
+		DebugText(__Me, "80%")
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:1)
+	THEN
+		DebugText(__Me, "90%")
+	ELSE
+		DebugText(__Me, "100%")
+	ENDIF
+	SetPriority(PercentageChance,0)
+INTERRUPT
+	Reset()

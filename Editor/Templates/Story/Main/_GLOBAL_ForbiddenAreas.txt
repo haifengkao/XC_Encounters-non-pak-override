@@ -1,0 +1,56 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+//REGION CYSEAL
+DB_ForbiddenArea("CYS_Esmeralda",CHARACTER_CYS_Esmeralda);
+DB_ForbiddenAreaTriggers("CYS_Esmeralda",TRIGGER_CYS_Ownership_Cyseal_Esmeralda_GF1,TRIGGER_CYS_Ownership_Cyseal_Esmeralda_GF1_Exit);
+DB_ForbiddenAreaTriggers("CYS_Esmeralda",TRIGGER_CYS_Ownership_Cyseal_Esmeralda_GF2,TRIGGER_CYS_Ownership_Cyseal_Esmeralda_GF2_Exit);
+DB_ForbiddenDoors("CYS_Esmeralda",ITEM_CYS_Door_Esmeralda1);
+DB_ForbiddenDoors("CYS_Esmeralda",ITEM_CYS_Door_Esmeralda2);
+DB_ForbiddenDoors("CYS_Esmeralda",ITEM_CYS_Door_Esmeralda3);
+
+DB_ForbiddenArea("CYS_Cecil",CHARACTER_CYS_Cecil);
+DB_ForbiddenAreaTriggers("CYS_Cecil",TRIGGER_CYS_Ownership_Cyseal_TownHall_GF1,TRIGGER_CYS_Ownership_Cyseal_TownHall_GF1_Exit);
+DB_ForbiddenDoors("CYS_Cecil",ITEM_CYS_CecilHouseDoor);
+
+DB_ForbiddenArea("CYS_Mortician",CHARACTER_CYS_Mortician);
+DB_ForbiddenAreaTriggers("CYS_Mortician",TRIGGER_CYS_Ownership_Cyseal_Mortician_GF1,TRIGGER_CYS_Ownership_Cyseal_Mortician_GF1_Exit);
+DB_ForbiddenDoors("CYS_Mortician",ITEM_CYS_Door_Mortician);
+
+DB_ForbiddenArea("CYS_Mortician_TopFloor",CHARACTER_CYS_Mortician);
+DB_ForbiddenAreaTriggers("CYS_Mortician_TopFloor",TRIGGER_CYS_Mortician_TopFloor_ForbiddenArea,TRIGGER_CYS_Mortician_TopFloor_ForbiddenArea_Point);
+DB_ForbiddenDoors("CYS_Mortician_TopFloor",ITEM_CYS_Mortician1FDoor);
+
+DB_ForbiddenArea("CYS_Warehouse",CHARACTER_CYS_WarehouseSergeant);
+DB_ForbiddenArea("CYS_Warehouse",CHARACTER_CYS_WarehouseGuard1);
+DB_ForbiddenAreaTriggers("CYS_Warehouse",TRIGGER_CYS_Forbidden_WarehouseNormalRoom,TRIGGER_CYS_Forbidden_WarehouseNormalRoom_Exit);
+DB_ForbiddenAreaTriggers("CYS_Warehouse",TRIGGER_CYS_Forbidden_WarehouseRichRoom,TRIGGER_CYS_Forbidden_WarehouseRichRoom_Exit);
+DB_ForbiddenDoors("CYS_Warehouse",ITEM_CYS_PortWarehouseDoorNormal);
+DB_ForbiddenDoors("CYS_Warehouse",ITEM_CYS_PortWarehouseDoorRich);
+//END_REGION
+
+//REGION LUCULLA
+DB_ForbiddenArea("LUC_Nadia",CHARACTER_LUC_Nadia);
+DB_ForbiddenArea("LUC_Nadia",CHARACTER_LUC_Brian);
+DB_ForbiddenAreaTriggers("LUC_Nadia",TRIGGER_LUC_Ownership_Silverglen_Nadia_GF,TRIGGER_LUC_Ownership_Silverglen_Nadia_GF_Exit);
+DB_ForbiddenDoors("LUC_Nadia",ITEM_LUC_Door_Nadia1);
+DB_ForbiddenDoors("LUC_Nadia",ITEM_LUC_Door_Nadia2);
+//END_REGION
+
+//REGION DARK FOREST
+DB_ForbiddenArea("DAF_Armory",CHARACTER_DAF_BO_PrisonGuard2);
+DB_ForbiddenArea("DAF_Armory",CHARACTER_DAF_BO_TorturerOrc);
+DB_ForbiddenArea("DAF_Armory",CHARACTER_DAF_BO_TorturerGoblin);
+DB_ForbiddenAreaTriggers("DAF_Armory",TRIGGER_DAF_Ownership_Armory,TRIGGER_DAF_Ownership_Armory_Exit);
+DB_ForbiddenDoors("DAF_Armory",ITEM_DAF_DoorWarehouse4);
+DB_ForbiddenArea("DAF_Swamphut",CHARACTER_DAF_AnguishDemon);
+DB_ForbiddenDoors("DAF_Swamphut",ITEM_DAF_ForestSpirit_Prisondoor);
+//END_REGION
+
+DB_IsNotMessingAround(CHARACTER_DAF_AnguishDemon);
+KBSECTION
+
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

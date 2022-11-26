@@ -1,0 +1,9 @@
+INIT
+CHARACTER:__Me
+EXTERN CHARACTER:%Followee = null
+
+BEHAVIOUR
+REACTION Wander, 1000
+USAGE PEACE
+ACTIONS
+	CharacterFollow(%Followee, -1.0, 0)

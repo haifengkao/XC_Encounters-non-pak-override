@@ -1,0 +1,31 @@
+#TEMPLATE "_SKILLFROMITEM_Base" : [ACTION], [SKILLOVERRIDE]
+
+INIT
+CHARACTER:__Me
+[GLOBAL_VARS]
+
+EVENTS
+
+[EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_[ACTION]
+VARS
+	[CALC_VARS]
+ON
+	OnFunction("CalculateScore_[ACTION]")
+ACTIONS	
+	[CALC_PRE_ACTIONS]
+
+	[CALC_POS_ACTIONS]
+	Set(%SkillTargetPos_[ACTION], [TARGET_POS])
+	Add(%ActionScore_[ACTION], [POS_SCORE])
+	[CALC_POS_ACTIONS_END]
+
+	[CALC_CHAR_ACTIONS]
+	Set(%SkillTargetChar_[ACTION], __Me)
+	Add(%ActionScore_[ACTION], [CHAR_SCORE])
+	[CALC_CHAR_ACTIONS_END]
+	
+	
+	

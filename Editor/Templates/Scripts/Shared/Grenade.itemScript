@@ -1,0 +1,59 @@
+INIT
+
+ITEM:__Me
+EXTERN FLOAT:%LifeTime=0
+
+SKILL:%ProjectileSkill=null
+CHARACTER:%Caster=null
+
+EVENTS
+
+EVENT GrenadeInit
+ON 
+	OnInit()
+ACTIONS
+	IF "c1"
+		ItemGetSkillId(__Me,%ProjectileSkill)
+	THEN		
+	ENDIF
+	
+EVENT GrenadeDestroy
+VARS
+	ITEM:_ItemSource
+ON
+	OnItemDestroyed(__Me)
+	OnFunction("GrenadeDestroy")
+	OnDamage(_,_,_,_ItemSource)
+ACTIONS
+	IF "!c1"
+		IsEqual(__Me,_ItemSource)
+	THEN
+		StopTimer("GrenadeTick")
+		ExplodeAt(__Me,%ProjectileSkill, -1,%Caster)
+		ItemDestroy(__Me)
+	ENDIF
+
+EVENT GrenadeLand
+VARS 
+	INT:_hitObstacle
+	CHARACTER:_caster	
+ON
+	OnGrenadeLand(_hitObstacle, _caster)
+ACTIONS
+	Set(%Caster, _caster)
+	IF "c1|!c2"
+		IsEqual(_hitObstacle,1)
+		IsGreaterThen(%LifeTime,0)
+	THEN
+		CallFunction("GrenadeDestroy")		
+	ELSE
+		StartTimer("GrenadeTick",%LifeTime,-1)
+	ENDIF
+
+EVENT GrenadeTimer
+ON
+	OnTimer("GrenadeTick")
+ACTIONS
+	StopTimer("GrenadeTick")	
+	CallFunction("GrenadeDestroy")
+	

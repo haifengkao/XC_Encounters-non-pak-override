@@ -1,0 +1,62 @@
+INIT
+	CHARACTER:__Me
+	CHARACTERTEMPLATE:%Spiderling="Animals_Spider_A_Hatched_e3f1f82c-8266-4fc4-9a42-2564e9c9d996"
+	CHARACTERTEMPLATE:%Spiderling2="Animals_Spider_A_Hatched_Green_dcb213f0-db60-474f-bf12-0c3e923b5a5a"
+	INT:%HatchCountdown_Current=0
+	INT:%HatchCountdown_Desired=1
+
+//------------------------
+EVENTS
+EVENT OnCombatStarted_GetRandomHatchingValue 
+ON
+	OnCombatStarted()
+ACTIONS
+	GetRandomBetween(%HatchCountdown_Desired,1,2)
+	CharacterSetCanFight(__Me,1,1)
+	
+EVENT OnTurn_GeneralControl
+VARS
+	CHARACTER:_SpawnedSpider
+	CHARACTERTEMPLATE:_ChosenSpiderTemplate
+ON
+	OnTurn()
+ACTIONS
+	IF "c1&!c2&!c3"
+		IsLessThen(%HatchCountdown_Current,%HatchCountdown_Desired)
+		CharacterHasStatus(__Me,"FROZEN")
+		CharacterIsDead(__Me)
+	THEN		
+		Add(%HatchCountdown_Current,1)
+		CharacterEndTurn()
+	ELIF "c1&!c2&!c3"
+		IsEqual(%HatchCountdown_Current,%HatchCountdown_Desired)
+		CharacterHasStatus(__Me,"FROZEN")
+		CharacterIsDead(__Me)
+	THEN
+		CharacterPlayEffect(__Me,"FX_GP_Hit_Ooze_A_Large")
+		CharacterDie(__Me)
+		GetWeightedRandom(_ChosenSpiderTemplate,%Spiderling,INT:2,%Spiderling2,INT:1)
+		SpawnCharacter(_SpawnedSpider,_ChosenSpiderTemplate,__Me,0)
+		Add(%HatchCountdown_Current,1)			//so current != desired, so doesn't spawn a spider every turn
+	ELSE
+		CharacterEndTurn()
+	ENDIF
+	
+EVENT OnDamage_EnableCanFight
+VARS
+	CHARACTER:_Attacker
+ON
+	OnDamage(_,_,_Attacker,_)
+ACTIONS
+	IF "!c1&c2"
+		IsEqual(_Attacker,null)
+		CharacterCheckRelation(_Attacker,Party)
+	THEN
+		CharacterSetCanFight(__Me,1,1)
+	ENDIF
+		
+EVENT OnCombatEnded_DisableCanFight
+ON
+	OnCombatEnded()
+ACTIONS
+	CharacterSetCanFight(__Me,0)

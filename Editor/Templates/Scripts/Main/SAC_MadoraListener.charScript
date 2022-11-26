@@ -1,0 +1,67 @@
+INIT
+
+CHARACTER:__Me
+
+	TRIGGER:%Yard = SAC_Behavior_MadoraListeners_f8a261f5-8b4b-413d-8ebf-7009ee59c59c
+	CHARACTER:%Madora = Madoc_5c5447e5-c1cf-4677-b84b-006d9be3f075
+	EXTERN ITEM:%Bench = null
+	INT:%Listen = 0
+	
+BEHAVIOUR
+
+REACTION Listen, 900
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Anim
+	FLOAT:_Sleep
+ACTIONS
+	/*
+	IF "!c1"
+		CharacterIsInTrigger(__Me, %Yard)
+	THEN
+		CharacterMoveTo(%Yard, 0, 1)
+		CharacterWander(%Yard, 1.5)
+	ENDIF
+	*/	
+	
+	IF "c1"
+		IsEqual(%Listen, 1)
+	THEN
+		CharacterMoveInRange(%Madora, 2.0, 2.0, 0)
+		CharacterLookAt(%Madora)
+		IF "c1"
+			IsRandom(.7)
+		THEN
+			GetRandom(_Anim, "Yes_01", "Yes_02", "Yes_03", "Yes_04", "Salute_01", "Salute_02", "Salute_03", "Salute_04")
+			CharacterPlayAnimation(_Anim)
+		ENDIF
+	ELSE
+		IF "!c1"
+			CharacterHasStatus(__Me, STATUS:SITTING)
+		THEN
+			CharacterUseItem(%Bench)
+		ENDIF
+		GetRandom(_Anim, "Sit_Bored_01", "Sit_Bored_02", "Sit_Tired_01", "Sit_Idle_01")
+		CharacterPlayAnimation(_Anim)
+	ENDIF
+
+	GetRandomBetween(_Sleep, 3.0, 8.0)
+	Sleep(_Sleep)
+
+EVENTS
+
+EVENT Yawn
+ON
+	OnGlobalEventSet("SAC_MadoraStory")
+ACTIONS
+	IF "c1"
+		IsRandom(.5)
+	THEN
+		DialogStart("SAC_AD_MadoraStory_RecruitComment", __Me)
+	ENDIF
+	
+EVENT Listen
+ON
+	OnCharacterEvent(%Madora, "SAC_Madora_Listen")
+ACTIONS
+	Set(%Listen, 1)

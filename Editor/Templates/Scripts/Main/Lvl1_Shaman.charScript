@@ -1,0 +1,64 @@
+#INCLUDE Base
+
+INIT
+USING Base
+CHARACTER:__Me
+INT:%loopCount = 2
+
+BEHAVIOUR
+
+REACTION TerminateAlly,1030
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_SkillMinRange=0
+	FLOAT:_SkillMaxRange=0
+	FLOAT:_hp
+CHECK "c1&c2&c3&c4&c5"
+	CharacterCanCast(__Me,Projectile_Fireball)
+	CharacterGet(_Target,__Me,null,Lowest,Vitality,Ally,null,null) 
+	CharacterGetSkillRange(_SkillMinRange,_SkillMaxRange,__Me,Projectile_Fireball)
+	CharacterGetStat(_hp,_Target,Vitality)
+	IsLessThen(_hp,0.25)
+ACTIONS
+	CharacterMoveInRange(_Target,_SkillMinRange,_SkillMaxRange)
+	CharacterUseSkill(Projectile_Fireball,_Target)
+	DisplayText(__Me,"Lvl1_Shaman_Ooze",3)
+
+REACTION StunEnemy,1025
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_SkillMinRange=0
+	FLOAT:_SkillMaxRange=0
+	FLOAT:_hp
+	
+CHECK "c1&c2&c3&c4&c5&c6"
+	CharacterCanCast(__Me,Projectile_BlitzBolt)
+	CharacterGet(_Target,__Me,null,Lowest,Vitality,Enemy,null,null) 
+	CharacterGetSkillRange(_SkillMinRange,_SkillMaxRange,__Me,Projectile_BlitzBolt)
+	CharacterGetStat(_hp,_Target,Vitality)
+	IsGreaterThen(_hp,0.75)
+	IsGreaterThen(%loopCount, 0)
+ACTIONS
+	CharacterMoveInRange(_Target,_SkillMinRange,_SkillMaxRange)
+	CharacterUseSkill(Projectile_BlitzBolt,_Target)
+	DisplayText(__Me,"Lvl1_Shaman_BlitzBolt",3)
+	Subtract(%loopCount, 1)
+	
+REACTION Fireball,1020
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_SkillMinRange=0
+	FLOAT:_SkillMaxRange=0
+CHECK "c1&c2&c3"
+	CharacterCanCast(__Me,Projectile_Fireball)
+	CharacterGetSkillRange(_SkillMinRange,_SkillMaxRange,__Me,Projectile_Fireball)
+	CharacterGet(_Target,__Me,null,Lowest,Vitality,Enemy,null,null)
+ACTIONS
+	CharacterMoveInRange(_Target,_SkillMinRange,_SkillMaxRange)
+	CharacterUseSkill(Projectile_Fireball,_Target)
+	DisplayText(__Me,"Lvl1_Shaman_FireBall",3)
+INTERRUPT
+	Reset()

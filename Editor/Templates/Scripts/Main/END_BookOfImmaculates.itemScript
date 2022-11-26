@@ -1,0 +1,37 @@
+INIT
+
+ITEM:__Me
+
+	INT:%Used = 0
+
+
+EVENTS
+
+EVENT OnUse
+ON
+	OnItemEvent( __Me, "END_Nega_BookOfImmaculatesGrab")
+ACTIONS
+	IF "!c1"
+		IsEqual(%Used, 1)
+	THEN
+		SetPriority("Bleed", 1000)
+		Set(%Used, 1)
+	ENDIF
+
+BEHAVIOUR 
+
+REACTION Bleed, 0
+USAGE ALL
+VARS
+	FLOAT:_Radius = 0
+ACTIONS
+	Label("Label_Loop")
+	IF "c1"
+		IsLessThen(_Radius, 20.0)
+	THEN
+		Add(_Radius, 1.0)
+		CreateSurfaceAt(__Me, SURFACE:Blood, _Radius, -1)
+		Sleep(0.1)
+	ENDIF
+	Goto("Label_Loop")
+	SetPriority("Bleed", 0)

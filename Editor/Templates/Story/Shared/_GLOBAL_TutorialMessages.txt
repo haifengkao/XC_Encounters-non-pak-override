@@ -1,0 +1,551 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_ItemOpened(0);
+
+/***********************
+ *-01: Nothing         * 
+ * 01: Inventory       *
+ * 02: Journal         *
+ * 03: Trading button  *
+ * 04: Sneak button    *
+ * 05: Chain           *
+ * 06: Low-HP portrait *
+ * 07: DB_Dead portrait   *
+ * 08: Draggable item  *
+ * 09: Waypoint        *
+ * 10: Locked chest    *
+ * 11: Enemy           *
+ * 12: Gas Pit         *
+ * 13: Other player    *
+ * 14: Gas cloud       *
+ * 15: Locked door     *
+ * 16: Fire surface    *
+ * 17: Oil surface     *
+ * 18: Pressure plate  *
+ * 19: Homestead button*
+ * 20: Formation button*
+ * 21: Mine            *
+ * 22: Door            *
+ * 23: Flee button     *
+ * 24: Skill button    *
+ * 25: Option button   *
+ * 26: Container opened*
+ ***********************/
+
+/***********************
+* Flags field: a bit field
+* 0	: no checks
+* 1 : no combat : don't show the tutorial if the character is active in combat
+* 2 : no UI : don't show the tutorial if the character has a UI open 
+* 4 : cancel on condition fail : the tutorial is removed from the queue if the conditions don't match, it can be sent again after that
+***********************/
+
+DB_TutorialInfo("TUT_Book",1,"TUT_CAT_Inventory","TUT_Book_Title",0,0,-1,1,0);
+DB_TutorialInfo("TUT_Camera",-1,"TUT_CAT_Exploring","TUT_Camera_Title",0,0,6000,1,0);
+DB_TutorialInfo("TUT_Combat",-1,"TUT_CAT_Combat","TUT_Combat_Title",0,0,-1,1,0);
+DB_TutorialInfo("TUT_Combat_Examine",11,"TUT_CAT_Combat","TUT_Combat_Examine_Title",0,0,20000,2,0);
+DB_TutorialInfo("TUT_Combat_Guard",11,"TUT_CAT_Combat","TUT_Combat_Guard_Title",0,0,-1,2,0);
+DB_TutorialInfo("TUT_Combat_TacticalView",-1,"TUT_CAT_Combat","TUT_Combat_TacticalView_Title",0,0,20000,1,0);
+DB_TutorialInfo("TUT_Combat_TargetCycle",-1,"TUT_CAT_Combat","TUT_Combat_TargetCycle_Controller_Title",2,0,-1,1,0);
+DB_TutorialInfo("TUT_Combat_TurnOrder",-1,"TUT_CAT_Combat","TUT_Combat_TurnOrder_Title",0,3,-1,1,0);
+DB_TutorialInfo("TUT_CompanionJoin",5,"TUT_CAT_Exploring","TUT_CompanionJoin_Title",0,1,-1,1,0);
+DB_TutorialInfo("TUT_CompanionJoinAdvanced",5,"TUT_CAT_Exploring","TUT_CompanionJoinAdvanced_Title",0,0,15000,2,0);
+DB_TutorialInfo("TUT_CompanionSplit",5,"TUT_CAT_Exploring","TUT_CompanionSplit_Title",0,0,-1,1,0);
+DB_TutorialInfo("TUT_CompanionStoryTalk",0,"TUT_CAT_Social","TUT_CompanionStoryTalk_Title",0,0,-1,3,0);
+DB_TutorialInfo("TUT_CompanionSwitch",5,"TUT_CAT_Exploring","TUT_CompanionSwitch_Title",0,0,-1,1,0);
+DB_TutorialInfo("TUT_CompanionTalk",0,"TUT_CAT_Social","TUT_CompanionTalk_Title",0,0,-1,2,0);
+DB_TutorialInfo("TUT_Died",7,"TUT_CAT_Combat","TUT_Died_Title",0,0,-1,1,0);
+DB_TutorialInfo("TUT_Disarm",1,"TUT_CAT_Exploring","TUT_Disarm_Title",0,0,-1,3,0);
+DB_TutorialInfo("TUT_Drag",8,"TUT_CAT_Exploring","TUT_Drag_Title",0,0,-1,1,0);
+DB_TutorialInfo("TUT_DragIcon",26,"TUT_CAT_Exploring","TUT_DragIcon_Title",1,0,-1,1,0);
+DB_TutorialInfo("TUT_DualDialog",13,"TUT_CAT_Social","TUT_DualDialog_Title",0,0,20000,1,3);
+DB_TutorialInfo("TUT_DualDialogCIR",-1,"TUT_CAT_Social","TUT_DualDialogCIR_Title",0,0,-1,1,0);
+DB_TutorialInfo("TUT_Equipment",-1,"TUT_CAT_Inventory","TUT_Equipment_Title",0,0,20000,1,0);
+DB_TutorialInfo("TUT_FireSurface",16,"TUT_CAT_Exploring","TUT_FireSurface_Title",0,0,-1,2,0);
+DB_TutorialInfo("TUT_Flee",23,"TUT_CAT_Combat","TUT_Flee_Title",0,0,-1,3,0);
+DB_TutorialInfo("TUT_GasPit",12,"TUT_CAT_Exploring","TUT_GasPit_Title",0,0,-1,1,0);
+DB_TutorialInfo("TUT_GenericBehaviors",-1,"TUT_CAT_Exploring","TUT_GenericBehaviors_Title",0,0,-1,3,0);
+DB_TutorialInfo("TUT_Hammer",1,"TUT_CAT_Inventory","TUT_Hammer_Title",0,0,-1,1,0);
+DB_TutorialInfo("TUT_HoHUnlocked",0,"TUT_CAT_Social","TUT_HoHUnlocked_Title",0,0,-1,1,0);
+DB_TutorialInfo("TUT_Homestead",19,"TUT_CAT_Exploring","TUT_Homestead_Title",0,0,-1,1,0);
+DB_TutorialInfo("TUT_HomesteadWaypointMenu",0,"TUT_CAT_Exploring","TUT_HomesteadWaypointMenu_Title",0,0,-1,1,0);
+DB_TutorialInfo("TUT_HOMRoomUnlocked",0,"TUT_CAT_Exploring","TUT_HOMRoomUnlocked_Title",0,0,-1,2,0);
+DB_TutorialInfo("TUT_HotbarAssignment",-1,"TUT_CAT_Inventory","TUT_HotbarAssignment_Title",0,0,15000,2,0);
+DB_TutorialInfo("TUT_IdentifyingGlass",1,"TUT_CAT_Inventory","TUT_IdentifyingGlass_Title",0,0,-1,1,0);
+DB_TutorialInfo("TUT_Inventory",1,"TUT_CAT_Inventory","TUT_Inventory_Title",0,0,20000,1,0);
+DB_TutorialInfo("TUT_ItemCombo",1,"TUT_CAT_Inventory","TUT_ItemCombo_Title",0,0,-1,1,0);
+DB_TutorialInfo("TUT_LevelUp",1,"TUT_CAT_Inventory","TUT_LevelUp_Title",0,0,20000,2,3);
+DB_TutorialInfo("TUT_Locked",10,"TUT_CAT_Exploring","TUT_Locked_Title",0,0,-1,3,0);
+DB_TutorialInfo("TUT_Locked_Destroy",10,"TUT_CAT_Exploring","TUT_Locked_Destroy_Title",0,0,-1,1,0);
+DB_TutorialInfo("TUT_Locked_UseKey",10,"TUT_CAT_Exploring","TUT_Locked_UseKey_Title",0,0,-1,1,0);
+DB_TutorialInfo("TUT_Locked_UseLockpick",10,"TUT_CAT_Exploring","TUT_Locked_UseLockpick_Title",0,0,-1,1,0);
+DB_TutorialInfo("TUT_LockedDoor",15,"TUT_CAT_Exploring","TUT_LockedDoor_Title",0,0,-1,1,0);
+DB_TutorialInfo("TUT_Lockpick",1,"TUT_CAT_Inventory","TUT_Lockpick_Title",0,0,-1,1,0);
+DB_TutorialInfo("TUT_Map",2,"TUT_CAT_Quest","TUT_Map_Title",0,0,-1,1,0);
+DB_TutorialInfo("TUT_Mine",21,"TUT_CAT_Exploring","TUT_Mine_Title",0,1,-1,1,0);
+DB_TutorialInfo("TUT_Mound",-1,"TUT_CAT_Exploring","TUT_Mound_Title",0,0,-1,3,0);
+DB_TutorialInfo("TUT_Movement",-1,"TUT_CAT_Exploring","TUT_Movement_Title",0,0,6000,1,0);
+DB_TutorialInfo("TUT_NoPetPal",-1,"TUT_CAT_Social","TUT_PetPal_Title",0,0,-1,2,0);
+DB_TutorialInfo("TUT_NPCCIR",-1,"TUT_CAT_Social","TUT_NPCCIR_Title",0,0,-1,3,0);
+DB_TutorialInfo("TUT_Perception",1,"TUT_CAT_Inventory","TUT_Perception_Title",0,0,-1,1,0);
+DB_TutorialInfo("TUT_PetPal",-1,"TUT_CAT_Social","TUT_PetPal_Title",0,0,-1,2,0);
+DB_TutorialInfo("TUT_PickPocket",-1,"TUT_CAT_Exploring","TUT_PickPocket_Title",0,0,20000,3,0);
+DB_TutorialInfo("TUT_PoisonFire",14,"TUT_CAT_Exploring","TUT_PoisonFire_Title",0,0,-1,1,0);
+DB_TutorialInfo("TUT_Potion",6,"TUT_CAT_Combat","TUT_Potion_Title",0,1,-1,2,0);
+DB_TutorialInfo("TUT_PressurePlates",18,"TUT_CAT_Exploring","TUT_PressurePlates_Title",0,0,-1,1,0);
+DB_TutorialInfo("TUT_Pyramid",-1,"TUT_CAT_Exploring","TUT_Pyramid_Title",0,0,-1,1,0);
+DB_TutorialInfo("TUT_Pyramid_2",-1,"TUT_CAT_Exploring","TUT_Pyramid_2_Title",0,0,-1,1,0);
+DB_TutorialInfo("TUT_PyramidsPickup",-1,"TUT_CAT_Exploring","TUT_PyramidsPickup_Title",0,0,-1,1,0);
+DB_TutorialInfo("TUT_QuestLog",2,"TUT_CAT_Quest","TUT_QuestLog_Title",0,0,-1,1,0);
+DB_TutorialInfo("TUT_RPS",0,"TUT_CAT_Social","TUT_RPS_Title",0,0,-1,2,0);
+DB_TutorialInfo("TUT_SaveLoad",-1,"TUT_CAT_General","TUT_SaveLoad_Title",0,0,-1,1,0);
+DB_TutorialInfo("TUT_Scroll",1,"TUT_CAT_Combat","TUT_Scroll_Title",0,0,-1,2,0);
+DB_TutorialInfo("TUT_Selection_Controller",-1,"TUT_CAT_Exploring","TUT_Selection_Controller_Title",2,1,20000,1,0);
+DB_TutorialInfo("TUT_SelectionActiveSearch_Controller",-1,"TUT_CAT_Exploring","TUT_SelectionActiveSearch_Controller_Title",2,0,-1,1,0);
+DB_TutorialInfo("TUT_SelectionCursorMode_Controller",-1,"TUT_CAT_Exploring","TUT_SelectionCursorMode_Controller_Title",2,0,-1,1,0);
+DB_TutorialInfo("TUT_Shovel",-1,"TUT_CAT_Exploring","TUT_Shovel_Title",0,0,-1,2,0);
+DB_TutorialInfo("TUT_Skill",1,"TUT_CAT_Inventory","TUT_Skill_Title",0,0,-1,2,0);
+DB_TutorialInfo("TUT_SkillUnlock",24,"TUT_CAT_Combat","TUT_SkillUnlock_Title",0,0,-1,2,0);
+DB_TutorialInfo("TUT_Sneak",4,"TUT_CAT_Exploring","TUT_Sneak_Title",0,0,-1,1,0);
+DB_TutorialInfo("TUT_SneakAttack",17,"TUT_CAT_Combat","TUT_SneakAttack_Title",0,1,-1,1,0);
+DB_TutorialInfo("TUT_Stealing",-1,"TUT_CAT_Exploring","TUT_Stealing_Title",0,0,-1,3,0);
+DB_TutorialInfo("TUT_Tooltips",-1,"TUT_CAT_Inventory","TUT_Tooltips_Title",0,0,20000,1,0);
+DB_TutorialInfo("TUT_Trade",3,"TUT_CAT_Trade","TUT_Trade_Title",0,0,-1,1,0);
+DB_TutorialInfo("TUT_TraitDialog",-1,"TUT_CAT_Social","TUT_TraitDialog_Title",0,0,-1,2,0);
+DB_TutorialInfo("TUT_TutorialLog",-1,"TUT_CAT_General","TUT_TutorialLog_Title",0,0,-1,1,0);
+DB_TutorialInfo("TUT_UseScroll",-1,"TUT_CAT_Inventory","TUT_UseScroll_Title",0,1,-1,1,0);
+DB_TutorialInfo("TUT_Wands",-1,"TUT_CAT_Combat","TUT_Wands_Title",0,0,15000,2,0);
+DB_TutorialInfo("TUT_Waypoint",9,"TUT_CAT_Exploring","TUT_Waypoint_Title",0,0,-1,2,0);
+DB_TutorialInfo("TUT_WoodenDoor",22,"TUT_CAT_Exploring","TUT_WoodenDoor_Title",0,0,6000,1,0);
+DB_TutorialInfo("TUT_WestGate",22,"TUT_CAT_Exploring","TUT_WestGate_Title",0,0,6000,1,0);
+
+DB_DualDialogTutorials("TUT_DualDialog");
+DB_DualDialogTutorials("TUT_DualDialog_Controller");
+KBSECTION
+//REGION Tutorial Message
+PROC
+ProcPlayTut((CHARACTER)_Char,(STRING)_Message)
+AND 
+DB_TutorialInfo(_Message,(INTEGER)_Key,(STRING)_Cat,(STRING)_Title,(INTEGER)_ControllerType,(INTEGER)_ModalType,(INTEGER)_Duration,(INTEGER)_Priority,(INTEGER)_Flags)
+THEN
+ShowTutorial(_Char,_Message,_Key,_Cat,_Title,_ControllerType,_ModalType,_Duration,_Priority,_Flags);
+
+PROC
+ProcPlayTut((CHARACTER)_Char,(STRING)_Message)
+AND
+NOT DB_TutorialInfo(_Message,_,_,_,_,_,_,_,_)
+AND
+StringConcatenate("Tutorial Message without info: ",_Message,_ErrorMessage)
+THEN
+DebugBreak(_ErrorMessage);
+ShowTutorial(_Char,_Message,-1,"","",0,0,-1,3,0);
+//END_REGION
+
+//REGION Movement Popup
+IF
+GameStarted(_Level)
+AND
+DB_TUT_InitialLevel((STRING)_Level)
+THEN
+TimerLaunch("TUT_Movement",2000);
+
+IF
+TimerFinished("TUT_Movement")
+THEN
+PROC_CheckPlayTut("TUT_Movement");
+
+IF
+TutorialBoxClosed(_,_Message)
+AND
+StringContains(_Message,"TUT_Movement",1)
+THEN
+TimerLaunch("TUT_Camera",1000);
+
+IF
+TimerFinished("TUT_Camera")
+THEN
+PROC_CheckPlayTut("TUT_Camera");
+//END_REGION 
+
+//REGION Inventory Popup
+IF
+ItemTemplateAddedToCharacter(_,_,_Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+PROC_CheckPlayTut(_Player,"TUT_Inventory");
+//END_REGION 
+
+//REGION Combat Popup
+IF				
+CharacterTurnStarted(_Player)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_Companion(_Player)
+AND
+CharacterGetAbility(_Player, "Loremaster", _Val)
+AND
+_Val > 0
+AND
+DB_CharCountHelper(_Player,"CombatTurnCounter",_Turn)
+AND
+_Turn >= 6
+THEN
+PROC_CheckPlayTut(_Player,"TUT_Combat_Examine");
+//END_REGION 
+
+IF
+ItemTemplateAddedToCharacter("TOOL_LockPick_A_06d0eecb-4271-42a7-bd8c-4cbf24927197",_,_Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+PROC_CheckPlayTut(_Player, "TUT_Lockpick");
+
+IF
+ItemTemplateAddedToCharacter("TOOL_Hammer_Repair_A_be7226da-7211-4250-be95-ca780bcdb3df",_,_Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+PROC_CheckPlayTut(_Player, "TUT_Hammer");
+
+IF
+ItemTemplateAddedToCharacter("TOOL_IdentifyingGlass_A_32288ce4-3d8d-46b3-a655-598350a96201",_,_Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+PROC_CheckPlayTut(_Player, "TUT_IdentifyingGlass");
+
+IF
+ItemTemplateAddedToCharacter("TOOL_Trap_DisarmToolkit_9fda335e-2220-4ae9-a4c2-2424d5ef5165",_,_Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+PROC_CheckPlayTut(_Player, "TUT_Disarm");
+
+IF
+DialogStarted(_,_Instance)
+AND
+DB_DialogNPCs(_Instance,_Npc,1)
+AND
+DB_BigTrader(_Npc)
+AND
+NOT DB_NoTradeTut(_Npc)
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+THEN
+PROC_CheckPlayTut(_Player,"TUT_Trade");
+
+IF
+ItemTemplateAddedToCharacter("TOOL_Shovel_A_41486dd2-3fd5-464e-870e-844120cf0517",_,_Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+PROC_CheckPlayTut(_Player,"TUT_Shovel");
+
+IF
+CharacterReceivedDamage(_Player)
+AND
+_Player.DB_IsPlayer()
+AND
+CharacterGetHitpointsPercentage(_Player,_Percentage)
+AND
+_Percentage < 25
+AND
+_Percentage > 0
+AND
+DB_PotionDone(1)
+AND
+DB_WaypointTuto(1)
+AND
+DB_Combat(_Player, _)
+THEN
+PROC_CheckPlayTut(_Player,"TUT_Flee");
+
+IF
+CharacterTurnStarted(_Player)
+AND
+_Player.DB_IsPlayer()
+AND
+CharacterGetHitpointsPercentage(_Player,_Percentage)
+AND
+_Percentage < 25
+AND
+_Percentage > 0
+THEN
+PROC_CheckPlayTut(_Player,"TUT_Potion");
+DB_PotionDone(1);
+
+IF
+ItemEvent(_Item,"WaypointDiscovered")
+AND
+DB_WaypointInfo((ITEM)_Item,(TRIGGER)_,(STRING)_)
+THEN
+DB_WaypointTuto(1);
+
+IF
+CharacterDied(_Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+PROC_CheckPlayTutWithDelay(_Player,"TUT_Died",2000);
+
+IF
+CharacterEvent(_Player,_Event)
+AND
+DB_Event2DisplayText(_Event,_Text) //See the goal TrapReactions for context about that DB
+AND
+_Player.DB_IsPlayer()
+THEN
+PROC_CheckPlayTutWithDelay(_Player,"TUT_Perception",2000);
+
+IF
+CharacterUsedItem(_Player,_Mound)
+AND
+DB_ShovelArea(_,_,_Mound)
+THEN
+PROC_CheckPlayTut(_Player,"TUT_Mound");
+
+IF
+TextEventSet("axeltuto")
+THEN
+DB_StartTutMessages(1);
+
+IF
+CharacterLeveledUp(_Player)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_Companion(_Player)
+THEN
+PROC_CheckPlayTut(_Player, "TUT_LevelUp");
+
+IF
+ItemTemplateAddedToCharacter(_Temp, _Handle, _Player)
+AND
+DB_IsPlayer(_Player)
+AND
+ItemHandleHasOnUse(_Handle,"skillbook",1)
+THEN
+PROC_CheckPlayTut(_Player,"TUT_Skill");
+
+IF
+ItemTemplateAddedToCharacter(_Temp, _Handle, _Player)
+AND
+DB_IsPlayer(_Player)
+AND
+ItemHandleHasOnUse(_Handle,"scrollarrow",1)
+AND
+ItemHandleIsTagged(_Handle,"Book",1)
+AND
+NOT DB_DLCDatabase((INTEGER)_,_Temp)
+THEN
+PROC_CheckPlayTut(_Player, "TUT_Scroll");
+
+IF
+ItemTemplateAddedToCharacter(_Temp, _Handle, _Player)
+AND
+DB_IsPlayer(_Player)
+AND
+ItemHandleHasOnUse(_Handle,"book",1)
+AND
+NOT DB_DLCDatabase((INTEGER)_,_Temp)
+THEN
+PROC_CheckPlayTut(_Player, "TUT_Book");
+
+IF
+DB_Companion(_Comp)
+AND
+GetMultiplayerCharacter(_Comp, _Player)
+THEN
+PROC_TestFor3CharactersControlledByPlayer(_Player);
+
+PROC
+PROC_TestFor3CharactersControlledByPlayer((CHARACTER)_Player)
+THEN
+Proc_CharCountHelperReset(_Player,"TUT_CompanionJoinAdvanced");
+
+PROC
+PROC_TestFor3CharactersControlledByPlayer((CHARACTER)_Player)
+AND
+CharacterGetReservedPeerID(_Player, _ID)
+AND
+DB_IsPlayer(_Player2)
+AND
+CharacterGetReservedPeerID(_Player2, _ID)
+THEN
+Proc_CharCountHelper(_Player,"TUT_CompanionJoinAdvanced");
+
+IF
+DB_CharCountHelper((CHARACTER)_Player,"TUT_CompanionJoinAdvanced",3)
+THEN
+PROC_CheckPlayTut((CHARACTER)_Player, "TUT_CompanionJoinAdvanced");
+
+PROC
+ProcComparePersuasionScores(_,_,_Player,_OtherPlayer,_)
+THEN
+PROC_CheckPlayTut(_Player,"TUT_RPS");
+PROC_CheckPlayTut(_OtherPlayer,"TUT_RPS");
+
+IF
+DifficultyChanged(0)
+THEN
+DB_TUT_PlayOnEasy(1);
+
+IF
+DifficultyChanged(_Int)
+AND
+_Int != 0
+THEN
+NOT DB_TUT_PlayOnEasy(1);
+
+IF
+CharacterLearnedSkill(_Player, _)
+THEN
+PROC_CheckPlayTut(_Player, "TUT_SkillUnlock");
+
+IF
+ItemTemplateOpening(_,_Handle, _Player)
+AND
+ItemHandleIsContainer(_Handle, 1)
+AND
+DB_ItemOpened(_Nb)
+AND
+_Nb == 10
+THEN
+PROC_CheckPlayTut(_Player, "TUT_DragIcon");
+
+IF
+ItemTemplateOpening(_,_Handle, _Player)
+AND
+ItemHandleIsContainer(_Handle, 1)
+AND
+DB_ItemOpened(_Nb)
+AND
+IntegerSum(_Nb,1,_NewNb)
+THEN
+NOT DB_ItemOpened(_Nb);
+DB_ItemOpened(_NewNb);
+
+IF
+DialogStarted(_,_Instance)
+AND
+DB_DialogNPCs(_Instance,_Animal,1)
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+AND
+CharacterHasTalent(_Player,"AnimalEmpathy",0)
+AND
+CharacterIsTagged(_Animal,"Animal",1)
+THEN
+PROC_CheckPlayTut(_Player,"TUT_NoPetPal");
+
+IF
+DialogStarted(_,_Instance)
+AND
+DB_DialogNPCs(_Instance,_Animal,1)
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+AND
+CharacterHasTalent(_Player,"AnimalEmpathy",1)
+AND
+CharacterIsTagged(_Animal,"Animal",1)
+THEN
+PROC_CheckPlayTut(_Player,"TUT_PetPal");
+
+IF
+ItemTemplateAddedToCharacter(_,_Handle,_Player)
+AND
+DB_IsPlayer(_Player)
+AND
+DB_CharCountHelper(_Player,"CombatTurnCounter",_Turn)
+AND
+_Turn >= 3
+AND
+ItemHandleHasOnUse(_Handle,"scrollarrow",1)
+AND
+ItemHandleIsEquipable(_Handle,0)
+THEN
+PROC_CheckPlayTut(_Player,"TUT_HotbarAssignment");
+
+IF
+ItemTemplateAddedToCharacter(_Templ,_Handle,_Player)
+AND
+DB_IsPlayer(_Player)
+AND
+ItemHandleIsEquipable(_Handle,1)
+AND
+NOT DB_DLCDatabase((INTEGER)_,_Templ)
+THEN
+PROC_CheckPlayTut(_Player,"TUT_Equipment");
+
+IF
+ItemTemplateAddedToCharacter(_Templ,_Handle,_Player)
+AND
+DB_IsPlayer(_Player)
+AND
+ItemHandleHasOnUse(_Handle,"scrollarrow",1)
+AND
+ItemHandleIsEquipable(_Handle,1)
+AND
+NOT DB_DLCDatabase((INTEGER)_,_Templ)
+THEN
+PROC_CheckPlayTut(_Player,"TUT_Wands");
+
+IF
+DialogCharacterEventSet("Show_NPC_CIR_Tutorial",_Player,_)
+THEN
+PROC_CheckPlayTut(_Player,"TUT_NPCCIR");
+
+IF
+ItemHandleTheft(_Player,_,_,_)
+AND
+CharacterHasStatus(_Player,"SNEAKING",0)
+AND
+_Player.DB_IsPlayer()
+THEN
+PROC_CheckPlayTut(_Player,"TUT_GenericBehaviors");
+CharTimer(_Player,"TUT_Stealing",18000);
+
+IF
+ItemHandleTheft(_Player,_,_,_)
+AND
+_Player.DB_IsPlayer()
+THEN
+Proc_CharCountHelper(_Player,"ItemsStolen");
+
+IF
+CharacterSpottedItemTemplateTheft_Redhanded(_Player,_,_,_,_,_,_,_,_,_,_,_,_,_,_)
+AND
+_Player.DB_IsPlayer()
+THEN
+PROC_CheckPlayTut(_Player,"TUT_GenericBehaviors");
+CharTimer(_Player,"TUT_Stealing",18000);
+Proc_CharCountHelper(_Player,"ItemsStolen");
+
+IF
+CharTimerFinished(_Player,"TUT_Stealing")
+THEN
+PROC_CheckPlayTut(_Player,"TUT_Stealing");
+
+IF
+DB_CharCountHelper(_Player,"ItemsStolen",_Amount)
+AND
+_Amount > 3
+THEN
+PROC_CheckPlayTut(_Player,"TUT_PickPocket");
+
+IF
+DialogStarted(_DualDialog,_Inst)
+AND
+DB_PartyDialogs(_,_DualDialog)
+AND
+DB_DialogPlayers(_Inst,_Player,_)
+THEN
+CompleteTutorial(_Player,"TUT_DualDialog");
+DB_HandledTutorial("TUT_DualDialog");
+NOT DB_WaitingToLaunchPartyTimer(_DualDialog);
+EXITSECTION
+
+ENDEXITSECTION

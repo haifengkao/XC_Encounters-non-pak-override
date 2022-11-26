@@ -1,0 +1,11 @@
+INIT
+ITEM:__Me
+EXTERN DAMAGE:%DamageType = Fire
+
+EVENTS
+
+EVENT ReceiveDamage
+ON
+	OnDamage(%DamageType, _, _, _)
+ACTIONS
+	ItemEvent(__Me, "Open")

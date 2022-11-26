@@ -1,0 +1,109 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+
+	CHARACTER:__Me
+	TRIGGER:%Trigger1 = CYS_PointCaptainJack1_6a7b549e-6f98-4c95-9e01-cd8a9770db84
+	TRIGGER:%Trigger2 = CYS_PointCaptainJack2_8b8b425e-1556-419e-9fee-dc226be77f2b
+	TRIGGER:%Trigger3 = CYS_PointCaptainJack3_68d6556c-dda0-4fa5-a947-2f4e2284d5ad
+	TRIGGER:%Trigger4 = CYS_PointCaptainJack4_9ac7c1a4-2e5f-4118-98b0-8c3d3a90d755
+	TRIGGER:%Trigger5 = CYS_Point_JackHelp1_d25d2004-c532-47dc-a588-1383e1992b43
+	TRIGGER:%Trigger6 = CYS_Point_JackHelp2_ad696ea6-29f9-4373-b46a-ace43181f8fc
+
+BEHAVIOUR
+
+REACTION State_LookingForHelp, 0
+	USAGE PEACE
+	ACTIONS
+		GetRandom(%currentAction, "Action_SeekHelp", "Action_Wander")
+		SetPriority(%currentAction, 1100)
+
+REACTION State_Working, 0
+	USAGE PEACE
+	ACTIONS
+		GetRandom(%currentAction, "Action_Command")
+		SetPriority(%currentAction, 1100)
+
+REACTION Action_Command, 0
+	USAGE PEACE
+	VARS
+		FIXEDSTRING:_CurrentAnimation = ""
+		TRIGGER:_point
+	ACTIONS
+		IF "c1"
+			IsEqual(_point,%Trigger1)
+		THEN
+			GetRandom(_point, %Trigger2, %Trigger3, %Trigger4)
+		ELIF "c1"
+			IsEqual(_point, %Trigger2)
+		THEN
+			GetRandom(_point, %Trigger1, %Trigger3, %Trigger4)
+		ELIF "c1"
+			IsEqual(_point, %Trigger3)
+		THEN
+			GetRandom(_point, %Trigger1, %Trigger2, %Trigger4)
+		ELIF "c1"
+			IsEqual(_point, %Trigger4)
+		THEN
+			GetRandom(_point, %Trigger1, %Trigger3, %Trigger2)
+		ELSE
+			GetRandom(_point, %Trigger1, %Trigger2, %Trigger3, %Trigger2)
+		ENDIF
+		CharacterMoveTo(_point, 0)
+		CharacterLookFrom(_point)
+		DialogStart("CYS_AD_CaptainJack", __Me)
+		GetRandom(_CurrentAnimation, "Attention_01", "Shout_01")
+		CharacterPlayAnimation(_CurrentAnimation)
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)
+
+REACTION Action_SeekHelp, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterPlayAnimation("Annoyed_01")
+		DialogStart("CYS_AD_CaptainJack",__Me)
+		IF "c1"
+			IsRandom(0.5)
+		THEN
+			CharacterPlayAnimation("Bored_02")
+		ELSE
+			DisplayText(__Me,"CYS_CaptainJack_Script_0",3)
+			CharacterPlayAnimation("Attention_02")
+		ENDIF
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)
+		
+REACTION Action_Wander, 0
+	USAGE PEACE
+	VARS
+		TRIGGER:_point
+	ACTIONS
+		IF "c1"
+			IsEqual(_point,%Trigger5)
+		THEN
+			Set(_point, %Trigger6)
+		ELIF "c1"
+			IsEqual(_point, %Trigger6)
+		THEN
+			Set(_point, %Trigger5)
+		ELSE
+			GetRandom(_point, %Trigger5, %Trigger6)
+		ENDIF
+		CharacterMoveTo(_point, 0)
+		CharacterLookFrom(_point)
+		CharacterPlayAnimation("Bored_01")
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)
+		
+	
+EVENTS
+
+EVENT WorkersArrived
+	ON
+		OnGlobalEventSet("CYS_ThanksTalk")
+	ACTIONS
+		Set(%currentState, "State_Working")

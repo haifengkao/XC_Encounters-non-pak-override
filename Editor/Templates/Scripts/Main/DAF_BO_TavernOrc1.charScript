@@ -1,0 +1,100 @@
+INIT
+
+CHARACTER:__Me
+CHARACTER:%Friend = DAF_BO_TavernOrc2_d4c3f814-9963-4fc9-b182-1e15727a7d5b
+CHARACTER:%Waiter = DAF_Hershel_c880dffc-364b-4367-ab3b-f0d2484add58
+INT:%State = 0
+INT:%CanCall = 1
+
+BEHAVIOUR
+
+REACTION ChooseAction,1050
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Action
+ACTIONS
+	Sleep(15)
+	GetRandom(_Action,"CallWaiter","Talk","FreshAir")
+	SetPriority(_Action,1070)
+
+REACTION Talk,0
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%State,0)
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	IF "!c1"
+		CharacterHasStatus(__Me,"SITTING")
+	THEN
+		CharacterUseItem(ITEM:FUR_Rich_Chair_A_034_f82b0ea3-ce9e-40de-9316-1334a21a5879)
+	ENDIF	
+	IF "c1"
+		IsRandom(0.5)
+	THEN
+		CharacterEvent(%Friend,"DialogRequest")
+		Sleep(12)
+	ELSE
+		Sleep(5)
+	ENDIF
+	SetPriority("Talk",0)
+INTERRUPT
+	SetPriority("Talk",0)
+
+REACTION FreshAir,0
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%State,0)
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	CharacterMoveTo(TRIGGER:DAF_PointHershel3_7a1ef439-996e-47ad-824d-13203d860fea)
+	CharacterPlayAnimation("knockdown_fall",0,1)
+	CharacterPlayAnimation("knockdown_getup")
+	DisplayText(__Me,"DAF_TavernOrcGrabbingFreshAir",3)
+	Sleep(4)
+	CharacterMoveTo(TRIGGER:DAF_Tavern_FreshAir_5203271d-0f52-430d-a13e-b8b260e296a2)
+	CharacterLookFrom(TRIGGER:DAF_Tavern_FreshAir_5203271d-0f52-430d-a13e-b8b260e296a2)
+	Sleep(15)
+	CharacterMoveTo(TRIGGER:DAF_TavernOrc1_5f66ae7d-fc1d-4156-bd13-68faf69b1a71)
+	CharacterLookFrom(TRIGGER:DAF_TavernOrc1_5f66ae7d-fc1d-4156-bd13-68faf69b1a71)
+	SetPriority("FreshAir",0)
+INTERRUPT
+	SetPriority("FreshAir",0)
+
+REACTION CallWaiter,0
+USAGE PEACE
+CHECK "c1&c2"
+	IsEqual(%State,0)
+	IsEqual(%CanCall,1)
+VARS
+	FIXEDSTRING:_Text
+ACTIONS
+	IF "!c1"
+		CharacterHasStatus(__Me,"SITTING")
+	THEN
+		CharacterUseItem(ITEM:FUR_Rich_Chair_A_034_f82b0ea3-ce9e-40de-9316-1334a21a5879)
+	ENDIF	
+	GlobalSetEvent("DAF_HershelCalled")
+	GetRandom(_Text,"DAF_BO_TavernOrcCallWaiter_1","DAF_BO_TavernOrcCallWaiter_2","DAF_BO_TavernOrcCallWaiter_3")
+	DisplayText(__Me,_Text,5)
+	CharacterEvent(%Waiter,"CalledByOrc1")
+	Sleep(20)
+	SetPriority("CallWaiter",0)
+INTERRUPT
+	SetPriority("CallWaiter",0)
+
+EVENTS
+
+EVENT HershelCalled
+ON
+	OnGlobalEventSet("DAF_HershelCalled")
+ACTIONS
+	Set(%CanCall,0)
+
+EVENT HershelAvailable
+ON
+	OnGlobalEventSet("DAF_HershelAvailable")
+ACTIONS
+	Set(%CanCall,1)
+	

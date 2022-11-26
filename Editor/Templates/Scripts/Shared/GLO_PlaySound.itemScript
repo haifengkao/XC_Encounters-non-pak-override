@@ -1,0 +1,15 @@
+INIT
+ITEM:__Me
+EXTERN STRING:%SoundEvent=null
+
+EVENTS
+
+EVENT OnClick
+ON
+	OnUseItem(_,__Me)
+ACTIONS
+	IF "!c1"
+		IsEqual(%SoundEvent,null)
+	THEN
+		PlaySound(__Me,%SoundEvent)
+	ENDIF

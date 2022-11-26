@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<save>
+    <header version="2" time="1402839614" />
+    <version major="1" minor="3" revision="0" build="0" />
+    <region id="keywordDialog">
+        <node id="root">
+            <attribute id="KeywordVoiced" value="0" type="19" />
+            <attribute id="keywordAutoImport" value="0" type="19" />
+            <attribute id="keywordName" value="Default_DontUseMyStuff" type="22" />
+            <attribute id="PlayGreeting" value="0" type="19" />
+            <children>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="1a70749c-482d-4942-bd2d-1f852970ae9c" type="22" />
+                    <attribute id="keywordContentMapValue" value="Greeting" handle="h7f890f24g8572g4902g90b4gd362b7e9bdf2" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="85d10211-e1d6-4802-9b9c-c825ee3a7f5d" type="22" />
+                    <attribute id="keywordContentMapValue" value="That&apos;s the last straw! You have no right to treat this place like your own personal playground! Guards! Guards!" handle="h43b0b3d8g4964g4fedga0d0gb9662f3c4643" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="ab459081-d4d5-4388-bfa9-b662510db72a" type="22" />
+                    <attribute id="keywordContentMapValue" value="Excuse me, but would you mind not handling that? I like to keep things just as they are, if you please." handle="hb5fd35afgba5bg4991gb0fdg8e2d9ccb1707" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="b51bc205-6839-403e-a38f-ce93bae53814" type="22" />
+                    <attribute id="keywordContentMapValue" value="I&apos;ll say it one more time: I don&apos;t appreciate your leaving greasy fingerprints on everything you please!" handle="h3b47ef72gca3cg49feg8622g30f311f3242d" type="28" />
+                </node>
+                <node id="keywordNode">
+                    <attribute id="keywordActions" value="" type="23" />
+                    <attribute id="keywordConditions" value="" type="23" />
+                    <attribute id="keywordDisplayedText" value="1a70749c-482d-4942-bd2d-1f852970ae9c" type="22" />
+                    <attribute id="keywordId" value="Greeting" type="22" />
+                    <attribute id="keywordLast" value="0" type="19" />
+                    <attribute id="keywordOwner" value="-1" type="4" />
+                    <attribute id="keywordShow" value="0" type="19" />
+                    <attribute id="keywordSource" value="0" type="5" />
+                    <children>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value="CONDITION IsCharacterFlag(&quot;EVENT_UsingWasWarnedBefore&quot;,1,1)&#x0D;&#x0A;CHECK !c" type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="ab459081-d4d5-4388-bfa9-b662510db72a" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value="CONDITION IsCharacterFlag(&quot;EVENT_UsingWasWarnedBefore&quot;,1,1)&#x0D;&#x0A;CONDITION IsCharacterFlag(&quot;EVENT_UsingCallingGuards&quot;,1,1)&#x0D;&#x0A;CHECK c&amp;!c" type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="b51bc205-6839-403e-a38f-ce93bae53814" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="ACTION CallGuards()" type="23" />
+                            <attribute id="keywordConditions" value="CONDITION IsCharacterFlag(&quot;EVENT_UsingCallingGuards&quot;,1,1)&#x0D;&#x0A;CHECK c" type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="85d10211-e1d6-4802-9b9c-c825ee3a7f5d" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value="CONDITION IsCharacterFlag(&quot;EVENT_UsingCallingGuards&quot;,1,1)&#x0D;&#x0A;CHECK c" type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordStub" value="1" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                        </node>
+                    </children>
+                </node>
+                <node id="keywordSpeakerNames" />
+            </children>
+        </node>
+    </region>
+</save>

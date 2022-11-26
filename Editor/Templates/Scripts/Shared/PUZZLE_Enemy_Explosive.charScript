@@ -1,0 +1,13 @@
+INIT
+EXTERN SKILL:%ExplosionSkill = null
+EXTERN INT:%ExplosionLevel = 1
+CHARACTER:__Me
+
+EVENTS
+EVENT ExplodeOnDeath
+ON
+	OnDie(__Me,_,_,_)
+VARS
+	FIXEDSTRING:_Faction
+ACTIONS
+	ExplodeAt(__Me,%ExplosionSkill,%ExplosionLevel)

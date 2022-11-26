@@ -1,0 +1,31 @@
+INIT
+
+CHARACTER:__Me
+	EXTERN ITEM:%Bed = null
+
+BEHAVIOUR
+
+REACTION Pain, 1000
+USAGE PEACE
+VARS
+	FLOAT:_Rest
+ACTIONS
+	IF "!c1&!c2&!c3"
+		ItemIsDestroyed(%Bed)
+		CharacterHasStatus(__Me, STATUS:LYING)
+		IsEqual(%Bed, null)
+	THEN
+		CharacterUseItem(%Bed)
+	ENDIF
+	Sleep(1)
+	
+	IF "c1"
+		IsRandom(0.3)
+	THEN
+		DialogStart("END_AD_NegaPatientsPain", __Me)
+	ENDIF
+	
+	GetRandomBetween(_Rest, 15.0, 30.0)
+	Sleep(_Rest)
+	Reset()
+		

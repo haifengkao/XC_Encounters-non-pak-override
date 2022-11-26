@@ -1,0 +1,67 @@
+INIT
+CHARACTER:__Me
+CHARACTER:%Love = DAF_Ophelia_d94e271f-c89f-4718-a83a-3600989b2d95
+INT:%State = 0
+INT:%Dialog = 0
+TRIGGER:%OpheliaPoint = DAF_Point_VincentToOphelia_75c0af63-d9f3-4015-b73b-633b30c3cdba
+TRIGGER:%VincentPoint = DAF_Point_VincentToAltar_45a263ab-9afb-47cd-aa44-b81bb8533ddd
+
+BEHAVIOUR
+
+REACTION ReactOnPlayerCloseToOphelia, 2000
+USAGE PEACE
+VARS
+	CHARACTER:_player
+	FIXEDSTRING:_TextOnGettingClose
+CHECK "c1&c2"
+	IsEqual(%State,0)
+	CharacterGet(_player, __Me, 6, COMPARE:Lowest, Distance, Player)
+ACTIONS
+	CharacterLookAt(_player)
+	CharacterMoveTo(%OpheliaPoint, 1)
+	GetRandom(_TextOnGettingClose,"DAF_VincentOnPlayerCloseToOphelia_01","DAF_VincentOnPlayerCloseToOphelia_01")
+	DisplayText(__Me, _TextOnGettingClose, 5)
+	Sleep(5)
+INTERRUPT
+	Reset()
+	
+REACTION CareForOphelia,1050
+USAGE PEACE
+VARS
+FIXEDSTRING:_Text
+FIXEDSTRING:_Animation
+CHECK "c1"
+	IsEqual(%State,0)
+ACTIONS
+	CharacterMoveTo(%VincentPoint,0)
+	DisplayText(__Me,"DAF_Vincent_01",5)
+	GetRandom(_Animation,"Fidget_Forward_01","Fidget_Low_01")
+	CharacterPlayAnimation(_Animation)
+	Sleep(3)
+	CharacterMoveTo(%OpheliaPoint)
+	CharacterPlayAnimation(_Animation)
+	Sleep(11)	
+INTERRUPT
+	Reset()
+	
+REACTION Dialog,1500
+USAGE PEACE
+CHECK "c1&!c2&!c3"
+	IsEqual(%Dialog,1)
+	IsInDialog(%Love)
+	IsInDialog(__Me)
+ACTIONS
+	Set(%Dialog,0)
+	CharacterLookAt(%Love)
+	CharacterMoveTo(%OpheliaPoint)
+	DialogStart("DAF_AD_OpheliaVincent",%Love,__Me)
+	
+	
+EVENTS
+
+EVENT StartDialog
+ON
+	OnCharacterEvent(__Me,"OpheliaDialogRequest")
+ACTIONS
+	Set(%Dialog,1)
+	

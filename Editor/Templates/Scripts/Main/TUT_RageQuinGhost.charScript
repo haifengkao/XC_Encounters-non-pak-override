@@ -1,0 +1,17 @@
+INIT
+
+	CHARACTER:__Me
+	
+EVENTS
+
+EVENT firstTurn
+	ON
+		OnInit()
+	ACTIONS
+		StartTimer("sayText", 1.5,0)
+
+EVENT Timer
+	ON
+		OnTimer("sayText")
+	ACTIONS
+		DisplayText(__Me, "TUT_RagequinGhost", 4)

@@ -1,0 +1,151 @@
+#INCLUDE State_Manager
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	INT:%WithCultist = 0
+//-------------		
+BEHAVIOUR
+REACTION State_BeforeTempleQuest,0
+USAGE PEACE
+ACTIONS
+	GetWeightedRandom(%currentAction, "Action_Preaching",INT:1, "Action_Moving",INT:3)
+	SetPriority(%currentAction, 1100)
+		
+REACTION Action_Preaching, 0
+USAGE PEACE
+ACTIONS
+	Sleep(15)
+	DialogStart("LUC_AD_LoicPreaching", __Me)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)
+		
+REACTION Action_Moving, 0
+USAGE PEACE
+ACTIONS
+	CharacterPlayAnimation("Pray_01")
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)	
+		
+REACTION Loic_MoveToBloodSurfaceAndHeal,0
+USAGE COMBAT
+VARS
+	FIXEDSTRING:_BloodText
+	FLOAT3:_ChosenSurface
+	FLOAT:_MyAP
+CHECK "c1"
+	FindSurface(_ChosenSurface,__Me,0,20,Blood,1,0,0,3)
+ACTIONS
+	CharacterMoveTo(_ChosenSurface,1,0,0,0,0)
+	IF "c1&!c2"
+		CharacterGetStat(_MyAP,__Me,ActionPoints)
+		IsLessThen(_MyAP,5)
+	THEN	
+		Sleep(0.5)
+		CreateSurfaceAt(_ChosenSurface,None,2,-1)
+		CharacterHeal(__Me,0.3)
+		GetRandom(_BloodText,"LUC_Loic_BloodText_01","LUC_Loic_BloodText_02","LUC_Loic_BloodText_03","LUC_Loic_BloodText_04","LUC_Loic_BloodText_05","LUC_Loic_BloodText_06")
+		DisplayText(__Me,_BloodText,4)
+		CharacterPlayAnimation("cast_self_cast")
+		CharacterUseActionPoints(__Me,4)
+	ENDIF
+	SetPriority("Loic_MoveToBloodSurfaceAndHeal",0)
+INTERRUPT
+	Reset()
+
+REACTION Loic_CastIceShard,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&!(c3|c4|c5|c6|c7)&c8&c9"
+	CharacterCanCast(__Me,"Projectile_EnemyIceShard")											//c1
+	CharacterGet(_ChosenTarget,__Me,30,Lowest,WaterResistance,Enemy)							//c2
+	CharacterHasStatus(_ChosenTarget,"INVULNERABLE")											//!c3
+	CharacterHasStatus(_ChosenTarget,"VOID_AURA")												//!c4
+	CharacterHasStatus(_ChosenTarget,"BURNING")													//!c5
+	CharacterHasStatus(_ChosenTarget,"WATER_IMMUNITY_AURA")										//!c6
+	CharacterHasStatus(_ChosenTarget,"WATER_IMMUNITY")											//!c7		
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyIceShard")					//c8
+	IsRandom(0.3)																				//c9
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	IF "c1"
+		IsRandom(0.3)
+	THEN
+		DisplayText(__Me,"HOM_Combat_Zandalor_IceShard",3)
+	ENDIF
+	CharacterUseSkill("Projectile_EnemyIceShard",_ChosenTarget)
+	
+REACTION Loic_CastEarthShard,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&!(c3|c4|c5|c6|c7)&c8&c9"
+	CharacterCanCast(__Me,"Projectile_EnemyEarthShard")											//c1
+	CharacterGet(_ChosenTarget,__Me,30,Lowest,EarthResistance,Enemy)							//c2
+	CharacterHasStatus(_ChosenTarget,"PETRIFIED")												//!c3
+	CharacterHasStatus(_ChosenTarget,"INVULNERABLE")											//!c4
+	CharacterHasStatus(_ChosenTarget,"VOID_AURA")												//!c5
+	CharacterHasStatus(_ChosenTarget,"EARTH_IMMUNITY_AURA")										//!c6
+	CharacterHasStatus(_ChosenTarget,"EARTH_IMMUNITY")											//!c7
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyEarthShard")				//c8
+	IsRandom(0.3)																				//c9
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	IF "c1"
+		IsRandom(0.3)
+	THEN
+		DisplayText(__Me,"HOM_Combat_Zandalor_EarthShard",3)
+	ENDIF
+	CharacterUseSkill("Projectile_EnemyEarthShard",_ChosenTarget)
+
+REACTION Loic_CastDamageBoost,1500	//need to > healing reaction's prio, else Loic will never use it (since condition is HP < 40% and Loic will have healed)
+USAGE COMBAT
+VARS
+	FLOAT:_MyVitality
+CHECK "c1&!(c2|c3)&c4&c5"
+	CharacterCanCast(__Me,"Target_EnemyTargetedDamageBoost")						//c1
+	CharacterHasStatus(__Me,"INVULNERABLE")											//!c2
+	CharacterHasStatus(__Me,"BOOST")												//!c3
+	CharacterGetStat(_MyVitality,__Me,"Vitality")									//c4
+	IsLessThen(_MyVitality,0.4)														//c5
+ACTIONS
+	CharacterUseSkill("Target_EnemyTargetedDamageBoost",__Me)
+
+//-------------	
+EVENTS
+EVENT OnInit_GiveSpells
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill("Projectile_EnemyEarthShard")
+	CharacterAddSkill("Projectile_EnemyIceShard")
+	CharacterAddSkill("Target_EnemyTargetedDamageBoost")
+	
+EVENT OnCombatStarted_BattleCry
+ON
+	OnCombatStarted()
+ACTIONS
+	IF "c1"
+		IsEqual(%WithCultist, 1)
+	THEN
+		DialogStart("LUC_AD_LoicFight", __Me)
+	ENDIF
+	
+EVENT OnTurn_GeneralControl
+VARS
+	FLOAT:_MyVitality
+ON
+	OnTurn()
+ACTIONS
+	IF "c1&c2"
+		CharacterGetStat(_MyVitality,__Me,Vitality)
+		IsLessThen(_MyVitality,0.4)
+	THEN
+		SetPriority("Loic_MoveToBloodSurfaceAndHeal",1200)
+	ENDIF

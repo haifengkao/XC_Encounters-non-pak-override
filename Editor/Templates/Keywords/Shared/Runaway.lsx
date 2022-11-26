@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<save>
+    <header version="2" time="1386076190" />
+    <version major="1" minor="3" revision="0" build="0" />
+    <region id="keywordDialog">
+        <node id="root">
+            <attribute id="keywordAutoImport" value="1" type="19" />
+            <attribute id="keywordName" value="Runaway" type="22" />
+            <attribute id="KeywordVoiced" value="0" type="19" />
+            <attribute id="PlayGreeting" value="0" type="19" />
+            <children>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="61eaa999-61c8-4bc4-9c4f-7a732e4a2899" type="22" />
+                    <attribute id="keywordContentMapValue" value="Please don&apos;t hurt me! I-I&apos;ll leave immediately!" handle="h183c39b6ge568g4afagb89eg6cd00641f285" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="e23bc551-4c2b-4b95-b5a6-dda6a78b4f82" type="22" />
+                    <attribute id="keywordContentMapValue" value="Greeting" handle="h7f890f24g8572g4902g90b4gd362b7e9bdf2" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="f6cd388c-ab8f-4582-8801-74d6279cd0d1" type="22" />
+                    <attribute id="keywordContentMapValue" value="Aaaaahh!" handle="h34e2ecacgb9a3g45b8g884eg1b4676d4093b" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="fa983169-1b97-431d-b9af-aa23042b438a" type="22" />
+                    <attribute id="keywordContentMapValue" value="HELP! SOMEBODY HELP!" handle="h8c3f1973g5d75g4b02gbd1bga43e330b7687" type="28" />
+                </node>
+                <node id="keywordNode">
+                    <attribute id="keywordActions" value="" type="23" />
+                    <attribute id="keywordConditions" value="" type="23" />
+                    <attribute id="keywordDisplayedText" value="e23bc551-4c2b-4b95-b5a6-dda6a78b4f82" type="22" />
+                    <attribute id="keywordId" value="Greeting" type="22" />
+                    <attribute id="keywordLast" value="0" type="19" />
+                    <attribute id="keywordOwner" value="-1" type="4" />
+                    <attribute id="keywordShow" value="0" type="19" />
+                    <attribute id="keywordSource" value="0" type="5" />
+                    <children>
+                        <node id="keywordText">
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value="CONDITION IsCharacterFlag(&quot;EVENT_dialog_random1_1&quot;,1,1)&#x0D;&#x0A;CHECK c" type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="fa983169-1b97-431d-b9af-aa23042b438a" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value="CONDITION IsCharacterFlag(&quot;EVENT_dialog_random1_2&quot;,1,1)&#x0D;&#x0A;CHECK c" type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="f6cd388c-ab8f-4582-8801-74d6279cd0d1" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value="CONDITION IsCharacterFlag(&quot;EVENT_dialog_random1_3&quot;,1,1)&#x0D;&#x0A;CHECK c" type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="61eaa999-61c8-4bc4-9c4f-7a732e4a2899" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="keywordSpeakerNames" />
+            </children>
+        </node>
+    </region>
+</save>

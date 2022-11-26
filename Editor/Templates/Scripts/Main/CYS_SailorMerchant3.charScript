@@ -1,0 +1,46 @@
+#INCLUDE CYS_BurningShipHelper
+
+INIT
+USING CYS_BurningShipHelper
+CHARACTER:%Friend = CYS_SailorMerchant1_cf3210eb-aebc-4f0e-8ff5-85a7f4ebcebe
+INT:%Dialog = 0
+
+BEHAVIOUR
+	
+REACTION State_ActionManager, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, "Action_Wait")
+	SetPriority(%currentAction, 1100)
+
+REACTION State_Dialog,0
+USAGE PEACE
+CHECK "!c1&!c2"
+	IsInDialog(%Friend)
+	IsInDialog(__Me)
+ACTIONS
+	CharacterLookAt(%Friend)
+	DialogStart("CYS_AD_Sailors",%Friend,__Me)
+	Set(%currentState, "State_ActionManager")
+INTERRUPT
+	Reset()
+	
+REACTION Action_Wait,0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	GetRandom(_Animation,"Chuckle_01","Chuckle_02","Laugh_01","Laugh_02")
+	CharacterPlayAnimation(_Animation)
+	Sleep(5)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	Reset()
+	
+EVENTS
+
+EVENT StartDialog
+ON
+	OnCharacterEvent(__Me,"DialogRequest")
+ACTIONS
+	Set(%currentState,"State_Dialog")

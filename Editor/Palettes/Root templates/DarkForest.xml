@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<palette xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <palettes>
+    <EntityPalette>
+      <palettes />
+      <objectids>
+        <guid>4486aae6-f11d-40be-8c81-e3091daa74ca</guid>
+        <guid>15d93c55-7c69-496a-99d2-f02cf8c1b251</guid>
+        <guid>47a99ebe-1f06-4eb9-89d7-8d4cd01fc779</guid>
+        <guid>f3197f49-e01a-4d12-95ba-1a6eb4d20c88</guid>
+        <guid>a8886d55-dd64-4cb8-acb2-f3c5d8fd3fd6</guid>
+        <guid>e1a818bf-849f-499e-b200-5379f6cd94f7</guid>
+        <guid>76bc0cc6-cbd6-4e89-8c30-55b732705a7d</guid>
+        <guid>b2793fa8-ad49-46c8-9e46-8773c3e5263e</guid>
+        <guid>cf171c37-6808-42ef-bc24-c22e3158d358</guid>
+      </objectids>
+      <name>Corpses</name>
+    </EntityPalette>
+    <EntityPalette>
+      <palettes>
+        <EntityPalette>
+          <palettes />
+          <objectids />
+          <name>DAF_Golem</name>
+        </EntityPalette>
+        <EntityPalette>
+          <palettes />
+          <objectids />
+          <name>DAF_ReginsShrine</name>
+        </EntityPalette>
+      </palettes>
+      <objectids>
+        <guid>2c9eb520-5fe6-483c-a004-51c1b2169040</guid>
+        <guid>bf712a6e-e78d-4d10-b7df-88a44ed4aefc</guid>
+        <guid>98a4f2cd-7066-4dd2-ba84-fbaa40f4b5e2</guid>
+        <guid>b53181cf-a196-4ce8-b456-a34a7f9b5882</guid>
+        <guid>c3ea97c5-0f2b-41db-886a-13d7a7f027d0</guid>
+        <guid>d5e7563e-a426-45b4-af33-38b778d0b82f</guid>
+      </objectids>
+      <name>Quest</name>
+    </EntityPalette>
+    <EntityPalette>
+      <palettes />
+      <objectids>
+        <guid>40163e07-b67b-4009-bdbe-a4e5ce5ee1d9</guid>
+      </objectids>
+      <name>Lab</name>
+    </EntityPalette>
+  </palettes>
+  <objectids>
+    <guid>017ea170-66c1-48f0-b5bf-0af23001b474</guid>
+    <guid>083c21b0-ce67-47af-97f4-07a979cc04e7</guid>
+    <guid>189dc485-5ef4-4c44-ad4d-bc44d8f6ecd3</guid>
+    <guid>127c2d34-cfd3-48d5-80f8-8ba7c37e2a30</guid>
+    <guid>1aa1caf8-fe2b-4b95-a062-7e9941bf18d6</guid>
+    <guid>838629b0-8283-415c-bd30-185f7bccab5e</guid>
+    <guid>edc34ee4-4434-4211-90cf-ffdcacfb5749</guid>
+    <guid>0d0491da-40e1-4534-bfb0-18a2194fc341</guid>
+    <guid>dc8c1172-e599-42ed-bc53-3d03f51025f3</guid>
+    <guid>0a8130d2-67f6-4269-a576-1d027176d0e3</guid>
+    <guid>487e68a3-48e4-42fe-b0b4-7fc9b1f19255</guid>
+    <guid>2f75be7b-da61-43e4-8844-f9bebecaa804</guid>
+    <guid>a230b4e8-e4f6-44e1-af1f-d1ec0708095f</guid>
+    <guid>e4273fec-2a1c-481e-a99b-6a03c2e4b7d0</guid>
+    <guid>81662816-f2f7-433a-8a6d-804a71c716d5</guid>
+    <guid>30c659c0-cb9f-4e18-9ac8-66e434f5da19</guid>
+    <guid>79382e88-5056-4a5b-ab03-df6d171264b3</guid>
+    <guid>958b3cc3-d107-4640-8493-671d0506f8e8</guid>
+    <guid>fc1a8e16-a045-4606-8b90-f7c12a09d730</guid>
+    <guid>39ec7ea8-3243-49e9-81da-4f924d91a1dd</guid>
+    <guid>ca7e731e-d961-47cf-9e3f-4b992722085a</guid>
+    <guid>44585ce6-5da8-4817-8e66-25f2516f9717</guid>
+    <guid>057dfa1b-152a-4340-a76a-d72f65eafb24</guid>
+    <guid>4a0a4de4-01fa-4b66-8311-a42edecddb90</guid>
+    <guid>4997cea8-c8e9-4042-997d-8eaaf5f0b4cf</guid>
+    <guid>54fce968-d392-4007-be65-db158de527c3</guid>
+    <guid>0bb1f68f-ee2f-4635-9337-a6df4ee4677a</guid>
+    <guid>31284854-da55-4b37-80c3-5bc84ee05b04</guid>
+    <guid>b0b89946-5363-4b4d-a699-48d1c9fe9821</guid>
+    <guid>0179dca6-be59-4b63-855c-a669e71a2882</guid>
+    <guid>cde2363d-1243-475e-8db2-ed5c2de6aa81</guid>
+    <guid>279978b3-2d18-4668-bcd4-71d1d2fe904d</guid>
+    <guid>c099c96f-d9bf-47c8-9bc7-daa7ff1c674f</guid>
+    <guid>8f054225-2e3c-49a0-8806-32f7e5596471</guid>
+    <guid>1f89ab8c-8dcf-4c92-97cd-e85c2664a9a6</guid>
+    <guid>c4331b12-b53e-468e-8d67-2a1d7a4690a7</guid>
+    <guid>ffeffb6b-4e7f-420f-b1e2-12cccb20fa6b</guid>
+    <guid>c5e0c215-8918-477d-895c-5a33475cd2bc</guid>
+    <guid>5af13a0b-daa0-4e6d-b6b4-d14b9119743d</guid>
+    <guid>55891fd1-a805-41d2-93b2-b45133008155</guid>
+    <guid>15164738-e40f-4c42-b7fb-2808dc66e582</guid>
+    <guid>6e7ac9d7-c7e2-41c7-9515-c6f33372c2bc</guid>
+    <guid>f98bb77f-980b-4786-8e99-66f299854d40</guid>
+    <guid>05a3705c-8eb2-4687-ba4b-c4cc18304987</guid>
+    <guid>dafe0ed8-74ad-4981-8068-ce8a453d66c3</guid>
+    <guid>348db9f3-d18c-4b4f-958a-e5653c76ed66</guid>
+    <guid>e959fb9d-5faa-438f-9bfd-2bb5b88be108</guid>
+    <guid>186951f1-e65f-4995-8b16-89f1be8b52fe</guid>
+    <guid>669d54b4-57eb-419f-9ae0-39cc0d2b565c</guid>
+  </objectids>
+  <name>DarkForest</name>
+</palette>

@@ -1,0 +1,19 @@
+INIT
+	CHARACTER:__Me
+
+//-------------------
+BEHAVIOUR
+REACTION Global_RunAway,0
+USAGE COMBAT
+ACTIONS
+	CharacterFleeFrom(Enemy,12)
+	SetPriority("Global_RunAway",0)
+
+//-------------------
+EVENTS
+EVENT OnDamage_OnMiss_IncreaseRunAwayPriority
+ON
+	OnDamage(_,_,_,_)
+	OnMiss(_,_, __Me, _)
+ACTIONS
+	SetPriority("Global_RunAway",1500)

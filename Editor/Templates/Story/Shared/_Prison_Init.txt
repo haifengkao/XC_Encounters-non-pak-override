@@ -1,0 +1,50 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+// (INTEGER)_GuardType,(LOCATION)_PrisonCell,(LOCATION)_ReleaseLocation,(OBJECT)_Door,(OBJECT)_Chest,(INTEGER)_TradeImage
+//PrisonData(CHARACTER_Player1,"PRISON_WATCH_RIVERTOWN", TRIGGER_Test_Prison_Cell,TRIGGER_Test_Prison_Exit, ITEM_Test_Prison_Door,ITEM_Test_Prison_Chest/*,        962*/);
+//PrisonData(CHARACTER_Player2,"PRISON_WATCH_RIVERTOWN", TRIGGER_Test_Prison_Cell2,TRIGGER_Test_Prison_Exit2, ITEM_Test_Prison_Door2,ITEM_Test_Prison_Chest2/*,        962*/);
+
+//TODO: commented block, beds?
+/*
+PrisonBed(PRISON_CASTLE,OBJECT_bed_prison_sfcastle1);
+PrisonBed(PRISON_CASTLE,OBJECT_bed_prison_sfcastle2);
+PrisonBed(PRISON_WATCH_RIVERTOWN,OBJECT_bed_prison_watch_riv);
+PrisonBed(PRISON_WATCH_VERDISTIS,OBJECT_bed_prison_watch_verd);
+PrisonBed(PRISON_GLENBORUS,OBJECT_bed_prison_glenborus);
+// I was falling asleep I guess, but the object is for sure the bed of the dwarven halls prison:
+PrisonBed(PRISON_DWARVEN_HALLS,OBJECT_bed_glenborus_prison);
+*/
+
+//_PrisonID,_Region,_ProhibitedRegion,_Guard,_Script
+//PrisonEscapeData("PRISON_WATCH_RIVERTOWN",TRIGGER_Test_Prison_Prohibited,CHARACTER_Prison_Guard, "prison guard riv take a leak",TRIGGER_Test_Prison);
+
+// GuardedRegion(_GuardedRegion,_QuitChaseRegion,_GuardType,_Prison)
+//GuardedRegion(TRIGGER_Test_Prison,TRIGGER_Test_Prison,"GUARD_TYPE_WATCH_RIVERTOWN_LANCE","PRISON_WATCH_RIVERTOWN");
+
+//GuardTypeNpc("GUARD_TYPE_WATCH_RIVERTOWN_LANCE",CHARACTER_Prison_Patrol1,"Guard_1_to_hero",1);
+
+SetupGuardDialogs();
+
+KBSECTION
+PROC
+SetupGuardDialogs()
+AND
+GuardTypeNpc(_Type,_Npc,_,_)
+AND
+DB_GuardDialogs((STRING)_Type,(STRING)_Dialog)
+THEN
+DB_Dialogs(_Npc,_Dialog);
+
+PROC
+SetupGuardDialogs()
+AND
+GuardTypeNpc(_Type,_Npc,_,_)
+AND
+NOT DB_GuardDialogs((STRING)_Type,(STRING)_)
+THEN
+DB_Dialogs(_Npc,"Default_Guard");
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "__Start"

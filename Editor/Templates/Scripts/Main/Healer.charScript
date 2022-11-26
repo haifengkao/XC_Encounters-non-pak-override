@@ -1,0 +1,65 @@
+#INCLUDE Base
+
+INIT
+USING Base
+CHARACTER:__Me
+INT:%RangeSpellCount
+
+EVENTS
+
+EVENT CombatStart
+ON 
+	OnCombatStarted()
+ACTIONS
+	Set(%RangeSpellCount,2)
+	DebugText(__Me, "Inited!")
+
+BEHAVIOUR
+
+REACTION RangeSpell,7
+USAGE COMBAT
+VARS
+	CHARACTER:_Target	
+	FLOAT:_Min
+	FLOAT:_Max
+CHECK "c1&c2&c3&c4"
+	IsGreaterThen(%RangeSpellCount,0)	
+	CharacterGetSkillRange(_Min,_Max,__Me,Projectile_Fireball)
+	CharacterCanCast(__Me,Projectile_Fireball)
+	CharacterGet(_Target,__Me,null,Lowest,Distance,Enemy,null,null)
+ACTIONS
+	CharacterMoveInRange(_Target,_Min,_Max)
+	CharacterUseSkill(Projectile_Fireball,_Target)	
+	Subtract(%RangeSpellCount,1)
+INTERRUPT
+	Reset()
+
+REACTION DefaultAttack,5
+USAGE COMBAT
+VARS
+	CHARACTER:_Target	
+	FLOAT:_Min
+	FLOAT:_Max
+CHECK "c1"
+	CharacterGet(_Target,__Me,null,Lowest,Distance,Enemy,null,null)
+ACTIONS	
+	CharacterAttack(_Target)
+
+REACTION HealFriendly,10
+USAGE ALL
+VARS
+	CHARACTER:_Target
+	FLOAT:_hp
+	FLOAT:_Min
+	FLOAT:_Max
+CHECK "c1&c2&c3&c4&c5"
+	CharacterCanCast(__Me,Heal_EnemyRegenerate)
+	CharacterGetSkillRange(_Min,_Max,__Me,Heal_EnemyRegenerate)
+	CharacterGet(_Target,__Me,15,Lowest,Vitality,Ally,null,null)
+	CharacterGetStat(_hp,_Target,Vitality)
+	IsLessThen(_hp,0.5)		
+ACTIONS
+	CharacterMoveInRange(_Target,_Min,_Max)
+	CharacterUseSkill(Heal_EnemyRegenerate,_Target)
+INTERRUPT
+	Reset()

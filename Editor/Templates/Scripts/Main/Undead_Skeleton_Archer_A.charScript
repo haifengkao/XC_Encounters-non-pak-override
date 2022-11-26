@@ -1,0 +1,72 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter
+CHARACTER:__Me
+FLOAT3:%startPosition
+
+INT:%RangedEquipped=1
+
+BEHAVIOUR 
+
+REACTION CheckDistanceToStartPos, 25
+USAGE WAITING
+VARS
+	FLOAT3:_CurrentPosition
+	FLOAT:_Difference
+CHECK "c1&c2"
+	GetPosition(__Me,_CurrentPosition)
+	GetDistance(_Difference,_CurrentPosition,%startPosition)
+ACTIONS
+	IF "c1"
+		IsGreaterThen(_Difference,15)
+	THEN
+		SetPriority("FleeAndAttack",0)
+	ELSE
+		SetPriority("FleeAndAttack",15)
+	ENDIF
+
+REACTION SwitchToDagger, 20
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+CHECK "c1&c2&c3&c4"
+	IsEqual(%RangedEquipped,1)
+	CharacterGet(_Enemy,__Me,5,Lowest,Distance,Enemy)
+	CharacterInTouchRange(__Me,_Enemy)
+	CharacterHasWeaponType(__Me,SmallWeapons)
+ACTIONS
+	CharacterSwitchWeaponType(SmallWeapons)
+	Set(%RangedEquipped,0)
+
+REACTION SwitchToBow, 20
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+CHECK "c1&!c2&(c3|c4)"	
+	IsEqual(%RangedEquipped,0)
+	CharacterGet(_Enemy,__Me,4,Lowest,Distance,Enemy)
+	CharacterHasWeaponType(__Me,Bow)
+	CharacterHasWeaponType(__Me,CrossBow)
+ACTIONS
+	CharacterSwitchWeaponType(Bow)
+	CharacterSwitchWeaponType(CrossBow)
+	Set(%RangedEquipped,1)
+
+REACTION FleeAndAttack, 15
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+CHECK "c1&c2"
+	IsEqual(%RangedEquipped,1)
+	CharacterGet(_Enemy,__Me,5,Lowest,Distance,Enemy)
+ACTIONS
+	CharacterFleeFrom(RELATION:Enemy, 3)
+	CharacterAttack(_Enemy)
+
+EVENTS
+EVENT GetStartPosition
+ON
+	OnCombatStarted()
+ACTIONS
+	GetPosition(__Me,%startPosition)

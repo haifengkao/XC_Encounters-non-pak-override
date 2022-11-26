@@ -1,0 +1,25 @@
+INIT
+ITEM:__Me
+EXTERN STRING:%ExploCorpse_EventName="Explosive_Corpse"
+EXTERN SKILL:%ExploCorpse_Projectile="Projectile_Fireball"
+EXTERN INT:%ExploCorpse_Level=20
+
+EVENTS
+EVENT Explosion_Event
+ON
+	OnItemEvent(__Me,%ExploCorpse_EventName)
+ACTIONS
+	ExplodeAt(__Me,%ExploCorpse_Projectile,%ExploCorpse_Level)
+	ItemDie(__Me)
+	
+EVENT Explosion_Damage
+ON
+	OnUseItem(_,__Me)
+ACTIONS
+	IF "!c1&!c2"
+		ItemHasStatus(__Me,FROZEN)
+		ItemHasStatus(__Me,PETRIFIED)
+	THEN
+		ExplodeAt(__Me,%ExploCorpse_Projectile,%ExploCorpse_Level)
+		ItemDie(__Me)	
+	ENDIF

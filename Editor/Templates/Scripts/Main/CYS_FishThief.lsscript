@@ -1,0 +1,24 @@
+#INCLUDE Base
+
+INIT
+USING Base
+CHARACTER:__Me
+
+
+EVENTS
+
+BEHAVIOUR
+
+REACTION LookForTheftOpportunity 1005
+USAGE PEACE
+ACTIONS
+	CharacterWander(1, 6, 0)
+	Sleep(1.5)
+	Reset()
+
+STORY
+
+SCRIPTFRAME StealFish
+ACTIONS
+	CharacterPickUpItem(CON_Food_Fish_A_001_a0fc3064-b8f4-4622-b5da-d3241a950277)
+	CharacterMoveTo(TRIGGER:CYS_FishThiefFleePoint_e9bfcf08-4b8e-42bc-ae51-a688d49bfd2d, 1)

@@ -1,0 +1,267 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+//REGION affection triggers 
+
+DB_AffectionTraitTrigger("Compassionate",1,"Affinity_Compassionate");
+DB_AffectionTraitTrigger("Heartless",1,"Affinity_Heartless");
+DB_AffectionTraitTrigger("Egotistical",1,"Affinity_Egotistical");
+DB_AffectionTraitTrigger("Altruistic",1,"Affinity_Altruistic");
+DB_AffectionTraitTrigger("Spiritual",3,"Affinity_Spiritual");
+DB_AffectionTraitTrigger("Materialistic",3,"Affinity_Materialistic");
+DB_AffectionTraitTrigger("Pragmatic",4,"Affinity_Pragmatic");
+DB_AffectionTraitTrigger("Romantic",4,"Affinity_Romantic");
+DB_AffectionTraitTrigger("Vindictive",4,"Affinity_Vindictive");
+DB_AffectionTraitTrigger("Forgiving",4,"Affinity_Forgiving");
+DB_AffectionTraitTrigger("Bold",3,"Affinity_Bold");
+DB_AffectionTraitTrigger("Timid",3,"Affinity_Timid");
+DB_AffectionTraitTrigger("Independent",4,"Affinity_Independent");
+DB_AffectionTraitTrigger("Obedient",4,"Affinity_Obedient");
+DB_AffectionTraitTrigger("Righteous",6,"Affinity_Righteous");
+DB_AffectionTraitTrigger("Renegade",6,"Affinity_Renegade");
+DB_AffectionTraitTrigger("Blunt",5,"Affinity_Blunt");
+DB_AffectionTraitTrigger("Considerate",5,"Affinity_Considerate");
+
+//END_REGION
+
+DB_AffectionTriggers("Affection_KillingBlow");
+DB_AffectionTriggers("Affection_FriendlyFire");
+DB_AffectionTriggers("Affection_CombatAlone");
+DB_AffectionTriggers("Affection_SneakSteal");
+DB_AffectionTriggers("Affection_LevelUp");
+DB_AffectionTriggers("Affection_Shovel");
+DB_AffectionTriggers("Affection_Heal");
+DB_AffectionTriggers("Affection_Resurrect");
+DB_AffectionTriggers("Affection_ValuableItem");
+DB_AffectionTriggers("Affection_Crafting");
+
+DB_ValuablePercentage(0.4);
+KBSECTION
+//REGION Triggers 
+
+IF
+CharacterTemplateKilledByCharacter(_,_Player)
+AND
+NOT DB_Companion(_Player)
+AND
+NOT DB_Dead(_Player)
+AND
+_Player.DB_IsPlayer()
+AND
+DB_Combat(_Player,_ID)
+AND
+CharacterGetOtherPlayer(_Player,_OtherPlayer)
+AND
+DB_Combat(_OtherPlayer,_ID)
+THEN
+ProcTriggerAffectionDialog(_OtherPlayer,"Affection_KillingBlow");
+
+IF
+CharacterAttackedByCharacter(_Player,_OtherPlayer)
+AND
+_Player != _OtherPlayer
+AND
+NOT DB_Dead(_Player)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_Dead(_OtherPlayer)
+AND
+_OtherPlayer.DB_IsPlayer()
+AND
+NOT DB_Companion(_OtherPlayer)
+AND
+NOT DB_Companion(_Player)
+AND
+DB_Combat(_Player,_ID)
+AND
+DB_Combat(_OtherPlayer,_ID)
+THEN
+ProcTriggerAffectionDialog(_Player,"Affection_FriendlyFire");
+
+//clear the combat fact, the next rule will turn this back on if they are indeed together 
+IF
+DB_Combat(_Player,_ID)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_Companion(_Player)
+THEN
+NOT DB_PlayersTogetherInCombat(1);
+
+IF
+DB_Combat(_Player,_ID)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_Companion(_Player)
+AND
+CharacterGetOtherPlayer(_Player,_OtherPlayer)
+AND
+DB_Combat(_OtherEntry,_ID)
+AND
+_OtherEntry == _OtherPlayer
+THEN
+DB_PlayersTogetherInCombat(1);
+
+IF
+CharacterLeftCombat(_Player,_ID)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_Dead(_Player)
+AND
+NOT DB_Companion(_Player)
+AND
+NOT DB_PlayersTogetherInCombat(1)
+THEN
+ProcTriggerAffectionDialog(_Player,"Affection_CombatAlone");
+
+IF
+ItemHandleTheft(_Player,_Owner,_,_)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_Companion(_Player)
+AND
+CharacterHasStatus(_Player,"SNEAKING",1)
+AND
+CharacterGetOtherPlayer(_Player,_OtherPlayer)
+AND
+CharacterCanSeeCharacter(_Player,_OtherPlayer,1)
+AND
+NOT _Owner.DB_IsPlayer()
+THEN
+ProcTriggerAffectionDialog(_OtherPlayer,"Affection_SneakSteal");
+
+IF
+CharacterLeveledUp(_Char)
+AND
+_Char.DB_IsPlayer()
+AND
+NOT DB_Companion(_Char)
+AND
+CharacterGetLevel(_Char, 2)
+AND
+NOT DB_StartTutMessages(1)
+THEN
+ProcTriggerAffectionDialog(_Char,"Affection_LevelUp");
+
+IF
+CharacterLeveledUp(_Char)
+AND
+_Char.DB_IsPlayer()
+AND
+NOT DB_Companion(_Char)
+AND
+CharacterGetLevel(_Char, _Lvl)
+AND
+_Lvl != 2
+THEN
+ProcTriggerAffectionDialog(_Char,"Affection_LevelUp");
+
+PROC
+ProcShovelRewards((CHARACTER)_Player,(STRING)_Reward)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_Companion(_Player)
+AND
+CharacterGetOtherPlayer(_Player,_OtherPlayer)
+THEN
+ProcTriggerAffectionDialog(_OtherPlayer,"Affection_Shovel");
+
+IF
+CharacterUsedSkillOnTarget(_Player,_TargetCharacter,_,"Heal")
+AND
+_TargetCharacter!=_Player
+AND
+_Player.DB_IsPlayer()
+AND
+_TargetCharacter.DB_IsPlayer()
+AND
+NOT DB_Companion(_Player)
+AND
+NOT DB_Companion(_TargetCharacter)
+THEN
+ProcTriggerAffectionDialog(_TargetCharacter,"Affection_Heal");
+
+IF
+CharacterUsedSkillOnTarget(_Player, _TargetCharacter, "Target_Resurrect", _)
+AND
+_Player.DB_IsPlayer()
+AND
+_TargetCharacter.DB_IsPlayer()
+AND
+NOT DB_Companion(_Player)
+AND
+NOT DB_Companion(_TargetCharacter)
+THEN
+DB_Resurrected(_Player,_TargetCharacter);
+
+IF
+CharacterResurrected(_TargetCharacter)
+AND
+DB_Resurrected(_Player,_TargetCharacter)
+THEN
+NOT DB_Resurrected(_Player,_TargetCharacter);
+ProcTriggerAffectionDialog(_TargetCharacter,"Affection_Resurrect");
+
+IF
+ItemHandleMovedFromCharacterToCharacter(_Handle,_PlayerFrom,_PlayerTo,_Value)
+AND
+_PlayerFrom.DB_IsPlayer()
+AND
+_PlayerTo.DB_IsPlayer()
+AND
+NOT DB_Companion(_PlayerFrom)
+AND
+NOT DB_Companion(_PlayerTo)
+AND
+CharacterGetInventoryGoldValue(_PlayerTo,_InvGoldVal)
+AND
+IntegerSubtract(_InvGoldVal,_Value,_TotalGoldVal)
+AND
+Real(_TotalGoldVal,_FloatGold)
+AND
+Real(_Value,_FloatVal)
+THEN
+ProcCheckValuablePercentage(_FloatGold,_FloatVal,_PlayerFrom,_PlayerTo);
+
+PROC
+ProcCheckValuablePercentage((REAL)_InventoryVal,(REAL)_Value,(CHARACTER)_PlayerFrom,(CHARACTER)_PlayerTo)
+AND
+_InventoryVal<=0.0		//smaller shouldn't happen, but just in case
+THEN
+ProcTriggerAffectionDialog(_PlayerTo,"Affection_ValuableItem");
+
+PROC
+ProcCheckValuablePercentage((REAL)_InventoryVal,(REAL)_Value,(CHARACTER)_PlayerFrom,(CHARACTER)_PlayerTo)
+AND
+_InventoryVal>0.0
+AND
+RealDivide(_Value,_InventoryVal,_Ratio)
+AND
+DB_ValuablePercentage(_Percentage)
+AND
+_Ratio>=_Percentage
+THEN
+ProcTriggerAffectionDialog(_PlayerTo,"Affection_ValuableItem");
+
+IF
+ItemTemplateCombinedWithItemTemplate(_,_,_Player,_Handle)
+AND
+_Handle!=0
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_Companion(_Player)
+AND
+CharacterGetOtherPlayer(_Player,_Other)
+THEN
+ProcTriggerAffectionDialog(_Other,"Affection_Crafting");
+
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION

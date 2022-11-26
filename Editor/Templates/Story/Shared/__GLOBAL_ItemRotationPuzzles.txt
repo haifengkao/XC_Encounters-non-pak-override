@@ -1,0 +1,174 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_IRP_Internal_IndexCount(0);
+KBSECTION
+//REGION Initialization of databases
+
+PROC
+PROC_Puzzle_RegisterRotatingItem((STRING)_puzzleName, (ITEM)_item, (INTEGER)_solution)
+AND
+DB_IRP_Internal_IndexCount(_index)
+THEN
+DB_IRP_IncreaseInternalCount();
+DB_IRP_Internal_Items((INTEGER)_index, (ITEM)_item, 0);
+DB_IRP_Internal_Solutions((INTEGER)_index, (INTEGER)_solution);
+DB_IRP_Internal_Puzzles((STRING)_puzzleName, (INTEGER)_index, 0);
+PROC_IRP_Internal_IncreasePuzzleItemcount(_puzzleName);
+
+PROC
+DB_IRP_IncreaseInternalCount()
+AND
+DB_IRP_Internal_IndexCount(_indexCount)
+AND
+IntegerSum(_indexCount, 1, _newIndex)
+THEN
+NOT DB_IRP_Internal_IndexCount(_indexCount);
+DB_IRP_Internal_IndexCount(_newIndex);
+
+PROC
+PROC_ItemRotatePuzzle_AddItemToHandle((ITEM)_handle, (ITEM)_item)
+AND
+DB_IRP_Internal_Items(_index, _item, _)
+THEN
+DB_IRP_Internal_Handles(_handle, _index);
+
+PROC
+PROC_IRP_Internal_IncreasePuzzleItemcount((STRING)_puzzleName)
+AND
+NOT DB_IRP_Internal_PuzzlesTotalItemCount(_puzzleName, _)
+THEN
+DB_IRP_Internal_PuzzlesTotalItemCount(_puzzleName, 0);
+DB_IRP_Internal_PuzzlesItemsSolved(_puzzleName, 0);
+
+PROC
+PROC_IRP_Internal_IncreasePuzzleItemcount((STRING)_puzzleName)
+AND
+DB_IRP_Internal_PuzzlesTotalItemCount(_puzzleName, _count)
+AND
+IntegerSum(_count, 1, _newTotal)
+THEN
+NOT DB_IRP_Internal_PuzzlesTotalItemCount(_puzzleName, _count);
+DB_IRP_Internal_PuzzlesTotalItemCount(_puzzleName, _newTotal);
+
+//END_REGION
+
+
+//REGION Rotate items
+
+IF
+CharacterUsedItem(_player, _handle)
+AND
+_player.DB_IsPlayer()
+AND
+DB_IRP_Internal_Handles(_handle, _index)
+AND
+DB_IRP_Internal_Items(_index, _item, _)
+THEN
+PROC_IRP_RotateItem(_item);
+
+IF
+CharacterUsedItem(_player, _item)
+AND
+_player.DB_IsPlayer()
+AND
+DB_IRP_Internal_Items(_index, _item, _)
+THEN
+PROC_IRP_RotateItem(_item);
+
+PROC
+PROC_IRP_RotateItem((ITEM)_item)
+AND
+DB_IRP_Internal_Items(_index, _item, _turnCount)
+AND
+DB_IRP_Internal_Puzzles(_puzzleName, _index, _)
+AND
+IntegerSum(_turnCount, 1, _newTurnCount)
+THEN
+NOT DB_IRP_Internal_Items(_index, _item, _turnCount);
+DB_IRP_Internal_Items(_index, _item, _newTurnCount);
+ItemRotateY(_item, 90.0, 2.0);
+PROC_IRP_CheckItemState(_item);
+PROC_IRP_CheckPuzzleState(_puzzleName);
+
+IF
+DB_IRP_Internal_Items(_index, _item, 4)
+THEN
+NOT DB_IRP_Internal_Items(_index, _item, 4);
+DB_IRP_Internal_Items(_index, _item, 0);
+
+//END_REGION
+
+//REGION Check for item solution
+
+PROC
+PROC_IRP_CheckItemState((ITEM)_item)
+AND
+DB_IRP_Internal_Items(_index, _item, _turnCount)
+AND
+DB_IRP_Internal_Puzzles(_puzzleName, _index, 0)
+AND
+DB_IRP_Internal_Solutions(_index, _solution)
+AND
+_turnCount == _solution
+THEN 
+NOT DB_IRP_Internal_Puzzles(_puzzleName, _index, 0);
+DB_IRP_Internal_Puzzles(_puzzleName, _index, 1);
+
+PROC
+PROC_IRP_CheckItemState((ITEM)_item)
+AND
+DB_IRP_Internal_Items(_index, _item, _turnCount)
+AND
+DB_IRP_Internal_Puzzles(_puzzleName, _index, 1)
+AND
+DB_IRP_Internal_Solutions(_index, _solution)
+AND
+NOT _turnCount == _solution
+THEN 
+NOT DB_IRP_Internal_Puzzles(_puzzleName, _index, 1);
+DB_IRP_Internal_Puzzles(_puzzleName, _index, 0);
+
+//END_REGION
+
+//REGION Check for puzzle solution
+
+PROC
+PROC_IRP_CheckPuzzleState((STRING)_puzzleName)
+AND
+DB_IRP_Internal_Puzzles(_puzzleName, _, 1)
+AND
+DB_IRP_Internal_PuzzlesItemsSolved(_puzzleName, _count)
+AND
+IntegerSum(_count, 1, _new)
+THEN
+NOT DB_IRP_Internal_PuzzlesItemsSolved(_puzzleName, _count);
+DB_IRP_Internal_PuzzlesItemsSolved(_puzzleName, _new);
+
+PROC
+PROC_IRP_CheckPuzzleState((STRING)_puzzleName)
+AND
+DB_IRP_Internal_PuzzlesItemsSolved(_puzzleName, _itemsSolved)
+AND
+NOT DB_IRP_Internal_PuzzlesTotalItemCount(_puzzleName, _itemsSolved)
+THEN
+NOT DB_IRP_Internal_PuzzlesItemsSolved(_puzzleName, _itemsSolved);
+DB_IRP_Internal_PuzzlesItemsSolved(_puzzleName, 0);
+GlobalClearEvent(_puzzleName);
+
+PROC
+PROC_IRP_CheckPuzzleState((STRING)_puzzleName)
+AND
+DB_IRP_Internal_PuzzlesItemsSolved(_puzzleName, _itemsSolved)
+AND
+DB_IRP_Internal_PuzzlesTotalItemCount(_puzzleName, _itemsSolved)
+THEN
+NOT DB_IRP_Internal_PuzzlesItemsSolved(_puzzleName, _itemsSolved);
+DB_IRP_Internal_PuzzlesItemsSolved(_puzzleName, 0);
+GlobalSetEvent(_puzzleName);
+
+//END_REGION
+
+EXITSECTION
+
+ENDEXITSECTION

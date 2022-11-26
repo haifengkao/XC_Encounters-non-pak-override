@@ -1,0 +1,60 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	CHARACTER:%Buddy = LUC_IV_Tundrin_bfa988f9-4af3-4713-95b9-603252026b5e
+	INT:%IsAvailable = 1
+	TRIGGER:%LookFrom = LUC_IV_AttenberahShootApprentice_796c1a0a-5994-40d9-9ee4-5a49a67ae67c
+	
+BEHAVIOUR
+
+REACTION State_Talking, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterLookAt(%Buddy)
+		DialogStart("LUC_IV_AttenberahGuards", %Buddy, __Me)
+		SetPriority("State_Talking", 0)	
+	
+REACTION State_GuardDuty, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterLookFrom(%LookFrom)
+		GetWeightedRandom(%currentAction, "Action_Idling", INT:1, "Action_ExpressSelf", INT:1)
+		SetPriority(%currentAction, 1100)
+
+REACTION Action_Idling, 0
+	USAGE PEACE
+	VARS
+	ACTIONS
+		CharacterPlayAnimation("idle2")
+		Sleep(3)
+		SetPriority(%currentAction, 0)
+		
+REACTION Action_ExpressSelf, 0
+	USAGE PEACE
+	VARS
+		FIXEDSTRING:_Talk
+	ACTIONS
+		Set(%IsAvailable, 0)
+		GetRandom(_Talk, "LUC_AttenGuard_1", "LUC_AttenGuard_2", "LUC_AttenGuard_3", "LUC_Seargiu_1")
+		DisplayText(__Me, _Talk, 4)
+		Sleep(2)
+		IF "c1"
+			IsEqual(_Talk, "LUC_Seargiu_1")
+		THEN
+			CharacterPlayEffect(__Me, "FX_Skills_Fire_Fireball_Prepare_Dummy_A")
+			Sleep(2)
+			CharacterPlayAnimation("cast_self_cast")
+			DisplayText(__Me, "LUC_Seargiu_2", 4)
+		ENDIF
+		Sleep(8)
+		Set(%IsAvailable, 1)
+		SetPriority(%currentAction, 0)
+
+EVENTS	
+EVENT TalkToBuddy
+	ON	
+		OnCharacterEvent(%Buddy,"IWantToTalk")
+	ACTIONS
+		SetPriority("State_Talking", 3000)

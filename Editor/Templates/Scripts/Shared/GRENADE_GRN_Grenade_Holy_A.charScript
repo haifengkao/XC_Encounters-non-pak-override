@@ -1,0 +1,118 @@
+#TEMPLATE "_SKILLFROMITEM_Base" : GRN_Grenade_Holy_A, null
+
+INIT
+CHARACTER:__Me
+FLOAT:%SkillTargetScore_GRN_Grenade_Holy_A=-1000000
+// [GLOBAL_VARS]
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_GRN_Grenade_Holy_A
+VARS
+	// [CALC_VARS]
+	FLOAT:_SkillRangeMin
+	FLOAT:_SkillRangeMax
+	FLOAT:_SkillImpactRange
+	FLOAT3:_TargetPos
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_GRN_Grenade_Holy_A")
+ACTIONS
+	Set(%SkillTargetScore_GRN_Grenade_Holy_A, -1000000)
+
+	// [CALC_ACTIONS_PRE]
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	IF "(c1)&(c2)&(c3)"
+	    CharacterGetSkillRange(_SkillRangeMin, _SkillRangeMax, __Me, %SkillID_GRN_Grenade_Holy_A) // c1
+	    CharacterGetSkillImpactRange(_SkillImpactRange, __Me, %SkillID_GRN_Grenade_Holy_A) // c2
+	    FindPosition(_TargetPos, __Me, _SkillRangeMax, _SkillImpactRange, __Me, 2, -1, -1, -1) // c3
+	THEN
+	    Set(%SkillTargetPos_GRN_Grenade_Holy_A, _TargetPos)
+	    Add(%ActionScore_GRN_Grenade_Holy_A, 20.0)
+	ELSE 
+	    IterateCharactersInCombat(__Me, "CalculateTarget_GRN_Grenade_Holy_A", Random, Vitality)
+	    IF "!c1"
+	    	IsEqual(%SkillTargetChar_GRN_Grenade_Holy_A, null)
+	    THEN
+	    	Add(%ActionScore_GRN_Grenade_Holy_A, %SkillTargetScore_GRN_Grenade_Holy_A)
+	    ENDIF
+	ENDIF
+	// [~CALC_ACTIONS]
+
+	
+	
+// Calculate the character we should attack
+EVENT CalculateTarget_GRN_Grenade_Holy_A
+VARS	
+	CHARACTER:_Char
+	// [CALC_TARGET_VARS]
+	FLOAT:_StatVitality
+	FLOAT:_Score
+	INT:_HostileCount
+	FLOAT:_HostileScore=0
+	INT:_EnemiesInRange
+	// [~CALC_TARGET_VARS]
+ON
+	OnIterateCharacter(_Char, "CalculateTarget_GRN_Grenade_Holy_A")	
+ACTIONS
+	// [CALC_CHAR_TARGET_ACTIONS_PRE]
+	Set(_Score, 0.0)
+	// [~CALC_CHAR_TARGET_ACTIONS_PRE]
+	// [CALC_CHAR_TARGET_ACTIONS]
+	IF "(!c1&!c2&!c3)&((c4&c5)|c6)&(!c7&c8)&(c9)&(c10)"
+	    CharacterIsDead(_Char) // c1
+	    CharacterHasStatus(_Char, INVISIBLE) // c2
+	    CharacterHasStatus(_Char, SNEAKING) // c3
+	    CharacterGetStat(_StatVitality, _Char, Vitality) // c4
+	    IsLessThen(_StatVitality, 0.6) // c5
+	    IsLessThen(_StatVitality, 0.3) // c6
+	    IsEqual(__Me, _Char) // c7
+	    CharacterIsAlly(__Me, _Char) // c8
+	    CharacterGetHostileCount(_HostileCount, _Char) // c9
+	    CharacterCount(_EnemiesInRange, _Char, 5, Enemy, null) // c10
+	THEN
+	    // Hostile count score calculation
+	    IF "(c1)"
+	        IsLessThen(_HostileCount, 3) // c1
+	    THEN
+	        Set(_HostileScore, 10.0)
+	    ENDIF
+	    Add(_Score, _HostileScore)
+	    
+	    // NoEnemiesNearTarget score calculation
+	    IF "(c1)"
+	        IsEqual(_EnemiesInRange, 0) // c1
+	    THEN
+	        Add(_Score, 5.0)
+	    ENDIF
+	    
+	    // Can see score calculation
+	    IF "!c1"
+	    	CharacterCanSee(__Me, _Char)
+	    THEN
+	    	Add(_Score, -10.0)
+	    ENDIF
+	    
+	    IF "c1"
+	    	IsGreaterThen(_Score, %SkillTargetScore_GRN_Grenade_Holy_A)
+	    THEN
+	    	Set(%SkillTargetChar_GRN_Grenade_Holy_A, _Char)
+	    	Set(%SkillTargetScore_GRN_Grenade_Holy_A, _Score)
+	    ENDIF	
+	ENDIF
+	// [~CALC_CHAR_TARGET_ACTIONS]
+	
+	
+	
+	
+	
+	
+	
+	
+	

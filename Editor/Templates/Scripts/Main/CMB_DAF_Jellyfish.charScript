@@ -1,0 +1,114 @@
+INIT
+CHARACTER:__Me
+EXTERN INT:%TPAmongEnemiesStartsAt=3
+EXTERN INT:%TPAmongEnemiesFrequency=2
+EXTERN INT:%TPAmongEnemiesPriority=400
+EXTERN SKILL:%SkillInQuestion=null
+EXTERN INT:%MinRangeAdjustment=5
+EXTERN INT:%MaxRangeAdjustment=5
+FLOAT:%SkillMaxRange											
+FLOAT:%SkillMinRange											
+FLOAT:%CautiousMagesSightRange	
+
+//------------------------
+BEHAVIOUR
+REACTION TPAmongEnemiesCreateSurface,0
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+	FLOAT3:_PosOffset
+	FLOAT3:_MyPosition
+	FLOAT3:_EnemyPosition	
+	FLOAT:_Angle
+	FLOAT:_Dist	
+	FLOAT:_MyAP	
+	FLOAT:_DistanceBetwEnemyAndMe	
+CHECK "c1&c2&!c3&c4&c5&!c6&c7&c8"
+	CharacterCanCast(__Me,Shout_EnemyStunShout)
+	CharacterGetStat(_MyAP,__Me,ActionPoints)
+	IsLessThen(_MyAP,4)
+	CharacterGet(_Enemy,__Me,30,Highest,Distance,Enemy)
+	GetDistance(_DistanceBetwEnemyAndMe,__Me,_Enemy)
+	IsLessThen(_DistanceBetwEnemyAndMe,5)
+	GetPosition(__Me,_MyPosition)
+	GetPosition(_Enemy,_EnemyPosition)
+ACTIONS
+	Set(_PosOffset,{1;0;0}) 
+	GetRandomBetween(_Angle,0,360)
+	GetRandomBetween(_Dist,2.5,3.5)
+	RotateY(_PosOffset,_Angle)
+	Multiply(_PosOffset,_Dist)	
+	Add(_EnemyPosition,_PosOffset)
+	CharacterPlayEffect(__Me,"FX_GP_TeleportSmoke_A")
+	CharacterTeleportTo(_EnemyPosition)
+	Sleep(1)
+	CharacterUseSkill(Shout_EnemyStunShout,_Enemy)
+	Sleep(1)
+	CharacterPlayEffect(__Me,"FX_GP_TeleportSmoke_A")
+	CharacterTeleportTo(_MyPosition)
+	Sleep(0.5)
+	Set(%TPAmongEnemiesStartsAt,1)
+	CharacterEndTurn()
+	SetPriority("TPAmongEnemiesCreateSurface",0)
+INTERRUPT
+	Reset()
+
+REACTION KeepYourDistance, 0
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+CHECK "c1"
+	CharacterGet(_Enemy,__Me,%CautiousMagesSightRange,Lowest,Distance,Enemy)
+ACTIONS
+	CharacterMoveInRange(_Enemy,%SkillMinRange,%SkillMaxRange,1)
+	CharacterEndTurn()
+
+REACTION JustSkipTurnReally, 100
+USAGE COMBAT
+ACTIONS
+	CharacterEndTurn()
+	
+//------------------------
+EVENTS
+EVENT InitializeCautiousMage
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill(Shout_EnemyStunShout)
+	IF "c1&c2"	
+		CharacterGetSkillRange(%SkillMinRange,%SkillMaxRange,__Me,%SkillInQuestion)
+		CharacterGetSightRange(%CautiousMagesSightRange,__Me)
+	THEN
+		SetPriority("Combat_AttackSetEnemy",0)
+		Add(%SkillMinRange,%MinRangeAdjustment)
+		Subtract(%SkillMaxRange,%MaxRangeAdjustment)
+	ENDIF
+
+EVENT CheckDistance
+ON
+	OnTurn()
+VARS
+	FLOAT:_DistanceToEnemy
+	FLOAT:_MySightRange		
+	CHARACTER:_ClosestEnemy		
+ACTIONS
+	IF "c1&!c2&c3&c4"
+		CharacterGet(_ClosestEnemy,__Me,%CautiousMagesSightRange,Lowest,Distance,Enemy)
+		CharacterHasStatus(_ClosestEnemy,DYING)
+		GetDistance(_DistanceToEnemy,__Me,_ClosestEnemy)
+		IsLessThen(_DistanceToEnemy,%SkillMaxRange)
+	THEN
+		SetPriority("KeepYourDistance",200)
+	ENDIF
+	
+EVENT TPAmongEnemiesControlPanel
+ON
+	OnTurn()
+ACTIONS
+	IF "c1"
+		IsLessThen(%TPAmongEnemiesStartsAt,%TPAmongEnemiesFrequency)
+	THEN		
+		Add(%TPAmongEnemiesStartsAt,1)
+	ELSE
+		SetPriority("TPAmongEnemiesCreateSurface",%TPAmongEnemiesPriority)
+	ENDIF		

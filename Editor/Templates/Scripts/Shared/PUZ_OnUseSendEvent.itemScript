@@ -1,0 +1,33 @@
+INIT
+ITEM:__Me
+EXTERN STRING:%OnUseEvent=null
+EXTERN INT:%UseRepeat=0
+INT:%UseCounter=0
+EXTERN FLOAT:%UseDelay=0
+
+EVENTS
+
+EVENT ItemOnUse
+	ON
+		OnUseItem(_,__Me)
+	ACTIONS
+	StartTimer("UseDelayTimer",%UseDelay,0)
+		
+EVENT DelayTimer
+ON
+	OnTimer("UseDelayTimer")
+ACTIONS
+	IF "c1&c2"  //if used first time and no repeat
+			IsEqual(%UseCounter,0)
+			IsEqual(%UseRepeat,0)
+		THEN
+			CharacterItemEvent(null,__Me,%OnUseEvent)
+			Add(%UseCounter,1)
+		ENDIF
+		
+		IF "c1&!c2" //if used first time and repeat
+			IsEqual(%UseCounter,0)
+			IsEqual(%UseRepeat,0)
+		THEN
+			CharacterItemEvent(null,__Me,%OnUseEvent)
+		ENDIF

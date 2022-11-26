@@ -1,0 +1,70 @@
+INIT
+
+CHARACTER:__Me
+CHARACTER:%SirOrc = CHARACTER:DAF_BO_TorturerOrc_edb2c664-46a6-4f32-837d-fd5ea44254b6
+CHARACTER:%PrisonGuard = CHARACTER:DAF_BO_PrisonGuard2_7aeeaf52-8945-46f9-ae14-188ff65c0425
+CHARACTER:%Player = null
+INT:%NumberOfAnimations = 1
+FIXEDSTRING:%CurrentAnimation = ""
+
+BEHAVIOUR
+
+REACTION GuardRoom, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(TRIGGER:DAF_PointTorturerGoblin_8141958a-be8e-478c-81de-14cc91b2c26d,0,1,1,0.0)
+	CharacterLookFrom(TRIGGER:DAF_PointTorturerGoblin_8141958a-be8e-478c-81de-14cc91b2c26d,1)
+	Sleep(10)
+
+REACTION ChooseActionAfterNolanDied, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(TRIGGER:DAF_Point_BO_TorturersWeaponTable_e3a68075-c5aa-487f-b6de-49ce3f34f95c, 0)
+	DisplayText(__Me, "DAF_BO_GoblinAssistentNolanDied_03", 5)
+	Set(%NumberOfAnimations, 4)
+	Set(%CurrentAnimation, "attack1")
+	SetPriority("LoopAnimation", 1080)
+INTERRUPT
+	Reset()
+
+REACTION LoopAnimation, 0
+VARS
+	INT:_Counter = 0
+USAGE PEACE
+ACTIONS
+	CharacterPlayAnimation(%CurrentAnimation)
+	Add(_Counter, 1)
+	IF "!c1"
+		IsGreaterThen(_Counter, %NumberOfAnimations)
+	THEN
+		Goto("Start")
+	ELSE
+		Set(_Counter, 0)
+		SetPriority("LoopAnimation", 0)
+	ENDIF
+
+STORY
+
+SCRIPTFRAME EnterAfterNolanGotKilled
+ACTIONS
+	SetPriority("GuardRoom", 0)
+	CharacterMoveTo(%Player, 1)
+	Sleep(2)
+	SetPriority("ChooseActionAfterNolanDied", 1060)
+	
+SCRIPTFRAME EnterAfterNolanGotRescued
+ACTIONS
+	SetPriority("GuardRoom", 0)
+	DisplayText(__Me, "DAF_BO_GoblinTortureNolanRescued_01", 10) //We heard a very loud thank you! 
+	CharacterMoveTo(%Player, 1)
+	
+SCRIPTFRAME SpottedDeadGuard
+ACTIONS
+	CharacterLookAt(%SirOrc)
+	Sleep(3)
+	DisplayText(__Me, "DAF_GoblinTorturerSeesDeadGuard_01", 5) // Ragnar is not real! Lets finish this once and for all!
+	CharacterMoveTo(%Player, 1)
+	
+SCRIPTFRAME WaitingOutside
+ACTIONS
+	SetPriority("GuardRoom", 1070)

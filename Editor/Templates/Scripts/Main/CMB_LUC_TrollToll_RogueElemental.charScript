@@ -1,0 +1,80 @@
+INIT
+	CHARACTER:__Me
+	FLOAT:%MySightRange
+	CHARACTER:%TrollFriend=LUC_BrokenBridgeTroll02_ec9f5796-130f-457b-8e3c-82ed58fe8b99
+
+//------------------------------
+BEHAVIOUR
+REACTION RogueElemental_CastShield_OnTrollFriend,600
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "!c1&!c2&c3&!c4&!c5&!c6&!c7&!c8&!c9&c10"
+	CharacterIsDead(%TrollFriend)									//c1
+	CharacterHasStatus(%TrollFriend,SHIELD)							//c2
+	CharacterCanCast(__Me,Shield_EnemyEarth)						//c3
+	CharacterHasStatus(__Me,CHARMED)								//c4
+	CharacterHasStatus(__Me,PETRIFIED)								//c5
+	CharacterHasStatus(__Me,FEAR)									//c6
+	CharacterHasStatus(__Me,STUNNED)								//c7
+	CharacterHasStatus(__Me,MUTED)									//c8
+	CharacterHasStatus(__Me,FEAR)									//c9
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,Shield_EnemyEarth)			//c10
+ACTIONS	
+	CharacterMoveInRange(%TrollFriend,_MinRange,_MaxRange,1)	
+	CharacterUseSkill(Shield_EnemyEarth,%TrollFriend)
+	
+REACTION RogueElemental_CastFortify_OnTrollFriend,550
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "!c1&!c2&c3&!c4&!c5&!c6&!c7&!c8&!c9&c10"
+	CharacterIsDead(%TrollFriend)									//c1
+	CharacterHasStatus(%TrollFriend,FORTIFIED)						//c2
+	CharacterCanCast(__Me,Target_EnemyFortify)						//c3
+	CharacterHasStatus(__Me,CHARMED)								//c4
+	CharacterHasStatus(__Me,PETRIFIED)								//c5
+	CharacterHasStatus(__Me,FEAR)									//c6
+	CharacterHasStatus(__Me,STUNNED)								//c7
+	CharacterHasStatus(__Me,MUTED)									//c8
+	CharacterHasStatus(__Me,FEAR)									//c9
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,Target_EnemyFortify)		//c10
+ACTIONS	
+	CharacterMoveInRange(%TrollFriend,_MinRange,_MaxRange,1)
+	CharacterUseSkill(Target_EnemyFortify,%TrollFriend)	
+	
+REACTION RogueElemental_CastBless_OnTrollFriend,500
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "!c1&!c2&c3&!c4&!c5&!c6&!c7&!c8&!c9&c10"
+	CharacterIsDead(%TrollFriend)									//c1
+	CharacterHasStatus(%TrollFriend,BLESSED)						//c2
+	CharacterCanCast(__Me,Target_EnemyTargetedBless)				//c3
+	CharacterHasStatus(__Me,CHARMED)								//c4
+	CharacterHasStatus(__Me,PETRIFIED)								//c5
+	CharacterHasStatus(__Me,FEAR)									//c6
+	CharacterHasStatus(__Me,STUNNED)								//c7
+	CharacterHasStatus(__Me,MUTED)									//c8
+	CharacterHasStatus(__Me,FEAR)									//c9
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,Target_EnemyTargetedBless)	//c10
+ACTIONS	
+	CharacterMoveInRange(%TrollFriend,_MinRange,_MaxRange,1)
+	CharacterUseSkill(Target_EnemyTargetedBless,%TrollFriend)		
+	
+//------------------------------
+EVENTS	
+EVENT OnInit_GetSightRange_GiveSkills
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%MySightRange,__Me,Sight)
+	THEN
+		CharacterAddSkill(Shield_EnemyEarth)
+		CharacterAddSkill(Target_EnemyFortify)
+		CharacterAddSkill(Target_EnemyTargetedBless)
+	ENDIF

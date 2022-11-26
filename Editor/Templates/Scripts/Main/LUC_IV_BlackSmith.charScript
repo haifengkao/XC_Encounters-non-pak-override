@@ -1,0 +1,56 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	CHARACTER:%Apprentice = LUC_IV_BlacksmithApprentice_a5cbddf0-ffc5-45f2-9b88-7f2ad162ed12
+	ITEM:%Book = LUC_IV_BlacksmithBook_a0d4b67e-9952-4aaf-913a-fe9e770ea429
+	TRIGGER:%Boxes = LUC_IV_Smith_Boxes_8472270f-15bb-407a-83c8-eb7d0d3072b1
+	TRIGGER:%Counter = LUC_IV_Smith_Counter_e99670e3-82f8-4548-ac7f-1b897f1dea94
+	
+BEHAVIOUR
+
+REACTION State_Working, 0
+	USAGE PEACE
+	ACTIONS
+		GetWeightedRandom(%currentAction, "Action_TalkWithApprentice", INT:3, "Action_ReadBook",INT:5, "Action_GoingToBoxes",INT:5, "Action_GoingToCounter",INT:5)
+		SetPriority(%currentAction, 1100)
+		
+REACTION Action_ReadBook, 0
+	USAGE PEACE
+	ACTIONS
+	    CharacterMoveTo(%Book)
+		CharacterLookAt(%Book)
+		Sleep(4)
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)		
+		
+REACTION Action_GoingToBoxes, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterMoveTo(%Boxes)
+		CharacterLookFrom(%Boxes)
+		Sleep(2)
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)		
+		
+REACTION Action_GoingToCounter, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterMoveTo(%Counter)
+		CharacterLookFrom(%Counter)
+		Sleep(14)
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)		
+		
+REACTION Action_TalkWithApprentice, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterLookAt(%Apprentice)
+		CharacterEvent(%Apprentice,"TalkToBoss")
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)

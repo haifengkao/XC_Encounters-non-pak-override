@@ -1,0 +1,20 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	INT:%Counter = 0
+	
+EVENTS
+
+EVENT BattleCry
+ON
+	OnTurn()
+ACTIONS
+	IF "c1&!c2"
+		IsEqual(%Counter, 0)
+		CharacterIsDead(__Me)
+	THEN
+		DisplayText(__Me, "CYS_BC_AD_PontiusFight", 3)
+		Add(%Counter, 1)
+	ENDIF

@@ -1,0 +1,197 @@
+/*
+
+	/!\ This script isn't used anymore. /!\ 
+
+INIT
+CHARACTER:__Me
+INT:%DoubleSkipFirstTurn = 0
+CHARACTERTEMPLATE:%DoublesRootTemplate = Orcs_DAF_FemaleBoss_Double_9cf53fa7-62e9-42a7-bc28-223fa56b9b72
+INT:%ShadowFXHandle = 0
+EXTERN INT:%AmIADouble = 0
+EXTERN INT:%DoubleSummoningStartAt = 0
+EXTERN INT:%DoubleSummoningFrequency = 0
+
+//-------------------
+BEHAVIOUR
+REACTION OrcLadyHyperSummon,0
+USAGE COMBAT
+VARS
+	INT:_FailedHowManyTimes=0
+	INT:_HyperSummonStatus=0
+	INT:_BossSummonStatus=0
+	CHARACTER:_Player
+	CHARACTER:_OrcLadyDouble1
+	CHARACTER:_OrcLadyDouble2
+	CHARACTER:_OrcLadyDouble3
+	FLOAT3:_Double1SpawnPosition
+	FLOAT3:_Double2SpawnPosition
+	FLOAT3:_PosOffset
+	FLOAT3:_MyPosition
+	FLOAT:_Angle
+	FLOAT:_Dist
+CHECK "c1&c2&!c3&!c4&!c5&!c6&!c7&!c8"
+	IsEqual(%AmIADouble,0)										//c1
+	CharacterGet(_Player,__Me,30,Lowest,Distance,Enemy)			//c2
+	CharacterHasStatus(__Me,CHARMED)							//c3
+	CharacterHasStatus(__Me,PETRIFIED)							//c4
+	CharacterHasStatus(__Me,FEAR)								//c5
+	CharacterHasStatus(__Me,STUNNED)							//c6
+	CharacterHasStatus(__Me,MUTED)								//c7
+	CharacterHasStatus(__Me,FEAR)								//c8	
+ACTIONS
+	CharacterLookAt(_Player)
+	WHILE "c1&c2"
+		IsLessThen(_HyperSummonStatus,3)
+		IsLessThen(_FailedHowManyTimes,30)
+	DO
+		IF "c1"
+			GetPosition(__Me,_MyPosition)
+		THEN
+			Set(_PosOffset,{1;0;0}) 
+			GetRandomBetween(_Angle,-270,90)
+			GetRandomBetween(_Dist,2.5,3.5)
+			RotateY(_PosOffset,_Angle)
+			Multiply(_PosOffset,_Dist)	
+			Add(_MyPosition,_PosOffset)
+		ENDIF
+		IF "c1&!c2&!c3&!c4&!c5&!c6&!c7"
+			FindValidPosition(_MyPosition,3)
+			ContainsSurface(_MyPosition,1,Fire)
+			ContainsSurface(_MyPosition,1,CloudPoison)
+			ContainsSurface(_MyPosition,1,Ooze)
+			ContainsSurface(_MyPosition,1,Ice)
+			ContainsSurface(_MyPosition,1,CloudStatic)
+			ContainsSurface(_MyPosition,1,Electrified)
+		THEN	
+			CharacterPlayAnimation("cast_shout_cast",0,0)
+			IF "c1"
+				IsEqual(_HyperSummonStatus,0)
+			THEN	
+				Sleep(0.5)
+				PlayEffectAt(_MyPosition,"FX_Creatures_Shadow_Spawn_A")	
+				Sleep(0.7)				
+				SpawnCharacter(_OrcLadyDouble1,%DoublesRootTemplate,_MyPosition,1)
+				CharacterPlayLoopEffect(%ShadowFXHandle,_OrcLadyDouble1,"FX_Creatures_Shadow_Grunt_A_Body","Dummy_BodyFX")				
+				Sleep(0.7)
+				Add(_HyperSummonStatus,1)				
+			ELIF "c1"
+				IsEqual(_HyperSummonStatus,1)
+			THEN
+				Sleep(0.5)			
+				PlayEffectAt(_MyPosition,"FX_Creatures_Shadow_Spawn_A")	
+				Sleep(0.7)				
+				SpawnCharacter(_OrcLadyDouble2,%DoublesRootTemplate,_MyPosition,1)
+				CharacterPlayLoopEffect(%ShadowFXHandle,_OrcLadyDouble2,"FX_Creatures_Shadow_Grunt_A_Body","Dummy_BodyFX")				
+				Sleep(0.4)
+				Add(_HyperSummonStatus,1)
+			ELIF "c1"
+				IsEqual(_HyperSummonStatus,2)
+			THEN
+				Sleep(0.5)			
+				PlayEffectAt(_MyPosition,"FX_Creatures_Shadow_Spawn_A")	
+				Sleep(0.7)				
+				SpawnCharacter(_OrcLadyDouble3,%DoublesRootTemplate,_MyPosition,1)
+				CharacterPlayLoopEffect(%ShadowFXHandle,_OrcLadyDouble3,"FX_Creatures_Shadow_Grunt_A_Body","Dummy_BodyFX")				
+				Sleep(0.4)
+				Add(_HyperSummonStatus,1)	
+			ELSE
+				Add(_FailedHowManyTimes,1)
+			ENDIF
+		ELSE
+			 Add(_FailedHowManyTimes,1)
+		ENDIF
+	ENDWHILE
+	IF "c1"
+		IsEqual(_FailedHowManyTimes,30)
+	THEN
+		Set(_FailedHowManyTimes,0)
+		//CharacterEndTurn()
+	ENDIF
+	Set(_HyperSummonStatus,0)
+	Set(%DoubleSummoningStartAt,0)
+	//CharacterEndTurn()
+	SetPriority("OrcLadyHyperSummon",0)	
+
+REACTION DoubleUsesSuperCrossbowThenDies,1000
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+CHECK "c1&c2"
+	IsEqual(%AmIADouble,1)
+	//IsLessThen(%DoubleSkipFirstTurn,1)
+	CharacterGet(_Target,__Me,20,Random,Vitality,Enemy,null,null,null,1)
+ACTIONS
+	CharacterUseSkill(Projectile_EnemyExplosionArrow,_Target)
+	PlayEffectAt(__Me,"FX_Creatures_Shadow_Death_A")
+	StopLoopEffect(%ShadowFXHandle)
+	Set(%ShadowFXHandle,0)
+	Sleep(1)
+	CharacterDestroy(__Me)	
+	CharacterSetOffStage()
+	
+//-------------------
+EVENTS
+EVENT OnTurnIncreaseCounterForSummoning
+ON
+	OnTurn()
+ACTIONS
+	IF "c1&c2"
+		IsEqual(%AmIADouble,0)
+		IsLessThen(%DoubleSummoningStartAt,%DoubleSummoningFrequency)
+	THEN		
+		Add(%DoubleSummoningStartAt,1)
+	ELIF "c1&c2"
+		IsEqual(%AmIADouble,0)
+		IsEqual(%DoubleSummoningStartAt,%DoubleSummoningFrequency)
+	THEN
+		SetPriority("OrcLadyHyperSummon",500)
+	ENDIF
+
+EVENT OnInitAddSuperCrossbowSkill_IfIAmDouble
+ON
+	OnInit()
+ACTIONS
+	IF "c1&c2"
+		IsEqual(%AmIADouble,1)
+		IsLessThen(%DoubleSkipFirstTurn,1)
+	THEN
+		CharacterAddSkill(Projectile_EnemyExplosionArrow)
+		SetMaterial(__Me,462a3e37-417e-4dde-bca8-294b37ec6883,-1,1,1,1)
+	ENDIF
+	Set(%ShadowFXHandle,0)
+		
+/*
+EVENT OnTurnEndTurn_IfIAmDouble
+VARS
+	INT:_DoubleSkipFirstTurn=0
+ON
+	OnTurn()
+ACTIONS
+	IF "c1&c2"
+		IsEqual(%AmIADouble,1)
+		IsLessThen(%DoubleSkipFirstTurn,1)
+	THEN		
+		Set(%DoubleSkipFirstTurn,1)
+		CharacterEndTurn()
+	ENDIF
+*/	
+
+/*
+EVENT OnDamageDie_IfIAmADouble
+VARS
+	CHARACTER:_Player
+ON
+	OnDamage(_,_,_Player,_)
+ACTIONS
+	IF "c1&c2"
+		IsEqual(%AmIADouble,1)
+		CharacterIsInParty(_Player)
+	THEN		
+		PlayEffectAt(__Me,"FX_Creatures_Shadow_Death_A")
+		StopLoopEffect(%ShadowFXHandle)
+		Set(%ShadowFXHandle,0)
+		CharacterDestroy(__Me)	
+		CharacterSetOffStage()
+	ENDIF
+	
+*/	

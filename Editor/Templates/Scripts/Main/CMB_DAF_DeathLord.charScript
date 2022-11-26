@@ -1,0 +1,246 @@
+/*
+
+		/!\ This script isn't used anymore. /!\ 
+		
+		
+INIT
+	CHARACTER:__Me
+	FLOAT:%LordsSightRange
+	FLOAT3:%SelectedSpot1
+	FLOAT3:%SelectedSpot2
+	FLOAT3:%SelectedSpot3
+	FLOAT3:%SelectedSpot4
+	INT:%CastingFX_Handle
+	INT:%SelectedSpot1_FXHandle		
+	INT:%SelectedSpot2_FXHandle		
+	INT:%SelectedSpot3_FXHandle
+	INT:%SelectedSpot4_FXHandle	
+	INT:%IterateStatus=1	
+	EXTERN INT:%CreateSurfaces_Current=2
+	EXTERN INT:%CreateSurfaces_Desired=3
+
+//-----------------
+BEHAVIOUR
+REACTION DeathLord_GetPartyMembers_MarkGroundBeneathThem,0
+USAGE COMBAT
+VARS
+	CHARACTER:_Target	
+	FLOAT:_MyCurrentAP	
+CHECK "c1&c2&c3&!c4"
+	CharacterGet(_Target,__Me,30,Highest,Distance,Enemy)
+	CharacterIsPlayer(_Target)
+	CharacterGetStat(_MyCurrentAP,__Me,ActionPoints)
+	IsLessThen(_MyCurrentAP,7)
+ACTIONS
+	SetPriority("DeathLord_MovesToEnemy",0)
+	SetPriority("DeathLord_AttacksEnemyWhenRealClose",0)
+	CharacterLookAt(_Target)
+	CharacterPlayLoopEffect(%CastingFX_Handle,__Me,"FX_Skills_Fire_Summon_Prepare_A")
+	CharacterPlayAnimation("cast_long_loop",0,1)
+	CharacterPlayAnimation("cast_long_cast",1,0)	
+	CharacterFleeFrom(Enemy,3)
+	Set(%IterateStatus,1)
+	IterateCharactersNear(__Me,30,"CMB_DAF_DeathKnightBoss_ScanForEnemies_Event",Lowest,Distance)
+	Set(%CreateSurfaces_Current,0)
+	SetPriority("DeathLord_GetPartyMembers_MarkGroundBeneathThem",0)
+INTERRUPT
+	Reset()
+
+REACTION DeathLord_CastSlow,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Character
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&!c4&c5&!c6&!c7&!c8&!c9&!c10&c11"
+	CharacterCanCast(__Me,"Target_EnemySlow")												//c1
+	CharacterGet(_Character,__Me,20,Highest,Speed,Enemy)									//c2
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemySlow")						//c3
+	CharacterHasStatus(_Character,SLOWED)													//!c4
+	CharacterHasStatus(_Character,STUNNED)													//!c5
+	CharacterHasStatus(_Character,FROZEN)													//!c6
+	CharacterHasStatus(_Character,PETRIFIED)												//!c7
+	CharacterHasStatus(_Character,CHARMED)													//!c8
+	CharacterHasStatus(_Character,FEAR)														//!c9
+	CharacterHasStatus(_Character,KNOCKED_DOWN)												//!c10
+	IsRandom(0.4)																			//c11
+ACTIONS
+	CharacterMoveInRange(_Character,_MinRange,_MaxRange,0)
+	CharacterUseSkill("Target_EnemySlow",_Character)	
+INTERRUPT
+	Reset()
+	
+REACTION DeathLord_AttacksEnemyWhenRealClose,100
+USAGE COMBAT
+VARS
+	CHARACTER:_Player
+	FLOAT:_MyActionPoints
+	FLOAT:_DistanceBetwMeAndPlayer	
+CHECK "c1&c2&!c3&c4&!c5&c6"
+	CharacterGet(_Player,__Me,2,Lowest,Distance,Enemy)					//c1
+	GetDistance(_DistanceBetwMeAndPlayer,__Me,_Player)					//c2
+	IsGreaterThen(_DistanceBetwMeAndPlayer,2)							//!c3
+	CharacterGetStat(_MyActionPoints,__Me,ActionPoints)					//c4
+	IsLessThen(_MyActionPoints,3)										//!c5
+	CharacterCanSee(__Me,_Player)										//c6
+ACTIONS
+	CharacterAttack(_Player)
+INTERRUPT
+	Reset()
+	
+REACTION DeathLord_MovesToEnemy,50
+USAGE COMBAT
+VARS
+	CHARACTER:_Player
+	FLOAT:_DistanceBetwMeAndPlayer
+CHECK "c1&c2&c3"
+	CharacterGet(_Player,__Me,%LordsSightRange,Lowest,Distance,Enemy)
+	GetDistance(_DistanceBetwMeAndPlayer,__Me,_Player)
+	IsGreaterThen(_DistanceBetwMeAndPlayer,4)
+ACTIONS
+	CharacterMoveTo(_Player,0,0,0,0.5,1)
+
+REACTION DeathLord_Fallback,10
+USAGE COMBAT
+ACTIONS
+	CharacterEndTurn()
+	
+//-----------------
+EVENTS
+EVENT OnInit_GetSightRange
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%LordsSightRange,__Me,Sight)
+	THEN
+		SetPriority("Combat_AttackSetEnemy",0)
+		SetPriority("Combat_MoveToSetEnemy",0)		
+		CharacterAddSkill("Target_EnemySlow")
+	ENDIF
+
+EVENT OnTurn_SpellControl_BlowUpMarkOnTheGround
+VARS
+	INT:_LavaFX1_Handle
+	INT:_LavaFX2_Handle
+	INT:_LavaFX3_Handle
+	INT:_LavaFX4_Handle
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("DeathLord_MovesToEnemy",50)
+	SetPriority("DeathLord_AttacksEnemyWhenRealClose",100)
+//--
+	IF "c1"
+		IsLessThen(%CreateSurfaces_Current,%CreateSurfaces_Desired)
+	THEN
+		Add(%CreateSurfaces_Current,1)
+	ELSE
+		SetPriority("DeathLord_GetPartyMembers_MarkGroundBeneathThem",1000)	
+	ENDIF
+//--	
+	IF "!c1"
+		IsEqual(%SelectedSpot1,null)
+	THEN
+		PlayEffectAt(%SelectedSpot1,"FX_Creatures_Undead_Skeleton_Baby_Death_A")
+		PlayLoopEffectAt(_LavaFX1_Handle,%SelectedSpot1,"FX_Env_LavaFountain_A")		
+		CreateSurfaceAt(%SelectedSpot1,None,2,4)		
+		CreateSurfaceAt(%SelectedSpot1,Fire,2,4)		
+		CreateSurfaceAt(%SelectedSpot1,Lava,1.5,4)				
+		Set(%SelectedSpot1,null)	
+		StopLoopEffect(%SelectedSpot1_FXHandle)		
+		StopLoopEffect(_LavaFX1_Handle)		
+	ENDIF
+	IF "!c1"
+		IsEqual(%SelectedSpot2,null)
+	THEN
+		PlayEffectAt(%SelectedSpot2,"FX_Creatures_Undead_Skeleton_Baby_Death_A")
+		PlayLoopEffectAt(_LavaFX2_Handle,%SelectedSpot2,"FX_Env_LavaFountain_A")				
+		CreateSurfaceAt(%SelectedSpot2,None,2,4)		
+		CreateSurfaceAt(%SelectedSpot2,Fire,2,4)		
+		CreateSurfaceAt(%SelectedSpot2,Lava,1.5,4)					
+		Set(%SelectedSpot2,null)	
+		StopLoopEffect(%SelectedSpot2_FXHandle)		
+		StopLoopEffect(_LavaFX2_Handle)	
+	ENDIF	
+	IF "!c1"
+		IsEqual(%SelectedSpot3,null)
+	THEN
+		PlayEffectAt(%SelectedSpot3,"FX_Creatures_Undead_Skeleton_Baby_Death_A")
+		PlayLoopEffectAt(_LavaFX3_Handle,%SelectedSpot3,"FX_Env_LavaFountain_A")				
+		CreateSurfaceAt(%SelectedSpot3,None,2,4)		
+		CreateSurfaceAt(%SelectedSpot3,Fire,2,4)		
+		CreateSurfaceAt(%SelectedSpot3,Lava,1.5,4)				
+		Set(%SelectedSpot3,null)	
+		StopLoopEffect(%SelectedSpot3_FXHandle)		
+		StopLoopEffect(_LavaFX3_Handle)		
+	ENDIF
+	IF "!c1"
+		IsEqual(%SelectedSpot4,null)
+	THEN
+		PlayEffectAt(%SelectedSpot4,"FX_Creatures_Undead_Skeleton_Baby_Death_A")
+		PlayLoopEffectAt(_LavaFX4_Handle,%SelectedSpot4,"FX_Env_LavaFountain_A")			
+		CreateSurfaceAt(%SelectedSpot4,None,2,4)		
+		CreateSurfaceAt(%SelectedSpot4,Fire,2,4)		
+		CreateSurfaceAt(%SelectedSpot4,Lava,1.5,4)					
+		Set(%SelectedSpot4,null)	
+		StopLoopEffect(%SelectedSpot4_FXHandle)		
+		StopLoopEffect(_LavaFX4_Handle)		
+	ENDIF
+	StopLoopEffect(%CastingFX_Handle)
+	
+EVENT OnIterate_PlaceMarkOnTheGround_BeneathEnemies
+VARS
+	CHARACTER:_Enemy
+ON
+	OnIterateCharacter(_Enemy,"CMB_DAF_DeathKnightBoss_ScanForEnemies_Event")
+ACTIONS
+	IF "!c1&c2&!c3&!c4&!c5&!c6&!c7"
+		CharacterIsDead(_Enemy)												//!c1
+		CharacterIsInParty(_Enemy)											//c2
+		CharacterIsSummon(_Enemy)											//!c3
+		CharacterHasStatus(_Enemy,FROZEN)									//!c4
+		CharacterHasStatus(_Enemy,STUNNED)									//!c5
+		CharacterHasStatus(_Enemy,PETRIFIED)								//!c6
+		CharacterHasStatus(_Enemy,KNOCKED_DOWN)								//!c7
+	THEN
+		IF "c1&c2"
+			IsEqual(%IterateStatus,1)
+			GetPosition(_Enemy,%SelectedSpot1)
+		THEN
+			CharacterPlayEffect(_Enemy,"FX_GP_CameraShake_B")
+			PlayLoopEffectAt(%SelectedSpot1_FXHandle,%SelectedSpot1,"FX_Env_LavaFountain_Small_A")
+			CreateSurfaceAt(%SelectedSpot1,CloudSmoke,1.5,4)
+			CharacterApplyStatus(_Enemy,WARM,1)
+			Add(%IterateStatus,1)			
+		ELIF "c1&c2"
+			IsEqual(%IterateStatus,2)
+			GetPosition(_Enemy,%SelectedSpot2)
+		THEN
+			CharacterPlayEffect(_Enemy,"FX_GP_CameraShake_B")
+			PlayLoopEffectAt(%SelectedSpot2_FXHandle,%SelectedSpot2,"FX_Env_LavaFountain_Small_A")
+			CreateSurfaceAt(%SelectedSpot2,CloudSmoke,1.5,4)
+			CharacterApplyStatus(_Enemy,WARM,1)
+			Add(%IterateStatus,1)			
+		ELIF "c1&c2"
+			IsEqual(%IterateStatus,3)		
+			GetPosition(_Enemy,%SelectedSpot3)
+		THEN
+			CharacterPlayEffect(_Enemy,"FX_GP_CameraShake_B")
+			PlayLoopEffectAt(%SelectedSpot3_FXHandle,%SelectedSpot3,"FX_Env_LavaFountain_Small_A")
+			CreateSurfaceAt(%SelectedSpot3,CloudSmoke,1.5,4)
+			CharacterApplyStatus(_Enemy,WARM,1)	
+			Add(%IterateStatus,1)			
+		ELIF "c1&c2"
+			IsEqual(%IterateStatus,4)
+			GetPosition(_Enemy,%SelectedSpot4)
+		THEN
+			CharacterPlayEffect(_Enemy,"FX_GP_CameraShake_B")
+			PlayLoopEffectAt(%SelectedSpot4_FXHandle,%SelectedSpot4,"FX_Env_LavaFountain_Small_A")
+			CreateSurfaceAt(%SelectedSpot4,CloudSmoke,1.5,4)
+			CharacterApplyStatus(_Enemy,WARM,1)			
+			Add(%IterateStatus,1)			
+		ENDIF
+	ENDIF
+	
+*/	

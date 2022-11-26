@@ -1,0 +1,129 @@
+INIT
+
+	ITEM:__Me
+	INT:%GoblinGathered = 0
+	FIXEDSTRING:%Farce
+	INT:%Active = 1
+	INT:%InTheKilling = 0
+	
+	
+EVENTS
+
+EVENT Initialization
+	ON
+		OnInit()
+	ACTIONS
+		SetPriority("LaunchTimer", 1000)
+		
+EVENT GoblinGathering
+	ON
+		OnTimer("LUC_GV_GatherGoblins")
+	ACTIONS
+		ItemEvent(__Me, "gatherRound")
+		DisplayText(__Me, "LUC_GV_TotemGather", 4)
+
+EVENT LetTheGoblinsGo
+	ON
+		OnTimer("LUC_GV_TotemDance")
+	ACTIONS
+		ItemEvent(__Me, "goBackTent")
+		DisplayText(__Me, "LUC_GV_TotemBack", 4)
+		SetPriority("LaunchTimer", 1000)
+
+EVENT ResurectGoblins
+	ON
+		OnTimer("LUC_GV_TotemDie")
+	ACTIONS
+		ItemEvent(__Me, "ressurectGob")
+		Set(%InTheKilling, 0)
+		DisplayText(__Me, "LUC_GV_TotemRise", 4)
+		SetPriority("LaunchTimer", 1000)
+		
+
+EVENT GoblinArrived
+	ON
+		OnItemEvent(__Me, "GoblinArrived")
+	ACTIONS
+		Add(%GoblinGathered, 1)
+		
+EVENT Break
+	ON
+		OnItemEvent(__Me, "broken")
+	ACTIONS
+		Set(%Active, 0)	
+		
+EVENT ShootBadGuys
+	ON
+		OnItemEvent(__Me, "killIntruder")
+	ACTIONS
+		IterateCharactersNear(__Me, 30, "actuallyShoot")
+		
+EVENT EffectivelyShoot
+	VARS
+		CHARACTER:_Char
+	ON
+		OnIterateCharacter(_Char, "actuallyShoot")
+	ACTIONS
+		IF "c1"
+			CharacterIsInParty(_Char)
+		THEN
+			ShootLocalProjectileAt(Projectile_TotemKillingSpell, __Me, {0;20;0}, _Char)
+		ENDIF
+		
+BEHAVIOUR
+
+REACTION LaunchTimer, 0
+	VARS
+		FLOAT:_Timer
+	ACTIONS
+		IF "c1"
+			IsEqual(%Active, 1)
+		THEN
+			GetRandom(%Farce, "UpDown", "Dance", "Die")
+			GetRandomBetween(_Timer,10,20)
+			StartTimer("LUC_GV_GatherGoblins",_Timer, 0)
+		ENDIF
+		SetPriority("LaunchTimer", 0)
+		
+REACTION MakeFun, 1000
+	CHECK "!c1"
+		IsLessThen(%GoblinGathered, 5)
+	ACTIONS
+		Set(%GoblinGathered, 0)
+		SetPriority(%Farce, 1001)
+
+REACTION Dance, 0
+	ACTIONS
+		DisplayText(__Me, "LUC_GV_TotemDance", 4)
+		StartTimer("LUC_GV_TotemDance", 10, 0)
+		ItemEvent(__Me, "DanceForMe")
+		SetPriority("Dance", 0)
+		
+REACTION Die, 0
+	ACTIONS
+		DisplayText(__Me, "LUC_GV_TotemDie", 4)
+		StartTimer("LUC_GV_TotemDie", 10, 0)
+		ItemEvent(__Me, "DieForMe")
+		Set(%InTheKilling, 1)
+		SetPriority("Die", 0)	
+		
+REACTION UpDown, 0
+	VARS
+		INT:_i
+	ACTIONS
+		Set(_i, 0)
+		WHILE "c1"
+			IsLessThen(_i, 3)
+		DO
+			DisplayText(__Me, "LUC_GV_TotemDown", 4)
+			ItemEvent(__Me, "GetDown")
+			Sleep(3)
+			DisplayText(__Me, "LUC_GV_TotemUp", 4)
+			ItemEvent(__Me, "GetUp")
+			Add(_i, 1)
+			Sleep(2)
+		ENDWHILE
+		ItemEvent(__Me, "goBackTent")
+		DisplayText(__Me, "LUC_GV_TotemBack", 4)
+		SetPriority("LaunchTimer", 1000)
+		SetPriority("UpDown", 0)

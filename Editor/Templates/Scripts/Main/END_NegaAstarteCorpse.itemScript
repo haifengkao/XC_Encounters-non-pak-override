@@ -1,0 +1,15 @@
+INIT
+
+ITEM:__Me
+
+STORY
+
+SCRIPTFRAME Burn
+ACTIONS
+
+ItemApplyStatus(__Me, STATUS:BURNING, -1, 1)
+Sleep(2)
+ItemPlayEffect(__Me, "FX_Skills_Fire_Immolate_Impact_A")
+Sleep(1.5)
+
+

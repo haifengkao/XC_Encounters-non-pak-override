@@ -1,0 +1,33 @@
+INIT
+CHARACTER:__Me
+TRIGGER:%Point1 = DAF_HumanPatrol1_ce1c84d2-b4e7-44ce-b4a3-ccb5e724ce68
+TRIGGER:%Point2 = DAF_HumanPatrol2_9839e845-403a-485b-869c-45566df66a44
+TRIGGER:%Point3 = DAF_HumanPatrol3_f39d1473-046b-49f0-9f47-b854c278c51a
+TRIGGER:%Point4 = DAF_HumanPatrol4_5deda1e8-788d-4622-b458-d882e7716ed4
+TRIGGER:%Point5 = DAF_HumanPatrol5_a97e0fd3-7f69-4e33-9a2f-ae48550e6027
+
+BEHAVIOUR
+
+REACTION Main, 500
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Point1)
+	CharacterLookFrom(%Point1)
+	CharacterPlayAnimation("Fidget_Forward_02")
+	
+	CharacterMoveTo(%Point2)
+	CharacterLookFrom(%Point2)
+	CharacterPlayAnimation("Fidget_Forward_01")
+	
+	CharacterMoveTo(%Point3)
+	CharacterLookFrom(%Point3)
+	CharacterPlayAnimation("Fidget_Forward_02")
+	
+	CharacterMoveTo(%Point5)
+	CharacterLookFrom(%Point5)
+	CharacterPlayAnimation("Fidget_Forward_02")
+	
+	CharacterMoveTo(%Point4)
+	CharacterLookFrom(%Point4)
+	CharacterPlayAnimation("Fidget_Forward_01")
+	

@@ -1,0 +1,18 @@
+INIT
+	CHARACTER:__Me
+
+//------------------
+EVENTS
+EVENT OnInitIfGhostApplyGhostMaterial
+ON
+	OnInit()
+ACTIONS
+	SetMaterial(__Me,"b5641870-6213-481f-9b3b-8004faba7bcc",-1,1,1,1)
+	
+EVENT OnDieSpawnGhostCharacter
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	PlayEffectAt(__Me,"FX_Creatures_Undead_Skeleton_Grunt_Death_A")
+	PlayEffectAt(__Me,"FX_Creatures_Shadow_Death_A")
+	CharacterSetOffStage()	

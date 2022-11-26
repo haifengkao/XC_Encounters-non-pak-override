@@ -1,0 +1,43 @@
+INIT
+
+ITEM:__Me
+EXTERN FLOAT:%Distance = 10.0
+EXTERN STATUS:%Status = WARM
+EXTERN FIXEDSTRING:%ExtraData = ""
+EXTERN FLOAT:%StatusInfluence = 20
+EXTERN INT:%IsStatusOn = 1
+EXTERN INT:%IsWeather = 1
+
+EVENTS
+
+EVENT Initialize
+ON
+	OnInit()
+ACTIONS
+	StartTimer("UpdateStatusApplier",0.1,-1)
+
+EVENT Shutdown
+ON
+	OnShutdown()
+ACTIONS
+	StopTimer("UpdateStatusApplier")
+
+EVENT UpdateStatusApplier
+ON
+	OnTimer("UpdateStatusApplier")
+ACTIONS
+	IterateCharactersNear(__Me,%Distance,"StatusApplier")
+
+EVENT ApplyStatus
+VARS
+	CHARACTER:_Character
+ON
+	OnIterateCharacter(_Character,"StatusApplier")
+ACTIONS
+	IF "c1&!c2&c3"
+		IsEqual(%IsStatusOn,1)
+		CharacterIsDead(_Character)
+		CanSee(__Me,_Character)
+	THEN
+		AddTemporaryStatusInfluence(_Character,%Status,%StatusInfluence,%ExtraData,%IsWeather)
+	ENDIF

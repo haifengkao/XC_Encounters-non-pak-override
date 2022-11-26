@@ -1,0 +1,64 @@
+INIT
+
+ITEM:__Me
+EXTERN FLOAT:%Timer = 5
+
+CHARACTER:%Player1 = Player1_dac1443f-a866-4ab3-b240-e705c0b20ec5
+CHARACTER:%Player2 = Player2_a0af7520-57ac-4f1c-b9d7-197bceebeade
+
+CHARACTER:%ShootTarget = null
+
+EXTERN SKILL:%ProjectileSkill = null
+EXTERN INT:%CasterLevel = -1
+EXTERN FLOAT:%MaxRadius = 10.0
+
+FLOAT3:%HeightOffset = {0;8;0}
+INT:%ActiveShooting = 0 
+
+BEHAVIOUR
+
+REACTION Shooting, 1000
+USAGE ALL
+VARS 
+	FLOAT3:_Pos
+	INT:_Amount
+	FLOAT:_SleepTime
+	FLOAT3:_MyPos
+	FLOAT3:_TargetDir 
+	FLOAT:_Rotation
+	FLOAT:_Radius
+	FLOAT3:_SrcOffset = {0;0;8}
+CHECK "c1"
+	IsEqual(%ActiveShooting,1)
+ACTIONS
+	GetRandomBetween(_Amount,INT:1,INT:3)
+	Label("Loop_Shooting")
+	IF "!c1"
+		IsEqual(_Amount,0)
+	THEN
+		GetRandom(%ShootTarget,%Player1,%Player2)
+		GetPosition(%ShootTarget,_Pos)	
+
+		GetForwardDirection(%ShootTarget,_TargetDir)
+		GetRandomBetween(_Rotation,0.0,360.0)
+		RotateY(_TargetDir,_Rotation)
+		GetRandomBetween(_Radius,0.0,%MaxRadius)
+		Multiply(_TargetDir,_Radius)
+		
+		Set(_MyPos,_Pos)
+		Add(_MyPos,_TargetDir)
+		
+		Set(_Pos,_MyPos)
+		Add(_Pos,%HeightOffset)
+		Add(_Pos,_SrcOffset)
+		
+		ShootWorldProjectileAt(%ProjectileSkill,ITEM:null,_Pos,_MyPos,%CasterLevel)
+	
+		GetRandomBetween(_SleepTime,FLOAT:1.5,FLOAT:3.0)
+		Add(_SleepTime,0.5)
+		Sleep(_SleepTime)
+		Subtract(_Amount,1)
+		Goto("Loop_Shooting")
+	ENDIF
+	Sleep(5.0)
+

@@ -1,0 +1,42 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	TRIGGER:%Point1 = CYS_PointJakeDog1_368d663f-5ca1-4994-bd30-0704b13b5865
+	TRIGGER:%Point2 = CYS_PointJakeDog2_de1c0e69-9b14-49f0-bdba-352fe0881015
+
+BEHAVIOUR
+
+REACTION State_Walking, 0
+	USAGE PEACE
+	ACTIONS
+		GetRandom(%currentAction, "Action_WalkingAroundGrave")
+		SetPriority(%currentAction, 1100)
+
+REACTION Action_WalkingAroundGrave, 0
+	USAGE PEACE
+	VARS
+		TRIGGER:_Point
+	ACTIONS
+		IF "c1"
+			IsEqual(_Point, %Point1)
+		THEN
+			Set(_Point, %Point2)
+		ELIF "c1"
+			IsEqual(_Point, %Point2)
+		THEN
+			Set(_Point, %Point1)
+		ELSE
+			GetRandom(_Point, %Point1, %Point2)
+		ENDIF
+		Sleep(3)
+		CharacterWander(FLOAT:3,2,1)
+		Sleep(2)
+		CharacterMoveTo(_Point,1)
+		CharacterLookFrom(_Point)
+		Sleep(2)
+		DialogStart("CYS_AD_JakeDog", __Me)
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)

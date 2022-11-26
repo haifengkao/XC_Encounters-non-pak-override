@@ -1,0 +1,6 @@
+BEHAVIOUR
+
+REACTION EndTurn, 100000
+USAGE COMBAT
+ACTIONS
+	CharacterEndTurn()	

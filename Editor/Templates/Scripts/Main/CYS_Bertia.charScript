@@ -1,0 +1,50 @@
+#INCLUDE DefaultCharacter
+#INCLUDE State_Manager
+
+INIT
+USING DefaultCharacter
+USING State_Manager
+CHARACTER:__Me
+CHARACTER:%Player = Player1_dac1443f-a866-4ab3-b240-e705c0b20ec5
+TRIGGER:%Trigger1 = CYS_PointBertia_1d66c3b0-d548-4fea-bac8-80b732d43f46
+TRIGGER:%Trigger2 = CYS_Point_Bertia2_9c482b6b-ea27-49b1-9c64-7df5387c9ef2
+
+BEHAVIOUR
+
+REACTION State_Sales, 0
+	USAGE PEACE
+	ACTIONS
+		GetRandom(%currentAction, "Action_Sales")
+		SetPriority(%currentAction, 1100)
+
+REACTION Action_Sales,0
+USAGE PEACE
+VARS
+	CHARACTER:_Player
+	FIXEDSTRING:_Text
+ACTIONS
+	CharacterMoveTo(%Trigger1,0)
+	CharacterLookFrom(%Trigger1)
+		IF "c1"
+			CharacterGet(_Player,__Me,5,Lowest,Distance,Player)
+		THEN
+			DialogStart("CYS_AD_Bertia",__Me)
+		ELSE
+			CharacterPlayAnimation("Shrug_01")
+			GlobalSetEvent("CYS_BertiaAtBarrels")
+		ENDIF
+	Sleep(5)
+	CharacterMoveTo(%Trigger2,0)
+	CharacterLookFrom(%Trigger2)
+		IF "c1"
+			CharacterGet(_Player,__Me,3,Lowest,Distance,Player)
+		THEN
+			DialogStart("CYS_AD_Bertia",__Me)
+		ELSE
+			CharacterPlayAnimation("Fidget_Forward_01")
+			GlobalClearEvent("CYS_BertiaAtBarrels")
+		ENDIF
+	Sleep(5)
+	SetPriority("Action_Sales", 0)
+
+	

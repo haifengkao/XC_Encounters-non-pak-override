@@ -1,0 +1,127 @@
+INIT
+	CHARACTER:__Me
+	CHARACTERTEMPLATE:%TinyCrab_Tpl="Animals_Summoned_Crab_A_e6a23efa-0185-47db-8ec7-a44920c201bd"
+	INT:%AmountOfCrabs=0
+	INT:%FXHandle
+	INT:%SummonCrabs_Current=2
+	INT:%SummonCrabs_Desired=3
+	INT:%Bool_FXRestore=0
+
+//------------------------
+BEHAVIOUR
+REACTION CrabSummoner_SummonTinyCrabs,0
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+	FLOAT3:_direction
+	FLOAT3:_position01
+	FLOAT3:_position02
+	FLOAT3:_position03
+CHECK "c1&!c2&!c3&c4"
+	IsLessThen(%AmountOfCrabs,9)
+	CharacterHasStatus(__Me,CHARMED)
+	CharacterHasStatus(__Me,FEAR)
+	CharacterGet(_Enemy,__Me,40,Lowest,Distance,Enemy)
+ACTIONS
+	CharacterFleeFrom(Enemy,7)
+	CharacterLookAt(_Enemy)
+	CharacterPlayLoopEffect(%FXHandle,__Me,"FX_Skills_WitchCraft_Summon_Prepare_A")
+	Set(%Bool_FXRestore,1)
+	GetForwardDirection(__Me,_direction)
+	GetPosition(__Me,_position01)
+	GetPosition(__Me,_position02)
+	GetPosition(__Me,_position03)
+	Add(_position01,_direction)
+	Add(_position02,_direction)
+	Add(_position03,_direction)
+	Subtract(_position01,{1;0;0})
+	Add(_position02,{1;0;0})
+	Add(_position03,{1.5;0;0})
+	CharacterPlayAnimation("skill_rain_cast",1,1)
+	SpawnCharacter(_,%TinyCrab_Tpl,_position01,1)
+	PlayEffectAt(_position01,"FX_Skills_WitchCraft_Generic_A_Prepare")
+	Sleep(0.2)	
+	PlayEffectAt(_position02,"FX_Skills_WitchCraft_Generic_A_Prepare")
+	SpawnCharacter(_,%TinyCrab_Tpl,_position02,1)
+	Sleep(0.3)
+	PlayEffectAt(_position03,"FX_Skills_WitchCraft_Generic_A_Prepare")
+	SpawnCharacter(_,%TinyCrab_Tpl,_position03,1)	
+	Add(%AmountOfCrabs,3)
+	Sleep(1.0)		
+	PlayEffectAt(_position01,"FX_Skills_WitchCraft_Generic_A_Cast_A")
+	Sleep(0.2)		
+	PlayEffectAt(_position02,"FX_Skills_WitchCraft_Generic_A_Cast_A")
+	Sleep(0.3)		
+	PlayEffectAt(_position03,"FX_Skills_WitchCraft_Generic_A_Cast_A")	
+	StopLoopEffect(%FXHandle)
+	Set(%Bool_FXRestore,0)
+	Set(%SummonCrabs_Current,0)
+	IF "!c1"
+		IsHardcore()
+	THEN
+		CharacterEndTurn()
+	ENDIF
+	SetPriority("CrabSummoner_SummonTinyCrabs",0)
+
+REACTION CrabSummoner_TeleportIfTooFar,1500
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_DistanceBtwTargetAndMe
+	FLOAT:_APAmount
+CHECK "!(c1|c2|c3|c4|c5)&c6&!c7&c8&c9&c10&!(c11|c12|c13)"
+	CharacterHasStatus(__Me,FROZEN)															//c1
+	CharacterHasStatus(__Me,STUNNED)														//c2
+	CharacterHasStatus(__Me,KNOCKED_DOWN)													//c3		
+	CharacterHasStatus(__Me,CHARMED)														//c4		
+	CharacterHasStatus(__Me,FEAR)															//c5		
+	CharacterGetStat(_APAmount,__Me,ActionPoints)											//c6
+	IsLessThen(_APAmount,4)																	//c7
+	CharacterGet(_Target,__Me,50,Lowest,Distance,Enemy)										//c8
+	GetDistance(_DistanceBtwTargetAndMe,__Me,_Target)										//c9
+	IsGreaterThen(_DistanceBtwTargetAndMe,15)												//c10
+	CharacterIsDead(_Target)																//c11
+	CharacterHasStatus(_Target,INVISIBLE)													//c12
+	IsInDangerousSurface(_Target)															//c13
+ACTIONS
+	CharacterPlayEffect(__Me,"FX_Skills_WitchCraft_Generic_A_Prepare")
+	CharacterPlayAnimation(cast_shout_start,1,1)
+	CharacterPlayEffect(__Me,"FX_Skills_WitchCraft_Generic_A_Cast_A")	
+	CharacterPlayAnimation(cast_shout_cast,0,0)
+	CharacterPlayEffect(__Me,"FX_GP_TeleportSmoke_A")
+	CharacterTeleportTo(_Target)
+	CharacterPlayEffect(__Me,"FX_GP_TeleportSmoke_A")	
+
+//------------------------
+EVENTS
+EVENT OnInit_FXRestore
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		IsEqual(%Bool_FXRestore,1)
+	THEN
+		CharacterPlayLoopEffect(%FXHandle,__Me,"FX_Skills_WitchCraft_Summon_Prepare_A")
+	ENDIF
+	
+EVENT OnTurn_GeneralControl
+ON 
+	OnTurn()
+ACTIONS
+	IF "c1&c2"
+		IsLessThen(%SummonCrabs_Current,%SummonCrabs_Desired)
+		IsLessThen(%AmountOfCrabs,9)
+	THEN
+		Add(%SummonCrabs_Current,1)
+		SetPriority("CrabSummoner_SummonTinyCrabs",0)
+	ELSE
+		SetPriority("CrabSummoner_SummonTinyCrabs",1000)
+	ENDIF
+
+EVENT OnDie_StopLoopFX
+ON
+	OnDie(__Me,_,_,_)
+	OnCombatEnded()
+	OnDeactivate()
+ACTIONS
+	StopLoopEffect(%FXHandle)

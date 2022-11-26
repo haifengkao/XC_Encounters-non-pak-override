@@ -1,0 +1,23 @@
+INIT
+	CHARACTER:__Me
+	EXTERN INT:%Bool_DieAfterTimer=0
+	EXTERN FLOAT:%DeathTimer=4
+	
+EVENTS
+EVENT OnCombatEnded_Die
+ON
+	OnCombatEnded()
+ACTIONS
+	IF "c1"
+		IsEqual(%Bool_DieAfterTimer,0)
+	THEN
+		CharacterDie(__Me)
+	ELSE
+		StartTimer("CMB_GEN_DieAfterCombat_DeathTimer",%DeathTimer,0)
+	ENDIF
+
+EVENT OnTimer_Die
+ON
+	OnTimer("CMB_GEN_DieAfterCombat_DeathTimer")
+ACTIONS
+	CharacterDie(__Me)

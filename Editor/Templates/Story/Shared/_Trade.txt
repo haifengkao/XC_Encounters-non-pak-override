@@ -1,0 +1,394 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+//
+// Bookkeeping of who can trade + communicating this to the game engine:
+// (note that eggs can never trade, even if you can start a dialog with them)
+//
+
+IF
+DB_NoInitialTrade((CHARACTER)_NPC)
+THEN
+NOT DB_Trader(_NPC);
+
+IF
+DB_Trader((CHARACTER)_Npc)
+THEN
+Trader_2((CHARACTER)_Npc);
+ProcEnablePlayerTrade(_Npc);
+LastTradeItemGeneration(_Npc,0);
+
+IF
+Trader_2((CHARACTER)_Npc)
+AND
+NOT DB_Trader(_Npc)
+THEN
+NOT Trader_2(_Npc);
+ProcDisablePlayerTrade(_Npc);
+
+PROC
+ProcDisablePlayerTrade((CHARACTER)_Npc)
+THEN
+CannotTrade(_Npc);
+
+PROC
+ProcEnablePlayerTrade((CHARACTER)_Npc)
+THEN
+NOT CannotTrade(_Npc);
+
+// Update the engine from our internal status:
+PROC
+SetTradeStatus((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT CannotTrade(_Npc)
+AND
+NOT DB_TradeForPlayerDisabled(_Player)
+THEN
+CharacterSetCanTrade(CHARACTER_NULL,_Npc,1);
+
+PROC
+SetTradeStatus((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+CannotTrade(_Npc)
+AND
+NOT DB_TradeForPlayerDisabled(_Player)
+THEN
+CharacterSetCanTrade(CHARACTER_NULL,_Npc,0);
+
+PROC
+SetTradeStatus((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_TradeForPlayerDisabled(_Player)
+THEN
+CharacterSetCanTrade(CHARACTER_NULL,_Npc,0);
+
+///////////////////////////////////////////////////////////////////////
+// GenTradeItems((NPC)_Npc)
+
+PROC
+GenTradeItems((CHARACTER)_Player,(CHARACTER)_Trader)
+AND
+NOT DB_TraderGeneratedTreasureForLevel(_Trader,_)
+THEN
+DB_TraderGeneratedTreasureForLevel(_Trader,0);
+
+PROC
+GenTradeItems((CHARACTER)_Player,(CHARACTER)_Trader)
+AND
+DB_TraderGeneratedTreasureForLevel(_Trader,_OldLevel)
+AND
+CharacterGetLevel(_Player,_NewLevel)
+AND
+_NewLevel > _OldLevel
+THEN
+NOT DB_TraderGeneratedTreasureForLevel(_Trader,_OldLevel);
+DB_TraderGeneratedTreasureForLevel(_Trader,_NewLevel);
+DoGenTradeItems(_Player,_Trader);
+
+PROC
+ProcClearTradeFacts((CHARACTER)_Trader)
+AND
+DB_TraderGeneratedTreasureForLevel(_Trader,_OldLevel)
+THEN
+NOT DB_TraderGeneratedTreasureForLevel(_Trader,_OldLevel);
+
+PROC	
+GenTradeItems((CHARACTER)_Player,(CHARACTER)_Trader) 
+AND 
+NOT _Trader.DoesNotWantToTrade() 
+AND
+LastTradeItemGeneration(_Trader,(INTEGER)_THLastGen) 
+AND 
+_THLastGen != 0 
+AND		// check if last generation was long enough ago:
+Time(_,_,_TH) 
+AND
+IntegerSubtract(_TH,_THLastGen,_Delta) 
+AND
+_Delta >= 12
+THEN	
+DoGenTradeItems(_Player,_Trader);
+
+// If not yet an inventory generated for this npc, do it:
+PROC	
+GenTradeItems((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND 
+NOT _Npc.DoesNotWantToTrade() 
+AND
+LastTradeItemGeneration(_Npc,0)		// not yet generated
+THEN	
+DoGenTradeItems(_Player,_Npc);
+
+//
+PROC	
+DoGenTradeItems((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND 
+LastTradeItemGeneration(_Npc,_THLastGen)
+THEN	
+NOT LastTradeItemGeneration(_Npc,_THLastGen);
+
+//
+PROC	
+DoGenTradeItems((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND 
+Time(_,_,_TH)
+THEN	
+ProcGenerateTradeTreasure(_Player,_Npc);
+LastTradeItemGeneration(_Npc,_TH);
+
+PROC
+ProcClearGeneratedItems((CHARACTER)_Npc)
+AND
+NOT DB_ItemsCleared(_Npc)
+THEN
+DB_ItemsCleared(_Npc);
+CharacterClearTradeGeneratedItems(_Npc);
+
+IF
+ DB_CustomTradeTreasure(_Npc,_Treasure)
+THEN
+ProcClearLastTradeTime(_Npc);
+
+PROC
+ProcClearLastTradeTime((CHARACTER)_Trader)
+AND
+LastTradeItemGeneration(_Trader,(INTEGER)_THLastGen) 
+THEN
+NOT LastTradeItemGeneration(_Trader,_THLastGen);
+LastTradeItemGeneration(_Trader,0);
+
+PROC
+ProcGenerateTradeTreasure((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+DB_CustomTradeTreasure((CHARACTER)_Npc,(STRING)_Treasure)
+THEN
+ProcClearGeneratedItems(_Npc);
+CharacterGenerateCustomTradeTreasure(_Player,_Npc,_Treasure);
+DB_TreasureGenerated(1);
+
+PROC
+ProcGenerateTradeTreasure((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+NOT DB_TreasureGenerated(1)
+THEN
+GenerateItems(_Player,_Npc);
+
+PROC
+ProcGenerateTradeTreasure((CHARACTER)_Player,(CHARACTER)_Npc) 
+THEN
+NOT DB_TreasureGenerated(1);
+NOT DB_ItemsCleared(_Npc);
+
+//
+// StartTrade: set all facts and startup the trade window:
+//
+
+// Special rule for black market traders, the black market trader.
+// Must be put here, because needs to be checked before the other rules are checked:
+PROC	
+StartTrade((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND 
+BlackMarketTrader(_Npc)
+THEN	
+PlayerHasThievesRelationWith(_Player,_Npc);		// this increases the prices
+
+PROC	
+StartTrade((CHARACTER)_Player,(CHARACTER)_Npc)
+THEN	
+TradeRunning(_Player,_Npc,1);
+TradeRunning(_Player,1);
+GenTradeItems(_Player,_Npc);					// regenerate items (clear if _Npc.DB_IsHostile())
+
+PROC	
+StartTrade((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND 
+CharacterGetRepAttitudeTowardsPlayer(_Npc,_Player,_Att)
+AND
+_Att <= -45
+THEN	// A trade is activated, but only items can be given to the _Npc
+ActivateTrade(_Player,_Npc,0,0,0);	// the 3rd 0 does not really do much, hence we clear the npc's inventory in GenTradeItems
+
+PROC	
+StartTrade((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND 
+CharacterGetRepAttitudeTowardsPlayer(_Npc,_Player,_Att)
+AND
+_Att > -45
+THEN	
+DoStartTrade_1(_Player,_Npc);
+
+PROC	
+DoStartTrade_1((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+NoRepair(_Npc) 
+AND
+NoIdentify(_Npc)
+THEN	
+ActivateTrade(_Player,_Npc,0,0,1);
+
+PROC	
+DoStartTrade_1((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+NOT NoRepair(_Npc) 
+AND
+NoIdentify(_Npc)
+THEN	
+ActivateTrade(_Player,_Npc,1,0,1);
+
+PROC	
+DoStartTrade_1((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+NoRepair(_Npc) 
+AND
+NOT NoIdentify(_Npc)
+THEN	
+ActivateTrade(_Player,_Npc,0,1,1);
+
+PROC	
+DoStartTrade_1((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+NOT NoRepair(_Npc) 
+AND
+NOT NoIdentify(_Npc)
+THEN	
+ActivateTrade(_Player,_Npc,1,1,1);
+
+IF
+RequestPickpocket(_Player,_Npc)
+AND
+CharacterIsTagged(_Npc, "Animal", 1)
+THEN
+ProcMakeNPCHostile(_Player, _Npc);
+
+IF
+RequestPickpocket(_Player,_Npc)
+AND
+CharacterIsTagged(_Npc, "Elemental", 1)
+THEN
+ProcMakeNPCHostile(_Player, _Npc);
+
+IF
+RequestPickpocket(_Player,_Npc)
+AND
+CharacterIsTagged(_Npc, "Ghost", 1)
+THEN
+ProcMakeNPCHostile(_Player, _Npc);
+
+IF
+RequestPickpocket(_Player,_Npc)
+AND
+CharacterIsTagged(_Npc, "Animal", 0)
+AND
+CharacterIsTagged(_Npc, "Elemental", 0)
+AND
+CharacterIsTagged(_Npc, "Ghost", 0)
+THEN
+GenTradeItems(_Player,_Npc);
+StartPickpocket(_Player,_Npc,1);
+
+// Assertion of the fact CannotTrade(_Npc) prevents startup of the trade window.
+// This prevents the npc from interacting via the trade window, hence from repairing, healing or identifying as well.
+IF		
+RequestTrade(_Player,_Npc) 
+AND 
+NOT CannotTrade(_Npc)
+THEN	
+StartTrade(_Player,_Npc);
+
+//
+// the event reporting user pressed OK
+//
+// TODO: check if player offered stolen items,...
+IF		
+HappyWithDeal(_Player,_Npc,_ValuePlayer,_ValueNpc) 
+THEN
+ProcDecideAttitudeAdjustment(_Player,_Npc,_ValuePlayer,_ValueNpc);
+
+PROC
+ProcDecideAttitudeAdjustment((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_ValuePlayer,(INTEGER)_ValueNpc)
+AND
+DB_AttitudeAdjustMent(_Player,_Npc,_Q)
+THEN
+NOT DB_AttitudeAdjustMent(_Player,_Npc,_Q);
+
+PROC
+ProcDecideAttitudeAdjustment((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_ValuePlayer,(INTEGER)_ValueNpc)
+AND
+_ValuePlayer >= _ValueNpc
+THEN	
+ProcModifyAttitudeForGold(_Player,_Npc,_ValuePlayer,_ValueNpc);
+
+PROC
+ProcDecideAttitudeAdjustment((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_ValuePlayer,(INTEGER)_ValueNpc)
+AND
+NOT DB_AttitudeAdjustMent(_Player,_Npc,_)
+THEN
+DB_AttitudeAdjustMent(_Player,_Npc,0);
+
+IF		
+HappyWithDeal(_Player,_Npc,_,_) 
+AND
+DB_AttitudeAdjustMent(_Player,_Npc,_Att)
+THEN
+IncreaseAttitude(_Player,_Npc,_Att);
+
+IF		
+HappyWithDeal(_Player,_Npc,_ValuePlayer,_ValueNpc) 
+AND
+_ValuePlayer >= _ValueNpc
+AND
+DB_AttitudeAdjustMent(_Player,_Npc,_Att)
+THEN	
+ExecuteDeal(_Player,1,_Att);
+
+IF		
+HappyWithDeal(_Player,_Npc,_ValuePlayer,_ValueNpc) 
+AND
+_ValuePlayer < _ValueNpc
+AND
+DB_AttitudeAdjustMent(_Player,_Npc,_Att)
+THEN	
+ExecuteDeal(_Player,0,_Att);
+
+
+//
+// the event reporting end
+//
+IF		
+TradeEnds(_Npc,_Npc2) 
+AND 
+TradeRunning(_Npc,_Npc2,1)
+THEN	
+NOT TradeRunning(_Npc,_Npc2,1);
+
+IF		
+TradeEnds(_Npc,_Npc2) 
+AND 
+TradeRunning(_Npc,1)
+THEN	
+NOT TradeRunning(_Npc,1);
+
+// Additionally to the facts asserted in the init section, we have some general rules here:
+// 1. Guards do not trade:
+IF		
+GuardTypeNpc(_,_Npc,_,_) 
+THEN 
+DB_NoInitialTrade(_Npc);
+
+IF
+DialogCharacterEventSet("StartTrade",_Player,_Instance)
+AND
+DB_DialogNPCs(_Instance,_Npc,1)
+THEN
+StartTrade(_Player,_Npc);
+
+IF
+DB_BigTrader((CHARACTER)_Npc)
+THEN
+DB_Trader(_Npc);
+CharacterSetCanTrade(CHARACTER_NULL,_Npc,1);
+EXITSECTION
+
+ENDEXITSECTION

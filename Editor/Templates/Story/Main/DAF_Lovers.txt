@@ -1,0 +1,130 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_DAF_Lover(CHARACTER_DAF_Orc_Lover);
+DB_DAF_Lover(CHARACTER_DAF_Human_Lover);
+DB_Dialogs(CHARACTER_DAF_Human_Lover,CHARACTER_DAF_Orc_Lover,"DAF_Lovers");
+KBSECTION
+IF
+CharacterSawCharacter(_Lover,_Player)
+AND
+DB_DAF_Lover(_Lover)
+AND
+_Player.DB_IsPlayer()
+THEN
+DB_DAF_Lovers_VisiblePlayers(_Player);
+
+IF
+CharacterLostSightOfCharacter(_Lover,_Player)
+AND
+DB_DAF_Lover(_Lover)
+AND
+DB_DAF_Lovers_VisiblePlayers(_Player)
+AND
+NOT Sees(CHARACTER_DAF_Orc_Lover,_Player)
+AND
+NOT Sees(CHARACTER_DAF_Human_Lover,_Player)
+THEN
+NOT DB_DAF_Lovers_VisiblePlayers(_Player);
+Proc_DAF_Lovers_CheckAlone();
+
+IF
+CharacterLostSightOfCharacter(_Player,_Lover)
+AND
+DB_DAF_Lover(_Lover)
+AND
+DB_DAF_Lovers_VisiblePlayers(_Player)
+AND
+NOT Sees(CHARACTER_DAF_Orc_Lover,_Player)
+AND
+NOT Sees(CHARACTER_DAF_Human_Lover,_Player)
+THEN
+NOT DB_DAF_Lovers_VisiblePlayers(_Player);
+Proc_DAF_Lovers_CheckAlone();
+
+IF
+CharacterSawCharacter(_Lover,_Player)
+AND
+DB_DAF_Lover(_Lover)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT Boolean("DB_Lovers_Separated")
+THEN
+DialogRequestStopForCharacter(CHARACTER_DAF_Human_Lover);
+DialogRequestStopForCharacter(CHARACTER_DAF_Orc_Lover);
+CharacterDisplayText(CHARACTER_DAF_Orc_Lover,"DAF_Lover_PlayerSpotted");
+ProcCharacterMoveToTrigger(CHARACTER_DAF_Human_Lover,TRIGGER_DAF_Lover_Far,1,"LoverMovedAway");
+Boolean("DB_Lovers_Separated");
+
+IF
+CharacterEvent(CHARACTER_DAF_Human_Lover,"LoverMovedAway")
+THEN
+CharacterLookFromTrigger(CHARACTER_DAF_Human_Lover,TRIGGER_DAF_Lover_Far,0);
+DialogStartTwoSpeakerDialog("DAF_AD_Lovers_Far",CHARACTER_DAF_Human_Lover,CHARACTER_DAF_Orc_Lover);
+
+PROC
+Proc_DAF_Lovers_CheckAlone()
+AND
+NOT DB_DAF_Lovers_VisiblePlayers(_)
+AND
+Boolean("DB_Lovers_Separated")
+THEN
+TimerLaunch("DAF_Lover_Alone",3000);
+
+IF
+TimerFinished("DAF_Lover_Alone")
+AND
+NOT DB_DAF_Lovers_VisiblePlayers(_)
+THEN
+DialogRequestStopForCharacter(CHARACTER_DAF_Human_Lover);
+DialogRequestStopForCharacter(CHARACTER_DAF_Orc_Lover);
+CharacterDisplayText(CHARACTER_DAF_Orc_Lover,"DAF_Lover_PlayerGone");
+ProcCharacterMoveToTrigger(CHARACTER_DAF_Human_Lover,TRIGGER_DAF_Lover_Close,0,"LoverMovedClose");
+NOT Boolean("DB_Lovers_Separated");
+
+IF
+CharacterEvent(CHARACTER_DAF_Human_Lover,"LoverMovedClose")
+THEN
+DialogStartTwoSpeakerDialog("DAF_AD_Lovers_Close",CHARACTER_DAF_Human_Lover,CHARACTER_DAF_Orc_Lover);
+
+IF
+DialogEnded("DAF_Lovers",_)
+AND
+DB_GlobalEvent("DAF_LoversFight")
+THEN
+ProcSetRelationToPlayers(CHARACTER_DAF_Human_Lover, 0);
+ProcSetRelationToPlayers(CHARACTER_DAF_Orc_Lover, 0);
+
+IF
+CharacterDied(_Lover)
+AND
+DB_DAF_Lover(_Lover)
+AND
+DB_DAF_Lover(_Lover2)
+AND
+_Lover != _Lover2
+THEN
+CharacterDisplayText(_Lover2,"DAF_LoverSuicide");
+CharacterDie(_Lover2,0);
+GlobalClearEvent("DAF_KnowsAboutLovers");
+GoalCompleted;
+
+IF
+GlobalEventSet("DAF_GrutildaKnowsAboutLovers")
+AND
+DB_DAF_Lover(_Lover)
+THEN
+NOT DB_DAF_Lover(_Lover);
+PROC_RemoveDialogFromCharacter(_Lover);
+
+IF
+DAF_War(1)
+THEN
+CharacterDie(CHARACTER_DAF_Human_Lover,0);
+CharacterDie(CHARACTER_DAF_Orc_Lover,0);
+GoalCompleted;
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

@@ -1,0 +1,142 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%Target	
+	FLOAT:%LSSightRange
+	INT:%Bool_CastingLiquidStone=0
+	EXTERN INT:%Bool_IAmAnOrc=0
+	EXTERN INT:%LiquidStone_Turn_Current=0
+	EXTERN INT:%LiquidStone_Turn_Desired=2
+	EXTERN STRING:%LiquidStone_Event_Open="LUC_LiquidStone_Event_Open"
+	EXTERN STRING:%LiquidStone_Event_Close="LUC_LiquidStone_Event_Close"
+
+//---------
+BEHAVIOUR
+REACTION LiquidStone_Cast,0
+USAGE COMBAT
+CHECK "c1&c2"
+	CharacterGet(%Target,__Me,%LSSightRange,Highest,Distance,Enemy,null,null,null,1)
+	IsEqual(%Bool_CastingLiquidStone,0)
+ACTIONS
+	SetPriority("Combat_AttackSetEnemy",0)
+	SetPriority("Combat_MoveToSetEnemy",0)
+	CharacterLookAt(%Target)
+	CharacterPlayEffect(__Me,"FX_Skills_Earth_Summon_Prepare_A")
+	CharacterPlayEffect(__Me,"FX_Skills_Earth_EnemyLiquidStone_Cast_A")
+	CharacterPlayAnimation("cast_long_start",1,1)
+	CharacterPlayAnimation("cast_long_loop",1,1)
+	IF "c1"
+		IsEqual(%Bool_IAmAnOrc,1)
+	THEN
+		CharacterPlayAnimation("skill_blitzbolt_loop",0,0)
+	ELSE
+		CharacterPlayAnimation("Loop_Cast_Beam_01",0,0)	
+	ENDIF
+	CharacterEvent(__Me,%LiquidStone_Event_Open)
+	CharacterConsume(%Target,"CMBHC_LiquidStone")
+	Set(%LiquidStone_Turn_Current,0)
+	Set(%Bool_CastingLiquidStone,1)
+	SetPriority("LiquidStone_Cast",0)
+	CharacterEndTurn()
+
+REACTION LiquidStone_Maintain,400
+USAGE COMBAT
+CHECK "c1"
+	IsEqual(%Bool_CastingLiquidStone,1)
+ACTIONS
+	CharacterLookAt(%Target)
+	IF "c1"
+		IsEqual(%Bool_IAmAnOrc,1)
+	THEN
+		CharacterPlayAnimation("skill_blitzbolt_loop",0,0)
+	ELSE
+		CharacterPlayAnimation("Loop_Cast_Beam_01",0,0)	
+	ENDIF
+	CharacterConsume(%Target,"CMBHC_LiquidStone")
+	CharacterEndTurn()
+
+REACTION LiquidStone_PlayFX_WhileWaiting,400
+USAGE WAITING
+CHECK "c1"
+	IsEqual(%Bool_CastingLiquidStone,1)
+ACTIONS
+	//CharacterLookAt(%Target)
+	IF "c1"
+		IsEqual(%Bool_IAmAnOrc,1)
+	THEN
+		CharacterPlayAnimation("skill_blitzbolt_loop",0,0)
+	ELSE
+		CharacterPlayAnimation("Loop_Cast_Beam_01",0,0)	
+	ENDIF
+
+REACTION LiquidStone_Interrupted,0
+USAGE WAITING
+CHECK "c1"
+	IsEqual(%Bool_CastingLiquidStone,1)
+ACTIONS
+	Set(%Bool_CastingLiquidStone,0)	
+	Set(%LiquidStone_Turn_Current,0)	
+	SetPriority("Combat_AttackSetEnemy",7)
+	SetPriority("Combat_MoveToSetEnemy",6)	
+	SetPriority("LiquidStone_PlayFX_WhileWaiting",0)	
+	SetPriority("LiquidStone_Interrupted",0)	
+
+//---------
+EVENTS
+EVENT OnInit_GetLSSightRange
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%LSSightRange,__Me,Sight)
+	THEN
+	ENDIF
+	
+EVENT OnTurn_LiquidStone_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	IF "c1&c2"
+		IsEqual(%Bool_CastingLiquidStone,0)
+		IsLessThen(%LiquidStone_Turn_Current,%LiquidStone_Turn_Desired)
+	THEN
+		Add(%LiquidStone_Turn_Current,1)
+	ELIF "c1&c2"
+		IsEqual(%Bool_CastingLiquidStone,0)
+		IsEqual(%LiquidStone_Turn_Current,%LiquidStone_Turn_Desired)
+	THEN
+		SetPriority("LiquidStone_Cast",1000)
+	ENDIF
+
+EVENT OnCharacterStatus_InterruptLiquidStone
+VARS
+	STATUS:_Status
+ON
+	OnCharacterStatus(__Me,_Status)
+ACTIONS
+	IF "c1|c2|c3|c4|c5|c6"
+		IsEqual(_Status,"FEAR")				//c1
+		IsEqual(_Status,"CHARMED")			//c2
+		IsEqual(_Status,"KNOCKED_DOWN")		//c3
+		IsEqual(_Status,"PETRIFIED")		//c4
+		IsEqual(_Status,"FROZEN")			//c5
+		IsEqual(_Status,"STUNNED")			//c6
+	THEN
+		CharacterEvent(__Me,%LiquidStone_Event_Close)		
+		SetPriority("LiquidStone_Interrupted",1000)
+	ENDIF
+
+EVENT OnDie_Target_InterruptLiquidStone
+ON
+	OnDie(%Target,_,_,_)
+ACTIONS
+	Set(%Bool_CastingLiquidStone,0)
+	SetPriority("Combat_AttackSetEnemy",7)
+	SetPriority("Combat_MoveToSetEnemy",6)
+	CharacterEvent(__Me,%LiquidStone_Event_Close)	
+	
+EVENT OnDie_Me_InterruptLiquidStone
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	Set(%Bool_CastingLiquidStone,0)
+	CharacterEvent(__Me,%LiquidStone_Event_Close)

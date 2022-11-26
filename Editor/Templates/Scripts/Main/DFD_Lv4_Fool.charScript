@@ -1,0 +1,18 @@
+INIT
+
+CHARACTER:__Me
+
+INT:%State = 0
+
+BEHAVIOUR
+
+REACTION Singing,1050
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%State,0)
+ACTIONS
+	CharacterWander(FLOAT:4,3)
+	DialogStart("DFD_Lv4_AD_Fool",__Me)
+	Sleep(25)
+INTERRUPT
+	Reset()

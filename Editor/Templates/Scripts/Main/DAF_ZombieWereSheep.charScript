@@ -1,0 +1,71 @@
+INIT
+
+CHARACTER:__Me
+ITEM:%CurrentClosestFood = null
+ITEM:%CurrentTargetFood = null
+EXTERN FLOAT:%CombatDist = 3
+EXTERN FLOAT:%PeaceDist = 15
+EXTERN FIXEDSTRING:%FoodTemplate1 = "21943084-4c5d-46cc-a2bf-0fd9859319c1"
+
+BEHAVIOUR
+
+REACTION State_Idle, 1100
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(TRIGGER:DAF_XP_Kickstarter_da11f626-c741-424d-b07d-cec4e6838984,0)
+	Sleep(1.0)
+	CharacterWander(FLOAT:6.0,2.0,0,TRIGGER:DAF_XP_Kickstarter_da11f626-c741-424d-b07d-cec4e6838984)
+	
+REACTION EatFood, 0
+USAGE PEACE
+USAGE COMBAT
+ACTIONS
+	CharacterMoveTo(%CurrentTargetFood,1,1)
+	ItemSetOnStage(%CurrentTargetFood,0)
+INTERRUPT
+	Reset()
+	
+EVENTS
+
+EVENT Initialize
+ON
+	OnInit()
+ACTIONS
+	StartTimer("UpdateFoodCheck",0.5,-1)
+
+EVENT Shutdown
+ON
+	OnShutdown()
+ACTIONS
+	StopTimer("UpdateFoodCheck")
+
+EVENT UpdateFoodCheck
+ON
+	OnTimer("UpdateFoodCheck")
+VARS
+	ITEM:_ClosestFood
+	FLOAT:_Distance
+ACTIONS
+	Set(%CurrentClosestFood,null)
+	SetPriority("EatFood",0)		
+	IF "c1"
+		CharacterHasStatus(__Me,COMBAT)
+	THEN
+		Set(_Distance,%CombatDist)
+	ELSE
+		Set(_Distance,%PeaceDist)
+	ENDIF
+	IF "(!c1)&c2&!c3"
+		IsInDialog(__Me)
+		ItemGet(_ClosestFood,__Me,_Distance,Lowest,Distance,%FoodTemplate1)
+		ItemIsMoving(_ClosestFood)
+	THEN
+		Set(%CurrentClosestFood,_ClosestFood)	
+		SetPriority("EatFood",5000)	
+	ENDIF	
+	IF "!c1"
+		IsEqual(%CurrentClosestFood,%CurrentTargetFood)
+	THEN
+		Interrupt("EatFood")	
+		Set(%CurrentTargetFood,%CurrentClosestFood)		
+	ENDIF

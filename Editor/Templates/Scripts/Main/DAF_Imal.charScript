@@ -1,0 +1,342 @@
+INIT
+	CHARACTER:__Me
+	CHARACTERTEMPLATE:%ImalHeal="DAF_Imal_Heal_e40e702f-411e-4878-baee-1746f0e84410"
+	CHARACTERTEMPLATE:%ImalTank="DAF_Imal_Tank_9d1b9969-3df6-4bca-81d1-7d9b51d8ea0c"
+	CHARACTERTEMPLATE:%ImalKnight="DAF_Imal_Knight_a8166c09-2e35-4822-942a-46c0e65a5038"
+	CHARACTERTEMPLATE:%ImalMage="DAF_Imal_Mage_596837b8-896d-431a-af67-74c8a1766e22"
+	CHARACTERTEMPLATE:%ImalArcher="DAF_Imal_Archer_dc89c220-070b-42da-af32-8df9065d43f4"
+	INT:%EnemyCount
+	INT:%EffectHandle
+	INT:%Shadow_FXHandle
+	INT:%Bool_Disabled=0
+	INT:%AmountOfAfflictedAllies
+
+//----------
+BEHAVIOUR
+REACTION Imal_Peace_Anim, 1000
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Text
+ACTIONS
+	CharacterPlayAnimation("Loop_Cast_Low_01", 0, 1)
+	GetRandom(_Text, "DAF_AD_Imal1", "DAF_AD_Imal2", "DAF_AD_Imal3")
+	DisplayText(__Me, _Text, 4)
+	Sleep(20)
+
+REACTION Imal_HyperSummon, 1500
+USAGE COMBAT
+VARS
+	INT:_Successes=0
+	INT:_Failures=0
+	CHARACTER:_Player
+	FLOAT:_MyAP
+	FLOAT3:_PosOffset
+	FLOAT3:_MyPosition
+	FLOAT:_Angle
+	FLOAT:_Dist
+	CHARACTER:_Summon
+	CHARACTER:_ImalDouble
+CHECK "c1&c2&!(c3|c4|c5|c6|c7|c8|c9)"
+	CharacterGet(_Player,__Me,30,Lowest,Distance,Enemy)			//c1
+	CharacterGetStat(_MyAP,__Me,ActionPoints)					//c2
+	IsLessThen(_MyAP,5)											//!c3
+	CharacterHasStatus(__Me,"CHARMED")							//!c4
+	CharacterHasStatus(__Me,"PETRIFIED")						//!c5
+	CharacterHasStatus(__Me,"FEAR")								//!c6
+	CharacterHasStatus(__Me,"STUNNED")							//!c7
+	CharacterHasStatus(__Me,"MUTED")							//!c8
+	CharacterHasStatus(__Me,"FEAR")								//!c9	
+ACTIONS
+	CharacterLookAt(_Player)
+	WHILE "c1&c2"
+		IsLessThen(_Successes,5)
+		IsLessThen(_Failures,30)
+	DO
+		IF "c1"
+			GetPosition(__Me,_MyPosition)
+		THEN
+			Set(_PosOffset,{1;0;0}) 
+			GetRandomBetween(_Angle,-270,90)
+			GetRandomBetween(_Dist,1,3.5)
+			RotateY(_PosOffset,_Angle)
+			Multiply(_PosOffset,_Dist)	
+			Add(_MyPosition,_PosOffset)
+		ENDIF
+		IF "c1&!c2&!c3&!c4&!c5&!c6"
+			FindValidPosition(_MyPosition,3)
+			ContainsSurface(_MyPosition,1,"CloudPoison")
+			ContainsSurface(_MyPosition,1,"Ooze")
+			ContainsSurface(_MyPosition,1,"Ice")
+			ContainsSurface(_MyPosition,1,"CloudStatic")
+			ContainsSurface(_MyPosition,1,"Electrified")
+		THEN	
+			CharacterPlayEffect(__Me,"FX_Skills_Air_Summon_Prepare_A")
+			CharacterPlayAnimation("cast_shout_cast",0,0)
+			IF "c1"
+				IsEqual(_Successes,0)
+			THEN	
+				Sleep(0.5)
+				PlayEffectAt(_MyPosition,"FX_Creatures_Shadow_Spawn_A")	
+				Sleep(0.7)				
+				SpawnCharacter(_ImalDouble,%ImalHeal,_MyPosition,1,1,__Me)			
+				Sleep(0.7)
+				Add(_Successes,1)				
+			ELIF "c1"
+				IsEqual(_Successes,1)
+			THEN
+				Sleep(0.5)			
+				PlayEffectAt(_MyPosition,"FX_Creatures_Shadow_Spawn_A")	
+				CharacterPlayAnimation("emotion_insulting",0,0)
+				Sleep(0.7)				
+				SpawnCharacter(_ImalDouble,%ImalMage,_MyPosition,1,1,__Me)					
+				Sleep(0.4)
+				Add(_Successes,1)
+			ELIF "c1"
+				IsEqual(_Successes,2)
+			THEN
+				Sleep(0.5)			
+				PlayEffectAt(_MyPosition,"FX_Creatures_Shadow_Spawn_A")	
+				Sleep(0.7)				
+				SpawnCharacter(_ImalDouble,%ImalArcher,_MyPosition,1,1,__Me)	
+				Sleep(0.4)
+				Add(_Successes,1)	
+			ELIF "c1"
+				IsEqual(_Successes,3)
+			THEN
+				Sleep(0.5)
+				CharacterPlayAnimation("Revolt_02",0,0)
+				PlayEffectAt(_MyPosition,"FX_Creatures_Shadow_Spawn_A")	
+				Sleep(0.7)				
+				SpawnCharacter(_ImalDouble,%ImalTank,_MyPosition,1,1,__Me)				
+				Sleep(0.4)
+				Add(_Successes,1)	
+			ELIF "c1"
+				IsEqual(_Successes,4)
+			THEN
+				Sleep(0.5)			
+				CharacterPlayAnimation("Point_01",0,0)
+				CharacterPlayEffect(__Me,"FX_Skills_Air_Summon_Cast_A")			
+				PlayEffectAt(_MyPosition,"FX_Creatures_Shadow_Spawn_A")	
+				Sleep(0.7)				
+				SpawnCharacter(_ImalDouble,%ImalKnight,_MyPosition,1,1,__Me)			
+				Sleep(0.4)
+				Add(_Successes,1)	
+			ELSE
+				Add(_Failures,1)
+			ENDIF
+		ELSE
+			 Add(_Failures,1)
+		ENDIF
+	ENDWHILE
+	IF "c1"
+		IsEqual(_Failures,50)
+	THEN
+		Set(_Failures,0)
+		SetPriority("Imal_HyperSummon",0)	
+	ENDIF
+	Set(_Successes,0)
+	SetPriority("Imal_HyperSummon",0)
+INTERRUPT
+	Reset()
+	
+REACTION Imal_NaturesCurse,500
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&c4"
+	CharacterCanCast(__Me,"Shout_EnemyNaturesCurse")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Shout_EnemyNaturesCurse")
+	CharacterGet(_ChosenTarget,__Me,50,Lowest,Distance,Enemy)
+	IsRandom(0.4)
+ACTIONS
+	Set(%EnemyCount,0)
+	DebugText(__Me,"Mass Curse: scanning!")
+	IterateCharacters("CMB_Imal_CountEnemies",Lowest,Distance)
+	IF "c1"
+		IsGreaterThen(%EnemyCount,2)
+	THEN
+		CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+		CharacterUseSkill("Shout_EnemyNaturesCurse",_ChosenTarget)
+	ELSE
+		SetPriority("Imal_NaturesCurse",0)
+	ENDIF
+INTERRUPT
+	Reset()
+	
+REACTION Imal_Charm,400
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&!(c4|c5|c6|c7|c8|c9|c10|c11)&c12&c13"
+	CharacterCanCast(__Me,"Projectile_EnemyCharm")												//c1
+	CharacterGet(_ChosenTarget,__Me,50,Highest,Vitality,Enemy)									//c2
+	CharacterIsPlayer(_ChosenTarget)															//c3
+	CharacterHasStatus(_ChosenTarget,"CHARMED")													//!c4
+	CharacterHasStatus(_ChosenTarget,"STUNNED")													//!c5
+	CharacterHasStatus(_ChosenTarget,"FROZEN")													//!c6
+	CharacterHasStatus(_ChosenTarget,"PETRIFIED")												//!c7
+	CharacterHasStatus(_ChosenTarget,"KNOCKED_DOWN")											//!c8
+	CharacterHasStatus(_ChosenTarget,"FEAR")													//!c9
+	CharacterHasStatus(_ChosenTarget,"SHACKLES_OF_PAIN")										//!c10
+	CharacterHasStatus(_ChosenTarget,"MUTED")													//!c11
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyCharm")					//c12
+	IsRandom(0.4)																				//c13
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_EnemyCharm",_ChosenTarget)	
+
+REACTION Imal_Silence,400
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&!(c4|c5|c6|c7|c8|c9|c10)&c11&c12"
+	CharacterCanCast(__Me,"Projectile_EnemySilence")											//c1
+	CharacterGet(_ChosenTarget,__Me,50,Highest,Intelligence,Enemy)								//c2
+	CharacterIsPlayer(_ChosenTarget)															//c3
+	CharacterHasStatus(_ChosenTarget,"MUTED")													//!c4
+	CharacterHasStatus(_ChosenTarget,"STUNNED")													//!c5
+	CharacterHasStatus(_ChosenTarget,"FROZEN")													//!c6
+	CharacterHasStatus(_ChosenTarget,"PETRIFIED")												//!c7
+	CharacterHasStatus(_ChosenTarget,"KNOCKED_DOWN")											//!c8
+	CharacterHasStatus(_ChosenTarget,"FEAR")													//!c9
+	CharacterHasStatus(_ChosenTarget,"SHACKLES_OF_PAIN")										//!c10
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemySilence")					//c11
+	IsRandom(0.4)																				//c12
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_EnemySilence",_ChosenTarget)
+	
+REACTION Imal_PurifyingShout,800
+USAGE COMBAT
+VARS
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3"
+	IsHardcore()
+	CharacterCanCast(__Me,"Shout_EnemyPurifyingShout")
+	CharacterGetSkillRange(_,_MaxRange,__Me,"Shout_EnemyPurifyingShout")
+ACTIONS
+	DebugText(__Me,"PurifShout: scanning!")
+	Set(%AmountOfAfflictedAllies,0)
+	IterateCharactersNear(__Me,_MaxRange,"CMB_Imal_ScanForAlliesWithNegativeStatuses",Lowest,Distance)
+	IF "c1"
+		IsGreaterThen(%AmountOfAfflictedAllies,1)
+	THEN
+		CharacterUseSkill("Shout_EnemyPurifyingShout",__Me)
+	ELSE
+		SetPriority("Imal_PurifyingShout",0)
+	ENDIF
+INTERRUPT
+	Reset()
+
+REACTION Imal_StaffOfMagusFire,100
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&!c3&c4"
+	CharacterCanCast(__Me,"Projectile_EnemyStaffOfMagusFire")									//c1
+	CharacterGet(_ChosenTarget,__Me,50,Lowest,FireResistance,Enemy)								//c2
+	CharacterHasStatus(_ChosenTarget,"FROZEN")													//!c3		
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyStaffOfMagusFire")			//c4	
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_EnemyStaffOfMagusFire",_ChosenTarget)
+	
+REACTION Imal_Waiting_Showoff, 10
+USAGE WAITING
+VARS 
+	FIXEDSTRING:_Animation
+	FLOAT:_SleepTime 
+ACTIONS
+	GetWeightedRandom(_Animation,"still",INT:10,"Point_01",INT:20,"emotion_insulting",INT:10,"Dust_Off_01",INT:10,"Intimidate_01",INT:10,"Intimidate_02",INT:10)
+	CharacterPlayAnimation(_Animation)
+	GetRandomBetween(_SleepTime,1,8)
+	Sleep(_SleepTime)
+
+//----------	
+EVENTS
+EVENT OnInit_StartTimerToFX
+ON
+	OnInit()
+ACTIONS
+	StartTimer("DAF_Imal_InitialTimer",0.5,0)
+	CharacterAddSkill("Shout_EnemyPurifyingShout")
+	CharacterAddSkill("Shout_EnemyNaturesCurse")
+	CharacterAddSkill("Projectile_EnemyCharm")
+	CharacterAddSkill("Projectile_EnemySilence")
+	CharacterAddSkill("Projectile_EnemyStaffOfMagusFire")
+
+EVENT OnCharacterEvent_Dialog
+ON
+	OnCharacterEvent(__Me,"stopEvent")
+ACTIONS
+	Set(%Bool_Disabled,1)
+	SetPriority("Imal_Peace_Anim",0)
+	StopLoopEffect(%EffectHandle)
+		
+EVENT OnTimer_PlayLoopFX
+ON
+	OnTimer("DAF_Imal_InitialTimer")
+ACTIONS
+	IF "!c1"
+		IsEqual(%Bool_Disabled,1)
+	THEN
+		CharacterPlayLoopEffect(%EffectHandle,__Me,"FX_Skills_WitchCraft_Generic_A_Prepare_Hands","Bip001 L Forearm")
+	ENDIF
+
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("Imal_NaturesCurse",500)
+	SetPriority("Imal_PurifyingShout",800)
+
+EVENT OnIterateCharacter_CountEnemies
+VARS
+	CHARACTER:_Enemy
+ON
+	OnIterateCharacter(_Enemy,"CMB_Imal_CountEnemies")
+ACTIONS
+	IF "!c1&c2"
+		CharacterIsDead(_Enemy)
+		CharacterIsEnemy(__Me,_Enemy)
+	THEN
+		Add(%EnemyCount,1)
+		DebugText(_Enemy,"Enemy Count: [1]!",%EnemyCount)
+	ENDIF
+	
+EVENT OnIterateCharacter_ScanForAlliesWithNegativeStatuses
+VARS
+	CHARACTER:_Ally
+ON
+	OnIterateCharacter(_Ally,"CMB_Imal_ScanForAlliesWithNegativeStatuses")
+ACTIONS
+	IF "c1&!(c2|c3)&(c4|c5|c6|c7|c8|c9)"
+		CharacterIsAlly(__Me,_Ally)								//c1
+		CharacterIsDead(_Ally)									//!c2
+		CharacterHasStatus(_Ally,"CHARMED")						//!c3	//a charmed ally is an enemy!
+		CharacterHasStatus(_Ally,"BURNING")						//c4
+		CharacterHasStatus(_Ally,"FROZEN")						//c5
+		CharacterHasStatus(_Ally,"STUNNED")						//c6
+		CharacterHasStatus(_Ally,"SHIELD")						//c7
+		CharacterHasStatus(_Ally,"MARK_OF_DEATH")				//c8
+		CharacterHasStatus(_Ally,"CRAWLING_INFESTATION")		//c9
+	THEN
+		DebugText(_Ally,"Sick! ([1])",%AmountOfAfflictedAllies)
+		Add(%AmountOfAfflictedAllies,1)
+	ENDIF
+	
+EVENT OnCombatEnded_OnDie_StopLoopFX
+ON
+	OnCombatEnded()	
+	OnDie(__Me,_,_,_)
+	OnDeactivate()
+ACTIONS
+	StopLoopEffect(%EffectHandle)

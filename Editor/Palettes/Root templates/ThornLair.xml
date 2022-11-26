@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<palette xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <palettes />
+  <objectids>
+    <guid>fed11ba2-919f-463e-895a-300cccd54d11</guid>
+    <guid>b47f54ad-168f-4d33-b52f-a2b4508fb856</guid>
+    <guid>0fa9d538-f3ad-4897-bde7-1fc16e0c65f6</guid>
+    <guid>60e384a3-c431-46e0-9fc3-86824c14073e</guid>
+    <guid>4772150a-2f7b-4da9-8fe6-0d4108de1353</guid>
+    <guid>b5c1c258-827d-4eb0-ae56-88c3c3c005c2</guid>
+    <guid>8bfd4e11-18d6-435a-899f-1a9da3030dbd</guid>
+    <guid>6747f55b-62a6-4fd7-b529-2f73127fe237</guid>
+    <guid>c8e04721-b61d-4e34-9d2a-eba5451cbbf1</guid>
+    <guid>ba2bc7e0-6c75-4535-a0b4-cba02159c465</guid>
+    <guid>02d44cb4-eaba-4071-bdf6-c81df18205fd</guid>
+  </objectids>
+  <name>ThornLair</name>
+</palette>

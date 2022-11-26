@@ -1,0 +1,98 @@
+INIT
+CHARACTER:__Me
+EXTERN FIXEDSTRING:%Comment = ""
+INT:%EffectHandle = 0
+INT:%InitialFireLoopHandle = 0
+INT:%FireLoopHandle = 0
+INT:%Active = 1
+
+BEHAVIOUR
+REACTION State_Inspecting, 1000
+USAGE ALL
+VARS
+	FLOAT:_SightRange
+ACTIONS
+	IF "c1"
+		CharacterGetSightRange(_SightRange,__Me)
+	THEN
+		IterateCharactersNear(__Me,_SightRange,"AlminaCheckForPartyMember")
+	ENDIF
+	Sleep(1.0)
+
+EVENTS
+EVENT OnTimerPutOutInitialFire
+ON
+	OnTimer("HIB_AlminaCosmetic_Timer_InitialFire")
+ACTIONS
+	StopLoopEffect(%InitialFireLoopHandle)
+	Set(%InitialFireLoopHandle,null)
+	
+EVENT OnTimerDestroyStatue
+ON
+	OnTimer("HIB_AlminaCosmetic_Timer_Explode")
+ACTIONS
+	CharacterPlayEffect(__Me,"FX_Creatures_Summons_ElementalFire_A_Death","Dummy_CastFX")
+	StopLoopEffect(%FireLoopHandle)
+	Set(%FireLoopHandle,null)
+	CreateSurfaceAt(__Me,Fire,1.2,4)
+	
+EVENT Shutdown
+ON
+	OnShutdown()
+ACTIONS
+	StopLoopEffect(%EffectHandle)
+	Set(%EffectHandle, 0)
+	Set(%InitialFireLoopHandle, 0)
+	Set(%FireLoopHandle, 0)
+
+EVENT OnSpotting
+VARS
+	CHARACTER:_Player
+	FLOAT3:_MyPosition
+	FLOAT3:_MyUpDirection
+ON
+	OnSight(_Player)
+ACTIONS
+	IF "c1&c2&!c3"
+		CharacterIsPlayer(_Player)
+		IsEqual(%Active,1)
+		CharacterIsDead(_Player)
+	THEN
+		Set(%Active,0)
+		StartTimer("HIB_AlminaCosmetic_Timer_InitialFire",1,0)
+		CharacterPlayLoopEffect(%InitialFireLoopHandle,__Me,"FX_Creatures_Summons_ElementalFire_A_BodyFire","Dummy_CastFX")
+		CharacterPlayLoopEffect(%FireLoopHandle,__Me,"FX_LTS_DungeonFire_Yellow_A","Dummy_CastFX")
+		StartTimer("HIB_AlminaCosmetic_Timer_Explode",5,0)
+		CharacterEvent(__Me,"HIB_Almina_Talking")
+		DisplayText(__Me,%Comment,5)
+	ENDIF
+
+EVENT OnDamage
+ON
+	OnDamage(_,_,_,_)
+ACTIONS
+	IF "c1"
+		IsEqual(%Active,1)
+	THEN
+		Set(%Active,0)
+		StartTimer("HIB_AlminaCosmetic_Timer_InitialFire",1,0)
+		CharacterPlayLoopEffect(%InitialFireLoopHandle,__Me,"FX_Creatures_Summons_ElementalFire_A_BodyFire","Dummy_CastFX")
+		CharacterPlayLoopEffect(%FireLoopHandle,__Me,"FX_LTS_DungeonFire_Yellow_A","Dummy_CastFX")
+		StartTimer("HIB_AlminaCosmetic_Timer_Explode",5,0)
+		CharacterEvent(__Me,"HIB_Almina_Talking")
+		DisplayText(__Me,%Comment,5)
+	ENDIF
+	
+EVENT PartyMemberIterator
+VARS 
+	CHARACTER:_Player
+ON
+	OnIterateCharacter(_Player,"AlminaCheckForPartyMember")
+ACTIONS
+	IF "c1&c2&c3"
+		CharacterIsPlayer(_Player)
+		IsEqual(%Active,1)
+		CharacterCanSee(__Me,_Player,1)
+	THEN
+		
+	ENDIF

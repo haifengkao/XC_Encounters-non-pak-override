@@ -1,0 +1,48 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_LUC_M_HidingWorkers(CHARACTER_LUC_M_Worker1);
+DB_LUC_M_HidingWorkers(CHARACTER_LUC_M_Worker2);
+DB_LUC_M_HidingWorkers(CHARACTER_LUC_M_Worker3);
+DB_LUC_M_HidingWorkers(CHARACTER_LUC_M_Worker4);
+DB_LUC_M_HidingWorkers(CHARACTER_LUC_M_Worker5);
+DB_OneShot_DialogTrigger_NewSystem(TRIGGER_LUC_M_HiddingWorkers,"LUC_M_HidingWorkers",CHARACTER_LUC_M_Worker1);
+DB_Dialogs(CHARACTER_LUC_M_Worker1,"LUC_M_HidingWorkers");
+DB_Dialogs(CHARACTER_LUC_M_Worker2,"LUC_M_HidingWorkers_Minor");
+DB_Dialogs(CHARACTER_LUC_M_Worker3,"LUC_M_HidingWorkers_Minor");
+DB_Dialogs(CHARACTER_LUC_M_Worker4,"LUC_M_HidingWorkers_Minor");
+DB_Dialogs(CHARACTER_LUC_M_Worker5,"LUC_M_HidingWorkers_Minor");
+CharacterSetEvent(CHARACTER_LUC_M_Worker2,"StartWander");
+CharacterSetEvent(CHARACTER_LUC_M_Worker3,"StartWander");
+CharacterSetEvent(CHARACTER_LUC_M_Worker4,"StartWander");
+CharacterSetEvent(CHARACTER_LUC_M_Worker5,"StartWander");
+
+KBSECTION
+IF
+DB_LUC_M_HidingWorkers(_Char)
+THEN
+DB_IsNotMessingAround(_Char);
+SneakTriggerSpotter(TRIGGER_LUC_M_HiddingWorkers,_Char);
+
+IF
+DialogEnded("LUC_M_HidingWorkers",_)
+AND
+DB_GlobalEvent("LUC_M_WorkersAttack")
+AND
+DB_LUC_M_HidingWorkers(_Char)
+THEN
+ProcSetRelationToPlayers(_Char,0);
+
+IF
+DialogEnded("LUC_M_HidingWorkers",_)
+AND
+NOT DB_GlobalEvent("LUC_M_WorkersAttack")
+AND
+DB_LUC_M_HidingWorkers(_Char)
+THEN
+CharacterSetEvent(_Char,"StartWander");
+
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

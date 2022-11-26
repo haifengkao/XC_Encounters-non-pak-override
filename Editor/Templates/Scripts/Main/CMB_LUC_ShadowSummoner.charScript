@@ -1,0 +1,146 @@
+INIT
+	CHARACTER:__Me
+	CHARACTERTEMPLATE:%VoidSpider_RT="Shadows_Spider_LUC_Summon_04d36a1d-889e-418b-9d46-a551e163724f"
+	CHARACTERTEMPLATE:%VoidSpider2_RT="Shadows_Spider_LUC_Summon_Ranged_8ca0ab29-2a18-4dc2-bd6c-2bcfa76606eb"
+	INT:%SummonShadow_Desired=2
+	INT:%SummonShadow_Current=2
+	INT:%RemainingVoidSpiders=0
+	FLOAT:%ShadSumm_SightRange
+	FLOAT3:%TargetsPosition
+	WEAPON:%WeaponType_Unarmed="Unarmed"
+	WEAPON:%WeaponType_Staves="PoleArms"
+	
+//----------------	
+BEHAVIOUR
+REACTION ShadowSummoner_Hypersummon,1200
+USAGE COMBAT
+VARS
+	CHARACTERTEMPLATE:_ChosenSpider
+	INT:_Failures=0
+	INT:_Successes=0
+	CHARACTER:_Player
+	INT:_SpiderAmount=4
+	FLOAT:_Angle
+	FLOAT:_Dist
+	FLOAT3:_PlayersPosition
+	FLOAT3:_PosOffset
+	FIXEDSTRING:_Text
+CHECK "c1&!(c2|c3|c4|c5|c6|c7)"
+	CharacterGet(_Player,__Me,50,Lowest,Distance,Enemy)			//c1
+	CharacterHasStatus(__Me,"CHARMED")							//!c2
+	CharacterHasStatus(__Me,"PETRIFIED")						//!c3
+	CharacterHasStatus(__Me,"FEAR")								//!c4
+	CharacterHasStatus(__Me,"STUNNED")							//!c5
+	CharacterHasStatus(__Me,"MUTED")							//!c6
+	CharacterHasStatus(__Me,"FEAR")								//!c7
+ACTIONS
+	IF "c1"
+		IsHardcore()
+	THEN
+		Set(_SpiderAmount,5)
+	ENDIF
+	Set(%RemainingVoidSpiders,0)
+	IterateCharactersInCombat(__Me,"CMB_ShadSumm_IterateForVoidSpiders",Lowest,Distance)
+	IF "c1"
+		IsGreaterThen(%RemainingVoidSpiders,1)
+	THEN
+		SetPriority("ShadowSummoner_Hypersummon",0)
+	ENDIF
+	IF "c1"
+		IsInDangerousSurface(__Me)
+	THEN
+		CharacterFleeFromDangerousSurface()
+	ENDIF
+	CharacterLookAt(_Player)
+	CharacterSwitchWeaponType(%WeaponType_Unarmed)
+	CharacterPlayEffect(__Me,"FX_Skills_WitchCraft_Generic_A_Prepare")
+	GetRandom(_Text,"LUC_ShadowSummoner_FText_01","LUC_ShadowSummoner_FText_02","LUC_ShadowSummoner_FText_3","LUC_ShadowSummoner_FText_04","LUC_ShadowSummoner_FText_05","LUC_ShadowSummoner_FText_06")
+	DisplayText(__Me,_Text,4)	
+	CharacterPlayAnimation("cast_long_start",1,1)
+	CharacterPlayAnimation("cast_long_loop",1,0)	
+	WHILE "c1&c2"
+		IsLessThen(_Successes,_SpiderAmount)
+		IsLessThen(_Failures,15)
+	DO
+		IF "c1"
+			GetPosition(_Player,_PlayersPosition)
+		THEN
+			Set(_PosOffset,{1;0;0}) 
+			GetRandomBetween(_Angle,0,360)
+			GetRandomBetween(_Dist,2,3)
+			RotateY(_PosOffset,_Angle)
+			Multiply(_PosOffset,_Dist)	
+			Add(_PlayersPosition,_PosOffset)
+			CharacterPlayEffect(__Me,"FX_Skills_WitchCraft_Generic_A_Prepare")
+		ENDIF
+		IF "c1&!(c2|c3|c4)"
+			FindValidPosition(_PlayersPosition,3)				//c1
+			ContainsSurface(_PlayersPosition,1,"Fire")			//!c2
+			ContainsSurface(_PlayersPosition,1,"Ice")			//!c3
+			ContainsSurface(_PlayersPosition,1,"Lava")			//!c4
+		THEN
+			PlayEffectAt(_PlayersPosition,"FX_Skills_WitchCraft_Generic_A_Prepare")
+			CharacterPlayAnimation("cast_long_cast",1,0)
+			GetWeightedRandom(_ChosenSpider,%VoidSpider_RT,INT:2,%VoidSpider2_RT,INT:1)
+			SpawnCharacter(_,_ChosenSpider,_PlayersPosition,1)
+			Add(_Successes,1)
+		ELSE
+			Add(_Failures,1)
+		ENDIF
+	ENDWHILE
+	IF "c1"
+		IsEqual(_Failures,15)
+	THEN
+		Set(_Failures,0)
+		CharacterEndTurn()
+	ENDIF
+	CharacterSwitchWeaponType(%WeaponType_Staves)
+	Set(_Successes,0)
+	Set(_Failures,0)
+	Set(%SummonShadow_Current,0)
+	SetPriority("ShadowSummoner_Hypersummon",0)
+INTERRUPT
+	Reset()
+
+//----------------
+EVENTS
+EVENT OnInit_GiveSpells_FXRestore
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%ShadSumm_SightRange,__Me,Sight)
+	THEN
+		CharacterAddSkill("Summon_EnemyShadowGrunt")
+		CharacterAddSkill("Summon_EnemyShadowCaster")
+		CharacterAddSkill("Summon_EnemyShadowMage")
+		CharacterAddSkill("Shield_EnemyAir")
+	ENDIF
+	
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	IF "c1"
+		IsLessThen(%SummonShadow_Current,%SummonShadow_Desired)
+	THEN		
+		Add(%SummonShadow_Current,1)
+	ELSE
+		SetPriority("ShadowSummoner_Hypersummon",1200)
+	ENDIF
+
+EVENT OnIterateCharacter_ScanForVoidSpiders
+VARS
+	CHARACTER:_Character
+	CHARACTERTEMPLATE:_CharacterTemplate
+ON
+	OnIterateCharacter(_Character,"CMB_ShadSumm_IterateForVoidSpiders")
+ACTIONS
+	IF "!c1&c2&(c3|c4)"
+		CharacterIsDead(_Character)
+		CharacterGetTemplate(_Character,_CharacterTemplate)
+		IsEqual(_CharacterTemplate,%VoidSpider_RT)
+		IsEqual(_CharacterTemplate,%VoidSpider2_RT)
+	THEN
+		Add(%RemainingVoidSpiders,1)
+	ENDIF

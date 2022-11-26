@@ -1,0 +1,117 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%WarmachineUser
+	CHARACTERTEMPLATE:%Nick = Summon_Quest_Nick_73315d72-be4f-4ee8-b937-3486d7a3eea9
+	FLOAT:%MySightRange
+	FIXEDSTRING:%OozeBarrel_Template="0ae0668f-418c-46c4-bcbb-1683aa3c68e3"
+	FIXEDSTRING:%OilBarrel_Template="1b34b32c-e96c-404e-90cc-054cb549c558"
+	INT:%NickHere = 0
+	INT:%MyAllies = 0
+	ITEM:%Warmachine="MCH_Tesla_Ballista_A_000_5e48887f-dfcd-4fe8-97c4-3cc0e6c35bf6"
+
+//-------------------------	
+BEHAVIOUR
+REACTION Pontius_TeleportBarrelOnEnemy,500
+USAGE COMBAT
+VARS
+	CHARACTER:_BarrelTarget
+	ITEM:_Barrel
+	FLOAT3:_BarrelTargetPosition
+CHECK "c1&c2&(c3|c4)&c5&c6"
+	IsHardcore()																						//c1
+	CharacterCanCast(__Me,"Teleportation_EnemyFreeFall")												//c2
+	ItemGet(_Barrel,__Me,%MySightRange,Lowest,Distance,%OozeBarrel_Template)							//c3	
+	ItemGet(_Barrel,__Me,%MySightRange,Highest,Distance,%OilBarrel_Template)							//c4
+	CharacterGet(_BarrelTarget,__Me,%MySightRange,Highest,Distance,Enemy)								//c5
+	GetPosition(_BarrelTarget,_BarrelTargetPosition)													//c6
+ACTIONS	
+	CharacterUseSkill("Teleportation_EnemyFreeFall",_Barrel,_BarrelTargetPosition)
+	
+REACTION Pontius_Hardcore_UseIronCommandOnWMUser,0
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&!(c2|c3)&c4&c5"
+	IsHardcore()
+	CharacterIsDead(%WarmachineUser)
+	CharacterHasStatus(%WarmachineUser,"AGGRO_MARKED")
+	CharacterCanCast(__Me,"Target_EnemyIronCommand")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyIronCommand")
+ACTIONS
+	CharacterMoveInRange(%WarmachineUser,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Target_EnemyIronCommand",%WarmachineUser)
+
+//-------------------------	
+EVENTS
+EVENT OnInit_GiveSpells
+ON
+	OnInit()
+ACTIONS
+	IF "c1&c2"
+		CharacterGetStat(%MySightRange,__Me,Sight)
+		IsHardcore()		
+	THEN
+		CharacterAddSkill("Teleportation_EnemyFreeFall")
+		CharacterAddSkill("Target_EnemyIronCommand")
+	ENDIF
+	
+EVENT SayLineOnTurn
+ON
+	OnTurn()
+ACTIONS
+	IF "!c1"
+		CharacterIsDead(__Me)
+	THEN
+		Set(%NickHere, 0)
+		IterateCharactersInCombat(__Me, "checkIfNick", Random, VitalityPoints)
+		IF "c1"
+			IsEqual(%NickHere, 1)
+		THEN
+			DialogStart("CYS_AD_PontiusAgainstNick", __Me)
+		ENDIF
+	ENDIF
+	
+EVENT Iterator
+VARS
+	CHARACTER:_Char
+	CHARACTERTEMPLATE:_Temp
+ON
+	OnIterateCharacter(_Char, "checkIfNick")
+ACTIONS
+	IF "c1&c2&c3"
+		CharacterGet(_Char, __Me, 15, Random, Distance)
+		CharacterGetTemplate(_Char, _Temp)
+		IsEqual(_Temp, %Nick)
+	THEN
+		Set(%NickHere, 1)
+	ENDIF
+	
+EVENT OnUseItem_Warmachine
+VARS
+	CHARACTER:_WarmachineUser
+ON
+	OnUseItem(_WarmachineUser,%Warmachine)
+ACTIONS
+	Set(%WarmachineUser,_WarmachineUser)
+	Set(%MyAllies,0)
+	IterateCharacters("CMBHC_CYSBC_Pontius_LookAroundForAllies",Lowest,Distance)
+	IF "c1"
+		IsGreaterThen(%MyAllies,0)
+	THEN
+	ENDIF
+	SetPriority("Pontius_Hardcore_UseIronCommandOnWMUser",600)
+	
+EVENT OnIterateCharacter_LookAroundForAllies
+VARS
+	CHARACTER:_Ally
+ON
+	OnIterateCharacter(_Ally,"CMBHC_CYSBC_Pontius_LookAroundForAllies")
+ACTIONS
+	IF "!(c1|c2)&c3"
+		CharacterIsDead(_Ally)
+		CharacterIsPlayer(_Ally)
+		CharacterIsAlly(__Me,_Ally)
+	THEN
+		Add(%MyAllies,1)
+	ENDIF

@@ -1,0 +1,21 @@
+INIT
+ITEM:__Me
+EXTERN SKILL:%MineProjectile=Projectile_Fireball
+EXTERN INT:%CasterLevel=-1
+
+BEHAVIOUR
+REACTION Explode, 10
+USAGE ALL
+VARS
+	CHARACTER:_Target
+	FLOAT3:_Distance
+CHECK "c1&c2&!c3&!c4"
+	CharacterGet(_Target,__Me,5,Random,Distance,Enemy)
+	CharacterIsPlayer(_Target)
+	CharacterHasStatus(_Target,INVISIBLE)
+	CharacterHasStatus(_Target,SNEAKING)
+ACTIONS
+	DisplayText(__Me,"CMB_ScareCrowExplodes",2)
+	ExplodeAt(__Me,%MineProjectile,%CasterLevel)
+	PlayEffectAt(__Me,"FX_GP_TeleportSmoke_A")
+	ItemSetOnStage(__Me,0)

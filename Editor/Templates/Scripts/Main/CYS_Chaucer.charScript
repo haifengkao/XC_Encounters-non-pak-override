@@ -1,0 +1,51 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+TRIGGER:%Lookout = CYS_ChaucerPoint_23fa61c7-7591-4687-82df-1c667d461468
+
+BEHAVIOUR
+
+REACTION State_SeekingPeople, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, "Action_SeekPeople")
+	SetPriority(%currentAction, 1100)
+
+REACTION State_ShowOnBoard, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, "Action_ShowOnBoard")
+	SetPriority(%currentAction, 1100)
+
+REACTION Action_SeekPeople, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation=""
+	INT:_loopCount
+ACTIONS
+	CharacterMoveTo(%Lookout,0)
+	CharacterLookFrom(%Lookout)
+	GetRandom(_loopCount, 1, 2, 3, 4)
+	WHILE "c1"
+		IsGreaterThen(_loopCount, 0)
+	DO
+		GetRandom(_Animation,"Pst_01","Wave_03","Clap_02","Trader_03","Point_01")
+		CharacterPlayAnimation(_Animation)
+		Subtract(_loopCount, 1)
+	ENDWHILE
+	DialogStart("CYS_AD_ChaucerSeekPerformer", __Me)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)
+	
+REACTION Action_ShowOnBoard, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Lookout,0)
+	CharacterLookFrom(%Lookout)
+	Sleep(3)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)

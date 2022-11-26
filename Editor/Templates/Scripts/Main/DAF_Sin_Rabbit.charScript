@@ -1,0 +1,29 @@
+INIT
+CHARACTER:__Me
+TRIGGER:%Destination = null
+FIXEDSTRING:%Text = ""
+INT:%State = 0
+
+BEHAVIOUR
+
+REACTION GoToDestination, 1010
+USAGE ALL
+CHECK "c1"
+	IsEqual(%State, 1)
+ACTIONS
+	DisplayText(__Me, %Text, 5)
+	CharacterMoveTo(%Destination, 0)
+
+REACTION FleeFromPlayer, 1020
+USAGE ALL
+VARS
+	CHARACTER:_char
+	FLOAT:_dist
+	FIXEDSTRING:_text
+CHECK "c1"
+	CharacterGet(_char,__Me,5,Lowest,Distance,Player,null,null)
+ACTIONS
+	GetRandom(_text, "DAF_Deer_Human_01", "DAF_Deer_Human_02", "DAF_Deer_Human_03")
+	DisplayText(__Me, _text, 5)
+	CharacterFleeFrom(Player,5)
+	CharacterEvent(__Me, "DAF_SinRabbitDisappearOutOfSight")

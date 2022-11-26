@@ -1,0 +1,157 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Dialogs(CHARACTER_CYS_UnsinkableSam,"CYS_UnsinkableSam");
+DB_Dialogs(CHARACTER_CYS_Maxine,"CYS_Maxine");
+ItemToCharacter(ITEM_CYS_BC_OscarCollar, CHARACTER_CYS_BC_SeaSpider);
+DB_Dialogs(CHARACTER_CYS_BC_Ebenezer,"CYS_BC_Ebenezer");
+DB_Dialogs(CHARACTER_CYS_BC_EbenezerListener4,"CYS_BC_EbenezerListener");
+DB_Dialogs(CHARACTER_CYS_BC_EbenezerListener3,"CYS_BC_EbenezerListener");
+DB_Dialogs(CHARACTER_CYS_BC_EbenezerListener2,"CYS_BC_EbenezerListener");
+DB_Dialogs(CHARACTER_CYS_BC_EbenezerListener1,"CYS_BC_EbenezerListener");
+
+
+KBSECTION
+//REGION Unsinkable Sam
+IF
+ItemAddedToCharacter(ITEM_CYS_BC_OscarCollar, _Player)
+AND
+_Player.DB_IsPlayer()
+AND
+CharacterGetVarInteger(CHARACTER_CYS_UnsinkableSam, "CYS_SamSendYou", 1)
+AND
+NOT DB_FoundSamCollar(1)
+THEN
+DB_FoundSamCollar(1);
+QuestUpdate("CYS_UnsinkableSam", "FoundCollar");
+
+IF
+ItemAddedToCharacter(ITEM_CYS_BC_OscarCollar, _Player)
+AND
+_Player.DB_IsPlayer()
+AND
+CharacterGetVarInteger(CHARACTER_CYS_UnsinkableSam, "CYS_SamSendYou", 0)
+AND
+NOT DB_FoundSamCollar(1)
+THEN
+DB_FoundSamCollar(1);
+QuestAdd("CYS_UnsinkableSam");
+QuestUpdate("CYS_UnsinkableSam", "StumbleCollar");
+
+IF
+DialogStartRequested(CHARACTER_CYS_UnsinkableSam,_Player)
+AND
+ItemIsInPartyInventory(ITEM_CYS_BC_OscarCollar,_Player,0,1)
+THEN
+GlobalSetEvent("CYS_HasOscarCollar");
+
+IF
+DialogEnded("CYS_UnsinkableSam", _)
+THEN
+GlobalClearEvent("CYS_HasOscarCollar");
+
+IF
+DialogCharacterEventSet("CYS_TakeOscarCollar",_Player,_)
+AND
+ItemIsInPartyInventory(ITEM_CYS_BC_OscarCollar,_Player,1,1)
+THEN
+ItemToCharacter(ITEM_CYS_BC_OscarCollar, CHARACTER_CYS_UnsinkableSam);
+
+IF
+DialogEnded("CYS_UnsinkableSam", _)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_UnsinkableSam, "goesToMaxine",1)
+THEN
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_CYS_UnsinkableSam);
+CharacterTransformIntoCharacterTemplate(CHARACTER_CYS_UnsinkableSam, "Animals_Cat_A_Grey_Collar_A_3bd3806b-50e7-489b-83d5-ffa9981b7893", 1);
+CharacterSetVarInteger(CHARACTER_CYS_UnsinkableSam, "goesToMaxine",0);
+CharacterSetHasDialog(CHARACTER_CYS_UnsinkableSam,0);
+CharacterSetHasDialog(CHARACTER_CYS_Maxine,0);
+DialogRequestStopForCharacter(CHARACTER_CYS_Maxine);
+CharacterMoveToCharacter(CHARACTER_CYS_UnsinkableSam, CHARACTER_CYS_Maxine, 1, "atMaxine",0);
+
+IF
+CharacterEvent(CHARACTER_CYS_UnsinkableSam, "atMaxine")
+THEN
+CharacterSetVarFixedString(CHARACTER_CYS_Maxine,"currentState","");
+CharacterSetVarFixedString(CHARACTER_CYS_UnsinkableSam,"currentState","");
+CharacterSetReactionPriority(CHARACTER_CYS_UnsinkableSam, "Waiting", 50000);
+CharacterSetReactionPriority(CHARACTER_CYS_Maxine, "Waiting", 50000);
+CHARACTER_CYS_UnsinkableSam.willAsk();
+
+IF
+CharacterEvent(CHARACTER_CYS_UnsinkableSam, "atMaxine")
+AND
+Sees(CHARACTER_CYS_UnsinkableSam, _Player)
+AND
+_Player.DB_IsPlayer()
+AND
+CHARACTER_CYS_UnsinkableSam.willAsk()
+THEN
+DialogStartTwoSpeakerDialog("CYS_AD_SamAndMaxine", CHARACTER_CYS_UnsinkableSam, CHARACTER_CYS_Maxine);
+NOT CHARACTER_CYS_UnsinkableSam.willAsk();
+
+IF
+CharacterSawCharacter(_Player, CHARACTER_CYS_UnsinkableSam)
+AND
+_Player.DB_IsPlayer()
+AND
+CHARACTER_CYS_UnsinkableSam.willAsk()
+THEN
+DialogStartTwoSpeakerDialog("CYS_AD_SamAndMaxine", CHARACTER_CYS_UnsinkableSam, CHARACTER_CYS_Maxine);
+NOT CHARACTER_CYS_UnsinkableSam.willAsk();
+
+
+IF
+AutomatedDialogEnded("CYS_AD_SamAndMaxine", _)
+THEN
+CharacterSetHasDialog(CHARACTER_CYS_Maxine,1);
+CharacterSetHasDialog(CHARACTER_CYS_UnsinkableSam,1);
+ProcCharacterMoveToTrigger(CHARACTER_CYS_UnsinkableSam, TRIGGER_CYS_Point_TavernBar_01, 1, "");
+ProcCharacterMoveToTrigger(CHARACTER_CYS_Maxine, TRIGGER_CYS_Point_TavernBar_01, 1, "");
+GlobalSetEvent("CYS_BC_HelpedOscar");
+ProcDefinePartyDialog("CYS_PD_AfterSam");
+CharacterSetVarFixedString(CHARACTER_CYS_Maxine,"currentState","State_RunningInside");
+CharacterSetReactionPriority(CHARACTER_CYS_UnsinkableSam, "Waiting", 0);
+CharacterSetReactionPriority(CHARACTER_CYS_Maxine, "Waiting", 0);
+QuestUpdate("CYS_UnsinkableSam", "Close");
+QuestClose("CYS_UnsinkableSam");
+    Proc_CompanionDialog(CHARACTER_Jahan,"JAH_CD_SamMaxine",CHARACTER_CYS_UnsinkableSam);
+
+//END_REGION
+//REGION Test
+IF
+TextEventSet("samounet")
+THEN
+ItemToCharacter(ITEM_CYS_BC_OscarCollar, CHARACTER_Player2);
+//END_REGION
+//REGION CHARACTER_CYS_BC_Ebenezer
+IF
+DialogEnded("CYS_BC_Ebenezer", _)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_BC_Ebenezer, "isHappy", 1)
+AND
+NOT 	CHARACTER_CYS_BC_Ebenezer.RewardPlayer()
+THEN
+CHARACTER_CYS_BC_Ebenezer.RewardPlayer();
+ProcRewardQuestMedium(TRIGGER_CYS_BC_Area_Listener);
+
+
+IF
+DialogEnded("CYS_BC_Ebenezer", _)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_BC_Ebenezer, "isAngry", 1)
+THEN
+ProcSetRelationToPlayers(CHARACTER_CYS_BC_Ebenezer, 0);
+ProcSetRelationToPlayers(CHARACTER_CYS_BC_EbenezerListener1, 0);
+ProcSetRelationToPlayers(CHARACTER_CYS_BC_EbenezerListener2, 0);
+ProcSetRelationToPlayers(CHARACTER_CYS_BC_EbenezerListener3, 0);
+ProcSetRelationToPlayers(CHARACTER_CYS_BC_EbenezerListener4, 0);
+QuestUpdate("CYS_BC_Ebenezer", "Update4");
+QuestClose("CYS_BC_Ebenezer");
+
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

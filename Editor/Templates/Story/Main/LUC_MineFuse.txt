@@ -1,0 +1,338 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+ProcTriggerRegisterForPlayers(TRIGGER_LUC_AreaFuseMiners);
+TriggerRegisterForCharacter(TRIGGER_LUC_AreaFuseMiners,CHARACTER_LUC_M_Mittix);
+DB_LUC_M_Prisonguards(CHARACTER_LUC_M_Prisonguard1);
+DB_LUC_M_Prisonguards(CHARACTER_LUC_M_Prisonguard2);
+DB_LUC_M_Prisonguards(CHARACTER_LUC_M_Prisonguard4);
+DB_LUC_M_Prisonguards(CHARACTER_LUC_M_Prisonguard5);
+DB_LUC_M_Prisonguards(CHARACTER_LUC_M_Prisonguard5_Pet);
+DB_LUC_M_Prisonguards(CHARACTER_LUC_M_Prisonguard6);
+CharacterSetEvent(CHARACTER_LUC_M_Prisonguard2,"StartWander");
+DB_OneShot_DialogTrigger_NewSystem(TRIGGER_LUC_M_HidingPrisonguards,"LUC_M_Prisonguards",CHARACTER_LUC_M_Prisonguard1);
+DB_Dialogs(CHARACTER_LUC_M_Prisonguard1,"LUC_M_Prisonguards");
+DB_Dialogs(CHARACTER_LUC_M_Prisonguard2,"LUC_M_Prisonguards_Minor");
+DB_Dialogs(CHARACTER_LUC_M_Prisonguard4,"LUC_M_Prisonguards_Minor");
+DB_Dialogs(CHARACTER_LUC_M_Prisonguard5,"LUC_M_Prisonguards_Minor");
+DB_Dialogs(CHARACTER_LUC_M_Prisonguard6,"LUC_M_Prisonguards_Minor");
+
+DB_LUC_M_Fuse_Barrels(ITEM_LUC_TNTBarrel1);
+DB_LUC_M_Fuse_Barrels(ITEM_LUC_TNTBarrel2);
+DB_LUC_M_Fuse_Barrels(ITEM_LUC_TNTBarrel3);
+DB_LUC_M_Fuse_Barrels(ITEM_LUC_TNTBarrel4);
+
+KillCounter("LUC_MineFuseGoblins",4);
+KillCounterDB(CHARACTER_LUC_M_GoblinPrisoner1,"LUC_MineFuseGoblins");
+KillCounterDB(CHARACTER_LUC_M_GoblinPrisoner2,"LUC_MineFuseGoblins");
+KillCounterDB(CHARACTER_LUC_M_GoblinPrisoner3,"LUC_MineFuseGoblins");
+KillCounterDB(CHARACTER_LUC_M_GoblinPrisoner4,"LUC_MineFuseGoblins");
+
+DB_PlayerComment_Trigger(TRIGGER_LUC_BoxHasSeenTNT1, "LUC_CommentMineFuseRoomSpotted");
+DB_PlayerComments("LUC_CommentMineFuseRoomSpotted", "LUC_CommentMineFuseRoomSpotted_1_1", 1,1);
+DB_PlayerComments("LUC_CommentMineFuseRoomSpotted", "LUC_CommentMineFuseRoomSpotted_2_1", 2,1);
+DB_PlayerComments("LUC_CommentMineFuseRoomSpotted", "LUC_CommentMineFuseRoomSpotted_2_2", 2,2);
+ItemSetOnstage(ITEM_LUC_M_DreksisBody, 0);
+ItemSetOnstage(ITEM_LUC_M_DreksisHead, 0);
+DB_PlayerComment_Trigger(TRIGGER_LUC_BoxFuse, "LUC_CommentMineFuseSpotted");
+DB_PlayerComments("LUC_CommentMineFuseSpotted", "LUC_CommentMineFuseSpotted_1_1", 1,1);
+DB_PlayerComments("LUC_CommentMineFuseSpotted", "LUC_CommentMineFuseSpotted_2_1", 2,1);
+DB_PlayerComments("LUC_CommentMineFuseSpotted", "LUC_CommentMineFuseSpotted_2_2", 2,2);
+
+RoomBlownUp(0);
+
+DB_Dialogs(CHARACTER_LUC_M_GoblinPrisoner1,"LUC_M_GoblinPrisoner");
+
+DB_DreksisGang(CHARACTER_LUC_M_GoblinPrisoner1);
+DB_DreksisGang(CHARACTER_LUC_M_GoblinPrisoner2);
+DB_DreksisGang(CHARACTER_LUC_M_GoblinPrisoner3);
+DB_DreksisGang(CHARACTER_LUC_M_GoblinPrisoner4);
+
+DB_IsNotMessingAround(CHARACTER_LUC_M_GoblinPrisoner1);
+DB_IsNotMessingAround(CHARACTER_LUC_M_GoblinPrisoner2);
+DB_IsNotMessingAround(CHARACTER_LUC_M_GoblinPrisoner3);
+DB_IsNotMessingAround(CHARACTER_LUC_M_GoblinPrisoner4);
+KBSECTION
+//Meet the hiding prison guards
+IF
+DB_LUC_M_Prisonguards(_Char)
+THEN
+DB_IsNotMessingAround(_Char);
+SneakTriggerSpotter(TRIGGER_LUC_M_HidingPrisonguards,_Char);
+
+IF
+CharacterDied(CHARACTER_LUC_M_GoblinPrisoner1)
+THEN
+QuestUpdate("LUC_LawrenceMineTrouble", "DreksisDead");
+
+IF
+ItemAddedToCharacter(ITEM_LUC_M_DreksisHead, _)
+THEN
+QuestUpdate("LUC_LawrenceMineTrouble", "HeadFound");
+
+IF
+RegionStarted("LUC_Mines")
+THEN
+QuestUpdate("LUC_LawrenceMineTrouble", "MineEntry");
+
+IF
+DialogEnded("LUC_M_Prisonguards",_)
+AND
+DB_GlobalEvent("LUC_M_PrisonguardsAttack")
+THEN
+Proc_MakeLUCMinesPrisonGuardsHostile();
+
+PROC
+Proc_MakeLUCMinesPrisonGuardsHostile()
+AND
+DB_LUC_M_Prisonguards(_Char)
+THEN
+ProcSetRelationToPlayers(_Char,0);
+
+IF
+DialogEnded("LUC_M_GoblinPrisoner", _)
+THEN
+QuestUpdate("LUC_LawrenceMineTrouble", "DreksisChat");
+
+IF
+GlobalEventSet("LUC_M_Finished")
+THEN
+QuestUpdate("LUC_LawrenceMineTrouble", "MineCollapsed");
+
+IF
+DialogEnded("LUC_M_Prisonguards",_)
+AND
+NOT DB_GlobalEvent("LUC_M_PrisonguardsAttack")
+AND
+DB_LUC_M_Prisonguards(_Char)
+THEN
+CharacterSetEvent(_Char,"StartWander");
+
+IF
+CharacterDied(CHARACTER_LUC_M_GoblinPrisoner1)
+THEN
+CharacterSetEvent(CHARACTER_LUC_M_GoblinPrisoner1, "dead");
+
+IF
+GlobalEventSet("LUC_MineFuseLit")
+THEN
+CharacterDisplayText(CHARACTER_LUC_M_Prisonguard1,"LUC_M_PrisonGuardsReactToFuse");
+Proc_MakeLUCMinesPrisonGuardsHostile();
+
+//---------------------------------------------------//
+//----------------- USE THE DETONATOR ---------------//
+//---------------------------------------------------//
+IF
+CharacterEnteredTrigger(_,TRIGGER_LUC_BoxHasSeenTNT1)
+THEN
+GlobalSetEvent("LUC_M_SawTNTMiners");
+QuestUpdate("LUC_MineFuse","Fuse");
+
+IF
+CharacterEnteredTrigger(_,TRIGGER_LUC_BoxFuse)
+THEN
+QuestAdd("LUC_MineFuse");
+QuestUpdate("LUC_MineFuse","Start");
+
+//Blowing the room after goblins killed: No DD, just harmless explosion
+IF
+CharacterUsedItem(_Character,ITEM_LUC_Detonator)
+AND
+PreventPartyDialog("LUC_M_DD_BlownUpGoblins")
+THEN
+TimerLaunch("LUC_MineBlowUp",2000);
+QuestUpdate("LUC_MineFuse","Harmless");
+QuestClose("LUC_MineFuse");
+
+IF
+GlobalEventSet("LUC_MineFuseLit")
+AND
+NOT ITEM_LUC_Detonator.isMineFuseIsLit()
+AND
+DB_CharacterUsedDetonator(_Player)
+THEN
+NOT DB_CharacterUsedDetonator(_Player);
+ITEM_LUC_Detonator.isMineFuseIsLit();
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_BoxHasSeenTNT1);
+CharacterDisplayText(_Player,"LUC_Mines_Fuse_Story_2");
+TimerLaunch("LUC_MineBlowUp",2000);
+
+IF
+GlobalEventSet("LUC_MineFuseNotLit")
+THEN
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_BoxHasSeenTNT1);
+QuestUpdate("LUC_MineFuse","Nothing");
+QuestClose("LUC_MineFuse");
+
+//---------------------------------------------------//
+//----------------- BLOW UP THE ROOM ----------------//
+//---------------------------------------------------//
+IF
+TimerFinished("LUC_MineBlowUp")
+AND
+DB_InRegion(_Char,TRIGGER_LUC_AreaFuseMiners)
+THEN
+CharacterDie(_Char,0);
+
+IF
+TimerFinished("LUC_MineBlowUp")
+AND
+NOT PreventPartyDialog("LUC_M_DD_BlownUpGoblins")
+THEN
+DB_TriggerGivesPartyDialog(TRIGGER_LUC_CommentExplodedGoblins,"LUC_M_DD_BlownUpGoblins");
+QuestUpdate("LUC_MineFuse","Kill");
+QuestClose("LUC_MineFuse");
+
+IF
+TimerFinished("LUC_MineBlowUp")
+AND
+DB_LUC_M_Fuse_Barrels(_Item)
+AND
+ItemGetPosition(_Item,_X,_Y,_Z)
+THEN
+PlayEffectAtPosition("FX_Skills_Earth_BoulderDash_Explode_A",_X,_Y,_Z);
+ItemDestroy(_Item);
+
+//----------------------------------------------------//
+//----------------- FIGHT THE GOBLINS ----------------//
+//----------------------------------------------------//
+IF
+KillCounterDB(_Char,"LUC_MineFuseGoblins")
+THEN
+TriggerRegisterForCharacter(TRIGGER_LUC_AreaFuseMiners,_Char);
+
+//Dont give the party dialog if the explosion is triggered after the goblins are dead already
+PROC
+ReactOnKillCounter("LUC_MineFuseGoblins")
+AND
+NOT ITEM_LUC_Detonator.isMineFuseIsLit()
+THEN
+PreventPartyDialog("LUC_M_DD_BlownUpGoblins");
+NOT DB_PlayerComment_Trigger(TRIGGER_LUC_BoxHasSeenTNT1, "LUC_CommentMineFuseRoomSpotted");
+NOT DB_PlayerComment_Trigger(TRIGGER_LUC_BoxFuse, "LUC_CommentMineFuseSpotted");
+
+IF
+CharacterItemEvent(_,ITEM_LUC_M_PrisonLever,"flip")
+AND
+ItemIsClosed(ITEM_LUC_M_PrisonDoor,1)
+THEN
+ItemUnlockAndOpen(ITEM_LUC_M_PrisonDoor);
+DB_Dialogs(CHARACTER_LUC_M_Mittix,"LUC_M_Mittix");
+ItemSetEvent(ITEM_LUC_M_PrisonLever,"LUCM_PrisonDoorOpened_ItemEvent");
+PROC_LUC_M_GoblinsFight();
+
+PROC
+PROC_LUC_M_GoblinsFight()
+AND
+KillCounterDB(_Character,"LUC_MineFuseGoblins")
+THEN
+ProcSetRelationToPlayers(_Character,0);
+CharacterSetCanFight(_Character,1);
+
+IF
+CharacterItemEvent(_,ITEM_LUC_M_PrisonLever,"flip")
+AND
+ItemIsOpened(ITEM_LUC_M_PrisonDoor,1)
+THEN
+ItemCloseAndLock(ITEM_LUC_M_PrisonDoor,"storylock");
+
+IF
+DialogEnded("LUC_M_Mittix",_)
+AND
+DB_GlobalEvent("MittixToHomestead")
+AND
+NOT DB_OnlyOnce("MittixToHomestead")
+THEN
+DB_OnlyOnce("MittixToHomestead");
+ProcCharacterMoveToTrigger(CHARACTER_LUC_M_Mittix,TRIGGER_LUC_PointMikeTheMiner,1,"MittixLeaves");
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_LUC_M_Mittix);
+CharacterSetHasDialog(CHARACTER_LUC_M_Mittix,0);
+CharacterSetHasDefaultDialog(CHARACTER_LUC_M_Mittix,0);
+
+IF
+CharacterEvent(CHARACTER_LUC_M_Mittix,"MittixLeaves")
+AND
+CharacterGetVarTrigger(CHARACTER_LUC_M_Mittix,"Anchor",_Trigger)
+THEN
+DB_Dialogs(CHARACTER_LUC_M_Mittix,"HOM_Mittix");
+CharacterSetEvent(CHARACTER_LUC_M_Mittix,"StartWander");
+CharacterTeleportToTrigger(CHARACTER_LUC_M_Mittix,_Trigger,"");
+
+IF
+CharacterAttackedByCharacter(_Gob, _)
+AND
+DB_DreksisGang(_Gob)
+AND
+CharacterCanFight(_Gob, 0)
+THEN
+CharacterSetCanFight(CHARACTER_LUC_M_GoblinPrisoner1, 1);
+CharacterSetCanFight(CHARACTER_LUC_M_GoblinPrisoner2, 1);
+CharacterSetCanFight(CHARACTER_LUC_M_GoblinPrisoner3, 1);
+CharacterSetCanFight(CHARACTER_LUC_M_GoblinPrisoner4, 1);
+
+IF
+DialogEnded("LUC_MineFuse",_Instance)
+AND
+ITEM_LUC_Detonator.isInItemDialog()
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+THEN
+CharacterMakeStoryNpc(_Player,0);
+NOT _Player.DB_IsInDialog();
+NOT ITEM_LUC_Detonator.isInItemDialog();
+
+IF
+CharacterSpottedItemUsed_Redhanded(_Player,_,_,ITEM_LUC_Detonator,_)
+AND
+NOT PreventPartyDialog("LUC_M_DD_BlownUpGoblins")
+THEN
+DB_BlockDetonator(1);
+
+IF
+CharacterUsedItem(_Player,ITEM_LUC_Detonator)
+AND
+DB_OnlyOnce("LUC_MineFuse")
+AND
+NOT PreventPartyDialog("LUC_M_DD_BlownUpGoblins")
+THEN
+CharacterDisplayText(_Player, "GEN_Broken");
+
+IF
+CharacterUsedItem(_Player,ITEM_LUC_Detonator)
+AND
+DB_Companion(_Player)
+AND
+NOT DB_BlockDetonator(1)
+AND
+NOT PreventPartyDialog("LUC_M_DD_BlownUpGoblins")
+THEN
+CharacterDisplayText(_Player, "GLO_FailedUse");
+
+IF
+CharacterUsedItem(_Player,ITEM_LUC_Detonator)
+AND
+NOT DB_Companion(_Player)
+AND
+NOT DB_BlockDetonator(1)
+AND
+NOT DB_OnlyOnce("LUC_MineFuse")
+AND
+NOT PreventPartyDialog("LUC_M_DD_BlownUpGoblins")
+THEN
+DB_CharacterUsedDetonator(_Player);
+ProcItemDialogCheck("LUC_MineFuse",_Player,ITEM_LUC_Detonator);
+DB_OnlyOnce("LUC_MineFuse");
+
+IF
+CharacterUsedItem(_Player,ITEM_LUC_Detonator)
+AND
+NOT PreventPartyDialog("LUC_M_DD_BlownUpGoblins")
+AND
+DB_BlockDetonator(1)
+THEN
+NOT DB_BlockDetonator(1);
+EXITSECTION
+NOT ITEM_LUC_Detonator.HasBeenTouched();
+NOT ITEM_LUC_Detonator.isMineFuseIsLit();
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

@@ -1,0 +1,79 @@
+INIT
+
+	CHARACTER:__Me
+	CHARACTER:%Target
+	FLOAT3:%targetPos
+	FLOAT:%Distance
+	FLOAT:%MySightRange	
+	FLOAT:%UseInvisOnce=0
+
+BEHAVIOUR
+REACTION ChooseTargetInvisStab,600
+USAGE COMBAT
+CHECK "c1&!c2&!c3&c4"
+	CharacterGet(%Target,__Me,50,Lowest,VitalityPoints,Enemy)
+	CharacterHasStatus(%Target,INVISIBLE)
+	CharacterHasTalent(%Target,Stench)
+	IsEqual(%UseInvisOnce,0)
+ACTIONS
+	SetPriority("InvisibleChooseTarget",500)
+	SetPriority("ChooseTargetInvisStab",0)
+
+REACTION InvisibleChooseTarget,0
+USAGE COMBAT
+VARS
+	FLOAT3:_BackwDirection
+CHECK "!c1&!c2&!c3&!c4&!c5"
+	CharacterHasStatus(__Me,FROZEN)
+	CharacterHasStatus(__Me,STUNNED)
+	CharacterHasStatus(__Me,KNOCKED_DOWN)
+	CharacterHasStatus(__Me,MUTED)
+	IsEqual(%Target,null)
+ACTIONS
+	GetPosition(%Target,%targetPos)
+	GetForwardDirection(%Target,_BackwDirection)
+	RotateY(_BackwDirection,180)
+	Add(%targetPos,_BackwDirection)
+	IF "!c1"
+		CharacterHasStatus(__Me,INVISIBLE)
+	THEN
+		CharacterUseSkill(Target_EnemyInvisibilityTarget,__Me)
+	ENDIF
+	CharacterMoveTo(%targetPos,1,0,0,0.5)
+	CharacterAttack(%Target)
+	Set(%UseInvisOnce,1)
+	SetPriority("InvisibleChooseTarget",0)
+	
+EVENTS
+EVENT Initiliaze
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill(Target_EnemyInvisibilityTarget)
+
+EVENT UpdatePosition
+ON
+	OnTurn()
+VARS
+	FLOAT3:_BackwDirectionUpdate
+ACTIONS
+	IF "!c1"
+		IsEqual(%Target,null)
+	THEN
+		IF "c1"
+			CharacterHasStatus(%Target,INVISIBLE)
+		THEN
+			SetPriority("ChooseTargetInvisStab",600)
+		ELSE
+			GetPosition(%Target,%targetPos)
+			GetForwardDirection(%Target,_BackwDirectionUpdate)
+			RotateY(_BackwDirectionUpdate,180)
+			Add(%targetPos,_BackwDirectionUpdate)
+		ENDIF
+	ENDIF
+
+EVENT NotInvisibleAnymore
+ON
+	OnCharacterStatusRemoved(__Me,INVISIBLE)
+ACTIONS
+	SetPriority("InvisibleChooseTarget",0)

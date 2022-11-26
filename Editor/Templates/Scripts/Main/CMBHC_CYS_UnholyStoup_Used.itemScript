@@ -1,0 +1,15 @@
+INIT
+	ITEM:__Me
+	
+EVENTS
+EVENT OnUse_DisplayTextOnPlayer
+VARS
+	CHARACTER:_Player
+ON
+	OnUseItem(_Player,__Me)
+ACTIONS
+	IF "c1"
+		CharacterIsPlayer(_Player)
+	THEN
+		DisplayText(_Player,"TortureRackNoWay",3)
+	ENDIF

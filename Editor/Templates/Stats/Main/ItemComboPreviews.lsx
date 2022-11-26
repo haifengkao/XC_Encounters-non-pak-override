@@ -1,0 +1,423 @@
+<?xml version="1.0" ?>
+<save>
+<header version="1" time="1338287481" />
+<region id="CategoryPreviews">
+    <node id="Root">
+        <children>
+        </children>
+    </node>
+</region>
+<region id="ItemComboPreviews">
+    <node id="Root">
+        <children>
+            <node id="Combo">
+                <attribute id="Object1" value="LOOT_Ink_Pot_A_Quill_A" type="22" />
+                <attribute id="Object2" value="Quest_CYS_BlossiusWill" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="StatsID" value="Quest_CYS_BlossiusWillAltered" type="22" />
+                <attribute id="CraftAmount" value="3" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="LOOT_Ink_Pot_A_Quill_A_Magic" type="22" />
+                <attribute id="Object2" value="Quest_CYS_BlossiusWill" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="StatsID" value="Quest_CYS_BlossiusWillAltered" type="22" />
+                <attribute id="CraftAmount" value="3" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="Quest_DAF_SheilaAltar_A" type="22" />
+                <attribute id="Object2" value="Quest_DAF_SheilaAmulet_A" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="StatsID" value="Quest_DAF_SheilaAltar_B" type="22" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="DAF_COR_Ophelia" type="22" />
+                <attribute id="Object2" value="WPN_Wooden_Stake" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="StatsID" value="ASH_Ophelia" type="22" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="Quest_LUC_SacrificialChickenCorpse" type="22" />
+                <attribute id="Object2" value="Quest_LUC_SacrificialChickenEmptyVial" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="StatsID" value="Quest_LUC_SacrificialChickenFullVial" type="22" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="FOOD_Pumpkin" type="22" />
+                <attribute id="Object2" value="FOOD_Apple" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="StatsID" value="Quest_ImpFearless" type="22" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="WPN_Trolls_2H_Staff_IceKing_A_Human" type="22" />
+                <attribute id="Object2" value="Quest_HIB_ElementalForge" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="CraftAmount" value="2" type="4" />
+                <attribute id="ShowCraftUI" value="0" type="19" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="Hum_WaterMillWheel_A" type="22" />
+                <attribute id="Object2" value="Quest_Barley" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="StatsID" value="Quest_Grist" type="22" />
+                <attribute id="CraftAmount" value="3" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="Quest_Grist" type="22" />
+                <attribute id="Object2" value="FUR_Bucket_A_Water" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="StatsID" value="Quest_Wort" type="22" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="FUR_Brew_Fireplace_A" type="22" />
+                <attribute id="Object2" value="Quest_Wort" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="StatsID" value="Quest_Spirit" type="22" />
+                <attribute id="CraftAmount" value="3" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="Quest_LeandraBlood" type="22" />
+                <attribute id="Object2" value="Quest_LeandraSpell" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="StatsID" value="SKILLBOOK_DeathKnightBane" type="22" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="Quest_LUC_SacrificialChickenFullVial" type="22" />
+                <attribute id="Object2" value="Quest_Stone_Star_Depleted_A" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="CraftAmount" value="2" type="4" />
+                <attribute id="ShowCraftUI" value="0" type="19" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="Quest_ImmaculatesAmulet" type="22" />
+                <attribute id="Object2" value="Quest_ControlPanel_A" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="CraftAmount" value="1" type="4" />
+                <attribute id="ShowCraftUI" value="0" type="19" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="Quest_WeresheepWool" type="22" />
+                <attribute id="Object2" value="Quest_HIB_ElementalForge" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="CraftAmount" value="2" type="4" />
+                <attribute id="ShowCraftUI" value="0" type="19" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="WPN_Branch_A" type="22" />
+                <attribute id="Object2" value="LOOT_Ore_A_BlackRock_A" type="22" />
+                <attribute id="RequiredSkill" value="Crafting" type="22" />
+                <attribute id="RequiredSkillLevel" value="5" type="4" />
+                <attribute id="StatsID" value="TOOL_Wand_ShamblingMound" type="22" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="Quest_VoxWood" type="22" />
+                <attribute id="Object2" value="Quest_BottledVoice" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="StatsID" value="Quest_VoicePotion" type="22" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="TOOL_DLC_Dye_Triad" type="22" />
+                <attribute id="Object2" value="GRN_Ingredient_Round_Empty_A" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="StatsID" value="GRN_DLC_Grenade_EyeOfThePatriarch" type="22" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="TOOL_DLC_Dye_Petrol" type="22" />
+                <attribute id="Object2" value="GRN_Ingredient_Round_Empty_A" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="StatsID" value="GRN_DLC_Grenade_BreachingFire" type="22" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="TOOL_DLC_Dye_Candy" type="22" />
+                <attribute id="Object2" value="GRN_Ingredient_Round_Empty_A" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="StatsID" value="GRN_DLC_Grenade_ScalesOfSteel" type="22" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="UNI_DLC_Sprocket_Blue_A" type="22" />
+                <attribute id="Object2" value="DLC_Wand" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="StatsID" value="WPN_DLC_PSN_BlueDragonWand" type="22" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="UNI_DLC_Sprocket_Blue_A" type="22" />
+                <attribute id="Object2" value="LOOT_Wand_A" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="StatsID" value="WPN_DLC_PSN_BlueDragonWand" type="22" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="UNI_DLC_Sprocket_Blue_A" type="22" />
+                <attribute id="Object2" value="LOOT_Wand_B" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="StatsID" value="WPN_DLC_PSN_BlueDragonWand" type="22" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="UNI_DLC_Sprocket_Blue_A" type="22" />
+                <attribute id="Object2" value="LOOT_Wand_C" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="StatsID" value="WPN_DLC_PSN_BlueDragonWand" type="22" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="UNI_DLC_Sprocket_Blue_A" type="22" />
+                <attribute id="Object2" value="LOOT_Wand_D" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="StatsID" value="WPN_DLC_PSN_BlueDragonWand" type="22" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="UNI_DLC_Sprocket_Silver_A" type="22" />
+                <attribute id="Object2" value="DLC_Wand" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="StatsID" value="WPN_DLC_XBL_SilverDragonWand" type="22" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="UNI_DLC_Sprocket_Silver_A" type="22" />
+                <attribute id="Object2" value="LOOT_Wand_A" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="StatsID" value="WPN_DLC_XBL_SilverDragonWand" type="22" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="UNI_DLC_Sprocket_Silver_A" type="22" />
+                <attribute id="Object2" value="LOOT_Wand_B" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="StatsID" value="WPN_DLC_XBL_SilverDragonWand" type="22" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="UNI_DLC_Sprocket_Silver_A" type="22" />
+                <attribute id="Object2" value="LOOT_Wand_C" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="StatsID" value="WPN_DLC_XBL_SilverDragonWand" type="22" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="UNI_DLC_Sprocket_Silver_A" type="22" />
+                <attribute id="Object2" value="LOOT_Wand_D" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="StatsID" value="WPN_DLC_XBL_SilverDragonWand" type="22" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="UNI_DLC_Sprocket_White_A" type="22" />
+                <attribute id="Object2" value="DLC_Wand" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="StatsID" value="WPN_DLC_BOX_WhiteDragonWand" type="22" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="UNI_DLC_Sprocket_White_A" type="22" />
+                <attribute id="Object2" value="LOOT_Wand_A" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="StatsID" value="WPN_DLC_BOX_WhiteDragonWand" type="22" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="UNI_DLC_Sprocket_White_A" type="22" />
+                <attribute id="Object2" value="LOOT_Wand_B" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="StatsID" value="WPN_DLC_BOX_WhiteDragonWand" type="22" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="UNI_DLC_Sprocket_White_A" type="22" />
+                <attribute id="Object2" value="LOOT_Wand_C" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="StatsID" value="WPN_DLC_BOX_WhiteDragonWand" type="22" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="UNI_DLC_Sprocket_White_A" type="22" />
+                <attribute id="Object2" value="LOOT_Wand_D" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="StatsID" value="WPN_DLC_BOX_WhiteDragonWand" type="22" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="TOOL_DLC_Dye_Triad" type="22" />
+                <attribute id="Category2" value="ClothArmor" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="Icon" value="Object2" type="22" />
+                <attribute id="Tooltip" value="Boosted [1]" handle="hf8671fbcga4c5g47e1g929bg53c7e15ef91c" type="28" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="TOOL_DLC_Dye_Triad" type="22" />
+                <attribute id="Category2" value="ArmorLeather" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="Icon" value="Object2" type="22" />
+                <attribute id="Tooltip" value="Boosted [1]" handle="hf8671fbcga4c5g47e1g929bg53c7e15ef91c" type="28" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="TOOL_DLC_Dye_Triad" type="22" />
+                <attribute id="Category2" value="ArmorScale" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="Icon" value="Object2" type="22" />
+                <attribute id="Tooltip" value="Boosted [1]" handle="hf8671fbcga4c5g47e1g929bg53c7e15ef91c" type="28" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="TOOL_DLC_Dye_Triad" type="22" />
+                <attribute id="Category2" value="RobeArmor" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="Icon" value="Object2" type="22" />
+                <attribute id="Tooltip" value="Boosted [1]" handle="hf8671fbcga4c5g47e1g929bg53c7e15ef91c" type="28" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="TOOL_DLC_Dye_Triad" type="22" />
+                <attribute id="Category2" value="Garment" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="Icon" value="Object2" type="22" />
+                <attribute id="Tooltip" value="Boosted [1]" handle="hf8671fbcga4c5g47e1g929bg53c7e15ef91c" type="28" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="TOOL_DLC_Dye_Triad" type="22" />
+                <attribute id="Category2" value="ArmorShoes" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="Icon" value="Object2" type="22" />
+                <attribute id="Tooltip" value="Boosted [1]" handle="hf8671fbcga4c5g47e1g929bg53c7e15ef91c" type="28" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="TOOL_DLC_Dye_Triad" type="22" />
+                <attribute id="Category2" value="ArmorGloves" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="Icon" value="Object2" type="22" />
+                <attribute id="Tooltip" value="Boosted [1]" handle="hf8671fbcga4c5g47e1g929bg53c7e15ef91c" type="28" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="TOOL_DLC_Dye_Petrol" type="22" />
+                <attribute id="Category2" value="ClothArmor" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="Icon" value="Object2" type="22" />
+                <attribute id="Tooltip" value="Boosted [1]" handle="hf8671fbcga4c5g47e1g929bg53c7e15ef91c" type="28" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="TOOL_DLC_Dye_Petrol" type="22" />
+                <attribute id="Category2" value="ArmorLeather" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="Icon" value="Object2" type="22" />
+                <attribute id="Tooltip" value="Boosted [1]" handle="hf8671fbcga4c5g47e1g929bg53c7e15ef91c" type="28" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="TOOL_DLC_Dye_Petrol" type="22" />
+                <attribute id="Category2" value="ArmorScale" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="Icon" value="Object2" type="22" />
+                <attribute id="Tooltip" value="Boosted [1]" handle="hf8671fbcga4c5g47e1g929bg53c7e15ef91c" type="28" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="TOOL_DLC_Dye_Petrol" type="22" />
+                <attribute id="Category2" value="RobeArmor" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="Icon" value="Object2" type="22" />
+                <attribute id="Tooltip" value="Boosted [1]" handle="hf8671fbcga4c5g47e1g929bg53c7e15ef91c" type="28" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="TOOL_DLC_Dye_Petrol" type="22" />
+                <attribute id="Category2" value="Garment" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="Icon" value="Object2" type="22" />
+                <attribute id="Tooltip" value="Boosted [1]" handle="hf8671fbcga4c5g47e1g929bg53c7e15ef91c" type="28" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="TOOL_DLC_Dye_Petrol" type="22" />
+                <attribute id="Category2" value="ArmorShoes" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="Icon" value="Object2" type="22" />
+                <attribute id="Tooltip" value="Boosted [1]" handle="hf8671fbcga4c5g47e1g929bg53c7e15ef91c" type="28" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="TOOL_DLC_Dye_Petrol" type="22" />
+                <attribute id="Category2" value="ArmorGloves" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="Icon" value="Object2" type="22" />
+                <attribute id="Tooltip" value="Boosted [1]" handle="hf8671fbcga4c5g47e1g929bg53c7e15ef91c" type="28" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="TOOL_DLC_Dye_Candy" type="22" />
+                <attribute id="Category2" value="ClothArmor" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="Icon" value="Object2" type="22" />
+                <attribute id="Tooltip" value="Boosted [1]" handle="hf8671fbcga4c5g47e1g929bg53c7e15ef91c" type="28" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="TOOL_DLC_Dye_Candy" type="22" />
+                <attribute id="Category2" value="ArmorLeather" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="Icon" value="Object2" type="22" />
+                <attribute id="Tooltip" value="Boosted [1]" handle="hf8671fbcga4c5g47e1g929bg53c7e15ef91c" type="28" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="TOOL_DLC_Dye_Candy" type="22" />
+                <attribute id="Category2" value="ArmorScale" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="Icon" value="Object2" type="22" />
+                <attribute id="Tooltip" value="Boosted [1]" handle="hf8671fbcga4c5g47e1g929bg53c7e15ef91c" type="28" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="TOOL_DLC_Dye_Candy" type="22" />
+                <attribute id="Category2" value="RobeArmor" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="Icon" value="Object2" type="22" />
+                <attribute id="Tooltip" value="Boosted [1]" handle="hf8671fbcga4c5g47e1g929bg53c7e15ef91c" type="28" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="TOOL_DLC_Dye_Candy" type="22" />
+                <attribute id="Category2" value="Garment" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="Icon" value="Object2" type="22" />
+                <attribute id="Tooltip" value="Boosted [1]" handle="hf8671fbcga4c5g47e1g929bg53c7e15ef91c" type="28" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="TOOL_DLC_Dye_Candy" type="22" />
+                <attribute id="Category2" value="ArmorShoes" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="Icon" value="Object2" type="22" />
+                <attribute id="Tooltip" value="Boosted [1]" handle="hf8671fbcga4c5g47e1g929bg53c7e15ef91c" type="28" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+            <node id="Combo">
+                <attribute id="Object1" value="TOOL_DLC_Dye_Candy" type="22" />
+                <attribute id="Category2" value="ArmorGloves" type="22" />
+                <attribute id="RequiredSkillLevel" value="0" type="4" />
+                <attribute id="Icon" value="Object2" type="22" />
+                <attribute id="Tooltip" value="Boosted [1]" handle="hf8671fbcga4c5g47e1g929bg53c7e15ef91c" type="28" />
+                <attribute id="CraftAmount" value="7" type="4" />
+            </node>
+        </children>
+    </node>
+</region>
+</save>

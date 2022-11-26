@@ -1,0 +1,14 @@
+#INCLUDE Base
+
+INIT
+USING Base
+CHARACTER:__Me
+FIXEDSTRING:%Text = "Hoi"
+
+BEHAVIOUR
+
+REACTION SaySomething,5
+USAGE ALL
+ACTIONS
+	StatusText(__Me,%Text)
+	Sleep(2)

@@ -1,0 +1,69 @@
+INIT
+	CHARACTER:__Me
+	TRIGGER:%Goal = LUC_KadraskazExit_9b7db67b-5f93-4ef1-ab0d-a2ed14a8271c
+	TRIGGER:%Checkpoint1 = LUC_Kadraskaz1_ab67329a-1ab5-4675-81b1-428833b285aa
+	TRIGGER:%Checkpoint2 = LUC_Kadraskaz2_73966e5d-b4aa-4301-8dfa-d384d101578d
+	CHARACTER:%Mount = LUC_KadraskazMount_17c633c4-4b4f-4833-80f3-e2638db9a07d
+	INT:%NagAtMount = 1
+BEHAVIOUR
+
+REACTION WalkToObjectif, 500
+	USAGE PEACE
+	ACTIONS
+		CharacterMoveTo(%Checkpoint1,0,0,1)
+		CharacterMoveTo(%Checkpoint2,0,0,1)
+		CharacterMoveTo(%Goal,0,0,1)
+		CharacterEvent(__Me, "atTheShop")
+		CharacterLookFrom(%Goal)
+		SetPriority("YellAtMount", 0)
+		SetPriority("WalkToObjectif", 0)
+		
+		
+REACTION YellAtMount, 600
+	USAGE PEACE
+	VARS
+		FLOAT:_Dist
+	CHECK "!c1&c2&c3"
+		CharacterIsDead(%Mount)
+		GetDistance(_Dist, __Me, %Mount)
+		IsGreaterThen(_Dist, 7)
+	ACTIONS
+		CharacterLookAt(%Mount)
+		IF "c1|c2"
+			IsEqual(%NagAtMount,1)
+			IsRandom(0.25)
+		THEN
+			Set(%NagAtMount,0)
+			CharacterPlayAnimation("emotion_angry")
+			DisplayText(__Me, "LUC_KadraskazAngry", 3)
+		ENDIF
+		Sleep(4.5)
+	INTERRUPT
+		Set(%NagAtMount,1)
+		
+REACTION ManagingShop, 400
+	USAGE PEACE
+	VARS
+		FIXEDSTRING:_Anim
+	ACTIONS
+		Sleep(5)
+		IF "c1"
+			IsRandom(0.5)
+		THEN
+			GetRandom(_Anim, "Attention_01", "Trade_03")
+			CharacterPlayAnimation(_Anim)
+		ENDIF
+	
+EVENTS
+
+EVENT combatStarted
+ON
+	OnCombatStarted()
+ACTIONS
+	CharacterEvent(__Me, "fleeRalfie")
+	
+EVENT combatEnded
+ON
+	OnCombatEnded()
+ACTIONS
+	CharacterEvent(__Me, "comeRalfie")

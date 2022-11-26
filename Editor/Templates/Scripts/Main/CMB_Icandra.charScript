@@ -1,0 +1,955 @@
+#INCLUDE DefaultCharacter
+INIT
+	USING DefaultCharacter				//required for OVERRIDE below
+	CHARACTER:__Me
+	CHARACTER:%Zandalor="Zandalor_2535a516-8e0f-4c00-abe6-285e545fdc9b"
+	CHARACTER:%VoidDragon="HOM_AstralDragon_fd8e91d7-843e-46fc-9b2e-965b3de76a7e"
+	CHARACTER:%Astarte2="HOM_Astarte_SecondFight_bd1ae42b-e714-49e7-9103-cd6d0379e760"
+	CHARACTER:%DeathKnightBane_Target
+	CHARACTER:%Regenerate_Target
+	CHARACTER:%UnholyRegenerate_Target
+	CHARACTER:%CleansingWater_Target
+	CHARACTER:%ChillingTouch_Target
+	CHARACTER:%Resurrect_Target
+	ITEM:%GodBox="HOM_GodBox_8ecaea45-ae64-412e-a538-d892d2389c93"
+	FLOAT:%Icandra_SightRange
+	INT:%Bool_FirstTurnHasPassed=0
+	INT:%ChangeAlign_Current=0
+	INT:%ChangeAlign_Desired=3
+	INT:%AmountOfWoundedAllies=0
+	INT:%AmountOfDeadAllies=0
+	INT:%AmountOfAfflictedAllies=0
+	INT:%AmountOfVulnerableDKs=0
+	INT:%FXHandle_01
+	INT:%FXHandle_02
+	INT:%FXHandle_03
+	INT:%FXHandle_04
+	INT:%FXHandle_05
+	STRING:%CurrentSoul="Icara"			//"Icara" or "Leandra"
+	
+	//Icara: healing / mass healing / resurrect / mass resurrect / mass cleansing water / awesome healing summon / mass slow / fortify / blessed earth
+	//Leandra: flare / iceshard / blitzbolt / earthshard
+
+//---------
+BEHAVIOUR
+REACTION Icandra_ChangeAlignment,0
+USAGE COMBAT
+VARS
+	FIXEDSTRING:_IcandrasFaction
+	FIXEDSTRING:_ChosenString
+CHECK "!(c1|c2|c3|c4|c5|c6)"
+	CharacterHasStatus(__Me,"STUNNED")				//!c1
+	CharacterHasStatus(__Me,"FEAR")					//!c2
+	CharacterHasStatus(__Me,"PETRIFIED")			//!c3
+	CharacterHasStatus(__Me,"FROZEN")				//!c4
+	CharacterHasStatus(__Me,"CHARMED")				//!c5
+	CharacterHasStatus(__Me,"KNOCKED_DOWN")			//!c6
+ACTIONS
+	//DebugText(__Me,"Changing alignment!")
+	StopLoopEffect(%FXHandle_01)
+	StopLoopEffect(%FXHandle_02)
+	StopLoopEffect(%FXHandle_03)
+	StopLoopEffect(%FXHandle_04)
+	StopLoopEffect(%FXHandle_05)
+	CharacterRemoveStatus(__Me,"BLESSED")
+	CharacterRemoveStatus(__Me,"HASTED")
+	CharacterRemoveStatus(__Me,"HEALING")
+	CharacterRemoveStatus(__Me,"SHIELD")
+	CharacterRemoveStatus(__Me,"BOOST")
+	IF "c1&c2"
+		CharacterGetFaction(_IcandrasFaction,__Me)
+		IsEqual(_IcandrasFaction,"Good NPC")
+	THEN
+		CharacterSetFaction(__Me,"Evil NPC")
+		Set(%CurrentSoul,"Leandra")
+		//DebugText(__Me,"Soul = [1]",%CurrentSoul)
+		IterateCharactersInCombat(__Me,"CMB_Icandra_IterateForWolves",Lowest,Distance)
+		SetMaterial(__Me,"d8ce47be-5d26-4a3d-a1e1-ef35ede57f8d",-1,1,1,0)
+		CharacterPlayLoopEffect(%FXHandle_01,__Me,"Fx_Creatures_NPC_Icandra_Bad_Aura_A","Dummy_Root")
+		CharacterPlayLoopEffect(%FXHandle_02,__Me,"Fx_Creatures_NPC_Icandra_Bad_Aura_A_Pelvis","Bip001")
+		CharacterPlayLoopEffect(%FXHandle_03,__Me,"Fx_Creatures_NPC_Icandra_Bad_Aura_A_Spine","Bip001 Spine1")
+		CharacterPlayLoopEffect(%FXHandle_04,__Me,"Fx_Creatures_NPC_Icandra_Bad_Hands_A","Bip001 R Hand")
+		CharacterPlayLoopEffect(%FXHandle_05,__Me,"Fx_Creatures_NPC_Icandra_Bad_Hands_A","Bip001 L Hand")
+		GetRandom(_ChosenString,"CMB_END_Icandra_Leandra_1","CMB_END_Icandra_Leandra_2","CMB_END_Icandra_Leandra_3")
+		DisplayText(__Me,_ChosenString,3)
+		Sleep(2)
+	ELSE
+		CharacterSetFaction(__Me,"Good NPC")
+		Set(%CurrentSoul,"Icara")
+		//DebugText(__Me,"Soul = [1]",%CurrentSoul)
+		SetMaterial(__Me,"f79e2ed6-a774-415f-b0af-e7c6d3f0d483",-1,1,1,0)
+		CharacterPlayLoopEffect(%FXHandle_01,__Me,"Fx_Creatures_NPC_Icandra_Good_Aura_A","Dummy_Root")
+		CharacterPlayLoopEffect(%FXHandle_02,__Me,"Fx_Creatures_NPC_Icandra_Good_Aura_A_Pelvis","Bip001")
+		CharacterPlayLoopEffect(%FXHandle_03,__Me,"Fx_Creatures_NPC_Icandra_Good_Aura_A_Spine","Bip001 Spine1")
+		CharacterPlayLoopEffect(%FXHandle_04,__Me,"Fx_Creatures_NPC_Icandra_Good_Hands_A","Bip001 R Hand")
+		CharacterPlayLoopEffect(%FXHandle_05,__Me,"Fx_Creatures_NPC_Icandra_Good_Hands_A","Bip001 L Hand")
+		GetRandom(_ChosenString,"CMB_END_Icandra_Icara_1","CMB_END_Icandra_Icara_2","CMB_END_Icandra_Icara_3")
+		DisplayText(__Me,_ChosenString,3)
+		Sleep(2)		
+	ENDIF
+	Set(%ChangeAlign_Current,1)
+	SetPriority("Icandra_ChangeAlignment",0)
+
+REACTION Icandra_I_CastMassResurrect,1600
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3"
+	IsEqual(%CurrentSoul,"Icara")
+	CharacterCanCast(__Me,"Shout_EnemyMassResurrect")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Shout_EnemyMassResurrect")
+ACTIONS
+	Set(%AmountOfDeadAllies,0)
+	Set(%Resurrect_Target,null)
+	//DebugText(__Me,"MassRez: scanning!")
+	IterateCharactersInCombat(__Me,"CMB_Icandra_ScanForDeadAllies",Lowest,Distance)
+	IF "!c1&c2"
+		IsEqual(%Resurrect_Target,null)
+		IsGreaterThen(%AmountOfDeadAllies,1)
+	THEN
+		//DebugText(__Me,"[1] dead: MassRez!",%AmountOfDeadAllies)
+		CharacterMoveInRange(%Resurrect_Target,_MinRange,_MaxRange,1)
+		DisplayText(__Me,"HOM_Combat_Icandra_I_Resurrect",3)		
+		CharacterUseSkill("Shout_EnemyMassResurrect",%Resurrect_Target)	
+		IterateCharactersNear(__Me,15,"CMB_Icandra_MassResurrect",Lowest,Distance)
+	ELSE
+		SetPriority("Icandra_I_CastMassResurrect",0)
+	ENDIF
+INTERRUPT
+	Reset()
+
+REACTION Icandra_I_CastResurrect,1500
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3"
+	IsEqual(%CurrentSoul,"Icara")
+	CharacterCanCast(__Me,"Target_Enemy_IcandraResurrect")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_Enemy_IcandraResurrect")
+ACTIONS
+	Set(%Resurrect_Target,null)
+	//DebugText(__Me,"Rez: scanning!")	
+	IterateCharacters("CMB_Icandra_ScanForDeadAllies",Lowest,Distance)
+	IF "!c1"
+		IsEqual(%Resurrect_Target,null)
+	THEN
+		//DebugText(__Me,"Using NormalRez!")
+		CharacterMoveInRange(%Resurrect_Target,_MinRange,_MaxRange,1)
+		DisplayText(__Me,"HOM_Combat_Icandra_I_Resurrect",3)
+		CharacterUseSkill("Target_Enemy_IcandraResurrect",%Resurrect_Target)
+	ELSE
+		SetPriority("Icandra_I_CastResurrect",0)
+	ENDIF
+INTERRUPT
+	Reset()
+	
+REACTION Icandra_I_CastMassHealing,1400
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3"
+	IsEqual(%CurrentSoul,"Icara")
+	CharacterCanCast(__Me,"Target_EnemyMassHeal")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyMassHeal")
+ACTIONS
+	//DebugText(__Me,"MassHeal: scanning!")	
+	Set(%Regenerate_Target,null)
+	Set(%AmountOfWoundedAllies,0)
+	IterateCharactersInCombat(__Me,"CMB_Icandra_ScanForWoundedAllies",Lowest,Vitality)
+	IF "!c1&c2"
+		IsEqual(%Regenerate_Target,null)
+		IsGreaterThen(%AmountOfWoundedAllies,1)		
+	THEN
+		CharacterMoveInRange(%Regenerate_Target,_MinRange,_MaxRange,1)
+		DisplayText(__Me,"HOM_Combat_Icandra_I_Heal",3)	
+		CharacterUseSkill("Target_EnemyMassHeal",%Regenerate_Target)
+	ELSE
+		SetPriority("Icandra_I_CastMassHealing",0)
+	ENDIF
+INTERRUPT
+	Reset()	
+	
+REACTION Icandra_I_CastRegenerate,1300
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+	FLOAT:_AstarteVitality
+CHECK "c1&c2&c3"
+	IsEqual(%CurrentSoul,"Icara")
+	CharacterCanCast(__Me,"Heal_EnemyRegenerate_Astarte")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Heal_EnemyRegenerate_Astarte")
+ACTIONS
+	//DebugText(__Me,"Heal: scanning!")	
+	Set(%Regenerate_Target,null)
+	IterateCharactersInCombat(__Me,"CMB_Icandra_ScanForWoundedAllies",Lowest,Vitality)
+	IF "c1&c2&c3"
+		IsInCombatWith(__Me,%Astarte2)
+		CharacterGetStat(_AstarteVitality,%Astarte2,"Vitality")
+		IsLessThen(_AstarteVitality,0.5)
+	THEN
+		Set(%Regenerate_Target,%Astarte2)
+	ENDIF
+	IF "!c1"
+		IsEqual(%Regenerate_Target,null)
+	THEN
+		CharacterMoveInRange(%Regenerate_Target,_MinRange,_MaxRange,1)
+		DisplayText(__Me,"HOM_Combat_Icandra_I_Heal",3)		
+		CharacterUseSkill("Heal_EnemyRegenerate_Astarte",%Regenerate_Target)
+	ELSE
+		SetPriority("Icandra_I_CastRegenerate",0)
+	ENDIF
+INTERRUPT
+	Reset()	
+	
+REACTION Icandra_I_CastCleansingWave,1200
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3"
+	IsEqual(%CurrentSoul,"Icara")
+	CharacterCanCast(__Me,"Shout_EnemyCleansingWave")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Shout_EnemyCleansingWave")
+ACTIONS
+	Set(%CleansingWater_Target,null)
+	Set(%AmountOfAfflictedAllies,0)
+	IterateCharactersInCombat(__Me,"CMB_Icandra_ScanForAlliesWithNegativeStatuses",Lowest,Distance)
+	IF "!c1&c2"
+		IsEqual(%CleansingWater_Target,null)
+		IsGreaterThen(%AmountOfAfflictedAllies,1)
+	THEN
+		CharacterMoveInRange(%CleansingWater_Target,_MinRange,_MaxRange,1)
+		DisplayText(__Me,"HOM_Combat_Icandra_I_CleansWater",3)
+		CharacterUseSkill("Shout_EnemyCleansingWave",%CleansingWater_Target)
+	ELSE
+		SetPriority("Icandra_I_CastCleansingWave",0)
+	ENDIF
+INTERRUPT
+	Reset()
+	
+REACTION Icandra_I_CastCleansingWater,1100
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3"
+	IsEqual(%CurrentSoul,"Icara")
+	CharacterCanCast(__Me,"Target_EnemyCleansingWater")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyCleansingWater")
+ACTIONS
+	Set(%CleansingWater_Target,null)
+	IterateCharactersInCombat(__Me,"CMB_Icandra_ScanForAlliesWithNegativeStatuses",Lowest,Distance)
+	IF "!c1"
+		IsEqual(%CleansingWater_Target,null)
+	THEN
+		CharacterMoveInRange(%CleansingWater_Target,_MinRange,_MaxRange,1)
+		DisplayText(__Me,"HOM_Combat_Icandra_I_CleansWater",3)
+		CharacterUseSkill("Target_EnemyCleansingWater",%CleansingWater_Target)
+	ELSE
+		SetPriority("Icandra_I_CastCleansingWater",0)
+	ENDIF
+INTERRUPT
+	Reset()
+	
+REACTION Icandra_I_CastDeathKnightBane,900
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&!c4"
+	IsEqual(%CurrentSoul,"Icara")
+	CharacterCanCast(__Me,"Target_EnemyDeathKnightBane")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyDeathKnightBane")
+	IsInCombatWith(__Me,%Astarte2)
+ACTIONS
+	//DebugText(__Me,"DK Bane!")
+	IF "(c1|c2)&c3&c4"
+		IsEqual(%DeathKnightBane_Target,null)
+		CharacterIsDead(%DeathKnightBane_Target)
+		CharacterGet(%DeathKnightBane_Target,__Me,50,Lowest,Vitality,Enemy)
+		CharacterHasStatus(%DeathKnightBane_Target,"INVULNERABLE")
+	THEN
+		CharacterMoveInRange(%DeathKnightBane_Target,_MinRange,_MaxRange,1)
+		IF "c1"
+			IsRandom(0.3)
+		THEN
+			DisplayText(__Me,"HOM_Combat_Icandra_I_DKBane",3)
+		ENDIF	
+		CharacterUseSkill("Target_EnemyDeathKnightBane",%DeathKnightBane_Target)
+	ELIF "c1"
+		CharacterHasStatus(%DeathKnightBane_Target,"INVULNERABLE")
+	THEN
+		CharacterMoveInRange(%DeathKnightBane_Target,_MinRange,_MaxRange,1)
+		IF "c1"
+			IsRandom(0.3)
+		THEN
+			DisplayText(__Me,"HOM_Combat_Icandra_I_DKBane",3)
+		ENDIF
+		CharacterUseSkill("Target_EnemyDeathKnightBane",%DeathKnightBane_Target)
+	ELSE
+		SetPriority("Icandra_I_CastDeathKnightBane",0)
+	ENDIF
+INTERRUPT
+	Reset()
+
+REACTION Icandra_I_SummonHealingWolf,800
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2"
+	IsEqual(%CurrentSoul,"Icara")
+	CharacterCanCast(__Me,"Summon_EnemyHealingWolf")
+ACTIONS
+	CharacterUseSkill("Summon_EnemyHealingWolf",__Me)
+		
+REACTION Icandra_I_CastMassSlow,700
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&c4&!c5"
+	IsEqual(%CurrentSoul,"Icara")
+	CharacterCanCast(__Me,"Shout_EnemySlowMass")
+	CharacterGet(_Target,__Me,30,Highest,Speed,Enemy)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Shout_EnemySlowMass")
+	IsInCombatWith(__Me,%Astarte2)
+ACTIONS
+	Set(%AmountOfVulnerableDKs,0)
+	//DebugText(__Me,"MassSlow: scanning!")
+	IterateCharacters("CMB_Icandra_ScanForVulnerableDeathKnights",Lowest,Distance)
+	IF "c1"
+		IsGreaterThen(%AmountOfVulnerableDKs,3)
+	THEN
+		CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+		CharacterUseSkill("Shout_EnemySlowMass",_Target)
+	ELSE
+		SetPriority("Icandra_I_CastMassSlow",0)
+	ENDIF
+INTERRUPT
+	Reset()
+	
+REACTION Icandra_I_CastChillingTouch,600
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3"
+	IsEqual(%CurrentSoul,"Icara")
+	CharacterCanCast(__Me,"Target_EnemyChillyWind")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyChillyWind")
+ACTIONS
+	Set(%ChillingTouch_Target,null)
+	IterateCharactersInCombat(__Me,"CMB_Icandra_ScanForBurningAllies",Lowest,Distance)
+	IF "!c1"
+		IsEqual(%ChillingTouch_Target,null)
+	THEN
+		CharacterMoveInRange(%ChillingTouch_Target,_MinRange,_MaxRange,1)
+		DisplayText(__Me,"HOM_Combat_Icandra_I_ChillingTouch",3)
+		CharacterUseSkill("Target_EnemyChillyWind",%ChillingTouch_Target)
+	ELSE
+		SetPriority("Icandra_I_CastChillingTouch",0)
+	ENDIF
+INTERRUPT
+	Reset()
+
+REACTION Icandra_L_CastBoostOnDragon,500
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3"
+	IsInCombatWith(__Me,%Astarte2)
+	CharacterCanCast(__Me,"Target_EnemyTargetedDamageBoost")	
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyTargetedDamageBoost")
+ACTIONS
+	CharacterMoveInRange(%VoidDragon,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Target_EnemyTargetedDamageBoost",%VoidDragon)
+	
+REACTION Icandra_L_CastUnholyRegenerate,400
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+	FLOAT:_DragonVitality	
+CHECK "c1&c2&c3"
+	IsEqual(%CurrentSoul,"Leandra")
+	CharacterCanCast(__Me,"Heal_EnemyUnholyRegenerate_Nega")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Heal_EnemyUnholyRegenerate_Nega")
+ACTIONS
+	IF "c1&c2"
+		CharacterGetStat(_DragonVitality,%VoidDragon,"Vitality")
+		IsLessThen(_DragonVitality,0.4)
+	THEN
+		CharacterMoveInRange(%VoidDragon,_MinRange,_MaxRange,1)	
+		CharacterUseSkill("Heal_EnemyUnholyRegenerate_Nega",%VoidDragon)
+		SetPriority("Icandra_L_CastUnholyRegenerate",0)
+	ENDIF
+	//DebugText(__Me,"Unholy heal: dragon OK, scanning summons!")	
+	Set(%UnholyRegenerate_Target,null)
+	IterateCharactersInCombat(__Me,"CMB_Icandra_ScanForWoundedAllies_Nega",Lowest,Vitality)
+	IF "!c1"
+		IsEqual(%UnholyRegenerate_Target,null)
+	THEN
+		CharacterMoveInRange(%UnholyRegenerate_Target,_MinRange,_MaxRange,1)	
+		CharacterUseSkill("Heal_EnemyUnholyRegenerate_Nega",%UnholyRegenerate_Target)
+	ELSE
+		SetPriority("Icandra_L_CastUnholyRegenerate",0)
+	ENDIF
+INTERRUPT
+	Reset()
+	
+REACTION Icandra_L_CastFlare,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&!(c4|c5|c6|c7)&c8&c9"
+	IsEqual(%CurrentSoul,"Leandra")																//c1
+	CharacterCanCast(__Me,"Projectile_EnemyFlare")												//c2
+	CharacterGet(_ChosenTarget,__Me,%Icandra_SightRange,Lowest,FireResistance,Enemy)			//c3
+	CharacterHasStatus(_ChosenTarget,"INVULNERABLE")											//!c4
+	CharacterHasStatus(_ChosenTarget,"FROZEN")													//!c5
+	CharacterHasStatus(_ChosenTarget,"FIRE_IMMUNITY_AURA")										//!c6
+	CharacterHasStatus(_ChosenTarget,"FIRE_IMMUNITY")											//!c7	
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyFlare")					//c8
+	IsRandom(0.3)																				//c9	
+ACTIONS
+	IF "c1"
+		IsInCombatWith(__Me,%Astarte2)
+	THEN
+		Set(_ChosenTarget,%Astarte2)
+	ENDIF
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	IF "c1"
+		IsRandom(0.3)
+	THEN
+		DisplayText(__Me,"HOM_Combat_Icandra_L_Flare",3)
+	ENDIF
+	CharacterUseSkill("Projectile_EnemyFlare",_ChosenTarget)
+	
+REACTION Icandra_L_CastIceShard,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&!(c4|c5|c6|c7|c8)&c9&c10"
+	IsEqual(%CurrentSoul,"Leandra")																//c1
+	CharacterCanCast(__Me,"Projectile_EnemyIceShard")											//c2
+	CharacterGet(_ChosenTarget,__Me,%Icandra_SightRange,Lowest,WaterResistance,Enemy)			//c3
+	CharacterHasStatus(_ChosenTarget,"INVULNERABLE")											//!c4
+	CharacterHasStatus(_ChosenTarget,"VOID_AURA")												//!c5
+	CharacterHasStatus(_ChosenTarget,"FROZEN")													//!c6
+	CharacterHasStatus(_ChosenTarget,"WATER_IMMUNITY_AURA")										//!c7
+	CharacterHasStatus(_ChosenTarget,"WATER_IMMUNITY")											//!c8	
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyIceShard")					//c9
+	IsRandom(0.3)																				//c10
+ACTIONS
+	IF "c1"
+		IsInCombatWith(__Me,%Astarte2)
+	THEN
+		Set(_ChosenTarget,%Astarte2)
+	ENDIF
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	IF "c1"
+		IsRandom(0.3)
+	THEN
+		DisplayText(__Me,"HOM_Combat_Icandra_L_IceShard",3)
+	ENDIF
+	CharacterUseSkill("Projectile_EnemyIceShard",_ChosenTarget)
+
+REACTION Icandra_L_CastBlitzBolt,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&!(c4|c5|c6|c7)&c8&c9"
+	IsEqual(%CurrentSoul,"Leandra")																//c1	
+	CharacterCanCast(__Me,"Projectile_EnemyBlitzBolt")											//c2
+	CharacterGet(_ChosenTarget,__Me,%Icandra_SightRange,Lowest,AirResistance,Enemy)				//c3
+	CharacterHasStatus(_ChosenTarget,"INVULNERABLE")											//!c4
+	CharacterHasStatus(_ChosenTarget,"VOID_AURA")												//!c5
+	CharacterHasStatus(_ChosenTarget,"AIR_IMMUNITY_AURA")										//!c6
+	CharacterHasStatus(_ChosenTarget,"AIR_IMMUNITY")											//!c7
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyBlitzBolt")				//c8
+	IsRandom(0.3)																				//c9
+ACTIONS
+	IF "c1"
+		IsInCombatWith(__Me,%Astarte2)
+	THEN
+		Set(_ChosenTarget,%Astarte2)
+	ENDIF
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	IF "c1"
+		IsRandom(0.3)
+	THEN
+		DisplayText(__Me,"HOM_Combat_Icandra_L_BlitzBolt",3)
+	ENDIF
+	CharacterUseSkill("Projectile_EnemyBlitzBolt",_ChosenTarget)
+	
+REACTION Icandra_L_CastEarthShard,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&!(c4|c5|c6|c7)&c8&c9"
+	IsEqual(%CurrentSoul,"Leandra")																//c1	
+	CharacterCanCast(__Me,"Projectile_EnemyEarthShard")											//c2
+	CharacterGet(_ChosenTarget,__Me,%Icandra_SightRange,Lowest,EarthResistance,Enemy)			//c3
+	CharacterHasStatus(_ChosenTarget,"INVULNERABLE")											//!c4
+	CharacterHasStatus(_ChosenTarget,"VOID_AURA")												//!c5
+	CharacterHasStatus(_ChosenTarget,"EARTH_IMMUNITY_AURA")										//!c6
+	CharacterHasStatus(_ChosenTarget,"EARTH_IMMUNITY")											//!c7
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyEarthShard")				//c8
+	IsRandom(0.3)																				//c9	
+ACTIONS
+	IF "c1"
+		IsInCombatWith(__Me,%Astarte2)
+	THEN
+		Set(_ChosenTarget,%Astarte2)
+	ENDIF
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	IF "c1"
+		IsRandom(0.3)
+	THEN
+		DisplayText(__Me,"HOM_Combat_Icandra_L_EarthShard",3)
+	ENDIF
+	CharacterUseSkill("Projectile_EnemyEarthShard",_ChosenTarget)
+
+REACTION Icandra_MoveToGodbox,0
+USAGE COMBAT
+VARS
+	FLOAT:_DistBtwMeAndGodbox
+CHECK "c1&c2&c3"
+	IsInCombatWith(__Me,%Astarte2)
+	GetDistance(_DistBtwMeAndGodbox,__Me,%GodBox)
+	IsGreaterThen(_DistBtwMeAndGodbox,8)
+ACTIONS
+	CharacterMoveTo(%GodBox,1,0,0,5,2)
+	SetPriority("Icandra_MoveToGodbox",0)
+		
+//---------
+EVENTS
+EVENT DefaultIterateSetTarget OVERRIDE 				//don't attack anything invulnerable
+VARS 
+	CHARACTER:_Char
+	CHARACTER:_previousSetTarget
+	FLOAT:_targetDistance
+	INT:_alreadyTargetedBy
+	FLOAT:_targetClosestThisScore=0
+	FLOAT:_movement
+ON
+	OnIterateCharacter(_Char,"DefaultSetTargetClosestIterator")
+ACTIONS
+	IF "!c1&!c2&c3&c4&c5&!(c6|c7|c8|c9)"
+		CharacterIsDead(_Char)
+		IsEqual(__Me,_Char)
+		CharacterIsEnemy(__Me,_Char)
+		GetDistance(_targetDistance,__Me,_Char)
+		CharacterGetHostileCount(_alreadyTargetedBy,_Char)
+		CharacterHasStatus(_Char,"INVISIBLE")
+		CharacterHasStatus(_Char,"SNEAKING")
+		CharacterHasStatus(_Char,"INVULNERABLE")
+		CharacterHasStatus(_Char,"VOID_AURA")
+	THEN
+		IF "c1&c2"
+			CharacterGetEnemy(_previousSetTarget,__Me)
+			IsEqual(_previousSetTarget,_Char)
+		THEN
+			Multiply(_targetDistance,0.8)
+		ENDIF
+		IF "c1"
+			IsEqual(_alreadyTargetedBy,0)
+		THEN
+			Multiply(_targetDistance,0.5)
+		ENDIF
+		IF "c1"
+			IsEqual(_alreadyTargetedBy,1)
+		THEN
+			Multiply(_targetDistance,0.6)
+		ENDIF
+		IF "c1"
+			CharacterIsSummon(_Char)
+		THEN
+			Multiply(_targetDistance,1.5)
+		ENDIF	
+		IF "c1&!c2"
+			IsGreaterThen(_alreadyTargetedBy,1)
+			CharacterHasStatus(_Char,AGGRO_MARKED)
+		THEN
+			Add(_alreadyTargetedBy,0.6)
+			Multiply(_alreadyTargetedBy,_alreadyTargetedBy)
+			Multiply(_targetDistance,_alreadyTargetedBy)
+		ENDIF
+		IF "c1&c2"
+			IsGreaterThen(_alreadyTargetedBy,3)
+			CharacterHasStatus(_Char,AGGRO_MARKED)
+		THEN
+			Multiply(_targetDistance,2)
+		ENDIF
+		IF "!c1"
+			CharacterCanSee(__Me,_Char)
+		THEN
+			Multiply(_targetDistance,3)
+		ENDIF
+		IF "c1&!c2"
+			CharacterHasTalent(_Char,Stench)
+			CharacterHasStatus(_Char,AGGRO_MARKED)
+		THEN
+			Multiply(_targetDistance,4)
+		ENDIF
+		IF "c1&c2"
+			CharacterHasTalent(_Char,Stench)
+			CharacterHasStatus(_Char,AGGRO_MARKED)
+		THEN
+			Multiply(_targetDistance,2)
+		ENDIF
+		Set(_targetClosestThisScore,_targetDistance)
+		IF "!c1"
+			IsGreaterThen(_targetClosestThisScore,%setTargetDefaultBestScore)
+		THEN
+			Set(%setTargetDefaultBestScore,_targetClosestThisScore)
+			CharacterSetEnemy(__Me,_Char)
+		ENDIF
+	ENDIF
+	
+EVENT DontAttackAlliesOrInvisibles OVERRIDE 		//nor will you attack anything invulnerable
+VARS
+	CHARACTER:_Target
+ON
+	OnTurn()
+ACTIONS
+	IF "c1&(c2|c3|c4|c5)"
+		CharacterGetEnemy(_Target,__Me)
+		CharacterIsAlly(__Me,_Target)
+		CharacterHasStatus(_Target,"INVISIBLE")
+		CharacterHasStatus(_Target,"INVULNERABLE")
+		CharacterHasStatus(_Target,"VOID_AURA")
+	THEN
+		CharacterSetEnemy(__Me,null)
+		Set(%defaultEvaluateTarget,1)
+	ENDIF
+
+EVENT OnCombatStarted_SetGoodFaction
+ON
+	OnCombatStarted()
+ACTIONS
+	CharacterSetFaction(__Me,"Good NPC")
+	Set(%CurrentSoul,"Icara")
+
+EVENT OnInit_GiveSpells_GetSightRange
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%Icandra_SightRange,__Me,Sight)
+	THEN
+		StartTimer("CMB_END_Icandra_InitialMaterial_Timer",0.2,0)
+		CharacterAddSkill("Shout_EnemyMassResurrect")						//Icara	
+		CharacterAddSkill("Target_Enemy_IcandraResurrect")
+		CharacterAddSkill("Summon_EnemyHealingWolf")
+		CharacterAddSkill("Target_EnemyMassHeal")
+		CharacterAddSkill("Heal_EnemyRegenerate_Astarte")
+		CharacterAddSkill("Shout_EnemyCleansingWave")
+		CharacterAddSkill("Target_EnemyCleansingWater")		
+		CharacterAddSkill("Shout_EnemySlowMass")	
+		CharacterAddSkill("Target_EnemyDeathKnightBane")		
+		CharacterAddSkill("Target_EnemyChillyWind")						
+		CharacterAddSkill("Projectile_EnemyFireball")						//Leandra
+		CharacterAddSkill("Projectile_EnemyIceShard")
+		CharacterAddSkill("Projectile_EnemyBlitzBolt")
+		CharacterAddSkill("Projectile_EnemyEarthShard")
+		CharacterAddSkill("Heal_EnemyUnholyRegenerate_Nega")
+	ENDIF
+
+EVENT OnTimer_ApplyMaterial
+ON
+	OnTimer("CMB_END_Icandra_InitialMaterial_Timer")
+ACTIONS
+	IF "c1"
+		IsEqual(%CurrentSoul,"Icara")
+	THEN
+		SetMaterial(__Me,"f79e2ed6-a774-415f-b0af-e7c6d3f0d483",-1,1,1,0)
+		CharacterPlayLoopEffect(%FXHandle_01,__Me,"Fx_Creatures_NPC_Icandra_Good_Aura_A","Dummy_Root")
+		CharacterPlayLoopEffect(%FXHandle_02,__Me,"Fx_Creatures_NPC_Icandra_Good_Aura_A_Pelvis","Bip001")
+		CharacterPlayLoopEffect(%FXHandle_03,__Me,"Fx_Creatures_NPC_Icandra_Good_Aura_A_Spine","Bip001 Spine1")
+		CharacterPlayLoopEffect(%FXHandle_04,__Me,"Fx_Creatures_NPC_Icandra_Good_Hands_A","Bip001 R Hand")
+		CharacterPlayLoopEffect(%FXHandle_05,__Me,"Fx_Creatures_NPC_Icandra_Good_Hands_A","Bip001 L Hand")	
+	ELSE	
+		SetMaterial(__Me,"f79e2ed6-a774-415f-b0af-e7c6d3f0d483",-1,1,1,0)
+		CharacterPlayLoopEffect(%FXHandle_01,__Me,"Fx_Creatures_NPC_Icandra_Bad_Aura_A","Dummy_Root")
+		CharacterPlayLoopEffect(%FXHandle_02,__Me,"Fx_Creatures_NPC_Icandra_Bad_Aura_A_Pelvis","Bip001")
+		CharacterPlayLoopEffect(%FXHandle_03,__Me,"Fx_Creatures_NPC_Icandra_Bad_Aura_A_Spine","Bip001 Spine1")
+		CharacterPlayLoopEffect(%FXHandle_04,__Me,"Fx_Creatures_NPC_Icandra_Bad_Hands_A","Bip001 R Hand")
+		CharacterPlayLoopEffect(%FXHandle_05,__Me,"Fx_Creatures_NPC_Icandra_Bad_Hands_A","Bip001 L Hand")		
+	ENDIF
+
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	//DebugText(__Me,"I am [1]!",%CurrentSoul)
+	IF "c1"
+		IsEqual(%Bool_FirstTurnHasPassed,0)
+	THEN
+		Add(%Bool_FirstTurnHasPassed,1)
+	ENDIF
+	IF "c1&c2"
+		IsEqual(%Bool_FirstTurnHasPassed,1)
+		IsLessThen(%ChangeAlign_Current,%ChangeAlign_Desired)
+	THEN
+		Add(%ChangeAlign_Current,1)
+		//DebugText(__Me,"ChangeAlign = [1]/[2]",%ChangeAlign_Current,%ChangeAlign_Desired)
+	ELIF "c1&c2"		
+		IsEqual(%Bool_FirstTurnHasPassed,1)
+		IsEqual(%ChangeAlign_Current,%ChangeAlign_Desired)
+	THEN
+		//DebugText(__Me,"ChangeAlign = [1]/[2]",%ChangeAlign_Current,%ChangeAlign_Desired)
+		SetPriority("Icandra_ChangeAlignment",4000)
+	ENDIF
+	SetPriority("Icandra_I_CastMassResurrect",1600)
+	SetPriority("Icandra_I_CastResurrect",1500)
+	SetPriority("Icandra_I_CastMassHealing",1400)
+	SetPriority("Icandra_I_CastRegenerate",1300)
+	SetPriority("Icandra_I_CastCleansingWave",1200)
+	SetPriority("Icandra_I_CastCleansingWater",1100)
+	//SetPriority("Icandra_I_CastBlessedEarth",1000)
+	SetPriority("Icandra_I_CastDeathKnightBane",900)
+	//SetPriority("Icandra_I_SummonHealingWolf",800)	
+	SetPriority("Icandra_I_CastMassSlow",700)	
+	SetPriority("Icandra_I_CastChillingTouch",600)	
+	SetPriority("Icandra_L_CastUnholyRegenerate",400)	
+	IF "c1"
+		IsInCombatWith(__Me,%Astarte2)
+	THEN
+		SetPriority("Icandra_MoveToGodbox",300)
+	ENDIF
+
+EVENT OnIterateCharacter_ScanForAlliesWithNegativeStatuses
+VARS
+	CHARACTER:_Ally
+ON
+	OnIterateCharacter(_Ally,"CMB_Icandra_ScanForAlliesWithNegativeStatuses")
+ACTIONS
+	IF "!c1&c2&(c3|c4|c5|c6|c7|c8)"
+		CharacterIsDead(_Ally)								//c1
+		CharacterIsAlly(__Me,_Ally)							//c2
+		CharacterHasStatus(_Ally,"BLIND")					//c3
+		CharacterHasStatus(_Ally,"BLEEDING")				//c4
+		CharacterHasStatus(_Ally,"CRIPPLED")				//c5
+		CharacterHasStatus(_Ally,"DISEASED")				//c6
+		CharacterHasStatus(_Ally,"INFECTIOUS_DISEASED")		//c7
+		CharacterHasStatus(_Ally,"MUTED")					//c8
+	THEN
+		//DebugText(_Ally,"Sick!")
+		Set(%CleansingWater_Target,_Ally)
+		Add(%AmountOfAfflictedAllies,1)
+	ENDIF	
+
+EVENT OnIterateCharacter_ScanForWoundedAllies
+VARS
+	CHARACTER:_Ally
+	FLOAT:_AllysVitality
+ON
+	OnIterateCharacter(_Ally,"CMB_Icandra_ScanForWoundedAllies")
+ACTIONS
+	IF "!(c1|c2)&c3&c4&c5&!c6"
+		CharacterIsDead(_Ally)								//!c1
+		IsEqual(__Me,_Ally)									//!c2
+		CharacterIsAlly(__Me,_Ally)							//c3
+		CharacterGetStat(_AllysVitality,_Ally,Vitality)		//c4
+		IsLessThen(_AllysVitality,0.5)						//c5
+		CharacterHasTalent(_Ally,"Zombie")					//!c6		//added by Edouard on 4/01/2015
+	THEN
+		//DebugText(_Ally,"Wounded!")
+		Set(%Regenerate_Target,_Ally)
+		Add(%AmountOfWoundedAllies,1)
+	ENDIF	
+	
+EVENT OnIterateCharacter_ScanForWoundedAllies_Nega
+VARS
+	CHARACTER:_Ally
+	FLOAT:_AllysVitality
+	CHARACTERTEMPLATE:_AllyTemplate
+	CHARACTERTEMPLATE:_VoidGrunt_RT="Shadows_Grunt_B_35d1a441-11a9-414f-aa2d-4253c51c18bf"
+	CHARACTERTEMPLATE:_VoidCaster_RT="Shadows_Caster_B_f20f481c-d832-4204-ad6a-3eebc3455663"
+	CHARACTERTEMPLATE:_VoidMage_RT="Shadows_Mage_B_b63de0c5-8e4d-4052-bc50-1c59092065f3"
+	CHARACTERTEMPLATE:_VoidSpider_RT="Shadows_Spider_A_25c1e827-dd1e-4f7b-ad26-fd7c599f4f28"
+ON
+	OnIterateCharacter(_Ally,"CMB_Icandra_ScanForWoundedAllies_Nega")
+ACTIONS
+	IF "!c1&c2&c3&(c4|c5|c6|c7)&c8&c9"
+		CharacterIsDead(_Ally)								//!c1
+		CharacterIsAlly(__Me,_Ally)							//c2
+		CharacterGetTemplate(_Ally,_AllyTemplate)			//c3
+		IsEqual(_AllyTemplate,_VoidGrunt_RT)				//c4
+		IsEqual(_AllyTemplate,_VoidCaster_RT)				//c5
+		IsEqual(_AllyTemplate,_VoidMage_RT)					//c6
+		IsEqual(_AllyTemplate,_VoidSpider_RT)				//c7
+		CharacterGetStat(_AllysVitality,_Ally,Vitality)		//c8
+		IsLessThen(_AllysVitality,0.5)						//c9
+	THEN
+		//DebugText(_Ally,"Wounded!")
+		Set(%UnholyRegenerate_Target,_Ally)
+	ENDIF	
+
+EVENT OnIterateCharacter_ScanForBurningAllies
+VARS
+	CHARACTER:_Ally
+ON
+	OnIterateCharacter(_Ally,"CMB_Icandra_ScanForBurningAllies")
+ACTIONS
+	IF "!c1&c2&c3&!c4"
+		CharacterIsDead(_Ally)
+		CharacterIsAlly(__Me,_Ally)
+		CharacterHasStatus(_Ally,"BURNING")
+		IsInSurface(_Ally,"Fire")
+	THEN
+		//DebugText(_Ally,"Burning!")
+		Set(%ChillingTouch_Target,_Ally)
+	ENDIF	
+
+EVENT OnIterateCharacter_ScanForDeadAllies
+VARS
+	CHARACTER:_Ally
+ON
+	OnIterateCharacter(_Ally,"CMB_Icandra_ScanForDeadAllies")
+ACTIONS
+	IF "c1&c2&!(c3|c4)"
+		CharacterIsDead(_Ally)
+		CharacterIsAlly(__Me,_Ally)
+		IsEqual(_Ally,%Astarte2)
+		CharacterIsSummon(_Ally)
+	THEN
+		//DebugText(_Ally,"Dead!")
+		Add(%AmountOfDeadAllies,1)
+		Set(%Resurrect_Target,_Ally)
+	ENDIF
+
+EVENT OnIterateCharacter_ScanForVulnerableDKs
+VARS
+	CHARACTER:_DeathKnight
+	CHARACTERTEMPLATE:_Detected_RT
+	CHARACTERTEMPLATE:_RegularDK_RT="DarkMinions_Eden_DeathKnight_93c3e196-d5be-4b25-9da0-d58a17e0a02c"
+	CHARACTERTEMPLATE:_OrangeDK_RT="DarkMinions_Eden_OrangeKnight_59293e32-f8db-4868-bd8f-c49149843d76"
+	CHARACTERTEMPLATE:_GreenDK_RT="DarkMinions_Eden_GreenKnight_ddc485de-a551-4765-9b38-4e6297780eb8"
+	CHARACTERTEMPLATE:_PinkDK_RT="DarkMinions_Eden_PinkKnight_5712610b-eb73-40d1-a7a6-5ec74de011e7"
+	CHARACTERTEMPLATE:_BlueDK_RT="DarkMinions_Eden_BlueKnight_cfdc6869-502d-4516-8d3a-74c22d4e0876"	
+ON
+	OnIterateCharacter(_DeathKnight,"CMB_Icandra_ScanForVulnerableDeathKnights")
+ACTIONS
+	IF "!c1&c2&(c3|c4|c5|c6|c7|c8)&!(c9|c10)"
+		CharacterIsDead(_DeathKnight)							//!c1
+		CharacterIsEnemy(__Me,_DeathKnight)						//c2
+		CharacterGetTemplate(_DeathKnight,_Detected_RT)			//c3
+		IsEqual(_Detected_RT,_RegularDK_RT)						//c4
+		IsEqual(_Detected_RT,_OrangeDK_RT)						//c5
+		IsEqual(_Detected_RT,_GreenDK_RT)						//c6
+		IsEqual(_Detected_RT,_PinkDK_RT)						//c7
+		IsEqual(_Detected_RT,_BlueDK_RT)						//c8
+		CharacterHasStatus(_DeathKnight,"VOID_AURA")			//!c9			
+		CharacterHasStatus(_DeathKnight,"INVULNERABLE")			//!c10
+	THEN
+		Add(%AmountOfVulnerableDKs,1)
+	ENDIF
+	
+EVENT OnIterateCharacter_ScanForWolvesToKill
+VARS
+	CHARACTER:_Wolf
+	CHARACTERTEMPLATE:_Detected_RT
+	CHARACTERTEMPLATE:_Wolf_RT="HOM_Icandra_Summon_HealingWolf_60891fc1-274a-4418-83e2-69c817becd6c"
+ON
+	OnIterateCharacter(_Wolf,"CMB_Icandra_IterateForWolves")
+ACTIONS
+	IF "!c1&c2&c3"
+		CharacterIsDead(_Wolf)
+		CharacterGetTemplate(_Wolf,_Detected_RT)
+		IsEqual(_Detected_RT,_Wolf_RT)
+	THEN
+		CharacterDie(_Wolf)
+	ENDIF
+
+EVENT OnIterateCharacter_MassResurrect
+VARS
+	CHARACTER:_Ally
+ON
+	OnIterateCharacter(_Ally,"CMB_Icandra_MassResurrect")
+ACTIONS
+	IF "c1&c2&!c3"
+		CharacterIsDead(_Ally)
+		CharacterIsAlly(__Me,_Ally)
+		CharacterIsSummon(_Ally)
+	THEN
+		//DebugText(_Ally,"Resurrecting!")
+		CharacterResurrect(_Ally,50)
+		PlayEffectAt(_Ally,"FX_Skills_Ranger_Resurrect_Impact_B")
+	ENDIF
+
+EVENT OnCombatEnded_ResetToGoodSoul
+ON
+	OnCombatEnded()
+ACTIONS
+	Set(%Bool_FirstTurnHasPassed,0)
+	Set(%CurrentSoul,"Icara")
+	StopLoopEffect(%FXHandle_01)
+	StopLoopEffect(%FXHandle_02)
+	StopLoopEffect(%FXHandle_03)
+	StopLoopEffect(%FXHandle_04)
+	StopLoopEffect(%FXHandle_05)
+	CharacterSetFaction(__Me,"Good NPC")
+	SetMaterial(__Me,"f79e2ed6-a774-415f-b0af-e7c6d3f0d483",-1,1,1,0)
+	CharacterPlayLoopEffect(%FXHandle_01,__Me,"Fx_Creatures_NPC_Icandra_Good_Aura_A","Dummy_Root")
+	CharacterPlayLoopEffect(%FXHandle_02,__Me,"Fx_Creatures_NPC_Icandra_Good_Aura_A_Pelvis","Bip001")
+	CharacterPlayLoopEffect(%FXHandle_03,__Me,"Fx_Creatures_NPC_Icandra_Good_Aura_A_Spine","Bip001 Spine1")
+	CharacterPlayLoopEffect(%FXHandle_04,__Me,"Fx_Creatures_NPC_Icandra_Good_Hands_A","Bip001 R Hand")
+	CharacterPlayLoopEffect(%FXHandle_05,__Me,"Fx_Creatures_NPC_Icandra_Good_Hands_A","Bip001 L Hand")
+	IterateCharactersNear(__Me,30,"Icandra_IterateForWolves",Lowest,Distance)
+
+EVENT OnDie_DisplayText_CleanUp
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	StopLoopEffect(%FXHandle_01)
+	StopLoopEffect(%FXHandle_02)
+	StopLoopEffect(%FXHandle_03)
+	StopLoopEffect(%FXHandle_04)
+	StopLoopEffect(%FXHandle_05)
+	IF "c1"
+		IsEqual(%CurrentSoul,"Icara")
+	THEN
+		DisplayText(__Me,"HOM_Combat_Icandra_I_Died",3)	
+	ELSE
+		DisplayText(__Me,"HOM_Combat_Icandra_L_Died",3)		
+	ENDIF
+	
+EVENT OnDeactivate_StopLoopFX
+ON
+	OnDeactivate()
+ACTIONS
+	StopLoopEffect(%FXHandle_01)
+	StopLoopEffect(%FXHandle_02)
+	StopLoopEffect(%FXHandle_03)
+	StopLoopEffect(%FXHandle_04)
+	StopLoopEffect(%FXHandle_05)
+
+EVENT OnDie_Zandalor_DisplayText
+ON
+	OnDie(%Zandalor,_,_,_)
+ACTIONS
+	IF "c1"
+		IsEqual(%CurrentSoul,"Icara")
+	THEN
+		DisplayText(__Me,"HOM_Combat_Icandra_I_ZandalorDied",3)	
+	ELSE
+		DisplayText(__Me,"HOM_Combat_Icandra_L_ZandalorDied",3)		
+	ENDIF

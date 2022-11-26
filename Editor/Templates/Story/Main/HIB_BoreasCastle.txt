@@ -1,0 +1,239 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+ItemToCharacter(ITEM_HIB_ElementalStaff,CHARACTER_HIB_KingBoreas);
+
+DB_IsNotMessingAround(CHARACTER_HIB_KingBoreas);
+SneakTriggerSpotter(TRIGGER_HIB_Area_KingBoreas, CHARACTER_HIB_KingBoreas);
+
+//REGION SURFACE MATTERS
+DB_HIB_BoreasFightSurfaces(TRIGGER_HIB_Point_WardenSurface1);
+DB_HIB_BoreasFightSurfaces(TRIGGER_HIB_Point_WardenSurface2);
+DB_HIB_BoreasFightSurfaces(TRIGGER_HIB_Point_WardenSurface3);
+DB_HIB_BoreasFightSurfaces(TRIGGER_HIB_Point_WardenSurface4);
+DB_HIB_BoreasFightSurfaces(TRIGGER_HIB_Point_WardenSurface5);
+DB_HIB_BoreasFightSurfaceTypes("Ice","Fire","HIB_Boreas_Surface_Comment_Ice","TheWarden_Ice","Boreas_SummonIceElementals","FX_Creatures_Skills_IceKing_ChangeElement_Ice_Cast_A","HIB_Boreas_PlayIceFX_Event");
+DB_HIB_BoreasFightSurfaceTypes("Fire","Ooze","HIB_Boreas_Surface_Comment_Fire","TheWarden_Fire","Boreas_SummonFireElementals","FX_Creatures_Skills_IceKing_ChangeElement_Fire_Cast_A","HIB_Boreas_PlayFireFX_Event");
+DB_HIB_BoreasFightSurfaceTypes("Ooze","Electrified","HIB_Boreas_Surface_Comment_Ooze","TheWarden_Earth","Boreas_SummonEarthElementals","FX_Creatures_Skills_IceKing_ChangeElement_Earth_Cast_A","HIB_Boreas_PlayEarthFX_Event");
+DB_HIB_BoreasFightSurfaceTypes("Electrified","Ice","HIB_Boreas_Surface_Comment_Electricity","TheWarden_Lightning","Boreas_SummonAirElementals","FX_Creatures_Skills_IceKing_ChangeElement_Wind_Cast_A","HIB_Boreas_PlayAirFX_Event");
+//END_REGION
+
+//REGION ALTARS
+DB_HIB_Altars(ITEM_HIB_Altar_Air,"TOTEM_HIB_Altar_Air_Debuff","HIB_BoreasDebuffAir");
+DB_HIB_Altars(ITEM_HIB_Altar_Fire,"TOTEM_HIB_Altar_Fire_Debuff","HIB_BoreasDebuffFire");
+DB_HIB_Altars(ITEM_HIB_Altar_Earth,"TOTEM_HIB_Altar_Earth_Debuff","HIB_BoreasDebuffEarth");
+DB_HIB_Altars(ITEM_HIB_Altar_Ice,"TOTEM_HIB_Altar_Ice_Debuff","HIB_BoreasDebuffWater");
+//END_REGION
+
+DB_Boreas_Arithmetics(0);
+
+DB_ItemDialogs(ITEM_HIB_StatueThroneRoom, "HIB_BoreasStatue");
+KBSECTION
+//REGION ENTERING THE CASTLE
+IF
+GameBookInterfaceClosed(ITEM_HIB_BloodStoneGuardOrders,_Player)
+AND
+NOT ITEM_HIB_BloodStoneGuardOrders.Read()
+THEN
+ITEM_HIB_BloodStoneGuardOrders.Read();
+Launch_PlayerComment(_Player,"HIB_CommentOnCastlePassword");
+GlobalSetEvent("HIB_KnowsForcefieldPassword");
+QuestUpdate("HIB_Boreas","LearnedPassword");
+//END_REGION
+
+//REGION BOREAS FIGHT - ALTAR DESTROYED
+IF
+ItemDestroyed(_Item)
+AND
+DB_HIB_Altars(_Item,_Potion,_Comment)
+AND
+NOT DB_Dead(CHARACTER_HIB_KingBoreas)
+AND
+CharacterConsume(CHARACTER_HIB_KingBoreas,_Potion,_Handle)
+THEN
+NOT DB_HIB_Altars(_Item,_Potion,_Comment);
+CharacterDisplayText(CHARACTER_HIB_KingBoreas,_Comment);
+//END_REGION
+
+//REGION BOREAS FIGHT - COMBAT INTRO
+IF
+CharacterAttackedByCharacter(CHARACTER_HIB_KingBoreas, _Player)
+AND
+NOT DB_Combat(CHARACTER_HIB_KingBoreas,_)
+AND
+DB_Boreas_Arithmetics(1)
+THEN
+DB_Boreas_Arithmetics(2);
+DialogRequestStopForCharacter(CHARACTER_HIB_KingBoreas);
+CharacterSetCanFight(CHARACTER_HIB_KingBoreas,1);
+CharacterMoveToCharacter(CHARACTER_HIB_KingBoreas,_Player,1,"",1);
+
+IF
+ItemAttackedByCharacter(_Item, _Player, _)
+AND
+DB_HIB_Altars(_Item, _, _)
+AND
+NOT DB_Combat(CHARACTER_HIB_KingBoreas,_)
+AND
+DB_Boreas_Arithmetics(1)
+THEN
+DB_Boreas_Arithmetics(2);
+DialogRequestStopForCharacter(CHARACTER_HIB_KingBoreas);
+CharacterSetCanFight(CHARACTER_HIB_KingBoreas,1);
+CharacterMoveToCharacter(CHARACTER_HIB_KingBoreas,_Player,1,"",1);
+
+PROC
+ProcCharInTriggerSpotted(_Player, TRIGGER_HIB_Area_KingBoreas)
+AND
+DB_Boreas_Arithmetics(0)
+THEN
+PROC_MendatoryDialog("HIB_KingBoreas",CHARACTER_HIB_KingBoreas,_Player);
+NOT DB_Boreas_Arithmetics(0);
+DB_Boreas_Arithmetics(1);
+
+IF
+CharacterAttackedByCharacter(CHARACTER_HIB_KingBoreas,_Player)
+AND
+DB_Boreas_Arithmetics(0)
+THEN
+ProcDoTwoSpeakerDialog("HIB_KingBoreas",CHARACTER_HIB_KingBoreas,_Player);
+NOT DB_Boreas_Arithmetics(0);
+DB_Boreas_Arithmetics(1);
+
+IF
+CharacterEvent(CHARACTER_HIB_KingBoreas,"HIB_Boreas_StartConversation")
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_HIB_KingBoreas,_Player)
+AND
+DB_Boreas_Arithmetics(0)
+THEN
+PROC_MendatoryDialog("HIB_KingBoreas",CHARACTER_HIB_KingBoreas,_Player);
+NOT DB_Boreas_Arithmetics(0);
+DB_Boreas_Arithmetics(1);
+
+IF
+DialogEnded("HIB_KingBoreas",_)
+AND
+CharacterGetClosestPlayer(CHARACTER_HIB_KingBoreas,_Player)
+THEN
+CharacterSetCanFight(CHARACTER_HIB_KingBoreas,1);
+CharacterMoveToCharacter(CHARACTER_HIB_KingBoreas,_Player,1,"",1);
+
+IF
+CharacterEnteredCombat(CHARACTER_HIB_KingBoreas,_)
+THEN
+CharacterPurgeQueue(CHARACTER_HIB_KingBoreas);
+//END_REGION
+
+//REGION BOREAS FIGHT - SURFACES
+IF
+CharacterEvent(CHARACTER_HIB_KingBoreas,"HIB_WardenSurfaceSpawn")
+AND
+NOT DB_Dead(CHARACTER_HIB_KingBoreas)
+THEN
+PROC_HIB_BoreasClearSurfaces();
+PROC_HIB_BoreasPlayFlavorActions();
+PROC_HIB_BoreasSpawnSurfaces();
+PROC_HIB_BoreasChangeSurfaceType();
+
+PROC
+PROC_HIB_BoreasClearSurfaces()
+AND
+DB_HIB_BoreasFightSurfaces(_Trigger)
+THEN
+TriggerCreateSurface(_Trigger,"None",10.0);
+
+PROC
+PROC_HIB_BoreasSpawnSurfaces()
+AND
+DB_HIB_BoreasFightSurfaces(_Trigger)
+AND
+DB_HIB_BoreasFightSurfaceTypes(_Type,_New,_BoreasComment,_NewAtmo,_,_,_)
+AND
+CharacterGetVarString(CHARACTER_HIB_KingBoreas,"SurfaceType",_Type)
+THEN
+TriggerCreatePuddle(_Trigger,_Type,550,750,15,30,0.2);
+
+PROC
+PROC_HIB_BoreasPlayFlavorActions()
+AND
+CharacterGetVarString(CHARACTER_HIB_KingBoreas,"SurfaceType",_Type)
+AND
+DB_HIB_BoreasFightSurfaceTypes(_Type,_New,_BoreasComment,_NewAtmo,_SummoningSpell,_ChangeAtmFX,_BoreasEvent)
+THEN
+CharacterPlayAnimation(CHARACTER_HIB_KingBoreas,"cast_ground_cast","");
+CharacterPlayEffect(CHARACTER_HIB_KingBoreas,_ChangeAtmFX);
+CharacterDisplayText(CHARACTER_HIB_KingBoreas,_BoreasComment);
+TriggerSetAtmosphere("1209632a-43ef-4fdf-8f16-1bb584a5aa29",_NewAtmo);
+CharacterSetReactionPriority(CHARACTER_HIB_KingBoreas,_SummoningSpell,500);
+CharacterSetEvent(CHARACTER_HIB_KingBoreas,_BoreasEvent);
+
+PROC
+PROC_HIB_BoreasChangeSurfaceType()
+AND
+CharacterGetVarString(CHARACTER_HIB_KingBoreas,"SurfaceType",_Type)
+AND
+DB_HIB_BoreasFightSurfaceTypes(_Type,_New,_,_,_,_,_)
+THEN
+CharacterSetVarString(CHARACTER_HIB_KingBoreas,"SurfaceType",_New);
+//END_REGION
+
+//REGION BOREAS FIGHT - CONCLUSION
+IF
+CharacterDied(CHARACTER_HIB_KingBoreas)
+THEN
+ItemSetEvent(ITEM_HIB_CastleGate1, "shutDown");
+ItemSetCanInteract(ITEM_HIB_CastleGate1,0);
+GlobalSetEvent("HIB_BoreasKilled");
+QuestUpdate("HIB_Boreas", "KilledBoreas");
+QuestUpdate("HOM_Starstones", "KilledBoreas");
+QuestUpdate("LUC_WhiteWitch","BoreasIsDead");
+TriggerResetAtmosphere("1209632a-43ef-4fdf-8f16-1bb584a5aa29");
+
+IF
+ItemAddedToCharacter(ITEM_HIB_ElementalStaff,_Player)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_OnlyOnce("HIB_Staff")
+THEN
+DB_OnlyOnce("HIB_Staff");
+ProcDoTwoSpeakerItemDialog("HIB_Staff",_Player,ITEM_HIB_ElementalStaff);
+QuestUpdate("HIB_Boreas","LearnedForge");
+GlobalSetEvent("HIB_PlayersHaveBoreasStaff");
+//END_REGION
+
+//REGION BOREAS STATUE
+IF
+GlobalEventSet("ThroneRoomBoom")
+THEN
+ITEM_HIB_StatueThroneRoom.prepForExplosion();
+GlobalClearEvent("ThroneRoomBoom");
+
+IF
+GlobalEventSet("ThroneRoomUnlock")
+THEN
+ITEM_HIB_StatueThroneRoom.prepForReward();
+GlobalClearEvent("ThroneRoomUnlock");
+
+IF
+DialogEnded("HIB_BoreasStatue", _)
+AND
+ITEM_HIB_StatueThroneRoom.prepForExplosion()
+THEN
+NOT ITEM_HIB_StatueThroneRoom.prepForExplosion();
+ItemSetEvent(ITEM_HIB_StatueThroneRoom, "explode");
+
+IF
+DialogEnded("HIB_BoreasStatue", _)
+AND
+ITEM_HIB_StatueThroneRoom.prepForReward()
+THEN
+NOT ITEM_HIB_StatueThroneRoom.prepForReward();
+ItemSetEvent(ITEM_HIB_CastleGate2, "shutDown");
+ItemSetCanInteract(ITEM_HIB_StatueThroneRoom, 0);
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

@@ -1,0 +1,25 @@
+INIT
+EXTERN CHARACTER:%Master = null
+EXTERN FIXEDSTRING:%HostileFaction = null
+CHARACTER:__Me
+
+EVENTS
+EVENT MasterDies
+ON
+	OnDie(%Master,_,_,_)
+ACTIONS
+	IF "!c1"
+		CharacterIsDead(__Me)
+	THEN
+		CharacterSetFaction(__Me,%HostileFaction)
+		DisplayText(__Me,"GEN_GoHostile",5)
+		IterateCharactersInCombat(__Me,"PartnerGoesHostile")
+	ENDIF
+
+EVENT AlertPartners
+VARS
+	CHARACTER:_Character
+ON
+	OnIterateCharacter(_Character,"PartnerGoesHostile")
+ACTIONS
+	CharacterEvent(_Character,"PartnerGoesHostile")

@@ -1,0 +1,101 @@
+/*
+
+	/!\ This script isn't used anymore. /!\ 
+
+
+INIT
+	CHARACTER:__Me
+	INT:%Bool_FXRestore=0
+	INT:%RbtMiss_FXHandle	
+	EXTERN INT:%RbtMiss_TurnCurrent=2
+	EXTERN INT:%RbtMiss_TurnDesired=2
+	FLOAT:%MySightRange=0
+	FLOAT3:%RbtMiss_Spot		
+
+//-----------
+BEHAVIOUR	
+REACTION Robot_PlaceMarkOnTheGround,0
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MyCurrentAP
+CHECK "c1&c2&c3&c4&!c5"
+	IsHardcore()
+	CharacterGet(_Target,__Me,%MySightRange,Random,Distance,Enemy)
+	GetPosition(_Target,%RbtMiss_Spot)
+	CharacterGetStat(_MyCurrentAP,__Me,ActionPoints)
+	IsLessThen(_MyCurrentAP,4)
+ACTIONS
+	CharacterLookAt(_Target)
+	CharacterPlayEffect(__Me,"FX_Creatures_Skills_MetalRain_Cast_Chicken_A")
+	CharacterPlayAnimation("cast_ground_loop",0,1)
+	CharacterPlayAnimation("cast_ground_cast",1,0)
+	Sleep(0.2)
+	PlayLoopEffectAt(%RbtMiss_FXHandle,%RbtMiss_Spot,"FX_Creatures_Skills_MetalRain_Target_Chicken_A")
+	Set(%Bool_FXRestore,1)
+	Sleep(0.5)	
+	SetPriority("Robot_PlaceMarkOnTheGround",0)
+INTERRUPT
+	Reset()	
+
+REACTION Robot_ExplodeAt,0
+USAGE COMBAT
+CHECK "c1"
+	IsHardcore()
+ACTIONS
+	CharacterLookAt(%RbtMiss_Spot)
+	CharacterPlayAnimation("cast_rain_loop",0,1)
+	CharacterPlayAnimation("cast_rain_cast",1,0)
+	PlayEffectAt(%RbtMiss_Spot,"FX_Creatures_Skills_MetalRain_Impact_Chicken_A")
+	Sleep(0.5)
+	ExplodeAt(%RbtMiss_Spot,"Projectile_EnemyFireball",10)
+	CreateSurfaceAt(%RbtMiss_Spot,"Fire",2,4)
+	StopLoopEffect(%RbtMiss_FXHandle)
+	Set(%RbtMiss_TurnCurrent,0)
+	Set(%Bool_FXRestore,0)
+	Sleep(3)
+	SetPriority("Robot_ExplodeAt",0)
+INTERRUPT
+	Reset()	
+
+//-----------
+EVENTS
+EVENT OnInit_RestoreFX
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		IsEqual(%Bool_FXRestore,1)
+	THEN
+		PlayLoopEffectAt(%RbtMiss_FXHandle,%RbtMiss_Spot,"FX_Creatures_Skills_MetalRain_Target_Chicken_A")
+	ENDIF
+	
+EVENT OnTurn_Robot_MissileControl
+ON
+	OnTurn()
+ACTIONS
+	IF "c1&c2"
+		IsHardcore()	
+		IsLessThen(%RbtMiss_TurnCurrent,%RbtMiss_TurnDesired)
+	THEN
+		Add(%RbtMiss_TurnCurrent,1)
+	ELIF "c1&c2"
+		IsHardcore()
+		IsEqual(%RbtMiss_TurnCurrent,%RbtMiss_TurnDesired)
+	THEN
+		Add(%RbtMiss_TurnCurrent,1)
+		SetPriority("Robot_Hardcore_PlaceMarkOnTheGround",500)
+	ELIF "c1&c2"
+		IsHardcore()
+		IsGreaterThen(%RbtMiss_TurnCurrent,%RbtMiss_TurnDesired)
+	THEN
+		SetPriority("Robot_Hardcore_ExplodeAt",500)
+	ENDIF	
+	
+EVENT OnDeactivate_StopLoopFX
+ON
+	OnDeactivate()
+ACTIONS
+	StopLoopEffect(%RbtMiss_FXHandle)
+	
+*/	

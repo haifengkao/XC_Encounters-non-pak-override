@@ -1,0 +1,29 @@
+INIT
+CHARACTER:__Me
+CHARACTER:%SparringPartner = LUC_WitchCave_Boar_a7ac677e-866f-45d6-b326-bf0eaafda40b
+
+BEHAVIOUR
+
+REACTION TrainingAttack, 1100
+USAGE PEACE
+VARS 
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&!c2"
+	CharacterGetWeaponRange(_MinRange,_MaxRange,__Me)
+	CharacterIsDead(%SparringPartner)
+ACTIONS
+	CharacterMoveInRange(%SparringPartner,_MinRange,_MaxRange)
+	CharacterAttack(%SparringPartner)
+	DisplayText(__Me, "LUC_WC_StrikingImmaculate", 2)
+	DisplayText(%SparringPartner, "LUC_WC_Boar", 2)
+	Sleep(6)
+INTERRUPT
+	Reset()
+
+REACTION UnSheath, 1101
+USAGE PEACE
+CHECK "!c1"
+	CharacterHasStatus(__Me,UNSHEATHED)
+ACTIONS
+	CharacterApplyStatus(__Me,UNSHEATHED)

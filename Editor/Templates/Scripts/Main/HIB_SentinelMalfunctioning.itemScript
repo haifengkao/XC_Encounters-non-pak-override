@@ -1,0 +1,56 @@
+INIT
+ITEM:__Me
+INT:%EffectHandle = null
+INT:%CommentTimes = 1
+
+BEHAVIOUR
+REACTION Talking, 1000
+USAGE ALL
+VARS
+	STRING:_Effect
+	FIXEDSTRING:_Text
+	FLOAT:_Sleep = 20.0
+ACTIONS
+	GetRandom(_Text,"HIB_SentinelMalfunctioning_1","HIB_SentinelMalfunctioning_2","HIB_SentinelMalfunctioning_3")
+	DisplayText(__Me,_Text,5.0)
+	Multiply(_Sleep, %CommentTimes)
+	Add(%CommentTimes, 1)
+	Sleep(_Sleep)
+	IF "c1"
+		IsGreaterThen(%CommentTimes, 10)
+	THEN
+		Set(%CommentTimes, 1)
+	ENDIF
+
+EVENTS
+EVENT Init
+ON
+	OnInit()
+VARS
+	FLOAT:_Duration
+ACTIONS
+	ItemPlayLoopEffect(%EffectHandle,__Me,"FX_GP_Light_Orange_A")
+	GetRandomBetween(_Duration,0.5,2.0)
+	StartTimer("LightSwitch",_Duration,0)
+
+EVENT Shutdown
+ON
+	OnShutdown()
+ACTIONS
+	StopTimer("LightSwitch")
+	StopLoopEffect(%EffectHandle)
+	Set(%EffectHandle,0)
+
+EVENT LightSwitch
+ON
+	OnTimer("LightSwitch")
+VARS
+	STRING:_Effect
+	FLOAT:_Duration
+ACTIONS
+	StopLoopEffect(%EffectHandle)
+	Set(%EffectHandle,0)
+	GetRandom(_Effect,"FX_GP_Light_Orange_A","FX_GP_Light_Red_A","FX_GP_Light_Blue_A","FX_GP_Light_Green_A","FX_GP_Light_Yellow_A")
+	ItemPlayLoopEffect(%EffectHandle,__Me,_Effect)
+	GetRandomBetween(_Duration,0.5,2.0)
+	StartTimer("LightSwitch",_Duration,0)

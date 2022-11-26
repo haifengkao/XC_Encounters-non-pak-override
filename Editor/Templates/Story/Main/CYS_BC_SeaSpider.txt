@@ -1,0 +1,260 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+//REGION Canal Trigger / Canal Target / Canal Active? / Canal Used / WaterFX Event
+
+DB_CYS_BC_SeaSpiderElements(TRIGGER_CYS_BC_SeaSpider_Canal01, ITEM_CYS_BC_SeaSpider_Water_Invisible_01, 0, "Used_Canal_01", "Interrupt_Canal_01");
+
+DB_CYS_BC_SeaSpiderElements(TRIGGER_CYS_BC_SeaSpider_Canal02, ITEM_CYS_BC_SeaSpider_Water_Invisible_02, 0, "Used_Canal_02", "Interrupt_Canal_02");
+
+DB_CYS_BC_SeaSpiderElements(TRIGGER_CYS_BC_SeaSpider_Canal03, ITEM_CYS_BC_SeaSpider_Water_Invisible_03, 0, "Used_Canal_03", "Interrupt_Canal_03");
+
+DB_CYS_BC_SeaSpiderElements(TRIGGER_CYS_BC_SeaSpider_Canal04, ITEM_CYS_BC_SeaSpider_Water_Invisible_04, 0, "Used_Canal_04", "Interrupt_Canal_04");
+
+//END_REGION
+
+//REGION Sea Spider Player Comments
+
+DB_PlayerComments("CYS_BC_CommentSpiderCrab","CYS_BC_CommentSpiderCrab_1_1",1,1);
+
+DB_PlayerComments("CYS_BC_CommentSpiderCrab","CYS_BC_CommentSpiderCrab_2_1",2,1);
+
+DB_PlayerComments("CYS_BC_CommentSpiderCrab","CYS_BC_CommentSpiderCrab_2_2",2,2);
+
+DB_PlayerComments("CYS_BC_TutorialSpiderCrab","CYS_BC_TutorialSpiderCrab_1_1",1,1);
+
+DB_PlayerComments("CYS_BC_TutorialSpiderCrab","CYS_BC_TutorialSpiderCrab_2_1",2,1);
+
+DB_PlayerComments("CYS_BC_TutorialSpiderCrab","CYS_BC_TutorialSpiderCrab_2_2",2,2);
+
+//END_REGION
+
+CharacterSetOnStage(CHARACTER_CYS_BC_SeaSpider,0);
+CharacterSetOnStage(CHARACTER_CYS_BC_SpiderBoss_InitialSpiderling_01,0);
+CharacterSetOnStage(CHARACTER_CYS_BC_SpiderBoss_InitialSpiderling_02,0);
+CharacterSetOnStage(CHARACTER_CYS_BC_SpiderBoss_InitialSpiderling_03,0);
+
+AmbushTrigger(TRIGGER_CYS_BC_SeaSpider_SpawnBox, ITEM_CYS_BC_SeaSpider_Spawn_InvisibleAmbushHelper);
+
+PROC_CYS_BC_SeaSpider_RegisterTriggers();
+KBSECTION
+//REGION Register Trigger for Players
+PROC
+PROC_CYS_BC_SeaSpider_RegisterTriggers()
+AND
+DB_CYS_BC_SeaSpiderElements(_CanalTrigger,_,_,_,_)
+THEN
+ProcTriggerRegisterForPlayers(_CanalTrigger);
+ProcTriggerRegisterForPlayers(TRIGGER_CYS_BC_SeaSpider_SpiderZone);
+//END_REGION
+
+//REGION Spawn Spider, Player Comment, TP Party if in Spider Zone
+PROC
+ProcLaunchAmbush(TRIGGER_CYS_BC_SeaSpider_SpawnBox, _Player)
+THEN	
+CharacterAppear(CHARACTER_CYS_BC_SeaSpider,1);
+TimerLaunch("CYS_BC_SeaSpider_TP_Spider",100);
+
+IF
+TimerFinished("CYS_BC_SeaSpider_TP_Spider")
+AND
+_Player.DB_IsPlayer()
+AND
+DB_InRegion(_Player,TRIGGER_CYS_BC_SeaSpider_SpiderZone)
+THEN
+CharacterTeleportToTrigger(_Player, TRIGGER_CYS_BC_SeaSpider_SpawnTP_01,"");
+
+IF
+TimerFinished("CYS_BC_SeaSpider_TP_Spider")
+THEN
+CharacterAppearAtTrigger(CHARACTER_CYS_BC_SeaSpider,TRIGGER_CYS_BC_SeaSpider_SpiderTeleport,1);
+TimerLaunch("CYS_BC_SeaSpider_PlayerComment_Timer",5700);
+TimerLaunch("CYS_BC_SeaSpider_SpawnTinySpider_01",10000);
+TimerLaunch("CYS_BC_SeaSpider_SpawnTinySpider_02",10500);
+TimerLaunch("CYS_BC_SeaSpider_SpawnTinySpider_03",11200);
+TriggerUnregisterForPlayers(TRIGGER_CYS_BC_SeaSpider_SpiderZone);
+
+IF
+TimerFinished("CYS_BC_SeaSpider_PlayerComment_Timer")
+AND
+CharacterGetClosestPlayer(CHARACTER_CYS_BC_SeaSpider, _Player)
+THEN
+Launch_PlayerComment(_Player, "CYS_BC_CommentSpiderCrab");
+//END_REGION
+
+//REGION Spawn Tiny Spiders
+IF
+TimerFinished("CYS_BC_SeaSpider_SpawnTinySpider_01")
+THEN
+CharacterAppear(CHARACTER_CYS_BC_SpiderBoss_InitialSpiderling_01,1);
+
+IF
+TimerFinished("CYS_BC_SeaSpider_SpawnTinySpider_02")
+THEN
+CharacterAppear(CHARACTER_CYS_BC_SpiderBoss_InitialSpiderling_02,1);
+
+IF
+TimerFinished("CYS_BC_SeaSpider_SpawnTinySpider_03")
+THEN
+CharacterAppear(CHARACTER_CYS_BC_SpiderBoss_InitialSpiderling_03,1);
+//END_REGION
+
+//REGION Play Tutorial
+IF
+CharacterEvent(CHARACTER_CYS_BC_SeaSpider,"CYS_BC_SeaSpider_TutorialAD")
+AND
+CharacterGetClosestPlayer(CHARACTER_CYS_BC_SeaSpider, _Player)
+THEN
+Launch_PlayerComment(_Player, "CYS_BC_TutorialSpiderCrab");
+//END_REGION
+
+//REGION Establish Water Beams
+IF
+CharacterEvent(CHARACTER_CYS_BC_SeaSpider,_CanalUsed)												//comes from script, works like a skill + subject to random
+AND
+DB_CYS_BC_SeaSpiderElements(_CanalTrigger,_CanalTarget,_CanalActive,_CanalUsed,_)
+AND
+NOT DB_InRegion(_,_CanalTrigger)
+AND
+ItemPlayLoopBeamEffect(_CanalTarget,CHARACTER_CYS_BC_SeaSpider,"FX_GP_Beam_Water_A","","Dummy_CastFX",_WaterBeamHandle)		//beam fx
+AND
+ItemPlayLoopEffect(_CanalTarget,"FX_Env_Water_SuckedUpWater_Splash_A",_WaterTargetHandle)			//fx on target in the water
+THEN																								//create a new db with
+DB_CYS_BC_WaterBeamFX(_CanalTrigger,_WaterBeamHandle);
+DB_CYS_BC_WaterTargetFX(_CanalTarget,_WaterTargetHandle);
+
+IF //set CanalActive to 1 - special case not taking into account the fact that a player stands in the way
+CharacterEvent(CHARACTER_CYS_BC_SeaSpider,_CanalUsed)
+AND
+DB_CYS_BC_SeaSpiderElements(_CanalTrigger,_CanalTarget,_CanalActive,_CanalUsed,_InterruptFX)
+THEN
+NOT DB_CYS_BC_SeaSpiderElements(_CanalTrigger,_CanalTarget,_CanalActive,_CanalUsed,_InterruptFX);
+DB_CYS_BC_SeaSpiderElements(_CanalTrigger,_CanalTarget,1,_CanalUsed,_InterruptFX);
+
+IF
+CharacterEvent(CHARACTER_CYS_BC_SeaSpider,"UsingCanals")
+THEN
+TimerLaunch("CYS_BC_SeaSpider_GoingToShake",200);
+TimerLaunch("CYS_BC_SeaSpider_UsingCanals",7000);
+
+IF
+TimerFinished("CYS_BC_SeaSpider_GoingToShake")
+AND
+_Player.DB_IsPlayer()
+THEN
+CharacterPlayEffect(_Player,"FX_GP_CameraShake_A");
+//END_REGION
+
+//REGION Shutdown Water Beams
+IF
+TimerFinished("CYS_BC_SeaSpider_UsingCanals")
+AND
+DB_CYS_BC_SeaSpiderElements(_CanalTrigger,_CanalTarget,_CanalActive,_CanalUsed,_InterruptFX)
+AND
+DB_CYS_BC_WaterBeamFX(_CanalTrigger,_WaterBeamHandle)
+AND
+DB_CYS_BC_WaterTargetFX(_CanalTarget,_WaterTargetHandle)
+THEN
+StopLoopEffect(_WaterBeamHandle);
+NOT DB_CYS_BC_WaterBeamFX(_CanalTrigger,_WaterBeamHandle);
+StopLoopEffect(_WaterTargetHandle);
+NOT DB_CYS_BC_WaterTargetFX(_CanalTarget,_WaterTargetHandle);
+CharacterSetEvent(CHARACTER_CYS_BC_SeaSpider,_InterruptFX);
+CharacterSetEvent(CHARACTER_CYS_BC_SeaSpider,"CYS_BC_SeaSpider_Charged");
+
+IF	//set CanalActive to 0 - special case not taking into account the fact that a player stands in the way
+TimerFinished("CYS_BC_SeaSpider_UsingCanals")
+AND
+DB_CYS_BC_SeaSpiderElements(_CanalTrigger,_CanalTarget,_CanalActive,_CanalUsed,_InterruptFX)
+THEN
+NOT DB_CYS_BC_SeaSpiderElements(_CanalTrigger,_CanalTarget,_CanalActive,_CanalUsed,_InterruptFX);
+DB_CYS_BC_SeaSpiderElements(_CanalTrigger,_CanalTarget,0,_CanalUsed,_InterruptFX);
+//END_REGION
+
+//REGION Emergency Water Beam Shutdown  (if Player Skipped Their Turn)
+IF
+CharacterEvent(CHARACTER_CYS_BC_SeaSpider,"CYS_BC_SeaSpider_ItsMyTurn")	//here in case the player skipped their turn we kill all fxs + sent the event as if the UsingCanals timer had ended properly
+AND
+DB_CYS_BC_SeaSpiderElements(_CanalTrigger,_CanalTarget,_CanalActive,_CanalUsed,_InterruptFX)
+AND
+DB_CYS_BC_WaterBeamFX(_CanalTrigger,_WaterBeamHandle)
+AND
+DB_CYS_BC_WaterTargetFX(_CanalTarget,_WaterTargetHandle)
+THEN
+TimerCancel("CYS_BC_SeaSpider_UsingCanals");
+StopLoopEffect(_WaterBeamHandle);
+NOT DB_CYS_BC_WaterBeamFX(_CanalTrigger,_WaterBeamHandle);
+StopLoopEffect(_WaterTargetHandle);
+NOT DB_CYS_BC_WaterTargetFX(_CanalTarget,_WaterTargetHandle);
+CharacterSetEvent(CHARACTER_CYS_BC_SeaSpider,_InterruptFX);
+CharacterSetEvent(CHARACTER_CYS_BC_SeaSpider,"CYS_BC_SeaSpider_Charged");
+
+IF
+CharacterEvent(CHARACTER_CYS_BC_SeaSpider,"CYS_BC_SeaSpider_ItsMyTurn") //set CanalActive to 0 in case of emergency shutdown
+AND
+DB_CYS_BC_SeaSpiderElements(_CanalTrigger,_CanalTarget,_CanalActive,_CanalUsed,_InterruptFX)
+THEN
+NOT DB_CYS_BC_SeaSpiderElements(_CanalTrigger,_CanalTarget,_CanalActive,_CanalUsed,_InterruptFX);
+DB_CYS_BC_SeaSpiderElements(_CanalTrigger,_CanalTarget,0,_CanalUsed,_InterruptFX);
+//END_REGION
+
+//REGION Close Water Beams: Play Sucking Water Anim & Send Big Puddle Event
+IF
+TimerFinished("CYS_BC_SeaSpider_UsingCanals")
+THEN
+TimerLaunch("CYS_BC_SeaSpider_Sucking_Timer",355);
+
+IF
+TimerFinished("CYS_BC_SeaSpider_Sucking_Timer")
+THEN
+CharacterPlayAnimation(CHARACTER_CYS_BC_SeaSpider,"SuckWater_End","");
+CharacterSetReactionPriority(CHARACTER_CYS_BC_SeaSpider, "SeaSpider_Suckinganimation", 0);
+CharacterSetEvent(CHARACTER_CYS_BC_SeaSpider,"CYS_BC_CreatePuddleUnderSpider");
+//END_REGION
+
+//REGION Block & Unblock Canals
+IF		//BLOCKING CANAL
+CharacterEnteredTrigger(_Player,_CanalTrigger)
+AND
+_Player.DB_IsPlayer()
+AND
+DB_CYS_BC_SeaSpiderElements(_CanalTrigger,_CanalTarget,1,_,_InterruptFX)
+AND
+DB_CYS_BC_WaterBeamFX(_CanalTrigger,_WaterBeamHandle)
+AND
+DB_CYS_BC_WaterTargetFX(_CanalTarget,_WaterTargetHandle)
+THEN
+CharacterApplyStatus(_Player,"WET", 12.0);
+StopLoopEffect(_WaterBeamHandle);
+NOT DB_CYS_BC_WaterBeamFX(_CanalTrigger,_WaterBeamHandle);
+StopLoopEffect(_WaterTargetHandle);
+NOT DB_CYS_BC_WaterTargetFX(_CanalTarget,_WaterTargetHandle);
+CharacterSetEvent(CHARACTER_CYS_BC_SeaSpider,_InterruptFX);
+
+IF		//UNBLOCKING CANAL
+CharacterLeftTrigger(_Player,_CanalTrigger)
+AND
+_Player.DB_IsPlayer()
+AND
+DB_CYS_BC_SeaSpiderElements(_CanalTrigger,_CanalTarget,1,_,_)
+AND
+NOT DB_InRegion(_,_CanalTrigger)
+AND
+ItemPlayLoopBeamEffect(_CanalTarget,CHARACTER_CYS_BC_SeaSpider,"FX_GP_Beam_Water_A","","Dummy_CastFX",_WaterBeamHandle)
+AND
+ItemPlayLoopEffect(_CanalTarget,"FX_Env_Water_Splash_River_A",_WaterTargetHandle)	
+THEN
+CharacterPlayEffect(_Player,"FX_GP_Footstep_A_Large_Water");
+DB_CYS_BC_WaterBeamFX(_CanalTrigger,_WaterBeamHandle);
+DB_CYS_BC_WaterTargetFX(_CanalTarget,_WaterTargetHandle);
+//END_REGION
+EXITSECTION
+
+
+
+
+
+
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

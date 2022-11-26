@@ -1,0 +1,48 @@
+#INCLUDE CYS_FairPeople
+
+INIT
+USING CYS_FairPeople
+TRIGGER:%Trigger1 = CYS_Point_FairCedric_1_fe18ab92-7cda-4ebb-aea8-e08b05d88a20
+FIXEDSTRING:%CurrentlyDoing = "State_NotPerforming"
+
+BEHAVIOUR
+
+REACTION State_NotPerforming, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, "Action_WaitForSpectators")
+	SetPriority(%currentAction, 1100)
+	
+REACTION State_Performing, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, "Action_Perform")
+	SetPriority(%currentAction, 1100)
+	
+REACTION Action_WaitForSpectators, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	CharacterMoveTo(%Trigger1)
+	CharacterLookFrom(%Trigger1)
+	GetRandom(_Animation,"Attention_01","Attention_02","Bored_01","Bored_02","Depressed_01","Sigh_01","Shrug_01")
+	CharacterPlayAnimation(_Animation)
+	Sleep(5)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)
+
+REACTION Action_Perform, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	CharacterMoveTo(%Trigger1)
+	CharacterLookFrom(%Trigger1)
+	GetRandom(_Animation,"Perform_01","Perform_02","Perform_03","Bow_01","Bow_02","Curtsey_01")
+	CharacterPlayAnimation(_Animation)
+	Sleep(5)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)

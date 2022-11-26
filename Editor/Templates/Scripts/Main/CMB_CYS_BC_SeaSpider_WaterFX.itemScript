@@ -1,0 +1,30 @@
+INIT
+
+ITEM:__Me
+EXTERN FLOAT:%SleepBeforeFX = 1.0
+EXTERN FLOAT:%WaterPuddleSize = 1.0
+EXTERN STRING:%InterruptEvent = ""
+EXTERN CHARACTER:%InterruptSource = CYS_BC_SeaSpider_71c50437-b2ed-4c15-a2eb-f580ddeae3d0
+EXTERN SURFACE:%SurfaceType = Water
+EXTERN STRING:%EffectName="FX_Env_Water_Splash_River_A"
+
+//------------------------
+
+EVENTS
+		
+EVENT CanalInterruptedEvent
+	ON
+	OnCharacterEvent(%InterruptSource,%InterruptEvent)
+	ACTIONS
+	SetPriority(CanalInterruptedFX,500)
+
+BEHAVIOUR
+	
+REACTION CanalInterruptedFX,0
+ACTIONS
+	Sleep(%SleepBeforeFX)
+	ItemPlayEffect(__Me,%EffectName)
+	CreateSurfaceAt(__Me,%SurfaceType,%WaterPuddleSize,4)
+	SetPriority(CanalInterruptedFX,0)
+INTERRUPT
+	Reset()

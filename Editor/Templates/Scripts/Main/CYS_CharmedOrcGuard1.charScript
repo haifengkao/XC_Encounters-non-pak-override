@@ -1,0 +1,72 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	CHARACTER:%Friend = CYS_CharmedOrcGuard2_5a647c1b-c340-4908-b13f-a5285084dc9f
+	CHARACTER:%Orc = CYS_CharmedOrc_1162016d-7f3f-42f4-bfd5-9754051976a5
+
+BEHAVIOUR
+
+REACTION State_WithTheOrc, 0
+	USAGE PEACE
+	ACTIONS
+		GetRandom(%currentAction, "Action_WatchOrc")
+		SetPriority(%currentAction, 1100)
+
+REACTION State_AfterTheOrc, 0
+	USAGE PEACE
+	ACTIONS
+		GetRandom(%currentAction, "Action_WaitingToHelp")
+		SetPriority(%currentAction, 1100)
+
+REACTION Action_WaitingToHelp, 0
+	USAGE PEACE
+	VARS
+		FIXEDSTRING:_Animation
+	ACTIONS
+		CharacterMoveTo(TRIGGER:CYS_PointOrcGuard1_2adb0195-f84b-4f2f-bc82-7d952f55f7f4)
+		CharacterLookFrom(TRIGGER:CYS_PointOrcGuard1_2adb0195-f84b-4f2f-bc82-7d952f55f7f4)
+		GetRandom(_Animation, "Sigh_01", "Tired_01")
+		CharacterPlayAnimation(_Animation)
+		Sleep(5)
+		DialogStart("CYS_AD_CharmedOrcGuardAfterKillingOrc",__Me)
+		Sleep(30)
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)
+
+REACTION Action_WatchOrc, 0
+	USAGE PEACE
+	VARS
+		FIXEDSTRING:_Animation
+	ACTIONS
+		IF "c1"
+			IsRandom(0.5)
+		THEN
+			CharacterLookAt(%Friend)
+			CharacterEvent(__Me, "LookAtMe")
+			DialogStart("CYS_AD_OrcFemaleGuards",%Friend,__Me)
+		ELSE
+			CharacterLookAt(%Orc)
+			GetRandom(_Animation,"Taunt_01","Taunt_02","Intimidate_01","Intimidate_02")
+			CharacterPlayAnimation(_Animation)
+		ENDIF
+		Sleep(4)
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)
+EVENTS
+
+EVENT OrcKilled
+ON
+	OnCharacterEvent(__Me,"CYS_GuardWalkAway")
+ACTIONS
+	Set(%currentState, "State_AfterTheOrc")
+
+STORY
+
+SCRIPTFRAME KillOrc
+ACTIONS	
+	CharacterMoveTo(%Orc,0)
+	CharacterAttack(%Orc, 1)

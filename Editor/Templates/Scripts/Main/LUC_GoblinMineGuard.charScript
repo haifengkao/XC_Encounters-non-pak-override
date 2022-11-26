@@ -1,0 +1,6 @@
+#INCLUDE DefaultCharacter
+#INCLUDE SpottingGuard
+
+INIT
+USING DefaultCharacter
+USING SpottingGuard

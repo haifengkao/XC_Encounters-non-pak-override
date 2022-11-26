@@ -1,0 +1,19 @@
+INIT
+
+ITEM:__Me
+
+EVENTS
+
+EVENT OnUseDestroy
+ON
+	OnUseItem(_, __Me)
+ACTIONS
+	SetPriority("Destroy", 900)
+	
+BEHAVIOUR
+
+REACTION Destroy, 0
+USAGE ALL
+ACTIONS
+	PlayEffectAt(__Me, "FX_Env_Crystal_Void_Explode_A")
+	ItemDestroy(__Me)

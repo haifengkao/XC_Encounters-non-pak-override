@@ -1,0 +1,145 @@
+INIT
+	ITEM:__Me
+	CHARACTER:%SpawnedChar1 = "DarkMinions_Eden_DeathKnight_017_f3768311-73ce-4283-814e-c4b461292342"
+	CHARACTER:%SpawnedChar2 = "DarkMinions_Eden_BlueKnight_005_3847d2b1-6aa3-4968-8ecd-5451580b1a98"
+	CHARACTER:%SpawnedChar3 = "DarkMinions_Eden_OrangeKnight_008_8e709001-ef0f-4d48-9236-97bc65c7b79c"
+	CHARACTER:%SpawnedChar4 = "DarkMinions_Eden_PinkKnight_005_606c2376-e045-49ff-8a2a-c944b5e18eb0"
+	CHARACTER:%SpawnedChar5 = "DarkMinions_Eden_GreenKnight_007_b708c765-07d4-4f22-b272-3e7e73d018fe"
+	CHARACTERTEMPLATE:%DeathTemplate = "DarkMinions_Eden_DeathKnight_93c3e196-d5be-4b25-9da0-d58a17e0a02c"
+	CHARACTERTEMPLATE:%OrangeTemplate = "DarkMinions_Eden_OrangeKnight_59293e32-f8db-4868-bd8f-c49149843d76"
+	CHARACTERTEMPLATE:%GreenTemplate = "DarkMinions_Eden_GreenKnight_ddc485de-a551-4765-9b38-4e6297780eb8"
+	CHARACTERTEMPLATE:%PinkTemplate = "DarkMinions_Eden_PinkKnight_5712610b-eb73-40d1-a7a6-5ec74de011e7"
+	CHARACTERTEMPLATE:%BlueTemplate = "DarkMinions_Eden_BlueKnight_cfdc6869-502d-4516-8d3a-74c22d4e0876"
+	TRIGGER:%SpawnTrigger1 = "END_DK_PortalSpawner_Slot1_fe1a12fa-4b14-41c6-818b-3e884aa48719"
+	TRIGGER:%SpawnTrigger2 = "END_DK_PortalSpawner_Slot2_23879662-0217-4bb6-bca2-8f40b5529dbc"
+	TRIGGER:%SpawnTrigger3 = "END_DK_PortalSpawner_Slot3_dd274c3d-789e-4d6e-941b-54c2d3d16a25"
+	TRIGGER:%SpawnTrigger4 = "END_DK_PortalSpawner_Slot4_9bb7810b-4f9c-4d56-8a30-45f16367196f"
+	TRIGGER:%SpawnTrigger5 = "END_DK_PortalSpawner_Slot5_c5a4c25b-ca28-44c2-ad52-4168cec26706"
+	INT:%NumberToSpawn = 10
+	INT:%NumberSpawned = 0
+	INT:%Spewing = 1
+
+//------------------------
+BEHAVIOUR
+REACTION SpawnChar1, 0
+VARS
+	FLOAT:_SleepValue	
+	CHARACTERTEMPLATE:_ChosenTemplate
+ACTIONS
+	GetRandomBetween(_SleepValue, 2, 4)
+	Sleep(_SleepValue)
+	GetWeightedRandom(_ChosenTemplate,%DeathTemplate,INT:3,%GreenTemplate,INT:1,%PinkTemplate,INT:3,%BlueTemplate,INT:3)
+	SpawnCharacter(%SpawnedChar1,_ChosenTemplate,%SpawnTrigger1,0)
+	PlayEffectAt(%SpawnedChar1,"FX_GP_StarStone_Up_B")
+	PlayEffectAt(%SpawnedChar3,"FX_GP_CameraShake_A")
+	GlobalSetEvent("END_LaunchDKRespawnComment")
+	SetPriority(SpawnChar1, 0)
+
+REACTION SpawnChar2, 0
+VARS
+	FLOAT:_SleepValue	
+	CHARACTERTEMPLATE:_ChosenTemplate
+ACTIONS
+	GetRandomBetween(_SleepValue, 2, 4)
+	Sleep(_SleepValue)
+	GetWeightedRandom(_ChosenTemplate,%DeathTemplate,INT:3,%GreenTemplate,INT:1,%PinkTemplate,INT:3,%BlueTemplate,INT:3)
+	SpawnCharacter(%SpawnedChar2,_ChosenTemplate,%SpawnTrigger2,0)
+	PlayEffectAt(%SpawnedChar2,"FX_GP_StarStone_Up_B")
+	PlayEffectAt(%SpawnedChar3,"FX_GP_CameraShake_A")
+	GlobalSetEvent("END_LaunchDKRespawnComment")
+	SetPriority(SpawnChar2, 0)
+
+REACTION SpawnChar3, 0	//there can be only one orange knight
+VARS
+	FLOAT:_SleepValue	
+	CHARACTERTEMPLATE:_ChosenTemplate
+ACTIONS
+	GetRandomBetween(_SleepValue, 2, 4)
+	Sleep(_SleepValue)
+	SpawnCharacter(%SpawnedChar3,%OrangeTemplate,%SpawnTrigger3,0)
+	PlayEffectAt(%SpawnedChar3,"FX_GP_StarStone_Up_B")
+	PlayEffectAt(%SpawnedChar3,"FX_GP_CameraShake_A")
+	GlobalSetEvent("END_LaunchDKRespawnComment")
+	SetPriority(SpawnChar3, 0)
+
+REACTION SpawnChar4, 0
+VARS
+	FLOAT:_SleepValue	
+	CHARACTERTEMPLATE:_ChosenTemplate
+ACTIONS
+	GetRandomBetween(_SleepValue, 2, 4)
+	Sleep(_SleepValue)
+	GetWeightedRandom(_ChosenTemplate,%DeathTemplate,INT:3,%GreenTemplate,INT:1,%PinkTemplate,INT:3,%BlueTemplate,INT:3)
+	SpawnCharacter(%SpawnedChar4,_ChosenTemplate,%SpawnTrigger4,0)
+	PlayEffectAt(%SpawnedChar4,"FX_GP_StarStone_Up_B")
+	PlayEffectAt(%SpawnedChar3,"FX_GP_CameraShake_A")
+	GlobalSetEvent("END_LaunchDKRespawnComment")
+	SetPriority(SpawnChar4, 0)
+
+REACTION SpawnChar5, 0
+VARS
+	FLOAT:_SleepValue	
+	CHARACTERTEMPLATE:_ChosenTemplate
+ACTIONS
+	GetRandomBetween(_SleepValue, 2, 4)
+	Sleep(_SleepValue)
+	GetWeightedRandom(_ChosenTemplate,%DeathTemplate,INT:3,%GreenTemplate,INT:1,%PinkTemplate,INT:3,%BlueTemplate,INT:3)
+	SpawnCharacter(%SpawnedChar5,_ChosenTemplate,%SpawnTrigger5,0)
+	PlayEffectAt(%SpawnedChar5,"FX_GP_StarStone_Up_B")
+	PlayEffectAt(%SpawnedChar3,"FX_GP_CameraShake_A")
+	GlobalSetEvent("END_LaunchDKRespawnComment")
+	SetPriority(SpawnChar5, 0)
+	
+//------------------------
+EVENTS
+
+EVENT OnCharacterDied
+VARS
+	CHARACTER:_Char				
+ON
+	OnDie(_Char, _, _, _)
+ACTIONS
+	IF "(c1|c2|c3|c4|c5)&c6"
+		IsEqual(_Char, %SpawnedChar1)
+		IsEqual(_Char, %SpawnedChar2)
+		IsEqual(_Char, %SpawnedChar3)
+		IsEqual(_Char, %SpawnedChar4)
+		IsEqual(_Char, %SpawnedChar5)
+		IsEqual(%Spewing, 1)
+	THEN
+		Add(%NumberSpawned, 1)
+		IF "c1"
+			IsEqual(_Char, %SpawnedChar1)
+		THEN
+			SetPriority(SpawnChar1, 1000)
+		ELIF "c1"
+			IsEqual(_Char, %SpawnedChar2)
+		THEN
+			SetPriority(SpawnChar2, 900)
+		ELIF "c1"
+			IsEqual(_Char, %SpawnedChar3)
+		THEN
+			SetPriority(SpawnChar3, 800)
+		ELIF "c1"
+			IsEqual(_Char, %SpawnedChar4)
+		THEN
+			SetPriority(SpawnChar4, 700)
+		ELIF "c1"
+			IsEqual(_Char, %SpawnedChar5)
+		THEN	
+			SetPriority(SpawnChar5, 600)
+		ENDIF
+		IF "c1"
+			IsEqual(%NumberSpawned, %NumberToSpawn)
+		THEN
+			GlobalSetEvent("END_PortalEnding")
+		ENDIF		
+	ENDIF
+
+EVENT WrapUp
+ON
+	OnItemEvent(__Me, "killTheRest")
+ACTIONS
+	Set(%Spewing, 0)
+	ItemEvent(__Me,"HOM_KillDKEden")
+	ItemEvent(__Me, "SetMeOffStage")

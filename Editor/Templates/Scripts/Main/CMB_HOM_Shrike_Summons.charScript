@@ -1,0 +1,441 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%Shrike="HOM_Shrike_8a5afb7b-08ad-4057-9a97-5bc66bb3ac6e"
+	CHARACTERTEMPLATE:%Icara_RT="END_ShrikeNightmare_Icara_0d48ddcb-76b0-46ee-8175-8f75e3858d7b"
+	CHARACTERTEMPLATE:%Arhu_RT="END_ShrikeNightmare_Arhu_6fcffb91-4f4c-4680-b1fa-a72f3d4e1ffa"
+	CHARACTERTEMPLATE:%Zandalor_RT="END_ShrikeNightmare_NegaZandalor_0b7a6136-c227-43fa-b7f8-b19885f67c8c"
+	CHARACTERTEMPLATE:%Zixzax_RT="END_ShrikeNightmare_ZixZax_64742f7a-f92e-41f1-ad9c-5abf08ed4bd9"
+	INT:%AuraThreshold=0	
+	FLOAT:%MySightRange
+	
+BEHAVIOUR
+REACTION NegaIcara_CastRegenerate,800
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+	FLOAT:_ShrikesVitality	
+CHECK "c1&c2&c3&c4"
+	CharacterCanCast(__Me,"Heal_EnemyUnholyRegenerate_Nega")
+	CharacterGetStat(_ShrikesVitality,%Shrike,Vitality)
+	IsLessThen(_ShrikesVitality,0.8)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Heal_EnemyUnholyRegenerate_Nega")
+ACTIONS
+	CharacterMoveInRange(%Shrike,_MinRange,_MaxRange,1)
+	DisplayText(__Me,"CMB_END_Shrike_Summon_NI_Healing",3)
+	CharacterUseSkill("Heal_EnemyUnholyRegenerate_Nega",%Shrike)
+
+REACTION NegaIcara_CastChillingTouch,700
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3"
+	CharacterCanCast(__Me,"Target_EnemyChillyWind")
+	CharacterHasStatus(%Shrike,"BURNING")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyChillyWind")
+ACTIONS
+	CharacterMoveInRange(%Shrike,_MinRange,_MaxRange,0)
+	CharacterUseSkill("Target_EnemyChillyWind",%Shrike)
+	
+REACTION NegaIcara_CastStaffOfMagus,200
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3"
+	CharacterCanCast(__Me,"Projectile_EnemyStaffOfMagusAir")
+	CharacterGet(_Target,__Me,20,Lowest,AirResistance,Enemy)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyStaffOfMagusAir")
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,0)
+	CharacterUseSkill("Projectile_EnemyStaffOfMagusAir",_Target)
+
+REACTION NegaIcara_Waiting_LookAtEnemy,500
+USAGE WAITING
+VARS
+	CHARACTERTEMPLATE:_MyTemplate
+	CHARACTER:_Enemy
+	FIXEDSTRING:_Text
+CHECK "c1&c2&c3"
+	CharacterGetTemplate(__Me,_MyTemplate)
+	IsEqual(_MyTemplate,%Icara_RT)
+	CharacterGet(_Enemy,__Me,20,Highest,Strength,Enemy)
+ACTIONS
+	CharacterLookAt(_Enemy)
+	IF "c1"
+		IsRandom(0.25)
+	THEN
+		GetRandom(_Text,"CMB_END_Shrike_Summon_NI_Taunt01","CMB_END_Shrike_Summon_NI_Taunt02","CMB_END_Shrike_Summon_NI_Taunt03")
+		DisplayText(__Me,_Text,3)
+	ENDIF
+	Sleep(10)
+
+REACTION NegaZixzax_Waiting_LookAtEnemy,500
+USAGE WAITING
+VARS
+	CHARACTERTEMPLATE:_MyTemplate
+	CHARACTER:_Enemy
+	FIXEDSTRING:_Text
+CHECK "c1&c2&c3"
+	CharacterGetTemplate(__Me,_MyTemplate)
+	IsEqual(_MyTemplate,%Zixzax_RT)
+	CharacterGet(_Enemy,__Me,20,Highest,Strength,Enemy)
+ACTIONS
+	CharacterLookAt(_Enemy)
+	IF "c1"
+		IsRandom(0.25)
+	THEN
+		GetRandom(_Text,"CMB_END_Shrike_Summon_NZZ_Taunt01","CMB_END_Shrike_Summon_NZZ_Taunt02","CMB_END_Shrike_Summon_NZZ_Taunt03")
+		DisplayText(__Me,_Text,3)
+	ENDIF
+	Sleep(10)
+	
+REACTION NegaIcara_CastFortify,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&!c2&c3&c4"
+	CharacterCanCast(__Me,"Target_EnemyFortify")												//c1
+	CharacterHasStatus(%Shrike,"FORTIFIED")														//!c2
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyFortify")						//c5
+	IsRandom(0.3)																				//c6
+ACTIONS
+	CharacterMoveInRange(%Shrike,_MinRange,_MaxRange,0)
+	CharacterUseSkill("Target_EnemyFortify",%Shrike)
+
+REACTION NegaMage_CastFlare,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	CHARACTERTEMPLATE:_MyTemplate
+	FLOAT:_TargetsResistance
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&!(c4|c5)&c6&c7&c8"
+	CharacterCanCast(__Me,"Projectile_EnemyFlare")												//c1
+	CharacterGet(_ChosenTarget,__Me,%MySightRange,Lowest,FireResistance,Enemy)					//c2
+	CharacterGetStat(_TargetsResistance,_ChosenTarget,FireResistance)							//c3
+	CharacterHasStatus(_ChosenTarget,"FROZEN")													//!c4
+	IsGreaterThen(_TargetsResistance,100)														//!c5
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyFlare")					//c6
+	CharacterGetTemplate(__Me,_MyTemplate)														//c7
+	IsRandom(0.3)																				//c8	
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,0)
+	IF "c1&c2"
+		IsEqual(_MyTemplate,%Arhu_RT)
+		IsRandom(0.5)		
+	THEN
+		DisplayText(__Me,"CMB_END_Shrike_Summon_NA_Taunt01",3)
+	ELIF "c1&c2"
+		IsEqual(_MyTemplate,%Zandalor_RT)
+		IsRandom(0.5)		
+	THEN
+		DisplayText(__Me,"CMB_END_Shrike_Summon_NZ_Taunt01",3)
+	ENDIF
+	CharacterUseSkill("Projectile_EnemyFlare",_ChosenTarget)
+	IF "c1"
+		IsRandom(0.5)
+	THEN
+		CharacterEndTurn()
+	ENDIF
+	
+REACTION NegaMage_CastIceShard,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	CHARACTERTEMPLATE:_MyTemplate
+	FLOAT:_TargetsResistance
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&!(c4|c5)&c6&c7&c8"
+	CharacterCanCast(__Me,"Projectile_EnemyIceShard")											//c1
+	CharacterGet(_ChosenTarget,__Me,%MySightRange,Lowest,WaterResistance,Enemy)					//c2
+	CharacterGetStat(_TargetsResistance,_ChosenTarget,FireResistance)							//c3
+	CharacterHasStatus(_ChosenTarget,"BURNING")													//!c4
+	IsGreaterThen(_TargetsResistance,100)														//!c5
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyIceShard")					//c6
+	CharacterGetTemplate(__Me,_MyTemplate)														//c7
+	IsRandom(0.3)																				//c8	
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,0)	
+	IF "c1&c2"
+		IsEqual(_MyTemplate,%Arhu_RT)
+		IsRandom(0.5)		
+	THEN
+		DisplayText(__Me,"CMB_END_Shrike_Summon_NA_Taunt02",3)
+	ELIF "c1&c2"
+		IsEqual(_MyTemplate,%Zandalor_RT)
+		IsRandom(0.5)		
+	THEN
+		DisplayText(__Me,"CMB_END_Shrike_Summon_NZ_Taunt02",3)
+	ENDIF
+	CharacterUseSkill("Projectile_EnemyIceShard",_ChosenTarget)
+	IF "c1"
+		IsRandom(0.5)
+	THEN
+		CharacterEndTurn()
+	ENDIF
+
+REACTION NegaMage_CastBlitzBolt,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	CHARACTERTEMPLATE:_MyTemplate
+	FLOAT:_TargetsResistance
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&!c4&c5&c6&c7"
+	CharacterCanCast(__Me,"Projectile_EnemyBlitzBolt")											//c1
+	CharacterGet(_ChosenTarget,__Me,%MySightRange,Lowest,AirResistance,Enemy)					//c2
+	CharacterGetStat(_TargetsResistance,_ChosenTarget,AirResistance)							//c3
+	IsGreaterThen(_TargetsResistance,100)														//!c4
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyBlitzBolt")				//c5
+	CharacterGetTemplate(__Me,_MyTemplate)														//c6
+	IsRandom(0.3)																				//c7	
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,0)
+	IF "c1&c2"
+		IsEqual(_MyTemplate,%Arhu_RT)
+		IsRandom(0.5)		
+	THEN
+		DisplayText(__Me,"CMB_END_Shrike_Summon_NA_Taunt03",3)
+	ELIF "c1&c2"
+		IsEqual(_MyTemplate,%Zandalor_RT)
+		IsRandom(0.5)		
+	THEN
+		DisplayText(__Me,"CMB_END_Shrike_Summon_NZ_Taunt03",3)
+	ENDIF
+	CharacterUseSkill("Projectile_EnemyBlitzBolt",_ChosenTarget)
+	IF "c1"
+		IsRandom(0.5)
+	THEN
+		CharacterEndTurn()
+	ENDIF
+
+REACTION NegaMage_CastEarthShard,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	CHARACTERTEMPLATE:_MyTemplate
+	FLOAT:_TargetsResistance
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&!c4&c5&c6&c7"
+	CharacterCanCast(__Me,"Projectile_EnemyEarthShard")											//c1
+	CharacterGet(_ChosenTarget,__Me,%MySightRange,Lowest,EarthResistance,Enemy)					//c2
+	CharacterGetStat(_TargetsResistance,_ChosenTarget,EarthResistance)							//c3
+	IsGreaterThen(_TargetsResistance,100)														//!c4
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyEarthShard")				//c5
+	CharacterGetTemplate(__Me,_MyTemplate)														//c6
+	IsRandom(0.3)																				//c7
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,0)
+	IF "c1&c2"
+		IsEqual(_MyTemplate,%Arhu_RT)
+		IsRandom(0.5)		
+	THEN
+		DisplayText(__Me,"CMB_END_Shrike_Summon_NA_Taunt04",3)
+	ELIF "c1&c2"
+		IsEqual(_MyTemplate,%Zandalor_RT)
+		IsRandom(0.5)		
+	THEN
+		DisplayText(__Me,"CMB_END_Shrike_Summon_NZ_Taunt04",3)
+	ENDIF	
+	CharacterUseSkill("Projectile_EnemyEarthShard",_ChosenTarget)
+	IF "c1"
+		IsRandom(0.5)
+	THEN
+		CharacterEndTurn()
+	ENDIF	
+
+REACTION NegaArhu_CastPurifyingFire_OnSelf,800
+USAGE COMBAT	
+VARS
+	CHARACTER:_ChosenTarget
+	CHARACTERTEMPLATE:_MyTemplate
+CHECK "c1&(c2|c3|c4|c5|c6|c7)"
+	CharacterCanCast(__Me,"Target_EnemyPurifyingFire")											//c1
+	CharacterHasStatus(__Me,"BLIND")															//c2
+	CharacterHasStatus(__Me,"BLEEDING")															//c3
+	CharacterHasStatus(__Me,"CRIPPLED")															//c4
+	CharacterHasStatus(__Me,"DISEASED")															//c5
+	CharacterHasStatus(__Me,"INFECTIOUS_DISEASED")												//c6
+	CharacterHasStatus(__Me,"BURNING")															//c7
+ACTIONS
+	CharacterUseSkill("Target_EnemyPurifyingFire",__Me)
+
+REACTION NegaZigzax_SelectNextAura,600
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+	CHARACTERTEMPLATE:_MyTemplate
+CHECK "c1&c2&c3&!c4"
+	CharacterGetTemplate(__Me,_MyTemplate)
+	IsEqual(_MyTemplate,%Zixzax_RT)
+	CharacterGet(_Enemy,__Me,20,Random,Distance,Enemy)
+	IsHardcore()											//Zix doesn't do this in HC (Edouard, 29/07/2015)
+ACTIONS
+	CharacterLookAt(_Enemy)
+	CharacterRemoveStatus(__Me,"FIRE_IMMUNITY_AURA")
+	CharacterRemoveStatus(__Me,"WATER_IMMUNITY_AURA")
+	CharacterRemoveStatus(__Me,"AIR_IMMUNITY_AURA")
+	CharacterRemoveStatus(__Me,"EARTH_IMMUNITY_AURA")
+	IF "c1"
+		IsEqual(%AuraThreshold,0)
+	THEN
+		CharacterPlayEffect(__Me,"FX_Skills_Fire_Summon_Prepare_A")
+		CharacterApplyStatus(__Me,"FIRE_IMMUNITY_AURA",-1,1)
+		Add(%AuraThreshold,1)
+	ELIF "c1"
+		IsEqual(%AuraThreshold,1)
+	THEN
+		CharacterPlayEffect(__Me,"FX_Skills_Water_Summon_Prepare_A")
+		CharacterApplyStatus(__Me,"WATER_IMMUNITY_AURA",-1,1)
+		Add(%AuraThreshold,1)
+	ELIF "c1"
+		IsEqual(%AuraThreshold,2)
+	THEN
+		CharacterPlayEffect(__Me,"FX_Skills_Air_Summon_Prepare_A")
+		CharacterApplyStatus(__Me,"AIR_IMMUNITY_AURA",-1,1)
+		Add(%AuraThreshold,1)
+	ELIF "c1"
+		IsEqual(%AuraThreshold,3)
+	THEN
+		CharacterPlayEffect(__Me,"FX_Skills_Earth_Summon_Prepare_A")
+		CharacterApplyStatus(__Me,"EARTH_IMMUNITY_AURA",-1,1)
+		Set(%AuraThreshold,0)
+	ELSE
+		Set(%AuraThreshold,0)
+	ENDIF
+	CharacterPlayAnimation("cast_shout_cast",1,1)
+	SetPriority("NegaZigzax_SelectNextAura",0)
+
+REACTION NegaZigzax_CastHasteOnSelf,300
+USAGE COMBAT
+CHECK "c1&!c2"
+	CharacterCanCast(__Me,"Target_EnemyHaste")
+	CharacterHasStatus(__Me,"HASTED")
+ACTIONS
+	CharacterUseSkill("Target_EnemyHaste",__Me)
+
+REACTION NegaZigzax_CastSlow,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&!(c3|c4|c5|c6)&c7"
+	CharacterCanCast(__Me,"Target_EnemySlow")									//c1
+	CharacterGet(_Target,__Me,%MySightRange,Highest,Speed,Enemy)				//c2
+	CharacterHasStatus(_Target,"SLOWED")										//!c3	
+	CharacterHasStatus(_Target,"KNOCKED_DOWN")									//!c4	
+	CharacterHasStatus(_Target,"FROZEN")										//!c5	
+	CharacterHasStatus(_Target,"STUNNED")										//!c6	
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemySlow")			//c7
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,0)
+	CharacterUseSkill("Target_EnemySlow",_Target)
+
+REACTION NegaZixzax_CastStaffOfMagus,200
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3"
+	CharacterCanCast(__Me,"Projectile_EnemyStaffOfMagusEarth")
+	CharacterGet(_Target,__Me,20,Lowest,EarthResistance,Enemy)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyStaffOfMagusEarth")
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,0)
+	CharacterUseSkill("Projectile_EnemyStaffOfMagusEarth",_Target)
+
+REACTION NegaZixzax_CastMassSlow,400
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&!(c4|c5|c6)&c7"
+	IsHardcore()																//c1
+	CharacterCanCast(__Me,"Shout_EnemySlowMass")								//c2
+	CharacterGet(_Target,__Me,%MySightRange,Highest,Speed,Enemy)				//c3
+	CharacterHasStatus(_Target,"SLOWED")										//!c4	
+	CharacterHasStatus(_Target,"KNOCKED_DOWN")									//!c5	
+	CharacterHasStatus(_Target,"STUNNED")										//!c6	
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Shout_EnemySlowMass")		//c7
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,0)
+	CharacterUseSkill("Shout_EnemySlowMass",_Target)
+	
+EVENTS
+EVENT OnInit_AddSpells
+VARS
+	CHARACTERTEMPLATE:_MyTemplate
+ON
+	OnInit()
+ACTIONS
+	IF "c1&c2"
+		CharacterGetStat(%MySightRange,__Me,Sight)
+		CharacterGetTemplate(__Me,_MyTemplate)
+	THEN
+		IF "c1"
+			IsEqual(_MyTemplate,%Icara_RT)	
+		THEN
+			SetPriority("Combat_AttackSetEnemy",0)						
+			SetPriority("Combat_MoveToSetEnemy",0)
+			CharacterAddSkill("Heal_EnemyUnholyRegenerate_Nega")
+			CharacterAddSkill("Projectile_EnemyStaffOfMagusAir")
+			CharacterAddSkill("Target_EnemyFortify")
+			CharacterAddSkill("Target_EnemyChillyWind")
+			IF "c1"
+				IsHardcore()
+			THEN
+				CharacterApplyStatus(__Me,"WATER_IMMUNITY_AURA",-1)
+			ENDIF
+		ELIF "c1|c2"
+			IsEqual(_MyTemplate,%Zandalor_RT)	
+			IsEqual(_MyTemplate,%Arhu_RT)	
+		THEN
+			CharacterAddSkill("Projectile_EnemyFlare")
+			CharacterAddSkill("Projectile_EnemyIceShard")
+			CharacterAddSkill("Projectile_EnemyBlitzBolt")
+			CharacterAddSkill("Projectile_EnemyEarthShard")
+			CharacterAddSkill("Target_EnemyPurifyingFire")
+			IF "c1&c2"
+				IsHardcore()
+				IsEqual(_MyTemplate,%Zandalor_RT)
+			THEN
+				CharacterApplyStatus(__Me,"FIRE_IMMUNITY_AURA",-1)
+			ELIF "c1&c2"
+				IsHardcore()
+				IsEqual(_MyTemplate,%Arhu_RT)
+			THEN
+				CharacterApplyStatus(__Me,"AIR_IMMUNITY_AURA",-1)
+			ENDIF
+		ELIF "c1"
+			IsEqual(_MyTemplate,%Zixzax_RT)
+		THEN
+			CharacterAddSkill("Target_EnemyHaste")
+			CharacterAddSkill("Target_EnemySlow")
+			CharacterAddSkill("Projectile_EnemyStaffOfMagusEarth")
+			IF "c1"
+				IsHardcore()
+			THEN
+				CharacterApplyStatus(__Me,"EARTH_IMMUNITY_AURA",-1)
+				CharacterAddSkill("Shout_EnemySlowMass")
+			ENDIF
+		ENDIF
+	ENDIF
+
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("NegaZigzax_SelectNextAura",500)
+	

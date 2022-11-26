@@ -1,0 +1,81 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_RecipeBook("BOOK_RCP_Archer1_792751b8-7225-47b3-9824-d24ccd2d18e5", "RCP_Archer1");
+DB_RecipeBook("BOOK_RCP_Archer3_d0578e37-2d4e-42ce-b78b-6b7a328e1a41", "RCP_Archer3");
+DB_RecipeBook("BOOK_RCP_Archer2_4ecf1ba5-11e3-4984-a360-f181d37acf79", "RCP_Archer2");
+DB_RecipeBook("BOOK_RCP_Cooking2_5a897944-7ce7-4812-804e-bdd30f5536ef", "RCP_Cooking2");
+DB_RecipeBook("BOOK_RCP_Cooking1_0167d959-428e-48d2-931a-004f68e7f3ad", "RCP_Cooking1");
+DB_RecipeBook("BOOK_RCP_Cooking3_f1e6ffd8-d61a-4935-aae9-5eaf15334d00", "RCP_Cooking3");
+DB_RecipeBook("BOOK_RCP_Cooking4_8c278980-0d4e-4c24-9b27-7b56a9a61578", "RCP_Cooking4");
+DB_RecipeBook("BOOK_RCP_Cooking5_45cdfb8b-bb2e-424d-9f28-0a18eb6bbf4d", "RCP_Cooking5");
+DB_RecipeBook("BOOK_RCP_Magic8_b0c1c9b5-10af-4919-b600-e5a21b4edc83", "RCP_Magic8");
+DB_RecipeBook("BOOK_RCP_Magic7_ae89f8cc-276e-4acd-880e-63b646e0fa6e", "RCP_Magic7");
+DB_RecipeBook("BOOK_RCP_Magic9_4b7e28b3-e2f3-4506-bda5-510340411b6b", "RCP_Magic9");
+DB_RecipeBook("BOOK_RCP_Magic1_d8936e1c-4b5e-4048-b597-f1bfe2d18fdb", "RCP_Magic1");
+DB_RecipeBook("BOOK_RCP_Magic2_60fa1357-7431-4296-9662-4cfc937f1718", "RCP_Magic2");
+DB_RecipeBook("BOOK_RCP_Magic4_0c3e6c56-1e8f-42f8-8d10-089cece62c2e", "RCP_Magic4");
+DB_RecipeBook("BOOK_RCP_Magic3_c2650e38-fbcf-4e0b-b526-5133c4f4ab59", "RCP_Magic3");
+DB_RecipeBook("BOOK_RCP_Magic5_37d4472a-2102-43d2-a80f-a3213b9bb9da", "RCP_Magic5");
+DB_RecipeBook("BOOK_RCP_Magic6_652724b6-50fd-457d-8f8a-1b4fe9b0853a", "RCP_Magic6");
+DB_RecipeBook("BOOK_RCP_Magic10_3d87ed7c-cb0c-4128-ab30-247910b397b5", "RCP_Magic10");
+DB_RecipeBook("BOOK_RCP_Potion1_1acb230f-be23-4548-8765-cc4f0f8d56b4", "RCP_Potion1");
+DB_RecipeBook("BOOK_RCP_Potion4_83f22024-7c72-4ca7-afe8-25290d5d4cc8", "RCP_Potion4");
+DB_RecipeBook("BOOK_RCP_Potion2_db3d26d4-e72c-4a86-8625-6b7273d5117e", "RCP_Potion2");
+DB_RecipeBook("BOOK_RCP_Potion3_03b33141-82fd-4486-a77a-309ba0bdc6f0", "RCP_Potion3");
+DB_RecipeBook("BOOK_RCP_Potion8_5d39c6f8-a25c-4f34-b429-5d9e3cf9dd85", "RCP_Potion8");
+DB_RecipeBook("BOOK_RCP_Potion9_9b737919-5efe-435e-8f74-33d49908b6da", "RCP_Potion9");
+DB_RecipeBook("BOOK_RCP_Potion5_4e2eaa6a-d595-4324-9eb4-9bab7c8dc287", "RCP_Potion5");
+DB_RecipeBook("BOOK_RCP_Potion6_a8c6ee44-5000-4099-9e1e-2af197589ea6", "RCP_Potion6");
+DB_RecipeBook("BOOK_RCP_Potion7_1123b14b-50f7-4f06-84aa-4da04d0816e8", "RCP_Potion7");
+DB_RecipeBook("BOOK_RCP_Potion10_a876e1c7-4984-47a1-83e8-a06e0e5e04b1", "RCP_Potion10");
+DB_RecipeBook("BOOK_RCP_Smith1_c8b55ad2-5d2a-4e28-9693-d62ece29095a", "RCP_Smith1");
+DB_RecipeBook("BOOK_RCP_Smith2_549a3ed4-d7f3-4225-9965-2b5c79e571cd", "RCP_Smith2");
+DB_RecipeBook("BOOK_RCP_Smith3_33066446-f680-4145-aecf-f81e2b30e014", "RCP_Smith3");
+DB_RecipeBook("BOOK_RCP_Smith4_8eed0141-8ba7-4f36-82a3-586b4d951860", "RCP_Smith4");
+DB_RecipeBook("BOOK_RCP_Smith5_bf2382a9-d945-48fb-9d0a-932945ad64c5", "RCP_Smith5");
+DB_RecipeBook("BOOK_RCP_Smith7_8ed3f3c4-ca85-4a8a-813a-73ad95b087fa", "RCP_Smith7");
+DB_RecipeBook("BOOK_RCP_Smith6_9e572213-7d6c-48ae-a4ae-1660f0249a54", "RCP_Smith6");
+DB_RecipeBook("BOOK_RCP_Survivor1_69c0805f-0efa-408f-85a9-3d72a42276e2", "RCP_Survivor1");
+DB_RecipeBook("BOOK_RCP_Survivor2_1b3ae13d-4f79-4bcc-bb08-baf0816cb015", "RCP_Survivor2");
+DB_RecipeBook("BOOK_RCP_Survivor3_0e74be57-db43-4e89-ad67-7e9e599ff4ab", "RCP_Survivor3");
+DB_RecipeBook("BOOK_RCP_Survivor4_d087216e-78d3-4a51-a526-cf487585a4b8", "RCP_Survivor4");
+DB_RecipeBook("BOOK_RCP_Survivor5_37fbf1a1-5f3a-4894-8cf2-627d8e5e1d4a", "RCP_Survivor5");
+DB_RecipeBook("BOOK_RCP_Survivor6_63e8eefe-acba-4c25-a00d-8014fd72ed08", "RCP_Survivor6");
+DB_RecipeBook("BOOK_RCP_Survivor7_58aaeac1-e5f7-4ef5-95e1-32a1a5ba932b", "RCP_Survivor7");
+DB_RecipeBook("BOOK_RCP_Survivor8_a1ce2f9a-6be1-401d-962a-7fd6e526c6c9", "RCP_Survivor8");
+DB_RecipeBook("BOOK_RCP_Survivor9_77629279-f947-460a-8e94-76806785de6e", "RCP_Survivor9");
+DB_RecipeBook("BOOK_RCP_Survivor10_8ead196c-5031-471f-b209-d5f8ce1ccddd", "RCP_Survivor10");
+DB_RecipeBook("BOOK_RCP_Survivor11_0f820280-80c0-40e3-9f79-a3ab2dc84278", "RCP_Survivor11");
+DB_RecipeBook("BOOK_RCP_Survivor12_5805b766-b502-4046-9efa-72ab463eb9b1", "RCP_Survivor12");
+DB_RecipeBook("BOOK_RCP_Survivor13_961b407b-8422-4a70-9cb9-39522f47ae4a", "RCP_Survivor13");
+DB_RecipeBook("BOOK_RCP_Survivor14_79d2191d-6669-40a8-9a07-fd8d4a0f3601", "RCP_Survivor14");
+DB_RecipeBook("BOOK_RCP_Survivor15_55cb7f58-da13-4fe8-8870-a67b45995c3d", "RCP_Survivor15");
+DB_RecipeBook("BOOK_RCP_Survivor16_36a73e0e-7a65-4872-ac3c-a31c7155ad69", "RCP_Survivor16");
+DB_RecipeBook("BOOK_RCP_Survivor17_28e04e2b-f366-42f5-9082-5007040150dd", "RCP_Survivor17");
+DB_RecipeBook("BOOK_RCP_Survivor18_f485f6dc-1214-467e-ac9d-b6feb29d56dd", "RCP_Survivor18");
+DB_RecipeBook("BOOK_RCP_Survivor19_197a8c69-3603-4f89-aab4-c40d211da48a", "RCP_Survivor19");
+DB_RecipeBook("BOOK_RCP_Survivor20_4354433e-b6b7-4175-927a-753fe3b16f81", "RCP_Survivor20");
+DB_RecipeBook("BOOK_RCP_Legionnaire_a1925a5e-605f-4bd0-b0cb-97dc595e2257", "RCP_MaradinoCookbook");
+KBSECTION
+IF
+CharacterUsedItem(_player, _item)
+AND
+_player.DB_IsPlayer()
+AND
+DB_Global_ItemDescriptions((ITEM)_item,(STRING)_description)
+THEN
+ItemDisplayText(_item, _description);
+
+IF
+CharacterUsedItemTemplate(_Player, _Template, _)
+AND
+_Player.DB_IsPlayer()
+AND
+DB_RecipeBook(_Template, _ID)
+THEN
+UnlockJournalRecipe(_ID);
+NOT DB_RecipeBook(_Template, _ID);
+EXITSECTION
+
+ENDEXITSECTION

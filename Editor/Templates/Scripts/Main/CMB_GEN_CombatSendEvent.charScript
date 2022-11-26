@@ -1,0 +1,64 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%MyEnemy
+	EXTERN STRING:%EventSentOnTurn="CMBHC_GenericEvent_OnTurn"	
+	EXTERN STRING:%EventSentOnCombatEnded="CMBHC_GenericEvent_WhenCombatEnds"
+	EXTERN STRING:%EventSentOnCombatStarted="CMBHC_GenericEvent_WhenCombatStarts"
+	EXTERN INT:%Bool_SendEventOnAParticularTurn=1
+	EXTERN INT:%ChosenTurnID=3
+	
+EVENTS
+EVENT OnCombatStarted_StartTimer
+ON
+	OnCombatStarted()
+ACTIONS
+	StartTimer("CMB_GEN_CombatSendEvent_GetEnemy_Timer",0.2,0)
+
+EVENT OnTimer_GetEnemy_SendEvent	//fill MyEnemy variable for the Ward to use
+ON
+	OnTimer("CMB_GEN_CombatSendEvent_GetEnemy_Timer")
+ACTIONS
+	IF "c1&c2"
+		IsEqual(%MyEnemy,null)
+		CharacterGet(%MyEnemy,__Me,20,Lowest,Distance,Enemy)
+	THEN	
+		DebugText(__Me,"Got enemy: [1]",%MyEnemy)
+	ENDIF
+	CharacterEvent(__Me,%EventSentOnCombatStarted)
+	//DebugText(__Me,"Combat started - event sent!"
+	
+EVENT OnTurn_GeneralControl
+VARS
+	INT:_CurrentTurnID=0
+ON
+	OnTurn()
+ACTIONS
+	IF "c1&c2"
+		IsEqual(%Bool_SendEventOnAParticularTurn,0)
+		IsInCombat(__Me) 				//still in combat in a fight where he got killed, but doesn't enter a new fight
+	THEN
+		CharacterEvent(__Me,%EventSentOnTurn)
+		//DebugText(__Me,"OnTurn - event sent (every turn)!"		
+	ELIF "c1&(c2|c3)"
+		IsEqual(%Bool_SendEventOnAParticularTurn,1)
+		IsLessThen(_CurrentTurnID,%ChosenTurnID)
+		IsGreaterThen(_CurrentTurnID,%ChosenTurnID)
+	THEN
+		Add(_CurrentTurnID,1)
+	ELIF "c1&c2"
+		IsEqual(%Bool_SendEventOnAParticularTurn,1)
+		IsEqual(_CurrentTurnID,%ChosenTurnID)
+	THEN
+		CharacterEvent(__Me,%EventSentOnTurn)
+		//DebugText(__Me,"OnTurn - event sent!"
+		Add(_CurrentTurnID,1)		
+	ENDIF
+	
+EVENT OnCombatEnded_SendEventToWhoeverCatchesIt
+ON
+	OnCombatEnded()
+ACTIONS
+	CharacterEvent(__Me,%EventSentOnCombatEnded)
+	//DebugText(__Me,"Combat ended - event sent!"
+	StopTimer("CMB_GEN_CombatSendEvent_GetEnemy_Timer")
+	Set(%MyEnemy,null)	

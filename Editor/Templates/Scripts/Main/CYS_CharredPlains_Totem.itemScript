@@ -1,0 +1,36 @@
+INIT
+	ITEM:__Me
+	CHARACTERTEMPLATE:%FireSk_Ranger_RT="Undead_Character_Ranger_4a7622f9-4ed2-4e55-89d9-4b3473052258"
+	CHARACTERTEMPLATE:%FireSk_PikemanOrWarrior_RT="Undead_Character_Warrior_fe7cfb66-464d-4fe8-af93-037aee1c73db"
+	CHARACTERTEMPLATE:%FireSk_AxemanOrKnight_RT="Undead_Character_Axeman_118c14ac-1d0c-4f3c-8c95-33c783d5e596"
+	EXTERN CHARACTER:%BoneTotem="CYS_CharredPlains_BoneTotem_01_97bd2dcf-24a4-446f-9604-1c43ef7460c1"
+
+	//this is used in combination with CYS_CharredPlains_BoneTotem.charscript
+
+//------------------
+EVENTS 
+EVENT CatchEventFromBoneTotem
+ON
+	OnCharacterEvent(%BoneTotem,"CYS_CharredPlains_TimeToResurrectSkeletons")
+ACTIONS
+	IterateCharactersNear(__Me,30,"CYS_CharredPlains_TotemCheckEvent")
+	PlayEffectAt(%BoneTotem,"FX_Skills_Ranger_Resurrect_Prepare_A")
+
+EVENT FireSkeletonIterator
+VARS 
+	CHARACTER:_Character
+	CHARACTERTEMPLATE:_CharacterTemplate		
+ON
+	OnIterateCharacter(_Character,"CYS_CharredPlains_TotemCheckEvent")
+ACTIONS
+	IF "c1&c2&(c3|c4|c5)"
+		CharacterIsDead(_Character)
+		CharacterGetTemplate(_Character,_CharacterTemplate)
+		IsEqual(_CharacterTemplate,%FireSk_Ranger_RT)
+		IsEqual(_CharacterTemplate,%FireSk_PikemanOrWarrior_RT)
+		IsEqual(_CharacterTemplate,%FireSk_AxemanOrKnight_RT)
+	THEN
+		PlayEffectAt(_Character,"FX_Skills_Ranger_Resurrect_Impact_A")
+		CharacterResurrect(_Character,60)
+		CombatLogText(%BoneTotem,"CYS_CharredPlains_TotemRezzesSkeletons_Battlelog",0,1)
+	ENDIF

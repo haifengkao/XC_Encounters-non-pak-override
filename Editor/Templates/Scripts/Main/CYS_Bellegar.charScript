@@ -1,0 +1,28 @@
+INIT
+
+CHARACTER:__Me
+TRIGGER:%WanderArea = CYS_BellegarWomanWanderArea_52de4cb6-3c7f-4a94-9998-9f344bb08b0b
+FIXEDSTRING:%CurrentAction = "ChooseAction"
+
+BEHAVIOUR
+
+REACTION ChooseAction, 1060
+USAGE PEACE
+ACTIONS
+	GetRandom(%CurrentAction,"TalkAboutVisual", "Wander")
+	SetPriority(%CurrentAction,1070)
+
+REACTION Wander,0
+USAGE PEACE
+ACTIONS
+	CharacterWander(%WanderArea,10,0)
+	Sleep(5)
+	SetPriority("Wander",0)
+	
+	
+REACTION TalkAboutVisual, 0
+USAGE PEACE
+ACTIONS
+	DialogStart("CYS_AD_Bellegar",__Me)
+	Sleep(5)
+	SetPriority("TalkAboutVisual",0)

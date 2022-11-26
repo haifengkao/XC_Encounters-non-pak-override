@@ -1,0 +1,273 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%SparkMaster="CYS_NorthCaveSkeleton4_26268414-4ac9-4448-95b0-54b1b7cdd894"
+	CHARACTER:%MechanicForTutoDialogue="CYS_NorthCaveSkeleton1_bae10cf1-fa4e-48ba-b141-2800e11ad85a"
+	FLOAT:%MySightRange
+	INT:%Bool_SparkMasterIsCharged=0
+	EXTERN INT:%Bool_ThisCharOpensTuto=0
+	EXTERN INT:%Bool_ThisCharCanRecharge=0
+	EXTERN INT:%Bool_ThisCharCanRepair=0
+
+//---------------
+BEHAVIOUR	
+REACTION SparkMaster_Mechanic_Tuto,1000
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "!c1&!c2&!c3&!c4&!c5&c6&c7&c8"
+	CharacterHasStatus(__Me,"CHARMED")															//c1
+	CharacterHasStatus(__Me,"FEAR")																//c2
+	CharacterHasStatus(__Me,"FROZEN")															//c3
+	CharacterHasStatus(__Me,"STUNNED")															//c4
+	CharacterHasStatus(__Me,"PETRIFIED")														//c5
+	IsEqual(%Bool_ThisCharOpensTuto,1)															//c6
+	CharacterCanCast(__Me,"Projectile_EnemyLowStunBlitzBolt_SM")								//c7
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyLowStunBlitzBolt_SM")		//c8
+ACTIONS
+	Sleep(3)																					//wait until FIGHT! combat UI is gone
+	DisplayText(%MechanicForTutoDialogue,"CYS_NorthCave_SparkMaster_TutoLine_1",3)				//quick! charge it up!
+	CharacterLookAt(%MechanicForTutoDialogue)
+	Sleep(3)
+	CharacterLookAt(%SparkMaster)	
+	DisplayText(__Me,"CYS_NorthCave_SparkMaster_TutoLine_2",3)									//it damages it a lil bit but oboy does it pack a punch!
+	Sleep(3)
+	CharacterMoveInRange(%SparkMaster,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_EnemyLowStunBlitzBolt_SM",%SparkMaster)
+	SetPriority("SparkMaster_Mechanic_Tuto",0)
+	
+REACTION SparkMaster_Mechanic_GetCloserToBoss,400
+USAGE COMBAT
+VARS
+	FLOAT:_DistanceBetwMeAndSM
+CHECK "!(c1|c2)&c3&c4&c5"
+	IsHardcore()
+	CharacterIsDead(%SparkMaster)
+	CharacterCanSee(__Me,%SparkMaster)
+	GetDistance(_DistanceBetwMeAndSM,__Me,%SparkMaster)
+	IsGreaterThen(_DistanceBetwMeAndSM,3)
+ACTIONS
+	CharacterMoveTo(%SparkMaster,1,0,0,5)
+	CharacterLookAt(%SparkMaster)
+	SetPriority("SparkMaster_Mechanic_GetCloserToBoss",0)
+	
+REACTION SparkMaster_Mechanic_Hardcore_GetCloserToTrigger,400
+USAGE COMBAT
+VARS
+	FLOAT:_DistanceBetwMeAndTrigger
+	TRIGGER:_Mech1_Trigger="CYS_HC_NorthCave_SparkMaster_Mech01_7faf4f7d-6a05-41d9-b569-1b80729ed5f5"
+	TRIGGER:_Mech2_Trigger="CYS_HC_NorthCave_SparkMaster_Mech02_740a2c52-f871-4e48-8914-46bfea192dba"
+CHECK "c1&!c2&c3"
+	IsHardcore()
+	CharacterIsDead(%SparkMaster)
+	IsEqual(%Bool_ThisCharCanRepair,1)
+ACTIONS
+	//DebugText(__Me,"Checking distance!")
+	IF "c1&!(c2|c3|c4|c5|c6)&c7&c8"
+		IsEqual(__Me,"CYS_NorthCaveSkeleton1_bae10cf1-fa4e-48ba-b141-2800e11ad85a")			//c1
+		ContainsSurface(_Mech1_Trigger,1,"Fire")											//!c2
+		ContainsSurface(_Mech1_Trigger,1,"Electrified")										//!c3
+		ContainsSurface(_Mech1_Trigger,1,"BloodElectrified")								//!c4
+		ContainsSurface(_Mech1_Trigger,1,"Ice")												//!c5
+		ContainsSurface(_Mech1_Trigger,1,"BloodFrozen")										//!c6
+		GetDistance(_DistanceBetwMeAndTrigger,__Me,_Mech1_Trigger)							//c7
+		IsGreaterThen(_DistanceBetwMeAndTrigger,2)											//c8
+	THEN
+		//DebugText(__Me,"Dist = [1], reajusting!",_DistanceBetwMeAndTrigger)
+		CharacterMoveTo(_Mech1_Trigger,1)
+		CharacterLookAt(%SparkMaster)
+	ELIF "c1&!(c2|c3|c4|c5|c6)&c7&c8"
+		IsEqual(__Me,"CYS_NorthCaveSkeleton2_fc2aead8-4c04-45f3-a7a9-c2a77d7453c3")			//c1
+		ContainsSurface(_Mech2_Trigger,1,"Fire")											//!c2
+		ContainsSurface(_Mech2_Trigger,1,"Electrified")										//!c3
+		ContainsSurface(_Mech2_Trigger,1,"BloodElectrified")								//!c4
+		ContainsSurface(_Mech2_Trigger,1,"Ice")												//!c5
+		ContainsSurface(_Mech2_Trigger,1,"BloodFrozen")										//!c6
+		GetDistance(_DistanceBetwMeAndTrigger,__Me,_Mech2_Trigger)							//c7
+		IsGreaterThen(_DistanceBetwMeAndTrigger,2)											//c8
+	THEN
+		//DebugText(__Me,"Dist = [1], reajusting!",_DistanceBetwMeAndTrigger)
+		CharacterMoveTo(_Mech2_Trigger,1)
+		CharacterLookAt(%SparkMaster)
+	ELSE
+		SetPriority("SparkMaster_Mechanic_Hardcore_GetCloserToTrigger",0)
+	ENDIF
+	
+REACTION SparkMaster_Mechanic_UsePurifFireOnBoss,1500
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&c4&c5"
+	IsEqual(%Bool_ThisCharCanRepair,1)
+	CharacterHasStatus(%SparkMaster,"STUNNED")
+	CharacterCanSee(__Me,%SparkMaster)
+	CharacterCanCast(__Me,"Target_EnemyPurifyingFire")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyPurifyingFire")
+ACTIONS
+	CharacterMoveInRange(%SparkMaster,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Target_EnemyPurifyingFire",%SparkMaster)	
+	
+REACTION SparkMaster_Mechanic_UseBlitzBoltOnBoss,500
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "!(c1|c2|c3|c4|c5)&c6&c7&c8&c9"
+	CharacterIsDead(%SparkMaster)																	//!c1
+	CharacterHasStatus(%SparkMaster,"KNOCKED_DOWN")													//!c2
+	CharacterHasStatus(%SparkMaster,"STUNNED")														//!c3
+	CharacterHasStatus(%SparkMaster,"FROZEN")														//!c4
+	CharacterHasStatus(%SparkMaster,"PETRIFIED")													//!c5
+	IsEqual(%Bool_ThisCharCanRecharge,1)															//c6
+	CharacterCanCast(__Me,"Projectile_EnemyLowStunBlitzBolt_SM")									//c7
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyLowStunBlitzBolt_SM")			//c8
+	IsEqual(%Bool_SparkMasterIsCharged,0)															//c9
+ACTIONS
+	CharacterMoveInRange(%SparkMaster,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_EnemyLowStunBlitzBolt_SM",%SparkMaster)
+	
+REACTION SparkMaster_Mechanic_UseBlitzBoltOnEnemy,500
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&c4&c5"
+	CharacterIsDead(%SparkMaster)
+	IsEqual(%Bool_ThisCharCanRecharge,1)
+	CharacterGet(_Target,__Me,40,Lowest,Distance,Enemy)
+	CharacterCanCast(__Me,"Projectile_EnemyLowStunBlitzBolt_SM")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyLowStunBlitzBolt_SM")
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_EnemyLowStunBlitzBolt_SM",_Target)
+	
+REACTION SparkMaster_Mechanic_Greasemonkey,0
+USAGE COMBAT
+VARS
+	FLOAT:_SparkMasterHealth
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&!(c2|c3)&c4&c5&c6"
+	IsEqual(%Bool_ThisCharCanRepair,1)													//c1
+	CharacterIsDead(%SparkMaster)														//!c2
+	CharacterHasStatus(%SparkMaster,"HEALING")											//!c3
+	CharacterCanCast(__Me,"Heal_EnemySparkMasterRepair")								//c4
+	CharacterGetStat(_SparkMasterHealth,%SparkMaster,Vitality)							//c5	
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Heal_EnemySparkMasterRepair")		//c6
+ACTIONS
+	//DebugText(__Me,"Healing SM!")
+	IF "c1&c2"
+		IsHardcore()
+		IsLessThen(_SparkMasterHealth,0.8)
+	THEN
+		CharacterMoveInRange(%SparkMaster,_MinRange,_MaxRange,1)
+		CharacterUseSkill("Heal_EnemySparkMasterRepair",%SparkMaster)
+	ELIF "!c1&c2"
+		IsHardcore()		
+		IsLessThen(_SparkMasterHealth,0.5)	
+	THEN
+		CharacterMoveInRange(%SparkMaster,_MinRange,_MaxRange,1)
+		CharacterUseSkill("Heal_EnemySparkMasterRepair",%SparkMaster)
+	ELSE
+		SetPriority("SparkMaster_Mechanic_Greasemonkey",0)
+	ENDIF
+	
+REACTION SparkMaster_Mechanic_StaffOfMagus,200
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3"
+	CharacterCanCast(__Me,"Projectile_EnemyStaffOfMagusAir")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyStaffOfMagusAir")
+	IsEqual(%Bool_ThisCharCanRepair,1)
+ACTIONS
+	IF "!c1&c2&c3"
+		CharacterIsDead(%SparkMaster)
+		CharacterGet(_Target,__Me,_MaxRange,Lowest,Distance,Enemy)
+		CharacterCanSee(__Me,_Target)
+	THEN
+		CharacterUseSkill("Projectile_EnemyStaffOfMagusAir",_Target)
+	ELIF "c1&c2&c3"
+		CharacterIsDead(%SparkMaster)
+		CharacterGet(_Target,__Me,50,Lowest,Distance,Enemy)
+		CharacterCanSee(__Me,_Target)
+	THEN
+		CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+		CharacterUseSkill("Projectile_EnemyStaffOfMagusAir",_Target)
+	ELSE
+		SetPriority("SparkMaster_Mechanic_StaffOfMagus",0)
+	ENDIF
+
+//---------------	
+EVENTS	
+EVENT OnInit_GiveSpellsToMechanic
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		IsEqual(%Bool_ThisCharCanRepair,1)
+	THEN
+		SetPriority("Combat_AttackSetEnemy",0)
+		SetPriority("Combat_MoveToSetEnemy",0)
+	ENDIF
+	IF "c1"
+		CharacterGetStat(%MySightRange,__Me,Sight)
+	THEN
+		IF "c1"
+			IsEqual(%Bool_ThisCharCanRepair,1)
+		THEN
+			CharacterAddSkill("Projectile_EnemyLowStunBlitzBolt_SM")
+			CharacterAddSkill("Heal_EnemySparkMasterRepair")
+			CharacterAddSkill("Target_EnemyPurifyingFire")
+			CharacterAddSkill("Projectile_EnemyStaffOfMagusAir")
+		ENDIF
+	ENDIF
+	
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	IF "c1"
+		IsEqual(%Bool_ThisCharCanRepair,1)
+	THEN
+		SetPriority("SparkMaster_Mechanic_GetCloserToBoss",400)
+		SetPriority("SparkMaster_Mechanic_Hardcore_GetCloserToTrigger",400)
+		SetPriority("SparkMaster_Mechanic_StaffOfMagus",200)
+	ENDIF
+	
+EVENT OnCharEvent_SetSparkMasterIsCharged
+ON
+	OnCharacterEvent(%SparkMaster,"CYS_SparkMaster_Charged_Event")
+ACTIONS
+	Set(%Bool_SparkMasterIsCharged,1)
+	
+EVENT OnCharEvent_SetSparkMasterIsNotCharged	
+ON
+	OnCharacterEvent(%SparkMaster,"CYS_SparkMaster_NotCharged_Event")
+ACTIONS
+	Set(%Bool_SparkMasterIsCharged,0)	
+	
+EVENT OnCharEvent_DisplayTextToRepairSparkMaster
+ON
+	OnCharacterEvent(%SparkMaster,"CYS_SparkMaster_NeedsRepair_Event")
+ACTIONS
+	IF "c1"
+		IsEqual(%Bool_ThisCharCanRepair,1)
+	THEN
+		DisplayText(__Me,"CYS_NorthCave_SparkMaster_RepairmanReply",3)							//okay! coming!
+		SetPriority("SparkMaster_Mechanic_Greasemonkey",1000)
+	ENDIF
+
+EVENT OnCombatEnded_ResetTutoPriority
+ON
+	OnCombatEnded()
+ACTIONS
+	IF "!c1"
+		CharacterIsDead(%SparkMaster)
+	THEN
+		SetPriority("SparkMaster_Mechanic_Tuto",1000)
+	ENDIF

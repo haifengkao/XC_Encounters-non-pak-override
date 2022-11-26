@@ -1,0 +1,30 @@
+INIT
+	INT:%DoorUnlocked = 0
+	ITEM:__Me
+EVENTS
+
+EVENT CheckState
+	ON
+		OnItemEvent(__Me,"CheckState")
+	ACTIONS
+		IF "c1"
+			IsEqual(%DoorUnlocked, 4)
+		THEN
+			GlobalSetEvent("LUC_IT_MagicDoorsUnlock")
+		ELSE
+			GlobalClearEvent("LUC_IT_MagicDoorsUnlock")
+		ENDIF
+		
+EVENT AddDoor
+	ON
+		OnItemEvent(__Me, "AddDoor")
+	ACTIONS
+		Add(%DoorUnlocked, 1)	
+		ItemEvent(__Me,"CheckState")
+	
+EVENT SubDoor
+	ON
+		OnItemEvent(__Me, "SubDoor")
+	ACTIONS
+		Subtract(%DoorUnlocked, 1)
+		ItemEvent(__Me,"CheckState")

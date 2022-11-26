@@ -1,0 +1,31 @@
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+INIT
+CHARACTER:__Me
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BEHAVIOUR
+
+// PEACE SECTION
+REACTION Patrolling,1
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(TRIGGER:9708e0e9-43d8-415c-b51c-465bdc2ed506)
+	Sleep(1.0)
+	CharacterPlayAnimation("LookUpLong")
+	DebugText(__Me,"My lighthouse ... my home ... my hell ...")
+	Sleep(1.0)
+	CharacterMoveTo(TRIGGER:4778b14c-80c9-464e-bb63-953aa28741c2)
+	Sleep(1.0)
+	CharacterPlayAnimation("LookDownLong")
+	DebugText(__Me,"No boats on the horizon, but the flame will burn nonetheless!")
+	Sleep(1.0)
+	CharacterMoveTo(TRIGGER:2a25fc7e-600d-4b75-95ab-c48d4ea96bc4)
+	Sleep(1.0)
+	CharacterPlayAnimation("LookDownLong")
+	DebugText(__Me,"Orcs down on the beach ... What are these savages doing here?")
+	Sleep(1.0)
+	
+REACTION Waiting, 0
+USAGE PEACE
+ACTIONS
+	Sleep(5)

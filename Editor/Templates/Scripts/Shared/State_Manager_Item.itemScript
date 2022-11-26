@@ -1,0 +1,29 @@
+INIT
+
+FIXEDSTRING:%internalState = ""
+EXTERN FIXEDSTRING:%currentState = ""
+FIXEDSTRING:%currentAction = ""
+
+BEHAVIOUR
+
+REACTION StateManager, 1500
+USAGE PEACE
+CHECK "!c1"
+	IsEqual(%internalState, %currentState)
+ACTIONS
+	IF "!c1"
+		IsEqual(%internalState, "")
+	THEN
+		SetPriority(%internalState, 0)
+	ENDIF
+	IF "!c1"
+		IsEqual(%currentAction, "")
+	THEN
+		SetPriority(%currentAction, 0)
+	ENDIF
+	IF "!c1"
+		IsEqual(%currentState, "")
+	THEN
+		Set(%internalState, %currentState)
+		SetPriority(%currentState, 1000)
+	ENDIF

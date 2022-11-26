@@ -1,0 +1,43 @@
+#INCLUDE Mine
+
+INIT
+USING Mine
+ITEM:__Me
+EXTERN SKILL:%MineProjectile=Projectile_TrapOldFireball
+EXTERN INT:%MineLevel=-1
+EXTERN DAMAGE:%DamageType=Fire
+
+EVENTS
+
+EVENT PlateChange
+ON
+	OnItemEvent(__Me,"MineChange")
+ACTIONS
+	IF "c1"
+		IsEqual(%PreviousPercentage,1)
+	THEN
+		ItemEvent(__Me,"Mine")
+	ENDIF
+	
+EVENT MineElement
+VARS
+DAMAGE:_DamageReceived
+ON
+	OnDamage(_DamageReceived,_,_,_)
+ACTIONS
+	IF "c1" 
+		IsEqual(_DamageReceived,%DamageType)
+	THEN
+		ExplodeAt(__Me,%MineProjectile,%MineLevel)
+		ItemDie(__Me)
+	ELSE
+		ItemRemoveStatus(__Me,BURNING)
+		
+	ENDIF
+	
+EVENT MineEvent
+ON
+	OnItemEvent(__Me,"Mine")
+ACTIONS
+		ExplodeAt(__Me,%MineProjectile,%MineLevel)
+		ItemDie(__Me)

@@ -1,0 +1,167 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Dialogs(CHARACTER_DAF_Hershel,"DAF_Hershel");
+ItemToCharacter(ITEM_DAF_TavernCellarKey,CHARACTER_DAF_Hershel);
+
+ItemToContainer(ITEM_DAF_KeyToArmory, ITEM_DAF_ArmoryKeyChest,-1);
+
+DB_PlayerComments("DAF_TavernCellarTrap","DAF_CommentTavernCellarTrap_1_1",1,1);
+DB_PlayerComments("DAF_TavernCellarTrap","DAF_CommentTavernCellarTrap_2_1",2,1);
+DB_PlayerComments("DAF_TavernCellarTrap","DAF_CommentTavernCellarTrap_2_2",2,2);
+
+DB_PlayerComments("DAF_CommentOnMissingArmoryKey","DAF_CommentOnMissingArmoryKey_1_1",1,1);
+DB_PlayerComments("DAF_CommentOnMissingArmoryKey","DAF_CommentOnMissingArmoryKey_2_1",2,1);
+DB_PlayerComments("DAF_CommentOnMissingArmoryKey","DAF_CommentOnMissingArmoryKey_2_2",2,2);
+
+DB_Dialogs(CHARACTER_DAF_BO_ArmoryKeyOrc,"DAF_BO_ArmoryKeyOrc");
+DB_Dialogs(CHARACTER_DAF_BO_ArmoryKeyGuard,"DAF_BO_ArmoryKeyHuman");
+
+ItemSetOwner(ITEM_DAF_DoorWarehouse2,CHARACTER_DAF_BO_PrisonGuard2);
+KBSECTION
+//////////////////////////////////////////////////////////////////
+/////////////////Playercomment on missing key////////////////////
+///////////////////////////////////////////////////////////////
+IF
+GlobalEventSet("DAF_KnowsAboutKey")
+THEN
+CHARACTER_DAF_BO_ArmoryKeyOrc.knowsaboutArmoryKeymissing();
+
+IF
+DialogEnded("DAF_BO_ArmoryKeyOrc",_id)
+AND
+DB_DialogPlayers(_id,_Player,1)
+AND
+CHARACTER_DAF_BO_ArmoryKeyOrc.knowsaboutArmoryKeymissing()
+AND 
+NOT CHARACTER_DAF_BO_ArmoryKeyOrc.playerHasKey()
+THEN
+Launch_PlayerComment(_Player,"DAF_CommentOnMissingArmoryKey");
+
+IF
+DialogCharacterEventSet("DAF_OrcRewardsPlayer",_Player,_)
+THEN
+CharacterAddGold(_Player, 800);
+
+////////////////////////////////////////////////////////////////////
+///////////////// Hershel Gives Player Key to Cellar///////////////////////////////
+/////////////////////////////////////////////////////////////////
+IF
+DialogCharacterEventSet("DAF_HershelGivesHatchKey",_player,_)
+AND
+_player.DB_IsPlayer()
+THEN
+ItemToCharacter(ITEM_DAF_TavernCellarKey,_player);
+
+//////////////////////////////////////////////////////////////////
+//////////////////////// Hershel dies ////////////////////////////
+/////////////////////////////////////////////////////////////////
+
+IF
+CharacterDied(CHARACTER_DAF_Hershel)
+THEN
+ItemClearOwner(ITEM_DAF_TavernCellarKey);
+
+
+////////////////////////////////////////////////////////////////////
+//////////////////////// CELLAR TRAP///////////////////////////////
+/////////////////////////////////////////////////////////////////
+IF
+ItemOpened(ITEM_DAF_ArmoryKeyChest)
+AND
+ItemGetClosestPlayer(ITEM_DAF_ArmoryKeyChest, _Player)
+AND
+NOT DB_OnlyOnce("HershelChest")
+THEN
+DB_OnlyOnce("HershelChest");
+GlobalSetEvent("DAF_PlayerFoundCellarTrap");
+ItemSetEvent(ITEM_DAF_ArmoryKeyChest, "explode");
+Launch_PlayerComment(_Player, "DAF_TavernCellarTrap");
+CHARACTER_Player1.knowsAboutTrap();
+
+////////////////////////////////////////////////////////////////////
+//////////////////////////Player has ARMORYKEY/////////////////////////
+////////////////////////////////////////////////////////////////////
+IF
+ItemAddedToCharacter(ITEM_DAF_KeyToArmory,_Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+GlobalSetEvent("DAF_PlayerHasArmoryKey");
+QuestAdd("DAF_ArmoryKey");
+QuestUpdate("DAF_ArmoryKey","KeyFound");
+CHARACTER_DAF_BO_ArmoryKeyOrc.playerHasKey();
+
+
+IF
+ItemRemovedFromCharacter(ITEM_DAF_KeyToArmory,_Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+GlobalClearEvent("DAF_PlayerHasArmoryKey");
+
+IF
+DialogCharacterEventSet("DAF_TakeArmoryKey",_Player,_Inst)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+AND
+ItemIsInPartyInventory(ITEM_DAF_KeyToArmory,_Player,1,1)
+THEN
+ItemToCharacter(ITEM_DAF_KeyToArmory,_Npc);
+
+////////////////////////////////////////////////////////////////////
+//// Hershel Snaps after being pushed about cellar chest trap///////
+/////////////////////////////////////////////////////////////////
+IF
+GlobalEventSet("DAF_HershelSnaps")
+THEN
+CHARACTER_DAF_Hershel.attacksPlayer();
+
+IF
+DialogEnded("DAF_Hershel",_)
+AND
+CHARACTER_DAF_Hershel.attacksPlayer()
+THEN
+CharacterSetRelationFactionToFaction("DAF_Hershel","DAF_VillageBO_Orc",0);
+CharacterSetRelationFactionToFaction("DAF_Hershel","DAF_VillageBO_Human",0);
+CharacterSetRelationFactionToFaction("DAF_VillageBO_Orc","DAF_Hershel",0);
+CharacterSetRelationFactionToFaction("DAF_VillageBO_Human","DAF_Hershel",0);
+SetRelationFactionToPlayers("DAF_Hershel",0);
+ProcRemoveDialogEntryForSpeaker(CHARACTER_DAF_Hershel,"DAF_Hershel");
+CharacterSetHasDialog(CHARACTER_DAF_Hershel,0);
+NOT CHARACTER_DAF_Hershel.attacksPlayer();
+
+IF
+CharacterDied(CHARACTER_DAF_Hershel)
+AND
+CHARACTER_Player1.knowsAboutTrap()
+THEN
+ProcDefinePartyDialog("DAF_DD_KilledHershel");
+NOT CHARACTER_Player1.knowsAboutTrap();
+
+/////////////////////////////////////////////////////////////
+////////////Player gives Orc the ArmoryKey///////////////////
+/////////////////////////////////////////////////////////////
+
+IF
+GlobalEventSet("DAF_GaveOrcArmoryKey")
+THEN
+QuestUpdate("DAF_ArmoryKey","FinishOrc");
+QuestClose("DAF_ArmoryKey");
+
+//////////////////////////////////////////////////////////
+////////////Player gives Grutilda the ArmoryKey///////////
+//////////////////////////////////////////////////////////
+
+IF
+GlobalEventSet("DAF_GaveGruthildaArmoryKey")
+THEN
+QuestUpdate("DAF_ArmoryKey","FinishGrut");
+QuestClose("DAF_ArmoryKey");
+
+
+
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

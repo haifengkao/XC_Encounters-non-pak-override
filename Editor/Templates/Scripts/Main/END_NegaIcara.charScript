@@ -1,0 +1,73 @@
+INIT
+CHARACTER:__Me
+	
+	INT:%Running = 1
+	INT:%Iteration = 0
+
+BEHAVIOUR
+
+REACTION SearchLeandra, 1000
+USAGE PEACE
+ACTIONS
+	Sleep(10)
+	CharacterTeleportTo(TRIGGER:END_Point_Behavior_NegaIcaraStart_16c2a281-84bc-4c7f-b8cc-f8eb43ea9a6b)
+	CharacterSetOnStage()
+	PlayEffectAt(__Me, "FX_Env_Crystal_Void_Impact_A")
+	PlayEffectAt(__Me, "FX_Env_Crystal_Void_Explode_A")
+	
+	CharacterMoveTo(TRIGGER:END_Point_Behavior_NegaIcara1_d9f6e9c7-1ebe-44cc-a9f8-9ec19f534f2d, %Running)
+	CharacterLookFrom(TRIGGER:END_Point_Behavior_NegaIcara1_d9f6e9c7-1ebe-44cc-a9f8-9ec19f534f2d)
+	GlobalSetEvent("END_NegaKingsCrab_LeandraAD1")
+	DialogStart("END_AD_Icara_OneLinersLeandra", __Me)
+
+	CharacterMoveTo(TRIGGER:END_Point_Behavior_NegaIcara2_ac722e4b-38d2-4ba8-80d0-85d72c368602, %Running)
+	CharacterLookFrom(TRIGGER:END_Point_Behavior_NegaIcara2_ac722e4b-38d2-4ba8-80d0-85d72c368602)
+	GlobalSetEvent("END_NegaKingsCrab_LeandraAD2")
+	DialogStart("END_AD_Icara_OneLinersLeandra", __Me)
+
+	CharacterMoveTo(TRIGGER:END_Point_Behavior_NegaIcara3_1cc3b610-54b4-4a5c-8800-097b3878a57c, %Running)
+	CharacterLookFrom(TRIGGER:END_Point_Behavior_NegaIcara3_1cc3b610-54b4-4a5c-8800-097b3878a57c)
+	GlobalSetEvent("END_NegaKingsCrab_LeandraAD3")
+	DialogStart("END_AD_Icara_OneLinersLeandra", __Me)
+
+	CharacterMoveTo(TRIGGER:END_Point_Behavior_NegaIcara4_137937a7-84ca-4a1d-a2b4-d52b464944ba, %Running)
+	CharacterLookFrom(TRIGGER:END_Point_Behavior_NegaIcara4_137937a7-84ca-4a1d-a2b4-d52b464944ba)
+	GlobalSetEvent("END_NegaKingsCrab_LeandraAD4")
+	DialogStart("END_AD_Icara_OneLinersLeandra", __Me)
+	
+	CharacterMoveTo(TRIGGER:END_Point_Behavior_NegaIcara5_ec20f7a9-3ac1-47a2-aa6e-235ab122268e, %Running)
+	CharacterLookFrom(TRIGGER:END_Point_Behavior_NegaIcara5_ec20f7a9-3ac1-47a2-aa6e-235ab122268e)
+	GlobalSetEvent("END_NegaKingsCrab_LeandraAD5")
+	DialogStart("END_AD_Icara_OneLinersLeandra", __Me)
+	
+	
+	CharacterMoveTo(TRIGGER:END_Point_Behavior_NegaIcara6_945714ea-dfeb-4880-94b3-79280e8028c2, %Running)
+	PlayEffectAt(__Me, "FX_Env_Crystal_Void_Impact_A")
+	PlayEffectAt(__Me, "FX_Env_Crystal_Void_Explode_A")
+	CharacterSetOffStage()
+	IF "c1"
+		IsLessThen(%Iteration, 2)
+	THEN
+		Sleep(45)
+		Add(%Iteration, 1)
+	ELSE
+		Sleep(150)
+	ENDIF
+	Reset()
+
+EVENTS 
+	
+EVENT NegaEnd
+ON
+	OnGlobalEventSet("End_NegaEnd")
+ACTIONS
+	CharacterForceUpdate(0)
+	
+	
+EVENT NegaStart
+ON
+	OnGlobalEventSet("End_NegaStart")
+ACTIONS
+	CharacterForceUpdate(1)
+	
+	

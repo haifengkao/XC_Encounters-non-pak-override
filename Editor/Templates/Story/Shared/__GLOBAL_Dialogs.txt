@@ -1,0 +1,943 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_AnimalFoodVars("FoodTemplate1");
+DB_AnimalFoodVars("FoodTemplate2");
+DB_AnimalFoodVars("FoodTemplate3");
+DB_AnimalFoodVars("FoodTemplate4");
+DB_AnimalFoodVars("FoodTemplate5");
+DB_AnimalFoodVars("FoodTemplate6");
+
+DB_CustomThreatenGroupDialog("Orc","Threatened_Orcs");
+DB_CustomCompanionGroupDialog("Orc","Companion_Orcs");
+DB_CustomCompanionGroupDialog("Goblin","Companion_Goblins");
+
+KBSECTION
+IF
+DialogEnded(_Diag,_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_ItemDialog(2,_Item,_Player)
+THEN
+NOT DB_ItemDialog(2,_Item,_Player);
+NOT _Item.DB_IsInItemDialog();
+
+IF
+DialogEnded(_Diag,_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+AND
+DB_ItemDialog(3,_Player,_Npc,_Item)
+THEN
+NOT _Item.DB_IsInItemDialog();
+NOT DB_ItemDialog(3,_Player,_Npc,_Item);
+IF
+DialogEnded(_Diag,_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_DialogPlayers(_Inst,_OtherPlayer,2)
+AND
+DB_ItemDialog(3,_Player,_OtherPlayer,_Item)
+THEN
+NOT _Item.DB_IsInItemDialog();
+NOT DB_ItemDialog(3,_Player,_OtherPlayer,_Item);
+
+IF	
+DialogEnded(_,_Instance)
+THEN
+ProcHandleGenericDialogFacts(_Instance);
+
+IF
+DialogEnded(_,_Inst)
+THEN
+ProcClearDialogFlagsForPlayers(_Inst);
+ProcClearDialogFlagsForNPCs(_Inst);
+
+///////////////////////////////////////////////////////////////////////
+// Start/end and buffer Dialogs
+//
+// helper functions
+//
+PROC
+SetAndStartDialog((CHARACTER)_Player,(CHARACTER)_Npc,(STRING)_Dialog)		// default is close button enabled
+THEN
+SetAndStartDialog(_Player,_Npc,_Dialog,1);
+
+PROC
+SetAndStartDialog((CHARACTER)_Player,(CHARACTER)_Npc,(STRING)_Dialog,(INTEGER)_EnableCloseButton)
+AND 
+DialogRunning(_Player,1)
+THEN
+CheckIfQueueDialog(_Player,_Npc,_Dialog,_EnableCloseButton);
+//InterfaceDisabled(ENGINE_GAME,0);		// to break deadlock (1)
+SetAndStartDialogHandled(_Player,_Npc);
+
+PROC
+SetAndStartDialog((CHARACTER)_Player,(CHARACTER)_Npc,(STRING)_Dialog,(INTEGER)_EnableCloseButton)
+AND 
+NOT DialogRunning(_Player,1)
+AND 
+_Player.DB_IsInDialog()
+THEN
+CheckIfQueueDialog(_Player,_Npc,_Dialog,_EnableCloseButton);
+//InterfaceDisabled(ENGINE_GAME,0);		// to break deadlock (1)
+SetAndStartDialogHandled(_Player,_Npc);
+
+//
+// (1): possible deadlock:
+//				SetAndStartDialog(NPC_1,DIALOG_1);
+//				InterfaceDisabled(ENGINE_GAME,1);		// user cannot quit dialog_1 anymore
+//				SetAndStartDialog(NPC_2,DIALOG_2); // causes a queued dialog (since dialog_1 is still running)
+//																		// hence, the div call "StartDialog" is not executed and interface is not re-enabled
+//				
+
+// Helper proc: we queue a dialog ONLY if it is not yet already queued:
+PROC
+CheckIfQueueDialog((CHARACTER)_Player,(CHARACTER)_Npc,(STRING)_Dialog,(INTEGER)_EnableCloseButton)
+AND
+NOT DialogRunning(_Dialog,_Npc,_Player)
+THEN
+QueueDialog(_Player,_Npc,_Dialog,_EnableCloseButton);
+
+	
+PROC
+SetAndStartDialog((CHARACTER)_Player,(CHARACTER)_Npc,(STRING)_Dialog,(INTEGER)_EnableCloseButton) 
+AND 
+NOT SetAndStartDialogHandled(_Player,_Npc)
+THEN
+DoStartDialog_Internal(_Player,_Npc,_Dialog,_EnableCloseButton);
+
+// cleanup:
+PROC	
+SetAndStartDialog((CHARACTER)_Player,(CHARACTER)_Npc,(STRING)_Dialog,(INTEGER)_EnableCloseButton)
+THEN
+NOT SetAndStartDialogHandled(_Player,_Npc);
+
+//
+PROC
+ClearDialogQueue((CHARACTER)_Player,(INTEGER)_) 
+AND
+QueueDialog(_Player,_N,_D,_M)
+THEN
+NOT QueueDialog(_Player,_N,_D,_M);
+
+//////////////////////////////////////////////////////////////////////
+// the actual dialog start:
+//
+// PROC	DoStartDialog((NPC)_Npc,(DIALOG)_Dialog)
+// PROC	DoStartDialog((NPC)_Npc,(DIALOG)_Dialog,(INTEGER)_EnableCloseButton)
+//
+// PROC	DoStartEggDialog((DIALOG)_Dialog,(NPC_CLASS)_NpcClass,(INTEGER)_EggID)
+//
+// Do NOT use DoStartDialog_Internal directly from in the story!!
+// DoStartDialog clears the dialog queue, DoStartDialog_Internal does not!
+//
+PROC
+DoStartDialog((CHARACTER)_Player,(CHARACTER)_Npc,(STRING)_Dialog)
+THEN
+DoStartDialog(_Player,_Npc,_Dialog,1);
+
+// Since successive calls to SetAndStartDialog queue the dialogs (and wait for the current dialog
+// to end before a new one (a queued one) is started, the first rule of DoStartDialog
+// should not be necessary. It can be used though to forcefully quit the current and start a new dialog.
+// For that use, we first define 2 rules:
+PROC
+DoStartDialog((CHARACTER)_Player,(CHARACTER)_Npc,(STRING)_Dialog,(INTEGER)_Mode)
+AND
+DialogRunning(_Player,1)
+THEN
+DoStartDialog(_Player,1);		// using this fact to be able to have the test on DialogRunning evaluated before we do things that change this fact
+
+PROC
+DoStartDialog((CHARACTER)_Player,(CHARACTER)_Npc,(STRING)_Dialog,(INTEGER)_Mode) 
+AND
+NOT DialogRunning(_Player,1)
+THEN
+DoStartDialog(_Player,2);
+
+PROC
+DoStartDialog((CHARACTER)_Player,(CHARACTER)_Npc,(STRING)_Dialog,(INTEGER)_Mode)
+AND 
+DoStartDialog(_Player,1)
+THEN
+ClearDialogQueue(_Player,1);
+QueueDialog(_Player,_Npc,_Dialog,_Mode);
+EndDialog(_Player);		// will cause DialogRunning(1) to be deleted and DoStartDialog_Internal to be called
+
+
+PROC
+DoStartDialog((CHARACTER)_Player,(CHARACTER)_Npc,(STRING)_Dialog,(INTEGER)_Mode)
+AND
+DoStartDialog(_Player,2)
+THEN
+DoStartDialog_Internal(_Player,_Npc,_Dialog,_Mode);
+
+// Cleanup
+PROC
+DoStartDialog((CHARACTER)_Player,_,_,_)
+AND
+DoStartDialog(_Player,_I)
+THEN
+NOT DoStartDialog(_Player,_I);
+
+//////////////////////////////////////////////////////////////////////
+// the actual dialog start - internal functions, not to be called outside the "Dialogs" goal
+//
+/*
+PROC
+DoStartDialog_Internal((CHARACTER)_Player,(CHARACTER)_,(STRING)_,0)
+AND
+NOT DialogRunning(_Player,1)
+THEN
+DialogEnableCloseButton(ENGINE_GAME,0);
+*/
+
+// for npcs that normally can trade: disable trade for dialogs defined as such:
+PROC
+DoStartDialog_Internal((CHARACTER)_Player,(CHARACTER)_Npc,(STRING)_Dialog,(INTEGER)_) 
+AND
+DisableTradeForDialog(_Player,_Dialog)
+THEN
+CharacterSetCanTrade(CHARACTER_NULL,_Npc,0);		// force to no trade!
+
+PROC
+DoStartDialog_Internal((CHARACTER)_Player,(CHARACTER)_Npc,(STRING)_Dialog,(INTEGER)_) 
+AND
+NOT DisableTradeForDialog(_Player,_Dialog)
+THEN
+SetTradeStatus(_Player,_Npc);
+
+// since this is an npc setting in the engine, reset the correct status if the _Npc CAN trade
+IF
+DialogEnded(_Dialog,_Instance)
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+AND
+DB_DialogNPCs(_Instance,_Npc,1)
+THEN
+SetTradeStatus(_Player,_Npc);
+
+PROC
+DoStartDialog_Internal((CHARACTER)_Player,(CHARACTER)_Npc,(STRING)_Dialog,(INTEGER)_)
+AND
+NOT DialogRunning(_Player,1)
+AND
+CharacterIsDead(_Player,0)
+AND
+CharacterIsDead(_Npc,0)
+THEN
+//CharacterSetStill(_Player);	
+DialogRunning(_Dialog,_Npc,_Player);
+DialogRunning(_Player,1);
+_Npc.DB_IsInDialog();
+_Player.DB_IsInDialog();
+SetDialogEvents(_Player,_Npc);		// called AFTER assertion of DialogRunning
+PreStartDialog(_Player,_Npc,_Dialog);	// allow specific dialog events to be set
+			// to do so, define a PROC setting the events
+// protect the npcs involved in the dialog:
+CharacterMakeStoryNpc(_Npc,1);
+CharacterMakeStoryNpc(_Player,1);
+// finally, start it
+DialogRequestStopForCharacter(_Npc);
+DialogRequestStopForCharacter(_Player);
+ProcFaceEachother(_Npc,_Player);
+DialogStartTwoSpeakerDialog(_Dialog,_Npc,_Player);
+
+// Sets and starts the default dialog (or the queued dialog if one is queued):
+PROC
+SetAndStartDialog((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+QueueDialog(_Player,_Npc,_,_)
+THEN
+SetAndStartDialogHandled(_Player,_Npc);
+
+PROC
+SetAndStartDialog((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT SetAndStartDialogHandled(_Player,_Npc)
+AND
+DefaultDialog(_Npc,_Dialog,_CloseButtonEnabled)
+THEN
+SetAndStartDialog(_Player,_Npc,_Dialog,_CloseButtonEnabled);
+
+PROC
+SetAndStartDialog((CHARACTER)_Player,(CHARACTER)_Npc)
+THEN
+NOT SetAndStartDialogHandled(_Player,_Npc);
+
+//
+PROC
+ProcSetAnimalFoodEvents((CHARACTER)_Player,_)
+THEN
+CharacterSetVarInteger(_Player,"GEN_HasAnimalFood",0);
+
+PROC
+ProcSetAnimalFoodEvents((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_AnimalFoodVars(_Var)
+AND
+CharacterGetVarFixedString(_Npc,_Var,_TempVal)
+AND
+_TempVal!="DONTEAT"
+AND
+ItemTemplateIsInCharacterInventory(_Player,_TempVal,_Count)
+AND
+_Count>=1
+THEN
+CharacterSetVarInteger(_Player,"GEN_HasAnimalFood",1);
+
+PROC
+ProcGiveAnimalFood((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_AnimalFoodVars(_Var)
+AND
+CharacterGetVarFixedString(_Npc,_Var,_TempVal)
+AND
+_TempVal!="DONTEAT"
+AND
+ItemTemplateIsInCharacterInventory(_Player,_TempVal,_Count)
+AND
+_Count>=1
+AND
+NOT _Player.FoodGiven()
+THEN
+_Player.FoodGiven();
+ItemTemplateRemoveFromCharacter(_TempVal,_Player,1);
+IncreaseAttitude(_Player,_Npc,5);
+
+PROC
+ProcGiveAnimalFood(_Player,_Npc)
+THEN
+NOT _Player.FoodGiven();
+
+IF
+DialogCharacterEventSet("GEN_PlayerGivesFood",_Player,_Inst)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+THEN
+ProcGiveAnimalFood(_Player,_Npc);
+
+PROC
+StartHostileDialog((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+CharacterIsTagged(_Npc,"Animal",1)
+AND
+CharacterHasTalent(_Player, "AnimalEmpathy", 1)
+THEN
+ProcLaunchOverheadDialogReplacement(_Npc);
+
+PROC
+StartHostileDialog((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+CharacterIsTagged(_Npc,"Animal",1)
+THEN
+FoundDialog(_Player,_Npc);
+ProcSetAnimalFoodEvents(_Player,_Npc);
+SetAndStartDialog(_Player,_Npc,"default_animalHostile");
+
+PROC
+StartHostileDialog((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+CharacterIsTagged(_Npc,"Animal",0)
+THEN
+ProcLaunchOverheadDialogReplacement(_Npc);
+StartHostileDialog_1(_Player,_Npc);
+
+PROC
+StartHostileDialog_1((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+HostileDialog(_Npc,(STRING)_Dialog)
+THEN
+FoundDialog(_Player,_Npc);
+SetAndStartDialog(_Player,_Npc,_Dialog);
+
+PROC
+StartHostileDialog_1((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT FoundDialog(_Player,_Npc) 
+AND
+DB_EvilDude(_Npc)
+THEN
+FoundDialog(_Player,_Npc);
+SetAndStartDialog(_Player,_Npc,"Default_Out");
+
+PROC
+StartHostileDialog_1((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT FoundDialog(_Player,_Npc)
+THEN
+FoundDialog(_Player,_Npc);
+SetAndStartDialog(_Player,_Npc,"Default_Hostile");
+
+IF
+DialogEnded("Default_Out",_Instance) 
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+AND
+DB_DialogNPCs(_Instance,_Npc,1)
+AND
+NOT NoDecreaseAttitudeFor(_Player,_Npc,"Default_Out")
+THEN	
+DecreaseAttitude(_Player,_Npc,20);
+
+PROC
+SelectAndStartDialog((CHARACTER)_Player,(CHARACTER)_Npc)
+THEN
+SetTradeStatus(_Player,_Npc);
+
+// amoral npcs always use the default dialog (no threatened or hostile dialog), if available:
+PROC	
+SelectAndStartDialog((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+_Player.DB_IsPlayer()
+AND
+DB_Amoral(_Npc) 
+AND
+DefaultDialog(_Npc,_,_)		// = check if available
+THEN
+FoundDialog(_Player,_Npc);
+DefaultDialogStartRequested(_Npc,_Player);// start the default dialog (do nothing if there is no default dialog)
+
+// unintelligent npcs that are not protected by IsStoryNpc can be attacked just like that
+PROC
+SelectAndStartDialog((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT FoundDialog(_Player,_Npc)
+AND
+CharacterIsInFightMode(_Player,1)
+AND
+Unintelligent(_Npc)
+AND 
+NOT IsStoryNpc(_Npc)
+THEN
+FoundDialog(_Player,_Npc);		// block next rules - we don't need to start a dialog
+Attack(_Player,_Npc);
+
+// npcs for which no default dialog is defined do not react at all when clicked on them
+// (this might be useful in some scripts: the player cannot interrupt it then by initiating a dialog)
+// So, only proceed here *if* there is a default dialog:
+PROC
+SelectAndStartDialog((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT FoundDialog(_Player,_Npc)
+//AND
+//DefaultDialog(_Npc,_,_)		// = check if available		//:BS removed since we have a code call for this and we want to catch NPCs with default dialogs set in their templates!
+THEN
+SelectAndStartDialog1(_Player,_Npc);
+
+PROC
+SelectAndStartDialog((CHARACTER)_Player,(CHARACTER)_Npc)
+THEN
+NOT FoundDialog(_Player,_Npc);		// Cleanup
+
+PROC
+SelectAndStartDialog1((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_Companion(_Player)
+AND
+NOT DB_NoCharacterCompanionReplace(_Npc)
+THEN
+FoundDialog(_Player,_Npc);	//block other dialogs in any case
+ProcStartCompanionDialog(_Player,_Npc);
+
+PROC
+ProcStartCompanionDialog((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT _Npc.DB_IsPlayer()
+AND
+DB_CustomCompanionDialog((CHARACTER)_Npc,(STRING)_Dialog)
+THEN
+DB_SelectedCompanionDialog(1);
+SetTradeStatus(_Player,_Npc);
+PROC_CheckPlayTut(_Player,"TUT_CompanionTalk");
+SetAndStartDialog(_Player,_Npc,_Dialog);
+
+PROC
+ProcStartCompanionDialog((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT _Npc.DB_IsPlayer()
+AND
+DB_CustomCompanionGroupDialog((STRING)_Group,(STRING)_Dialog)
+AND
+NOT DB_SelectedCompanionDialog(1)
+AND
+CharacterIsTagged(_Npc,_Group,1)
+THEN
+DB_SelectedCompanionDialog(1);
+SetTradeStatus(_Player,_Npc);
+PROC_CheckPlayTut(_Player,"TUT_CompanionTalk");
+SetAndStartDialog(_Player,_Npc,_Dialog);
+
+PROC
+ProcStartCompanionDialog((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT _Npc.DB_IsPlayer()
+AND
+NOT DB_SelectedCompanionDialog(1)
+THEN
+SetTradeStatus(_Player,_Npc);
+PROC_CheckPlayTut(_Player,"TUT_CompanionTalk");
+SetAndStartDialog(_Player,_Npc,"Default_Companion");
+
+PROC
+ProcStartCompanionDialog((CHARACTER)_Player,(CHARACTER)_Npc)
+THEN
+NOT DB_SelectedCompanionDialog(1);
+
+PROC
+SelectAndStartDialog1((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+CharacterIsInFightMode(_Player,1)
+AND
+NOT _Npc.DB_IsPlayer()
+AND
+NOT _Npc.BlockThreatenedDialog()
+AND
+NOT FoundDialog(_Player,_Npc)
+AND
+CharacterIsTagged(_Npc,"Animal",0)
+AND
+NOT DB_Combat(_Player,_)
+THEN
+StartThreatenedDialog(_Player,_Npc);		// this call may or may not assert FoundDialog(_Npc)
+
+PROC
+SelectAndStartDialog1((CHARACTER)_Player,(CHARACTER)_Npc)
+THEN
+NOT _Npc.BlockThreatenedDialog();
+
+PROC	
+SelectAndStartDialog1((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND 
+NOT FoundDialog(_Player,_Npc) 
+AND
+DefaultDialog(_Npc,_,_)	
+AND
+CharacterGetRepAttitudeTowardsPlayer(_Npc,_Player,_Att)
+AND
+_Att > -45
+THEN
+FoundDialog(_Player,_Npc);
+DefaultDialogStartRequested(_Npc,_Player);// start the default dialog
+
+PROC
+SelectAndStartDialog1((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+NOT FoundDialog(_Player,_Npc)
+AND
+CharacterGetRepAttitudeTowardsPlayer(_Npc,_Player,_Att)
+AND
+_Att <= -45
+AND
+NOT _Npc.DB_IsPlayer()
+AND
+NOT DB_NoHostileDialog(_Npc)
+THEN
+StartHostileDialog(_Player,_Npc);
+FoundDialog(_Player,_Npc);
+
+PROC
+SelectAndStartDialog1((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+NOT FoundDialog(_Player,_Npc)
+AND
+CharacterGetRepAttitudeTowardsPlayer(_Npc,_Player,_Att)
+AND
+_Att <= -45
+THEN
+FoundDialog(_Player,_Npc);
+DefaultDialogStartRequested(_Npc,_Player);// start the default dialog
+
+PROC
+SelectAndStartDialog1((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+NOT FoundDialog(_Player,_Npc)
+AND
+CharacterHasDefaultDialog(_Npc,1)
+AND
+NOT _Player.DB_IsInDialog()
+AND
+NOT _Npc.DB_IsInDialog()
+AND
+NOT DB_Dead(_Npc)
+AND
+NOT DB_Dead(_Player)
+THEN
+ProcFaceEachother(_Npc,_Player);
+CharacterMakeStoryNpc(_Npc,1);
+CharacterMakeStoryNpc(_Player,1);
+_Npc.DB_IsInDialog();
+_Player.DB_IsInDialog();
+DialogRequestStopForCharacter(_Npc);
+DialogRequestStopForCharacter(_Player);
+StartDefaultDialog(_NPC,_Player);
+
+PROC
+StartThreatenedDialog((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+ThreatenedDialog((CHARACTER)_Npc,(STRING)_Dialog)
+THEN
+FoundDialog(_Player,_Npc);
+ProcLaunchOverheadDialogReplacement(_Npc);
+SetAndStartDialog(_Player,_Npc,_Dialog);
+// Try out Dante 20/11/2001: don't start the threatened dialog for StoryNpcs either
+// Fixed 'StoryNpc' on 8/2/2002 (!) - it never worked before now. Erm.
+// Added condition in Stormfist castle on 20/3/2002 - to make absolutely sure...
+
+PROC
+StartThreatenedDialog((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT FoundDialog(_Player,_Npc) 
+AND
+NOT NeverThreatenedDialog(_Npc) 
+AND
+NOT IsStoryNpc(_Npc) 
+THEN
+ProcLaunchOverheadDialogReplacement(_Npc);
+DoStartThreatenedDialog(_Player,_Npc);
+
+
+PROC
+StartThreatenedDialog((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+NOT FoundDialog(_Player,_Npc)
+THEN
+CharacterSetFightMode(_Player,0,0);		// auto clear fightmode
+// FoundDialog(_Npc) is not asserted, so execution ripples through to next rule for SelectAndStartDialog1
+
+PROC
+DoStartThreatenedDialog((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+DB_CustomThreatenDialog(_Npc,(STRING)_Dialog)
+THEN
+FoundDialog(_Player,_Npc);
+SetAndStartDialog(_Player,_Npc,_Dialog);
+
+PROC
+DoStartThreatenedDialog((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+NOT FoundDialog(_Player,_Npc)
+AND
+CharacterGetFaction(_Npc,_Faction)
+AND
+DB_CustomThreatenFactionDialog(_Faction,(STRING)_Dialog)
+THEN
+FoundDialog(_Player,_Npc);
+SetAndStartDialog(_Player,_Npc,_Dialog);
+
+PROC
+DoStartThreatenedDialog((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+DB_CustomThreatenGroupDialog((STRING)_Group,(STRING)_Dialog)
+AND
+CharacterIsTagged(_Npc,_Group,1)
+AND
+NOT FoundDialog(_Player,_Npc)
+THEN
+FoundDialog(_Player,_Npc);
+SetAndStartDialog(_Player,_Npc,_Dialog);
+
+PROC
+DoStartThreatenedDialog((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+NOT DB_EvilDude(_Npc)
+AND
+NOT FoundDialog(_Player,_Npc)
+THEN
+FoundDialog(_Player,_Npc);
+SetAndStartDialog(_Player,_Npc,"Default_Threatened");
+
+PROC
+DoStartThreatenedDialog((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_EvilDude(_Npc)
+AND
+NOT FoundDialog(_Player,_Npc)
+THEN
+FoundDialog(_Player,_Npc);
+SetAndStartDialog(_Player,_Npc,"Default_Threatened_EVIL");
+
+PROC
+RequestDialog1((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+OverrideDialog(_Npc,(STRING)_Dialog)		// OverrideDialog/2 provides an easy way to bypass the system
+THEN
+SetAndStartDialog(_Player,_Npc,_Dialog);				// As long as OverrideDialog is asserted, the default dialog is bypassed!
+RequestDialogHandled(_Player,_Npc);
+
+PROC
+RequestDialog1((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+_Player.DB_IsPlayer()
+AND // OverrideMonologue/2 provides an easy way to bypass the system
+NOT RequestDialogHandled(_Npc)
+AND		// previous rule did not trigger
+OverrideMonologue(_Npc,(STRING)_Monologue)
+THEN
+StartMonologue(_Monologue);
+NOT OverrideMonologue(_Npc,_Monologue);	// OverrideMonologue is automatically removed (so a use once mechanism)!
+RequestDialogHandled(_Player,_Npc);
+
+PROC	
+RequestDialog1((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND 
+NOT RequestDialogHandled(_Player,_Npc)
+THEN	
+SelectAndStartDialog(_Player,_Npc);
+
+PROC
+RequestDialog1((CHARACTER)_Player,(CHARACTER)_Npc)
+THEN
+NOT RequestDialogHandled(_Player,_Npc);	// cleanup
+
+//////////////////////////////////////////////////////////////////////
+// Asking if player wants to fight (events set by Default_threatened dialog and Default_threatened_EVIL)
+
+IF	
+DialogCharacterEventSet("EVENT_npc_player_puts_down_weapons_for",_Npc,_Instance)
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+THEN
+CharacterSetFightMode(_Player,0,0);
+_Npc.BlockThreatenedDialog();
+DB_DoRequestDialog(_Player,_Npc);
+
+IF
+DialogCharacterEventSet("EVENT_npc_player_attacks",_Npc,_Instance)
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+THEN
+AttackAfterDialog(_Player,_Npc);
+
+//////////////////////////////////////////////////////////////////////
+// EndDialog_Direct does not work when trade window is open. So remember the request and execute later.
+PROC
+EndDialog((CHARACTER)_Player)
+AND 
+TradeRunning(_Player,1)
+THEN
+EndDialogWhenTradeStops(_Player,1);
+
+PROC	
+EndDialog((CHARACTER)_Player)
+AND
+NOT TradeRunning(_Player,1)
+THEN
+DialogRequestStopForCharacter(_Player);
+
+/*
+TODO: the callback stuff in this comment block
+IF
+EndDialogWhenTradeStops(1) 
+AND 
+NOT TradeRunning(1)
+THEN
+NOT EndDialogWhenTradeStops(1);
+GenerateCallbackEvent(ENGINE_GAME,"CallbackEvent EndDialog");
+
+IF	
+CallbackEvent(ENGINE_GAME,"CallbackEvent EndDialog")
+THEN
+EndDialog_Direct(ENGINE_GAME);
+*/
+
+//////////////////////////////////////////////////////////////////////
+
+//
+// the events starting all
+//
+////disabled since this doesn't apply to DOS.
+/*
+IF
+DialogStartRequested(_Npc2,_Npc1)
+AND
+// If both are fighting and are friends, they are probably fighting a monster, so don't wanna start talking:
+CharacterIsInFightMode(_Npc1,1)
+AND
+NOT Unintelligent(_Npc1)
+AND
+CharacterIsInFightMode(_Npc2,1)
+AND
+NOT Unintelligent(_Npc2) 
+AND
+CharacterGetRelationToCharacter(_Npc1,_Npc2,_Value)
+AND
+_Value >= 25
+THEN
+DontRespondToRequestDialog(_NPC1,1);
+*/
+
+IF	
+DialogStartRequested(_Npc2,_Npc1)
+AND
+NOT DontRespondToRequestDialog(_Npc1,1)
+AND
+NOT _Npc2.DB_IsInDialog()
+AND
+NOT _Npc1.DB_IsInDialog()
+THEN
+RequestDialog1(_Npc1,_Npc2);
+
+// Cleanup:
+IF	
+DialogStartRequested(_Npc2,_Npc1)
+THEN	
+NOT DontRespondToRequestDialog(_Npc1,1);
+
+//
+// the event ending all
+//
+
+/*
+// always reenable the close button
+IF
+DialogEnded(_,_)
+THEN
+DialogEnableCloseButton(ENGINE_GAME,1);
+*/
+
+
+PROC
+ProcHandleGenericDialogFacts((INTEGER)_Instance)
+AND
+DB_DialogNumPlayers(_Instance,_Num)
+AND
+DB_DialogPlayers(_Instance,_Player,_Num)
+AND
+DialogRunning(_Dialog,_Npc,_Player)
+THEN
+NOT DialogRunning(_Dialog,_Npc,_Player);
+NOT DialogRunning(_Player,1);
+RanDialog(_Player,_Dialog);		// remember we already ran this dialog
+TalkedToPlayer(_Player,_Npc); // remember we already talked to this npc
+
+// If a dialog was queued to be started, start it.
+// (_Dialog was instructed to end when the new dialog was queued.
+// The parameters for this new dialog were saved in QueueDialog/2.)
+IF
+DialogEnded(_,_Instance)
+AND
+DB_DialogNumPlayers(_Instance,_Num)
+AND
+DB_DialogPlayers(_Instance,_Player,_Num)
+AND
+QueueDialog(_Player,_Npc,_Dialog,_Mode) 
+AND
+NOT StartQueuedDialog_Done(_Player,1)
+THEN
+NOT QueueDialog(_Player,_Npc,_Dialog,_Mode);
+DoStartDialog_Internal(_Player,_Npc,_Dialog,_Mode);		// Asserts DialogRunning(1)
+StartQueuedDialog_Done(_Player,1);
+
+//remove queued dialogs for characters that are dead
+IF
+CharacterDying(_Char)
+AND
+QueueDialog(_Player,_Char,_Dialog,_Mode) 
+THEN
+NOT QueueDialog(_Player,_Char,_Dialog,_Mode);
+
+IF	
+DialogEnded(_,_Instance)
+AND
+DB_DialogNumPlayers(_Instance,_Num)
+AND
+DB_DialogPlayers(_Instance,_Player,_Num)
+AND
+StartQueuedDialog_Done(_Player,1)
+THEN
+NOT StartQueuedDialog_Done(_Player,1);
+
+IF
+DialogEnded(_,_Inst)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_DoRequestDialog(_Player,_Npc)
+THEN
+NOT DB_DoRequestDialog(_Player,_Npc);
+RequestDialog1(_Player,_Npc);
+
+//////////////////////////////////////////////////////////////////////
+
+//TODO: do we want to have the killer?
+//Depends if the NPC handle will be available to request variables later on....
+IF	
+CharacterDied(_Npc)
+AND
+Killed_sets_DialogEvent(_Npc,(STRING)_DialogEvent)
+THEN
+SetAndRememberDialogEvent(_Npc,_DialogEvent,1);
+
+//////////////////////////////////////////////////////////////////////
+PROC
+ClearDefaultDialog((CHARACTER)_Npc) 
+AND
+DefaultDialog(_Npc,_Dialog,_Mode)
+THEN
+NOT DefaultDialog(_Npc,_Dialog,_Mode);
+
+// first remove the current DefaultDialog assertion (all if more than 1 - which would be an error) 
+PROC
+SetDefaultDialog((CHARACTER)_Npc,(STRING)_,(INTEGER)_)
+THEN
+ClearDefaultDialog(_Npc);
+
+// now set it:
+PROC
+SetDefaultDialog((CHARACTER)_Npc,(STRING)_Dialog,_CloseButtonEnabled)
+THEN
+DefaultDialog(_Npc,_Dialog,_CloseButtonEnabled);
+
+// first remove the current default ThreatenedDialog assertion (all if more than 1 - which would be an error) 
+PROC
+SetDefaultThreatenedDialog((CHARACTER)_Npc,(STRING)_)
+AND
+ThreatenedDialog(_Npc,_Dialog)
+THEN
+NOT ThreatenedDialog(_Npc,_Dialog);
+
+// now set it:
+PROC
+SetDefaultThreatenedDialog((CHARACTER)_Npc,(STRING)_Dialog)
+THEN
+ThreatenedDialog(_Npc,_Dialog);
+
+//////////////////////////////////////////////////////////////////////
+/*
+IF
+DialogCharacterEventSet(_,"EVENT_dialog_disable_close_button",_,_)
+THEN
+DialogEnableCloseButton(ENGINE_GAME,0);
+*/
+
+//////////////////////////////////////////////////////////////////////
+// Set DIALOG_Threaten_Shopowner as the default threatened dialog for every shop keeper:
+IF
+DB_ShopRegion((STRING)_Level,(TRIGGER)_Region,(CHARACTER)_ShopKeeper,(STRING)_)
+THEN
+ThreatenedDialog(_ShopKeeper,"Threaten_Shopowner");
+DB_ItemOwnerShipTriggers(_Level,_Region,_ShopKeeper);
+CharacterSetHasDialog(_ShopKeeper,1);
+
+IF
+DefaultDialog(_Npc,_,_)	
+THEN
+CharacterSetHasDialog(_Npc,1);
+
+IF
+CharacterDying(_Char)
+THEN
+DialogRequestStopForCharacter(_Char);
+
+EXITSECTION
+
+ENDEXITSECTION

@@ -1,0 +1,24 @@
+INIT 
+
+	CHARACTER:__Me
+	CHARACTER:%Target
+	
+EVENTS
+
+EVENT killVilain
+	VARS
+		CHARACTER:_Vilain
+	ON
+		OnCharacterEvent(_Vilain, "outsideOfJail")
+	ACTIONS
+		Set(%Target, _Vilain)
+		SetPriority("killTheVilain", 10000)
+		
+BEHAVIOUR
+
+REACTION killTheVilain, 0
+USAGE PEACE
+ACTIONS
+	CharacterAddSkill(Target_PrisonGuardKillingSpell)
+	CharacterUseSkill(Target_PrisonGuardKillingSpell, %Target)
+	SetPriority("killTheVilain", 0)

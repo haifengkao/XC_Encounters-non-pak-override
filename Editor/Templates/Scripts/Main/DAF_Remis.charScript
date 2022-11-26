@@ -1,0 +1,64 @@
+INIT
+CHARACTER:__Me
+INT:%State = 0
+EXTERN TRIGGER:%Patrol01 = null
+EXTERN TRIGGER:%Patrol02 = null
+EXTERN TRIGGER:%Patrol03 = null
+TRIGGER:%PointRemis = TRIGGER:DAF_Point_Remis_22c5136e-fd40-4e11-b9b3-86547510412c
+CHARACTER:%PlayerSpotted = null
+
+BEHAVIOUR
+
+REACTION CheckIfPlayerInSight, 1060
+VARS
+	CHARACTER:_player
+CHECK "c1"
+	CharacterGet(_player, __Me, 4, Lowest, Distance, Player)
+USAGE PEACE
+ACTIONS
+	Set(%PlayerSpotted, _player)
+	CharacterEvent(__Me, "DAF_WollockIntroductionTriggered")
+
+REACTION RemisWander, 1050
+VARS
+	FLOAT:_wait = 0
+	FIXEDSTRING:_text
+	TRIGGER:_trigger
+CHECK "c1"
+	IsEqual(%State, 0)
+USAGE PEACE
+ACTIONS
+	GetRandom(_trigger, %Patrol01, %Patrol02, %Patrol03)
+	CharacterMoveTo(_trigger, 0)
+	CharacterLookFrom(_trigger)
+	GetRandom(_text, "DAF_Remis_Patrol_01", "DAF_Remis_Patrol_02", "DAF_Remis_Patrol_03")
+	DisplayText(__Me, _text, 3)
+	GetRandom(_wait, 2, 3, 4, 5)
+	Sleep(_wait)
+
+STORY
+
+SCRIPTFRAME Male
+ACTIONS
+	DisplayText(__Me, "DAF_Remis_Male_01", 3)
+	CharacterMoveTo(%PointRemis, 1)
+	CharacterLookFrom(%PointRemis)
+	DisplayText(__Me, "DAF_Remis_Male_02", 3)
+	
+SCRIPTFRAME Female
+ACTIONS
+	DisplayText(__Me, "DAF_Remis_Female_01", 3)
+	CharacterMoveTo(%PointRemis, 1)
+	CharacterLookFrom(%PointRemis)
+	DisplayText(__Me, "DAF_Remis_Female_02", 3)
+	
+SCRIPTFRAME Both
+ACTIONS
+	DisplayText(__Me, "DAF_Remis_Both_01", 3)
+	CharacterMoveTo(%PointRemis, 1)
+	CharacterLookFrom(%PointRemis)
+	DisplayText(__Me, "DAF_Remis_Both_02", 3)
+
+SCRIPTFRAME DisableIntroduction
+ACTIONS
+	SetPriority("CheckIfPlayerInSight", 0)

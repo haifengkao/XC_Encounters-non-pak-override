@@ -1,0 +1,115 @@
+#INCLUDE Base 
+
+INIT
+USING Base
+CHARACTER:__Me
+CHARACTER:%oneSkillTarget3=null
+EXTERN SKILL:%chooseSkill3=null
+EXTERN INT:%rangeAdjustmentBoolOS3=0
+EXTERN INT:%frequencyOS3=0
+EXTERN INT:%frequencyOS3StartAt=0
+EXTERN INT:%priorityOS3=300
+EXTERN INT:%storeTargetOS3=1
+EXTERN COMPARE:%targetFindHowOS3=Random
+EXTERN COMPAREFUNC:%targetFindWhatOS3=Vitality
+EXTERN SURFACE:%targetOnSurfaceOS3=null
+EXTERN RELATION:%targetRelationOS3=Enemy
+EXTERN FLOAT:%targetHealthEqOrLowerOS3=1
+EXTERN STATUS:%targetStatusOS3=null
+EXTERN FIXEDSTRING:%saveAPText3="CMB_MageSkipsTurnToPrepare3"
+EXTERN INT:%displaySaveAPText3=1
+
+BEHAVIOUR
+REACTION CastSkill3,0
+VARS
+	CHARACTER:_char
+	FLOAT:_minRange
+	FLOAT:_maxRange
+	FLOAT:_hp
+USAGE COMBAT
+CHECK "c1&c2&c3&c4&!c5&!c6"
+	CharacterCanCast(__Me,%chooseSkill3,1)
+	CharacterGetSkillRange(_minRange,_maxRange,__Me,%chooseSkill3)
+	CharacterGet(_char,__Me,30,%targetFindHowOS3,%targetFindWhatOS3,%targetRelationOS3,%targetOnSurfaceOS3,%targetStatusOS3,null,__Me)
+	CharacterGetStat(_hp,_char,Vitality)
+	IsGreaterThen(_hp,%targetHealthEqOrLowerOS3)
+	CharacterHasStatus(_char,INVISIBLE)
+ACTIONS
+	IF "c1|c2|c3|c4|c5|c6"
+		IsEqual(%storeTargetOS3,0)
+		IsEqual(%oneSkillTarget3,null)
+		CharacterIsDead(%oneSkillTarget3)
+		CharacterHasStatus(%oneSkillTarget3,CHARMED)
+		CharacterIsAlly(__Me,%oneSkillTarget3)
+		CharacterHasStatus(%oneSkillTarget3,INVISIBLE)
+	THEN
+		Set(%oneSkillTarget3,_char)
+	ENDIF
+	IF "c1"
+		CharacterCanCast(__Me,%chooseSkill3,0)
+	THEN
+		IF "c1"
+			IsEqual(%rangeAdjustmentBoolOS3,1)
+		THEN
+			Subtract(_maxRange,3.0)
+		ENDIF	
+		CharacterMoveInRange(%oneSkillTarget3,_minRange,_maxRange,1)
+		CharacterUseSkill(%chooseSkill3,%oneSkillTarget3)
+		Set(%frequencyOS3StartAt,0)
+		SetPriority("CastSkill3",0)
+	ELSE
+		Sleep(1)
+		CharacterLookAt(%oneSkillTarget3)
+		IF "c1"
+			IsEqual(%displaySaveAPText3,1)
+		THEN
+			DisplayCombatInfoText(__Me,%saveAPText3,2)
+		ELSE
+			Sleep(1)
+		ENDIF
+		CharacterPlayEffect(__Me, "FX_GP_Status_SkipTurn_A_Icon", "Dummy_OverheadFX")
+		CharacterEndTurn()
+	ENDIF
+
+
+EVENTS
+EVENT AddSkill3
+ON
+	OnInit()
+ACTIONS
+	IF "!c1"
+		IsEqual(%chooseSkill3,null)
+	THEN
+		CharacterAddSkill(%chooseSkill3)
+	ENDIF
+	
+EVENT SetFrequence3
+ON
+	OnTurn()
+ACTIONS
+	IF "!c1&!c2"
+		IsEqual(%storeTargetOS3,1)
+		IsEqual(%storeTargetOS3,0)
+	THEN
+		DebugText(__Me,"Storetarget must be 1 or 0 (on or off)")
+		Set(%storeTargetOS3,1)
+	ENDIF
+	IF "!c1&!c2"
+		IsEqual(%rangeAdjustmentBoolOS3,1)
+		IsEqual(%rangeAdjustmentBoolOS3,0)
+	THEN
+		DebugText(__Me,"Range Adjustment must be 1 or 0 (on or off)")
+		Set(%rangeAdjustmentBoolOS3,1)
+	ENDIF	
+	IF "c1"
+		IsEqual(%chooseSkill3,null)
+	THEN
+		DebugText(__Me,"Skill script assigned but no skill selected")
+	ENDIF
+	IF "c1"
+		IsLessThen(%frequencyOS3StartAt,%frequencyOS3)
+	THEN		
+		Add(%frequencyOS3StartAt,1)
+	ELSE
+		SetPriority("CastSkill3",%priorityOS3)
+	ENDIF

@@ -1,0 +1,420 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%Chimera="CYS_Chimera_Braccus_56c330d3-3001-4b63-85dc-cd6391d8dba1"
+	CHARACTER:%SkeletonKing="CYS_SkeletonKing_Braccus_19835d85-1185-45a3-baf6-9347297a2a96"
+	ITEMTEMPLATE:%ProtCrystal_RT="PUZ_Protection_Crystal_A_20b19d47-6f07-4bfd-8ecb-d011db663fe4"
+	INT:%SummonCrystals_Current=0
+	INT:%SummonCrystals_Target=2
+	//INT:%DestroyedCrystals=3
+	INT:%CrystalCount=0
+	FLOAT:%BraccusSightRange
+	ITEM:%SpawnedCrystal_1
+	ITEM:%SpawnedCrystal_2
+	ITEM:%SpawnedCrystal_3
+	INT:%Crystal_1_Handle
+	INT:%Crystal_2_Handle
+	INT:%Crystal_3_Handle
+	INT:%Bool_FXRestore_Crystal_01=0
+	INT:%Bool_FXRestore_Crystal_02=0
+	INT:%Bool_FXRestore_Crystal_03=0
+
+//---------------------
+BEHAVIOUR
+REACTION Braccus_Hardcore_SummonProtectionCrystals,0
+USAGE COMBAT
+VARS
+	TRIGGER:_Trigger1="CMBHC_CYS_Braccus_CrystalTrigger_Point_01_604c7dd4-a6ad-41f4-89bf-4eafff3ab86a"
+	TRIGGER:_Trigger2="CMBHC_CYS_Braccus_CrystalTrigger_Point_02_ef684f7c-1c6f-47c2-9a0a-0915e93ab301"
+	TRIGGER:_Trigger3="CMBHC_CYS_Braccus_CrystalTrigger_Point_03_25d9d18c-cac4-4746-9022-b67450081256"
+	TRIGGER:_Trigger4="CMBHC_CYS_Braccus_CrystalTrigger_Point_04_e2035e0a-c1a9-44d5-9429-541da65c5f56"
+	TRIGGER:_Trigger5="CMBHC_CYS_Braccus_CrystalTrigger_Point_05_207d7499-46be-4fe4-9f74-6b817cae9b56"
+	TRIGGER:_Trigger6="CMBHC_CYS_Braccus_CrystalTrigger_Point_06_1f117855-d4c4-4cf9-9e1c-6ba699ca14aa"
+	TRIGGER:_Trigger7="CMBHC_CYS_Braccus_CrystalTrigger_Point_07_d116d559-7d3a-4901-a58d-bd8d36440405"
+	TRIGGER:_ChosenTrigger1
+	TRIGGER:_ChosenTrigger2
+	TRIGGER:_ChosenTrigger3
+	FLOAT:_MyAP
+CHECK "c1&c2&!c3"
+	IsHardcore()
+	CharacterGetStat(_MyAP,__Me,ActionPoints)
+	IsLessThen(_MyAP,5)
+ACTIONS
+	Set(%CrystalCount,0)
+	IterateItemsNear(__Me,60,"CMBHC_CYS_Braccus_ScanForRemainingCrystals")
+	IF "!c1"
+		IsGreaterThen(%CrystalCount,0)
+	THEN
+		CharacterPlayEffect(__Me,"FX_Skills_WitchCraft_Summon_Prepare_A")		
+		CharacterPlayAnimation("cast_self_loop",1,1)			
+		CharacterPlayAnimation("cast_self_cast",1,0)
+		CharacterPlayEffect(__Me,"FX_Skills_WitchCraft_Generic_A_Cast_A")
+		Sleep(0.1)
+		GetRandom(_ChosenTrigger1,_Trigger1,_Trigger2)
+		PlayEffectAt(_ChosenTrigger1,"FX_Skills_WitchCraft_Generic_A_Cast_A")	
+		SpawnItem(%ProtCrystal_RT,_ChosenTrigger1,%SpawnedCrystal_1)
+		ItemPlayLoopEffect(%Crystal_1_Handle,%SpawnedCrystal_1,"FX_GP_LightPillarPurple_A")
+		Set(%Bool_FXRestore_Crystal_01,1)
+		Sleep(0.1)	
+		GetRandom(_ChosenTrigger2,_Trigger3,_Trigger4)
+		PlayEffectAt(_ChosenTrigger2,"FX_Skills_WitchCraft_Generic_A_Cast_A")
+		SpawnItem(%ProtCrystal_RT,_ChosenTrigger2,%SpawnedCrystal_2)	
+		ItemPlayLoopEffect(%Crystal_2_Handle,%SpawnedCrystal_2,"FX_GP_LightPillarPurple_A")	
+		Set(%Bool_FXRestore_Crystal_02,1)
+		Sleep(0.1)
+		GetRandom(_ChosenTrigger3,_Trigger5,_Trigger6,_Trigger7)
+		PlayEffectAt(_ChosenTrigger3,"FX_Skills_WitchCraft_Generic_A_Cast_A")
+		SpawnItem(%ProtCrystal_RT,_ChosenTrigger3,%SpawnedCrystal_3)
+		ItemPlayLoopEffect(%Crystal_3_Handle,%SpawnedCrystal_3,"FX_GP_LightPillarPurple_A")
+		Set(%Bool_FXRestore_Crystal_03,1)	
+		Sleep(0.1)	
+		CharacterPlayEffect(__Me,"FX_Skills_WitchCraft_Invulnerability_Cast_A")
+		CharacterApplyStatus(__Me,"VOID_AURA",-1,1)	
+		//Set(%DestroyedCrystals,0)
+		Set(%SummonCrystals_Current,0)	
+		CharacterUseActionPoints(__Me,5)
+	ENDIF
+	SetPriority("Braccus_Hardcore_SummonProtectionCrystals",0)	
+	
+REACTION Braccus_FriendsStillAlive_Walk_CastMeteorShower,600
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "!(c1&c2)&c3&c4&c5"
+	CharacterIsDead(%Chimera)																//!c1
+	CharacterIsDead(%SkeletonKing)															//!c2
+	CharacterCanCast(__Me,"ProjectileStrike_EnemyMeteorShower")								//c3
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"ProjectileStrike_EnemyMeteorShower")	//c4
+	CharacterGet(_Target,__Me,%BraccusSightRange,Highest,Distance,Enemy)					//c5
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,0)
+	CharacterUseSkill("ProjectileStrike_EnemyMeteorShower",_Target)
+
+REACTION Braccus_FriendsStillAlive_Walk_CastFireball,500
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_TargetFireResistance
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "!(c1&c2)&c3&c4&c5&c6&c7&!c8"
+	CharacterIsDead(%Chimera)																//!c1
+	CharacterIsDead(%SkeletonKing)															//!c2
+	CharacterCanCast(__Me,"Projectile_EnemyFireball")										//c3
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyFireball")				//c4
+	CharacterGet(_Target,__Me,%BraccusSightRange,Highest,Distance,Enemy)					//c5
+	CharacterGetStat(_TargetFireResistance,_Target,FireResistance)							//c6
+	IsLessThen(_TargetFireResistance,100)													//c7
+	CharacterHasStatus(_Target,FROZEN)														//!c8
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,0)
+	CharacterUseSkill("Projectile_EnemyFireball",_Target)
+
+REACTION Braccus_FriendsStillAlive_Walk_CastFear,400
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "!(c1&c2)&c3&c4&c5"
+	CharacterIsDead(%Chimera)																//!c1
+	CharacterIsDead(%SkeletonKing)															//!c2
+	CharacterCanCast(__Me,"Shout_EnemyFear")												//c3
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Shout_EnemyFear")						//c4
+	CharacterGet(_Target,__Me,%BraccusSightRange,Highest,Distance,Enemy)					//c5
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,0)
+	CharacterUseSkill("Shout_EnemyFear",_Target)
+
+REACTION Braccus_FriendsStillAlive_Walk_CastFlare,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_TargetFireResistance
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "!(c1&c2)&c3&c4&c5&c6&c7&!c8"
+	CharacterIsDead(%Chimera)																//!c1
+	CharacterIsDead(%SkeletonKing)															//!c2
+	CharacterCanCast(__Me,"Projectile_EnemyFlare_Braccus")									//c3
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyFlare_Braccus")		//c4
+	CharacterGet(_Target,__Me,%BraccusSightRange,Highest,Distance,Enemy)					//c5
+	CharacterGetStat(_TargetFireResistance,_Target,FireResistance)							//c6
+	IsLessThen(_TargetFireResistance,100)													//c7
+	CharacterHasStatus(_Target,FROZEN)														//!c8
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,0)
+	CharacterUseSkill("Projectile_EnemyFlare_Braccus",_Target)
+
+REACTION Braccus_FriendsDead_CastRage,600
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&!c4&c5"
+	CharacterIsDead(%Chimera)																//c1
+	CharacterIsDead(%SkeletonKing)															//c2
+	CharacterCanCast(__Me,"Shout_EnemyRage")												//c3
+	CharacterHasStatus(__Me,"VOID_AURA")													//!c4
+	CharacterGet(_Target,__Me,%BraccusSightRange,Highest,Distance,Enemy)					//c5	
+ACTIONS
+	CharacterMoveTo(_Target,1)
+	CharacterUseSkill("Shout_EnemyRage",__Me)
+	
+REACTION Braccus_FlexMagicalMuscles,500
+USAGE PEACE
+VARS
+	INT:_pentagramHandle
+	INT:_fireHandle
+	INT:_fireballHandle
+ACTIONS
+	CharacterPlayLoopEffect(_fireHandle,__Me,"FX_Skills_Fire_Flare_Prepare_Dummy_A","Bip001 Head")
+	CharacterMoveTo(TRIGGER:CYS_BraccusWander1_90482fca-be27-4bc4-b752-6dca1a683bd4,0)
+	CharacterLookFrom(TRIGGER:CYS_BraccusWander1_90482fca-be27-4bc4-b752-6dca1a683bd4)
+	CharacterPlayEffect(__Me,"FX_Skills_Fire_Flare_Cast_Dummy_A")
+	DisplayText(__Me,"CYS_Braccus_Spell_1",3)
+	CharacterPlayAnimation("cast_long_cast")
+	StopLoopEffect(_fireHandle)
+	Sleep(1)
+	CharacterPlayLoopEffect(_pentagramHandle,__Me,"FX_Skills_WitchCraft_Generic_A_Prepare")
+	DisplayText(__Me,"CYS_Braccus_Spell_2",3)
+	CharacterMoveTo(TRIGGER:CYS_BraccusWander2_cb21a1dd-a534-4db3-8211-b10698121b5f,0)
+	CharacterLookFrom(TRIGGER:CYS_BraccusWander2_cb21a1dd-a534-4db3-8211-b10698121b5f)
+	CharacterPlayEffect(__Me,"FX_Skills_WitchCraft_Generic_A_Cast_A")
+	CharacterPlayAnimation("cast_ground_cast")
+	StopLoopEffect(_pentagramHandle)
+	Sleep(2)
+	CharacterPlayLoopEffect(_fireballHandle,__Me,"FX_Skills_Fire_Fireball_Prepare_Dummy_A")
+	CharacterMoveTo(TRIGGER:CYS_BraccusWander3_124c04c8-5948-4187-9420-1fe56de1699f,0)
+	DisplayText(__Me,"CYS_Braccus_Spell_3",3)
+	CharacterLookFrom(TRIGGER:CYS_BraccusWander3_124c04c8-5948-4187-9420-1fe56de1699f)
+	CharacterPlayEffect(__Me,"FX_Skills_Fire_Fireball_Cast_Dummy_A")
+	CharacterPlayAnimation("cast_self_cast")
+	StopLoopEffect(_fireballHandle)
+	Sleep(5)
+	CharacterMoveTo(TRIGGER:CYS_BraccusWander4_fa1300af-1f02-42cc-a06c-fc764c3a8317,0)
+	CharacterLookFrom(TRIGGER:CYS_BraccusWander4_fa1300af-1f02-42cc-a06c-fc764c3a8317)
+	CharacterPlayAnimation("use_inspect")
+	Sleep(3)
+INTERRUPT
+	StopLoopEffect(_fireballHandle)
+	StopLoopEffect(_pentagramHandle)
+	StopLoopEffect(_fireHandle)
+
+REACTION Braccus_WaitWhileSummoningHisFriends,0				//please do not rename this Reaction as it is used in Story as well
+USAGE ALL
+ACTIONS			
+	CharacterPlayEffect(__Me,"FX_Skills_Fire_Summon_Prepare_A")
+	CharacterPlayAnimation("cast_shout_cast",1,1)
+	CharacterPlayEffect(__Me,"FX_Skills_Fire_Summon_Cast_A")
+	Sleep(3)
+	IF "c1"
+		IsHardcore()
+	THEN
+		SetPriority("Braccus_Hardcore_SummonProtectionCrystals",900)
+	ENDIF
+	SetPriority("Braccus_WaitWhileSummoningHisFriends",0)
+
+//---------------------
+EVENTS
+EVENT OnInit_Setup_FXRestore
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%BraccusSightRange,__Me,Sight)
+	THEN
+		IF "!c1|!c2"
+			CharacterIsDead(%Chimera)
+			CharacterIsDead(%SkeletonKing)
+		THEN
+			SetPriority("Combat_AttackSetEnemy",0)						
+			SetPriority("Combat_MoveToSetEnemy",0)	
+		ELIF "c1&c2"
+			CharacterIsDead(%Chimera)
+			CharacterIsDead(%SkeletonKing)
+		THEN
+			SetPriority("Combat_AttackSetEnemy",8)						
+			SetPriority("Combat_MoveToSetEnemy",7)	
+		ENDIF	
+		CharacterAddSkill("ProjectileStrike_EnemyMeteorShower")	
+		CharacterAddSkill("Projectile_EnemyFireball")
+		CharacterAddSkill("Projectile_EnemyFlare_Braccus")	
+		CharacterAddSkill("Shout_EnemyFear")	
+		CharacterAddSkill("Shout_EnemyRage")	
+	ENDIF
+	IF "c1"
+		IsEqual(%Bool_FXRestore_Crystal_01,1)
+	THEN
+		ItemPlayLoopEffect(%Crystal_1_Handle,%SpawnedCrystal_1,"FX_GP_LightPillarPurple_A")
+	ENDIF
+	IF "c1"
+		IsEqual(%Bool_FXRestore_Crystal_02,1)
+	THEN
+		ItemPlayLoopEffect(%Crystal_2_Handle,%SpawnedCrystal_2,"FX_GP_LightPillarPurple_A")
+	ENDIF	
+	IF "c1"
+		IsEqual(%Bool_FXRestore_Crystal_03,1)
+	THEN
+		ItemPlayLoopEffect(%Crystal_3_Handle,%SpawnedCrystal_3,"FX_GP_LightPillarPurple_A")
+	ENDIF
+
+EVENT OnCombatStarted_CheckPrios
+ON
+	OnCombatStarted()
+ACTIONS
+	IF "!c1|!c2"
+		CharacterIsDead(%Chimera)
+		CharacterIsDead(%SkeletonKing)
+	THEN
+		SetPriority("Combat_AttackSetEnemy",0)						
+		SetPriority("Combat_MoveToSetEnemy",0)	
+	ELIF "c1&c2"
+		CharacterIsDead(%Chimera)
+		CharacterIsDead(%SkeletonKing)
+	THEN
+		SetPriority("Combat_AttackSetEnemy",8)						
+		SetPriority("Combat_MoveToSetEnemy",7)	
+	ENDIF	
+
+EVENT OnDie_Chimera_IfSkeletonIsDead_ChangePrios
+ON
+	OnDie(%Chimera,_,_,_)
+ACTIONS
+	IF "c1"
+		CharacterIsDead(%SkeletonKing)
+	THEN
+		SetPriority("Combat_AttackSetEnemy",8)						
+		SetPriority("Combat_MoveToSetEnemy",7)				
+		SetPriority("Braccus_FriendsStillAlive_Walk_CastFireball",0)			
+		SetPriority("Braccus_FriendsStillAlive_Walk_CastFlare",0)
+	ENDIF	
+	
+EVENT OnDie_Skeleton_IfChimeraIsDead_ChangePrios
+ON
+	OnDie(%SkeletonKing,_,_,_)
+ACTIONS
+	IF "c1"
+		CharacterIsDead(%Chimera)
+	THEN
+		SetPriority("Combat_AttackSetEnemy",8)						
+		SetPriority("Combat_MoveToSetEnemy",7)		
+		SetPriority("Braccus_FriendsStillAlive_Walk_CastFireball",0)			
+		SetPriority("Braccus_FriendsStillAlive_Walk_CastFlare",0)
+	ENDIF	
+	
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+VARS
+	FLOAT:_DistanceToEnemy
+	FLOAT:_MySightRange		
+	CHARACTER:_ClosestEnemy		
+ACTIONS
+	Set(%CrystalCount,0)
+	IterateItemsNear(__Me,60,"CMBHC_CYS_Braccus_ScanForRemainingCrystals")
+	IF "c1&c2&!c3"
+		IsHardcore()
+		IsEqual(%SummonCrystals_Current,%SummonCrystals_Target)
+		IsGreaterThen(%CrystalCount,0)
+		//IsEqual(%DestroyedCrystals,3)
+	THEN
+		SetPriority("Braccus_Hardcore_SummonProtectionCrystals",1700)
+	ELIF "c1&!c2&!c3"
+		IsHardcore()
+		IsEqual(%SummonCrystals_Current,%SummonCrystals_Target)
+		IsGreaterThen(%CrystalCount,0)		
+		//IsEqual(%DestroyedCrystals,3)
+	THEN
+		Add(%SummonCrystals_Current,1)
+	ENDIF
+	
+EVENT OnItemDestroyed_RemoveVoidAuraFromBraccus		//Hardcore
+VARS
+	ITEM:_Crystal
+	INT:_Bool_CrystalCheck=0
+ON
+	OnItemDestroyed(_Crystal)
+ACTIONS
+	IF "c1"
+		IsEqual(_Crystal,%SpawnedCrystal_1)
+	THEN
+		StopLoopEffect(%Crystal_1_Handle)
+		Set(%Bool_FXRestore_Crystal_01,0)
+		Set(_Bool_CrystalCheck,1)
+	ELIF "c1"
+		IsEqual(_Crystal,%SpawnedCrystal_2)
+	THEN
+		StopLoopEffect(%Crystal_2_Handle)
+		Set(%Bool_FXRestore_Crystal_02,0)
+		Set(_Bool_CrystalCheck,1)
+	ELIF "c1"
+		IsEqual(_Crystal,%SpawnedCrystal_3)
+	THEN
+		StopLoopEffect(%Crystal_3_Handle)
+		Set(%Bool_FXRestore_Crystal_03,0)
+		Set(_Bool_CrystalCheck,1)
+	ENDIF
+	IF "c1"
+		IsEqual(_Bool_CrystalCheck,1)
+	THEN
+		Set(%CrystalCount,0)
+		IterateItemsNear(__Me,60,"CMBHC_CYS_Braccus_ScanForRemainingCrystals")
+		IF "!c1"
+			IsGreaterThen(%CrystalCount,0)
+		THEN		
+			CharacterPlayEffect(__Me,"FX_Skills_Fire_PurifyingFire_Cast_A")
+			CharacterRemoveStatus(__Me,"VOID_AURA")
+			Set(_Bool_CrystalCheck,0)
+		ENDIF
+	ENDIF
+
+EVENT OnDeactivate_StopLoopingFX
+ON
+	OnDeactivate()
+ACTIONS
+	StopLoopEffect(%Crystal_1_Handle)
+	StopLoopEffect(%Crystal_2_Handle)
+	StopLoopEffect(%Crystal_3_Handle)
+	
+EVENT OnCombatEnded_CleanUp
+ON
+	OnCombatEnded()
+ACTIONS
+	IterateItemsNear(__Me,60,"CMBHC_CYS_Braccus_CrystalCleanUp")
+
+EVENT OnIterateItem_ScanForRemainingCrystals
+VARS
+	ITEM:_Item
+	ITEMTEMPLATE:_Item_RT
+ON
+	OnIterateItem(_Item,"CMBHC_CYS_Braccus_ScanForRemainingCrystals")
+ACTIONS
+	IF "!c1&c2&c3"
+		ItemIsDestroyed(_Item)
+		ItemGetTemplate(_Item,_Item_RT)
+		IsEqual(_Item_RT,%ProtCrystal_RT)
+	THEN
+		Add(%CrystalCount,1)
+	ENDIF
+
+EVENT OnIterateItem_CleanUpCrystals_RemoveVoidAura
+VARS
+	ITEM:_Item
+	ITEMTEMPLATE:_Item_RT
+ON
+	OnIterateItem(_Item,"CMBHC_CYS_Braccus_CrystalCleanUp")
+ACTIONS
+	IF "!c1&c2&c3"
+		ItemIsDestroyed(_Item)
+		ItemGetTemplate(_Item,_Item_RT)
+		IsEqual(_Item_RT,%ProtCrystal_RT)
+	THEN
+		ItemDie(_Item)
+		StopLoopEffect(%Crystal_1_Handle)
+		StopLoopEffect(%Crystal_2_Handle)
+		StopLoopEffect(%Crystal_3_Handle)
+		CharacterRemoveStatus(__Me,"VOID_AURA")
+	ENDIF

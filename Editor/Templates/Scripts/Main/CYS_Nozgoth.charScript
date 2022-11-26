@@ -1,0 +1,24 @@
+INIT
+
+CHARACTER:__Me
+
+BEHAVIOUR
+
+REACTION TalkAlone, 1000
+USAGE PEACE
+VARS
+	FLOAT:_Time
+CHECK "c1"
+	CharacterHasStatus(__Me,"LYING")
+ACTIONS
+	DialogStart("CYS_AD_Nozgoth",__Me)
+	GetRandomBetween(_Time, 10, 45)
+	Sleep(_Time)
+
+EVENTS
+
+EVENT Combat
+ON
+	OnCombatStarted()
+ACTIONS
+	DialogRequestStop("CYS_AD_Nozgoth")

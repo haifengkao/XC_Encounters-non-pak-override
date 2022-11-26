@@ -1,0 +1,474 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_LUC_ImmaculatesVillageChurchButtons(ITEM_LUC_ImmaculateChurchCellarButton1, 4);
+DB_LUC_ImmaculatesVillageChurchButtons(ITEM_LUC_ImmaculateChurchCellarButton2, 2);
+DB_LUC_ImmaculatesVillageChurchButtons(ITEM_LUC_ImmaculateChurchCellarButton3, 1);
+DB_LUC_ImmaculatesVillageChurchButtons(ITEM_LUC_ImmaculateChurchCellarButton4, 3);
+
+DB_LUC_IV_NextButton(1);
+
+DB_PlayerComments("LUC_Comment_WandManual", "LUC_Comment_WandManual_1_1",1,1);
+DB_PlayerComments("LUC_Comment_WandManual", "LUC_Comment_WandManual_2_1",2,1);
+DB_PlayerComments("LUC_Comment_WandManual", "LUC_Comment_WandManual_2_2",2,2);
+
+ItemSetOnstage(ITEM_LUC_IV_ChurchHatch, 0);
+DB_PlayerComments("LUC_IV_CommentSecretLibrary", "LUC_IV_CommentSecretLibrary_1_1",1,1);
+DB_PlayerComments("LUC_IV_CommentSecretLibrary", "LUC_IV_CommentSecretLibrary_2_1",2,1);
+DB_PlayerComments("LUC_IV_CommentSecretLibrary", "LUC_IV_CommentSecretLibrary_2_2",2,2);
+DB_PlayerComment_Trigger(TRIGGER_LUC_IV_CommentSecretLibrary, "LUC_IV_CommentSecretLibrary");
+
+DB_Dialogs(CHARACTER_LUC_IC_TheKeeper, "LUC_IC_Librarian");
+DB_Dialogs(CHARACTER_LUC_IC_Guard1, "LUC_IC_ImmaculateOutside");
+DB_Dialogs(CHARACTER_LUC_IC_Guard2, "LUC_IC_ImmaculateOutside");
+
+DB_OneShotPlayerTrigger(TRIGGER_LUC_IC_OutsideImmaculates);
+DB_OneShotPlayerTrigger(TRIGGER_LUC_IC_StartSceneInside);
+
+ItemToCharacter(ITEM_LUC_IC_OutsideKey, CHARACTER_LUC_IC_Guard2);
+
+DB_Sacrificed(CHARACTER_LUC_IC_Sacrificed1, "StartKilling", "SecondKilling", "KillFirst");
+DB_Sacrificed(CHARACTER_LUC_IC_Sacrificed2, "SecondKilling", "ThirdKilling", "KillSecond");
+DB_Sacrificed(CHARACTER_LUC_IC_Sacrificed3, "ThirdKilling", "FourthKilling", "KillThird");
+DB_Sacrificed(CHARACTER_LUC_IC_Sacrificed4, "FourthKilling", "FinishedKilling","KillFourth");
+
+DB_LUC_IC_UpperFight(CHARACTER_LUC_IC_DemonGuard1);
+DB_LUC_IC_UpperFight(CHARACTER_LUC_IC_DemonGuard2);
+DB_LUC_IC_UpperFight(CHARACTER_LUC_IC_InnerGuard1);
+DB_LUC_IC_UpperFight(CHARACTER_LUC_IC_InnerGuard2);
+DB_LUC_IC_UpperFight(CHARACTER_LUC_IC_Mangoth);
+
+KillCounterDB(CHARACTER_LUC_IC_DemonGuard1, "LUC_IC_UpperFight");
+KillCounterDB(CHARACTER_LUC_IC_DemonGuard2, "LUC_IC_UpperFight");
+KillCounterDB(CHARACTER_LUC_IC_InnerGuard1, "LUC_IC_UpperFight");
+KillCounterDB(CHARACTER_LUC_IC_InnerGuard2, "LUC_IC_UpperFight");
+KillCounter("LUC_IC_UpperFight", 4);
+
+DB_LUC_IC_LibraryFight(CHARACTER_LUC_IC_LibrarySkeleton1);
+DB_LUC_IC_LibraryFight(CHARACTER_LUC_IC_LibrarySkeleton2);
+DB_LUC_IC_LibraryFight(CHARACTER_LUC_IC_LibrarySkeleton3);
+DB_LUC_IC_LibraryFight(CHARACTER_LUC_IC_LibrarySkeleton4);
+DB_LUC_IC_LibraryFight(CHARACTER_LUC_IC_LibrarySkeleton5);
+//DB_LUC_IC_LibraryFight(CHARACTER_LUC_IC_LibrarySkeleton6);
+//DB_LUC_IC_LibraryFight(CHARACTER_LUC_IC_LibrarySkeleton7);
+//DB_LUC_IC_LibraryFight(CHARACTER_LUC_IC_LibrarySkeleton8);
+
+PROC_LUC_IC_HideLibraryFight();
+
+SneakTriggerSpotter(TRIGGER_LUC_IC_OutsideTalk, CHARACTER_LUC_IC_OrcSlaver1);
+SneakTriggerSpotter(TRIGGER_LUC_IC_OutsideTalk, CHARACTER_LUC_IC_OrcSlaver2);
+SneakTriggerSpotter(TRIGGER_LUC_IV_CommentChurchAltar, CHARACTER_LUC_IC_Mangoth);
+SneakTriggerSpotter(TRIGGER_LUC_IV_CommentChurchAltar, CHARACTER_LUC_IC_InnerGuard1);
+SneakTriggerSpotter(TRIGGER_LUC_IV_CommentChurchAltar, CHARACTER_LUC_IC_InnerGuard2);
+
+CharacterSetOnStage(CHARACTER_LUC_IC_DemonGuard2, 0);
+CharacterSetOnStage(CHARACTER_LUC_IC_DemonGuard1, 0);
+
+DB_LUC_IC_LibrarianAssistants(CHARACTER_LUC_IC_TheKeeper_Ghost_01);
+DB_LUC_IC_LibrarianAssistants(CHARACTER_LUC_IC_TheKeeper_Ghost_02);
+DB_LUC_IC_LibrarianAssistants(CHARACTER_LUC_IC_TheKeeper_Ghost_03);
+DB_LUC_IC_LibrarianAssistants(CHARACTER_LUC_IC_TheKeeper_Ghost_04);
+
+DB_IsNotMessingAround(CHARACTER_LUC_IC_TheKeeper);
+
+CharacterSetOnStage(CHARACTER_LUC_IC_TheKeeper_Ghost_01, 0);
+CharacterSetOnStage(CHARACTER_LUC_IC_TheKeeper_Ghost_02, 0);
+CharacterSetOnStage(CHARACTER_LUC_IC_TheKeeper_Ghost_03, 0);
+CharacterSetOnStage(CHARACTER_LUC_IC_TheKeeper_Ghost_04, 0);
+
+ItemSetOnstage(ITEM_LUC_IC_BloodStone3, 0);
+
+DB_NoDefaultBehavior(CHARACTER_LUC_IC_Sacrificed1);
+DB_NoDefaultBehavior(CHARACTER_LUC_IC_Sacrificed2);
+DB_NoDefaultBehavior(CHARACTER_LUC_IC_Sacrificed3);
+DB_NoDefaultBehavior(CHARACTER_LUC_IC_Sacrificed4);
+KBSECTION
+//REGION Secret Library
+IF
+CharacterUsedItem(_Player, _Button)
+AND
+DB_LUC_ImmaculatesVillageChurchButtons(_Button, _Order)
+AND
+DB_LUC_IV_NextButton(_Next)
+AND
+_Order != _Next
+THEN
+PROC_CommentHiddenEffect(_Player);
+NOT DB_LUC_IV_NextButton(_Next);
+DB_LUC_IV_NextButton(1);
+
+IF
+CharacterUsedItem(_Player, _Button)
+AND
+DB_LUC_ImmaculatesVillageChurchButtons(_Button, _Order)
+AND
+DB_LUC_IV_NextButton(_Next)
+AND
+_Order == _Next
+AND
+IntegerSum(_Next, 1, _NewNext)
+THEN
+NOT DB_LUC_IV_NextButton(_Next);
+DB_LUC_IV_NextButton(_NewNext);
+PROC_LUC_IV_CheckIfAllButtonAreOn(_Player);
+
+PROC
+PROC_LUC_IV_CheckIfAllButtonAreOn((CHARACTER) _Player)
+AND
+DB_LUC_IV_NextButton(_Value)
+AND
+_Value != 5
+THEN
+PROC_CommentHiddenEffect(_Player);
+
+PROC
+PROC_LUC_IV_CheckIfAllButtonAreOn((CHARACTER) _Player)
+AND
+DB_LUC_IV_NextButton(5)
+THEN
+CharacterDisplayText(_Player, "GLO_SuccessfulUse");
+PlayEffectAtItem("FX_GP_TeleportSmoke_A", ITEM_LUC_ImmaculatesHiddenWallChurch);
+ItemSetOnstage(ITEM_LUC_ImmaculatesHiddenWallChurch,0);
+ItemPlaySound(ITEM_LUC_LeandraDiary,"Item_Door_Stone_Slide_Open");
+
+IF
+CharacterItemEvent(_Player, ITEM_LUC_IV_SecretBook, "moveAltar")
+THEN
+CharacterDisplayText(_Player, "LUC_IC_CommentLever");
+ItemMoveToTrigger(ITEM_LUC_IV_ChurchAltar, TRIGGER_LUC_IV_ChurchAltarPoint,0.75,0.0, 0);
+ItemMoveToTrigger(ITEM_LUC_IC_ChurchRelic, TRIGGER_LUC_IV_ChurchRelicPoint,0.75,0.0, 0);
+ItemSetOnstage(ITEM_LUC_IV_ChurchHatch, 1);
+
+/*
+IF
+CharacterSawCharacter(CHARACTER_LUC_IC_Mangoth, _Player)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT CHARACTER_LUC_IC_Mangoth.hadIsTalk()
+THEN
+ProcDoTwoSpeakerDialog("LUC_IV_Abbot", CHARACTER_LUC_IC_Mangoth, _Player);
+CHARACTER_LUC_IC_Mangoth.hadIsTalk();
+
+IF
+DialogEnded("LUC_IV_Abbot", _)
+THEN
+CharacterDisplayText(CHARACTER_LUC_IC_Mangoth, "LUC_IV_Hanibaal_Story");
+CharacterSetFaction(CHARACTER_LUC_IC_Mangoth, "Evil NPC");
+
+IF
+CharacterDied(CHARACTER_LUC_IC_Mangoth)
+AND
+CharacterGetClosestPlayer(CHARACTER_LUC_IC_Mangoth, _Player)
+THEN
+Launch_PlayerComment(_Player, "LUC_IV_CommentHannibalStudy");
+*/
+//END_REGION
+//REGION Outside
+PROC
+ProcCharInTriggerSpotted(_Player, TRIGGER_LUC_IC_OutsideTalk)
+THEN
+ProcDoTwoSpeakerDialog("LUC_IC_OrcOutside", CHARACTER_LUC_IC_OrcSlaver2, _Player);
+
+IF
+DialogEnded("LUC_IC_OrcOutside", _)
+THEN
+CharacterSetCanFight(CHARACTER_LUC_IC_OrcSlaver1, 1);
+CharacterSetCanFight(CHARACTER_LUC_IC_OrcSlaver2, 1);
+
+IF
+CharacterAttackedByCharacter(CHARACTER_LUC_IC_OrcSlaver1, _)
+THEN
+CharacterSetCanFight(CHARACTER_LUC_IC_OrcSlaver1, 1);
+CharacterSetCanFight(CHARACTER_LUC_IC_OrcSlaver2, 1);
+
+IF
+CharacterAttackedByCharacter(CHARACTER_LUC_IC_OrcSlaver2, _)
+THEN
+CharacterSetCanFight(CHARACTER_LUC_IC_OrcSlaver1, 1);
+CharacterSetCanFight(CHARACTER_LUC_IC_OrcSlaver2, 1);
+
+IF
+DB_Dead(CHARACTER_LUC_IC_OrcSlaver1)
+AND
+DB_Dead(CHARACTER_LUC_IC_OrcSlaver2)
+THEN
+ProcCharacterMoveToTrigger(CHARACTER_LUC_IC_HumanPrisoner, TRIGGER_LUC_IV_OutsideTeacher3, 1, "LUC_IC_Disappear");
+ProcCharacterMoveToTrigger(CHARACTER_LUC_IC_HumanPrisonner2, TRIGGER_LUC_IV_OutsideTeacher3, 1, "LUC_IC_Disappear");
+ProcCharacterMoveToTrigger(CHARACTER_LUC_IC_HumanPrisonner3, TRIGGER_LUC_IV_OutsideTeacher3, 1, "LUC_IC_Disappear");
+
+IF
+CharacterEvent(_Dude, "LUC_IC_Disappear")
+THEN
+CharacterDisappearOutOfSight(_Dude, 0, 1,"", 1);
+//END_REGION
+//REGION Entry guards
+IF	
+GlobalEventSet("LUC_IC_EntranceGranted")
+THEN
+ProcRemoveDialogEntryForSpeaker(CHARACTER_LUC_IC_Guard1, "LUC_IC_ImmaculateOutside");
+ProcRemoveDialogEntryForSpeaker(CHARACTER_LUC_IC_Guard2, "LUC_IC_ImmaculateOutside");
+DB_Dialogs(CHARACTER_LUC_IC_Guard1, "LUC_ImmaculateGuardGeneric");
+DB_Dialogs(CHARACTER_LUC_IC_Guard2, "LUC_ImmaculateGuardGeneric");
+ItemUnLock(ITEM_LUC_IC_ChurchOuterDoor);
+
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,TRIGGER_LUC_IC_OutsideImmaculates)
+AND
+NOT DB_Combat(CHARACTER_LUC_IC_Guard1, _)
+THEN
+ProcDoTwoSpeakerDialog("LUC_IC_ImmaculateOutside", CHARACTER_LUC_IC_Guard1, _Player);
+
+IF
+ItemAttackedByCharacter(ITEM_LUC_IC_ChurchOuterDoor, _Player, _)
+THEN
+ProcMakeNPCHostile(_Player, CHARACTER_LUC_IC_Guard1);
+ProcMakeNPCHostile(_Player, CHARACTER_LUC_IC_Guard2);
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_IC_OutsideImmaculates);
+NOT DB_OneShotPlayerTrigger(TRIGGER_LUC_IC_OutsideImmaculates);
+
+IF
+DialogEnded("LUC_IC_ImmaculateOutside", _)
+AND
+CharacterGetVarInteger(CHARACTER_LUC_IC_Guard1, "isAngry", 1)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+THEN
+ProcMakeNPCHostile(_Player, CHARACTER_LUC_IC_Guard1);
+ProcMakeNPCHostile(_Player, CHARACTER_LUC_IC_Guard2);
+//END_REGION
+//REGION Sacrifices
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,TRIGGER_LUC_IC_StartSceneInside)
+THEN
+DialogStartOneSpeakerDialog("LUC_IC_AD_MangothPrayer", CHARACTER_LUC_IC_Mangoth);
+
+IF
+AutomatedDialogEnded("LUC_IC_AD_MangothPrayer", _)
+THEN
+CharTimer(CHARACTER_LUC_IC_Mangoth, "StartKilling", 1000);
+
+IF
+CharTimerFinished(CHARACTER_LUC_IC_Mangoth, _Timer)
+AND
+DB_Sacrificed(_, _Timer, _, _Event)
+THEN
+CharacterSetEvent(CHARACTER_LUC_IC_Mangoth, _Event);
+
+IF
+CharacterEvent(_Dude, "BeZapped")
+AND
+DB_Sacrificed(_Dude, _, _, _)
+AND
+CharacterPlayLoopBeamEffectToItem(_Dude,ITEM_LUC_IC_StarStone3,"FX_GP_Beam_Blood_A","","",_Handle)
+THEN
+CharacterSetVarFixedString(_Dude,"currentState","State_Killed");
+CharacterPlayEffect(_Dude, "FX_GP_TeleportSmoke_A");
+DB_SacrificeHandle(_Handle);
+CharTimer(_Dude, "EffectivelyKill", 2000);
+
+IF
+CharTimerFinished(_Dude, "EffectivelyKill")
+AND
+DB_SacrificeHandle(_Handle)
+AND
+DB_Sacrificed(_Dude, _Foo, _Timer, _Bar)
+THEN
+StopLoopEffect(_Handle);
+CharacterDie(_Dude,0);
+CharacterDisplayText(CHARACTER_LUC_IC_Mangoth, "LUC_IC_MangothLaugh");
+CharTimer(CHARACTER_LUC_IC_Mangoth, _Timer, 5000);
+NOT DB_SacrificeHandle(_Handle);
+NOT DB_Sacrificed(_Dude, _Foo, _Timer, _Bar);
+
+IF
+CharTimerFinished(CHARACTER_LUC_IC_Sacrificed4, "EffectivelyKill")
+THEN
+ItemSetOnstage(ITEM_LUC_IC_StarStone3, 0);
+ItemSetOnstage(ITEM_LUC_IC_BloodStone3, 1);
+
+PROC
+ProcCharInTriggerSpotted(_Player, TRIGGER_LUC_IV_CommentChurchAltar)
+AND
+NOT CHARACTER_LUC_IC_Mangoth.hadFirstDialog()
+THEN
+NOT DB_LUC_IC_UpperFight(CHARACTER_LUC_IC_Mangoth);
+CHARACTER_LUC_IC_Mangoth.hadFirstDialog();
+PROC_MendatoryDialog("LUC_IC_MangothIntroduction", CHARACTER_LUC_IC_Mangoth, _Player);
+
+IF
+DialogEnded("LUC_IC_MangothIntroduction", _)
+THEN
+CharacterAppear(CHARACTER_LUC_IC_DemonGuard1, 1);
+CharacterAppear(CHARACTER_LUC_IC_DemonGuard2, 1);
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_LUC_IC_DemonGuard2);
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_LUC_IC_DemonGuard1);
+CharacterDisplayText(CHARACTER_LUC_IC_DemonGuard1, "LUC_IC_MangothRetreat");
+TimerLaunch("LUC_IC_MangothGoAway", 1500);
+Proc_CompanionComment(CHARACTER_Jahan,"JAH_CC_MangothDemons",CHARACTER_LUC_IC_DemonGuard1);
+
+IF
+TimerFinished("LUC_IC_MangothGoAway")
+THEN
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_LUC_IC_Mangoth);
+CharacterTeleportToTrigger(CHARACTER_LUC_IC_Mangoth, TRIGGER_LUC_IC_MangothInnerLibrary, "inLibrary");
+CharacterSetVarInteger(CHARACTER_LUC_IC_Mangoth, "inSecretLibrary", 1);
+
+IF
+CharacterEvent(CHARACTER_LUC_IC_Mangoth, "inLibrary")
+AND
+DB_LUC_IC_UpperFight(_Dude)
+THEN
+CharacterSetCanFight(_Dude, 1);
+
+IF
+CharacterAttackedByCharacter(_Dude, _)
+AND
+DB_LUC_IC_UpperFight(_Dude)
+AND
+CharacterCanFight(_Dude, 0)
+THEN
+CharacterDisplayText(CHARACTER_LUC_IC_DemonGuard1, "LUC_IC_MangothRetreat");
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_LUC_IC_DemonGuard2);
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_LUC_IC_DemonGuard1);
+CharacterAppear(CHARACTER_LUC_IC_DemonGuard1, 1);
+CharacterAppear(CHARACTER_LUC_IC_DemonGuard2, 1);
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_LUC_IC_Mangoth);
+CharacterTeleportToTrigger(CHARACTER_LUC_IC_Mangoth, TRIGGER_LUC_IC_MangothInnerLibrary, "inLibrary");
+CharacterSetVarInteger(CHARACTER_LUC_IC_Mangoth, "inSecretLibrary", 1);
+NOT DB_LUC_IC_UpperFight(CHARACTER_LUC_IC_Mangoth);
+CHARACTER_LUC_IC_Mangoth.hadFirstDialog();
+
+PROC
+ReactOnKillCounter("LUC_IC_UpperFight")
+AND
+DB_Sacrificed(_Dude, _Foo, _Bar, _FooBar)
+THEN
+CharacterRemoveStatus(_Dude, "STUNNED");
+CharacterDisappearOutOfSight(_Dude, -90, 1, "", 1);
+NOT DB_Sacrificed(_Dude, _Foo, _Bar, _FooBar);
+//END_REGION
+//REGION SecretLibrary
+PROC
+PROC_LUC_IC_HideLibraryFight()
+AND
+DB_LUC_IC_LibraryFight(_Dude)
+THEN
+CharacterSetOnStage(_Dude, 0);
+
+PROC
+PROC_LUC_IC_HideLibraryFight()
+THEN
+CharacterSetOnStage(CHARACTER_LUC_IC_Spider1, 0);
+CharacterSetOnStage(CHARACTER_LUC_IC_Spider2, 0);
+
+IF
+CharacterEvent(CHARACTER_LUC_IC_Mangoth, "inLibrary")
+THEN
+CharacterSetOnStage(CHARACTER_LUC_IC_Mangoth, 0);
+ProcTriggerRegisterForPlayers(TRIGGER_LUC_IV_StartMangothSpeech);
+
+IF
+CharacterEnteredTrigger(_Player, TRIGGER_LUC_IV_StartMangothSpeech)
+AND 
+NOT DB_OnlyOnce("MangothDialog")
+THEN
+DB_OnlyOnce("MangothDialog");
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_IV_StartMangothSpeech);
+CharacterSetOnStage(CHARACTER_LUC_IC_Mangoth, 1);
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_LUC_IC_Mangoth);
+PROC_MendatoryDialog("LUC_IV_Abbot", CHARACTER_LUC_IC_Mangoth, _Player);
+
+IF
+DialogEnded("LUC_IV_Abbot", _)
+THEN
+CharacterSetCanFight(CHARACTER_LUC_IC_Mangoth, 1);
+
+IF
+DialogEnded("LUC_IV_Abbot", _)
+AND
+DB_LUC_IC_LibraryFight(_Dude)
+THEN
+CharacterAppear(_Dude, 1);
+
+IF
+DialogEnded("LUC_IV_Abbot", _)
+AND
+CharacterGetVarInteger(CHARACTER_LUC_SpiderBoss, "isHappy", 1)
+THEN
+CharacterAppear(CHARACTER_LUC_IC_Spider1, 1);
+CharacterAppear(CHARACTER_LUC_IC_Spider2, 1);
+CharacterDisplayText(CHARACTER_LUC_IC_Spider1, "LUC_IC_SpiderHelp");
+
+IF
+GameBookInterfaceClosed(ITEM_LUC_LeandraDiary, _Player)
+AND
+NOT DB_GlobalEvent("LUC_DiscoveredLeandraDiary")
+THEN
+QuestUpdate("HOM_Starstones", "DiscoveredLeandraDiary");
+GlobalSetEvent("LUC_DiscoveredLeandraDiary");
+
+IF
+GameBookInterfaceClosed(ITEM_LUC_IC_LeandraBook, _Player)
+THEN
+Launch_PlayerComment(_Player, "LUC_Comment_DiscoveredLeandraDiary");
+
+IF
+CharacterUsedItem(_Player,ITEM_LUC_LeandraMap)
+AND
+DB_OnlyOnce("DAF_TempleMarkerUnlocked")
+THEN
+CharacterDisplayText(_Player, "GLO_OldTreasureMap");
+
+IF
+CharacterUsedItem(_Player,ITEM_LUC_LeandraMap)
+AND
+NOT DB_OnlyOnce("DAF_TempleMarkerUnlocked")
+THEN
+DB_OnlyOnce("DAF_TempleMarkerUnlocked");
+CharacterDisplayText(_Player,"DAF_TempleMarkerUnlocked");
+ProcShowMarker("DAF_InnerSanctum");
+//END_REGION
+//REGION Librarian Fight
+IF 
+CharacterEnteredCombat(CHARACTER_LUC_IC_TheKeeper,_)
+AND
+DB_LUC_IC_LibrarianAssistants(_Ghost)
+THEN
+Foop(_Ghost);
+CharTimer(_Ghost,"LUC_Librarian_Ghost_Timer",500);
+
+IF
+CharTimerFinished(_Ghost,"LUC_Librarian_Ghost_Timer")
+AND
+db_Combat(CHARACTER_LUC_IC_TheKeeper,_LibrarianCombat)
+AND
+db_Combat(_Player,_LibrarianCombat)
+AND
+_Player.DB_IsPlayer()
+AND
+DB_LUC_IC_LibrarianAssistants(_Ghost)
+THEN
+CharacterSetTemporaryHostileRelation(_Ghost,_Player);
+
+IF
+CharacterLeftCombat(_Ghost,_)
+AND
+DB_LUC_IC_LibrarianAssistants(_Ghost)
+AND
+CharacterIsDead(_Ghost,0)
+THEN
+Poof(_Ghost);
+//END_REGION
+
+IF
+GameBookInterfaceClosed(ITEM_LUC_DeathKnightWandManual, _Player)
+AND
+NOT ITEM_LUC_DeathKnightWandManual.triggeredComment()
+THEN
+ITEM_LUC_DeathKnightWandManual.triggeredComment();
+Launch_PlayerComment(_Player, "LUC_Comment_WandManual");
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

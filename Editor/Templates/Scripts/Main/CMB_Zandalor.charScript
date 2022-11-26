@@ -1,0 +1,764 @@
+#INCLUDE DefaultCharacter
+INIT
+	USING DefaultCharacter	//required for OVERRIDE below
+	CHARACTER:__Me
+	CHARACTER:%Icara="HOM_Icara_f536c5cf-cf2a-47eb-a148-c6e8ee966fb0"
+	CHARACTER:%Leandra="HOM_Leandra_111ff690-48fc-4341-909e-815fd4e16936"
+	CHARACTER:%Astarte2="HOM_Astarte_SecondFight_bd1ae42b-e714-49e7-9103-cd6d0379e760"
+	CHARACTER:%VoidDragon="HOM_AstralDragon_fd8e91d7-843e-46fc-9b2e-965b3de76a7e"
+	CHARACTER:%Endfight_Target
+	CHARACTER:%DeathKnightBane_Target
+	CHARACTER:%PurifyingFire_Target
+	CHARACTER:%HelpingHand_Target
+	CHARACTER:%ChillingTouch_Target
+	CHARACTER:%Wandbearer
+	INT:%Bool_CombatIsOver=0
+	FLOAT:%Zandalor_SightRange
+
+//---------
+BEHAVIOUR
+REACTION Zandalor_Astarte_MoveTo,0
+USAGE COMBAT
+VARS
+	TRIGGER:_ZandalorPoint="HOM_EndFight_ZandalorPoint_7b5cb2ac-303e-46f7-90a0-2a9384282a1c"
+	FLOAT:_DistBtwAstarteAndMe
+	CHARACTER:_ZandyEnemyCheck
+CHECK "!c1&c2&c3&!c4&c5&c6"
+	CharacterIsDead(%Astarte2)												//!c1
+	IsInCombatWith(__Me,%Astarte2)											//c2
+	CharacterGet(_ZandyEnemyCheck,%Astarte2,3,Lowest,Vitality,Enemy)		//c3
+	IsEqual(_ZandyEnemyCheck,%VoidDragon)									//!c4
+	GetDistance(_DistBtwAstarteAndMe,__Me,_ZandalorPoint)					//c5
+	IsGreaterThen(_DistBtwAstarteAndMe,7)									//c6
+ACTIONS
+	CharacterMoveTo(_ZandalorPoint,1,1)
+	SetPriority("Zandalor_Astarte_MoveTo",0)
+
+REACTION Zandalor_Wandbearer_CastPurifyingFire,900				//ALLIES
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&!c3"
+	CharacterCanCast(__Me,"Target_EnemyPurifyingFire")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyPurifyingFire")
+	IsInCombatWith(__Me,%Astarte2)
+ACTIONS
+	//DebugText(__Me,"PurFire Wandbearer: scanning!")
+	Set(%Wandbearer,null)
+	IterateCharactersInCombat(__Me,"CMB_Zandalor_ScanForWandbearer",Lowest,Distance)	
+	IF "!c1&(c2|c3|c4|c5|c6|c7)"
+		IsEqual(%Wandbearer,null)
+		CharacterHasStatus(%Wandbearer,"BURNING")
+		CharacterHasStatus(%Wandbearer,"FROZEN")
+		CharacterHasStatus(%Wandbearer,"STUNNED")
+		CharacterHasStatus(%Wandbearer,"CHARMED")
+		CharacterHasStatus(%Wandbearer,"MARK_OF_DEATH")
+		CharacterHasStatus(%Wandbearer,"CRAWLING_INFESTATION")
+	THEN
+		CharacterMoveInRange(%Wandbearer,_MinRange,_MaxRange,1))
+		IF "c1"
+			IsRandom(0.5)
+		THEN
+			DisplayText(__Me,"Target_EnemyPurifyingFire",3)
+		ENDIF
+		CharacterUseSkill("Target_EnemyPurifyingFire",%Wandbearer)
+	ELSE
+		SetPriority("Zandalor_Wandbearer_CastPurifyingFire",0)
+	ENDIF
+
+REACTION Zandalor_Wandbearer_CastHaste,800
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&!c3"
+	CharacterCanCast(__Me,"Target_EnemyHaste")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyHaste")
+	IsInCombatWith(__Me,%Astarte2)
+ACTIONS
+	//DebugText(__Me,"Haste Wandbearer: scanning!")
+	Set(%Wandbearer,null)
+	IterateCharactersInCombat(__Me,"CMB_Zandalor_ScanForWandbearer",Lowest,Distance)	
+	IF "!(c1|c2|c3|c4|c5|c6|c7|c8)"
+		IsEqual(%Wandbearer,null)
+		CharacterHasStatus(%Wandbearer,"HASTED")
+		CharacterHasStatus(%Wandbearer,"PETRIFIED")
+		CharacterHasStatus(%Wandbearer,"FROZEN")
+		CharacterHasStatus(%Wandbearer,"CHARMED")
+		CharacterHasStatus(%Wandbearer,"FEAR")
+		CharacterHasStatus(%Wandbearer,"STUNNED")
+		CharacterHasStatus(%Wandbearer,"WARM")
+	THEN
+		CharacterMoveInRange(%Wandbearer,_MinRange,_MaxRange,1))
+		IF "c1"
+			IsRandom(0.5)
+		THEN
+			DisplayText(__Me,"HOM_Combat_Zandalor_Haste",3)
+		ENDIF
+		CharacterUseSkill("Target_EnemyHaste",%Wandbearer)
+	ELSE
+		SetPriority("Zandalor_Wandbearer_CastHaste",0)
+	ENDIF
+
+REACTION Zandalor_Wandbearer_CastHelpingHand,800
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&!c3"
+	CharacterCanCast(__Me,"Target_HelpingHandEnemy")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_HelpingHandEnemy")
+	IsInCombatWith(__Me,%Astarte2)	
+ACTIONS
+	//DebugText(__Me,"HHand Wandbearer: scanning!")
+	Set(%Wandbearer,null)
+	IterateCharactersInCombat(__Me,"CMB_Zandalor_ScanForWandbearer",Lowest,Distance)	
+	IF "!c1&c2"
+		IsEqual(%Wandbearer,null)
+		CharacterHasStatus(%Wandbearer,"KNOCKED_DOWN")
+	THEN
+		CharacterMoveInRange(%Wandbearer,_MinRange,_MaxRange,1))
+		IF "c1"
+			IsRandom(0.5)
+		THEN
+			DisplayText(__Me,"HOM_Combat_Zandalor_HelpingHand",3)
+		ENDIF
+		CharacterUseSkill("Target_HelpingHandEnemy",%Wandbearer)
+	ELSE
+		SetPriority("Zandalor_Wandbearer_CastHelpingHand",0)
+	ENDIF
+	
+REACTION Zandalor_Ally_CastHelpingHand,700
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2"
+	CharacterCanCast(__Me,"Target_HelpingHandEnemy")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyPurifyingFire")
+ACTIONS
+	//DebugText(__Me,"HHand: scanning!")
+	Set(%HelpingHand_Target,null)
+	IterateCharactersInCombat(__Me,"CMB_Zandalor_ScanForKnockedDownAllies",Lowest,Distance)
+	IF "!c1&c2"
+		IsEqual(%HelpingHand_Target,null)
+		CharacterCanSee(__Me,%HelpingHand_Target)
+	THEN
+		CharacterMoveInRange(%HelpingHand_Target,_MinRange,_MaxRange,1)
+		DisplayText(__Me,"HOM_Combat_Zandalor_HelpingHand",3)
+		CharacterUseSkill("Target_HelpingHandEnemy",%HelpingHand_Target)
+	ELSE
+		SetPriority("Zandalor_Ally_CastHelpingHand",0)
+	ENDIF
+INTERRUPT
+	Reset()
+
+REACTION Zandalor_Ally_CastChillingTouch,700
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2"
+	CharacterCanCast(__Me,"Target_EnemyChillyWind")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyChillyWind")
+ACTIONS
+	//DebugText(__Me,"Chilltouch: scanning!")	
+	Set(%ChillingTouch_Target,null)
+	IterateCharactersInCombat(__Me,"CMB_Zandalor_ScanForBurningAllies",Lowest,Distance)
+	IF "!c1&c2"
+		IsEqual(%ChillingTouch_Target,null)
+		CharacterCanSee(__Me,%ChillingTouch_Target)
+	THEN
+		CharacterMoveInRange(%ChillingTouch_Target,_MinRange,_MaxRange,1)
+		DisplayText(__Me,"HOM_Combat_Zandalor_ChillyWind",3)
+		CharacterUseSkill("Target_EnemyChillyWind",%ChillingTouch_Target)
+	ELSE
+		SetPriority("Zandalor_Ally_CastChillingTouch",0)
+	ENDIF
+INTERRUPT
+	Reset()
+	
+REACTION Zandalor_Ally_CastBoost,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&!(c4|c5|c6|c7|c8|c9)&c10&c11"
+	CharacterCanCast(__Me,"Target_EnemyTargetedDamageBoost")									//c1
+	CharacterGet(_ChosenTarget,__Me,%Zandalor_SightRange,Highest,Strength,Ally)					//c2
+	CharacterIsInParty(_ChosenTarget)															//c3
+	CharacterHasStatus(_ChosenTarget,"BOOST")													//!c4
+	CharacterHasStatus(_ChosenTarget,"PETRIFIED")												//!c5
+	CharacterHasStatus(_ChosenTarget,"FROZEN")													//!c6
+	CharacterHasStatus(_ChosenTarget,"CHARMED")													//!c7
+	CharacterHasStatus(_ChosenTarget,"FEAR")													//!c8
+	CharacterHasStatus(_ChosenTarget,"STUNNED")													//!c9
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyTargetedDamageBoost")			//c10
+	IsRandom(0.3)																				//c11
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	IF "c1"
+		IsRandom(0.5)
+	THEN
+		DisplayText(__Me,"HOM_Combat_Zandalor_Boost",3)
+	ENDIF
+	CharacterUseSkill("Target_EnemyTargetedDamageBoost",_ChosenTarget)
+	
+REACTION Zandalor_Ally_CastHaste,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&!(c4|c5|c6|c7|c8|c9|c10)&c11&c12"
+	CharacterCanCast(__Me,"Target_EnemyHaste")													//c1
+	CharacterGet(_ChosenTarget,__Me,%Zandalor_SightRange,Lowest,Speed,Ally)						//c2
+	CharacterIsInParty(_ChosenTarget)															//c3
+	CharacterHasStatus(_ChosenTarget,"HASTED")													//!c4
+	CharacterHasStatus(_ChosenTarget,"PETRIFIED")												//!c5
+	CharacterHasStatus(_ChosenTarget,"FROZEN")													//!c6
+	CharacterHasStatus(_ChosenTarget,"CHARMED")													//!c7
+	CharacterHasStatus(_ChosenTarget,"FEAR")													//!c8
+	CharacterHasStatus(_ChosenTarget,"STUNNED")													//!c9
+	CharacterHasStatus(_ChosenTarget,"WARM")													//!c10
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyHaste")						//c11
+	IsRandom(0.3)																				//c12
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	IF "c1"
+		IsRandom(0.5)
+	THEN
+		DisplayText(__Me,"HOM_Combat_Zandalor_Haste",3)
+	ENDIF
+	CharacterUseSkill("Target_EnemyHaste",_ChosenTarget)
+
+REACTION Zandalor_Enemy_CastDeathKnightBane,500					//ENEMIES
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2"
+	CharacterCanCast(__Me,"Target_EnemyDeathKnightBane")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyDeathKnightBane")
+ACTIONS
+	IF "(c1|c2)&c3&c4"
+		IsEqual(%DeathKnightBane_Target,null)
+		CharacterIsDead(%DeathKnightBane_Target)
+		CharacterGet(%DeathKnightBane_Target,__Me,50,Lowest,Vitality,Enemy)
+		CharacterHasStatus(%DeathKnightBane_Target,"INVULNERABLE")
+	THEN
+		CharacterMoveInRange(%DeathKnightBane_Target,_MinRange,_MaxRange,1)
+		IF "c1"
+			IsRandom(0.5)
+		THEN
+			DisplayText(__Me,"HOM_Combat_Zandalor_DKBane",3)
+		ENDIF
+		CharacterUseSkill("Target_EnemyDeathKnightBane",%DeathKnightBane_Target)
+	ELIF "c1"
+		CharacterHasStatus(%DeathKnightBane_Target,"INVULNERABLE")
+	THEN
+		CharacterMoveInRange(%DeathKnightBane_Target,_MinRange,_MaxRange,1)
+		IF "c1"
+			IsRandom(0.5)
+		THEN
+			DisplayText(__Me,"HOM_Combat_Zandalor_DKBane",3)
+		ENDIF
+		CharacterUseSkill("Target_EnemyDeathKnightBane",%DeathKnightBane_Target)
+	ELSE
+		SetPriority("Zandalor_Enemy_CastDeathKnightBane",0)
+	ENDIF
+INTERRUPT
+	Reset()
+
+REACTION Zandalor_Enemy_CastPurifyingFire,800
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2"
+	CharacterCanCast(__Me,"Target_EnemyPurifyingFire")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyPurifyingFire")
+ACTIONS
+	//DebugText(__Me,"Purfire Enemy: scanning!")
+	Set(%PurifyingFire_Target,null)
+	IterateCharactersInCombat(__Me,"CMB_Zandalor_ScanForEnemiesWithPositiveStatuses",Lowest,Distance)
+	IF "!c1"
+		IsEqual(%PurifyingFire_Target,null)
+	THEN
+		CharacterMoveInRange(%PurifyingFire_Target,_MinRange,_MaxRange,1)
+		DisplayText(__Me,"HOM_Combat_Zandalor_PurifFire",3)
+		CharacterUseSkill("Target_EnemyPurifyingFire",%PurifyingFire_Target)
+	ELSE
+		SetPriority("Zandalor_Enemy_CastPurifyingFire",0)
+	ENDIF
+INTERRUPT
+	Reset()
+	
+REACTION Zandalor_Enemy_CastFlare,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&!(c3|c4|c5|c6|c7)&c8&c9"
+	CharacterCanCast(__Me,"Projectile_EnemyFlare")												//c1
+	CharacterGet(_ChosenTarget,__Me,%Zandalor_SightRange,Lowest,FireResistance,Enemy)			//c2
+	CharacterHasStatus(_ChosenTarget,"INVULNERABLE")											//!c3
+	CharacterHasStatus(_ChosenTarget,"VOID_AURA")												//!c4
+	CharacterHasStatus(_ChosenTarget,"FROZEN")													//!c5
+	CharacterHasStatus(_ChosenTarget,"FIRE_IMMUNITY_AURA")										//!c6
+	CharacterHasStatus(_ChosenTarget,"FIRE_IMMUNITY")											//!c7	
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyFlare")					//c8
+	IsRandom(0.3)																				//c9	
+ACTIONS
+	IF "!c1"
+		IsEqual(%Endfight_Target,null)
+	THEN
+		Set(_ChosenTarget,%Endfight_Target)
+	ENDIF
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	IF "c1"
+		IsRandom(0.3)
+	THEN
+		DisplayText(__Me,"HOM_Combat_Zandalor_Flare",3)
+	ENDIF
+	CharacterUseSkill("Projectile_EnemyFlare",_ChosenTarget)
+	
+REACTION Zandalor_Enemy_CastIceShard,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&!(c3|c4|c5|c6|c7)&c8&c9"
+	CharacterCanCast(__Me,"Projectile_EnemyIceShard")											//c1
+	CharacterGet(_ChosenTarget,__Me,%Zandalor_SightRange,Lowest,WaterResistance,Enemy)			//c2
+	CharacterHasStatus(_ChosenTarget,"INVULNERABLE")											//!c3
+	CharacterHasStatus(_ChosenTarget,"VOID_AURA")												//!c4
+	CharacterHasStatus(_ChosenTarget,"BURNING")													//!c5
+	CharacterHasStatus(_ChosenTarget,"WATER_IMMUNITY_AURA")										//!c6
+	CharacterHasStatus(_ChosenTarget,"WATER_IMMUNITY")											//!c7		
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyIceShard")					//c8
+	IsRandom(0.3)																				//c9	
+ACTIONS
+	IF "!c1"
+		IsEqual(%Endfight_Target,null)
+	THEN
+		Set(_ChosenTarget,%Endfight_Target)
+	ENDIF
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	IF "c1"
+		IsRandom(0.3)
+	THEN
+		DisplayText(__Me,"HOM_Combat_Zandalor_IceShard",3)
+	ENDIF
+	CharacterUseSkill("Projectile_EnemyIceShard",_ChosenTarget)
+
+REACTION Zandalor_Enemy_CastBlitzBolt,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+	FLOAT:_AirRes	
+CHECK "c1&c2&!(c3|c4|c5|c6)&c7&c8&c9&c10"
+	CharacterCanCast(__Me,"Projectile_EnemyBlitzBolt")											//c1
+	CharacterGet(_ChosenTarget,__Me,%Zandalor_SightRange,Lowest,AirResistance,Enemy)			//c2
+	CharacterHasStatus(_ChosenTarget,"INVULNERABLE")											//!c3
+	CharacterHasStatus(_ChosenTarget,"VOID_AURA")												//!c4
+	CharacterHasStatus(_ChosenTarget,"AIR_IMMUNITY_AURA")										//!c5
+	CharacterHasStatus(_ChosenTarget,"AIR_IMMUNITY")											//!c6
+	CharacterGetStat(_AirRes,_ChosenTarget,"AirResistance")										//c7
+	IsLessThen(_AirRes,100)																		//c8
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyBlitzBolt")				//c9
+	IsRandom(0.3)																				//c10	
+ACTIONS
+	IF "!c1"
+		IsEqual(%Endfight_Target,null)
+	THEN
+		Set(_ChosenTarget,%Endfight_Target)
+	ENDIF
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	IF "c1"
+		IsRandom(0.3)
+	THEN
+		DisplayText(__Me,"HOM_Combat_Zandalor_BlitzBolt",3)
+	ENDIF
+	CharacterUseSkill("Projectile_EnemyBlitzBolt",_ChosenTarget)
+	
+REACTION Zandalor_Enemy_CastEarthShard,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&!(c3|c4|c5|c6|c7)&c8&c9"
+	CharacterCanCast(__Me,"Projectile_EnemyEarthShard")											//c1
+	CharacterGet(_ChosenTarget,__Me,%Zandalor_SightRange,Lowest,EarthResistance,Enemy)			//c2
+	CharacterHasStatus(_ChosenTarget,"PETRIFIED")												//!c3
+	CharacterHasStatus(_ChosenTarget,"INVULNERABLE")											//!c4
+	CharacterHasStatus(_ChosenTarget,"VOID_AURA")												//!c5
+	CharacterHasStatus(_ChosenTarget,"EARTH_IMMUNITY_AURA")										//!c6
+	CharacterHasStatus(_ChosenTarget,"EARTH_IMMUNITY")											//!c7
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyEarthShard")				//c8
+	IsRandom(0.3)																				//c9	
+ACTIONS
+	IF "!c1"
+		IsEqual(%Endfight_Target,null)
+	THEN
+		Set(_ChosenTarget,%Endfight_Target)
+	ENDIF
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	IF "c1"
+		IsRandom(0.3)
+	THEN
+		DisplayText(__Me,"HOM_Combat_Zandalor_EarthShard",3)
+	ENDIF
+	CharacterUseSkill("Projectile_EnemyEarthShard",_ChosenTarget)
+	
+REACTION Zandalor_Self_CastShield_Fire,0						//SELF
+USAGE COMBAT
+CHECK "!c1"
+	CharacterHasStatus(__Me,"SHIELD")
+ACTIONS
+	IF "c1"
+		CharacterCanCast(__Me,"Shield_EnemyFire")
+	THEN
+		CharacterUseSkill("Shield_EnemyFire",__Me)
+	ENDIF
+	SetPriority("Zandalor_Self_CastShield_Fire",0)
+		
+REACTION Zandalor_Self_CastShield_Water,0
+USAGE COMBAT
+CHECK "!c1"
+	CharacterHasStatus(__Me,"SHIELD")
+ACTIONS
+	IF "c1"
+		CharacterCanCast(__Me,"Shield_EnemyWater")
+	THEN
+		CharacterUseSkill("Shield_EnemyWater",__Me)
+	ENDIF
+	SetPriority("Zandalor_Self_CastShield_Water",0)
+		
+REACTION Zandalor_Self_CastShield_Air,0
+USAGE COMBAT
+CHECK "!c1"
+	CharacterHasStatus(__Me,"SHIELD")
+ACTIONS
+	IF "c1"
+		CharacterCanCast(__Me,"Shield_EnemyAir")
+	THEN
+		CharacterUseSkill("Shield_EnemyAir",__Me)
+	ENDIF	
+	SetPriority("Zandalor_Self_CastShield_Air",0)
+	
+REACTION Zandalor_Self_CastShield_Earth,0
+USAGE COMBAT
+CHECK "!c1"
+	CharacterHasStatus(__Me,"SHIELD")
+ACTIONS
+	IF "c1"
+		CharacterCanCast(__Me,"Shield_EnemyEarth")
+	THEN
+		CharacterUseSkill("Shield_EnemyEarth",__Me)
+	ENDIF
+	SetPriority("Zandalor_Self_CastShield_Earth",0)
+	
+REACTION Zandalor_Waiting_Dragon,600
+USAGE WAITING
+VARS
+	FIXEDSTRING:_Text
+CHECK "!c1&c2"
+	CharacterIsDead(%VoidDragon)
+	IsInCombatWith(__Me,%VoidDragon)
+ACTIONS
+	CharacterLookAt(%VoidDragon)
+	IF "c1"
+		IsRandom(0.05)
+	THEN
+		GetWeightedRandom(_Text,"HOM_Combat_Zandalor_Wait_01",INT:1,"HOM_Combat_Zandalor_Wait_02",INT:1,"HOM_Combat_Zandalor_Wait_03",INT:1,"HOM_Combat_Zandalor_Wait_04",INT:1,"HOM_Combat_Zandalor_Wait_05",INT:1,"",INT:3)
+		DisplayText(__Me,_Text,3)
+	ENDIF
+	Sleep(10)	
+	
+REACTION Zandalor_Waiting,500
+USAGE WAITING
+VARS
+	FIXEDSTRING:_Text
+ACTIONS
+	IF "c1"
+		IsRandom(0.05)
+	THEN
+		GetWeightedRandom(_Text,"HOM_Combat_Zandalor_Wait_01",INT:1,"HOM_Combat_Zandalor_Wait_02",INT:1,"HOM_Combat_Zandalor_Wait_03",INT:1,"HOM_Combat_Zandalor_Wait_04",INT:1,"HOM_Combat_Zandalor_Wait_05",INT:1,"",INT:3)
+		DisplayText(__Me,_Text,3)
+	ENDIF
+	Sleep(10)
+		
+//---------
+EVENTS
+EVENT DefaultIterateSetTarget OVERRIDE 					//don't attack anything invulnerable or charmed
+VARS 
+	CHARACTER:_Char
+	CHARACTER:_previousSetTarget
+	FLOAT:_targetDistance
+	INT:_alreadyTargetedBy
+	FLOAT:_targetClosestThisScore=0
+	FLOAT:_movement
+ON
+	OnIterateCharacter(_Char,"DefaultSetTargetClosestIterator")
+ACTIONS
+	IF "!c1&!c2&c3&c4&c5&!(c6|c7|c8|c9|c10|c11|c12)"
+		CharacterIsDead(_Char)
+		IsEqual(__Me,_Char)
+		CharacterIsEnemy(__Me,_Char)
+		GetDistance(_targetDistance,__Me,_Char)
+		CharacterGetHostileCount(_alreadyTargetedBy,_Char)
+		CharacterHasStatus(_Char,"INVISIBLE")
+		CharacterHasStatus(_Char,"SNEAKING")
+		CharacterHasStatus(_Char,"INVULNERABLE")
+		CharacterHasStatus(_Char,"VOID_AURA")
+		CharacterHasStatus(_Char,"CHARMED")
+		CharacterHasStatus(_Char,"PHYSICAL_IMMUNITY_AURA")
+		CharacterHasStatus(_Char,"PHYSICAL_IMMUNITY")
+	THEN
+		IF "c1&c2"
+			CharacterGetEnemy(_previousSetTarget,__Me)
+			IsEqual(_previousSetTarget,_Char)
+		THEN
+			Multiply(_targetDistance,0.8)
+		ENDIF
+		IF "c1"
+			IsEqual(_alreadyTargetedBy,0)
+		THEN
+			Multiply(_targetDistance,0.5)
+		ENDIF
+		IF "c1"
+			IsEqual(_alreadyTargetedBy,1)
+		THEN
+			Multiply(_targetDistance,0.6)
+		ENDIF
+		IF "c1"
+			CharacterIsSummon(_Char)
+		THEN
+			Multiply(_targetDistance,1.5)
+		ENDIF	
+		IF "c1&!c2"
+			IsGreaterThen(_alreadyTargetedBy,1)
+			CharacterHasStatus(_Char,AGGRO_MARKED)
+		THEN
+			Add(_alreadyTargetedBy,0.6)
+			Multiply(_alreadyTargetedBy,_alreadyTargetedBy)
+			Multiply(_targetDistance,_alreadyTargetedBy)
+		ENDIF
+		IF "c1&c2"
+			IsGreaterThen(_alreadyTargetedBy,3)
+			CharacterHasStatus(_Char,AGGRO_MARKED)
+		THEN
+			Multiply(_targetDistance,2)
+		ENDIF
+		IF "!c1"
+			CharacterCanSee(__Me,_Char)
+		THEN
+			Multiply(_targetDistance,3)
+		ENDIF
+		IF "c1&!c2"
+			CharacterHasTalent(_Char,Stench)
+			CharacterHasStatus(_Char,AGGRO_MARKED)
+		THEN
+			Multiply(_targetDistance,4)
+		ENDIF
+		IF "c1&c2"
+			CharacterHasTalent(_Char,Stench)
+			CharacterHasStatus(_Char,AGGRO_MARKED)
+		THEN
+			Multiply(_targetDistance,2)
+		ENDIF
+		Set(_targetClosestThisScore,_targetDistance)
+		IF "!c1"
+			IsGreaterThen(_targetClosestThisScore,%setTargetDefaultBestScore)
+		THEN
+			Set(%setTargetDefaultBestScore,_targetClosestThisScore)
+			CharacterSetEnemy(__Me,_Char)
+		ENDIF
+	ENDIF
+	
+EVENT DontAttackAlliesOrInvisibles OVERRIDE 			//nor will you attack anything invulnerable or charmed
+VARS
+	CHARACTER:_Target
+ON
+	OnTurn()
+ACTIONS
+	IF "c1&(c2|c3|c4|c5|c6|c7|c8)"
+		CharacterGetEnemy(_Target,__Me)
+		CharacterIsAlly(__Me,_Target)
+		CharacterHasStatus(_Target,"INVISIBLE")
+		CharacterHasStatus(_Target,"INVULNERABLE")
+		CharacterHasStatus(_Target,"VOID_AURA")
+		CharacterHasStatus(_Target,"CHARMED")
+		CharacterHasStatus(_Target,"PHYSICAL_IMMUNITY_AURA")
+		CharacterHasStatus(_Target,"PHYSICAL_IMMUNITY")		
+	THEN
+		CharacterSetEnemy(__Me,null)
+		Set(%defaultEvaluateTarget,1)
+	ENDIF
+	
+EVENT OnInit_GiveSpells_GetSightRange
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%Zandalor_SightRange,__Me,Sight)
+	THEN
+		CharacterAddSkill("Target_EnemyDeathKnightBane")	
+		CharacterAddSkill("Target_EnemyPurifyingFire")	
+		CharacterAddSkill("Projectile_EnemyFlare")
+		CharacterAddSkill("Projectile_EnemyIceShard")
+		CharacterAddSkill("Projectile_EnemyBlitzBolt")
+		CharacterAddSkill("Projectile_EnemyEarthShard")	
+		CharacterAddSkill("Target_HelpingHandEnemy")
+		CharacterAddSkill("Target_EnemyChillyWind")
+		CharacterAddSkill("Target_EnemyTargetedDamageBoost")			
+		CharacterAddSkill("Target_EnemyHaste")	
+		CharacterAddSkill("Shield_EnemyFire")	
+		CharacterAddSkill("Shield_EnemyWater")	
+		CharacterAddSkill("Shield_EnemyAir")	
+		CharacterAddSkill("Shield_EnemyEarth")	
+	ENDIF
+	
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	IF "c1"
+		IsEqual(%Bool_CombatIsOver,1)
+	THEN
+		CharacterEndTurn()
+	ENDIF
+	IF "c1"
+		IsInCombatWith(__Me,%Astarte2)
+	THEN
+		SetPriority("Zandalor_Astarte_MoveTo",2000)
+	ENDIF
+	SetPriority("Zandalor_Wandbearer_CastPurifyingFire",900)
+	SetPriority("Zandalor_Wandbearer_CastHelpingHand",900)
+	SetPriority("Zandalor_Wandbearer_CastHelpingHand",800)
+	SetPriority("Zandalor_Wandbearer_CastHaste",800)
+	SetPriority("Zandalor_Enemy_CastPurifyingFire",800)
+	SetPriority("Zandalor_Ally_CastHelpingHand",700)
+	SetPriority("Zandalor_Ally_CastChillingTouch",700)	
+	SetPriority("Zandalor_Enemy_CastDeathKnightBane",500)
+	
+EVENT OnIterateCharacter_ScanForEnemiesWithPositiveStatuses
+VARS
+	CHARACTER:_Enemy
+ON
+	OnIterateCharacter(_Enemy,"CMB_Zandalor_ScanForEnemiesWithPositiveStatuses")
+ACTIONS
+	IF "!c1&c2&(c3|c4)"
+		CharacterIsDead(_Enemy)
+		CharacterIsEnemy(__Me,_Enemy)
+		CharacterHasStatus(_Enemy,"SHIELD")
+		CharacterHasStatus(_Enemy,"HEALING")
+	THEN
+		Set(%PurifyingFire_Target,_Enemy)
+	ENDIF
+	
+EVENT OnIterateCharacter_ScanForBurningAllies
+VARS
+	CHARACTER:_Ally
+ON
+	OnIterateCharacter(_Ally,"CMB_Zandalor_ScanForBurningAllies")
+ACTIONS
+	IF "!c1&c2&c3"
+		CharacterIsDead(_Ally)
+		CharacterIsInParty(_Ally)
+		CharacterHasStatus(_Ally,"BURNING")
+	THEN
+		Set(%ChillingTouch_Target,_Ally)
+	ENDIF	
+	
+EVENT OnIterateCharacter_ScanForKnockedDownAllies
+VARS
+	CHARACTER:_Ally
+ON
+	OnIterateCharacter(_Ally,"CMB_Zandalor_ScanForKnockedDownAllies")
+ACTIONS
+	IF "!c1&c2&c3"
+		CharacterIsDead(_Ally)
+		CharacterIsInParty(_Ally)
+		CharacterHasStatus(_Ally,"KNOCKED_DOWN")
+	THEN
+		Set(%HelpingHand_Target,_Ally)
+	ENDIF	
+	
+EVENT OnIterateCharacter_ScanForWandbearer
+VARS
+	CHARACTER:_Ally
+	ITEM:_Wand="END_DeathKnightKillWand_841299de-a661-477a-9a99-290c102acd93"
+ON
+	OnIterateCharacter(_Ally,"CMB_Zandalor_ScanForWandbearer")
+ACTIONS
+	IF "c1&!(c2|c3)&c4"
+		CharacterIsAlly(__Me,_Ally)
+		CharacterIsSummon(_Ally)
+		CharacterIsDead(_Ally)
+		ItemIsInCharacterInventory(_Wand,_Ally)
+	THEN
+		Set(%Wandbearer,_Ally)
+	ENDIF
+	
+EVENT OnDamage_CheckDamageType_SetShieldPrio
+VARS
+	DAMAGE:_Damage
+ON
+	OnDamage(_Damage,_,_,_)
+ACTIONS
+	IF "c1"
+		IsEqual(_Damage,"Fire")
+	THEN
+		SetPriority("Zandalor_Self_CastShield_Fire",500)
+	ELIF "c1"
+		IsEqual(_Damage,"Water")
+	THEN
+		SetPriority("Zandalor_Self_CastShield_Water",500)
+	ELIF "c1"
+		IsEqual(_Damage,"Air")
+	THEN
+		SetPriority("Zandalor_Self_CastShield_Air",500)
+	ELIF "c1"
+		IsEqual(_Damage,"Earth")
+	THEN
+		SetPriority("Zandalor_Self_CastShield_Earth",500)
+	ENDIF
+	
+EVENT OnDie_DisplayText
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	DisplayText(__Me,"HOM_Combat_Zandalor_Died",3)	
+	
+EVENT OnDie_Astarte_EndCombat
+ON
+	OnDie(%Astarte2,_,_,_)
+ACTIONS
+	Set(%Bool_CombatIsOver,1)
+	
+EVENT OnDie_Dragon_EndCombat
+ON
+	OnDie(%VoidDragon,_,_,_)
+ACTIONS
+	Set(%Bool_CombatIsOver,1)	
+
+EVENT OnDie_Icara_DisplayText
+ON
+	OnDie(%Icara,_,_,_)
+ACTIONS
+	DisplayText(__Me,"HOM_Combat_Zandalor_IcaraDied",3)
+	
+EVENT OnDie_Leandra_DisplayText
+ON
+	OnDie(%Leandra,_,_,_)
+ACTIONS
+	DisplayText(__Me,"HOM_Combat_Zandalor_LeandraDied",3)

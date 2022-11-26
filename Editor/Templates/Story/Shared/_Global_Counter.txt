@@ -1,0 +1,50 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+PROC
+ProcRemoveCounter((STRING)_Name)
+AND
+DB_GlobalCounter(_Name,_Count)
+THEN
+NOT DB_GlobalCounter(_Name,_Count);
+
+PROC
+ProcDeclareCounter((STRING)_Name)
+THEN
+ProcRemoveCounter(_Name);
+DB_GlobalCounter(_Name,0);
+
+PROC
+ProcIncreaseCounter((STRING)_Name)
+THEN
+ProcIncreaseCounter(_Name,1);
+
+PROC
+ProcIncreaseCounter((STRING)_Name,(INTEGER)_Amount)
+AND
+DB_GlobalCounter(_Name,_Count)
+AND
+IntegerSum(_Count,_Amount,_NewCount)
+THEN
+NOT DB_GlobalCounter(_Name,_Count);
+DB_GlobalCounter(_Name,_NewCount);
+
+PROC
+ProcDecreaseCounter((STRING)_Name)
+THEN
+ProcDecreaseCounter(_Name,1);
+
+PROC
+ProcDecreaseCounter((STRING)_Name,(INTEGER)_Amount)
+AND
+DB_GlobalCounter(_Name,_Count)
+AND
+IntegerSubtract(_Count,_Amount,_NewCount)
+THEN
+NOT DB_GlobalCounter(_Name,_Count);
+DB_GlobalCounter(_Name,_NewCount);
+EXITSECTION
+
+ENDEXITSECTION

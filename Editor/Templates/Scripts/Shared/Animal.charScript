@@ -1,0 +1,75 @@
+INIT
+CHARACTER:__Me
+ITEM:%CurrentClosestFood = null
+ITEM:%CurrentTargetFood = null
+EXTERN FIXEDSTRING:%FoodTemplate1 = "DONTEAT"
+EXTERN FIXEDSTRING:%FoodTemplate2 = "DONTEAT"
+EXTERN FIXEDSTRING:%FoodTemplate3 = "DONTEAT"
+EXTERN FIXEDSTRING:%FoodTemplate4 = "DONTEAT"
+EXTERN FIXEDSTRING:%FoodTemplate5 = "DONTEAT"
+EXTERN FIXEDSTRING:%FoodTemplate6 = "DONTEAT"
+EXTERN FLOAT:%CombatDist = 3
+EXTERN FLOAT:%PeaceDist = 15
+FLOAT3:%Test
+BEHAVIOUR
+
+REACTION EatFood, 0
+USAGE PEACE
+USAGE COMBAT
+ACTIONS
+	CharacterUseItem(%CurrentTargetFood)
+INTERRUPT
+	Reset()
+
+EVENTS
+
+EVENT Initialize
+ON
+	OnInit()
+ACTIONS
+	StartTimer("UpdateFoodCheck",0.5,-1)
+
+EVENT Shutdown
+ON
+	OnShutdown()
+ACTIONS
+	StopTimer("UpdateFoodCheck")
+
+EVENT UpdateFoodCheck
+ON
+	OnTimer("UpdateFoodCheck")
+VARS
+	ITEM:_ClosestFood
+	FLOAT:_Distance
+ACTIONS
+	Set(%CurrentClosestFood,null)
+	SetPriority("EatFood",0)		
+	IF "c1"
+		CharacterHasStatus(__Me,COMBAT)
+	THEN
+		Set(_Distance,%CombatDist)
+	ELSE
+		Set(_Distance,%PeaceDist)
+	ENDIF
+	
+	IF "(!c1)&(c2|c3|c4|c5|c6|c7)"
+		IsInDialog(__Me)
+		ItemGet(_ClosestFood,__Me,_Distance,Lowest,Distance,%FoodTemplate1)
+		ItemGet(_ClosestFood,__Me,_Distance,Lowest,Distance,%FoodTemplate2)
+		ItemGet(_ClosestFood,__Me,_Distance,Lowest,Distance,%FoodTemplate3)
+		ItemGet(_ClosestFood,__Me,_Distance,Lowest,Distance,%FoodTemplate4)
+		ItemGet(_ClosestFood,__Me,_Distance,Lowest,Distance,%FoodTemplate5)
+		ItemGet(_ClosestFood,__Me,_Distance,Lowest,Distance,%FoodTemplate6)		
+	THEN
+		Set(%CurrentClosestFood,_ClosestFood)	
+	ENDIF	
+	IF "!c1&(c2|!c3)&c4"
+		IsEqual(%CurrentClosestFood,null)
+		IsEqual(%CurrentTargetFood,null)
+		IsEqual(%CurrentClosestFood,%CurrentTargetFood)
+		CanSee(__Me,%CurrentClosestFood)
+	THEN
+		Interrupt("EatFood")	
+		Set(%CurrentTargetFood,%CurrentClosestFood)		
+		SetPriority("EatFood",5000)	
+	ENDIF

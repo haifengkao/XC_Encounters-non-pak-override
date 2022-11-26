@@ -1,0 +1,12 @@
+INIT
+
+CHARACTER:__Me
+
+BEHAVIOUR
+
+REACTION Idle_Henchman,100
+USAGE PEACE
+ACTIONS
+	CharacterPlayAnimation(emotion_cower_scared)
+	
+	

@@ -1,0 +1,36 @@
+INIT
+	CHARACTER:__Me
+	EXTERN STATUS:%DesiredStatus="FIRE_IMMUNITY_AURA"
+	EXTERN INT:%Int_StatusDuration=-1
+	EXTERN INT:%Bool_ForceStatus=1
+	EXTERN INT:%Bool_RefreshStatus=1
+	INT:%ImDead = 0
+	
+EVENTS
+EVENT OnInit_ApplyStatus
+ON
+	OnInit()
+	OnCombatStarted()
+ACTIONS
+	IF "!c1"
+		CharacterHasStatus(__Me,%DesiredStatus)
+	THEN
+		CharacterApplyStatus(__Me,%DesiredStatus,%Int_StatusDuration,%Bool_ForceStatus)
+	ENDIF
+	
+EVENT OnDying
+ON
+	OnDie(__Me, _, _, _)
+ACTIONS
+	Set(%ImDead, 1)
+	
+EVENT OnVitaChange
+ON
+	OnVitalityChanged(_)
+ACTIONS
+	IF "c1"
+		IsEqual(%ImDead, 1)
+	THEN
+		Set(%ImDead, 0)
+		CharacterApplyStatus(__Me,%DesiredStatus,%Int_StatusDuration,%Bool_ForceStatus)
+	ENDIF

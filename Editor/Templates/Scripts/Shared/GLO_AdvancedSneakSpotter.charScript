@@ -1,0 +1,156 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%SpottedDude
+	TRIGGER:%SpottedTrigger
+	TRIGGER:%SpottedTrigger1
+	TRIGGER:%SpottedTrigger2
+	TRIGGER:%SpottedTrigger3
+	INT:%CharInTrigger
+	INT:%CharInTrigger1
+	INT:%CharInTrigger2
+	INT:%CharInTrigger3
+	INT:%SpottedCounter = 0
+	INT:%SpottedAlready = 0
+	EXTERN INT:%IgnoreDialogChecks = 1
+	FIXEDSTRING:%SpotterGroup = ""
+EVENTS
+
+EVENT InitializeSneakSpotter
+	ON
+		OnInit
+	ACTIONS
+		IF "c1"
+			IsEqual(%SpottedCounter, 0)
+		THEN
+			StartTimer("UpdateSneak",0.1,-1)
+		ENDIF
+
+EVENT CombatStartedForSpotter
+	ON
+		OnCombatStarted
+	ACTIONS
+		StopTimer("UpdateSneak")
+		Set(%SpottedCounter, 1)
+		
+EVENT ShutdownSneakSpotter
+	ON
+		OnShutdown
+	ACTIONS
+		StopTimer("UpdateSneak")
+
+EVENT UpdateSneakSpotter
+
+	ON
+
+		OnTimer("UpdateSneak")
+
+	ACTIONS
+
+		IterateParty("SneakingCheck")
+
+	
+
+EVENT UpdateSneakSpotter
+
+	ON
+
+		OnCharacterEvent(__Me,"RestartSpotting")
+
+	ACTIONS
+
+		IF "c1"
+
+			IsEqual(%SpottedCounter, 1)
+
+		THEN
+
+			StartTimer("UpdateSneak",0.1,-1)
+
+			Set(%SpottedCounter, 0)
+
+		ENDIF
+
+	
+
+EVENT CheckSpottersSight
+VARS
+CHARACTER:_Char
+ON
+	OnIterateCharacter(_Char,"SneakingCheck")
+ACTIONS
+	IF "c1"
+		IsEqual(%SpottedTrigger,null)
+	THEN
+		SetVar(__Me, "CharInTrigger", INT:0)
+	ELSE
+		IF "c1"
+			CharacterIsInTrigger(_Char, %SpottedTrigger)
+		THEN
+			SetVar(__Me, "CharInTrigger", INT:1)
+		ELSE
+			SetVar(__Me, "CharInTrigger", INT:0)
+		ENDIF
+	ENDIF
+	IF "c1"
+		IsEqual(%SpottedTrigger1,null)
+	THEN
+		SetVar(__Me, "CharInTrigger1", INT:0)
+	ELSE
+		IF "c1"
+			CharacterIsInTrigger(_Char, %SpottedTrigger1)
+		THEN
+			SetVar(__Me, "CharInTrigger1", INT:1)
+		ELSE
+			SetVar(__Me, "CharInTrigger1", INT:0)
+		ENDIF
+	ENDIF
+	IF "c1"
+		IsEqual(%SpottedTrigger2,null)
+	THEN
+		SetVar(__Me, "CharInTrigger2", INT:0)
+	ELSE
+		IF "c1"
+			CharacterIsInTrigger(_Char, %SpottedTrigger2)
+		THEN
+			SetVar(__Me, "CharInTrigger2", INT:1)
+		ELSE
+			SetVar(__Me, "CharInTrigger2", INT:0)
+		ENDIF
+	ENDIF
+	IF "c1"
+		IsEqual(%SpottedTrigger3,null)
+	THEN
+		SetVar(__Me, "CharInTrigger3", INT:0)
+	ELSE
+		IF "c1"
+			CharacterIsInTrigger(_Char, %SpottedTrigger3)
+		THEN
+			SetVar(__Me, "CharInTrigger3", INT:1)
+		ELSE
+			SetVar(__Me, "CharInTrigger3", INT:0)
+		ENDIF
+	ENDIF
+	
+	IF "(c1|c2|c3|c4)&(c5&c6&c7&!c8)&(c9|!c10)&(c11&!c12)"
+		IsEqual(%CharInTrigger,1)
+		IsEqual(%CharInTrigger1,1)
+		IsEqual(%CharInTrigger2,1)
+		IsEqual(%CharInTrigger3,1)
+		
+		IsEqual(%SpottedCounter, 0)
+		CharacterIsStoryGlobal(_Char)
+		CharacterCanSee(__Me,_Char,1)
+		CharacterIsDead(_Char)
+		
+		IsEqual(%IgnoreDialogChecks,1)
+		IsInDialog(_Char)
+		
+		GetVar(%SpottedAlready,_Char,%SpotterGroup)
+		IsEqual(%SpottedAlready,1)
+	THEN
+		Set(%SpottedCounter, 1)
+		StopTimer("UpdateSneak")
+		SetVar(__Me, "SpottedDude", _Char)
+		SetVar(_Char,%SpotterGroup,INT:1)
+		CharacterEvent(__Me, "GLO_AdvancedSpotterSneaker")
+	ENDIF

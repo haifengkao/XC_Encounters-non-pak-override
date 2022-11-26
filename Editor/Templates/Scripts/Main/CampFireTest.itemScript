@@ -1,0 +1,15 @@
+INIT
+ITEM:__Me
+
+EVENTS 
+
+EVENT Explode
+VARS
+	FLOAT3:_position
+ON
+	OnCharacterItemEvent(_,_,"TestPressureOn")
+ACTIONS
+	DebugText(__Me, "defefef")
+	GetPosition(__Me, _position)
+	PlayEffectAt(_position,"FX_GP_TeleportSmoke_A")
+	

@@ -1,0 +1,38 @@
+INIT
+	CHARACTER:__Me
+	
+//------------------	
+BEHAVIOUR
+REACTION Shroom_CastDeadlySpores,300
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+	FLOAT:_hp
+USAGE COMBAT
+CHECK "c1&c2&c3&c4"
+	CharacterCanCast(__Me,"Projectile_EnemySmallDeadlySpores")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemySmallDeadlySpores")
+	CharacterGet(_Target,__Me,_MaxRange,Lowest,Distance,Enemy)
+	CharacterCanSee(__Me,_Target)
+ACTIONS
+	CharacterUseSkill("Projectile_EnemySmallDeadlySpores",_Target)
+
+REACTION Shroom_CannotMoveEndTurn,200
+USAGE COMBAT
+ACTIONS
+	CharacterEndTurn()
+
+//------------------
+EVENTS
+EVENT OnInit_AddSkill
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill("Projectile_EnemySmallDeadlySpores")
+	
+/*EVENT OnDamage_CreatePoisonCloud
+ON
+	OnDamage(_,_,_,_)
+ACTIONS
+	CreateSurfaceAt(__Me,"CloudPoison",2,2)	*/

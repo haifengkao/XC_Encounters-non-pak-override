@@ -1,0 +1,95 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+CHARACTER:%escortee = Player2_a0af7520-57ac-4f1c-b9d7-197bceebeade
+CHARACTER:%Bibius = CYS_IntroGuards_Bibius_ae7a49c0-8aff-41e8-ad0d-e1edceb0f41c
+
+BEHAVIOUR
+
+REACTION State_GuardingBridge, 0
+	USAGE PEACE
+	ACTIONS
+		GetWeightedRandom(%currentAction,"Action_GuardingBridge",INT:2,"Action_Talking",INT:1)
+		SetPriority(%currentAction, 1100)
+	
+REACTION State_Escorting, 0
+	USAGE PEACE
+	ACTIONS
+		GetRandom(%currentAction, "Action_Escort")
+		SetPriority(%currentAction, 1100)
+		
+REACTION State_WaitingPatiently, 0
+	USAGE PEACE
+	ACTIONS
+		Sleep(10)
+			
+REACTION State_BeingYelledAt, 0
+	USAGE PEACE
+	VARS
+		FIXEDSTRING:_Anim
+	ACTIONS
+		CharacterMoveTo(TRIGGER:CYS_PointJesse_5536e500-0e44-4526-8d47-e7e02b773466)
+		CharacterLookAt(TRIGGER:CYS_ArhuGuardAfterFight_81cdcb5f-36a9-44a7-8be7-bd8ea35115fb)
+		GetRandom(_Anim, "Think_01", "Sooth_01", "Sigh_01", "Shrug_01", "Depressed_01")
+		CharacterPlayAnimation(_Anim,1,1)
+		Sleep(4)
+
+	
+REACTION Action_GuardingBridge, 0
+	USAGE PEACE
+	VARS
+		FIXEDSTRING:_animation
+	ACTIONS
+		GetRandom(_animation, "Bored_01", "Bored_02", "Bored_03", "Tired_01", "Yawn_01")
+		CharacterPlayAnimation(_animation)
+		Sleep(4)
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)
+
+REACTION Action_Escort, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterFollow(%escortee, 10, 1)
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)
+
+REACTION Action_Talking, 0
+USAGE PEACE
+VARS
+	FLOAT:_Dist
+ACTIONS
+	IF "c1&c2&!c3"
+		GetDistance(_Dist,__Me,%Bibius)
+		IsLessThen(_Dist,FLOAT:10)
+		CharacterIsDead(%Bibius)
+	THEN
+		CharacterEvent(%Bibius,"DialogRequest")
+	ENDIF
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)
+	
+EVENTS
+
+EVENT CombatStopsDialog
+	ON
+		OnCombatStarted()
+	ACTIONS
+		DialogRequestStop("CYS_AD_IntroGuards")
+		
+EVENT ShamefullReply
+ON
+	OnCharacterEvent(__Me, "ShamefullReply")
+VARS
+	FIXEDSTRING:_Text
+ACTIONS
+	IF "!c1"
+		CharacterIsDead(__Me)
+	THEN
+		GetRandom(_Text, "CYS_BibiusJuniusComplain_1", "CYS_BibiusJuniusComplain_2", "CYS_BibiusJuniusComplain_3", "CYS_BibiusJuniusComplain_4")
+		DisplayText(__Me, _Text, 4)
+	ENDIF

@@ -1,0 +1,81 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	CHARACTER:%Friend = CYS_SailorMerchant2_c3e0d427-7b73-49a3-8223-64aa9226a4bd
+	INT:%Dialog = 0
+
+BEHAVIOUR 
+
+REACTION State_BeforeStaff, 0
+	USAGE PEACE
+	ACTIONS
+		GetRandom(%currentAction, "Action_WaitingBefore")
+		SetPriority(%currentAction, 1100)
+		
+REACTION State_AfterStaff, 0
+	USAGE PEACE
+	ACTIONS
+		GetRandom(%currentAction, "Action_WaitingAfter")
+		SetPriority(%currentAction, 1100)
+
+REACTION Action_WaitingBefore, 0
+	USAGE PEACE
+	VARS
+		FIXEDSTRING:_Animation
+	ACTIONS
+		IF "c1&!c2&!c3"
+			IsEqual(%Dialog,1)
+			IsInDialog(%Friend)
+			IsInDialog(__Me)
+		THEN
+			Set(%Dialog,0)
+			CharacterLookAt(%Friend)
+			Sleep(15)
+			DialogStart("CYS_AD_ConradSailor",__Me,%Friend)
+		ELSE
+			GetRandom(_Animation,"Annoyed_01","Depressed_01")
+			CharacterPlayAnimation(_Animation)
+			Sleep(5)
+		ENDIF
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)
+
+REACTION Action_WaitingAfter, 0
+	USAGE PEACE
+	VARS
+		FIXEDSTRING:_Animation
+	ACTIONS
+		IF "c1&!c2&!c3"
+			IsEqual(%Dialog,1)
+			IsInDialog(%Friend)
+			IsInDialog(__Me)
+		THEN
+			Set(%Dialog,0)
+			CharacterLookAt(%Friend)
+			DialogStart("CYS_AD_ConradSailor",__Me,%Friend)
+			CharacterPlayAnimation("Intimidate_01")
+		ELSE
+			GetRandom(_Animation,"Shout_01","Ignore_01")
+			CharacterPlayAnimation(_Animation)
+			Sleep(5)
+		ENDIF
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)
+
+EVENTS
+
+EVENT StartDialog
+ON
+	OnCharacterEvent(__Me,"DialogRequest")
+ACTIONS
+	Set(%Dialog,1)
+	
+EVENT AfterStaff
+ON
+	OnGlobalEventSet("CYS_ConradIsAngry")
+ACTIONS
+	Set(%currentState, "State_AfterStaff")

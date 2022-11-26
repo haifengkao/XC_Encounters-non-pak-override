@@ -1,0 +1,33 @@
+new teacher "T1
+new skill 5 10
+add path "Wizard"
+add path "Elemental attack"
+add path "Focussed"
+add path "Missile"
+new teacher "T2
+new skill 5 33
+add path "Wizard"
+add path "Elemental attack"
+add path "Focussed"
+add path "Instant"
+new teacher "T11
+new skill 2 300
+add path "Warrior"
+add path "Craftmanship"
+add path "Identify"
+add path "Equipment"
+new teacher "T12
+new skill 5 600
+add path "Warrior"
+add path "Melee specialities"
+add path "One handed"
+add path "Shadow"
+new teacher "T24
+new skill 10 900
+add path "Dexterity"
+add path "Thieving skills"
+add path "Pickpocket"
+new teacher "T31
+new skill 5 1000
+add path "Summoning dolls"
+add path "Upgrades"

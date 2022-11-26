@@ -1,0 +1,779 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%Zandalor="Zandalor_2535a516-8e0f-4c00-abe6-285e545fdc9b"
+	CHARACTER:%Icara="HOM_Icara_f536c5cf-cf2a-47eb-a148-c6e8ee966fb0"
+	CHARACTER:%SummonedDemon_Brown=null
+	CHARACTER:%SummonedDemon_Red=null
+	CHARACTER:%SummonedDemon_Yellow=null
+	CHARACTER:%SummonedArcaneVortex=null
+	CHARACTERTEMPLATE:%Demon_Brown_RT="Leandra_Demon_Brown_f0c7c995-142f-4483-9bff-4d42126c5cfc"
+	CHARACTERTEMPLATE:%Demon_Red_RT="Leandra_Demon_Red_e9d9a55b-9b73-4def-a26d-19cd52a35ee4"
+	CHARACTERTEMPLATE:%Demon_Yellow_RT="Leandra_Demon_Yellow_9f8f7fda-9ff3-4915-94fb-05f2ad9f03c5"
+	CHARACTERTEMPLATE:%ArcaneVortex_RT="Leandra_Elemental_Arcane_6db254a8-356d-4e6f-b518-846b064f5f4e"
+	CHARACTERTEMPLATE:%VoidKnight_RT="Leandra_VoidKnight_3a45be85-f2b0-45cb-bcca-80c3dfdfd323"
+	ITEMTEMPLATE:%ProtectionCrystal_RT="PUZ_Protection_Crystal_A_20b19d47-6f07-4bfd-8ecb-d011db663fe4"
+	TRIGGER:%Phase1_Demon_Brown_Trigger="CMB_Leandra_P1_Water_cb5b0de2-f42e-4fe9-895c-4ea7cc207709"
+	TRIGGER:%Phase1_Demon_Red_Trigger="CMB_Leandra_P1_Earth_0e14da11-9493-4427-923d-2177faef939e"
+	TRIGGER:%Phase1_Demon_Yellow_Trigger="CMB_Leandra_P1_Air_4f2566dd-49a6-4ac4-b544-ea00a86c8ebc"
+	FLOAT:%Leandra_SightRange
+	INT:%CurrentPhase=1	
+	INT:%Bool_BombHasBeenPlanted=0
+	INT:%SummonVoidKnight_Current=0
+	INT:%SummonVoidKnight_Desired=3
+	INT:%DelayedExplo_Current=2
+	INT:%DelayedExplo_Desired=2	
+	INT:%RemainingVoidKnights=0
+	INT:%CrystalCount=0
+	INT:%Bool_OpeningComplete=0
+	INT:%Bool_FXRestore_Crystal_01=0
+	INT:%Bool_FXRestore_Crystal_02=0
+	INT:%Bool_FXRestore_Crystal_03=0
+	INT:%ReusableHandle_1
+	INT:%ReusableHandle_2
+	INT:%ReusableHandle_3
+	INT:%ReusableHandle_1b
+	INT:%ReusableHandle_2b
+	INT:%ReusableHandle_3b	
+	ITEM:%SpawnedCrystal_1=null
+	ITEM:%SpawnedCrystal_2=null
+	ITEM:%SpawnedCrystal_3=null
+	WEAPON:%WeaponType_Unarmed="Unarmed"
+	WEAPON:%WeaponType_Staves="PoleArms"
+	
+	//PHASE 1
+		//brown makes red invulnerable (ice = extra tough + freezing contact)
+		//red makes yellow invulnerable
+		//yellow makes leandra invulnerable
+		//leandra summons void knights & uses mild spells
+	//PHASE 2 (all elem. are dead)
+		//leandra summons an arcane vortex
+		//leandra creates protection crystals
+		//leandra summons void knights & uses strong spells
+	//PHASE 3 (crystals destroyed + vortex is dead)
+		//leandra uses shackles of pain
+		//leandra charms strongest
+		//leandra uses poison hail attack
+		//leandra summons an iron ward
+		//leandra summons void knights & uses strong spells
+		
+//-------	
+BEHAVIOUR
+REACTION Leandra_Phase1_SummonDemons,1500
+USAGE COMBAT
+VARS
+	CHARACTER:_Player
+CHECK "c1&c2"
+	IsEqual(%CurrentPhase,1)
+	CharacterGet(_Player,__Me,50,Lowest,Distance,Enemy)	
+ACTIONS
+	CharacterLookAt(_Player)
+	CharacterPlayEffect(__Me,"FX_Skills_WitchCraft_Generic_A_Prepare")
+	DisplayText(__Me,"HOM_Combat_Leandra_SummDemons",3)
+	PlayLoopEffectAt(%ReusableHandle_1,%Phase1_Demon_Brown_Trigger,"FX_GP_LightPillarWhite_A")
+	PlayLoopEffectAt(%ReusableHandle_2,%Phase1_Demon_Red_Trigger,"FX_GP_LightPillarRed_A")
+	PlayLoopEffectAt(%ReusableHandle_3,%Phase1_Demon_Yellow_Trigger,"FX_GP_LightPillarOrange_A")
+	CharacterSwitchWeaponType(%WeaponType_Unarmed)
+	CharacterPlayAnimation("skill_resurrect_loop",1,1)
+	CharacterPlayAnimation("skill_resurrect_cast",1,0)
+	Sleep(0.7)
+	PlayEffectAt(%Phase1_Demon_Brown_Trigger,"FX_Creatures_Skills_Dragon_Astral_Earth_Impact_A")		//FX_GP_TeleportSmoke_A
+	SpawnCharacter(%SummonedDemon_Brown,%Demon_Brown_RT,%Phase1_Demon_Brown_Trigger,1)
+	Sleep(0.7)
+	PlayEffectAt(%Phase1_Demon_Red_Trigger,"FX_Creatures_Skills_Dragon_Astral_FireBall_Impact_A")
+	SpawnCharacter(%SummonedDemon_Red,%Demon_Red_RT,%Phase1_Demon_Red_Trigger,1)
+	Sleep(1.2)	
+	PlayEffectAt(%Phase1_Demon_Yellow_Trigger,"FX_Creatures_Skills_Dragon_Astral_LightningBall_Impact_A")
+	SpawnCharacter(%SummonedDemon_Yellow,%Demon_Yellow_RT,%Phase1_Demon_Yellow_Trigger,1)
+	Sleep(0.8)	
+	StopLoopEffect(%ReusableHandle_1)
+	StopLoopEffect(%ReusableHandle_2)
+	StopLoopEffect(%ReusableHandle_3)
+	CharacterSwitchWeaponType(%WeaponType_Staves)
+	Sleep(2)
+	SetPriority("Leandra_AnyPhase_SummonVoidKnights",1400)
+	SetPriority("Leandra_Phase1_SummonDemons",0)
+	
+REACTION Leandra_Phase1_Blind,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&!c4&c5&c6"
+	IsEqual(%CurrentPhase,1)																	//c1
+	CharacterCanCast(__Me,"Target_EnemyBlind")													//c2
+	CharacterGet(_ChosenTarget,__Me,50,Highest,Dexterity,Enemy)									//c3
+	CharacterHasStatus(_ChosenTarget,"BLIND")													//!c4	
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyBlind")						//c5
+	IsRandom(0.3)																				//c6
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	IF "c1"
+		IsRandom(0.3)
+	THEN
+		DisplayText(__Me,"HOM_Combat_Leandra_Blind",3)
+	ENDIF
+	CharacterUseSkill("Target_EnemyBlind",_ChosenTarget)	
+	
+REACTION Leandra_Phase1_Curse,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&!c4&c5&c6"
+	IsEqual(%CurrentPhase,1)																	//c1
+	CharacterCanCast(__Me,"Target_EnemyTargetedCurse")											//c2
+	CharacterGet(_ChosenTarget,__Me,50,Highest,Strength,Enemy)									//c3
+	CharacterHasStatus(_ChosenTarget,"CURSED")													//!c4	
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyTargetedCurse")				//c5
+	IsRandom(0.3)																				//c6
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	IF "c1"
+		IsRandom(0.3)
+	THEN
+		DisplayText(__Me,"HOM_Combat_Leandra_Curse",3)
+	ENDIF
+	CharacterUseSkill("Target_EnemyTargetedCurse",_ChosenTarget)	
+	
+REACTION Leandra_Phase1_Slow,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&!c4&c5&c6"
+	IsEqual(%CurrentPhase,1)																	//c1
+	CharacterCanCast(__Me,"Target_EnemySlow")													//c2
+	CharacterGet(_ChosenTarget,__Me,50,Highest,Speed,Enemy)										//c3
+	CharacterHasStatus(_ChosenTarget,"SLOWED")													//!c4	
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemySlow")							//c5
+	IsRandom(0.3)																				//c6
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Target_EnemySlow",_ChosenTarget)	
+	
+REACTION Leandra_Phase2_SummonArcaneVortex,1200
+USAGE COMBAT
+VARS
+	INT:_Failures=0
+	INT:_Successes=0
+	CHARACTER:_Player
+	FLOAT:_Angle
+	FLOAT:_Dist
+	FLOAT3:_MyPosition
+	FLOAT3:_PosOffset	
+CHECK "c1&c2"
+	IsEqual(%CurrentPhase,2)
+	CharacterGet(_Player,__Me,50,Lowest,Distance,Enemy)	
+ACTIONS
+	CharacterLookAt(_Player)
+	CharacterPlayEffect(__Me,"FX_Skills_WitchCraft_Generic_A_Prepare")
+	CharacterSwitchWeaponType(%WeaponType_Unarmed)
+	CharacterPlayAnimation("skill_resurrect_loop",1,1)
+	CharacterPlayAnimation("skill_resurrect_cast",1,0)	
+	WHILE "c1&c2"
+		IsLessThen(_Successes,1)
+		IsLessThen(_Failures,15)
+	DO
+		IF "c1"
+			GetPosition(__Me,_MyPosition)
+		THEN
+			Set(_PosOffset,{1;0;0}) 
+			GetRandomBetween(_Angle,0,360)
+			GetRandomBetween(_Dist,3,5)
+			RotateY(_PosOffset,_Angle)
+			Multiply(_PosOffset,_Dist)	
+			Add(_MyPosition,_PosOffset)
+			CharacterPlayEffect(__Me,"FX_Skills_WitchCraft_Generic_A_Prepare")
+		ENDIF
+		IF "c1"
+			FindValidPosition(_MyPosition,3)
+		THEN
+			PlayEffectAt(_MyPosition,"FX_Skills_WitchCraft_Generic_A_Prepare")
+			DisplayText(__Me,"HOM_Combat_Leandra_ArcVortex",3)
+			CharacterPlayAnimation("cast_shout_cast",0,1)
+			SpawnCharacter(%SummonedArcaneVortex,%ArcaneVortex_RT,_MyPosition,1,1,__Me)
+			CharacterApplyStatus(%SummonedArcaneVortex,"PHYSICAL_IMMUNITY_AURA",-1,1)
+			Add(_Successes,1)
+		ELSE
+			Add(_Failures,1)
+		ENDIF
+	ENDWHILE
+	IF "c1"
+		IsEqual(_Failures,15)
+	THEN
+		Set(_Failures,0)
+		CharacterEndTurn()
+	ENDIF
+	Sleep(2)
+	Set(_Successes,0)
+	Set(_Failures,0)
+	CharacterSwitchWeaponType(%WeaponType_Staves)
+	SetPriority("Leandra_Phase2_SummonArcaneVortex",0)	
+	
+REACTION Leandra_Phase2_SummonProtectionCrystals,1100
+USAGE COMBAT
+VARS
+	TRIGGER:_Trigger1="CMB_Leandra_P2_Crystal1_36e60db6-6a10-4f83-b9f6-55bbdb3f65e2"
+	TRIGGER:_Trigger2="CMB_Leandra_P2_Crystal2_e2b8d0c5-3e54-4906-97f2-8e839407d803"
+	TRIGGER:_Trigger3="CMB_Leandra_P2_Crystal3_57569c18-5eac-41c1-988a-b300c233d076"
+	TRIGGER:_Trigger4="CMB_Leandra_P2_Crystal4_2a73728f-6d16-48f2-a228-1bb2f7b86775"
+	TRIGGER:_Trigger5="CMB_Leandra_P2_Crystal5_56ac77de-39df-4df0-bdd8-e4168925257e"
+	TRIGGER:_Trigger6="CMB_Leandra_P2_Crystal6_864a9c9c-6d31-4a36-9c89-61fb6ed2dde9"
+	TRIGGER:_ChosenTrigger1
+	TRIGGER:_ChosenTrigger2
+	TRIGGER:_ChosenTrigger3
+CHECK "c1"
+	IsEqual(%CurrentPhase,2)
+ACTIONS
+	CharacterPlayEffect(__Me,"FX_Skills_WitchCraft_Summon_Prepare_A")		
+	CharacterSwitchWeaponType(%WeaponType_Unarmed)
+	CharacterPlayAnimation("cast_self_loop",1,1)			
+	DisplayText(__Me,"HOM_Combat_Leandra_ProtCrystals",3)
+	CharacterPlayAnimation("cast_self_cast",0,0)
+	CharacterPlayEffect(__Me,"FX_Skills_WitchCraft_Generic_A_Cast_A")
+	Sleep(0.1)
+	GetRandom(_ChosenTrigger1,_Trigger1,_Trigger2)
+	PlayEffectAt(_ChosenTrigger1,"FX_Skills_WitchCraft_Generic_A_Cast_A")
+	SpawnItem(%ProtectionCrystal_RT,_ChosenTrigger1,%SpawnedCrystal_1)
+	ItemPlayLoopEffect(%ReusableHandle_1,%SpawnedCrystal_1,"FX_Skills_WitchCraft_Generic_B_Prepare")
+	ItemPlayLoopEffect(%ReusableHandle_1b,%SpawnedCrystal_1,"FX_GP_LightPillarPurple_A")
+	Set(%Bool_FXRestore_Crystal_01,1)	
+	Sleep(0.1)	
+	GetRandom(_ChosenTrigger2,_Trigger3,_Trigger4)
+	PlayEffectAt(_ChosenTrigger2,"FX_Skills_WitchCraft_Generic_A_Cast_A")
+	SpawnItem(%ProtectionCrystal_RT,_ChosenTrigger2,%SpawnedCrystal_2)	
+	ItemPlayLoopEffect(%ReusableHandle_2,%SpawnedCrystal_2,"FX_Skills_WitchCraft_Generic_B_Prepare")
+	ItemPlayLoopEffect(%ReusableHandle_2b,%SpawnedCrystal_2,"FX_GP_LightPillarPurple_A")
+	Set(%Bool_FXRestore_Crystal_02,1)	
+	Sleep(0.1)
+	GetRandom(_ChosenTrigger3,_Trigger5,_Trigger6)
+	PlayEffectAt(_ChosenTrigger3,"FX_Skills_WitchCraft_Generic_A_Cast_A")
+	SpawnItem(%ProtectionCrystal_RT,_ChosenTrigger3,%SpawnedCrystal_3)
+	ItemPlayLoopEffect(%ReusableHandle_3,%SpawnedCrystal_3,"FX_Skills_WitchCraft_Generic_B_Prepare")	
+	ItemPlayLoopEffect(%ReusableHandle_3b,%SpawnedCrystal_3,"FX_GP_LightPillarPurple_A")
+	Set(%Bool_FXRestore_Crystal_03,1)
+	Sleep(0.1)	
+	CharacterPlayEffect(__Me,"FX_Skills_WitchCraft_Invulnerability_Cast_A")
+	CharacterRemoveStatus(__Me,"VOID_AURA")
+	CharacterApplyStatus(__Me,"VOID_AURA",-1,1)	
+	CharacterSwitchWeaponType(%WeaponType_Staves)
+	SetPriority("Leandra_Phase2_SummonProtectionCrystals",0)
+
+REACTION Leandra_Phase2_Fireball,500
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "!c1&c2&c3&!c4&c5&c6"
+	IsLessThen(%CurrentPhase,2)																	//!c1
+	CharacterCanCast(__Me,"Projectile_EnemyFireball")											//c2
+	CharacterGet(_ChosenTarget,__Me,50,Lowest,FireResistance,Enemy)								//c3
+	CharacterHasStatus(_ChosenTarget,"FROZEN")													//!c4	
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyFireball")					//c5
+	IsRandom(0.3)																				//c6
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_EnemyFireball",_ChosenTarget)	
+
+REACTION Leandra_Phase2_Iceshard,500
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "!c1&c2&c3&!c4&c5&c6"
+	IsLessThen(%CurrentPhase,2)																	//!c1
+	CharacterCanCast(__Me,"Projectile_EnemyIceShard")											//c2
+	CharacterGet(_ChosenTarget,__Me,50,Lowest,WaterResistance,Enemy)							//c3
+	CharacterHasStatus(_ChosenTarget,"BURNING")													//!c4	
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyIceShard")					//c5
+	IsRandom(0.3)																				//c6
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_EnemyIceShard",_ChosenTarget)	
+
+REACTION Leandra_Phase2_BlitzBolt,500
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "!c1&c2&c3&c4&c5"
+	IsLessThen(%CurrentPhase,2)																	//!c1
+	CharacterCanCast(__Me,"Projectile_EnemyBlitzBolt")											//c2
+	CharacterGet(_ChosenTarget,__Me,50,Lowest,AirResistance,Enemy)								//c3	
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyBlitzBolt")				//c4
+	IsRandom(0.3)																				//c5
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_EnemyBlitzBolt",_ChosenTarget)	
+
+REACTION Leandra_Phase2_EarthShard,500
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "!c1&c2&c3&c4&c5"
+	IsLessThen(%CurrentPhase,2)																	//!c1
+	CharacterCanCast(__Me,"Projectile_EnemyEarthShard")											//c2
+	CharacterGet(_ChosenTarget,__Me,50,Lowest,EarthResistance,Enemy)							//c3	
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyEarthShard")				//c4
+	IsRandom(0.3)																				//c5
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_EnemyEarthShard",_ChosenTarget)	
+
+REACTION Leandra_Phase3_SummonMagicWard,900
+USAGE COMBAT
+CHECK "c1&c2"
+	IsEqual(%CurrentPhase,3)
+	CharacterCanCast(__Me,"Summon_EnemyWard_Magic")
+ACTIONS
+	DisplayText(__Me,"HOM_Combat_Leandra_IronWard",3)
+	CharacterUseSkill("Summon_EnemyWard_Magic",__Me)
+		
+REACTION Leandra_Phase3_ShacklesOfPain,800
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&c4&!(c5&c6)&c7"
+	IsEqual(%CurrentPhase,3)																	//c1
+	CharacterCanCast(__Me,"Target_EnemyShacklesOfPain")											//c2
+	CharacterGet(_ChosenTarget,__Me,50,Lowest,Vitality,Enemy)									//c3
+	CharacterIsPlayer(_ChosenTarget)															//c4
+	CharacterHasStatus(_ChosenTarget,"SHACKLES_OF_PAIN")										//!c5	
+	CharacterHasStatus(_ChosenTarget,"CHARMED")													//!c6	
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyShacklesOfPain")				//c7
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Target_EnemyShacklesOfPain",_ChosenTarget)	
+
+REACTION Leandra_Phase3_Charm,700
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&c4&!(c5|c6|c7|c8|c9|c10|c11)&c12"
+	IsEqual(%CurrentPhase,3)																	//c1
+	CharacterCanCast(__Me,"Projectile_EnemyCharm")												//c2
+	CharacterGet(_ChosenTarget,__Me,50,Highest,Intelligence,Enemy)								//c3
+	CharacterIsPlayer(_ChosenTarget)															//c4
+	CharacterHasStatus(_ChosenTarget,"CHARMED")													//!c5
+	CharacterHasStatus(_ChosenTarget,"STUNNED")													//!c6
+	CharacterHasStatus(_ChosenTarget,"FROZEN")													//!c7
+	CharacterHasStatus(_ChosenTarget,"PETRIFIED")												//!c8
+	CharacterHasStatus(_ChosenTarget,"KNOCKED_DOWN")											//!c9
+	CharacterHasStatus(_ChosenTarget,"FEAR")													//!c10
+	CharacterHasStatus(_ChosenTarget,"SHACKLES_OF_PAIN")										//!c11
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyCharm")					//c12
+ACTIONS
+	DisplayText(__Me,"HOM_Combat_Leandra_Charm",3)
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_EnemyCharm",_ChosenTarget)	
+	
+REACTION Leandra_Phase3_PoisonHailAttack,600 
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&c4&c5"
+	IsEqual(%CurrentPhase,3)																	//!c1
+	CharacterCanCast(__Me,"Projectile_Enemy_PoisonHailAttack")									//c2
+	CharacterGet(_ChosenTarget,__Me,50,Lowest,PoisonResistance,Enemy)							//c3	
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_Enemy_PoisonHailAttack")		//c4
+	IsRandom(0.5)																				//c5
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_Enemy_PoisonHailAttack",_ChosenTarget)	
+	
+REACTION Leandra_AnyPhase_SummonVoidKnights,0
+USAGE COMBAT
+VARS
+	INT:_Failures=0
+	INT:_Successes=0
+	CHARACTER:_Player
+	FLOAT:_Angle
+	FLOAT:_Dist
+	FLOAT3:_MyPosition
+	FLOAT3:_PosOffset
+CHECK "c1&!(c2|c3|c4|c5|c6|c7)"
+	CharacterGet(_Player,__Me,50,Lowest,Distance,Enemy)			//c1
+	CharacterHasStatus(__Me,"CHARMED")							//!c2
+	CharacterHasStatus(__Me,"PETRIFIED")						//!c3
+	CharacterHasStatus(__Me,"FEAR")								//!c4
+	CharacterHasStatus(__Me,"STUNNED")							//!c5
+	CharacterHasStatus(__Me,"MUTED")							//!c6
+	CharacterHasStatus(__Me,"FEAR")								//!c7
+ACTIONS
+	Set(%RemainingVoidKnights,0)
+	IterateCharactersInCombat(__Me,"CMB_Leandra_IterateForVoidKnights",Lowest,Distance)
+	IF "c1"
+		IsGreaterThen(%RemainingVoidKnights,1)
+	THEN
+		SetPriority("Leandra_AnyPhase_SummonVoidKnights",0)
+	ENDIF
+	IF "c1"
+		IsInDangerousSurface(__Me)
+	THEN
+		CharacterFleeFromDangerousSurface()
+	ENDIF
+	CharacterLookAt(_Player)
+	CharacterSwitchWeaponType(%WeaponType_Unarmed)
+	CharacterPlayEffect(__Me,"FX_Skills_WitchCraft_Generic_A_Prepare")
+	CharacterPlayAnimation("skill_summon_air_loop",1,1)
+	CharacterPlayAnimation("skill_summon_air_cast",1,0)	
+	WHILE "c1&c2"
+		IsLessThen(_Successes,4)
+		IsLessThen(_Failures,15)
+	DO
+		IF "c1"
+			GetPosition(__Me,_MyPosition)
+		THEN
+			Set(_PosOffset,{1;0;0}) 
+			GetRandomBetween(_Angle,0,360)
+			GetRandomBetween(_Dist,2,3)
+			RotateY(_PosOffset,_Angle)
+			Multiply(_PosOffset,_Dist)	
+			Add(_MyPosition,_PosOffset)
+			CharacterPlayEffect(__Me,"FX_Skills_WitchCraft_Generic_A_Prepare")
+		ENDIF
+		IF "c1&!(c2|c3|c4)"
+			FindValidPosition(_MyPosition,3)				//c1
+			ContainsSurface(_MyPosition,1,"Fire")			//!c2
+			ContainsSurface(_MyPosition,1,"Ice")			//!c3
+			ContainsSurface(_MyPosition,1,"Lava")			//!c4
+		THEN
+			PlayEffectAt(_MyPosition,"FX_Skills_WitchCraft_Generic_A_Prepare")
+			CharacterPlayAnimation("cast_shout_cast",0,0)
+			SpawnCharacter(_,%VoidKnight_RT,_MyPosition,1,1,__Me)
+			Add(_Successes,1)
+		ELSE
+			Add(_Failures,1)
+		ENDIF
+	ENDWHILE
+	IF "c1"
+		IsEqual(_Failures,15)
+	THEN
+		Set(_Failures,0)
+		CharacterEndTurn()
+	ENDIF
+	CharacterSwitchWeaponType(%WeaponType_Staves)
+	Set(_Successes,0)
+	Set(_Failures,0)
+	Set(%SummonVoidKnight_Current,0)
+	IF "c1"
+		IsEqual(%Bool_OpeningComplete,0)
+	THEN
+		Set(%Bool_OpeningComplete,1)
+		CharacterEndTurn()
+	ENDIF
+	SetPriority("Leandra_AnyPhase_SummonVoidKnights",0)
+INTERRUPT
+	Reset()
+	
+REACTION Leandra_Phase1or2_CastStaffOfMagus,200
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "!c1&c2&c3&c4"
+	IsEqual(%CurrentPhase,3)																	//!c1
+	CharacterCanCast(__Me,"Projectile_EnemyStaffOfMagus_Leandra")								//c2
+	CharacterGet(_ChosenTarget,__Me,50,Lowest,FireResistance,Enemy)								//c3
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyStaffOfMagus_Leandra")		//c4
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_EnemyStaffOfMagus_Leandra",_ChosenTarget)
+	CharacterEndTurn()
+	
+REACTION Leandra_PhaseManager,0
+USAGE COMBAT
+VARS
+	FLOAT:_MyVitality
+ACTIONS
+	IF "c1"
+		IsEqual(%CurrentPhase,1)
+	THEN
+		IF "(c1&c2&c3)|(c4&c5)"
+			CharacterIsDead(%SummonedDemon_Brown)
+			CharacterIsDead(%SummonedDemon_Red)
+			CharacterIsDead(%SummonedDemon_Yellow)
+			CharacterGetStat(_MyVitality,__Me,Vitality)
+			IsLessThen(_MyVitality,0.6)
+		THEN
+			//DebugText(__Me,"Entering Phase 2!")
+			CharacterEvent(__Me,"CMB_HOM_Leandra_EnteredPhase2_Event")
+			Set(%CurrentPhase,2)
+			SetPriority("Leandra_PhaseManager",0)
+		ENDIF
+		SetPriority("Leandra_PhaseManager",0)
+	ELIF "c1"
+		IsEqual(%CurrentPhase,2)
+	THEN
+		CharacterEvent(__Me,"CMB_HOM_Leandra_EnteredPhase2_Event")		//so new vDKs know that they gotta use their sword ^^
+		Set(%CrystalCount,0)
+		IterateItemsNear(__Me,60,"CMB_END_Leandra_ScanForRemainingCrystals")
+			IF "(c1&!c2)|(c3&c4)"
+			CharacterIsDead(%SummonedArcaneVortex)
+			IsGreaterThen(%CrystalCount,0)
+			CharacterGetStat(_MyVitality,__Me,Vitality)
+			IsLessThen(_MyVitality,0.3)
+		THEN
+			//DebugText(__Me,"Entering Phase 3!")
+			SetPriority("Combat_AttackSetEnemy",7)
+			SetPriority("Combat_MoveToSetEnemy",6)
+			Set(%CurrentPhase,3)			
+			SetPriority("Leandra_PhaseManager",0)
+		ENDIF
+		SetPriority("Leandra_PhaseManager",0)
+	ELIF "c1"
+		IsEqual(%CurrentPhase,3)
+	THEN
+		CharacterEvent(__Me,"CMB_HOM_Leandra_EnteredPhase2_Event")		//so new vDKs know that they gotta use their sword ^^
+		SetPriority("Leandra_PhaseManager",0)
+	ENDIF
+INTERRUPT
+	Reset()
+
+REACTION Waiting_EquipStaff, 0
+USAGE WAITING
+ACTIONS
+	CharacterSwitchWeaponType(%WeaponType_Staves)
+	SetPriority("Waiting_EquipStaff", 0)
+	
+REACTION Leandra_Waiting,500
+USAGE WAITING
+VARS
+	FIXEDSTRING:_Text
+ACTIONS
+	IF "c1"
+		IsRandom(0.05)
+	THEN
+		GetWeightedRandom(_Text,"HOM_Combat_Leandra_Wait_01",INT:1,"HOM_Combat_Leandra_Wait_02",INT:1,"HOM_Combat_Leandra_Wait_03",INT:1,"HOM_Combat_Leandra_Wait_04",INT:1,"HOM_Combat_Leandra_Wait_05",INT:1,"",INT:3)
+		DisplayText(__Me,_Text,3)
+	ENDIF
+	Sleep(10)
+	
+//-------
+EVENTS
+EVENT OnInit_GiveSpells_GetSightRange
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%Leandra_SightRange,__Me,Sight)
+	THEN
+		CharacterApplyStatus(__Me,"IMPROVED_INITIATIVE_AURA",-1)
+		CharacterAddSkill("Projectile_EnemyStaffOfMagus_Leandra")
+		CharacterAddSkill("Target_EnemyBlind")
+		CharacterAddSkill("Target_EnemySlow")
+		CharacterAddSkill("Target_EnemyTargetedCurse")
+		CharacterAddSkill("Projectile_EnemyFireball")
+		CharacterAddSkill("Projectile_EnemyIceShard")
+		CharacterAddSkill("Projectile_EnemyBlitzBolt")
+		CharacterAddSkill("Projectile_EnemyEarthShard")
+		CharacterAddSkill("Projectile_EnemyCharm")
+		CharacterAddSkill("Projectile_Enemy_PoisonHailAttack")
+		CharacterAddSkill("Summon_EnemyWard_Magic")
+		CharacterAddSkill("Target_EnemyShacklesOfPain")
+	ENDIF
+	IF "c1"
+		IsEqual(%Bool_FXRestore_Crystal_01,1)
+	THEN
+		ItemPlayLoopEffect(%ReusableHandle_1,%SpawnedCrystal_1,"FX_Skills_WitchCraft_Generic_B_Prepare")
+		ItemPlayLoopEffect(%ReusableHandle_1b,%SpawnedCrystal_1,"FX_GP_LightPillarPurple_A")
+	ENDIF
+	IF "c1"
+		IsEqual(%Bool_FXRestore_Crystal_02,1)
+	THEN
+		ItemPlayLoopEffect(%ReusableHandle_2,%SpawnedCrystal_2,"FX_Skills_WitchCraft_Generic_B_Prepare")
+		ItemPlayLoopEffect(%ReusableHandle_2b,%SpawnedCrystal_2,"FX_GP_LightPillarPurple_A")
+	ENDIF
+	IF "c1"
+		IsEqual(%Bool_FXRestore_Crystal_03,1)
+	THEN
+		ItemPlayLoopEffect(%ReusableHandle_3,%SpawnedCrystal_3,"FX_Skills_WitchCraft_Generic_B_Prepare")
+		ItemPlayLoopEffect(%ReusableHandle_3b,%SpawnedCrystal_3,"FX_GP_LightPillarPurple_A")
+	ENDIF	
+
+EVENT OnCombatStarted_KillDefCharPriorities
+ON
+	OnCombatStarted()
+ACTIONS
+	SetPriority("Combat_AttackSetEnemy",0)
+	SetPriority("Combat_MoveToSetEnemy",0)
+
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	IF "c1"
+		IsEqual(%Bool_OpeningComplete,1)		//set during the first "Leandra_AnyPhase_SummonVoidKnights"
+	THEN
+		SetPriority("Leandra_PhaseManager",2000)
+	ENDIF
+	IF "c1"
+		IsLessThen(%SummonVoidKnight_Current,%SummonVoidKnight_Desired)
+	THEN
+		Add(%SummonVoidKnight_Current,1)
+	ELSE
+		SetPriority("Leandra_AnyPhase_SummonVoidKnights",1400)
+	ENDIF
+	
+EVENT OnItemDestroyed_RemoveVoidAuraFromLeandra
+VARS
+	ITEM:_Crystal
+	INT:_Bool_CrystalCheck=0
+ON
+	OnItemDestroyed(_Crystal)
+ACTIONS
+	IF "c1"
+		IsEqual(_Crystal,%SpawnedCrystal_1)
+	THEN
+		StopLoopEffect(%ReusableHandle_1)
+		StopLoopEffect(%ReusableHandle_1b)
+		Set(%Bool_FXRestore_Crystal_01,0)
+		Set(_Bool_CrystalCheck,1)		
+	ELIF "c1"
+		IsEqual(_Crystal,%SpawnedCrystal_2)
+	THEN
+		StopLoopEffect(%ReusableHandle_2)
+		StopLoopEffect(%ReusableHandle_2b)	
+		Set(%Bool_FXRestore_Crystal_02,0)
+		Set(_Bool_CrystalCheck,1)		
+	ELIF "c1"
+		IsEqual(_Crystal,%SpawnedCrystal_3)
+	THEN
+		StopLoopEffect(%ReusableHandle_3)
+		StopLoopEffect(%ReusableHandle_3b)	
+		Set(%Bool_FXRestore_Crystal_03,0)
+		Set(_Bool_CrystalCheck,1)		
+	ENDIF
+	Set(%CrystalCount,0)
+	IterateItemsNear(__Me,60,"CMB_END_Leandra_ScanForRemainingCrystals")
+	IF "c1"
+		IsEqual(_Bool_CrystalCheck,1)
+	THEN
+		IF "!c1"
+			IsGreaterThen(%CrystalCount,0)
+		THEN		
+			CharacterPlayEffect(__Me,"FX_Skills_Fire_PurifyingFire_Cast_A")
+			CharacterRemoveStatus(__Me,"VOID_AURA")
+			Set(_Bool_CrystalCheck,0)		
+		ENDIF	
+	ENDIF
+
+EVENT OnIterateCharacter_ScanForVoidKnights
+VARS
+	CHARACTER:_Character
+	CHARACTERTEMPLATE:_CharacterTemplate
+ON
+	OnIterateCharacter(_Character,"CMB_Leandra_IterateForVoidKnights")
+ACTIONS
+	IF "!c1&c2&c3"
+		CharacterIsDead(_Character)
+		CharacterGetTemplate(_Character,_CharacterTemplate)
+		IsEqual(_CharacterTemplate,%VoidKnight_RT)
+	THEN
+		Add(%RemainingVoidKnights,1)
+	ENDIF
+
+EVENT OnIterateItem_ScanForRemainingCrystals
+VARS
+	ITEM:_Item
+	ITEMTEMPLATE:_Item_RT
+ON
+	OnIterateItem(_Item,"CMB_END_Leandra_ScanForRemainingCrystals")
+ACTIONS
+	IF "!c1&c2&c3"
+		ItemIsDestroyed(_Item)
+		ItemGetTemplate(_Item,_Item_RT)
+		IsEqual(_Item_RT,%ProtectionCrystal_RT)
+	THEN
+		Add(%CrystalCount,1)
+	ENDIF
+	
+EVENT OnCombatEnded_StartCleaningUp
+ON
+	OnCombatEnded()
+ACTIONS
+	IterateCharacters("CMB_Leandra_Cleanup",Lowest,Distance)	
+	IF "!c1|!c2|!c3"
+		IsEqual(%ReusableHandle_1,0)
+		IsEqual(%ReusableHandle_2,0)
+		IsEqual(%ReusableHandle_3,0)
+	THEN
+		StopLoopEffect(%ReusableHandle_1)
+		StopLoopEffect(%ReusableHandle_2)
+		StopLoopEffect(%ReusableHandle_3)
+		StopLoopEffect(%ReusableHandle_1b)
+		StopLoopEffect(%ReusableHandle_2b)
+		StopLoopEffect(%ReusableHandle_3b)
+		ItemDie(%SpawnedCrystal_1)
+		ItemDie(%SpawnedCrystal_2)
+		ItemDie(%SpawnedCrystal_3)
+	ENDIF
+	
+EVENT OnDeactivate_StopLoopingFX
+ON
+	OnDeactivate()
+ACTIONS
+	StopLoopEffect(%ReusableHandle_1)
+	StopLoopEffect(%ReusableHandle_2)
+	StopLoopEffect(%ReusableHandle_3)
+	StopLoopEffect(%ReusableHandle_1b)
+	StopLoopEffect(%ReusableHandle_2b)
+	StopLoopEffect(%ReusableHandle_3b)
+	
+EVENT OnIterateCharacter_CleanUp
+VARS
+	CHARACTER:_Character
+	CHARACTERTEMPLATE:_CharacterTemplate
+ON
+	OnIterateCharacter(_Character,"CMB_Leandra_Cleanup")
+ACTIONS
+	IF "!c1&c2&(c3|c4|c5|c6|c7)"
+		CharacterIsDead(_Character)
+		CharacterGetTemplate(_Character,_CharacterTemplate)
+		IsEqual(_CharacterTemplate,%VoidKnight_RT)
+		IsEqual(_CharacterTemplate,%Demon_Red_RT)
+		IsEqual(_CharacterTemplate,%Demon_Yellow_RT)
+		IsEqual(_CharacterTemplate,%ArcaneVortex_RT)
+		IsEqual(_CharacterTemplate,"Summons_Ward_Physical_c542a8df-8352-4cc5-a839-e5016c1f29a6")
+	THEN
+		CharacterDie(_Character)
+	ENDIF
+
+EVENT OnDie_DisplayText
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	DisplayText(__Me,"HOM_Combat_Leandra_Died",3)
+
+EVENT OnEndTurn_EquipStaff
+ON
+	OnTurnEnded()
+ACTIONS
+	SetPriority("Waiting_EquipStaff", 100000)
+	
+EVENT OnDie_Zandalor_DisplayText
+ON
+	OnDie(%Zandalor,_,_,_)
+ACTIONS
+	DisplayText(__Me,"HOM_Combat_Leandra_ZandalorDied",3)	
+
+EVENT OnDie_Icara_DisplayText
+ON
+	OnDie(%Icara,_,_,_)
+ACTIONS
+	DisplayText(__Me,"HOM_Combat_Leandra_IcaraDied",3)	

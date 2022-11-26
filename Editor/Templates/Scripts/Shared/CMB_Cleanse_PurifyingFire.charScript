@@ -1,0 +1,101 @@
+INIT
+
+	CHARACTER:__Me
+	CHARACTER:%TargetPurify=null
+	FLOAT:%lowestDistancePurify=50000
+
+BEHAVIOUR
+REACTION CleanseStatusPurifyIterator,0
+USAGE COMBAT
+CHECK "c1"
+	IsEqual(%TargetPurify,null)
+ACTIONS
+	Set(%lowestDistancePurify,50000)
+	IterateCharactersInCombat(__Me,"GetPurifiableAllies")
+	IF "c1"
+		IsEqual(%TargetPurify,null)
+	THEN
+		SetPriority(CleanseStatusPurifyIterator,0)
+	ENDIF
+
+REACTION CleanseStatusPurify,700
+VARS
+	FLOAT:_minRange
+	FLOAT:_maxRange
+USAGE COMBAT
+CHECK "c1&!c2"
+	CharacterGetSkillRange(_minRange,_maxRange,__Me,Target_EnemyPurifyingFire)
+	IsEqual(%TargetPurify,null)
+ACTIONS
+	CharacterMoveInRange(%TargetPurify,_minRange,_maxRange,1)
+	CharacterUseSkill(Target_EnemyPurifyingFire,%TargetPurify)
+
+EVENTS
+EVENT InitiliazePurify
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill(Target_EnemyPurifyingFire)
+
+EVENT GetPurifiableAlliesIterator
+VARS
+	CHARACTER:_Char
+	FLOAT:_targetDistance
+ON
+	OnIterateCharacter(_Char,"GetPurifiableAllies")
+ACTIONS
+	IF "c1&(c2|c3|c4|c5|c6|c7)&c8"
+		CharacterIsAlly(__Me,_Char)
+		CharacterHasStatus(_Char,STATUS:BURNING)
+		CharacterHasStatus(_Char,STATUS:FROZEN)
+		CharacterHasStatus(_Char,STATUS:POISONED)
+		CharacterHasStatus(_Char,STATUS:STUNNED)
+		CharacterHasStatus(_Char,STATUS:FEAR)
+		CharacterHasStatus(_Char,STATUS:MUTED)
+		GetDistance(_targetDistance,__Me,_Char)	
+	THEN
+		IF "c1"
+			IsLessThen(_targetDistance,%lowestDistancePurify)
+		THEN
+			Set(%lowestDistancePurify,_targetDistance)
+			Set(%TargetPurify,_Char)
+		ENDIF
+	ENDIF		
+
+EVENT AllyGetsStatus
+VARS
+	CHARACTER:_Char
+	STATUS:_Status
+ON
+	OnCharacterStatus(_Char,_Status)
+ACTIONS
+	IF "c1&(c2|c3|c4|c5|c6|c7)"
+		CharacterIsAlly(__Me,_Char)
+		IsEqual(_Status,STATUS:BURNING)
+		IsEqual(_Status,STATUS:FROZEN)
+		IsEqual(_Status,STATUS:POISONED)
+		IsEqual(_Status,STATUS:STUNNED)
+		IsEqual(_Status,STATUS:FEAR)
+		IsEqual(_Status,STATUS:MUTED)
+	THEN
+		SetPriority("CleanseStatusPurifyIterator",800)
+	ENDIF
+
+
+EVENT AllyLosesPurifiableStatus
+VARS
+	STATUS:_Status
+ON
+	OnCharacterStatusRemoved(%TargetPurify,_Status)
+ACTIONS
+	IF "c1|c2|c3|c4|c5|c6"
+		IsEqual(_Status,STATUS:BURNING)
+		IsEqual(_Status,STATUS:FROZEN)
+		IsEqual(_Status,STATUS:POISONED)
+		IsEqual(_Status,STATUS:STUNNED)
+		IsEqual(_Status,STATUS:FEAR)
+		IsEqual(_Status,STATUS:MUTED)
+	THEN
+		Set(%TargetPurify,null)
+		SetPriority("CleanseStatusPurifyIterator",800)
+	ENDIF

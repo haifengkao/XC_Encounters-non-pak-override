@@ -1,0 +1,14 @@
+// --- Started on it, but don't need it right now so didn't continue
+
+INIT
+CHARACTER:__Me
+BEHAVIOUR
+
+REACTION Wander,1
+USAGE ALL
+ACTIONS
+	CharacterWander(FLOAT:8,10)
+	Sleep(1)
+	CharacterWander(FLOAT:3,3)
+	Sleep(0.5)
+	Goto(Start)

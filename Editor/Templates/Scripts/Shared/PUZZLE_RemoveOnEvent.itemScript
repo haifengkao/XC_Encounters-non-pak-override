@@ -1,0 +1,13 @@
+INIT
+
+	ITEM:__Me
+	EXTERN STRING:%Event=null
+	
+EVENTS
+
+EVENT DestroyOnEvent
+	ON
+		OnCharacterItemEvent(_,_,%Event)
+	ACTIONS
+		PlayEffectAt(__Me, "FX_GP_TeleportSmoke_A")
+		ItemDestroy(__Me)

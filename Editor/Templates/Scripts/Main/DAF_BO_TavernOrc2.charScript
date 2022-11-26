@@ -1,0 +1,52 @@
+INIT
+
+CHARACTER:__Me
+CHARACTER:%Friend = DAF_BO_TavernOrc1_8499b5b0-3488-4452-bb83-4fa306171e20
+INT:%Dialog = 0
+
+BEHAVIOUR
+
+REACTION Dialog,1100
+USAGE PEACE
+CHECK "c1&!c2&!c3"
+	IsEqual(%Dialog,1)
+	IsInDialog(%Friend)
+	IsInDialog(__Me)
+ACTIONS
+	Set(%Dialog,0)
+	IF "!c1"
+		CharacterHasStatus(__Me,"SITTING")
+	THEN
+		CharacterUseItem(ITEM:FUR_Rich_Chair_A_033_4634f783-8c7a-4ac2-8d34-b3262a909528)
+	ENDIF	
+	DialogStart("DAF_AD_BO_TavernOrcs1",%Friend,__Me)
+	
+REACTION Waiting,1050
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%Dialog,0)
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	IF "!c1"
+		CharacterHasStatus(__Me,"SITTING")
+	THEN
+		CharacterUseItem(ITEM:FUR_Rich_Chair_A_033_4634f783-8c7a-4ac2-8d34-b3262a909528)
+	ENDIF	
+	Sleep(4)
+INTERRUPT
+	Reset()
+
+EVENTS
+
+EVENT StartDialog
+ON
+	OnCharacterEvent(__Me,"DialogRequest")
+ACTIONS
+	Set(%Dialog,1)
+	
+EVENT CombatStopsDialog
+ON
+	OnCombatStarted()
+ACTIONS
+	DialogRequestStop("DAF_AD_BO_TavernOrcs1")

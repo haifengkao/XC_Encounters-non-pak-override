@@ -1,0 +1,28 @@
+INIT
+
+ITEM:__Me 
+EXTERN SURFACE:%SurfaceType = Electrified
+EXTERN FLOAT:%SurfaceRadius = 8.0
+EXTERN FLOAT:%DetectionRange = 6.0
+
+BEHAVIOUR
+
+REACTION WaitingForExplosion, 1000
+VARS
+	CHARACTER:_Player
+	FLOAT:_Distance
+CHECK "c1&c2&c3"
+	GetClosestPlayer(_Player)
+	GetDistance(_Distance,__Me,_Player)
+	IsLessThen(_Distance,%DetectionRange)
+ACTIONS
+	CreateSurfaceAt(__Me,%SurfaceType,%SurfaceRadius,4)
+	ItemDie(__Me)
+
+EVENTS
+
+EVENT OnDestroy
+ON
+	OnItemStatus(__Me,DYING)
+ACTIONS
+	CreateSurfaceAt(__Me,%SurfaceType,%SurfaceRadius,4)

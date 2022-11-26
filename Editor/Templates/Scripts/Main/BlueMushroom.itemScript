@@ -1,0 +1,18 @@
+#INCLUDE State_Manager_Item
+
+INIT
+USING State_Manager_Item
+ITEM:__Me
+
+EVENTS
+
+BEHAVIOUR
+
+REACTION State_Talking, 0
+	USAGE PEACE
+	VARS
+		FIXEDSTRING:_Talk
+	ACTIONS
+		GetRandom(_Talk, "LUC_MushroomTalk1", "LUC_MushroomTalk2", "LUC_MushroomTalk3")
+		DisplayText(__Me, _Talk, 4)
+		Sleep(10)

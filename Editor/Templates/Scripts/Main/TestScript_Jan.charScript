@@ -1,0 +1,32 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter
+
+CHARACTER:__Me
+
+EVENTS
+EVENT TargetDies
+ON
+	OnDie(_,_,_,_)
+ACTIONS
+	Interrupt("MoveToTriggers")
+
+
+BEHAVIOUR
+REACTION MoveToTriggers,300
+USAGE ALL
+VARS
+	FIXEDSTRING:_reactionName
+ACTIONS
+	CharacterMoveTo(TRIGGER:Point_000_dc260ab7-0a8b-4bae-8ea6-a5acd0cd5a43)
+	CharacterMoveTo(TRIGGER:Point_001_9617ad0c-0ead-4455-8c2a-f428229b8e86)
+INTERRUPT
+ON
+	OnManualInterrupt(_reactionName)
+ACTIONS
+	DebugText(__Me,"INTERRUPT (manual by [1])",_reactionName)
+	DelayReaction("MoveToTriggers", 2)
+INTERRUPT
+	DebugText(__Me,"INTERRUPT")
+	Reset()

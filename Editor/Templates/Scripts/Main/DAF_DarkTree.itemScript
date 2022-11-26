@@ -1,0 +1,43 @@
+INIT
+ITEM:__Me
+INT:%ShrikeAlive = 0
+INT:%CommentTree = 0
+EXTERN FIXEDSTRING:%Comment1 = "comment1"
+EXTERN FIXEDSTRING:%Comment2 = "comment2"
+	
+BEHAVIOUR
+
+REACTION CallForHelp,1050
+USAGE PEACE
+VARS
+	CHARACTER:_Player
+CHECK "c1&c2"
+	IsEqual(%ShrikeAlive,0)
+	CharacterGet(_Player, __Me, 8, COMPARE:Lowest, Distance, Player)
+ACTIONS
+	DisplayText(__Me,%Comment1,5)
+	Sleep(60)
+	DisplayText(__Me,%Comment2,5)
+	Sleep(60)
+	IF "c1"
+		IsEqual(%CommentTree,0)
+	THEN
+		CharacterEvent(_Player,"DAF_PlayersSeesFirstTree")
+		GlobalSetEvent("DAF_CommentDFTreeDone")
+	ENDIF
+INTERRUPT
+	Reset()
+	
+EVENTS
+
+EVENT ShrikeDead
+ON
+	OnGlobalEventSet("ShrikeIsDead")   
+ACTIONS
+	Set(%ShrikeAlive,1)
+
+EVENT CommentDFTreeDone
+ON
+	OnGlobalEventSet("DAF_CommentDFTreeDone")   
+ACTIONS
+	Set(%CommentTree,1)

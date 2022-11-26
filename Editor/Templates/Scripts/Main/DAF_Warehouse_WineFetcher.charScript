@@ -1,0 +1,48 @@
+INIT
+CHARACTER:__Me
+TRIGGER:%Point1 = DAF_Point_Warehouse_EntranceGuardSpot_94c88c2b-ae5d-446d-aaba-5394a5277382
+TRIGGER:%Point2 = DAF_Point_Warehouse_Winebarrel_8d95cb94-283a-4e1a-b9dd-3f75773f61cb
+CHARACTER:%Colleague = DAF_BO_Human_Male_A_000_5c6bbe9f-abf8-4b2e-bb6d-146e74b8dbdf
+
+BEHAVIOUR
+
+REACTION Main, 500
+USAGE PEACE
+VARS
+	FLOAT:_dist
+ACTIONS
+	IF "!c1&c2&c3"
+		CharacterIsDead(%Colleague)
+		GetDistance(_dist,__Me,%Colleague)
+		IsLessThen(_dist,5.0)
+	THEN
+		DialogStart("DAF_AD_WarehouseGuardsWineRun",__Me,%Colleague)
+		CharacterMoveTo(%Point2)
+		CharacterLookFrom(%Point2)
+		CharacterPlayAnimation("Fidget_Forward_02")
+		Sleep(2)
+		CharacterMoveTo(%Colleague,0,0,0,0.5)
+		CharacterPlayAnimation("Fidget_Forward_02")
+		Sleep(2)
+	ENDIF
+
+	CharacterMoveTo(%Point1,0,0,0,0.5)
+	CharacterLookFrom(%Point1)		
+
+	IF "!c1&c2&c3"
+		CharacterIsDead(%Colleague)
+		GetDistance(_dist,__Me,%Colleague)
+		IsLessThen(_dist,5.0)
+	THEN
+		DialogStart("DAF_AD_WarehouseGuardsWineRun2",%Colleague,__Me)
+	ENDIF
+	
+	Sleep(40)
+
+EVENTS
+EVENT CombatStopsDialog
+ON
+	OnCombatStarted()
+ACTIONS
+	DialogRequestStop("DAF_AD_WarehouseGuardsWineRun")
+	DialogRequestStop("DAF_AD_WarehouseGuardsWineRun2")

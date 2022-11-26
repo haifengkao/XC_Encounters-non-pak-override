@@ -1,0 +1,49 @@
+INIT
+	CHARACTER:__Me
+	FLOAT:%MySightRange
+	EXTERN FIXEDSTRING:%Template_OozeBarrel="0ae0668f-418c-46c4-bcbb-1683aa3c68e3"
+	EXTERN FIXEDSTRING:%Template_OilBarrel="1b34b32c-e96c-404e-90cc-054cb549c558"
+	EXTERN FIXEDSTRING:%Template_WaterBarrel="59b25792-1cc2-4364-92eb-89aca8fb8425"
+	EXTERN FIXEDSTRING:%Template_Barrel="9f41f684-590b-46db-b26d-87189941d8e0"
+	EXTERN FIXEDSTRING:%Template_Crate="a866a929-28ee-4a17-a867-34f049b73ca5"
+	EXTERN INT:%Character_Teleport_Priority=500
+
+//-------------------------	
+BEHAVIOUR
+REACTION Character_TeleportBarrelOnEnemy,0
+USAGE COMBAT
+VARS
+	CHARACTER:_BarrelTarget
+	ITEM:_Barrel
+	FLOAT3:_BarrelTargetPosition
+CHECK "c1&(c2|c3|c4|c5|c6)&c7&c8"
+	CharacterCanCast(__Me,Teleportation_EnemyFreeFall)	
+	ItemGet(_Barrel,__Me,%MySightRange,Lowest,Distance,%Template_OozeBarrel)	
+	ItemGet(_Barrel,__Me,%MySightRange,Lowest,Distance,%Template_OilBarrel)
+	ItemGet(_Barrel,__Me,%MySightRange,Lowest,Distance,%Template_WaterBarrel)
+	ItemGet(_Barrel,__Me,%MySightRange,Lowest,Distance,%Template_Crate)
+	ItemGet(_Barrel,__Me,%MySightRange,Lowest,Distance,%Template_Barrel)	
+	CharacterGet(_BarrelTarget,__Me,%MySightRange,Highest,Distance,Enemy)
+	GetPosition(_BarrelTarget,_BarrelTargetPosition)
+ACTIONS	
+	CharacterUseSkill(Teleportation_EnemyFreeFall,_Barrel,_BarrelTargetPosition)
+	IF "!c1&!c2"
+		CharacterHasStatus(_BarrelTarget,INVULNERABLE)
+		CharacterHasStatus(_BarrelTarget,KNOCKED_DOWN)
+	THEN
+		CharacterPlayEffect(__Me,"FX_GP_CameraShake_B")
+		CharacterApplyStatus(_BarrelTarget,KNOCKED_DOWN,1)
+	ENDIF
+
+//-------------------------	
+EVENTS
+EVENT OnInit_GiveSpells
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%MySightRange,__Me,Sight)
+	THEN
+		SetPriority("Character_TeleportBarrelOnEnemy",%Character_Teleport_Priority)
+		CharacterAddSkill(Teleportation_EnemyFreeFall)
+	ENDIF	

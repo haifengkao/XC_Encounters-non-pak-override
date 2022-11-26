@@ -1,0 +1,42 @@
+INIT
+TRIGGER:%CurrentTrigger = null
+TRIGGER:%PatrolSpot7 = LUC_M_DK_Patrol7_63618a27-bf37-42de-872e-7a792ea02b83
+TRIGGER:%PatrolSpot8 = LUC_M_DK_Patrol8_279d195a-8785-4369-ae54-f6d5c704b2ab
+INT:%index = 0
+
+BEHAVIOUR
+
+REACTION ChooseAction, 1060
+USAGE PEACE
+ACTIONS
+	GetElement(%CurrentTrigger,%index,%PatrolSpot7,%PatrolSpot8)
+	SetPriority("GoToSpot", 1070)
+	IF "c1"
+		IsEqual(%index,1)
+	THEN
+		Set(%index,0)
+	ELSE
+		Add(%index,1)
+	ENDIF
+	
+REACTION GoToSpot, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%CurrentTrigger, 0,1,1)
+	SetPriority("GoToSpot", 0)
+INTERRUPT
+	Reset()
+
+EVENTS
+
+EVENT Initialize
+ON
+	OnInit()
+ACTIONS
+	CharacterForceUpdate(1)
+
+EVENT Shutdown
+ON
+	OnShutdown()
+ACTIONS
+	CharacterForceUpdate(0)

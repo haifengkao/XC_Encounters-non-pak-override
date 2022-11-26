@@ -1,0 +1,53 @@
+INIT
+ITEM:__Me
+EXTERN STRING:%Event1=null
+EXTERN STRING:%Event2=null
+
+INT:%CurrentState = 0
+INT:%WantedState = 0
+CHARACTER:%UsedBy = null
+
+EVENTS
+
+EVENT LeverUse
+VARS
+CHARACTER:_Char
+ON
+	OnUseItem(_Char,__Me)
+ACTIONS
+	Set(%WantedState,1)
+	IF "c1"
+		IsEqual(%UsedBy,null)
+	THEN
+		Set(%UsedBy,_Char)
+	ENDIF
+	
+BEHAVIOUR
+
+REACTION GoOn,10
+CHECK "c1&!c2"
+	IsEqual(%WantedState,1)
+	IsEqual(%CurrentState,%WantedState)
+ACTIONS	
+	ItemPlayAnimationTo("Lever",1)
+	Set(%CurrentState,%WantedState)
+	CharacterItemEvent(%UsedBy,__Me,%Event1)
+	CharacterItemEvent(%UsedBy,__Me,%Event2)
+	ItemPlayEffect(__Me, "FX_GP_CameraShake_B")
+	Set(%UsedBy,null)
+	
+REACTION AutoTurnOff,1
+CHECK "c1"
+	IsEqual(%CurrentState,1)
+ACTIONS
+	Set(%WantedState,0)
+	
+REACTION GoOff,5
+CHECK "c1&!c2"
+	IsEqual(%WantedState,0)
+	IsEqual(%CurrentState,%WantedState)
+ACTIONS
+	Set(%CurrentState,%WantedState)
+	ItemPlayAnimationTo("Lever",0)	
+INTERRUPT
+	Reset()

@@ -1,0 +1,15 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+IF
+GlobalEventSet("CYS_Duke_LowerAttitude")
+THEN
+CharacterAddAttitudeTowardsPlayer(CHARACTER_CYS_Duke,CHARACTER_Player1,-20);
+CharacterAddAttitudeTowardsPlayer(CHARACTER_CYS_Duke,CHARACTER_Player2,-20);
+GoalCompleted;
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

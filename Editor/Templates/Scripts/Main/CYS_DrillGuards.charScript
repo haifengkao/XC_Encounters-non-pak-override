@@ -1,0 +1,81 @@
+#INCLUDE Base
+
+INIT
+USING Base
+
+CHARACTER:__Me
+
+//look trigger
+EXTERN TRIGGER:%Trigger = null
+//return trigger
+EXTERN TRIGGER:%Trigger3 = null
+//barracks trigger
+TRIGGER:%Trigger2 = CYS_PointDrillGuards1_64a3bf89-51cf-46f4-8d46-f794f504d2dd
+
+INT:%Turn = 0
+INT:%March = 0
+INT:%Return = 0
+INT:%LookAtShoes = 0
+
+BEHAVIOUR
+
+REACTION TurnRight,1100
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%Turn,1)
+ACTIONS
+	Set(%Turn,0)
+	CharacterLookFrom(%Trigger)
+	
+REACTION March,1100
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%March,1)
+ACTIONS
+	Set(%March,0)
+	CharacterMoveTo(%Trigger2)
+	
+REACTION Return,1200
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%Return,1)
+ACTIONS
+	Set(%March,0)
+	Set(%Return,0)		
+	CharacterMoveTo(%Trigger3,1)
+	CharacterLookFrom(%Trigger3)	
+
+REACTION LookAtShoes,1100
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%LookAtShoes,1)
+ACTIONS
+	Set(%LookAtShoes,0)
+	CharacterPlayAnimation("Fidget_Low_01")
+	DisplayText(__Me,"CYS_DrillGuards_Script_0",4)
+
+
+EVENTS
+EVENT ShouldTurn
+	ON
+	OnGlobalEventSet("CYS_DrillGuardsShouldTurn")
+	ACTIONS
+	Set(%Turn,1)
+	
+EVENT ShouldMarch
+	ON
+	OnGlobalEventSet("CYS_DrillGuardsShouldMarch")
+	ACTIONS
+	Set(%March,1)
+
+EVENT ShouldReturn
+	ON
+	OnGlobalEventSet("CYS_DrillGuardsShouldReturn")
+	ACTIONS
+	Set(%Return,1)
+	
+EVENT LookAtShoes
+	ON	
+	OnCharacterEvent(__Me,"LookAtShoes")
+	ACTIONS	
+	Set(%LookAtShoes,1)

@@ -1,0 +1,24 @@
+INIT
+	CHARACTER:__Me
+	EXTERN STATUS:%DesiredStatus=STUNNED
+	EXTERN INT:%Int_StatusDuration=2
+	EXTERN INT:%Bool_ForceStatus=0	
+	
+EVENTS
+EVENT OnDamage_ApplyStatus_Slashing
+VARS
+	CHARACTER:_Player
+	DAMAGE:_Damage
+	FLOAT:_DistanceBtwMeAndAttacker
+ON
+	OnDamage(_Damage,_,_Player,_)
+ACTIONS
+	IF "(c1|c2|c3)&c4&!c5"
+		IsEqual(_Damage,Slashing)
+		IsEqual(_Damage,Piercing)
+		IsEqual(_Damage,Crushing)	
+		GetDistance(_DistanceBtwMeAndAttacker,__Me,_Player)
+		IsGreaterThen(_DistanceBtwMeAndAttacker,3)
+	THEN
+		CharacterApplyStatus(_Player,%DesiredStatus,%Int_StatusDuration,%Bool_ForceStatus)
+	ENDIF

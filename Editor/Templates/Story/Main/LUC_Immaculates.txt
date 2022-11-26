@@ -1,0 +1,835 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+//REGION Dialogs
+DB_Dialogs(CHARACTER_LUC_Loic,"LUC_Loic");
+DB_Dialogs(CHARACTER_LUC_SacrificialChicken,"LUC_SacrificialChicken");
+DB_Dialogs(CHARACTER_LUC_ChurchMiner1,"LUC_AD_ChurchMiner");
+DB_Dialogs(CHARACTER_LUC_ChurchMiner2,"LUC_AD_ChurchMiner");
+DB_Dialogs(CHARACTER_LUC_ChurchMiner3,"LUC_AD_ChurchMiner");
+DB_Dialogs(CHARACTER_LUC_ChurchMiner4,"LUC_AD_ChurchMiner");
+DB_Dialogs(CHARACTER_LUC_ChurchMiner5,"LUC_AD_ChurchMiner");
+DB_Dialogs(CHARACTER_LUC_Temple_Cultist1,"LUC_IV_Treecultis");
+DB_Dialogs(CHARACTER_LUC_Temple_Cultist2,"LUC_IV_Treecultis");
+DB_Dialogs(CHARACTER_LUC_Temple_Cultist3,"LUC_IV_Treecultis");
+DB_Dialogs(CHARACTER_LUC_Temple_Cultist4,"LUC_IV_Treecultis");
+DB_ItemDialogs(ITEM_LUC_TempleFirstTrialStatue, "LUC_TempleTrial1");
+DB_ItemDialogs(ITEM_LUC_TempleStatueSecondTrial, "LUC_TempleTrial2");
+DB_ItemDialogs(ITEM_LUC_TempleThirdStatue, "LUC_TempleTrial3");
+
+DB_LUC_ID_Levers(ITEM_LUC_ID_LeftLever,0);
+DB_LUC_ID_Levers(ITEM_LUC_ID_MiddleLever,0);
+DB_LUC_ID_Levers(ITEM_LUC_ID_RightLever,0);
+//END_REGION
+//REGION Triggers
+ProcTriggerRegisterForPlayers(TRIGGER_LUC_Area_BlackRockContamination);
+ProcTriggerRegisterForPlayers(TRIGGER_LUC_IT_LaunchTrap);
+DB_OneShotPlayerTrigger(TRIGGER_LUC_Area_TempleStarstone);
+SneakTriggerSpotter(TRIGGER_LUC_Area_TempleChickenInstructions, CHARACTER_LUC_Loic);
+DB_OneShotPlayerTrigger(TRIGGER_LUC_TempleSecondStatue);
+DB_OneShotPlayerTrigger(TRIGGER_LUC_TempleThirdStatue);
+DB_OneShot_DialogTrigger_NewSystem(TRIGGER_LUC_Area_FirstTalkLoic,"LUC_Loic", CHARACTER_LUC_Loic);
+//END_REGION
+//REGION Comments
+DB_PlayerComments("LUC_CommentTraped","LUC_CommentTraped_1_1",1,1);
+DB_PlayerComments("LUC_CommentTraped","LUC_CommentTraped_2_1",2,1);
+DB_PlayerComments("LUC_CommentTraped","LUC_CommentTraped_2_2",2,2);
+DB_PlayerComments("LUC_CommentCorridor","LUC_CommentCorridor_1_1",1,1);
+DB_PlayerComments("LUC_CommentCorridor","LUC_CommentCorridor_2_1",2,1);
+DB_PlayerComments("LUC_CommentCorridor","LUC_CommentCorridor_2_2",2,2);
+DB_PlayerComments("LUC_CommentBloodOnStone","LUC_CommentBloodOnStone_1_1",1,1);
+DB_PlayerComments("LUC_CommentBloodOnStone","LUC_CommentBloodOnStone_2_1",2,1);
+DB_PlayerComments("LUC_CommentBloodOnStone","LUC_CommentBloodOnStone_2_2",2,2);
+DB_PlayerComments("LUC_Comment_AfterPlatesTemple","LUC_Comment_AfterPlatesTemple_1_1",1,1);
+DB_PlayerComments("LUC_Comment_AfterPlatesTemple","LUC_Comment_AfterPlatesTemple_2_1",2,1);
+DB_PlayerComments("LUC_Comment_AfterPlatesTemple","LUC_Comment_AfterPlatesTemple_2_2",2,2);
+DB_PlayerComments("LUC_CommentTemplePortal","LUC_CommentTemplePortal_1_1",1,1);
+DB_PlayerComments("LUC_CommentTemplePortal","LUC_CommentTemplePortal_2_1",2,1);
+DB_PlayerComments("LUC_CommentTemplePortal","LUC_CommentTemplePortal_2_2",2,2);
+DB_PlayerComment_Trigger(TRIGGER_LUC_Temple_AreaCommentPortal, "LUC_CommentTemplePortal");
+DB_PlayerComments("LUC_IV_CommentTemplePortalArrived","LUC_IV_CommentTemplePortalArrived_1_1",1,1);
+DB_PlayerComments("LUC_IV_CommentTemplePortalArrived","LUC_IV_CommentTemplePortalArrived_2_1",2,1);
+DB_PlayerComments("LUC_IV_CommentTemplePortalArrived","LUC_IV_CommentTemplePortalArrived_2_2",2,2);
+DB_PlayerComments("LUC_IV_CommentForestPortalArrived","LUC_IV_CommentForestPortalArrived_1_1",1,1);
+DB_PlayerComments("LUC_IV_CommentForestPortalArrived","LUC_IV_CommentForestPortalArrived_2_1",2,1);
+DB_PlayerComments("LUC_IV_CommentForestPortalArrived","LUC_IV_CommentForestPortalArrived_2_2",2,2);
+DB_PlayerComments("LUC_IV_CommentForestPortal","LUC_IV_CommentForestPortal_1_1",1,1);
+DB_PlayerComments("LUC_IV_CommentForestPortal","LUC_IV_CommentForestPortal_2_1",2,1);
+DB_PlayerComments("LUC_IV_CommentForestPortal","LUC_IV_CommentForestPortal_2_2",2,2);
+DB_PlayerComment_Trigger(TRIGGER_LUC_IV_CommentPortalToTrial, "LUC_IV_CommentForestPortal");
+
+//END_REGION
+//REGION Hidding Quest Items
+PROC_LUC_SwitchPoisonCloud(0);
+ItemSetOnstage(ITEM_LUC_TempleGreen1, 0);
+ItemSetOnstage(ITEM_LUC_TempleGreen2, 0);
+ItemSetOnstage(ITEM_LUC_TempleGreen3, 0);
+ItemSetOnstage(ITEM_LUC_TempleGreen4, 0);
+CharacterSetInitiative(CHARACTER_LUC_Loic, 10000);
+//END_REGION
+//REGION Databases
+DB_LUC_TempleCultists(CHARACTER_LUC_Loic, TRIGGER_LUC_LoicAtStone, TRIGGER_LUC_Point_TeleporterTemple, "LUC_SpawningLoic", "LUC_SpawningCultist2");
+DB_LUC_TempleCultists(CHARACTER_LUC_Temple_Cultist2, TRIGGER_LUC_TempleCultist2, TRIGGER_LUC_Temple_Cultist2, "LUC_SpawningCultist2", "LUC_SpawningCultist3");
+DB_LUC_TempleCultists(CHARACTER_LUC_Temple_Cultist3, TRIGGER_LUC_TempleCultist3, TRIGGER_LUC_Temple_Cultist3, "LUC_SpawningCultist3", "LUC_SpawningCultist4");
+DB_LUC_TempleCultists(CHARACTER_LUC_Temple_Cultist4, TRIGGER_LUC_TempleCultist4, TRIGGER_LUC_Temple_Cultist4, "LUC_SpawningCultist4", "LUC_SpawningCultist1");
+DB_LUC_TempleCultists(CHARACTER_LUC_Temple_Cultist1,TRIGGER_LUC_TempleCultist1, TRIGGER_LUC_Temple_Cultist1, "LUC_SpawningCultist1", "LUC_CultistsOver");
+
+DB_LUC_Miners(CHARACTER_LUC_ChurchMiner1, TRIGGER_LUC_ChurchMiner1AfterQuest);
+DB_LUC_Miners(CHARACTER_LUC_ChurchMiner2, TRIGGER_LUC_ChurchMiner2AfterQuest);
+DB_LUC_Miners(CHARACTER_LUC_ChurchMiner3, TRIGGER_LUC_ChurchMiner3AfterQuest);
+DB_LUC_Miners(CHARACTER_LUC_ChurchMiner4, TRIGGER_LUC_ChurchMiner4AfterQuest);
+DB_LUC_Miners(CHARACTER_LUC_ChurchMiner5, TRIGGER_LUC_ChurchMiner5AfterQuest);
+
+DB_LUC_PoisonCloud(ITEM_LUC_PoisonCloud1);
+DB_LUC_PoisonCloud(ITEM_LUC_PoisonCloud2);
+DB_LUC_PoisonCloud(ITEM_LUC_PoisonCloud3);
+DB_LUC_PoisonCloud(ITEM_LUC_PoisonCloud4);
+DB_LUC_PoisonCloud(ITEM_LUC_PoisonCloud5);
+DB_LUC_PoisonCloud(ITEM_LUC_PoisonCloud6);
+DB_LUC_PoisonCloud(ITEM_LUC_PoisonCloud7);
+DB_LUC_PoisonCloud(ITEM_LUC_PoisonCloud8);
+DB_LUC_PoisonCloud(ITEM_LUC_PoisonCloud9);
+DB_LUC_PoisonCloud(ITEM_LUC_PoisonCloud10);
+DB_LUC_PoisonCloud(ITEM_LUC_PoisonCloud11);
+DB_LUC_PoisonCloud(ITEM_LUC_PoisonCloud12);
+DB_LUC_PoisonCloud(ITEM_LUC_PoisonCloud13);
+DB_LUC_PoisonCloud(ITEM_LUC_PoisonCloud14);
+DB_LUC_PoisonCloud(ITEM_LUC_PoisonCloud15);
+DB_LUC_PoisonCloud(ITEM_LUC_PoisonCloud16);
+
+KillCounter("LUC_LoicCultists",5);
+KillCounterDB(CHARACTER_LUC_Temple_Cultist1, "LUC_LoicCultists");
+KillCounterDB(CHARACTER_LUC_Temple_Cultist2, "LUC_LoicCultists");
+KillCounterDB(CHARACTER_LUC_Temple_Cultist3, "LUC_LoicCultists");
+KillCounterDB(CHARACTER_LUC_Temple_Cultist4, "LUC_LoicCultists");
+KillCounterDB(CHARACTER_LUC_Loic, "LUC_LoicCultists");
+//END_REGION
+//REGION General
+ItemToCharacter(ITEM_LUC_SacrificialChickenCorpse, CHARACTER_LUC_SacrificialChicken);
+ItemToCharacter(ITEM_LUC_LoicKey, CHARACTER_LUC_Loic);
+CharacterSetOnStage(CHARACTER_LUC_IT_ShadowTrap, 0);
+ItemToCharacter(ITEM_LUC_ChurchCellarKey, CHARACTER_LUC_Loic);
+DB_ObjectCustomBehavior(ITEM_LUC_LoicImmaculateBook);
+
+PROC_RegisterHiddenWall(ITEM_LUC_TempleHiddenWall2);
+PROC_RegisterWaysToOpenHiddenWallTemple();
+
+DB_LUC_IV_NumberOfCreatures(0);
+
+ProcTriggerRegisterForPlayers(TRIGGER_LUC_ImmaculateTempleArea);
+
+DB_NoRunAway(CHARACTER_LUC_Loic);
+DB_NoRunAway(CHARACTER_LUC_Temple_Cultist1);
+DB_NoRunAway(CHARACTER_LUC_Temple_Cultist2);
+DB_NoRunAway(CHARACTER_LUC_Temple_Cultist3);
+DB_NoRunAway(CHARACTER_LUC_Temple_Cultist4);
+//END_REGION
+
+ProcTriggerRegisterForPlayers(TRIGGER_LUC_ImmaculateVilage);
+DB_NoCompanionReplace(ITEM_LUC_TempleStatueSecondTrial);
+DB_NoCompanionReplace(ITEM_LUC_TempleFirstTrialStatue);
+DB_NoCompanionReplace(ITEM_LUC_TempleThirdStatue);
+KBSECTION
+//REGION Initialization
+PROC
+PROC_LUC_SwitchPoisonCloud((INTEGER)_Bool)
+AND
+DB_LUC_PoisonCloud(_Cloud)
+THEN
+ItemSetOnstage(_Cloud,_Bool);
+
+PROC
+PROC_LUC_MoveMinersAway()
+AND
+DB_LUC_Miners(_Dude,_Point)
+THEN
+ProcRemoveDialogEntryForSpeaker(_Dude,"LUC_AD_ChurchMiner");
+DB_Dialogs(_Dude,"LUC_Miners");
+
+PROC
+PROC_RegisterWaysToOpenHiddenWallTemple()
+AND
+HiddenWallDB(_WallIndex, ITEM_LUC_TempleHiddenWall2)
+THEN
+HiddenWallItemDB(ITEM_LUC_TemplePushButton,_WallIndex);	
+
+IF
+CharacterEnteredTrigger(_Player, TRIGGER_LUC_TempleFirstStatue)
+AND
+NOT ITEM_LUC_TempleFirstTrialStatue.DB_IsInItemDialog()
+AND
+NOT _Player.DB_IsInDialog()
+THEN
+DialogRequestStopForCharacter(_Player);
+CharacterMakeStoryNpc(_Player,1);
+ITEM_LUC_TempleFirstTrialStatue.DB_IsInItemDialog();
+_Player.DB_IsInDialog();
+CharacterLookAtItem(_Player,ITEM_LUC_TempleFirstTrialStatue,0);
+DialogStartTwoSpeakerItemDialog("LUC_TempleTrial1",ITEM_LUC_TempleFirstTrialStatue,_Player);
+DB_ItemDialog(2,ITEM_LUC_TempleFirstTrialStatue,_Player);
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_TempleFirstStatue);
+
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,TRIGGER_LUC_TempleSecondStatue)
+AND
+NOT ITEM_LUC_TempleStatueSecondTrial.DB_IsInItemDialog()
+AND
+NOT _Player.DB_IsInDialog()
+THEN
+DialogRequestStopForCharacter(_Player);
+CharacterMakeStoryNpc(_Player,1);
+ITEM_LUC_TempleStatueSecondTrial.DB_IsInItemDialog();
+_Player.DB_IsInDialog();
+CharacterLookAtItem(_Player,ITEM_LUC_TempleStatueSecondTrial,0);
+DialogStartTwoSpeakerItemDialog("LUC_TempleTrial2",ITEM_LUC_TempleStatueSecondTrial,_Player);
+DB_ItemDialog(2,ITEM_LUC_TempleStatueSecondTrial,_Player);
+
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,TRIGGER_LUC_TempleThirdStatue)
+AND
+NOT ITEM_LUC_TempleThirdStatue.DB_IsInItemDialog()
+AND
+NOT _Player.DB_IsInDialog()
+THEN
+DialogRequestStopForCharacter(_Player);
+CharacterMakeStoryNpc(_Player,1);
+ITEM_LUC_TempleThirdStatue.DB_IsInItemDialog();
+_Player.DB_IsInDialog();
+CharacterLookAtItem(_Player,ITEM_LUC_TempleThirdStatue,0);
+DialogStartTwoSpeakerItemDialog("LUC_TempleTrial3",ITEM_LUC_TempleThirdStatue,_Player);
+DB_ItemDialog(2,ITEM_LUC_TempleThirdStatue,_Player);
+
+//END_REGION
+
+//REGION Church
+IF
+GlobalEventSet("LUC_DisableLoic")
+THEN
+DB_DisableAttackReaction(CHARACTER_LUC_Loic);
+DB_NoDefaultBehavior(CHARACTER_LUC_Loic);
+
+IF
+DialogEnded("LUC_Loic",_)
+AND
+CharacterGetVarInteger(CHARACTER_LUC_Loic,"goDownstairs",1)
+THEN
+CharacterSetVarInteger(CHARACTER_LUC_Loic,"goDownstairs",0);
+CharacterSetHasDialog(CHARACTER_LUC_Loic,0);
+CharacterSetVarInteger(CHARACTER_LUC_Loic,"doingInitiation",1);
+CharacterSetVarFixedString(CHARACTER_LUC_Loic,"curentState","");
+DB_DisableAttackReaction(CHARACTER_LUC_Loic);
+DB_NoDefaultBehavior(CHARACTER_LUC_Loic);
+DialogStartOneSpeakerDialog("LUC_AD_Loic", CHARACTER_LUC_Loic);
+GlobalSetEvent("LUC_TrialBegin");
+DB_OneShotPlayerTrigger(TRIGGER_LUC_TempleFirstStatue);
+
+IF
+AutomatedDialogEnded("LUC_AD_Loic",_)
+AND
+CharacterGetVarInteger(CHARACTER_LUC_Loic,"doingInitiation",1)
+THEN
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_LUC_Loic);
+CharacterTeleportToTrigger(CHARACTER_LUC_Loic, TRIGGER_LUC_LoicPointUpstairs, "loicUpstairs");
+DB_IsNotMessingAround(CHARACTER_LUC_Loic);
+PROC_LUC_MoveMinersAway();
+CharacterSetHasDialog(CHARACTER_LUC_Loic,1);
+ItemRemoveStatus(ITEM_LUC_ChandelierChurch1, "BURNING");
+ItemRemoveStatus(ITEM_LUC_CHandelierChurch2, "BURNING");
+ItemRemoveStatus(ITEM_LUC_ChandelierChurch3, "BURNING");
+ItemRemoveStatus(ITEM_LUC_ChandelierChurch4, "BURNING");
+GlobalSetEvent("LUC_MinersExitChurch");
+
+IF
+CharacterEvent(CHARACTER_LUC_Loic, "loicUpstairs")
+THEN
+NOT DB_DisableAttackReaction(CHARACTER_LUC_Loic);
+NOT DB_NoDefaultBehavior(CHARACTER_LUC_Loic);
+CharacterFlushQueue(CHARACTER_LUC_Loic);
+
+IF
+GlobalEventSet("LoicGaveBlessing")
+THEN
+ProcShowMarker("LUC_ImmaculateTrials");
+
+IF
+CharacterSpottedItemTheft_Redhanded(_Player, CHARACTER_LUC_Loic, CHARACTER_LUC_Loic, ITEM_LUC_LoicImmaculateBook, _,_,_CrimeID,_,_,_,_,_,_,_)
+THEN
+CharacterDisplayText(CHARACTER_LUC_Loic,"LUC_LoicShoutBook");
+ItemTeleportToTrigger(ITEM_LUC_LoicImmaculateBook, TRIGGER_LUC_LoicImmaculateBookPoint);
+ItemSetOwner(ITEM_LUC_LoicImmaculateBook, CHARACTER_LUC_Loic);
+GlobalSetEvent("LUC_TriedToStealLoicBook");
+//END_REGION
+
+//REGION Contamination
+IF
+DialogEnded("LUC_TempleTrial1", _)
+AND
+CharacterGetVarInteger(CHARACTER_LUC_Loic,"doingInitiation",1)
+THEN
+ItemUnlockAndOpen(ITEM_LUC_TempleDoorEntranceContamination);
+
+IF
+CharacterEnteredTrigger(_Player, TRIGGER_LUC_IT_LaunchTrap)
+AND
+NOT DB_OnlyOnce("LUC_TrialStarted")
+THEN
+Launch_PlayerComment(_Player,"LUC_CommentCorridor");
+ItemLock(ITEM_LUC_TempleDoorEntranceContamination, "LUC_TempleNoKey");
+ItemLock(ITEM_LUC_TempleDoorContaminationPressure, "LUC_TempleNoKey");
+DB_OnlyOnce("LUC_TrialStarted");
+TimerLaunch("LUC_IT_LaunchRotTrap", 10000);
+
+IF
+TimerFinished("LUC_IT_LaunchRotTrap")
+THEN
+PROC_LaunchLucullaTempleTrap();
+
+
+PROC
+PROC_LaunchLucullaTempleTrap()
+AND
+DB_InRegion(_Player, TRIGGER_LUC_Area_BlackRockContamination)
+AND
+NOT DB_Companion(_Player)
+THEN
+Launch_PlayerComment(_Player,"LUC_CommentTraped");
+
+PROC
+PROC_LaunchLucullaTempleTrap()
+THEN
+CharacterSetVarFixedString(CHARACTER_LUC_Loic, "currentState", "");
+CharacterSetVarInteger(CHARACTER_LUC_Loic,"doingInitiation",0);
+CharacterSetVarInteger(CHARACTER_LUC_Loic,"willGetMad",1);
+PROC_LUC_SwitchPoisonCloud(1);
+QuestUpdate("LUC_Immaculates","Corridor");
+TimerLaunch("LUC_IT_ExecuteRotTrap", 10000);
+PROC_LUC_IT_SickenDudes();
+DB_PlayerComments("LUC_CommentTraped","LUC_CommentTraped_1_1",1,1);
+DB_PlayerComments("LUC_CommentTraped","LUC_CommentTraped_2_1",2,1);
+DB_PlayerComments("LUC_CommentTraped","LUC_CommentTraped_2_2",2,2);
+DB_PlayerComments("LUC_CommentCorridor","LUC_CommentCorridor_1_1",1,1);
+DB_PlayerComments("LUC_CommentCorridor","LUC_CommentCorridor_2_1",2,1);
+DB_PlayerComments("LUC_CommentCorridor","LUC_CommentCorridor_2_2",2,2);
+ItemUnlockAndOpen(ITEM_LUC_TempleDoorContaminationPressure);
+ItemUnlockAndOpen(ITEM_LUC_TempleDoorEntranceContamination);
+
+IF
+TimerFinished("LUC_IT_ExecuteRotTrap")
+THEN
+PROC_LUC_SwitchPoisonCloud(0);
+
+PROC
+PROC_LUC_IT_SickenDudes()
+AND
+DB_InRegion(_Dude,TRIGGER_LUC_Area_BlackRockContamination)
+THEN
+CharacterApplyStatus(_Dude,"BLACKROCKED",-1.0);
+//END_REGION
+
+//REGION Pressure plates
+IF	
+GlobalEventSet("LUC_IT_MagicDoorsUnlock")
+THEN
+DB_PlayerComment_Trigger(TRIGGER_LUC_Temple_CommentAfterPlates,"LUC_Comment_AfterPlatesTemple");
+ItemPlaySound(ITEM_LUC_TempleMagicDoor1, "UI_Notification_PuzzleSolvedGen");
+
+IF
+GlobalEventCleared("LUC_IT_MagicDoorsUnlock")
+THEN
+NOT DB_PlayerComment_Trigger(TRIGGER_LUC_Temple_CommentAfterPlates,"LUC_Comment_AfterPlatesTemple");
+
+//END_REGION
+
+//REGION Lever room
+IF
+CharacterItemEvent(_, _Lever, "good")
+AND
+DB_LUC_ID_Levers(_Lever, _OldState)
+THEN
+NOT DB_LUC_ID_Levers(_Lever, _OldState);
+DB_LUC_ID_Levers(_Lever, 1);
+PROC_LUC_ID_CheckLevers();
+
+PROC
+PROC_LUC_ID_CheckLevers()
+AND
+NOT DB_LUC_ID_Levers(_, 0)
+THEN
+ITEM_LUC_ID_ActivateLever.isGood();
+
+IF
+CharacterItemEvent(_, _Lever, "fail")
+AND
+DB_LUC_ID_Levers(_Lever, _OldState)
+THEN
+NOT DB_LUC_ID_Levers(_Lever, _OldState);
+DB_LUC_ID_Levers(_Lever, 0);
+NOT ITEM_LUC_ID_ActivateLever.isGood();
+
+IF
+CharacterItemEvent(_Player, ITEM_LUC_ID_ActivateLever, "activated")
+AND
+ITEM_LUC_ID_ActivateLever.isGood()
+THEN
+PlayEffectAtItem("FX_GP_Regenerate", ITEM_LUC_ID_DoorToStarstone);
+CharacterDisplayText(_Player, "LUC_Trials_LeverGood");
+ItemUnLock(ITEM_LUC_ID_DoorToStarstone);
+ItemPlaySound(ITEM_LUC_ID_DoorToStarstone, "UI_Notification_PuzzleSolvedGen");
+
+IF
+CharacterItemEvent(_Player, ITEM_LUC_ID_ActivateLever, "activated")
+AND
+NOT ITEM_LUC_ID_ActivateLever.isGood()
+THEN
+CharacterDisplayText(_Player, "GLO_FailedUse");
+PROC_LUC_ID_CheckCreatures(_Player);
+
+PROC
+PROC_LUC_ID_CheckCreatures((CHARACTER)_Player)
+AND
+DB_LUC_IV_NumberOfCreatures(_Already)
+AND
+_Already > 0
+THEN
+CharacterApplyDamage(_Player, 25, "AIR");
+CharacterPlayEffect(_Player, "FX_GP_Death_Lightning_A_Medium");
+
+PROC
+PROC_LUC_ID_CheckCreatures((CHARACTER)_Player)
+AND
+DB_LUC_IV_NumberOfCreatures(_Already)
+AND
+_Already < 1
+AND
+IntegerSum(_Already, 1, _New)
+THEN
+NOT DB_LUC_IV_NumberOfCreatures(_Already);
+DB_LUC_IV_NumberOfCreatures(_New);
+CharacterAppear(CHARACTER_LUC_IT_ShadowTrap, 1);
+PlayEffectAtTrigger("FX_GP_TeleportSmoke_A", TRIGGER_LUC_ID_SpawnCreature);
+//END_REGION
+
+//REGION Starstone
+IF
+CharacterItemEvent(_Player, ITEM_LUC_TempleStarstone,"GLO_StarStoneZap")
+THEN
+QuestUpdate("LUC_Immaculates","Zapped");
+ProcNewStarStoneFound();
+GlobalSetEvent("LUC_ImmaculateStarstoneFound");
+
+//END_REGION
+
+//REGION Sacrificial chicken
+IF
+GlobalEventSet("LUC_KillChicken")
+THEN
+CHARACTER_LUC_SacrificialChicken.isGoingToBeKilled();
+
+IF
+DialogEnded("LUC_SacrificialChicken",_Inst)
+AND
+CHARACTER_LUC_SacrificialChicken.isGoingToBeKilled()
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+THEN
+CharacterPlayAnimation(_Player, "attack1", "");
+CharacterDie(CHARACTER_LUC_SacrificialChicken,1);
+
+IF
+CharacterDied(CHARACTER_LUC_SacrificialChicken)
+THEN
+CharacterSetOnStage(CHARACTER_LUC_SacrificialChicken, 0);
+
+IF
+ItemTemplateCombinedWithItemTemplate("Quest_LUC_SacrificialChickenFullVial_01a28790-6d50-499f-a914-0f7f57b28211", "Quest_Stone_Star_Depleted_A_c6d8d1e7-ee24-4e3d-8cca-6996564b284b", _Player, _)
+THEN
+Launch_PlayerComment(_Player,"LUC_CommentBloodOnStone");
+//END_REGION
+
+//REGION Fight with cultists
+IF
+DialogEnded("LUC_Loic", _)
+AND
+CharacterGetVarInteger(CHARACTER_LUC_Loic,"willGetMad",1)
+THEN
+CharacterSetHasDialog(CHARACTER_LUC_Loic, 0);
+QuestUpdate("LUC_Immaculates","Mad");
+CharacterSetVarInteger(CHARACTER_LUC_Loic, "Counter", 0);
+CharacterSetVarInteger(CHARACTER_LUC_Loic,"willGetMad",0);
+CharacterSetVarInteger(CHARACTER_LUC_Loic,"isMad",1);
+ProcCharacterMoveToItem(CHARACTER_LUC_Loic, ITEM_LUC_TempleDoorPortal, 1, "atThePortalDoor");
+
+IF
+CharacterEvent(CHARACTER_LUC_Loic, "atThePortalDoor")
+AND
+ItemIsLocked(ITEM_LUC_TempleDoorPortal,0)
+THEN
+ItemOpen(ITEM_LUC_TempleDoorPortal);
+ProcCharacterMoveToTrigger(CHARACTER_LUC_Loic, TRIGGER_LUC_Point_TeleporterTemple, 1, "teleportVillage");
+
+IF
+CharacterEvent(CHARACTER_LUC_Loic, "atThePortalDoor")
+AND
+ItemIsLocked(ITEM_LUC_TempleDoorPortal,1)
+AND
+ItemIsInCharacterInventory(ITEM_LUC_LoicKey,CHARACTER_LUC_Loic,1)
+THEN
+ItemUnlockAndOpen(ITEM_LUC_TempleDoorPortal);
+ProcCharacterMoveToTrigger(CHARACTER_LUC_Loic, TRIGGER_LUC_Point_TeleporterTemple, 1, "teleportVillage");
+
+IF
+CharacterEvent(CHARACTER_LUC_Loic, "atThePortalDoor")
+AND
+ItemIsLocked(ITEM_LUC_TempleDoorPortal,1)
+AND
+ItemIsInCharacterInventory(ITEM_LUC_LoicKey,CHARACTER_LUC_Loic,0)
+THEN
+CharacterDisplayText(CHARACTER_LUC_Loic, "LUC_LoicLockedAfterChicken");
+CharacterSetFaction(CHARACTER_LUC_Loic, "Evil NPC");
+CHARACTER_LUC_Loic.isTrapped();
+
+IF
+CharacterDied(CHARACTER_LUC_Loic)
+AND
+CHARACTER_LUC_Loic.isTrapped()
+THEN
+QuestUpdate("LUC_Immaculates","FinishedAloneTemple");
+QuestClose("LUC_Immaculates");
+
+IF
+CharacterEvent(CHARACTER_LUC_Loic, "teleportVillage")
+THEN
+CharacterTeleportToTrigger(CHARACTER_LUC_Loic, TRIGGER_WAYP_LucullaImmaculatePos,"atTheVillage");
+
+IF
+CharacterEvent(CHARACTER_LUC_Loic, "atTheVillage")
+THEN
+CharacterDisplayText(CHARACTER_LUC_Loic, "LUC_LoicAtVillage");
+
+IF
+GlobalEventSet("LUC_IV_EverybodyIsDead")
+THEN
+CHARACTER_LUC_Loic.wontFindHelp();
+
+IF
+CharacterDied(CHARACTER_LUC_Loic)
+AND
+CHARACTER_LUC_Loic.wontFindHelp()
+THEN
+QuestUpdate("LUC_Immaculates","FinishedAloneVillage");
+QuestClose("LUC_Immaculates");
+
+IF
+CharacterDisplayTextEnded(CHARACTER_LUC_Loic, "LUC_LoicAtVillage")
+AND
+NOT DB_Combat(CHARACTER_LUC_Loic, _)
+THEN
+CharacterSetVarFixedString(CHARACTER_LUC_Temple_Cultist1, "currentState", "");
+CharacterSetVarFixedString(CHARACTER_LUC_Temple_Cultist2, "currentState", "");
+CharacterSetVarFixedString(CHARACTER_LUC_Temple_Cultist3, "currentState", "");
+CharacterSetVarFixedString(CHARACTER_LUC_Temple_Cultist4, "currentState", "");
+
+IF
+CharacterDisplayTextEnded(CHARACTER_LUC_Loic, "LUC_LoicAtVillage")
+AND
+NOT DB_Combat(CHARACTER_LUC_Loic, _)
+AND
+CHARACTER_LUC_Loic.wontFindHelp()
+THEN
+CharacterSetCanFight(CHARACTER_LUC_Loic, 1);
+CharacterSetFaction(CHARACTER_LUC_Loic, "Evil NPC");
+
+IF
+CharacterDisplayTextEnded(CHARACTER_LUC_Loic, "LUC_LoicAtVillage")
+AND
+NOT DB_Combat(CHARACTER_LUC_Loic, _)
+AND
+NOT CHARACTER_LUC_Loic.wontFindHelp()
+THEN
+TimerLaunch("LUC_SpawningLoic", 1000);
+CharacterSetVarInteger(CHARACTER_LUC_Loic, "WithCultist", 1);
+
+IF
+TimerFinished(_Timer)
+AND
+DB_LUC_TempleCultists(_Cultist, _WhereTo, _Spawn, _Timer, _NextTimer)
+THEN
+CharacterAppearAtTrigger(_Cultist, _Spawn, 0);
+CharacterSetFaction(_Cultist, "Evil NPC");
+ProcLUCSetCultistCanFight(_Cultist);
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", _Cultist);
+PlayEffectAtItem("FX_GP_TeleportSmoke_A", ITEM_WAYP_Luculla_Trials);
+ProcCharacterMoveToTrigger(_Cultist, _WhereTo, 1, "");
+TimerLaunch(_NextTimer, 1000);
+
+PROC
+ProcLUCSetCultistCanFight((CHARACTER)_Cultist)
+AND
+NOT DB_FinalLoicFightStarted(1)
+THEN
+CharacterSetCanFight(_Cultist, 0);
+
+PROC
+ProcLUCSetCultistCanFight((CHARACTER)_Cultist)
+AND
+DB_FinalLoicFightStarted(1)
+THEN
+CharacterSetCanFight(_Cultist, 1);
+
+IF
+CharacterSawCharacter(_Player, _Cultist)
+AND
+DB_LUC_TempleCultists(_Cultist, _, _, _, _)
+AND
+_Player.DB_IsPlayer()
+AND
+CharacterGetFaction(_Cultist, "Evil NPC")
+THEN
+CharacterPurgeQueue(_Cultist);
+
+IF
+CharacterSawCharacter(_Player, CHARACTER_LUC_Loic)
+AND
+_Player.DB_IsPlayer()
+AND 
+NOT DB_Companion(_Player)
+AND
+CharacterGetFaction(CHARACTER_LUC_Loic, "Evil NPC")
+AND
+CharacterCanFight(CHARACTER_LUC_Loic, 0)
+AND
+NOT DB_OnlyOnce("LUC_LoicFight")
+THEN
+PROC_MendatoryDialog("LUC_LoicFight", CHARACTER_LUC_Loic, _Player);
+DB_OnlyOnce("LUC_LoicFight");
+
+IF
+CharacterSawCharacter(_Player, CHARACTER_LUC_Loic)
+AND
+_Player.DB_IsPlayer()
+AND 
+DB_Companion(_Player)
+AND
+CharacterGetFaction(CHARACTER_LUC_Loic, "Evil NPC")
+AND
+CharacterCanFight(CHARACTER_LUC_Loic, 0)
+AND
+NOT DB_OnlyOnce("LUC_LoicFight")
+THEN
+DB_FinalLoicFightStarted(1);
+CharacterSetCanFight(CHARACTER_LUC_Temple_Cultist1, 1);
+CharacterSetCanFight(CHARACTER_LUC_Temple_Cultist2, 1);
+CharacterSetCanFight(CHARACTER_LUC_Temple_Cultist3, 1);
+CharacterSetCanFight(CHARACTER_LUC_Temple_Cultist4, 1);
+CharacterSetCanFight(CHARACTER_LUC_Loic, 1);
+DB_OnlyOnce("LUC_LoicFight");
+
+IF
+DialogEnded("LUC_LoicFight", _ID)
+AND
+DB_DialogPlayers(_ID, _Player, 1)
+THEN
+DB_FinalLoicFightStarted(1);
+CharacterSetCanFight(CHARACTER_LUC_Temple_Cultist1, 1);
+CharacterSetCanFight(CHARACTER_LUC_Temple_Cultist2, 1);
+CharacterSetCanFight(CHARACTER_LUC_Temple_Cultist3, 1);
+CharacterSetCanFight(CHARACTER_LUC_Temple_Cultist4, 1);
+CharacterSetCanFight(CHARACTER_LUC_Loic, 1);
+CharacterSetTemporaryHostileRelation(CHARACTER_LUC_Loic,_Player);
+CharacterSetTemporaryHostileRelation(CHARACTER_LUC_Temple_Cultist1,_Player);
+
+IF
+CharacterAttackedByCharacter(_Cultist, _Player)
+AND
+DB_LUC_TempleCultists(_Cultist, _, _, _, _)
+AND
+CharacterCanFight(_Cultist, 0)
+THEN
+DB_FinalLoicFightStarted(1);
+CharacterSetCanFight(CHARACTER_LUC_Temple_Cultist1, 1);
+CharacterSetCanFight(CHARACTER_LUC_Temple_Cultist2, 1);
+CharacterSetCanFight(CHARACTER_LUC_Temple_Cultist3, 1);
+CharacterSetCanFight(CHARACTER_LUC_Temple_Cultist4, 1);
+DialogRequestStopForCharacter(CHARACTER_LUC_Loic);
+CharacterSetCanFight(CHARACTER_LUC_Loic, 1);
+
+IF
+CharacterItemEvent(_,ITEM_LUC_ImmaculateLastLever, "activated")
+THEN
+ItemUnlockAndOpen(ITEM_LUC_TempleDoorEntranceStone);
+
+IF
+CharacterUsedItem(_Player, ITEM_LUC_TemplePortal)
+AND
+NOT ITEM_LUC_IV_ForestPortal.isUsed()
+THEN
+NOT DB_PlayerComments("LUC_IV_CommentForestPortal","LUC_IV_CommentForestPortal_1_1",1,1);
+NOT DB_PlayerComments("LUC_IV_CommentForestPortal","LUC_IV_CommentForestPortal_2_1",2,1);
+NOT DB_PlayerComments("LUC_IV_CommentForestPortal","LUC_IV_CommentForestPortal_2_2",2,2);
+NOT DB_PlayerComments("LUC_IV_CommentTemplePortalArrived","LUC_IV_CommentTemplePortalArrived_1_1",1,1);
+NOT DB_PlayerComments("LUC_IV_CommentTemplePortalArrived","LUC_IV_CommentTemplePortalArrived_2_1",2,1);
+NOT DB_PlayerComments("LUC_IV_CommentTemplePortalArrived","LUC_IV_CommentTemplePortalArrived_2_2",2,2);
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_IV_CommentPortalToTrial);
+DB_PlayerComment_Trigger(TRIGGER_LUC_IV_CommentPortalToTrial, "LUC_IV_CommentForestPortalArrived");
+ITEM_LUC_TemplePortal.isUsed();
+
+IF
+CharacterUsedItem(_Player, ITEM_LUC_IV_ForestPortal)
+AND
+NOT ITEM_LUC_TemplePortal.isUsed()
+THEN
+NOT DB_PlayerComments("LUC_CommentTemplePortal","LUC_CommentTemplePortal_1_1",1,1);
+NOT DB_PlayerComments("LUC_CommentTemplePortal","LUC_CommentTemplePortal_2_1",2,1);
+NOT DB_PlayerComments("LUC_CommentTemplePortal","LUC_CommentTemplePortal_2_2",2,2);
+NOT DB_PlayerComments("LUC_IV_CommentForestPortalArrived","LUC_IV_CommentForestPortalArrived",1,1);
+NOT DB_PlayerComments("LUC_IV_CommentForestPortalArrived","LUC_IV_CommentForestPortalArrived",2,1);
+NOT DB_PlayerComments("LUC_IV_CommentForestPortalArrived","LUC_IV_CommentForestPortalArrived",2,2);
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_Temple_AreaCommentPortal);
+DB_PlayerComment_Trigger(TRIGGER_LUC_Temple_AreaCommentPortal, "LUC_IV_CommentTemplePortalArrived");
+ITEM_LUC_IV_ForestPortal.isUsed();
+
+PROC
+ReactOnKillCounter("LUC_LoicCultists")
+AND
+DB_InRegion(_Player, TRIGGER_LUC_ImmaculateTempleArea)
+AND
+CharacterGetClosestPlayer(CHARACTER_LUC_Loic, _Talker)
+THEN
+QuestUpdate("LUC_Immaculates","FinishedRegular");
+QuestClose("LUC_Immaculates");
+//END_REGION
+//REGION Testing
+IF
+ TextEventSet("loicfight")
+THEN
+ CharacterSetVarFixedString(CHARACTER_LUC_Loic, "currentState", "");
+ CharacterSetVarInteger(CHARACTER_LUC_Loic,"doingInitiation",0);
+ CharacterSetVarInteger(CHARACTER_LUC_Loic,"willGetMad",1);
+ CharacterTeleportToTrigger(CHARACTER_LUC_Loic,TRIGGER_LUC_LoicPointUpstairs,"");
+//END_REGION
+//REGION Level Warning
+IF
+CharacterLeveledUp(_Player)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT 	CHARACTER_LUC_Loic.CharacterReady()
+AND
+CharacterGetLevel(_Player, _Lvl)
+AND
+_Lvl >= 13
+THEN
+CHARACTER_LUC_Loic.CharacterReady();
+GlobalSetEvent("LUC_PlayerReadyTrials");
+
+//END_REGION
+//Failsafe in case you just slaughter Loic
+IF
+CharacterDied(CHARACTER_LUC_Loic)
+THEN
+ItemUnLock(ITEM_LUC_TempleDoorEntranceStone);
+
+IF
+ItemAddedToCharacter(ITEM_LUC_ChurchCellarKey,_Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+QuestAdd("LUC_SacredStone");
+QuestUpdate("LUC_SacredStone","GotLoicKey");
+
+PROC
+ProcOneShotTriggerEntered(_,TRIGGER_LUC_AUTOSAVE_ImmaculateForest)
+AND
+NOT DB_GlobalEvent("LUC_FoundSacredStone")
+THEN
+ProcLUCGiveSacredStoneNEarbyUpdate();
+
+PROC
+ProcLUCGiveSacredStoneNEarbyUpdate()
+AND
+DB_GlobalEvent("LUC_KnowsAboutImmacVillage")
+THEN
+QuestAdd("LUC_SacredStone");
+QuestUpdate("LUC_SacredStone","PassedInitiationKnowsSacredStone");
+
+PROC
+ProcLUCGiveSacredStoneNEarbyUpdate()
+AND
+NOT DB_GlobalEvent("LUC_KnowsAboutImmacVillage")
+THEN
+QuestAdd("LUC_SacredStone");
+QuestUpdate("LUC_SacredStone","PassedInitiationDoesntKnowSacredStone");
+
+IF
+CharacterEnteredTrigger(_,TRIGGER_LUC_ImmaculateVilage)
+AND
+NOT DB_OnlyOnce("LUC_FoundSacredStone")
+THEN
+DB_OnlyOnce("LUC_FoundSacredStone");
+QuestAdd("LUC_SacredStone");
+QuestUpdate("LUC_SacredStone","FoundSacredStone");
+GlobalSetEvent("LUC_FoundSacredStone");
+
+PROC
+ProcOneShotTriggerEntered(_,TRIGGER_LUC_AUTOSAVE_ImmaculateCathedral)
+THEN
+QuestAdd("LUC_SacredStone");
+QuestUpdate("LUC_SacredStone","FoundTemple");
+
+IF
+DialogEnded("LUC_IC_MangothIntroduction",_)
+THEN
+QuestAdd("LUC_SacredStone");
+QuestUpdate("LUC_SacredStone","MetMangoth");
+
+PROC
+ProcOneShotTriggerEntered(_,TRIGGER_LUC_AUTOSAVE_ChurchInnerLibrary)
+THEN
+QuestAdd("LUC_SacredStone");
+QuestUpdate("LUC_SacredStone","OpenedHatch");
+
+IF
+DialogEnded("LUC_IV_Abbot", _)
+THEN
+DB_HadMangothSpeech(1);
+QuestAdd("LUC_SacredStone");
+QuestUpdate("LUC_SacredStone","TalkedtoMangoth");
+
+IF
+CharacterDied(CHARACTER_LUC_IC_Mangoth)
+AND
+DB_HadMangothSpeech(1)
+AND
+NOT DB_LeandraBloodTouched(1)
+THEN
+QuestAdd("LUC_SacredStone");
+QuestUpdate("LUC_SacredStone","DefeatedMangoth");
+
+IF
+ItemAddedToCharacter(ITEM_LUC_IC_LeandraBlood,_Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+DB_LeandraBloodTouched(1);
+ProcGiveLeandraBloodUpdate();
+
+PROC
+ProcGiveLeandraBloodUpdate()
+AND
+NOT DB_GlobalEvent("LUC_IcaraGaveSacredStone")
+THEN
+QuestUpdate("LUC_SacredStone","FoundBloodNoIcara");
+
+PROC
+ProcGiveLeandraBloodUpdate()
+AND
+DB_GlobalEvent("LUC_IcaraGaveSacredStone")
+THEN
+QuestUpdate("LUC_SacredStone","FoundBloodIcara");
+
+
+
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

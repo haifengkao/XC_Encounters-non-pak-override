@@ -1,0 +1,205 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Companion_Default_Dialog(CHARACTER_Jahan,"JAH_Default");
+DB_Companion_Default_Dialog(CHARACTER_Madoc,"MAD_Default");
+DB_Companion_Default_Dialog(CHARACTER_Bairdotr,"BRD_Default");
+DB_Companion_Default_Dialog(CHARACTER_Wolgraff,"CYS_Wolgraff");
+
+DB_CompanionBanter_Event(CHARACTER_Jahan,"CompanionComment_JahanReplies");
+DB_CompanionBanter_Event(CHARACTER_Madoc,"CompanionComment_MadoraReplies");
+DB_CompanionBanter_Event(CHARACTER_Bairdotr,"CompanionComment_BairdotrReplies");
+DB_CompanionBanter_Event(CHARACTER_Wolgraff,"CompanionComment_WolgraffReplies");
+DB_SpecialCompanionBanter_Event(CHARACTER_Jahan,"CompanionComment_Jahan");
+DB_SpecialCompanionBanter_Event(CHARACTER_Madoc,"CompanionComment_Madora");
+DB_SpecialCompanionBanter_Event(CHARACTER_Bairdotr,"CompanionComment_Bairdotr");
+DB_SpecialCompanionBanter_Event(CHARACTER_Wolgraff,"CompanionComment_Wolgraff");
+KBSECTION
+PROC
+Proc_LimitAbilitiesForCompanion(CHARACTER_Bairdotr)
+THEN
+CharacterUnlockAbility(CHARACTER_Bairdotr,"Blackrock");
+
+PROC
+Proc_ResetCompanions()
+THEN
+CharacterDetachFromGroup(CHARACTER_Jahan);
+CharacterMakeNPC(CHARACTER_Jahan);
+CharacterRemoveFromParty(CHARACTER_Jahan);
+CharacterTeleportToTrigger(CHARACTER_Jahan,TRIGGER_CYS_PointCecilLibrary,"");
+CharacterDetachFromGroup(CHARACTER_Madoc);
+CharacterMakeNPC(CHARACTER_Madoc);
+CharacterRemoveFromParty(CHARACTER_Madoc);
+CharacterTeleportToTrigger(CHARACTER_Madoc,TRIGGER_CYS_Point_TavernTable_02,"");
+CharacterDetachFromGroup(CHARACTER_Bairdotr);
+CharacterMakeNPC(CHARACTER_Bairdotr);
+CharacterRemoveFromParty(CHARACTER_Bairdotr);
+CharacterTeleportToTrigger(CHARACTER_Bairdotr,TRIGGER_CYS_Bairdotr_Start,"");
+CharacterDetachFromGroup(CHARACTER_Wolgraff);
+CharacterMakeNPC(CHARACTER_Wolgraff);
+CharacterRemoveFromParty(CHARACTER_Wolgraff);
+CharacterTeleportToTrigger(CHARACTER_Wolgraff,TRIGGER_CYS_Wolgraff_Start,"");
+
+PROC
+ProcShowCompanionDismissMessage((CHARACTER)_Player)
+AND
+NOT DB_Companion(_)
+THEN
+DB_ShownCompanionDismissMessage(_Player);
+OpenMessageBox(_Player,"GLO_LoneWolf_NoCompanions");
+
+
+PROC
+ProcShowCompanionDismissMessage((CHARACTER)_Player)
+AND
+DB_GlobalEvent("HallOfHeroesUnlocked")
+AND
+NOT DB_ShownCompanionDismissMessage(_Player)
+THEN
+DB_ShownCompanionDismissMessage(_Player);
+OpenMessageBox(_Player,"GLO_CompanionsLeft_HOM");
+
+IF
+DB_Companion(_Character)
+AND
+DB_UnlockedBlackRock(1)
+AND
+CharacterGetBaseAbility(_Character, "Blackrock", 0)
+THEN
+CharacterUnlockAbility(_Character, "Blackrock");
+CharacterAddAbility(_Character, "Blackrock", 1);
+
+//REGION Special Companion Banter
+IF
+DB_SpecialCompanionTrigger(_Trigger,_)
+THEN
+ProcTriggerRegisterForPlayers(_Trigger);
+
+IF
+CharacterEnteredTrigger(_Companion,_Trigger)
+AND
+DB_SpecialCompanionTrigger(_Trigger,_Dialog)
+AND
+DB_Companion(_Companion)
+AND
+NOT IgnoreCompanionDialogsAndComments(_Companion)
+AND
+QueryOnlyOnce(_Dialog)
+THEN
+Proc_SpecialCompanionBanter_SetEventForPrimaryCompanion(_Companion);
+Proc_CompanionComment(_Companion,_Dialog,_Companion);
+
+PROC
+Proc_SpecialCompanionBanter_SetEventForPrimaryCompanion((CHARACTER)_Companion)
+AND
+DB_SpecialCompanionBanter_Event(_,_Event)
+THEN
+GlobalClearEvent(_Event);
+
+PROC
+Proc_SpecialCompanionBanter_SetEventForPrimaryCompanion((CHARACTER)_Companion)
+AND
+DB_SpecialCompanionBanter_Event(_Companion,_Event)
+THEN
+GlobalSetEvent(_Event);
+//END_REGION
+
+//REGION Companion Nemeses
+PROC
+PROC_DoCompanionNemesisDialog((STRING)_Dialog, (CHARACTER)_Nemesis, (CHARACTER)_Companion)
+AND
+CharacterGetClosestAlivePlayer(_Companion, _Player)
+AND
+NOT DB_Combat(_Player, _)
+AND
+NOT _Player.DB_IsInDialog()
+THEN
+DialogStartThreeSpeakerDialog(_Dialog, _Nemesis , _Player, _Companion);
+DB_CompNemesisHandled(1);
+
+PROC
+PROC_DoCompanionNemesisDialog((STRING)_Dialog, (CHARACTER)_Nemesis, (CHARACTER)_Companion)
+AND
+NOT DB_CompNemesisHandled(1)
+AND
+CharacterGetClosestAlivePlayer(_Companion, _Player)
+AND
+CharacterGetOtherPlayer(_Player, _Other)
+AND
+NOT DB_Dead(_Other)
+AND
+NOT DB_Combat(_Other, _)
+AND
+NOT _Other.DB_IsInDialog()
+THEN
+DialogStartThreeSpeakerDialog(_Dialog, _Nemesis , _Other, _Companion);
+DB_CompNemesisHandled(1);
+
+PROC
+PROC_DoCompanionNemesisDialog((STRING)_Dialog, (CHARACTER)_Nemesis, (CHARACTER)_Companion)
+AND
+NOT DB_CompNemesisHandled(1)
+THEN
+DB_QueuedDialogNemesis(_Dialog, _Nemesis, _Companion);
+CharacterFreeze(_Companion);
+CharacterSetHasDialog(_Companion,0);	//make sure other players can't talk to him and disrupt the flow
+CharacterDisplayText(_Companion,"GEN_CompleteLeaderDialog");
+DB_FrozenCompanion(_Companion);
+
+PROC
+PROC_DoCompanionNemesisDialog((STRING)_Dialog, (CHARACTER)_Nemesis, (CHARACTER)_Companion)
+THEN
+NOT DB_CompNemesisHandled(1);
+
+IF
+DB_QueuedDialogNemesis(_Dialog, _Nemesis, _Companion)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_Companion(_Player)
+AND
+NOT DB_Dead(_Player)
+AND
+NOT DB_Combat(_Player)
+AND
+NOT _Player.DB_IsInDialog()
+THEN
+DialogStartThreeSpeakerDialog(_Dialog, _Nemesis , _Player, _Companion);
+NOT DB_QueuedDialogNemesis(_Dialog, _Nemesis, _Companion);
+
+IF
+DB_FrozenCompanion(_Companion)
+AND
+NOT DB_QueuedDialogNemesis(_, _, _Companion)
+THEN
+NOT DB_FrozenCompanion(_Companion);
+CharacterUnFreeze(_Companion);
+CharacterSetHasDialog(_Companion,1);
+//END_REGION
+
+PROC
+ProcHACKFixCompanionReputation((CHARACTER)_Char)
+AND
+CharacterGetRepAttitudeTowardsPlayer(CHARACTER_HOM_HenchmenTrader,_Char,_RepAtt)
+AND
+_RepAtt<=-75
+AND
+CharacterGetAttitudeTowardsPlayer(CHARACTER_HOM_HenchmenTrader,_Char,_Att)
+AND 
+CharacterGetReputation(_Char,_Rep)
+AND
+IntegerSubtract(-45,_Att,_RepVal)
+AND
+IntegerDivide(_RepVal,5,_RepTotalNeeded)
+AND
+IntegerSubtract(_RepTotalNeeded,_Rep,_RepAdjust)
+THEN
+//reset ourselves so we don't end up attacking everyone there 
+//this assumes the standard reputation multiplier of 5
+CharacterAddReputation(_Char,_RepAdjust);
+
+
+
+EXITSECTION
+
+ENDEXITSECTION

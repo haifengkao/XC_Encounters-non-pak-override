@@ -1,0 +1,54 @@
+INIT
+
+CHARACTER:__Me
+EXTERN INT:%int_HealingFromSurfaceStartsAtTurn=0
+EXTERN INT:%int_HealingFromSurfaceFrequency=2
+EXTERN FLOAT:%float_HealingHPThreshold=0.5
+EXTERN FLOAT:%float_AmountHealedFromSurface=0.2
+EXTERN SURFACE:%surface_HealFromWhatSurface=Fire
+FLOAT:%MySightRange
+FLOAT:%MyActionPoints
+
+//------------------------
+BEHAVIOUR
+REACTION Heal_FromDesignatedSurface, 0
+	USAGE COMBAT
+	VARS
+		FLOAT3:_ChosenSurface
+	CHECK "c1"
+		FindSurface(_ChosenSurface,__Me,0,%MySightRange,%surface_HealFromWhatSurface,1,0,0,3)
+	ACTIONS
+		CharacterMoveTo(_ChosenSurface,1,0,0,0,0)
+		Sleep(0.5)
+		CreateSurfaceAt(_ChosenSurface,None,2,4)
+		CharacterHeal(__Me,%float_AmountHealedFromSurface)
+		CharacterPlayAnimation("cast_self_cast")
+		Subtract(%MyActionPoints,3)
+		SetPriority("Heal_FromDesignatedSurface",0)
+		
+//------------------------
+EVENTS
+EVENT OnInit_GetSightAndActionPoints
+ON
+	OnInit()
+ACTIONS
+	IF "c1&c2"
+		CharacterGetStat(%MySightRange,__Me,Sight)
+		CharacterGetStat(%MyActionPoints,__Me,ActionPoints)
+	THEN
+	ENDIF
+	
+EVENT Threshold_HealFromSurface
+VARS
+	FLOAT:_MyVitality
+ON
+	OnTurn()
+ACTIONS
+	IF "c1&c2&c3&!c4"
+		CharacterGetStat(_MyVitality,__Me,Vitality)
+		IsLessThen(_MyVitality,%float_HealingHPThreshold)
+		CharacterGetStat(%MyActionPoints,__Me,ActionPoints)
+		IsLessThen(%MyActionPoints,4)
+	THEN
+		SetPriority("Heal_FromDesignatedSurface",2000)
+	ENDIF

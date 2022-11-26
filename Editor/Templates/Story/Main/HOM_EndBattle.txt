@@ -1,0 +1,255 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+CharacterSetOnStage(CHARACTER_HOM_AstralDragon,0);
+CharacterSetOnStage(CHARACTER_HOM_Astarte_SecondFight,0);
+ProcTriggerRegisterForPlayers(TRIGGER_HOM_EndFight_FinalFightStart_Box);
+CharacterSetVisible(CHARACTER_HOM_AstarteDialogHack, 0);
+CharacterSetOnStage(CHARACTER_HOM_AstarteDialogHack, 0);
+CharacterSetCanFight(CHARACTER_HOM_AstarteDialogHack, 0);
+
+
+DB_PlayerComments("HOM_Comment_GodBox","HOM_Comment_GodBox_1_1",1,1);
+DB_PlayerComments("HOM_Comment_GodBox","HOM_Comment_GodBox_2_1",2,1);
+DB_PlayerComments("HOM_Comment_GodBox","HOM_Comment_GodBox_2_2",2,2);
+DB_RepeatPlayerComment("HOM_Comment_GodBox");
+KBSECTION
+//REGION EndBattle Victory / Defeat
+IF
+CharacterDied(CHARACTER_HOM_Astarte)
+THEN
+TimerLaunch("PlayEndLoseMovie",1000);
+
+IF
+CharacterUsedItem(_Player, ITEM_HOM_GodBox)
+THEN
+Launch_PlayerComment(_Player, "HOM_Comment_GodBox");
+//END_REGION
+
+//REGION Astarte appears
+IF
+TimerFinished("HOM_EndFight_AstarteSpawns_FX1_Timer")
+THEN
+PlayEffectAtTrigger("FX_Skills_Earth_TargetedBless_Cast_A",TRIGGER_HOM_EndGame_ShrikeDest);
+
+IF
+TimerFinished("HOM_EndFight_AstarteSpawns_FX2_Timer")
+THEN
+PlayEffectAtTrigger("FX_GP_Footstep_A_Medium_Dirt", TRIGGER_HOM_EndGame_ShrikeDest);
+
+IF
+CharacterEnteredTrigger(_Player,TRIGGER_HOM_EndFight_FinalFightStart_Box)
+AND
+DB_TUT_PlayOnEasy(1)
+AND
+CharacterConsume(CHARACTER_HOM_Astarte_SecondFight, "HACK_AstarteHealthFix", _Handle)
+THEN
+DB_NOP(1);
+
+IF
+CharacterEnteredTrigger(_Player,TRIGGER_HOM_EndFight_FinalFightStart_Box)
+AND
+NOT DB_OnlyOnce("HOM_EndFight_PlayerEntersFinalFightBoxTrigger")
+THEN
+CharacterAppearAtTrigger(CHARACTER_HOM_Astarte_SecondFight,TRIGGER_HOM_EndGame_ShrikeDest,1);
+TimerLaunch("HOM_EndFight_AstarteSpawns_FX1_Timer",3000);
+TimerLaunch("HOM_EndFight_AstarteSpawns_FX2_Timer",7400);
+TimerLaunch("HOM_EndFight_AstarteSpawns_Dialogue_Timer",7700);
+DB_OnlyOnce("HOM_EndFight_PlayerEntersFinalFightBoxTrigger");
+ProcTriggerUnregisterForPlayers(TRIGGER_HOM_EndFight_FinalFightStart_Box);
+//END_REGION
+
+//REGION Prepare for EndBattle / Cutscene
+IF
+TimerFinished("HOM_EndFight_AstarteSpawns_Dialogue_Timer")
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_HOM_Astarte_SecondFight, _Player)
+THEN
+CharacterSetOnStage(CHARACTER_HOM_AstarteDialogHack, 1);
+ShroudSetInTrigger(TRIGGER_HOM_NoShroudDragonFight, 0);
+PROC_MendatoryDialogThreeSpeaker("END_AstarteBeforeEndFight", CHARACTER_HOM_AstarteDialogHack,CHARACTER_HOM_Astarte_SecondFight, _Player);
+
+IF
+DB_NoMoreQueued(CHARACTER_HOM_Astarte_SecondFight, "END_AstarteBeforeEndFight")
+THEN
+DB_QueuedDialog(CHARACTER_HOM_Astarte_SecondFight, "END_AstarteBeforeEndFight");
+NOT DB_NoMoreQueued(CHARACTER_HOM_Astarte_SecondFight, "END_AstarteBeforeEndFight");
+
+IF
+DialogEnded("END_AstarteBeforeEndFight", _)
+THEN
+CharacterMoveToTrigger(CHARACTER_HOM_Astarte_SecondFight, TRIGGER_HOM_EndFight_Astarte, 1, "");
+CharacterMakeStoryNpc(CHARACTER_HOM_AstralDragon, 0);
+NOT IsStoryNpc(CHARACTER_HOM_AstralDragon);
+CharacterSetOnStage(CHARACTER_HOM_AstarteDialogHack, 0);
+
+IF
+GlobalEventSet("HOM_SpawnVoid")
+THEN
+TimerLaunch("HOM_PlayEarthFXWhenDragonHitsRock", 2900);
+TimerLaunch("HOM_KillAstarteBeforeFight", 7000);
+CharacterMakeStoryNpc(CHARACTER_HOM_AstralDragon, 1);
+IsStoryNpc(CHARACTER_HOM_AstralDragon);
+TriggerSetAtmosphere("d8dacdaa-c9d7-4580-b15d-d9463f10dc69","Eden_Endfight");
+CharacterAppearAtTrigger(CHARACTER_HOM_AstralDragon,TRIGGER_HOM_EndFight_Dragon,1);
+//CharacterSetImmortal(CHARACTER_HOM_AstralDragon,1);
+TimerLaunch("HOM_EndFight_AstartePrepares_Timer",2100);
+CharacterLookAtItem(CHARACTER_HOM_Astarte_SecondFight,ITEM_HOM_GodBox,0);
+
+IF
+TimerFinished("HOM_PlayEarthFXWhenDragonHitsRock")
+THEN
+PlayEffectAtTrigger("FX_Creatures_Animals_Spider_Unburrow_A",TRIGGER_HOM_EndFight_DragonSpawns_EarthFX);
+//PlayEffectAtTrigger("FX_GP_CameraShake_B",TRIGGER_HOM_EndFight_DragonSpawns_EarthFX);
+
+IF
+TimerFinished("HOM_KillAstarteBeforeFight")
+THEN
+DialogRequestStopForCharacter(CHARACTER_HOM_AstarteDialogHack);
+//END_REGION
+
+//REGION End Fight - Conclusion
+IF
+CharacterDying(CHARACTER_HOM_Astarte_SecondFight)
+AND
+NOT DB_EndMovieStarted(_)
+THEN
+DB_EndMovieStarted(1);
+CharacterSetImmortal(CHARACTER_HOM_AstralDragon,1);
+
+IF
+CharacterDied(CHARACTER_HOM_Astarte_SecondFight)
+AND
+DB_EndMovieStarted(1)
+THEN
+TimerLaunch("PlayEndLoseMovie",1000);
+
+IF
+TimerFinished("PlayEndLoseMovie")
+THEN
+ProcFreezeParty();
+ProcStartMovie("EndMovieLose.bik");
+
+IF
+MovieFinished("EndMovieLose.bik")
+THEN
+ShowGameOverMenu(); 
+//Play animations for Godbox
+
+IF
+CharacterDying(CHARACTER_HOM_AstralDragon)
+AND
+NOT DB_EndMovieStarted(_)
+THEN
+DB_EndMovieStarted(2);
+CharacterSetImmortal(CHARACTER_HOM_Astarte_SecondFight,1);
+//CharacterTeleportToTrigger(CHARACTER_HOM_AstralDragon,TRIGGER_HOM_EndFight_Dragon,"");
+TriggerResetAtmosphere("d8dacdaa-c9d7-4580-b15d-d9463f10dc69");
+TimerLaunch("END_LaunchEndMovie", 5100);
+
+IF
+TimerFinished("END_LaunchEndMovie")
+THEN
+ProcStartMovie("EndMovieWin.bik");
+ProcFreezeParty();
+KillCombatFor(CHARACTER_Player1);
+KillCombatFor(CHARACTER_Player2);
+CharacterMakeStoryNpc(CHARACTER_Player1,1);
+CharacterMakeStoryNpc(CHARACTER_Player2,1);
+TimerLaunch("HOM_EndMovieStarted",200);
+//Play animations for Godbox
+QuestUpdate("HOM_Starstones", "KilledDragon");
+QuestClose("HOm_Starstones");
+
+// decreases the lag after win movie ended
+IF
+TimerFinished("HOM_EndMovieStarted")
+THEN
+CharacterSetOnStage(CHARACTER_HOM_AstralDragon, 0);
+CharacterResurrect(CHARACTER_Player1);
+CharacterResurrect(CHARACTER_Player2);
+CharacterTeleportPartyToTrigger(TRIGGER_HOM_EnfightAstarteDialogDest,"");
+CharacterTeleportToTrigger(CHARACTER_HOM_Astarte_SecondFight,TRIGGER_HOM_EndGame_ShrikeDest,"");
+CharacterFlushQueue(CHARACTER_Player1);
+CharacterFlushQueue(CHARACTER_Player2);
+
+IF
+MovieFinished("EndMovieWin.bik")
+THEN
+FadeToBlack(CHARACTER_Player2,0.5,1);
+TimerLaunch("HOM_DoAstarteFinalDialog2",600);
+
+PROC 
+ProcSetEndgameAstartePlayerFlags()
+AND
+_Player.DB_IsPlayer()
+THEN
+ProcCalculateDominantAffectionType(_Player);
+ProcCalculateAffinity();
+
+IF
+TimerFinished("HOM_DoAstarteFinalDialog2")
+AND
+NOT DB_Dead(CHARACTER_END_Icandra)
+AND
+DB_GlobalEvent("END_IcandraIsFollowing")
+THEN
+ProcSetEndgameAstartePlayerFlags();
+DialogRequestStopForCharacter(CHARACTER_HOM_Astarte_SecondFight);
+DialogRequestStopForCharacter(CHARACTER_Player1);
+DialogRequestStopForCharacter(CHARACTER_Player2);
+DialogRequestStopForCharacter(CHARACTER_HOM_Icara);
+NOT CHARACTER_HOM_Astarte_SecondFight.DB_IsInDialog();
+DialogRequestStopForCharacter(CHARACTER_END_Icandra);
+NOT CHARACTER_HOM_Icara.DB_IsInDialog();
+NOT CHARACTER_END_Icandra.DB_IsInDialog();
+NOT CHARACTER_Player1.DB_IsInDialog();
+NOT CHARACTER_Player2.DB_IsInDialog();
+CharacterSetVisible(CHARACTER_HOM_Icara, 0);
+CharacterSetOnStage(CHARACTER_HOM_Icara, 1);
+CharacterTeleportToTrigger(CHARACTER_HOM_Icara, TRIGGER_HOM_EndFight_Astarte, "");
+CharacterTeleportToTrigger(CHARACTER_END_Icandra, TRIGGER_HOM_EndFight_Astarte, "");
+GlobalSetEvent("HOM_IcandraAtEnd");
+DialogStartFourSpeakerDialog("HOM_Astarte_FinalDialog", CHARACTER_HOM_Astarte_SecondFight, CHARACTER_HOM_Icara, CHARACTER_Player1, CHARACTER_Player2);
+
+IF
+TimerFinished("HOM_DoAstarteFinalDialog2")
+AND
+DB_Dead(CHARACTER_END_Icandra)
+THEN
+DialogRequestStopForCharacter(CHARACTER_HOM_Astarte_SecondFight);
+DialogRequestStopForCharacter(CHARACTER_Player1);
+DialogRequestStopForCharacter(CHARACTER_Player2);
+NOT CHARACTER_HOM_Astarte_SecondFight.DB_IsInDialog();
+NOT CHARACTER_Player1.DB_IsInDialog();
+NOT CHARACTER_Player2.DB_IsInDialog();
+ProcSetEndgameAstartePlayerFlags();
+DialogStartThreeSpeakerDialog("HOM_Astarte_FinalDialog", CHARACTER_HOM_Astarte_SecondFight, CHARACTER_Player1, CHARACTER_Player2);
+
+IF
+TimerFinished("HOM_DoAstarteFinalDialog2")
+AND
+NOT DB_GlobalEvent("END_IcandraIsFollowing")
+THEN
+DialogRequestStopForCharacter(CHARACTER_HOM_Astarte_SecondFight);
+DialogRequestStopForCharacter(CHARACTER_Player1);
+DialogRequestStopForCharacter(CHARACTER_Player2);
+NOT CHARACTER_HOM_Astarte_SecondFight.DB_IsInDialog();
+NOT CHARACTER_Player1.DB_IsInDialog();
+NOT CHARACTER_Player2.DB_IsInDialog();
+ProcSetEndgameAstartePlayerFlags();
+DialogStartThreeSpeakerDialog("HOM_Astarte_FinalDialog", CHARACTER_HOM_Astarte_SecondFight, CHARACTER_Player1, CHARACTER_Player2);
+
+IF
+GlobalEventSet("HOM_TransformIcandraBack")
+AND
+CharacterGetPosition(CHARACTER_END_Icandra, _X, _Y, _Z)
+THEN
+PlayScaledEffectAtPosition("FX_GP_TeleportSmoke_A", 5.0, _X, _Y, _Z);
+CharacterSetVisible(CHARACTER_HOM_Icara, 1);
+CharacterSetOnStage(CHARACTER_END_Icandra, 0);
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

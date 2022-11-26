@@ -1,0 +1,76 @@
+INIT
+	ITEM:__Me
+	INT:%VoidCrystal_Loop_Handle_1
+	INT:%VoidCrystal_Loop_Handle_2
+	EXTERN INT:%Bool_ReactToShadowSummoner=0
+
+EVENTS
+EVENT OnInit_StartFXTimer
+ON
+	OnInit()
+ACTIONS
+	StartTimer("CMBHC_VoidCrystal_StartHandles_Timer",0.2,0)
+	
+EVENT OnTimer_StartFX
+ON
+	OnTimer("CMBHC_VoidCrystal_StartHandles_Timer")
+ACTIONS
+	ItemPlayLoopEffect(%VoidCrystal_Loop_Handle_1,__Me,"FX_Skills_WitchCraft_Generic_A_Prepare")
+	ItemPlayLoopEffect(%VoidCrystal_Loop_Handle_2,__Me,"FX_Skills_Air_BlitzBolt_Prepare_A")
+	
+EVENT OnDamage_Explode
+ON
+	OnDamage(_,_,_,_)
+ACTIONS
+	ExplodeAt(__Me,Projectile_EnemyDragonProjectileAir,10)
+	IterateCharactersNear(__Me,5,"Iterate_ScanFor_NearbyCharacters",Lowest,Distance)
+	
+EVENT OnCharacterEvent_Explode		//ONLY IN STORY
+VARS
+	CHARACTER:_ShadowSummoner=LUC_WitchCabin_BOMage1_9ed078dd-529c-4c50-bbd8-6d99eaf8ae5c
+ON
+	OnCharacterEvent(_ShadowSummoner,"CMBHC_LUC_ShadowSummoner_Intro_Event")
+ACTIONS	
+	ExplodeAt(__Me,Projectile_EnemyDragonProjectileAir,10)
+	IterateCharactersNear(__Me,5,"Iterate_ScanFor_NearbyCharacters",Lowest,Distance)
+		
+EVENT OnCharacterEvent_Explode_Die	//ONLY DURING BOSSFIGHT
+VARS
+	CHARACTER:_ShadowSummoner="LUC_WitchCabin_BOMage1_9ed078dd-529c-4c50-bbd8-6d99eaf8ae5c"
+ON
+	OnCharacterEvent(_ShadowSummoner,"CMBHC_LUC_ShadowSummoner_Event")
+ACTIONS
+	IF "c1"
+		IsEqual(%Bool_ReactToShadowSummoner,1)
+	THEN
+		ExplodeAt(__Me,Projectile_EnemyDragonProjectileAir,10)
+		IterateCharactersNear(__Me,5,"Iterate_ScanFor_NearbyCharacters",Lowest,Distance)
+		ItemDie(__Me)
+	ENDIF
+
+EVENT OnIterate_ScanForNearbyCharacters
+VARS
+	CHARACTER:_DetectedCharNearCrystal
+ON
+	OnIterateCharacter(_DetectedCharNearCrystal,"Iterate_ScanFor_NearbyCharacters")
+ACTIONS
+	IF "!c1"
+		CharacterIsDead(_DetectedCharNearCrystal)
+	THEN
+		CharacterApplyStatus(_DetectedCharNearCrystal,STUNNED,1)
+		Set(_DetectedCharNearCrystal,null)	
+	ENDIF
+
+EVENT OnItemDestroyed_DestroyAllItems
+ON
+	OnItemDestroyed(__Me)
+ACTIONS
+	StopLoopEffect(%VoidCrystal_Loop_Handle_1)
+	StopLoopEffect(%VoidCrystal_Loop_Handle_2)
+	
+EVENT OnDeactivate_StopLoopFX
+ON
+	OnDeactivate()
+ACTIONS
+	StopLoopEffect(%VoidCrystal_Loop_Handle_1)
+	StopLoopEffect(%VoidCrystal_Loop_Handle_2)

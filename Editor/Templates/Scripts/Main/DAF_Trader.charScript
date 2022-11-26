@@ -1,0 +1,28 @@
+INIT
+CHARACTER:__Me
+EXTERN FIXEDSTRING:%String1 = null
+EXTERN FIXEDSTRING:%String2 = null
+EXTERN FIXEDSTRING:%String3 = null
+FIXEDSTRING:%String
+CHARACTER:%Player
+
+BEHAVIOUR
+REACTION Main, 500
+USAGE PEACE
+ACTIONS
+	IF "c1"
+		GetClosestPlayer(%Player)
+	THEN
+		CharacterLookAt(%Player)
+		GetRandom(%String,%String1,%String2,%String3)
+		DisplayText(__Me,%String)
+		Sleep(0.5)
+	ENDIF
+	Sleep(15)
+
+EVENTS
+EVENT OnCharacterEvent_StopTryingToSellMerchandise
+ON
+	OnCharacterEvent(DAF_Leonard_3e60eaa9-a33f-4b53-b8f7-81bc93672dd9,"DAF_LeonardCallGrutilda")
+ACTIONS
+	SetPriority("Main",0)

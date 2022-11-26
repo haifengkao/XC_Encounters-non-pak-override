@@ -1,0 +1,674 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_ZappedCounter(0);
+KBSECTION
+//REGION Character killcounter
+PROC
+CheckCounter((INTEGER)_Count,(STRING)_CounterDB)
+AND
+KillCounterCounts(_CounterDB,_OldCount)
+THEN
+NOT KillCounterCounts(_CounterDB,_OldCount);
+KillCounterCounts(_CounterDB,_Count);
+
+PROC
+ClearCounterDB((STRING)_CounterDB)
+AND
+KillCounterDB(_Character,_CounterDB)
+THEN
+NOT KillCounterDB(_Character,_CounterDB);
+
+PROC
+ClearCounterDB((STRING)_CounterDB)
+AND
+KillCounterTestDB(_Char,_CounterDB)
+THEN
+NOT KillCounterTestDB(_Char,_CounterDB);
+
+PROC
+CheckCounter(_Count,_CounterDB)
+AND
+KillCounter((STRING)_CounterDB,(INTEGER)_TargetCount)
+AND
+_Count == _TargetCount 
+THEN
+NOT KillCounter(_CounterDB,_TargetCount);
+ClearCounterDB(_CounterDB);
+KillCounterReached(_CounterDB);
+NOT KillCounterCounterDefined(_CounterDB);
+NOT KillCounterCounts(_CounterDB,_TargetCount);
+
+PROC
+CheckCounter(_Count, _CounterDB)
+AND
+KillCounter((STRING)_CounterDB,(INTEGER)_TargetCount)
+AND
+IntegerSubtract(_TargetCount, 1, _New)
+AND
+_Count == _New
+AND
+KillCounterDB(_LastCharacter, _CounterDB)
+THEN
+LastManStandingDB((CHARACTER)_LastCharacter, (STRING)_CounterDB);
+
+IF
+CharacterDying(_Character)
+AND
+KillCounterDB(_Character,_CounterDB)
+AND
+DB_Combat(_Character,_ID)
+THEN
+ProcSetCounterCombatID(_CounterDB,_ID);
+ProcCheckCounterCombatOver(_CounterDB,_ID);
+
+PROC
+ProcClearCounterCombatID((STRING)_Counter)
+AND
+DB_CounterCombatID(_Counter,_OldID)
+THEN
+NOT DB_CounterCombatID(_Counter,_OldID);
+PROC
+ProcSetCounterCombatID((STRING)_Counter,(INTEGER)_ID)
+THEN
+ProcClearCounterCombatID(_Counter);
+DB_CounterCombatID(_Counter,_ID);
+
+IF
+CharacterEnteredCombat(_Char, _ID)
+AND
+KillCounterDB(_Char, _Counter)
+THEN
+ProcClearCounterCombatID(_Counter);
+
+IF
+CharacterEnteredCombat(_LastMan, _ID)
+AND
+KillCounterDB(_LastMan, _Counter)
+AND
+KillCounter(_Counter,1)
+THEN
+LastManStandingDB((CHARACTER)_LastMan, (STRING)_Counter);
+
+IF
+CharacterKilledByCharacter(_LastMan, _Killer)
+AND
+LastManStandingDB(_LastMan, _CounterDB)
+THEN
+NOT LastManStandingDB(_LastMan, _CounterDB);
+LastManInCombatKilledBy((CHARACTER)_Killer, (STRING)_CounterDB);
+
+IF
+CharacterDied(_Character)
+AND
+KillCounterDB(_Character,_CounterDB)
+AND
+KillCounterCounts(_CounterDB,_Count)
+AND
+IntegerSum(_Count,1,_NewCount)
+THEN
+NOT KillCounterDB(_Character,_CounterDB);
+KillCounterTestDB(_Character,_CounterDB);
+CheckCounter(_NewCount,_CounterDB);
+
+IF
+CharacterResurrected(_Character)
+AND
+KillCounterTestDB(_Character,_CounterDB)
+AND
+KillCounterCounts(_CounterDB,_Count)
+AND
+IntegerSubtract(_Count,1,_NewCount)
+THEN
+KillCounterDB(_Character,_CounterDB);
+NOT KillCounterTestDB(_Character,_CounterDB);
+CheckCounter(_NewCount,_CounterDB);
+
+IF
+KillCounterDB(_Character,_CounterDB)
+AND
+NOT KillCounterCounterDefined(_CounterDB)
+THEN
+KillCounterCounts(_CounterDB,0);
+KillCounterCounterDefined(_CounterDB);
+
+IF
+CharacterLeftCombat(_Player, _CombatID)
+AND
+_Player.DB_IsPlayer()
+AND
+CombatGetNumberOfInvolvedPartyMembers(_CombatID, 0)
+AND
+DB_CounterCombatID(_CounterDB,_CombatID)
+THEN
+KillCounterCombatOver(_CombatID, _CounterDB);
+
+IF
+DB_Combat(_Char, _CombatID)
+AND
+KillCounterDB(_Char,_CounterDB)
+THEN
+ProcClearCombatOverDB(_CounterDB);
+
+PROC
+ProcClearCombatOverDB((STRING)_CounterDB)
+AND
+KillCounterCombatOver(_OldCombatID, _CounterDB)
+THEN
+NOT KillCounterCombatOver(_OldCombatID, _CounterDB);
+
+//killed people outside of combat
+IF
+KillCounterReached((STRING)_CounterDB)
+AND
+NOT DB_CounterCombatID(_CounterDB,_)
+THEN
+ReactOnKillCounter(_CounterDB);
+NOT KillCounterReached(_CounterDB);
+
+IF
+KillCounterReached((STRING)_CounterDB)
+AND
+KillCounterCombatOver(_CombatID, _CounterDB)
+THEN
+ReactOnKillCounter(_CounterDB);
+NOT KillCounterCombatOver(_CombatID, _CounterDB);
+NOT KillCounterReached(_CounterDB);
+
+//Wasn't involved in combat
+PROC
+ProcCheckCounterCombatOver((STRING)_CounterDB,(INTEGER)_CombatID)
+THEN
+NOT KillCounterCombatOver(_CombatID, _CounterDB);
+
+PROC
+ProcCheckCounterCombatOver((STRING)_CounterDB,(INTEGER)_CombatID)
+AND
+CombatGetNumberOfInvolvedPartyMembers(_CombatID, 0)
+THEN
+KillCounterCombatOver(_CombatID, _CounterDB);
+//END_REGION
+
+//REGION Item Destroy Counter
+PROC
+CheckItemCounter((INTEGER)_Count,(STRING)_CounterDB)
+AND
+ItemDestroyCounterCounts(_CounterDB,_OldCount)
+THEN
+NOT ItemDestroyCounterCounts(_CounterDB,_OldCount);
+ItemDestroyCounterCounts(_CounterDB,_Count);
+
+PROC
+ClearItemDestroyCounterDB((STRING)_CounterDB)
+AND
+ItemDestroyCounterDB(_Item,_CounterDB)
+THEN
+NOT ItemDestroyCounterDB(_Item,_CounterDB);
+
+PROC
+CheckItemCounter(_Count,_CounterDB)
+AND
+ItemDestroyCounter((STRING)_CounterDB,(INTEGER)_TargetCount)
+AND
+_Count == _TargetCount 
+THEN
+NOT ItemDestroyCounter(_CounterDB,_TargetCount);
+ClearItemDestroyCounterDB(_CounterDB);
+NOT ItemDestroyCounterCounterDefined(_CounterDB);
+NOT ItemDestroyCounter(_CounterDB,_TargetCount);
+
+IF
+ItemDestroyed(_Item)
+AND
+ItemDestroyCounterDB(_Item,_CounterDB)
+AND
+ItemDestroyCounterCounts(_CounterDB,_Count)
+AND
+IntegerSum(_Count,1,_NewCount)
+THEN
+NOT ItemDestroyCounterDB(_Item,_CounterDB);
+CheckItemCounter(_NewCount,_CounterDB);
+
+IF
+ItemDestroyCounterDB(_Item,_CounterDB)
+AND
+NOT ItemDestroyCounterCounterDefined(_CounterDB)
+THEN
+ItemDestroyCounterCounts(_CounterDB,0);
+ItemDestroyCounterCounterDefined(_CounterDB);
+//END_REGION
+
+//REGION Comment for hidden effect
+PROC
+PROC_CommentHiddenEffect((CHARACTER)_Player)
+AND
+Random(4,_Line)
+THEN
+PROC_LaunchHiddenComment(_Player, _Line);
+
+PROC
+PROC_LaunchHiddenComment((CHARACTER)_Player, (INTEGER)_Line)
+AND
+_Line == 0
+THEN
+CharacterDisplayText(_Player, "GLO_ActivatedSwitch1");
+
+PROC
+PROC_LaunchHiddenComment((CHARACTER)_Player, (INTEGER)_Line)
+AND
+_Line == 1
+THEN
+CharacterDisplayText(_Player, "GLO_ActivatedSwitch2");
+
+PROC
+PROC_LaunchHiddenComment((CHARACTER)_Player, (INTEGER)_Line)
+AND
+_Line == 2
+THEN
+CharacterDisplayText(_Player, "GLO_ActivatedSwitch3");
+
+PROC
+PROC_LaunchHiddenComment((CHARACTER)_Player, (INTEGER)_Line)
+AND
+_Line == 3
+THEN
+CharacterDisplayText(_Player, "GLO_ActivatedSwitch4");
+//END_REGION
+
+//REGION SneakTrigger
+IF
+SneakTriggerSpotter((TRIGGER)_Trigger, (CHARACTER)_Char)
+THEN
+CharacterSetVarTrigger(_Char, "SpottedTrigger", _Trigger);
+ProcTriggerRegisterForPlayers(_Trigger);
+
+PROC
+ProcHandleSneakSpotted((CHARACTER)_Char)
+THEN
+NOP(1);
+
+IF
+CharacterEvent(_Char, "GLO_SpotterSneaker")
+AND
+SneakTriggerSpotter((TRIGGER)_Trigger, (CHARACTER)_Char)
+AND
+CharacterGetVarCharacter(_Char, "SpottedDude", _Player)
+THEN
+ProcCharInTriggerSpotted(_Player,_Trigger);
+ProcCharInTriggerSpottedByChar(_Player,_Trigger,_Char);
+ProcHandleSneakSpotted(_Char);
+ProcCleanUpSneakTrigger(_Trigger);
+
+PROC
+ProcCharInTriggerSpottedByChar((CHARACTER)_Player,(TRIGGER)_Trigger,(CHARACTER)_Spotter)
+THEN
+NOP(1);
+
+PROC
+ProcCleanUpSneakTrigger((TRIGGER)_Trigger)
+AND
+SneakTriggerSpotter((TRIGGER)_Trigger, (CHARACTER)_Char)
+THEN
+CharacterSetVarInteger(_Char, "SpottedCounter", 1);
+NOT SneakTriggerSpotter(_Trigger, _Char);
+
+PROC
+ProcTriggerUnregisterForPlayers((TRIGGER)_Trigger)
+AND
+SneakTriggerSpotter((TRIGGER)_Trigger, (CHARACTER)_Char)
+THEN
+NOT SneakTriggerSpotter((TRIGGER)_Trigger, (CHARACTER)_Char);
+//END_REGION
+
+//REGION AmbushTrigger
+IF
+AmbushTrigger((TRIGGER)_Trigger, (ITEM)_Helper)
+THEN
+ProcTriggerRegisterForPlayers(_Trigger);
+ItemSetOnstage(_Helper, 1);
+
+IF
+CharacterEnteredTrigger(_Player,_Trigger)
+AND
+AmbushTrigger(_Trigger, _)
+AND
+CharacterHasStatus(_Player, "INVISIBLE", 0)
+AND
+CharacterHasStatus(_Player, "SNEAKING", 0)
+THEN
+ProcLaunchAmbush(_Trigger, _Player);
+
+IF
+CharacterStatusRemoved(_Player, "INVISIBLE")
+AND
+DB_InRegion(_Player, _Trigger)
+AND
+AmbushTrigger(_Trigger, _)
+THEN
+ProcLaunchAmbush(_Trigger, _Player);
+
+IF
+CharacterStatusRemoved(_Player, "SNEAKING")
+AND
+DB_InRegion(_Player, _Trigger)
+AND
+AmbushTrigger(_Trigger, _Helper)
+THEN
+ProcLaunchAmbush(_Trigger, _Player);
+
+PROC
+ProcLaunchAmbush((TRIGGER)_Trigger, (CHARACTER)_Player)
+AND
+AmbushTrigger(_Trigger, _Helper)
+THEN
+ProcTriggerUnregisterForPlayers(_Trigger);
+NOT AmbushTrigger(_Trigger, _Helper);
+ItemSetOnstage(_Helper, 0);
+//END_REGION
+
+//REGION Queuing Dialog
+PROC
+PROC_MendatoryDialog((STRING)_Dialog,(CHARACTER)_Npc,(CHARACTER)_Player)
+AND
+_Npc.DB_IsInDialog()
+THEN
+_Npc.dialogHandled();
+DB_QueuedDialog(_Npc,_Dialog);
+
+PROC
+PROC_MendatoryDialog((STRING)_Dialog,(CHARACTER)_Npc,(CHARACTER)_Player)
+AND
+NOT _Player.DB_IsInDialog()
+AND
+NOT _Npc.dialogHandled()
+THEN
+_Npc.dialogHandled();
+ProcDoTwoSpeakerDialog(_Dialog,_Npc,_Player);
+
+PROC
+PROC_MendatoryDialog((STRING)_Dialog, (CHARACTER)_Npc, (CHARACTER)_Player)
+AND
+_Player.DB_IsInDialog()
+AND
+_Other.DB_IsPlayer()
+AND
+NOT DB_Companion(_Other)
+AND
+_Player!=_Other
+AND
+NOT DB_Dead(_Other)
+AND
+NOT _Other.DB_IsInDialog()
+AND
+NOT _Npc.dialogHandled()
+THEN
+_Npc.dialogHandled();
+ProcDoTwoSpeakerDialog(_Dialog,_Npc,_Other);
+
+PROC
+PROC_MendatoryDialog((STRING)_Dialog, (CHARACTER)_Npc, (CHARACTER)_Player)
+AND
+NOT _Npc.dialogHandled()
+THEN
+DB_QueuedDialog(_Npc,_Dialog);
+
+PROC
+PROC_MendatoryDialog((STRING)_Dialog, (CHARACTER)_Npc, (CHARACTER)_Player)
+THEN
+NOT _Npc.dialogHandled();
+
+IF
+DB_QueuedDialog(_Npc,_Dialog)
+AND
+NOT _Npc.DB_IsInDialog()
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_Companion(_Player)
+AND
+NOT DB_Dead(_Player)
+AND
+NOT _Player.DB_IsInDialog()
+THEN
+PROC_LaunchMandatoryTwoSpeaker(_Npc,_Dialog, _Player);
+
+PROC
+PROC_LaunchMandatoryTwoSpeaker((CHARACTER)_Npc,(STRING)_Dialog, (CHARACTER)_Player)
+AND
+NOT _Npc.DB_IsInDialog()
+THEN
+NOT DB_QueuedDialog(_Npc,_Dialog);
+ProcDoTwoSpeakerDialog(_Dialog,_Npc,_Player);
+
+IF
+CharacterAttackedByCharacter(_Npc,_)
+AND
+DB_QueuedDialog(_Npc,_Dialog)
+THEN
+NOT DB_QueuedDialog(_Npc,_Dialog);
+DB_NoMoreQueued(_Npc, _Dialog);
+
+QRY
+QuerCheckIfNpcInDialog((CHARACTER)_Npc, (CHARACTER)_Npc2)
+AND
+_Npc.DB_IsInDialog()
+THEN
+DB_NOP(1);
+
+QRY
+QuerCheckIfNpcInDialog((CHARACTER)_Npc, (CHARACTER)_Npc2)
+AND
+_Npc2.DB_IsInDialog()
+THEN
+DB_NOP(1);
+
+PROC
+PROC_MendatoryDialogThreeSpeaker((STRING)_Dialog,(CHARACTER)_Npc,(CHARACTER)_Npc2,(CHARACTER)_Player)
+AND
+QuerCheckIfNpcInDialog(_Npc, _Npc2)
+THEN
+_Npc.dialogHandled();
+DB_QueuedDialogThreeSpeaker(_Npc,_Npc2,_Dialog);
+
+PROC
+PROC_MendatoryDialogThreeSpeaker((STRING)_Dialog,(CHARACTER)_Npc,(CHARACTER)_Npc2,(CHARACTER)_Player)
+AND
+NOT _Player.DB_IsInDialog()
+AND
+NOT _Npc.dialogHandled()
+THEN
+_Npc.dialogHandled();
+ProcDoThreeSpeakerDialog(_Dialog,_Npc,_Npc2,_Player);
+
+PROC
+PROC_MendatoryDialogThreeSpeaker((STRING)_Dialog,(CHARACTER)_Npc,(CHARACTER)_Npc2,(CHARACTER)_Player)
+AND
+_Player.DB_IsInDialog()
+AND
+_Other.DB_IsPlayer()
+AND
+NOT DB_Companion(_Other)
+AND
+_Player!=_Other
+AND
+NOT DB_Dead(_Other)
+AND
+NOT _Other.DB_IsInDialog()
+AND
+NOT _Npc.dialogHandled()
+THEN
+_Npc.dialogHandled();
+ProcDoThreeSpeakerDialog(_Dialog,_Npc,_Npc2,_Other);
+
+PROC
+PROC_MendatoryDialogThreeSpeaker((STRING)_Dialog,(CHARACTER)_Npc,(CHARACTER)_Npc2,(CHARACTER)_Player)
+AND
+NOT _Npc.dialogHandled()
+THEN
+DB_QueuedDialogThreeSpeaker(_Npc,_Npc2,_Dialog);
+
+PROC
+PROC_MendatoryDialogThreeSpeaker((STRING)_Dialog,(CHARACTER)_Npc,(CHARACTER)_Npc2,(CHARACTER)_Player)
+THEN
+NOT _Npc.dialogHandled();
+
+IF
+DB_QueuedDialogThreeSpeaker(_Npc,_Npc2,_Dialog)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT _Npc.DB_IsInDialog()
+AND
+NOT _Npc2.DB_IsInDialog()
+AND
+NOT DB_Companion(_Player)
+AND
+NOT DB_Dead(_Player)
+AND
+NOT _Player.DB_IsInDialog()
+THEN
+PROC_LaunchMandatoryThreeSpeaker(_Npc, _Npc2, _Dialog, _Player);
+
+PROC
+PROC_LaunchMandatoryThreeSpeaker((CHARACTER)_Npc, (CHARACTER)_Npc2,(STRING)_Dialog, (CHARACTER)_Player)
+AND
+NOT _Npc.DB_IsInDialog()
+AND
+NOT _Npc2.DB_IsInDialog()
+THEN
+NOT DB_QueuedDialogThreeSpeaker(_Npc,_Npc2,_Dialog);
+ProcDoThreeSpeakerDialog(_Dialog,_Npc,_Npc2,_Player);
+
+IF
+CharacterAttackedByCharacter(_Npc,_)
+AND
+DB_QueuedDialogThreeSpeaker(_Npc,_Npc2,_Dialog)
+THEN
+NOT DB_QueuedDialogThreeSpeaker(_Npc,_Npc2,_Dialog);
+DB_NoMoreQueuedThreeSpeaker(_Npc,_Npc2,_Dialog);
+
+IF
+CharacterAttackedByCharacter(_Npc2,_)
+AND
+DB_QueuedDialogThreeSpeaker(_Npc,_Npc2,_Dialog)
+THEN
+NOT DB_QueuedDialogThreeSpeaker(_Npc,_Npc2,_Dialog);
+DB_NoMoreQueuedThreeSpeaker(_Npc,_Npc2,_Dialog);
+
+QRY
+QuerCheckIfNpcItemInDialog((CHARACTER)_Npc, (ITEM)_Item)
+AND
+_Npc.DB_IsInDialog()
+THEN
+DB_NOP(1);
+
+QRY
+QuerCheckIfNpcItemInDialog((CHARACTER)_Npc, (ITEM)_Item)
+AND
+_Item.DB_IsInItemDialog()
+THEN
+DB_NOP(1);
+
+PROC
+PROC_MendatoryItemDialogThreeSpeaker((STRING)_Dialog,(CHARACTER)_Npc,(ITEM)_Item,(CHARACTER)_Player)
+AND
+QuerCheckIfNpcItemInDialog(_Npc, _Item)
+THEN
+_Npc.dialogHandled();
+DB_QueuedItemDialogThreeSpeaker(_Npc,_Item,_Dialog);
+
+PROC
+PROC_MendatoryItemDialogThreeSpeaker((STRING)_Dialog,(CHARACTER)_Npc,(ITEM)_Item,(CHARACTER)_Player)
+AND
+NOT _Player.DB_IsInDialog()
+AND
+NOT _Npc.dialogHandled()
+THEN
+_Npc.dialogHandled();
+ProcDoThreeSpeakerItemDialog(_Dialog,_Npc,_Player, _Item);
+
+PROC
+PROC_MendatoryItemDialogThreeSpeaker((STRING)_Dialog,(CHARACTER)_Npc,(ITEM)_Item,(CHARACTER)_Player)
+AND
+_Player.DB_IsInDialog()
+AND
+_Other.DB_IsPlayer()
+AND
+NOT DB_Companion(_Other)
+AND
+_Player!=_Other
+AND
+NOT DB_Dead(_Other)
+AND
+NOT _Other.DB_IsInDialog()
+AND
+NOT _Npc.dialogHandled()
+THEN
+_Npc.dialogHandled();
+ProcDoThreeSpeakerItemDialog(_Dialog,_Npc,_Other, _Item);
+
+PROC
+PROC_MendatoryItemDialogThreeSpeaker((STRING)_Dialog,(CHARACTER)_Npc,(ITEM)_Item,(CHARACTER)_Player)
+AND
+NOT _Npc.dialogHandled()
+THEN
+DB_QueuedItemDialogThreeSpeaker(_Npc,_Item,_Dialog);
+
+PROC
+PROC_MendatoryItemDialogThreeSpeaker((STRING)_Dialog,(CHARACTER)_Npc,(ITEM)_Item,(CHARACTER)_Player)
+THEN
+NOT _Npc.dialogHandled();
+
+IF
+DB_QueuedItemDialogThreeSpeaker(_Npc,_Item,_Dialog)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT _Npc.DB_IsInDialog()
+AND
+NOT _Item.DB_IsInItemDialog()
+AND
+NOT DB_Companion(_Player)
+AND
+NOT DB_Dead(_Player)
+AND
+NOT _Player.DB_IsInDialog()
+THEN
+PROC_LaunchMandatoryItemThreeSpeaker(_Npc, _Item, _Dialog, _Player);
+
+PROC
+PROC_LaunchMandatoryItemThreeSpeaker((CHARACTER)_Npc, (ITEM)_Item,(STRING)_Dialog, (CHARACTER)_Player)
+AND
+NOT _Npc.DB_IsInDialog()
+AND
+NOT _Item.DB_IsInItemDialog()
+THEN
+NOT DB_QueuedItemDialogThreeSpeaker(_Npc,_Item,_Dialog);
+ProcDoThreeSpeakerItemDialog(_Dialog,_Npc,_Player,_Item);
+
+IF
+CharacterAttackedByCharacter(_Npc,_)
+AND
+DB_QueuedItemDialogThreeSpeaker(_Npc,_Item,_Dialog)
+THEN
+NOT DB_QueuedItemDialogThreeSpeaker(_Npc,_Item,_Dialog);
+DB_NoMoreQueuedItemThreeSpeaker(_Npc,_Item,_Dialog);
+//END_REGION
+
+//REGION Quest Reward
+PROC
+ProcRewardQuestMedium((TRIGGER)_Trigger)
+THEN
+ItemCreateAtTrigger(_Trigger, "Quest_Reward_Small_94e12298-5e59-405a-9e93-95833e648ce2");
+PlayEffectAtTrigger("FX_GP_TeleportSmoke_A", _Trigger);
+
+PROC
+ProcRewardQuestBig((TRIGGER)_Trigger)
+THEN
+ItemCreateAtTrigger(_Trigger, "Quest_Reward_Big_b67596ec-18ca-4790-9273-8af23d8a7a43");
+PlayEffectAtTrigger("FX_GP_TeleportSmoke_A", _Trigger);
+//END_REGION
+
+EXITSECTION
+
+ENDEXITSECTION

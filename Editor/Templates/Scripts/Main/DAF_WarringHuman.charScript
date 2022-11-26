@@ -1,0 +1,210 @@
+INIT
+CHARACTER:__Me
+CHARACTER:%Orc1 = DAF_DreadOrc_Grutilda_1dc39f46-452a-43fc-a1b1-fa4875efe738
+CHARACTER:%Orc2 = DAF_DreadOrc_Male1_1a08d600-07df-465f-8ed5-2003c3ab695e
+CHARACTER:%Orc3 = DAF_DreadOrc_Male2_91d7c82b-4640-4e74-8737-8ea6fe07043b
+CHARACTER:%Orc4 = DAF_DreadOrc_Male3_d21423c2-013d-42a3-8200-3e99c5d920de
+CHARACTER:%Orc5 = DAF_DreadOrc_Male4_ef8d3788-911e-4d17-962e-d0937dd04087
+CHARACTER:%Orc6 = DAF_DreadOrc_Male5_9a606742-8829-47cd-9d1d-176443fa0e80
+CHARACTER:%Orc7 = DAF_DreadOrc_Male6_0c0b1722-cc08-4431-94dd-ae4cf75936a5
+CHARACTER:%Orc8 = DAF_BO_George_cdae11a3-20de-4665-8ee3-82a3684f2035
+CHARACTER:%Orc9 = DAF_BO_ArmoryKeyOrc_c0a1c621-96ac-4809-ad2c-fade4e57e5d2
+CHARACTER:%Orc10 = DAF_Campfire_Orc_286d39de-bdbc-49ca-bcb0-13fd9448a34a
+CHARACTER:%Orc11 = DAF_BO_Excecutioner_b60ca8fd-6450-45d4-83b6-c356b8e8e0ef
+CHARACTER:%Orc12 = DAF_BO_OrcTrader_7d0dc69d-afbe-4d9d-aa40-2ae92ce18255
+CHARACTER:%Orc13 = DAF_OrcPoet_47192833-80ab-4e61-a5be-36262ce9c5a1
+CHARACTER:%Orc14 = DAF_Orc_Male_A_000_56368a93-128c-4e32-bf31-e6796656161b
+CHARACTER:%Orc15 = DAF_Orc_Lover_98ea953c-df1e-4a8a-b85e-25e047ffe7c1
+CHARACTER:%Orc16 = DAF_Orc_ZandalorHouse1_2ffb3bab-017c-4b28-afb9-b4e8e8e2ca4c
+CHARACTER:%Orc17 = DAF_Orc_ZandalorHouse2_bdf166c6-0660-43f2-a51e-6438084bead5
+CHARACTER:%Orc18 = DAF_EquipmentTrader_10f21a9c-5b46-4aa3-b86e-f451f4f47af2
+CHARACTER:%Orc19 = DAF_MagicTrader_b2ab1a41-a81c-43ce-94b7-89bcf9394f29
+CHARACTER:%Orc20 = DAF_Ratcatcher_7bf6bfca-c0d6-4f65-92a6-595290dcc8ce
+CHARACTER:%Orc21 = DAF_Knight_Guard1_bad9a5ac-aeb9-4eb4-9d57-f4f0f528bf3d
+CHARACTER:%Orc22 = DAF_Knight_Guard2_42c36fc1-e7c1-4d1b-987e-ba8d4193a81e
+CHARACTER:%Orc23 = DAF_Knight_Guard3_0bbd84e7-4ac1-434d-9e35-2436b3add458
+CHARACTER:%Orc24 = DAF_Knight_Guard4_b4c09c5c-0601-48d7-8938-fd4c572d7001
+CHARACTER:%Orc25 = DAF_Knight_Guard5_dd229c0b-711d-482e-a579-21235af9fad0
+
+BEHAVIOUR
+
+REACTION NearlyAtWar, 0
+VARS
+	FLOAT:_dist
+USAGE PEACE
+ACTIONS
+	Sleep(3)
+		
+REACTION SearchAndDestroy, 0
+USAGE PEACE
+VARS
+	CHARACTER:_OrcToHunt1
+	CHARACTER:_OrcToHunt2
+	CHARACTER:_OrcToHunt3
+	CHARACTER:_OrcToHunt4
+	CHARACTER:_OrcToHunt
+ACTIONS
+	GetRandom(_OrcToHunt1,%Orc1,%Orc2,%Orc3,%Orc4,%Orc5,%Orc6,%Orc7)
+	GetRandom(_OrcToHunt2,%Orc8,%Orc9,%Orc10,%Orc11,%Orc12,%Orc13,%Orc14)
+	GetRandom(_OrcToHunt3,%Orc15,%Orc16,%Orc17,%Orc18,%Orc19,%Orc20,%Orc21)
+	GetRandom(_OrcToHunt4,%Orc22,%Orc23,%Orc24,%Orc25)
+	GetRandom(_OrcToHunt,_OrcToHunt1,_OrcToHunt2,_OrcToHunt3,_OrcToHunt4)
+	IF "!c1"
+		CharacterIsDead(_OrcToHunt)
+	THEN
+		CharacterMoveTo(_OrcToHunt,1,0,1)
+	ENDIF
+	IF "!c1"
+		CharacterIsDead(_OrcToHunt1)
+	THEN
+		CharacterMoveTo(_OrcToHunt1,1,0,1)
+	ENDIF
+	IF "!c1"
+		CharacterIsDead(_OrcToHunt2)
+	THEN
+		CharacterMoveTo(_OrcToHunt2,1,0,1)
+	ENDIF
+	IF "!c1"
+		CharacterIsDead(_OrcToHunt3)
+	THEN
+		CharacterMoveTo(_OrcToHunt3,1,0,1)
+	ENDIF
+	IF "!c1"
+		CharacterIsDead(%Orc1)
+	THEN
+		CharacterMoveTo(%Orc1,1,0,1)
+	ENDIF
+	IF "!c1"
+		CharacterIsDead(%Orc2)
+	THEN
+		CharacterMoveTo(%Orc2,1,0,1)
+	ENDIF
+	IF "!c1"
+		CharacterIsDead(%Orc3)
+	THEN
+		CharacterMoveTo(%Orc3,1,0,1)
+	ENDIF
+	IF "!c1"
+		CharacterIsDead(%Orc4)
+	THEN
+		CharacterMoveTo(%Orc4,1,0,1)
+	ENDIF
+	IF "!c1"
+		CharacterIsDead(%Orc5)
+	THEN
+		CharacterMoveTo(%Orc5,1,0,1)
+	ENDIF
+	IF "!c1"
+		CharacterIsDead(%Orc6)
+	THEN
+		CharacterMoveTo(%Orc6,1,0,1)
+	ENDIF
+	IF "!c1"
+		CharacterIsDead(%Orc7)
+	THEN
+		CharacterMoveTo(%Orc7,1,0,1)
+	ENDIF
+	IF "!c1"
+		CharacterIsDead(%Orc8)
+	THEN
+		CharacterMoveTo(%Orc8,1,0,1)
+	ENDIF
+	IF "!c1"
+		CharacterIsDead(%Orc9)
+	THEN
+		CharacterMoveTo(%Orc9,1,0,1)
+	ENDIF
+	IF "!c1"
+		CharacterIsDead(%Orc10)
+	THEN
+		CharacterMoveTo(%Orc10,1,0,1)
+	ENDIF
+	IF "!c1"
+		CharacterIsDead(%Orc11)
+	THEN
+		CharacterMoveTo(%Orc11,1,0,1)
+	ENDIF
+	IF "!c1"
+		CharacterIsDead(%Orc12)
+	THEN
+		CharacterMoveTo(%Orc12,1,0,1)
+	ENDIF
+	IF "!c1"
+		CharacterIsDead(%Orc13)
+	THEN
+		CharacterMoveTo(%Orc13,1,0,1)
+	ENDIF
+	IF "!c1"
+		CharacterIsDead(%Orc14)
+	THEN
+		CharacterMoveTo(%Orc14,1,0,1)
+	ENDIF
+	IF "!c1"
+		CharacterIsDead(%Orc15)
+	THEN
+		CharacterMoveTo(%Orc15,1,0,1)
+	ENDIF
+	IF "!c1"
+		CharacterIsDead(%Orc16)
+	THEN
+		CharacterMoveTo(%Orc16,1,0,1)
+	ENDIF
+	IF "!c1"
+		CharacterIsDead(%Orc17)
+	THEN
+		CharacterMoveTo(%Orc17,1,0,1)
+	ENDIF
+	IF "!c1"
+		CharacterIsDead(%Orc18)
+	THEN
+		CharacterMoveTo(%Orc18,1,0,1)
+	ENDIF
+	IF "!c1"
+		CharacterIsDead(%Orc19)
+	THEN
+		CharacterMoveTo(%Orc19,1,0,1)
+	ENDIF
+	IF "!c1"
+		CharacterIsDead(%Orc20)
+	THEN
+		CharacterMoveTo(%Orc20,1,0,1)
+	ENDIF
+	IF "!c1"
+		CharacterIsDead(%Orc21)
+	THEN
+		CharacterMoveTo(%Orc21,1,0,1)
+	ENDIF
+	IF "!c1"
+		CharacterIsDead(%Orc22)
+	THEN
+		CharacterMoveTo(%Orc22,1,0,1)
+	ENDIF
+	IF "!c1"
+		CharacterIsDead(%Orc23)
+	THEN
+		CharacterMoveTo(%Orc23,1,0,1)
+	ENDIF
+	IF "!c1"
+		CharacterIsDead(%Orc24)
+	THEN
+		CharacterMoveTo(%Orc24,1,0,1)
+	ENDIF
+	IF "!c1"
+		CharacterIsDead(%Orc25)
+	THEN
+		CharacterMoveTo(%Orc25,1,0,1)
+	ENDIF
+	Sleep(5)
+
+EVENTS
+EVENT PreWar
+ON
+	OnCharacterEvent(__Me,"prewar")
+ACTIONS
+	SetPriority("NearlyAtWar",1600)
+	
+EVENT War
+ON
+	OnCharacterEvent(__Me,"war")
+ACTIONS
+	SetPriority("SearchAndDestroy",1601)

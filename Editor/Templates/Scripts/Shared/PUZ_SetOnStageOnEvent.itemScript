@@ -1,0 +1,23 @@
+INIT
+	ITEM:__Me
+	EXTERN STRING:%Event=null
+	INT:%Executed = 0
+EVENTS
+
+EVENT InitHide
+	ON
+		OnInit()
+	ACTIONS
+		IF "!c1"
+			IsEqual(%Executed,1)
+		THEN
+			ItemSetOnStage(__Me,0)
+		ENDIF
+		
+EVENT AppearItem
+	ON
+		OnCharacterItemEvent(_,_,%Event)
+	ACTIONS
+		PlayEffectAt(__Me, "FX_GP_TeleportSmoke_A")
+		Set(%Executed,1)
+		ItemSetOnStage(__Me,1)

@@ -1,0 +1,127 @@
+#TEMPLATE "_SKILLFROMITEM_Base" : WPN_Arrow_Silver_A, null
+
+INIT
+CHARACTER:__Me
+FLOAT:%SkillTargetScore_WPN_Arrow_Silver_A=-1000000
+// [GLOBAL_VARS]
+INT:%ClassScore_WPN_Arrow_Silver_A
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_WPN_Arrow_Silver_A
+VARS
+	// [CALC_VARS]
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_WPN_Arrow_Silver_A")
+ACTIONS
+	Set(%SkillTargetScore_WPN_Arrow_Silver_A, -1000000)
+
+	// [CALC_ACTIONS_PRE]
+	Set(%ClassScore_WPN_Arrow_Silver_A, 0)
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	IterateCharactersInCombat(__Me, "CalculateTarget_WPN_Arrow_Silver_A", Random, Vitality)
+	IF "!c1"
+		IsEqual(%SkillTargetChar_WPN_Arrow_Silver_A, null)
+	THEN
+		Add(%ActionScore_WPN_Arrow_Silver_A, %SkillTargetScore_WPN_Arrow_Silver_A)
+	ENDIF
+	// [~CALC_ACTIONS]
+
+	
+	
+// Calculate the character we should attack
+EVENT CalculateTarget_WPN_Arrow_Silver_A
+VARS	
+	CHARACTER:_Char
+	// [CALC_TARGET_VARS]
+	INT:_ClassScore_WPN_Arrow_Silver_A
+	FLOAT:_Score
+	INT:_HostileCount
+	FLOAT:_HostileScore=0
+	FLOAT:_SkillRangeMin
+	FLOAT:_SkillRangeMax
+	FLOAT:_DistanceToChar
+	FLOAT:_DistanceScore
+	// [~CALC_TARGET_VARS]
+ON
+	OnIterateCharacter(_Char, "CalculateTarget_WPN_Arrow_Silver_A")	
+ACTIONS
+	// [CALC_CHAR_TARGET_ACTIONS_PRE]
+	Set(_ClassScore_WPN_Arrow_Silver_A, %ClassScore_WPN_Arrow_Silver_A)
+	Set(_Score, 0.0)
+	// [~CALC_CHAR_TARGET_ACTIONS_PRE]
+	// [CALC_CHAR_TARGET_ACTIONS]
+	IF "(!c1&!c2&!c3)&((c4)|c5)&(!(c6))&(c7)&(c8)&(c9)&(c10)"
+	    CharacterIsDead(_Char) // c1
+	    CharacterHasStatus(_Char, INVISIBLE) // c2
+	    CharacterHasStatus(_Char, SNEAKING) // c3
+	    CharacterHasStatus(_Char, FORTIFIED) // c4
+	    CharacterIsBetterOrEqualClass(_Char, %ClassScore_WPN_Arrow_Silver_A, _ClassScore_WPN_Arrow_Silver_A, 5, 3, 2, 5, 4) // c5
+	    CharacterHasStatus(_Char, FEAR) // c6
+	    CharacterIsEnemy(__Me, _Char) // c7
+	    CharacterGetHostileCount(_HostileCount, _Char) // c8
+	    CharacterGetSkillRange(_SkillRangeMin, _SkillRangeMax, __Me, %SkillID_WPN_Arrow_Silver_A) // c9
+	    GetDistance(_DistanceToChar, __Me, _Char) // c10
+	THEN
+	    Set(%ClassScore_WPN_Arrow_Silver_A, _ClassScore_WPN_Arrow_Silver_A)
+	    IF "(c1)"
+	        CharacterHasStatus(_Char, FORTIFIED) // c1
+	    THEN
+	        Add(_Score, 5.0)
+	    ENDIF
+	    // Hostile count score calculation
+	    IF "(c1)"
+	        IsGreaterThen(_HostileCount, 2) // c1
+	    THEN
+	        Set(_HostileScore, 10.0)
+	    ENDIF
+	    Add(_Score, _HostileScore)
+	    
+	    // Range score calculation
+	    Set(_DistanceScore, _DistanceToChar)
+	    IF "(c1)"
+	        IsGreaterThen(_DistanceScore, _SkillRangeMax) // c1
+	    THEN
+	        Subtract(_DistanceScore, _SkillRangeMax)
+	        Multiply(_DistanceScore, -1.0)
+	    ELIF "(c1)"
+	        IsLessThen(_DistanceScore, _SkillRangeMin) // c1
+	    THEN
+	        Subtract(_DistanceScore, _SkillRangeMin)
+	        Multiply(_DistanceScore, 1.0)
+	    ELSE 
+	        Set(_DistanceScore, 0.0)
+	    ENDIF
+	    Add(_Score, _DistanceScore)
+	    
+	    // Can see score calculation
+	    IF "!c1"
+	    	CharacterCanSee(__Me, _Char)
+	    THEN
+	    	Add(_Score, -10.0)
+	    ENDIF
+	    
+	    IF "c1"
+	    	IsGreaterThen(_Score, %SkillTargetScore_WPN_Arrow_Silver_A)
+	    THEN
+	    	Set(%SkillTargetChar_WPN_Arrow_Silver_A, _Char)
+	    	Set(%SkillTargetScore_WPN_Arrow_Silver_A, _Score)
+	    ENDIF	
+	ENDIF
+	// [~CALC_CHAR_TARGET_ACTIONS]
+	
+	
+	
+	
+	
+	
+	
+	
+	

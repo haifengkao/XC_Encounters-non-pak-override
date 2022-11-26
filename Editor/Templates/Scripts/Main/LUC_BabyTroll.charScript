@@ -1,0 +1,16 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter
+CHARACTER:__Me
+
+BEHAVIOUR
+
+REACTION Wander, 1100
+USAGE PEACE
+ACTIONS
+	CharacterLookAt(ITEM:LUC_BabyTorch_77c64181-e6f7-4a06-8f45-ed9701592598)
+	Sleep(3)
+	CharacterLookAt(ITEM:LUC_BabyTorch2_4653752a-959d-4bbc-afdc-595edc28cefd)
+	Sleep(3)
+	

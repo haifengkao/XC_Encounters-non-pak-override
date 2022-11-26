@@ -1,0 +1,12 @@
+INIT
+CHARACTER:__Me
+EXTERN STRING:%SentEvent="GEN_CombatEvent_CharacterIsDead"
+
+//------------------------------
+EVENTS	
+EVENT OnDie_SendEvent
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	//DebugText(__Me,"Event Sent!")
+	CharacterEvent(__Me,%SentEvent)

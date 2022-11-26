@@ -1,0 +1,163 @@
+#INCLUDE Base
+
+INIT
+USING Base
+CHARACTER:__Me
+CHARACTER:%persTarget
+
+BEHAVIOUR
+
+REACTION CastFearLowHealth,600
+USAGE COMBAT
+VARS
+	FLOAT:_hp
+CHECK "c1&c2&c3"
+	CharacterCanCast(__Me,Shout_EnemyFear,1)
+	CharacterGetStat(_hp,__Me,Vitality)
+	IsLessThen(_hp,0.3)
+ACTIONS
+	IF "c1"
+		CharacterCanCast(__Me,Shout_EnemyFear,0)
+	THEN
+		DisplayText(__Me,"CYS_WestBeachGiantCastsFear",3)
+		CharacterUseSkill(Shout_EnemyFear,__Me)
+		SetPriority("CastFearLowHealth",0)
+	ELSE
+		CharacterEndTurn()
+	ENDIF
+/*	
+REACTION DrinkPotionLowHealth,550
+USAGE COMBAT
+VARS
+	FLOAT:_hp
+CHECK "c1&c2"
+	CharacterGetStat(_hp,__Me,Vitality)
+	IsLessThen(_hp,0.4)
+ACTIONS
+	CharacterConsume(__Me,"POTION_Medium_Healing_Potion")
+	SetPriority("DrinkPotionLowHealth",0)
+*/
+REACTION BuffAlly,500
+USAGE COMBAT
+VARS
+	CHARACTER:_char
+CHECK "c1&c2"
+	CharacterCanCast(__Me,Shout_EnemyInspire,1)
+	CharacterGet(_char,__Me,20,Lowest,Distance,Ally)
+ACTIONS
+	IF "c1"
+		CharacterCanCast(__Me,Shout_EnemyInspire,0)
+	THEN
+		DisplayText(__Me,"CYS_WestBeachGiantBuffs",3)
+		CharacterUseSkill(Shout_EnemyInspire,_char)
+		SetPriority("BuffAlly",0)
+	ELSE
+		CharacterEndTurn()
+	ENDIF
+	
+REACTION ShootXBow,400
+USAGE COMBAT
+VARS
+	FLOAT:_minRange
+	FLOAT:_maxRange
+	CHARACTER:_target
+CHECK "c1&c2&c3"
+	CharacterCanCast(__Me,Projectile_EnemySilverArrowBarrage,1)
+	CharacterGetSkillRange(_minRange,_maxRange,__Me,Projectile_EnemySilverArrowBarrage)
+	CharacterGet(_target,__Me,50,Highest,VitalityPoints,Enemy,null,null,null,__Me)
+ACTIONS
+	IF "c1"
+		CharacterCanCast(__Me,Projectile_EnemySilverArrowBarrage,0)
+	THEN
+		CharacterMoveInRange(_target,_minRange,_maxRange,1)
+		CharacterUseSkill(Projectile_EnemySilverArrowBarrage,_target)
+	ELSE
+		CharacterEndTurn()
+	ENDIF
+	
+REACTION MoveToShootXBow,350
+USAGE COMBAT
+VARS
+	FLOAT:_minRange
+	FLOAT:_maxRange
+	CHARACTER:_target
+CHECK "c1&c2&c3"
+	CharacterCanCast(__Me,Projectile_EnemySilverArrowBarrage,1)
+	CharacterGetSkillRange(_minRange,_maxRange,__Me,Projectile_EnemySilverArrowBarrage)
+	CharacterGet(_target,__Me,50,Highest,VitalityPoints,Enemy)
+ACTIONS
+	CharacterMoveTo(_target,1)
+	
+EVENTS
+EVENT WestbeachOrcSkills
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill(Shout_EnemyFear)
+	CharacterAddSkill(Shout_EnemyInspire)
+	CharacterAddSkill(Projectile_EnemySilverArrowBarrage)
+
+/*
+	
+// attack but only if dying
+
+REACTION AttackWhenDying,400
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_hp
+CHECK "c1&c2&(c3|c4)"
+	CharacterGetStat(_hp,__Me,Vitality)
+	IsLessThen(_hp,0.2)
+	CharacterGet(_Target,__Me,40,Random,null,Enemy,null,FEAR)
+	CharacterGet(_Target,__Me,50,Lowest,Vitality,Enemy,null,null)
+ACTIONS
+	IF "c1|c2"
+		IsEqual(%persTarget,null)
+		CharacterIsDead(%persTarget)
+	THEN
+		Set(%persTarget,_Target)
+	ENDIF
+	CharacterAttack(%persTarget)
+
+// only attack freely if all normal grunts are dead
+
+
+
+REACTION AttackAnyone,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+CHECK "(!c1&!c2&!c3)&(c4&c5&c6)&(c7|c8)"
+	IsEqual(%ally1,null)
+	IsEqual(%ally2,null)
+	IsEqual(%ally3,null)
+	CharacterIsDead(%ally1)
+	CharacterIsDead(%ally2)
+	CharacterIsDead(%ally3)
+	CharacterGet(_Target,__Me,4,Random,null,Enemy,null,FEAR)
+	CharacterGet(_Target,__Me,50,Highest,Strength,Enemy,null,null)
+ACTIONS
+	DisplayText(__Me,"CYS_WestBeachGiantAlliesDead",3)
+	CharacterAttack(_Target)
+
+// attack if anyone comes too near
+
+REACTION AttackNearest,200
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+CHECK "c1|c2"
+	CharacterGet(_Target,__Me,2,Random,null,Enemy,null,FEAR)
+	CharacterGet(_Target,__Me,2,Highest,Strength,Enemy,null,null)		
+ACTIONS
+	DisplayText(__Me,"CYS_WestBeachGiantTooClose",3)
+	CharacterAttack(_Target)
+	
+REACTION Combat_DontDoAnything, 100
+USAGE COMBAT
+ACTIONS 
+	DisplayText(__Me,"CYS_WestBeachGiantSkipTurn",3)
+	CharacterEndTurn()
+
+*/

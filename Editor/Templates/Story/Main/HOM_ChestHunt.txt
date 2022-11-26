@@ -1,0 +1,76 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_ItemDialogs(ITEM_HOM_LastChest, "HOM_FinalChest");
+ItemToContainer(ITEM_HOM_CysealChestParchment, ITEM_HOM_CysealChest,-1);
+ItemToContainer(ITEM_HOM_DarkForestChestParchment, ITEM_HOM_DarkForestChet,-1);
+ItemToContainer(ITEM_HOM_HiberheimChestParchment, ITEM_HOM_HiberheimChest,-1);
+ItemToContainer(ITEM_HOM_LucullaChestParchment, ITEM_HOM_LucullaChest,-1);
+
+DB_ShovelArea(TRIGGER_DAF_ShovelMagicalUnlock,"HOM_MagicalUnlock1",ITEM_DAF_ShovelMagicalUnlockDirt);
+DB_ShovelArea(TRIGGER_LUC_M_ShovelMagicalUnlock,"HOM_MagicalUnlock2",ITEM_LUC_M_ShovelMagicalUnlockDirt);
+DB_ShovelArea(TRIGGER_DFD_Druid_ShovelMagicalUnlock,"HOM_MagicalUnlock3",ITEM_DFD_Druid_ShovelMagicalUnlockDirt);
+
+DB_ShovelRewardItemAppear("HOM_MagicalUnlock1",ITEM_DAF_ShovelMagicalUnlockScroll,TRIGGER_DAF_ShovelMagicalUnlockPoint);
+DB_ShovelRewardItemAppear("HOM_MagicalUnlock2",ITEM_LUC_M_ShovelMagicalUnlockScroll,TRIGGER_LUC_M_ShovelMagicalUnlockPoint);
+DB_ShovelRewardItemAppear("HOM_MagicalUnlock3",ITEM_DFD_Druid_ShovelMagicalUnlockScroll,TRIGGER_DFD_Druid_ShovelMagicalUnlockPoint);
+KBSECTION
+IF
+CharacterUsedItemTemplate(_Player, "BOOK_Skill_AbilityPoints_36da8caa-8e38-4b14-b96a-3511eed491b6", _Handle)
+THEN
+CharacterAddAbilityPoint(_Player, 3);
+ItemHandleDelete(_Handle);
+CharacterPlayEffect(_Player, "FX_GP_Level_Up_A");
+
+IF
+CharacterUsedItemTemplate(_Player, "BOOK_Skill_StatPoints_28b2ff38-74dd-494a-8a34-9020ecca47b1", _Handle)
+THEN
+CharacterAddAttributePoint(_Player, 1);
+ItemHandleDelete(_Handle);
+CharacterPlayEffect(_Player, "FX_GP_Level_Up_A");
+
+IF
+GameBookInterfaceClosed(ITEM_HOM_CysealChestParchment, _Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+GlobalSetEvent("HOM_LC_FirstChestFound");
+
+IF
+GameBookInterfaceClosed(ITEM_HOM_LucullaChestParchment, _Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+GlobalSetEvent("HOM_LC_SecondChestFound");
+
+IF
+GameBookInterfaceClosed(ITEM_HOM_HiberheimChestParchment, _Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+GlobalSetEvent("HOM_LC_ThirdChestFound");
+
+IF
+GameBookInterfaceClosed(ITEM_HOM_DarkForestChestParchment, _Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+GlobalSetEvent("HOM_LC_FourthChestFound");
+
+IF
+GlobalEventSet("HOM_LC_Opened")
+THEN
+ItemUnLock(ITEM_HOM_LastChest);
+NOT DB_ItemDialogs(ITEM_HOM_LastChest, "HOM_FinalChest");
+
+IF
+TextEventSet("lastChest")
+THEN
+GlobalSetEvent("HOM_LC_FourthChestFound");
+GlobalSetEvent("HOM_LC_FirstChestFound");
+GlobalSetEvent("HOM_LC_SecondChestFound");
+GlobalSetEvent("HOM_LC_ThirdChestFound");
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<palette xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <palettes />
+  <objectids>
+    <guid>47e6f238-1892-417b-9d76-c1f773873fe6</guid>
+    <guid>4b6e882d-140a-464d-9391-f589e4b7dd1b</guid>
+    <guid>8eaf822a-3668-48f9-aa29-4f29367fbce5</guid>
+    <guid>e81af7b8-f268-4b28-8980-dbfdef833082</guid>
+    <guid>11521e3d-39a3-4194-bc6e-908ea70a3bc6</guid>
+    <guid>b08b5e95-af6b-4e41-b198-8979ba19d30b</guid>
+  </objectids>
+  <name>Farmland</name>
+</palette>

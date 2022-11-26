@@ -1,0 +1,63 @@
+INIT
+ITEM:__Me
+INT:%CurrentIsVisible=0
+EXTERN FLOAT:%MinPerception=0
+EXTERN FLOAT:%MinDistance=0
+
+EVENTS
+
+EVENT InitializeHidden
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		IsEqual(%CurrentIsVisible,0)
+	THEN
+		StartTimer("UpdateHidden",0.2,-1)
+	ENDIF
+
+EVENT ShutdownHidden
+ON
+	OnShutdown()
+ACTIONS
+	StopTimer("UpdateHidden")
+
+EVENT UpdateHidden
+ON
+	OnTimer("UpdateHidden")
+ACTIONS
+	IterateParty("HiddenObjectCheck")
+	IF "c1"
+		IsEqual(%CurrentIsVisible,1)
+	THEN
+		StopTimer("UpdateHidden")
+	ENDIF
+
+EVENT CheckHidden
+VARS
+CHARACTER:_Char
+FLOAT:_Perception
+FLOAT:_Dist
+STRING:_Event
+ON
+	OnIterateCharacter(_Char,"HiddenObjectCheck")
+ACTIONS
+	IF "!c1&c2&c3&!c4&c5&c6" 
+		CharacterIsDead(_Char)
+		CharacterGetStat(_Perception,_Char,Perception)
+		GetDistance(_Dist,_Char,__Me)
+		IsLessThen(_Perception,%MinPerception)
+		IsLessThen(_Dist,%MinDistance)
+		IsEqual(%CurrentIsVisible,0)
+	THEN
+		Set(%CurrentIsVisible,1)
+		GetRandom(_Event, "AmbushReveal", "AmbushReveal2", "AmbushReveal3", "AmbushReveal4")
+		CharacterEvent(_Char,_Event)
+	ENDIF
+
+EVENT StoryReveal
+ON
+	OnItemEvent(__Me,"StoryReveal")
+ACTIONS
+	Set(%CurrentIsVisible,1)
+	StopTimer("UpdateHidden")

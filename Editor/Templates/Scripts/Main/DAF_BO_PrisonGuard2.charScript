@@ -1,0 +1,113 @@
+INIT
+
+CHARACTER:__Me
+CHARACTER:%Prisoner = DAF_TorturePrisoner1_b02aba54-b593-4e95-a02e-562644e7af48
+TRIGGER:%Point1 = DAF_PointBO_PrisonGuard2_1_402dd357-c335-4fa6-92b6-32d4f02b1aa7
+TRIGGER:%Point2 = DAF_PointBO_PrisonGuard2_2_ad1866a1-679b-4791-a653-7557b3d8749a
+CHARACTER:%ArmoryDoorUsedBy
+CHARACTER:%PrisonDoorUsedBy
+INT:%State = 0
+INT:%PrisonDoorOccupied = 0
+CHARACTER:%Player = null
+
+BEHAVIOUR
+
+REACTION ReactOnPrisonDoorUsage, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_text
+ACTIONS
+	CharacterLookAt(%PrisonDoorUsedBy)
+	GetRandom(_text, "DAF_BO_PrisonGuardPrisonDoorWarning_01", "DAF_BO_PrisonGuardPrisonDoorWarning_02", "DAF_BO_PrisonGuardPrisonDoorWarning_03")
+	DisplayText(__Me, _text, 5)
+	Sleep(5)
+	SetPriority("ReactOnPrisonDoorUsage", 0)
+
+REACTION Guarding,1050
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%State,0)
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	CharacterMoveTo(%Point1)
+	CharacterLookFrom(%Point1)
+	Sleep(2)
+	GetRandom(_Animation,"Bored_01","Bored_02","Dust_Off_01","Yawn_01")
+	CharacterPlayAnimation(_Animation)
+	Sleep(5)
+INTERRUPT
+	Reset()
+
+REACTION GoToDoor,1060
+USAGE PEACE
+CHECK "c1&c2"
+	IsEqual(%State,1)
+	IsEqual(%PrisonDoorOccupied, 0)
+VARS
+	FIXEDSTRING:_Animation
+	FIXEDSTRING:_Text
+ACTIONS
+	CharacterMoveTo(%Point2)
+	CharacterLookFrom(%Point2)
+	Sleep(2)
+	GetRandom(_Animation,"Annoyed_01","Intimidate_01","Intimidate_02","Revolt_01","Revolt_02")
+	GetRandom(_Text,"DAF_BO_PrisonGuard2_1","DAF_BO_PrisonGuard2_2")
+	CharacterPlayAnimation(_Animation,1,0)
+	DisplayText(__Me,_Text,5)
+	CharacterEvent(%Prisoner,"GuardAtDoor")
+	Sleep(5)
+	Set(%State,0)
+INTERRUPT
+	Reset()
+
+EVENTS
+
+EVENT PrisonerShouting
+ON
+	OnCharacterEvent(__Me,"PrisonerShouting")
+ACTIONS
+	Set(%State,1)
+	
+	
+EVENT PlayerHasClearing
+ON
+	OnGlobalEventSet("DAF_PlayerCanEnterArmory")
+ACTIONS
+	Set(%State,0)
+	
+EVENT PrisonDoorOccupied
+ON
+	OnCharacterEvent(__Me, "TogglePrisonDoorOccupied")
+ACTIONS
+	IF "c1"
+		IsEqual(%PrisonDoorOccupied, 0)
+	THEN
+		Set(%PrisonDoorOccupied, 1)
+	ELSE
+		Set(%PrisonDoorOccupied, 0)
+	ENDIF
+
+STORY
+
+SCRIPTFRAME ReactOnArmoryDoorUsage
+ACTIONS
+	CharacterMoveTo(%ArmoryDoorUsedBy, 1)
+	GlobalSetEvent("DAF_GuardWarnedArmoryDoor")
+	DialogStart("DAF_BO_PrisonGuard2_DoorWarning", __Me, %ArmoryDoorUsedBy)
+	CharacterUseItem(DAF_DoorWarehouse4_0676e900-ad34-4e7c-9693-0c942f5c31d7)
+	Set(%ArmoryDoorUsedBy, "")	
+	
+SCRIPTFRAME EnterAfterNolanGotRescued
+ACTIONS
+	CharacterMoveTo(%Player, 1)
+	
+SCRIPTFRAME ReactOnPrisonDoorUsage
+ACTIONS
+	SetPriority("ReactOnPrisonDoorUsage", 1999)
+	
+	
+
+	
+	
+	

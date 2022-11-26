@@ -1,0 +1,7 @@
+#INCLUDE MarketSeller
+
+INIT
+USING MarketSeller
+
+BEHAVIOUR
+

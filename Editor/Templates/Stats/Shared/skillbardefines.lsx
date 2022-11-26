@@ -1,0 +1,70 @@
+<?xml version="1.0" ?>
+<save>
+    <header version="1" time="1359551773" />
+    <region id="SkillbarPlayer1">
+        <node id="root">
+            <children>
+                <node id="Skill">
+                    <attribute id="SkillEntry" value="" type="22" />
+                </node>
+                <node id="Skill">
+                    <attribute id="SkillEntry" value="" type="22" />
+                </node>
+                <node id="Skill">
+                    <attribute id="SkillEntry" value="" type="22" />
+                </node>
+                <node id="Skill">
+                    <attribute id="SkillEntry" value="" type="22" />
+                </node>
+                <node id="Skill">
+                    <attribute id="SkillEntry" value="" type="22" />
+                </node>
+                <node id="Skill">
+                    <attribute id="SkillEntry" value="" type="22" />
+                </node>
+                <node id="Skill">
+                    <attribute id="SkillEntry" value="" type="22" />
+                </node>
+                <node id="Skill">
+                    <attribute id="SkillEntry" value="" type="22" />
+                </node>
+                <node id="Skill">
+                    <attribute id="SkillEntry" value="" type="22" />
+                </node>
+            </children>
+        </node>
+    </region>
+    <region id="SkillbarPlayer2">
+        <node id="root">
+            <children>
+                <node id="Skill">
+                    <attribute id="SkillEntry" value="" type="22" />
+                </node>
+                <node id="Skill">
+                    <attribute id="SkillEntry" value="" type="22" />
+                </node>
+                <node id="Skill">
+                    <attribute id="SkillEntry" value="" type="22" />
+                </node>
+                <node id="Skill">
+                    <attribute id="SkillEntry" value="" type="22" />
+                </node>
+                <node id="Skill">
+                    <attribute id="SkillEntry" value="" type="22" />
+                </node>
+                <node id="Skill">
+                    <attribute id="SkillEntry" value="" type="22" />
+                </node>
+                <node id="Skill">
+                    <attribute id="SkillEntry" value="" type="22" />
+                </node>
+                <node id="Skill">
+                    <attribute id="SkillEntry" value="" type="22" />
+                </node>
+                <node id="Skill">
+                    <attribute id="SkillEntry" value="" type="22" />
+                </node>
+            </children>
+        </node>
+    </region>
+</save>

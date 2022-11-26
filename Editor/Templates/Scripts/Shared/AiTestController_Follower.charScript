@@ -1,0 +1,93 @@
+INIT
+	CHARACTER:__Me
+	INT:%IsInCombat
+	
+BEHAVIOUR
+
+REACTION FollowMainCharacter, 20000
+USAGE PEACE
+VARS
+	CHARACTER:_MainCharacter
+	INT:_NumCharacters
+	FLOAT:_DistanceToMainCharacter
+ACTIONS
+	IF "c1&c2&c3"
+		GetPlayerCount(_NumCharacters)
+		IsGreaterThen(_NumCharacters, 0)
+		GetPlayerByIndex(_MainCharacter, 0)
+	THEN
+		IF "c1&c2"
+			GetDistance(_DistanceToMainCharacter, __Me, _MainCharacter)
+			IsGreaterThen(_DistanceToMainCharacter, 15)
+		THEN
+			CharacterTeleportTo(_MainCharacter)
+		ELSE
+			CharacterMoveTo(_MainCharacter, 1, 1, 1)
+		ENDIF
+	ENDIF
+INTERRUPT
+ACTIONS
+	Reset()
+	IF "c1&c2&c3&c4"
+		GetPlayerCount(_NumCharacters)
+		IsGreaterThen(_NumCharacters, 0)
+		GetPlayerByIndex(_MainCharacter, 0)
+		IsEqual(%IsInCombat, 0)
+	THEN
+		CharacterTeleportTo(_MainCharacter)
+	ENDIF
+	
+EVENTS
+
+EVENT Init
+ON
+	OnInit()
+ACTIONS
+	StartTimer("Update", 0.5, -1)
+	
+EVENT Update
+ON
+	OnTimer("Update")
+VARS
+	CHARACTER:_MainCharacter
+	INT:_NumCharacters
+	FLOAT:_DistanceToMainCharacter
+ACTIONS
+	// Teleport if distance too big
+	IF "c1&c2&c3"
+		GetPlayerCount(_NumCharacters)
+		IsGreaterThen(_NumCharacters, 0)
+		GetPlayerByIndex(_MainCharacter, 0)
+	THEN
+		IF "c1&c2"
+			GetDistance(_DistanceToMainCharacter, __Me, _MainCharacter)
+			IsGreaterThen(_DistanceToMainCharacter, 15)
+		THEN
+			Interrupt("FollowMainCharacter")
+		ENDIF
+	ENDIF
+	
+	IF "c1"
+		CharacterIsDead(__Me)
+	THEN
+		CharacterResurrect(__Me, 100)
+	ENDIF
+	
+EVENT Resurrect
+ON
+	OnDie(__Me, _, _, _)
+ACTIONS
+	CharacterResurrect(__Me, 100)
+	
+EVENT OnStartCombat
+ON
+	OnCombatStarted()
+ACTIONS
+	Set(%IsInCombat, 1)
+	
+EVENT OnEndCombat
+ON
+	OnCombatEnded()
+ACTIONS
+	Set(%IsInCombat, 0)
+	

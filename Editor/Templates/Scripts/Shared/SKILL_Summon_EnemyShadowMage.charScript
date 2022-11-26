@@ -1,0 +1,48 @@
+#TEMPLATE "_SKILL_Base" : Summon_EnemyShadowMage
+
+INIT
+CHARACTER:__Me
+// [GLOBAL_VARS]
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_Summon_EnemyShadowMage
+VARS
+	// [CALC_VARS]
+	FLOAT:_SkillRangeMin
+	FLOAT:_SkillRangeMax
+	FLOAT:_SkillImpactRange
+	FLOAT3:_TargetPos
+	FLOAT:_Score
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_Summon_EnemyShadowMage")
+ACTIONS	
+	// [CALC_ACTIONS_PRE]
+	Set(_Score, 0.0)
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	IF "(c1)&(c2)&(c3)"
+	    CharacterGetSkillRange(_SkillRangeMin, _SkillRangeMax, __Me, Summon_EnemyShadowMage) // c1
+	    CharacterGetSkillImpactRange(_SkillImpactRange, __Me, Summon_EnemyShadowMage) // c2
+	    FindPosition(_TargetPos, __Me, _SkillRangeMax, _SkillImpactRange, __Me, -1, -1, 2, -1) // c3
+	THEN
+	    Set(%SkillTargetPos_Summon_EnemyShadowMage, _TargetPos)
+	    Add(%ActionScore_Summon_EnemyShadowMage, 20.0)
+	ELSE 
+	    // Hostile count score calculation
+	    Add(_Score, 10.0) // HostileWeight
+	    
+	    Set(%SkillTargetChar_Summon_EnemyShadowMage, __Me)
+	    Add(%ActionScore_Summon_EnemyShadowMage, _Score)
+	ENDIF
+	// [~CALC_ACTIONS]
+
+	
+
+	

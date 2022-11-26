@@ -1,0 +1,76 @@
+INIT
+
+FIXEDSTRING:%internalState = ""
+FIXEDSTRING:%previousState = ""
+FIXEDSTRING:%previousAction = ""
+EXTERN FIXEDSTRING:%currentState = ""
+FIXEDSTRING:%currentAction = ""
+INT:%animationLoopCount = 0
+FIXEDSTRING:%currentAnimation = ""
+INT:%ClearInternalStatePriority = 0  
+
+BEHAVIOUR
+
+REACTION StateManager, 1500
+USAGE PEACE
+CHECK "!c1&!c2"
+	IsEqual(%internalState, %currentState)
+	IsEqual("", %currentState)
+ACTIONS
+	IF "!c1"
+		IsEqual(%internalState, "")
+	THEN
+		SetPriority(%internalState, 0)
+	ENDIF
+	IF "!c1"
+		IsEqual(%currentAction, "")
+	THEN
+		SetPriority(%currentAction, 0)
+	ENDIF
+	IF "!c1"
+		IsEqual(%currentState, "")
+	THEN
+		CallFunction("UpdateInternalState")
+	ENDIF
+INTERRUPT
+	Reset()
+	
+REACTION ResetInternalState, 1500
+USAGE PEACE
+CHECK "c1&c2"
+	IsEqual("", %currentState)
+	IsEqual(%ClearInternalStatePriority,1)
+ACTIONS
+	Set(%ClearInternalStatePriority,0)
+	IF "!c1"
+		IsEqual(%internalState, "")
+	THEN
+		SetPriority(%internalState, 0)
+	ENDIF
+	IF "!c1"
+		IsEqual(%currentAction, "")
+	THEN
+		SetPriority(%currentAction, 0)
+	ENDIF
+		
+REACTION State_LoopAnimation, 0
+USAGE PEACE
+ACTIONS
+	WHILE "c1"
+		IsGreaterThen(%animationLoopCount, 0)
+	DO
+		CharacterPlayAnimation(%currentAnimation)
+		Subtract(%animationLoopCount, 1)
+	ENDWHILE
+	Set(%currentState, %previousState)
+
+EVENTS
+
+EVENT UpdateInternalState
+ON
+	OnFunction("UpdateInternalState")
+ACTIONS
+	Set(%ClearInternalStatePriority,1)
+	Set(%previousState, %internalState)
+	Set(%internalState, %currentState)
+	SetPriority(%currentState, 1000)

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<save>
+    <header version="2" time="1417767588" />
+    <version major="1" minor="3" revision="0" build="0" />
+    <region id="keywordDialog">
+        <node id="root">
+            <attribute id="KeywordVoiced" value="0" type="19" />
+            <attribute id="PlayGreeting" value="0" type="19" />
+            <attribute id="keywordAutoImport" value="0" type="19" />
+            <attribute id="keywordName" value="Save_my_property" type="22" />
+            <children>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="1263143f-6717-4dea-ba74-6dee55485ab0" type="22" />
+                    <attribute id="keywordContentMapValue" value="Greeting" handle="h7f890f24g8572g4902g90b4gd362b7e9bdf2" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="54859075-24d0-41f4-bc93-520dfa723113" type="22" />
+                    <attribute id="keywordContentMapValue" value="Who do you think you are, treating my most prized possession that way? Guards! Guards! Do away with this vandal!" handle="h6ca82451g2c3dg45c0gaa45g1743e3271f9e" type="28" />
+                </node>
+                <node id="keywordNode">
+                    <attribute id="keywordActions" value="ACTION CallGuards()" type="23" />
+                    <attribute id="keywordConditions" value="" type="23" />
+                    <attribute id="keywordDisplayedText" value="1263143f-6717-4dea-ba74-6dee55485ab0" type="22" />
+                    <attribute id="keywordId" value="Greeting" type="22" />
+                    <attribute id="keywordLast" value="0" type="19" />
+                    <attribute id="keywordOwner" value="-1" type="4" />
+                    <attribute id="keywordShow" value="0" type="19" />
+                    <attribute id="keywordSource" value="0" type="5" />
+                    <children>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value="" type="23" />
+                            <attribute id="keywordEmotion" value="1" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="54859075-24d0-41f4-bc93-520dfa723113" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="keywordSpeakerNames">
+                    <children>
+                        <node id="keywordSpeakerName">
+                            <attribute id="Name" value="GROUP_All" type="23" />
+                        </node>
+                        <node id="keywordSpeakerName">
+                            <attribute id="Name" value="" type="23" />
+                        </node>
+                        <node id="keywordSpeakerName">
+                            <attribute id="Name" value="" type="23" />
+                        </node>
+                        <node id="keywordSpeakerName">
+                            <attribute id="Name" value="" type="23" />
+                        </node>
+                    </children>
+                </node>
+            </children>
+        </node>
+    </region>
+</save>

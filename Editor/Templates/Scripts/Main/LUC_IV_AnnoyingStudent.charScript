@@ -1,0 +1,22 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	CHARACTER:%Teacher = LUC_IV_Teacher_1c27c3b4-d322-4d31-83b3-1b428036f1d4
+	
+BEHAVIOUR
+
+REACTION State_Listening, 0
+	USAGE PEACE
+	ACTIONS
+		GetWeightedRandom(%currentAction, "Action_LookAtTeacher",INT:24)
+		SetPriority(%currentAction, 1100)
+		
+REACTION Action_LookAtTeacher, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterLookAt(%Teacher)
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)

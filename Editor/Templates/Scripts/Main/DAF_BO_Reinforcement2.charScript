@@ -1,0 +1,36 @@
+INIT
+
+CHARACTER:__Me
+CHARACTER:%Ragnar = DAF_Ragnar_0fa8ebec-7225-4542-9614-4041a45cd150
+INT:%DialogRequest = 0
+INT:%FirstTime = 0
+
+BEHAVIOUR
+
+REACTION Dialog,1100
+USAGE PEACE
+CHECK "c1&!c2&!c3"
+	IsEqual(%DialogRequest,1)
+	IsInDialog(%Ragnar)
+	IsInDialog(__Me)
+ACTIONS
+	Set(%DialogRequest,0)
+	IF "c1"
+		IsEqual(%FirstTime,0)
+	THEN
+		Set(%FirstTime,1)
+	ELSE
+		Sleep(12)
+	ENDIF
+	CharacterLookAt(%Ragnar)
+	DialogStart("DAF_AD_BOReinforcements",%Ragnar,__Me)
+INTERRUPT
+	Check()
+			
+EVENTS
+
+EVENT StartDialog
+ON
+	OnCharacterEvent(__Me,"DialogRequest")
+ACTIONS
+	Set(%DialogRequest,1)

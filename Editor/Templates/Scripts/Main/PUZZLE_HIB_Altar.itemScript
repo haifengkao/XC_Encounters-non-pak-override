@@ -1,0 +1,38 @@
+INIT
+ITEM:__Me
+EXTERN POTION:%ApplyPotion = null
+EXTERN POTION:%ApplyPoison = null
+EXTERN CHARACTER:%PoisonVictim = HIB_KingBoreas_52fa7fac-bcfa-4efa-892e-ee4359acb657
+
+EVENTS
+
+EVENT Used
+VARS
+	CHARACTER:_User
+ON
+	OnUseItem(_User,__Me)
+ACTIONS
+	IF "!c1"
+		CharacterHasStatus(_User,"CONSUME")
+	THEN
+		CharacterConsume(_User,%ApplyPotion)
+	ENDIF
+	IF "c1&c2"
+		IsEqual(%ApplyPotion,"TOTEM_HIB_Altar_Fire")
+		CharacterHasStatus(_User,"CHILLED")
+	THEN
+		CharacterRemoveStatus(_User,CHILLED)
+	ENDIF	
+/*
+EVENT Destroyed
+ON
+	OnDie(_,_,_,_)
+ACTIONS
+	DebugText(__Me,"I'm so dead!")
+	CharacterConsume(%PoisonVictim,%ApplyPoison)*/
+	
+EVENT Attacked
+ON
+	OnDamage(_,_,_,_)
+ACTIONS
+	CharacterEvent(%PoisonVictim,"HIB_Boreas_StartConversation")

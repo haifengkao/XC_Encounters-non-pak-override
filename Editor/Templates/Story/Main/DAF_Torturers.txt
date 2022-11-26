@@ -1,0 +1,627 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+ItemToCharacter(ITEM_DAF_KeyVillageWarehouseHatch, CHARACTER_DAF_BO_PrisonGuard1);
+ItemToCharacter(ITEM_DAF_BookOfTorturing_Volume_III, CHARACTER_DAF_BO_OrcTrader);
+ItemSetOnstage(ITEM_DAF_COR_Nolan,0);
+CharacterSetVarInteger(CHARACTER_DAF_BO_TorturerGoblin, "DAF_BO_TortureTestScore", -1);
+DB_Dialogs(CHARACTER_DAF_BO_PrisonGuard1,"DAF_BO_PrisonGuard1");
+DB_Dialogs(CHARACTER_DAF_TorturePrisoner1,"DAF_BO_Prisoners");
+DB_Dialogs(CHARACTER_DAF_TorturePrisoner2,"DAF_BO_Prisoners");
+
+DB_DAF_PrisonGuard(CHARACTER_DAF_BO_PrisonGuard2);
+DB_DAF_PrisonGuard(CHARACTER_DAF_BO_PrisonGuard3);
+DB_DAF_PrisonGuard(CHARACTER_DAF_BO_PrisonGuard4);
+DB_DAF_PrisonGuard(CHARACTER_DAF_BO_PrisonGuard5);
+KillCounter("DAF_PrisonGuard",4);
+
+DB_Dialogs(CHARACTER_DAF_BO_TorturerOrc, CHARACTER_DAF_BO_TorturerGoblin, "DAF_BOTorturers");
+DB_OneShot_DialogTrigger_NewSystem(TRIGGER_DAF_BO_Torturers_Dialog, "DAF_BOTorturers", CHARACTER_DAF_BO_TorturerOrc,CHARACTER_DAF_BO_TorturerGoblin);
+SneakTriggerSpotter(TRIGGER_DAF_PrisonerCell,CHARACTER_DAF_TorturePrisoner2);
+DB_OneShot_DialogTrigger_NewSystem(TRIGGER_DAF_PrisonerCell, "DAF_BO_Prisoners", CHARACTER_DAF_TorturePrisoner1);
+
+
+DB_OneShotPlayerTrigger(TRIGGER_DAF_Area_BOTorturers1);
+
+ItemToCharacter(ITEM_DAF_KeyWarehouse2,CHARACTER_DAF_BO_PrisonGuard2);
+TriggerRegisterForPlayers(TRIGGER_DAF_Area_InsideCell);
+
+DB_BO_Torturers_PlayerScore(0);
+
+DB_PlayerComments("DAF_CommentTunnelClearedFromShadowCreatures","DAF_CommentTunnelClearedFromShadowCreatures_1_1",1,1);
+DB_PlayerComments("DAF_CommentTunnelClearedFromShadowCreatures","DAF_CommentTunnelClearedFromShadowCreatures_2_1",2,1);
+DB_PlayerComments("DAF_CommentTunnelClearedFromShadowCreatures","DAF_CommentTunnelClearedFromShadowCreatures_2_2",2,2);
+
+DB_PlayerComments("DAF_CommentTunnelOpened","DAF_CommentTunnelOpened_1_1",1,1);
+DB_PlayerComments("DAF_CommentTunnelOpened","DAF_CommentTunnelOpened_2_1",2,1);
+DB_PlayerComments("DAF_CommentTunnelOpened","DAF_CommentTunnelOpened_2_2",2,2);
+
+DB_BO_Torturers(CHARACTER_DAF_BO_TorturerOrc);
+DB_BO_Torturers(CHARACTER_DAF_BO_TorturerGoblin);
+KillCounter("DAF_BO_Torturers", 2);
+
+DB_NoDefaultBehavior(CHARACTER_DAF_TorturePrisoner1);
+DB_NoDefaultBehavior(CHARACTER_DAF_TorturePrisoner2);
+DB_NoDefaultBehavior(CHARACTER_DAF_Nolan);
+
+TriggerRegisterForCharacter(TRIGGER_DAF_CommentTortureRoom, CHARACTER_DAF_BO_TorturerOrc);
+
+DB_BO_Prisoners(CHARACTER_DAF_TorturePrisoner1);
+DB_BO_Prisoners(CHARACTER_DAF_TorturePrisoner2);
+
+KillCounter("DAF_BO_TortureTunnelCreatures_KillCount", 7);
+KillCounterDB(CHARACTER_DAF_Tunnel_Mushroom_05, "DAF_BO_TortureTunnelCreatures_KillCount");
+KillCounterDB(CHARACTER_DAF_Tunnel_Mushroom_06, "DAF_BO_TortureTunnelCreatures_KillCount");
+KillCounterDB(CHARACTER_DAF_Tunnel_Mushroom_07, "DAF_BO_TortureTunnelCreatures_KillCount");
+KillCounterDB(CHARACTER_DAF_Tunnel_Mushroom_08, "DAF_BO_TortureTunnelCreatures_KillCount");
+KillCounterDB(CHARACTER_DAF_Tunnel_Mushroom_09, "DAF_BO_TortureTunnelCreatures_KillCount");
+KillCounterDB(CHARACTER_DAF_Tunnel_Zombie_01, "DAF_BO_TortureTunnelCreatures_KillCount");
+KillCounterDB(CHARACTER_DAF_Tunnel_Zombie_02, "DAF_BO_TortureTunnelCreatures_KillCount");
+
+NoReflectionDialogOnKill(CHARACTER_DAF_BO_TorturerGoblin);
+NoReflectionDialogOnKill(CHARACTER_DAF_BO_TorturerOrc);
+
+PROC_BO_InitTorturersQuest();
+
+DB_PlayerComment_Trigger(TRIGGER_DAF_Comment_TortureTunnelBodies, "DAF_CommentTortureTunnelBodies");
+DB_PlayerComments("DAF_CommentTortureTunnelBodies","DAF_CommentTortureTunnelBodies_1_1",1,1);
+DB_PlayerComments("DAF_CommentTortureTunnelBodies","DAF_CommentTortureTunnelBodies_2_1",2,1);
+DB_PlayerComments("DAF_CommentTortureTunnelBodies","DAF_CommentTortureTunnelBodies_2_2",2,2);
+DB_PlayerLastKilledShadowCreatureInTunnel(CHARACTER_Player1);
+KBSECTION
+//REGION Init
+IF
+DB_DAF_PrisonGuard(_Guard)
+THEN
+DB_Dialogs(_Guard,"DAF_BO_PrisonGuard2");
+DB_IsNotMessingAround(_Guard);
+DB_NoRunAway(_Guard);
+KillCounterDB(_Guard,"DAF_PrisonGuard");
+
+IF
+DB_Dead(CHARACTER_DAF_TorturePrisoner1)
+AND
+DB_Dead(CHARACTER_DAF_TorturePrisoner2)
+THEN
+GlobalSetEvent("DAF_PrisonersDead");
+
+IF
+CharacterUsedItem(_Character,ITEM_DAF_DoorVillageWarehouseHatch)
+AND
+Sees(CHARACTER_DAF_BO_PrisonGuard1,_Character)
+AND
+NOT DB_GlobalEvent("DAF_AccessTorture")
+THEN
+ProcDoTwoSpeakerDialog("DAF_BO_PrisonGuard1",CHARACTER_DAF_BO_PrisonGuard1,_Character);
+
+IF
+GlobalEventSet("DAF_AccessTorture")
+THEN
+ItemUnLock(ITEM_DAF_DoorVillageWarehouseHatch);
+
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,TRIGGER_DAF_Area_BOTorturers1)
+THEN
+DialogStartTwoSpeakerDialog("DAF_AD_BOTorturers",CHARACTER_DAF_BO_TorturerOrc,CHARACTER_DAF_BO_TorturerGoblin);
+
+IF
+CharacterDied(CHARACTER_DAF_BO_PrisonGuard1)
+THEN
+ItemClearOwner(ITEM_DAF_KeyVillageWarehouseHatch);
+//END_REGION
+
+//REGION Score Logic
+
+IF
+GlobalEventSet("DAF_TortureTest_Correct")
+AND
+DB_BO_Torturers_PlayerScore(_current)
+AND
+IntegerSum(_current, 1, _new)
+THEN
+NOT DB_BO_Torturers_PlayerScore(_current);
+DB_BO_Torturers_PlayerScore(_new);
+GlobalClearEvent("DAF_TortureTest_Correct");
+
+IF
+GlobalEventSet("DAF_BO_Torturers_ProcessScore")
+AND
+DB_BO_Torturers_PlayerScore(_score)
+THEN
+CharacterSetVarInteger(CHARACTER_DAF_BO_TorturerGoblin, "DAF_BO_TortureTestScore", _score);
+
+IF
+GlobalEventSet("DAF_BO_TortureQuiz_Reset")
+AND
+DB_BO_Torturers_PlayerScore(_score)
+THEN
+NOT DB_BO_Torturers_PlayerScore(_score);
+DB_BO_Torturers_PlayerScore(0);
+CharacterSetVarInteger(CHARACTER_DAF_BO_TorturerGoblin, "DAF_BO_TortureTestScore", -1);
+//END_REGION
+
+//REGION Tunnel Logic
+IF
+CharacterUsedItem(_player, ITEM_DAF_PrisonerButton)
+THEN
+Launch_PlayerComment(_Player,"DAF_CommentTunnelOpened");
+ItemSetCanInteract(ITEM_DAF_PrisonerButton,0);
+ItemMoveToTrigger(ITEM_DAF_PrisonersTunnelCupboard,TRIGGER_DAF_Point_PrisonersTunnelCupboard,0.4,0.2,1);
+ItemSetOnstage(ITEM_DAF_PrisonBlockRock,0);
+GlobalSetEvent("DAF_TunnelMoveCarpet");
+SetRelationFactionToPlayers("DAF_VillageBO_Torturers", 0);
+ProcTriggerUnregisterForPlayers(TRIGGER_DAF_Area_BOTorturers1);
+ProcTriggerUnregisterForPlayers(TRIGGER_DAF_BO_Torturers_Dialog);
+CharacterDisplayText(CHARACTER_DAF_BO_PrisonGuard5,"DAF_PrisonBreak");
+
+IF
+CharacterKilledByCharacter(_tunnelCreature, _player)
+AND
+KillCounterDB(_tunnelCreature, "DAF_BO_TortureTunnelCreatures_KillCount")
+AND
+_player.DB_IsPlayer()
+AND
+DB_PlayerLastKilledShadowCreatureInTunnel(_lastKiller)
+THEN
+NOT DB_PlayerLastKilledShadowCreatureInTunnel(_lastKiller);
+DB_PlayerLastKilledShadowCreatureInTunnel(_player);
+
+IF
+KillCounterCounts("DAF_BO_TortureTunnelCreatures_KillCount", 7)
+AND
+DB_PlayerLastKilledShadowCreatureInTunnel(_lastKiller)
+THEN
+GlobalSetEvent("DAF_BO_TortureTunnelSafe");
+Launch_PlayerComment(_lastKiller, "DAF_CommentTunnelClearedFromShadowCreatures");
+//END_REGION
+
+//REGION Prisoners Logic
+IF
+ItemOpened(ITEM_DAF_DoorWarehouse2)
+AND
+NOT DB_GlobalEvent("DAF_BO_PrisonersEscapeThroughTunnel")
+THEN
+SetRelationFactionToPlayers("DAF_VillageBO_Torturers", 0);
+ProcTriggerUnregisterForPlayers(TRIGGER_DAF_Area_BOTorturers1);
+ProcTriggerUnregisterForPlayers(TRIGGER_DAF_BO_Torturers_Dialog);
+CharacterDisplayText(CHARACTER_DAF_BO_PrisonGuard2,"DAF_PrisonBreak");
+CharacterSetVarInteger(CHARACTER_DAF_TorturePrisoner1, "DisablePrisonBehaviour", 1);
+GlobalSetEvent("DAF_PrisonDoorOpened");
+
+
+IF
+CharacterEnteredTrigger(CHARACTER_DAF_BO_TorturerOrc, TRIGGER_DAF_CommentTortureRoom)
+AND
+DB_Dead(CHARACTER_DAF_BO_PrisonGuard2)
+AND
+CharacterGetClosestPlayer(CHARACTER_DAF_Nolan, _player)
+THEN
+PROC_SetScriptPlayerForTorturers(_player);
+PROC_SetScriptFrameForTorturers("SpottedDeadGuard");
+TriggerUnregisterForCharacter(TRIGGER_DAF_CommentTortureRoom, CHARACTER_DAF_BO_TorturerOrc);
+
+IF
+CharacterEnteredTrigger(CHARACTER_DAF_BO_TorturerOrc, TRIGGER_DAF_CommentTortureRoom)
+AND
+NOT DB_Dead(CHARACTER_DAF_BO_PrisonGuard2)
+THEN
+PROC_SetScriptFrameForTorturers("WaitingOutside");
+TriggerUnregisterForCharacter(TRIGGER_DAF_CommentTortureRoom, CHARACTER_DAF_BO_TorturerOrc);
+DB_AD_Dialog(CHARACTER_DAF_BO_TorturerOrc,"DAF_AD_TorturerOrc");
+DB_AD_Dialog(CHARACTER_DAF_BO_TorturerGoblin,"DAF_AD_TorturerGoblin");
+
+IF
+GlobalEventSet("DAF_BO_PrisonersEscapeThroughTunnel")
+THEN
+CHARACTER_DAF_TorturePrisoner1.canEscape();
+
+IF
+DialogEnded("DAF_BO_Prisoners", _)
+AND
+CHARACTER_DAF_TorturePrisoner1.canEscape()
+THEN
+ItemUnlockAndOpen(ITEM_DAF_DoorWarehouse2);
+PROC_SetScriptFrameForPrisoners("EscapeToTunnel");
+GlobalSetEvent("DAF_BO_TorturePrisonersEscaped");
+
+IF
+CharacterScriptFrameFinished(_prisoner, "EscapeToTunnel")
+AND
+DB_BO_Prisoners(_prisoner)
+THEN
+CharacterSetHasDialog(_prisoner, 1);
+DB_Dialogs(_prisoner, "DAF_BO_Prisoners");
+NOT CHARACTER_DAF_TorturePrisoner1.canEscape();
+CHARACTER_DAF_TorturePrisoner1.hasEscaped();
+PROC_UpdateEscapingFlags();
+
+PROC
+PROC_SetScriptFrameForPrisoners((STRING)_scriptFrame)
+AND
+DB_BO_Prisoners(_prisoner)
+THEN
+CharacterSetHasDialog(_prisoner, 0);
+CharacterSetScriptframe(_prisoner, _scriptFrame);
+//END_REGION
+
+//REGION Torturers Logic
+IF
+GlobalEventSet("DAF_TorturersLeave")
+THEN
+CHARACTER_DAF_BO_TorturerOrc.isLeaving();
+
+IF
+DialogEnded("DAF_BOTorturers",_)
+AND
+CHARACTER_DAF_BO_TorturerOrc.isLeaving()
+THEN
+NOT CHARACTER_DAF_BO_TorturerOrc.isLeaving();
+CharacterDisplayText(CHARACTER_DAF_BO_TorturerOrc, "DAF_OrcTorturer_Cursing_01");
+ProcCharacterMoveToTrigger(CHARACTER_DAF_BO_TorturerOrc,TRIGGER_DAF_PointTorturerOrc,1,"");
+ProcCharacterMoveToTrigger(CHARACTER_DAF_BO_TorturerGoblin,TRIGGER_DAF_PointTorturerGoblin,1,"");
+DB_Dialogs(CHARACTER_DAF_Nolan,"DAF_Nolan");
+
+IF
+CharacterScriptFrameFinished(CHARACTER_DAF_BO_TorturerOrc, "SpottedDeadGuard")
+THEN
+SetRelationFactionToPlayers("DAF_VillageBO_Torturers",0);
+
+IF
+DialogStarted("DAF_BOTorturers",_)
+THEN
+DialogRequestStop("DAF_AD_BOTorturers",CHARACTER_DAF_BO_TorturerOrc);
+DialogRequestStop("DAF_AD_BOTorturers",CHARACTER_DAF_BO_TorturerGoblin);
+
+IF
+GlobalEventSet("DAF_TorturersGetHostile")
+THEN
+CHARACTER_DAF_BO_TorturerOrc.TorturersGetHostile();
+
+IF
+DialogEnded("DAF_BOTorturers", _)
+AND
+CHARACTER_DAF_BO_TorturerOrc.TorturersGetHostile()
+THEN
+SetRelationFactionToPlayers("DAF_VillageBO_Torturers",0);
+DB_Dialogs(CHARACTER_DAF_Nolan,"DAF_Nolan");
+
+IF
+DialogEnded("DAF_BOTorturers", _)
+AND
+NOT DB_GlobalEvent("DAF_TorturersLeave")
+AND
+NOT DB_GlobalEvent("DAF_TorturersGetHostile")
+THEN
+CharacterLookAtCharacter(CHARACTER_DAF_BO_TorturerOrc,CHARACTER_DAF_Nolan,1);
+CharacterLookAtCharacter(CHARACTER_DAF_BO_TorturerGoblin,CHARACTER_DAF_Nolan,1);
+DialogStartTwoSpeakerDialog("DAF_AD_BOTorturers", CHARACTER_DAF_BO_TorturerOrc,CHARACTER_DAF_BO_TorturerGoblin);
+//END_REGION
+
+//REGION Nolan Logic
+IF
+GlobalEventSet("DAF_BO_NolanInterruptDialog")
+AND
+CharacterGetClosestPlayer(CHARACTER_DAF_Nolan, _player)
+THEN
+DialogRequestStop("DAF_DD_Nolan", _player);
+DialogRequestStop("DAF_Nolan", CHARACTER_DAF_Nolan);
+
+PROC
+PROC_SetScriptFrameForTorturers((STRING)_scriptFrame)
+AND
+DB_BO_Torturers(_torturer)
+THEN
+ProcRemoveDialogEntryForSpeaker(_torturer,"DAF_BOTorturers");
+CharacterSetScriptframe(_torturer, _scriptFrame);
+
+PROC
+PROC_SetScriptPlayerForTorturers((CHARACTER)_player)
+AND
+DB_BO_Torturers(_torturer)
+THEN
+CharacterSetVarCharacter(_torturer, "Player", _player);
+
+IF
+CharacterAttackedByCharacter(CHARACTER_DAF_Nolan, _player)
+AND
+_player.DB_IsPlayer()
+THEN
+PROC_SetScriptPlayerForTorturers(_player);
+Proc_NolanMustDie();
+
+IF
+CharacterDied(CHARACTER_DAF_Nolan)
+THEN
+GlobalSetEvent("DAF_BOKillNolan");
+GlobalClearEvent("DAF_BOSaveNolan");
+GlobalSetEvent("DAF_NolanFreedOrKilled");
+
+IF
+CharacterDied(CHARACTER_DAF_Nolan)
+AND
+NOT DB_GlobalEvent("DAF_TorturersLeave")
+THEN
+DialogRequestStopForCharacter(CHARACTER_DAF_BO_TorturerOrc);
+SetRelationFactionToPlayers("DAF_VillageBO_Torturers",0);
+
+IF
+CharacterDied(CHARACTER_DAF_Nolan)
+AND
+DB_GlobalEvent("DAF_TorturersLeave")
+AND
+NOT DB_GlobalEvent("DAF_BOKillNolan")
+AND
+NOT DB_GlobalEvent("DAF_HiddenFamilyMarker")
+THEN
+Proc_RespondToNolanDeath();
+//END_REGION
+
+//REGION Nolan Killed Logic
+IF
+DialogCharacterEventSet("DAF_BO_Killed", CHARACTER_DAF_Nolan, _ID)
+AND
+DB_DialogPlayers(_ID,_Player,1)
+THEN
+CHARACTER_DAF_Nolan.getsKilled();
+PROC_SetScriptPlayerForTorturers(_player);
+GlobalSetEvent("DAF_NolanFreedOrKilled");
+
+IF
+DialogEnded("DAF_Nolan",_)
+AND
+CHARACTER_DAF_Nolan.getsKilled()
+THEN
+Proc_RespondToNolanDeath();
+
+PROC
+Proc_RespondToNolanDeath()
+THEN
+CharacterDisplayText(CHARACTER_DAF_Nolan,"DAF_NolanDies");
+DialogRequestStopForCharacter(CHARACTER_DAF_BO_TorturerOrc);
+PROC_SetScriptFrameForTorturers("EnterAfterNolanGotKilled");
+QuestUpdate("DAF_HiddenFamily","Prisoner2");
+ProcRemoveNPCADs(CHARACTER_DAF_BO_TorturerOrc);
+ProcRemoveNPCADs(CHARACTER_DAF_BO_TorturerGoblin);
+DB_AD_Dialog(CHARACTER_DAF_BO_TorturerOrc,"DAF_AD_TorturerOrc_NolanKilled");
+DB_AD_Dialog(CHARACTER_DAF_BO_TorturerGoblin,"DAF_AD_TorturerGoblin_NolanKilled");
+
+IF
+CharacterDisplayTextEnded(CHARACTER_DAF_Nolan,"DAF_NolanDies")
+THEN
+GlobalSetEvent("DAF_BOKillNolan");
+Proc_NolanMustDie();
+NOT DB_Dialogs(CHARACTER_DAF_BO_TorturerOrc,CHARACTER_DAF_BO_TorturerGoblin,"DAF_BOTorturers");
+
+PROC
+Proc_NolanMustDie()
+AND
+CHARACTER_DAF_Nolan.noLongerOnRack()
+THEN
+CharacterDie(CHARACTER_DAF_Nolan,0);
+
+PROC
+Proc_NolanMustDie()
+AND
+NOT CHARACTER_DAF_Nolan.noLongerOnRack()
+THEN
+CharacterSetScriptframe(CHARACTER_DAF_Nolan,"DoNothing");
+CharacterSetAnimationOverride(CHARACTER_DAF_Nolan,"TortureRack_Die_01");
+TimerLaunch("NolanCustomDie",3000);
+
+IF
+TimerFinished("NolanCustomDie")
+THEN
+CharacterDie(CHARACTER_DAF_Nolan,0);
+CharacterSetOnStage(CHARACTER_DAF_Nolan,0);
+ItemSetOnstage(ITEM_DAF_COR_Nolan,1);
+//END_REGION
+
+//REGION Nolan Saved Logic
+IF
+DialogCharacterEventSet("DAF_BO_Saved", CHARACTER_DAF_Nolan, _ID)
+AND
+DB_DialogPlayers(_ID,_Player,1)
+THEN
+PROC_SetScriptPlayerForTorturers(_player);
+CharacterSetVarCharacter(CHARACTER_DAF_BO_PrisonGuard2, "Player", _player);
+CHARACTER_DAF_Nolan.getsRescued();
+GlobalSetEvent("DAF_NolanFreedOrKilled");
+
+IF
+GlobalEventSet("DAF_BO_TorturersHeardRescue")
+THEN
+DialogRequestStopForCharacter(CHARACTER_DAF_BO_TorturerOrc);
+PROC_SetScriptFrameForTorturers("EnterAfterNolanGotRescued");
+CharacterSetScriptframe(CHARACTER_DAF_BO_PrisonGuard2, "EnterAfterNolanGotRescued");
+
+IF
+GlobalEventSet("DAF_BO_TorturersStormIn")
+THEN
+DialogRequestStopForCharacter(CHARACTER_DAF_Nolan);
+
+IF
+DialogEnded("DAF_Nolan",_)
+AND
+CHARACTER_DAF_Nolan.getsRescued()
+THEN
+CharacterSetEvent(CHARACTER_DAF_Nolan,"WaitingForRescue");
+CharacterSetHasDialog(CHARACTER_DAF_Nolan, 0);
+CHARACTER_DAF_Nolan.noLongerOnRack();
+
+IF
+CharacterScriptFrameFinished(_, "EnterAfterNolanGotRescued")
+THEN
+SetRelationFactionToPlayers("DAF_VillageBO_Torturers",0);
+
+IF
+DB_BO_Torturers(_Torturer)
+THEN
+KillCounterDB(_Torturer, "DAF_BO_Torturers");
+
+PROC
+ReactOnKillCounter("DAF_BO_Torturers")
+THEN
+NOT CHARACTER_DAF_Nolan.getsRescued();
+DB_Dialogs(CHARACTER_DAF_Nolan,"DAF_Nolan");
+CharacterSetHasDialog(CHARACTER_DAF_Nolan, 1);
+GlobalSetEvent("DAF_BO_TorturersDead");
+CharacterSetScriptframe(CHARACTER_DAF_Nolan, "AfterTorturersGetKilled");
+CHARACTER_DAF_Nolan.noLongerOnRack();
+
+PROC
+ReactOnKillCounter("DAF_BO_Torturers")
+AND
+CharacterIsDead(CHARACTER_DAF_Nolan,0)
+THEN
+GlobalSetEvent("DAF_BOSaveNolan");
+
+PROC
+ReactOnKillCounter("DAF_PrisonGuard")
+THEN
+GlobalSetEvent("DAF_PrisonGuards_Dead");
+
+IF
+GlobalEventSet("DAF_BO_NolanToTunnel")
+THEN
+CHARACTER_DAF_Nolan.goesToTunnel();
+
+IF
+DialogEnded("DAF_Nolan", _)
+AND
+CHARACTER_DAF_Nolan.goesToTunnel()
+THEN
+CharacterSetHasDialog(CHARACTER_DAF_Nolan, 0);
+CharacterSetScriptframe(CHARACTER_DAF_Nolan, "DAF_NolanRunsToTunnel");
+GlobalSetEvent("DAF_BOSaveNolan");
+
+IF
+CharacterScriptFrameFinished(CHARACTER_DAF_Nolan, "DAF_NolanRunsToTunnel")
+THEN
+NOT CHARACTER_DAF_Nolan.goesToTunnel();
+GlobalSetEvent("DAF_NolanEscapedToTunnel");
+CHARACTER_DAF_Nolan.hasEscaped();
+PROC_UpdateEscapingFlags();
+CharacterSetHasDialog(CHARACTER_DAF_Nolan, 1);
+//END_REGION
+
+//REGION Reward Logic
+PROC
+PROC_UpdateEscapingFlags()
+AND
+CHARACTER_DAF_TorturePrisoner1.hasEscaped()
+AND
+CHARACTER_DAF_Nolan.hasEscaped()
+THEN
+GlobalClearEvent("DAF_PrisonersTalkAboutNolan");
+
+IF
+DialogCharacterEventSet("DAF_BO_TorturerPrisonersGivesReward", _, _)
+THEN
+ProcShowMarker("DAF_SecretEntranceGrutilda");
+
+IF
+GlobalEventSet("DAF_BO_TorturePrisonersRunsOff")
+THEN
+CHARACTER_DAF_TorturePrisoner1.disappear();
+
+IF
+DialogEnded("DAF_BO_Prisoners", _)
+AND
+CHARACTER_DAF_TorturePrisoner1.disappear()
+THEN
+QuestUpdate("DAF_HiddenFamily","Prisoner3");
+PROC_BO_PrisonersDisappearOutOfSight();
+
+PROC
+PROC_BO_PrisonersDisappearOutOfSight()
+AND
+DB_BO_Prisoners(_prisoner)
+THEN
+CharacterSetHasDialog(_prisoner, 0);
+CharacterDisappearOutOfSight(_prisoner, 90, 1, "", 1);
+
+IF
+DialogCharacterEventSet("DAF_BO_NolanGivesReward", _player, _)
+AND
+_player.DB_IsPlayer()
+THEN
+//TODO GIVE REWARD HERE
+CHARACTER_DAF_Nolan.disappear();
+
+IF
+DialogEnded("DAF_Nolan", _)
+AND
+CHARACTER_DAF_Nolan.disappear()
+THEN
+CharacterSetHasDialog(CHARACTER_DAF_Nolan, 0);
+CharacterDisappearOutOfSight(CHARACTER_DAF_Nolan, 90, 1, "", 1);
+//END_REGION
+
+//REGION Clean up on war or after Ratcatcher
+IF
+GlobalEventSet("DAF_RatcatcherGone")
+AND
+NOT DB_OnlyOnce("DAF_stoptorture")
+THEN
+DB_OnlyOnce("DAF_stoptorture");
+Proc_DAF_TorturersCleanUp();
+
+IF
+TextEventSet("stoptorture")
+AND
+NOT DB_OnlyOnce("DAF_stoptorture")
+THEN
+DB_OnlyOnce("DAF_stoptorture");
+Proc_DAF_TorturersCleanUp();
+
+IF
+DAF_War(1)
+AND
+NOT DB_OnlyOnce("DAF_stoptorture")
+THEN
+DB_OnlyOnce("DAF_stoptorture");
+Proc_DAF_TorturersCleanUp();
+
+PROC
+Proc_DAF_TorturersCleanUp()
+AND
+NOT CHARACTER_DAF_Nolan.noLongerOnRack()
+THEN
+Proc_NolanMustDie();
+
+PROC
+Proc_DAF_TorturersCleanUp()
+THEN
+ProcCharacterMoveToTrigger(CHARACTER_DAF_BO_TorturerGoblin,TRIGGER_DAF_PointVillageWarehouseIn,1,"GEN_GoOffStage");
+ProcCharacterMoveToTrigger(CHARACTER_DAF_BO_TorturerOrc,TRIGGER_DAF_PointVillageWarehouseIn,1,"GEN_GoOffStage");
+ProcCharacterMoveToTrigger(CHARACTER_DAF_BO_PrisonGuard3,TRIGGER_DAF_PointVillageWarehouseIn,1,"GEN_GoOffStage");
+ProcCharacterMoveToTrigger(CHARACTER_DAF_BO_PrisonGuard4,TRIGGER_DAF_PointVillageWarehouseIn,1,"GEN_GoOffStage");
+ProcCharacterMoveToTrigger(CHARACTER_DAF_BO_PrisonGuard5,TRIGGER_DAF_PointVillageWarehouseIn,1,"GEN_GoOffStage");
+
+PROC
+Proc_DAF_TorturersCleanUp()
+AND
+NOT CHARACTER_DAF_TorturePrisoner1.hasEscaped()
+THEN
+ItemUnlockAndOpen(ITEM_DAF_DoorWarehouse2);
+CHARACTER_DAF_BO_PrisonGuard2.ExecutingPrisoners();
+CharacterAttackCharacter(CHARACTER_DAF_BO_PrisonGuard2,CHARACTER_DAF_TorturePrisoner1);
+
+IF
+CharacterAttackedByCharacter(CHARACTER_DAF_TorturePrisoner1,CHARACTER_DAF_BO_PrisonGuard2)
+AND
+CHARACTER_DAF_BO_PrisonGuard2.ExecutingPrisoners()
+THEN
+CharacterDie(CHARACTER_DAF_TorturePrisoner1,0);
+CharacterDie(CHARACTER_DAF_TorturePrisoner2,0);
+ProcCharacterMoveToTrigger(CHARACTER_DAF_BO_PrisonGuard2,TRIGGER_DAF_PointVillageWarehouseIn,1,"GEN_GoOffStage");
+
+
+
+EXITSECTION
+NOT CHARACTER_DAF_BO_TorturerOrc.isLeaving();
+
+
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

@@ -1,0 +1,67 @@
+#INCLUDE Prostitute
+INIT
+	USING Prostitute
+	TRIGGER:%Point1="LUC_PointRamon1_c4ed3248-6ab8-4516-ad59-89f56fe5afc3"
+	CHARACTER:%Brandon="LUC_Overseer_328e9643-f6aa-4502-82f0-5560a6eeacd0"
+
+//------------------
+BEHAVIOUR
+REACTION State_WaitingForClients, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction,"Action_AttractClients")
+	SetPriority(%currentAction,1100)
+
+REACTION State_Dialog, 0
+USAGE PEACE
+CHECK "!c1&!c2"
+	IsInDialog(%Brandon)
+	IsInDialog(__Me)
+ACTIONS
+	IF "!c1"
+		CharacterIsDead(%Brandon)
+	THEN
+		DialogStart("LUC_AD_BrandonRamon",%Brandon,__Me)
+	ENDIF
+	Set(%currentState,"State_WaitingForClients")
+INTERRUPT
+	Set(%currentState,"State_WaitingForClients")
+
+REACTION Ramon_CastSilence, 1000
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&!(c4|c5|c6)"
+	CharacterCanCast(__Me,"Projectile_RamonSilence",1)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_RamonSilence")
+	CharacterGet(_Target,__Me,50,Highest,Intelligence,Enemy)
+	CharacterHasStatus(_Target,"INVISIBLE")
+	CharacterHasStatus(_Target,"SNEAKING")
+	CharacterHasStatus(_Target,"MUTED")
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_RamonSilence",_Target)
+INTERRUPT
+	SetPriority("Ramon_CastSilence",0)
+	
+//------------------
+EVENTS
+EVENT OnInit_AddSkills
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill("Projectile_RamonSilence")
+	
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("Ramon_CastSilence",1000)
+	
+EVENT StartDialog
+ON
+	OnCharacterEvent(__Me,"DialogRequest")
+ACTIONS
+	Set(%currentState,"State_Dialog")

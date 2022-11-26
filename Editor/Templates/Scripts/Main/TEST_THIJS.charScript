@@ -1,0 +1,12 @@
+INIT 
+	CHARACTER:__Me
+	CHARACTER:%Spawnee
+	
+BEHAVIOUR
+REACTION SummonSomeone,100
+USAGE COMBAT
+VARS
+	CHARACTER:_Player
+ACTIONS
+	SpawnCharacter(%Spawnee,NPC_F_N_Cultist_4eb0c121-0e84-4930-8f44-892ede3e7cd4,__Me,1,1,__Me)
+	CharacterEndTurn()

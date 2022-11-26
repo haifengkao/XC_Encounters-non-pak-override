@@ -1,0 +1,655 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%Ally1="CYS_NorthCaveSkeleton1_bae10cf1-fa4e-48ba-b141-2800e11ad85a"
+	CHARACTER:%Ally2="CYS_NorthCaveSkeleton2_fc2aead8-4c04-45f3-a7a9-c2a77d7453c3"
+	CHARACTER:%Ally3="CYS_NorthCaveSkeleton3_ef1bd3b2-f610-4591-a876-473f6cbd218b"
+	CHARACTER:%MissileVictim
+	INT:%WeaponsDeactivated=0
+	INT:%Sparkmaster_ChargeLevel=0
+	INT:%Sparkmaster_ChargeFX_R=0
+	INT:%Sparkmaster_ChargeFX_L=0
+	INT:%LeverAPulled_FX_Handle=0
+	INT:%LeverBPulled_FX_Handle=0
+	INT:%LeverCPulled_FX_Handle=0
+	INT:%Bool_LeverAPulled=0
+	INT:%Bool_LeverBPulled=0
+	INT:%Bool_LeverCPulled=0
+	INT:%SpMiss_FXHandle
+	INT:%Bool_MissilesEnRoute=0
+	EXTERN INT:%MissileAttack_Current=0
+	EXTERN INT:%MissileAttack_Desired=2
+	ITEM:%InvisHelper_A="CYS_NorthCave_InvisHelper_Lever_A_7fecebb0-396f-450c-bcaa-702500b01be1"
+	ITEM:%InvisHelper_B="CYS_NorthCave_InvisHelper_Lever_B_d3ba4def-79a4-461f-a48e-a1e9f845582b"
+	ITEM:%InvisHelper_C="CYS_NorthCave_InvisHelper_Lever_C_27d1f93d-3aec-44c9-8fb4-bf6520861d27"
+	ITEM:%InvisHelper_Spike="CYS_NorthCave_InvisHelper_Spike_01_0d478b8c-2b0b-4e40-882e-d944345c08ca"
+	FLOAT:%MySightRange=0
+	FLOAT3:%SpMiss_Spot	
+	ITEM:%LeverA="PUZ_Lever_Garden_A_001_bd03f9ba-08fd-47cb-813d-4ce9e8008f95"
+	ITEM:%LeverB="PUZ_Lever_Garden_A_002_711d282c-b25a-4c3d-8f45-7f164a1c03ef"
+	ITEM:%LeverC="PUZ_Lever_Garden_A_003_401e6309-ad87-43a4-bb4a-621f8bc43046"
+	
+//---------------	
+BEHAVIOUR
+REACTION SparkMaster_ChargedAttack,700
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&!(c2|c3|c4|c5)&c6&c7&c8"
+	IsGreaterThen(%Sparkmaster_ChargeLevel,0)														//c1
+	CharacterHasStatus(__Me,"STUNNED")																//!c2
+	CharacterHasStatus(__Me,"FEAR")																	//!c3
+	CharacterHasStatus(__Me,"FROZEN")																//!c4
+	CharacterHasStatus(__Me,"PETRIFIED")															//!c5
+	CharacterCanCast(__Me,"Projectile_EnemyUltraBolt")												//c6
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyUltraBolt")					//c7
+	CharacterGet(_Enemy,__Me,%MySightRange,Highest,Vitality,Enemy)									//c8
+ACTIONS
+	CharacterMoveInRange(_Enemy,_MinRange,_MaxRange,1)
+	DisplayText(__Me,"CYS_NorthCave_SparkMaster_UltraBolt",2)
+	CharacterUseSkill("Projectile_EnemyUltraBolt",_Enemy)
+	Set(%Sparkmaster_ChargeLevel,0)
+	CharacterPlayEffect(__Me,"FX_Skills_Air_LightningStrike_Impact_A","Dummy_R_Hand")
+	StopLoopEffect(%Sparkmaster_ChargeFX_R)
+	CharacterPlayEffect(__Me,"FX_Skills_Air_LightningStrike_Impact_A","Dummy_L_Hand")
+	StopLoopEffect(%Sparkmaster_ChargeFX_L)	
+	IF "c1"
+		IsEqual(%Bool_LeverAPulled,1)
+	THEN
+		ItemPlayEffect(%LeverA,"FX_Skills_Air_LightningStrike_Impact_A")
+		StopLoopEffect(%LeverAPulled_FX_Handle)
+		Set(%Bool_LeverAPulled,0)
+	ENDIF
+	IF "c1"
+		IsEqual(%Bool_LeverBPulled,1)
+	THEN
+		ItemPlayEffect(%LeverB,"FX_Skills_Air_LightningStrike_Impact_A")			
+		StopLoopEffect(%LeverBPulled_FX_Handle)
+		Set(%Bool_LeverBPulled,0)
+	ENDIF	
+	IF "c1"
+		IsEqual(%Bool_LeverCPulled,1)
+	THEN
+		ItemPlayEffect(%LeverC,"FX_Skills_Air_LightningStrike_Impact_A")			
+		StopLoopEffect(%LeverCPulled_FX_Handle)
+		Set(%Bool_LeverCPulled,0)
+	ENDIF		
+	CombatLogText(__Me,"CYS_SparkMaster_Discharge_Attack_BL",0,1)
+	CharacterEvent(__Me,"CYS_SparkMaster_NotCharged_Event")
+	CharacterEndTurn() 
+INTERRUPT
+	Reset()
+	
+REACTION SparkMaster_DischargeElectricity,0												//can be triggered by REMOCON
+USAGE ALL
+VARS
+CHECK "c1"
+	IsGreaterThen(%Sparkmaster_ChargeLevel,0)
+ACTIONS
+	CharacterPlayEffect(__Me,"FX_Skills_Air_LightningStrike_Impact_A")
+	CharacterPlayAnimation("hit")
+	IF "!c1"
+		IsEqual(%Bool_LeverAPulled,0)
+	THEN
+		ItemPlayEffect(%LeverA,"FX_Skills_Air_LightningStrike_Impact_A")
+		StopLoopEffect(%LeverAPulled_FX_Handle)
+		Set(%Bool_LeverAPulled,0)		
+	ENDIF
+	IF "!c1"
+		IsEqual(%Bool_LeverBPulled,0)
+	THEN	
+		ItemPlayEffect(%LeverB,"FX_Skills_Air_LightningStrike_Impact_A")		
+		StopLoopEffect(%LeverBPulled_FX_Handle)
+		Set(%Bool_LeverBPulled,0)
+	ENDIF
+	IF "!c1"
+		IsEqual(%Bool_LeverCPulled,0)
+	THEN	
+		ItemPlayEffect(%LeverC,"FX_Skills_Air_LightningStrike_Impact_A")		
+		StopLoopEffect(%LeverCPulled_FX_Handle)
+		Set(%Bool_LeverCPulled,0)
+	ENDIF
+	IF "!c1"
+		IsEqual(%Sparkmaster_ChargeLevel,0)
+	THEN
+		CharacterPlayEffect(__Me,"FX_GP_StarStone_Up_A")
+		Set(%Sparkmaster_ChargeLevel,0)	
+		CharacterPlayEffect(__Me,"FX_Skills_Air_LightningStrike_Impact_A","Dummy_R_Hand")
+		StopLoopEffect(%Sparkmaster_ChargeFX_R)
+		CharacterPlayEffect(__Me,"FX_Skills_Air_LightningStrike_Impact_A","Dummy_L_Hand")
+		StopLoopEffect(%Sparkmaster_ChargeFX_L)
+		StartTimer("CYS_NorthCave_Timer_ChargeDissipatedFX",2,0)
+	ENDIF
+	CombatLogText(__Me,"CYS_SparkMaster_Discharge_Levers_BL",0,1)
+	CharacterEvent(__Me,"CYS_SparkMaster_NotCharged_Event")		
+	SetPriority("SparkMaster_DischargeElectricity",0)	
+INTERRUPT
+	Reset()
+	
+REACTION SparkMaster_CallForRepairs,0
+USAGE COMBAT
+CHECK "!c1&!c2&!c3&!c4&!c5"
+	CharacterHasStatus(__Me,STUNNED)
+	CharacterHasStatus(__Me,FEAR)
+	CharacterHasStatus(__Me,FROZEN)
+	CharacterHasStatus(__Me,PETRIFIED)
+	CharacterHasStatus(__Me,CHARMED)
+ACTIONS
+	DisplayText(__Me,"CYS_NorthCave_SparkMasterCallsForHelp",3)							//GREASEMONKEY!!
+	Sleep(2)
+	CharacterEvent(__Me,"CYS_SparkMaster_NeedsRepair_Event")
+	SetPriority("SparkMaster_CallForRepairs",0)
+
+REACTION SparkMaster_AttackClosest,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+CHECK "!c1&c2"
+	IsGreaterThen(%WeaponsDeactivated,0)
+	CharacterGet(_Enemy,__Me,5,Lowest,Distance,Enemy)
+ACTIONS
+	CharacterAttack(_Enemy)
+	
+REACTION SparkMaster_UseIronDart,200
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "!c1&!c2&c3&c4&c5"
+	IsCasual()																				//!c1
+	IsGreaterThen(%WeaponsDeactivated,0)													//!c2	
+	CharacterCanCast(__Me,"Projectile_EnemyIronDart_SM")									//c3
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyIronDart_SM")			//c4
+	CharacterGet(_Enemy,__Me,%MySightRange,Highest,Distance,Enemy)							//c5
+ACTIONS
+	CharacterMoveInRange(_Enemy,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_EnemyIronDart_SM",_Enemy)
+	CharacterEndTurn()
+	
+REACTION SparkMaster_REMOCON_VentSteam,0
+USAGE ALL
+ACTIONS
+	CreateSurfaceAt(__Me,CloudSteam,4,1)
+	DisplayText(__Me,"CYS_NorthCave_SparkMaster_VentingSteam",3)
+	SetPriority("SparkMaster_REMOCON_VentSteam", 0)
+INTERRUPT
+	Reset()
+	
+REACTION SparkMaster_CantGetToTarget_Fallback,6
+USAGE COMBAT
+VARS
+	FLOAT:_MyHealth
+CHECK "c1&c2"
+	CharacterIsDead(%Ally1)
+	CharacterIsDead(%Ally2)	
+ACTIONS
+	Sleep(0.5)
+	IF "c1&c2"
+		CharacterGetStat(_MyHealth,__Me,Vitality)
+		IsLessThen(_MyHealth,1.0)
+	THEN
+		DisplayText(__Me,"CYS_NorthCave_SparkMaster_CantGetATargetSoHeals",3)	//"Ah, this robot is so hard to steer! What's that button do?"
+		Sleep(2)
+		CharacterPlayEffect(__Me,"FX_Skills_WitchCraft_UndeadHeal_Impact_A")
+		CharacterHeal(__Me,0.02)
+	ELSE
+		DisplayText(__Me,"CYS_NorthCave_SparkMaster_CantMove",3)				//"Come on! Move! COME ON!"	
+	ENDIF	
+	Sleep(1)
+	CharacterEndTurn()
+
+//---- HARDCORE
+REACTION SparkMaster_Hardcore_PlaceMarkOnTheGround,0
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MyCurrentAP
+CHECK "c1&!(c2|c3|c4|c5|c6)&c7&c8&c9&!c10"
+	IsHardcore()												//c1
+	CharacterHasStatus(__Me,"FROZEN")							//!c2
+	CharacterHasStatus(__Me,"STUNNED")							//!c3
+	CharacterHasStatus(__Me,"CHARMED")							//!c4
+	CharacterHasStatus(__Me,"PETRIFIED")						//!c5
+	CharacterHasStatus(__Me,"KNOCKED_DOWN")						//!c6
+	CharacterGet(_Target,__Me,25,Highest,Distance,Enemy)		//c7
+	GetPosition(_Target,%SpMiss_Spot)							//c8
+	CharacterGetStat(_MyCurrentAP,__Me,ActionPoints)			//c9
+	IsLessThen(_MyCurrentAP,4)									//!c10
+ACTIONS
+	CharacterLookAt(_Target)
+	CharacterPlayAnimation("skill_rain_start",1,1)
+	CharacterPlayAnimation("skill_rain_loop",1,1)
+	CharacterPlayAnimation("skill_rain_cast",1,0)
+	CharacterPlayEffect(__Me,"FX_Creatures_Skills_MetalRain_Cast_A")	
+	Sleep(0.2)
+	Set(%Bool_MissilesEnRoute,1)
+	PlayLoopEffectAt(%SpMiss_FXHandle,%SpMiss_Spot,"FX_Creatures_Skills_MetalRain_Target_A")
+	CharacterUseActionPoints(__Me,4)
+	Sleep(3.5)
+	SetPriority("SparkMaster_UseIronDart",0)
+	SetPriority("SparkMaster_Hardcore_PlaceMarkOnTheGround",0)
+
+//---------------	
+EVENTS
+EVENT OnInit_GiveSkills_FXRestore
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%MySightRange,__Me,Sight)
+	THEN
+		SetPriority("Combat_AttackSetEnemy",0)
+		SetPriority("Combat_TakeCover",0)
+		CharacterAddSkill("Projectile_EnemyUltraBolt")
+		CharacterAddSkill("Projectile_EnemyIronDart_SM")
+	ENDIF
+	IF "c1"
+		IsEqual(%Bool_MissilesEnRoute,1)
+	THEN
+		PlayLoopEffectAt(%SpMiss_FXHandle,%SpMiss_Spot,"FX_Creatures_Skills_MetalRain_Target_A")
+	ENDIF
+	IF "c1"
+		IsEqual(%Bool_LeverAPulled,1)
+	THEN
+		ItemPlayLoopEffect(%LeverAPulled_FX_Handle,%InvisHelper_A,"FX_Creatures_Summons_ElementalWind_A_LightningHand")
+	ENDIF
+	IF "c1"
+		IsEqual(%Bool_LeverBPulled,1)
+	THEN
+		ItemPlayLoopEffect(%LeverBPulled_FX_Handle,%InvisHelper_B,"FX_Creatures_Summons_ElementalWind_A_LightningHand")
+	ENDIF
+	IF "c1"
+		IsEqual(%Bool_LeverCPulled,1)
+	THEN
+		ItemPlayLoopEffect(%LeverCPulled_FX_Handle,%InvisHelper_C,"FX_Creatures_Summons_ElementalWind_A_LightningHand")
+	ENDIF
+	IF "c1"
+		IsGreaterThen(%Sparkmaster_ChargeLevel,0)
+	THEN
+		CharacterPlayLoopEffect(%Sparkmaster_ChargeFX_R,__Me,"FX_Creatures_Env_Elemental_RocksWind_A","Dummy_R_Hand")
+		CharacterPlayLoopEffect(%Sparkmaster_ChargeFX_L,__Me,"FX_Creatures_Env_Elemental_RocksWind_A","Dummy_L_Hand")
+	ENDIF	
+	
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	IF "c1&c2&c3&c4"					//if allies are dead, restore default character's normal attack
+		IsGreaterThen(%WeaponsDeactivated,0)	
+		CharacterIsDead(%Ally1)
+		CharacterIsDead(%Ally2)
+		CharacterIsDead(%Ally3)
+	THEN
+		SetPriority("Combat_AttackSetEnemy",7)
+	ENDIF
+	IF "c1"								//weapons deactivated through remocon 
+		IsGreaterThen(%WeaponsDeactivated,0)
+	THEN
+		Subtract(%WeaponsDeactivated,1)
+		CombatLogText(__Me,"CYS_SparkMaster_WeaponsNotFunctional_BL",0,1)
+	ELSE
+		CombatLogText(__Me,"CYS_SparkMaster_WeaponsFunctional_BL",0,1)
+	ENDIF
+	IF "c1&c2"							//missile control
+		IsHardcore()	
+		IsLessThen(%MissileAttack_Current,%MissileAttack_Desired)
+	THEN
+		Add(%MissileAttack_Current,1)
+	ELIF "c1&c2"
+		IsHardcore()
+		IsEqual(%MissileAttack_Current,%MissileAttack_Desired)
+	THEN
+		Add(%MissileAttack_Current,1)
+		SetPriority("SparkMaster_Hardcore_PlaceMarkOnTheGround",500)
+	ELIF "c1&c2&c3"
+		IsHardcore()
+		IsGreaterThen(%MissileAttack_Current,%MissileAttack_Desired)
+		IsEqual(%Bool_MissilesEnRoute,1)
+	THEN
+		StartTimer("CYS_NorthCave_Timer_MissilesFall",3,0)
+	ENDIF
+		
+EVENT OnDamage_IfBolt_ChargeUp
+ON	
+	OnDamage(Air,_,_,_)
+ACTIONS
+	IF "!c1"
+		IsGreaterThen(%Sparkmaster_ChargeLevel,0)
+	THEN
+		Add(%Sparkmaster_ChargeLevel,1)
+		CharacterEvent(__Me,"CYS_SparkMaster_Charged_Event")
+		CombatLogText(__Me,"CYS_SparkMaster_Charged_BL",0,1)		
+		CharacterPlayEffect(__Me,"FX_Skills_Air_LightningStrike_Impact_A")
+		CharacterPlayEffect(__Me,"FX_Skills_Air_LightningStrike_Impact_A","Dummy_R_Hand")
+		CharacterPlayEffect(__Me,"FX_Skills_Air_LightningStrike_Impact_A","Dummy_L_Hand")
+		CharacterPlayLoopEffect(%Sparkmaster_ChargeFX_R,__Me,"FX_Creatures_Env_Elemental_RocksWind_A","Dummy_R_Hand")
+		CharacterPlayLoopEffect(%Sparkmaster_ChargeFX_L,__Me,"FX_Creatures_Env_Elemental_RocksWind_A","Dummy_L_Hand")
+		IF "!(c1|c2|c3|c4|c5)"
+			CharacterHasStatus(__Me,"STUNNED")
+			CharacterHasStatus(__Me,"KNOCKED_DOWN")
+			CharacterHasStatus(__Me,"FROZEN")
+			CharacterHasStatus(__Me,"PETRIFIED")
+			CharacterHasStatus(__Me,"FEAR")
+		THEN
+			DisplayText(__Me,"CYS_NorthCave_SparkMasterCharged",3)						//Haha! I am fully charged! (German accent)
+		ENDIF
+	ENDIF
+	
+EVENT OnDamage_IfPercentage_CallForHelp
+VARS
+	FLOAT:_MyHealth
+ON
+	OnDamage(_,_,_,_)
+ACTIONS
+	IF "(!c1|!c2)&c3"
+		CharacterIsDead(%Ally1)
+		CharacterIsDead(%Ally2)	
+		CharacterGetStat(_MyHealth,__Me,Vitality)
+	THEN
+		IF "c1&c2"
+			IsHardcore()
+			IsLessThen(_MyHealth,0.8)
+		THEN
+			SetPriority("SparkMaster_CallForRepairs",1000)
+		ELIF "!c1&c2"
+			IsHardcore()
+			IsLessThen(_MyHealth,0.5)
+		THEN
+			SetPriority("SparkMaster_CallForRepairs",1000)
+		ENDIF
+	ENDIF
+	
+//---- LEVERS
+EVENT OnCharacterItemEvent_Pulled_LeverA
+VARS
+	CHARACTER:_Player
+ON
+	OnCharacterItemEvent(_,%LeverA,"CYS_SparkMaster_Lever_Pulled")
+ACTIONS
+	IF "c1&c2&c3"
+		IsLessThen(%Sparkmaster_ChargeLevel,1)
+		CharacterGet(_Player,%LeverA,3,Lowest,Distance)
+		CharacterIsPlayer(_Player)
+	THEN
+		DisplayText(_Player,"GLO_FailedUse",3)
+	ELIF "!c1&c2&c3&c4"
+		CharacterIsDead(__Me)
+		IsGreaterThen(%Sparkmaster_ChargeLevel,0)	
+		IsEqual(%Bool_LeverBPulled,1)
+		IsEqual(%Bool_LeverCPulled,1)
+	THEN	
+		ItemPlayEffect(%LeverA,"FX_Skills_Air_LightningStrike_Impact_A")
+		StopLoopEffect(%LeverAPulled_FX_Handle)
+		ItemPlayEffect(%LeverB,"FX_Skills_Air_LightningStrike_Impact_A")			
+		StopLoopEffect(%LeverBPulled_FX_Handle)
+		ItemPlayEffect(%LeverC,"FX_Skills_Air_LightningStrike_Impact_A")			
+		StopLoopEffect(%LeverCPulled_FX_Handle)		
+		CharacterPlayEffect(__Me,"FX_Skills_Air_LightningStrike_Impact_A","Dummy_R_Hand")
+		StopLoopEffect(%Sparkmaster_ChargeFX_R)
+		CharacterPlayEffect(__Me,"FX_Skills_Air_LightningStrike_Impact_A","Dummy_L_Hand")
+		StopLoopEffect(%Sparkmaster_ChargeFX_L)	
+		CharacterPlayEffect(__Me,"FX_GP_StarStone_Up_A")				
+		Set(%Sparkmaster_ChargeLevel,0)	
+		Set(%Bool_LeverAPulled,0)
+		Set(%Bool_LeverBPulled,0)
+		Set(%Bool_LeverCPulled,0)
+		CombatLogText(__Me,"CYS_SparkMaster_Discharge_Levers_BL",0,1)
+		CharacterEvent(__Me,"CYS_SparkMaster_NotCharged_Event")		
+		StartTimer("CYS_NorthCave_Timer_ChargeDissipatedFX",2,0)		
+	ELIF "!c1&c2&!c3&(!c4|!c5)"		//checking on A, otherwise can create several FX therefore bug
+		CharacterIsDead(__Me)	
+		IsGreaterThen(%Sparkmaster_ChargeLevel,0)
+		IsEqual(%Bool_LeverAPulled,1)
+		IsEqual(%Bool_LeverBPulled,1)
+		IsEqual(%Bool_LeverCPulled,1)
+	THEN
+		Set(%Bool_LeverAPulled,1)
+		ItemPlayLoopEffect(%LeverAPulled_FX_Handle,%InvisHelper_A,"FX_Creatures_Summons_ElementalWind_A_LightningHand")
+	ENDIF
+	
+EVENT OnCharacterItemEvent_Pulled_LeverB
+VARS
+	CHARACTER:_Player
+ON
+	OnCharacterItemEvent(_,%LeverB,"CYS_SparkMaster_Lever_Pulled")	
+ACTIONS	
+	IF "c1&c2&c3"
+		IsLessThen(%Sparkmaster_ChargeLevel,1)
+		CharacterGet(_Player,%LeverB,3,Lowest,Distance)
+		CharacterIsPlayer(_Player)
+	THEN
+		DisplayText(_Player,"GLO_FailedUse",3)
+	ELIF "!c1&c2&c3&c4"
+		CharacterIsDead(__Me)
+		IsGreaterThen(%Sparkmaster_ChargeLevel,0)
+		IsEqual(%Bool_LeverAPulled,1)
+		IsEqual(%Bool_LeverCPulled,1)
+	THEN
+		ItemPlayEffect(%LeverA,"FX_Skills_Air_LightningStrike_Impact_A")
+		StopLoopEffect(%LeverAPulled_FX_Handle)
+		ItemPlayEffect(%LeverB,"FX_Skills_Air_LightningStrike_Impact_A")		
+		StopLoopEffect(%LeverBPulled_FX_Handle)
+		ItemPlayEffect(%LeverC,"FX_Skills_Air_LightningStrike_Impact_A")			
+		StopLoopEffect(%LeverCPulled_FX_Handle)			
+		CharacterPlayEffect(__Me,"FX_Skills_Air_LightningStrike_Impact_A","Dummy_R_Hand")
+		StopLoopEffect(%Sparkmaster_ChargeFX_R)
+		CharacterPlayEffect(__Me,"FX_Skills_Air_LightningStrike_Impact_A","Dummy_L_Hand")
+		StopLoopEffect(%Sparkmaster_ChargeFX_L)	
+		CharacterPlayEffect(__Me,"FX_GP_StarStone_Up_A")				
+		Set(%Sparkmaster_ChargeLevel,0)			
+		Set(%Bool_LeverAPulled,0)
+		Set(%Bool_LeverBPulled,0)	
+		Set(%Bool_LeverCPulled,0)		
+		CombatLogText(__Me,"CYS_SparkMaster_Discharge_Levers_BL",0,1)
+		CharacterEvent(__Me,"CYS_SparkMaster_NotCharged_Event")				
+		StartTimer("CYS_NorthCave_Timer_ChargeDissipatedFX",2,0)		
+	ELIF "!c1&c2&!c3&(!c4|!c5)"		//checking on B, otherwise can create several FX therefore bug
+		CharacterIsDead(__Me)	
+		IsGreaterThen(%Sparkmaster_ChargeLevel,0)
+		IsEqual(%Bool_LeverBPulled,1)
+		IsEqual(%Bool_LeverAPulled,1)
+		IsEqual(%Bool_LeverCPulled,1)
+	THEN
+		Set(%Bool_LeverBPulled,1)
+		ItemPlayLoopEffect(%LeverBPulled_FX_Handle,%InvisHelper_B,"FX_Creatures_Summons_ElementalWind_A_LightningHand")
+	ENDIF	
+	
+EVENT OnCharacterItemEvent_Pulled_LeverC
+VARS
+	CHARACTER:_Player
+ON
+	OnCharacterItemEvent(_,%LeverC,"CYS_SparkMaster_Lever_Pulled")	
+ACTIONS	
+	IF "c1&c2&c3"
+		IsLessThen(%Sparkmaster_ChargeLevel,1)
+		CharacterGet(_Player,%LeverC,3,Lowest,Distance)
+		CharacterIsPlayer(_Player)
+	THEN
+		DisplayText(_Player,"GLO_FailedUse",3)
+	ELIF "!c1&c2&c3&c4"
+		CharacterIsDead(__Me)
+		IsGreaterThen(%Sparkmaster_ChargeLevel,0)
+		IsEqual(%Bool_LeverAPulled,1)
+		IsEqual(%Bool_LeverBPulled,1)
+	THEN
+		ItemPlayEffect(%LeverA,"FX_Skills_Air_LightningStrike_Impact_A")
+		StopLoopEffect(%LeverAPulled_FX_Handle)
+		ItemPlayEffect(%LeverB,"FX_Skills_Air_LightningStrike_Impact_A")		
+		StopLoopEffect(%LeverBPulled_FX_Handle)
+		ItemPlayEffect(%LeverC,"FX_Skills_Air_LightningStrike_Impact_A")			
+		StopLoopEffect(%LeverCPulled_FX_Handle)			
+		CharacterPlayEffect(__Me,"FX_Skills_Air_LightningStrike_Impact_A","Dummy_R_Hand")
+		StopLoopEffect(%Sparkmaster_ChargeFX_R)
+		CharacterPlayEffect(__Me,"FX_Skills_Air_LightningStrike_Impact_A","Dummy_L_Hand")
+		StopLoopEffect(%Sparkmaster_ChargeFX_L)	
+		CharacterPlayEffect(__Me,"FX_GP_StarStone_Up_A")				
+		Set(%Sparkmaster_ChargeLevel,0)			
+		Set(%Bool_LeverAPulled,0)
+		Set(%Bool_LeverBPulled,0)	
+		Set(%Bool_LeverCPulled,0)		
+		CombatLogText(__Me,"CYS_SparkMaster_Discharge_Levers_BL",0,1)
+		CharacterEvent(__Me,"CYS_SparkMaster_NotCharged_Event")				
+		StartTimer("CYS_NorthCave_Timer_ChargeDissipatedFX",2,0)		
+	ELIF "!c1&c2&!c3&(!c4|!c5)"		//checking on C, otherwise can create several FX therefore bug
+		CharacterIsDead(__Me)	
+		IsGreaterThen(%Sparkmaster_ChargeLevel,0)
+		IsEqual(%Bool_LeverCPulled,1)
+		IsEqual(%Bool_LeverAPulled,1)
+		IsEqual(%Bool_LeverBPulled,1)
+	THEN
+		Set(%Bool_LeverCPulled,1)
+		ItemPlayLoopEffect(%LeverCPulled_FX_Handle,%InvisHelper_C,"FX_Creatures_Summons_ElementalWind_A_LightningHand")
+	ENDIF	
+	
+EVENT OnTimer_PlayLightningFX
+ON
+	OnTimer("CYS_NorthCave_Timer_ChargeDissipatedFX")
+ACTIONS
+	ItemPlayEffect(%InvisHelper_Spike,"FX_GP_StarStone_Down_A")	
+
+EVENT OnTimer_MissilesFall_Part1
+ON
+	OnTimer("CYS_NorthCave_Timer_MissilesFall")					//the missiles need to fall even though the SparkMaster is unavailable
+ACTIONS
+	PlayEffectAt(%SpMiss_Spot,"FX_Creatures_Skills_MetalRain_Impact_A")
+	StartTimer("CYS_NorthCave_Timer_MissilesFall_02",1.5,0)
+	
+EVENT OnTimer_MissilesFall_Part2
+ON
+	OnTimer("CYS_NorthCave_Timer_MissilesFall_02")
+ACTIONS
+	IF "c1"
+		CharacterGet(%MissileVictim,%SpMiss_Spot,2,Lowest,Distance)
+	THEN
+		IterateCharactersNear(%MissileVictim,2,"CMB_CYS_SparkMaster_ScanForCharactersWithinSplashDamage",Lowest,Distance)
+	ENDIF
+	CreateSurfaceAt(%SpMiss_Spot,"Fire",2.5,2)
+	StopLoopEffect(%SpMiss_FXHandle)
+	Set(%Bool_MissilesEnRoute,0)
+	Set(%MissileAttack_Current,0)	
+	SetPriority("SparkMaster_UseIronDart",200)	
+	
+//---- REMOCON EVENTS
+EVENT OnCharacterEvent_REMOCON_DischargeElectricity
+ON
+	OnCharacterEvent(__Me,"CYS_NorthCave_SparkMasterEvent_Discharge")
+ACTIONS
+	IF "!(c1|c2|c3|c4)"
+		CharacterHasStatus(__Me,"STUNNED")			//SM losing charge: used to be handled only in a reaction
+		CharacterHasStatus(__Me,"KNOCKED_DOWN")		//therefore if frozen / kd'd etc., SM wouldn't be able to lose charge before recovering from status
+		CharacterHasStatus(__Me,"FROZEN")			//therefore we're checking to see if he's fine: if yes, he loses the charge
+		CharacterHasStatus(__Me,"PETRIFIED")		//if not, we handle this here, minus the "hit" animation that can't be played in Events
+	THEN
+		SetPriority("SparkMaster_DischargeElectricity",1200)
+	ELSE
+		CharacterPlayEffect(__Me,"FX_Skills_Air_LightningStrike_Impact_A")
+		IF "!c1"
+			IsEqual(%Bool_LeverAPulled,0)
+		THEN
+			ItemPlayEffect(%LeverA,"FX_Skills_Air_LightningStrike_Impact_A")
+			StopLoopEffect(%LeverAPulled_FX_Handle)
+			Set(%Bool_LeverAPulled,0)		
+		ENDIF
+		IF "!c1"
+			IsEqual(%Bool_LeverBPulled,0)
+		THEN	
+			ItemPlayEffect(%LeverB,"FX_Skills_Air_LightningStrike_Impact_A")		
+			StopLoopEffect(%LeverBPulled_FX_Handle)
+			Set(%Bool_LeverBPulled,0)
+		ENDIF
+		IF "!c1"
+			IsEqual(%Bool_LeverCPulled,0)
+		THEN	
+			ItemPlayEffect(%LeverC,"FX_Skills_Air_LightningStrike_Impact_A")		
+			StopLoopEffect(%LeverCPulled_FX_Handle)
+			Set(%Bool_LeverCPulled,0)
+		ENDIF
+		IF "!c1"
+			IsEqual(%Sparkmaster_ChargeLevel,0)
+		THEN
+			CharacterPlayEffect(__Me,"FX_GP_StarStone_Up_A")
+			Set(%Sparkmaster_ChargeLevel,0)	
+			CharacterPlayEffect(__Me,"FX_Skills_Air_LightningStrike_Impact_A","Dummy_R_Hand")
+			StopLoopEffect(%Sparkmaster_ChargeFX_R)
+			CharacterPlayEffect(__Me,"FX_Skills_Air_LightningStrike_Impact_A","Dummy_L_Hand")
+			StopLoopEffect(%Sparkmaster_ChargeFX_L)
+			StartTimer("CYS_NorthCave_Timer_ChargeDissipatedFX",2,0)
+		ENDIF
+		CombatLogText(__Me,"CYS_SparkMaster_Discharge_Levers_BL",0,1)
+		CharacterEvent(__Me,"CYS_SparkMaster_NotCharged_Event")		
+		SetPriority("SparkMaster_DischargeElectricity",0)			
+	ENDIF
+	
+EVENT OnCharacterEvent_REMOCON_VentSteam
+ON
+	OnCharacterEvent(__Me,"CYS_NorthCave_SparkMasterEvent_VentSteam")
+ACTIONS
+	SetPriority("SparkMaster_REMOCON_VentSteam",1200)
+		
+EVENT OnCharacterEvent_REMOCON_DeactivateWeaponry
+ON
+	OnCharacterEvent(__Me,"CYS_NorthCave_SparkMasterEvent_TempDeactWeapons")
+ACTIONS
+	IF "c1"
+		IsEqual(%WeaponsDeactivated,0)
+	THEN
+		DisplayText(__Me,"CYS_NorthCave_SparkMaster_WeaponsDeactivated",4)
+		Set(%WeaponsDeactivated,2)
+	ENDIF
+
+EVENT OnIterate_ScanForVictimsOfSplashDamage
+VARS
+	CHARACTER:_Character
+ON
+	OnIterateCharacter(_Character,"CMB_CYS_SparkMaster_ScanForCharactersWithinSplashDamage")
+ACTIONS
+	IF "!c1"
+		CharacterIsDead(_Character)
+	THEN
+		ExplodeAt(_Character,"Projectile_EnemySparkMasterExplosion",6)
+	ENDIF
+
+EVENT OnCombatEnded_RemoveFXHandles
+ON
+	OnCombatEnded()
+ACTIONS
+	StopLoopEffect(%SpMiss_FXHandle)
+	StopLoopEffect(%LeverAPulled_FX_Handle)
+	StopLoopEffect(%LeverBPulled_FX_Handle)
+	StopLoopEffect(%LeverCPulled_FX_Handle)
+	Set(%Sparkmaster_ChargeLevel,0)
+	CharacterPlayEffect(__Me,"FX_Skills_Air_LightningStrike_Impact_A","Dummy_R_Hand")
+	StopLoopEffect(%Sparkmaster_ChargeFX_R)
+	CharacterPlayEffect(__Me,"FX_Skills_Air_LightningStrike_Impact_A","Dummy_L_Hand")
+	StopLoopEffect(%Sparkmaster_ChargeFX_L)	
+	IF "c1"
+		IsEqual(%Bool_MissilesEnRoute,1)
+	THEN
+		StartTimer("CYS_NorthCave_Timer_MissilesFall",3,0)
+	ENDIF	
+
+EVENT OnDie_RemoveFXHandles
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS	
+	StopLoopEffect(%SpMiss_FXHandle)
+	StopLoopEffect(%LeverAPulled_FX_Handle)
+	StopLoopEffect(%LeverBPulled_FX_Handle)
+	StopLoopEffect(%LeverCPulled_FX_Handle)	
+	CharacterPlayEffect(__Me,"FX_Skills_Air_LightningStrike_Impact_A","Dummy_R_Hand")
+	StopLoopEffect(%Sparkmaster_ChargeFX_R)
+	CharacterPlayEffect(__Me,"FX_Skills_Air_LightningStrike_Impact_A","Dummy_L_Hand")
+	StopLoopEffect(%Sparkmaster_ChargeFX_L)
+
+EVENT OnDeactivate_RemoveFXHandles
+ON
+	OnDeactivate()
+ACTIONS	
+	StopLoopEffect(%SpMiss_FXHandle)
+	StopLoopEffect(%LeverAPulled_FX_Handle)
+	StopLoopEffect(%LeverBPulled_FX_Handle)
+	StopLoopEffect(%LeverCPulled_FX_Handle)
+	StopLoopEffect(%Sparkmaster_ChargeFX_R)
+	StopLoopEffect(%Sparkmaster_ChargeFX_L)	

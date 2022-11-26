@@ -1,0 +1,104 @@
+INIT
+
+EXTERN FIXEDSTRING:%saveAPtext_$1="CMB_MageSkipsTurnToPrepare"
+EXTERN INT:%displaySaveAPtext_$1=1
+EXTERN FIXEDSTRING:%drinkText_$1=null
+EXTERN INT:%amount_$1=1
+
+EXTERN INT:%frequency_$1=0
+EXTERN INT:%frequencyStartAt_$1=0
+EXTERN INT:%priority_$1=300
+EXTERN INT:%disableInCasual_$1=0
+
+CHARACTER:__Me
+INT:%ActionScore_$1=0
+
+INT:%PotionGiven_$1=0
+
+EVENTS
+EVENT AddPotion_$1
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		IsEqual(%PotionGiven_$1,0)
+	THEN
+		CharacterAddToInventory(__Me, $1, %amount_$1) 
+		Set(%PotionGiven_$1,1)
+	ENDIF
+
+EVENT CalculateScoreWrapper_$1
+ON
+	OnFunction("CalculateScore")
+ACTIONS
+	Set(%ActionScore_$1,0)
+	IF "(c1|!c2)&c3"
+		IsEqual(%disableInCasual_$1,0)
+		IsCasual()
+		CharacterCanDrinkPotion(__Me, $1, 1)
+	THEN
+		// Calculate default score
+		IF "!c1"
+			IsLessThen(%frequencyStartAt_$1, %frequency_$1)
+		THEN
+			Set(%ActionScore_$1, %priority_$1)
+		ENDIF
+		// Give specific scripts chance to overwrite score.
+		CallFunction("CalculateScore_$1")
+	ENDIF
+
+	SetPriority("WaitOnDrink_$1", %ActionScore_$1)
+	SetPriority("DrinkPotion_$1", %ActionScore_$1)
+	
+EVENT SetFrequence_$1
+ON
+	OnTurn()
+ACTIONS	
+	IF "c1"
+		IsLessThen(%frequencyStartAt_$1, %frequency_$1)
+	THEN		
+		Add(%frequencyStartAt_$1, 1)
+	ENDIF
+	
+BEHAVIOUR
+
+// Check if we have enough action points
+REACTION WaitOnDrink_$1, 0
+USAGE COMBAT
+CHECK "(c1|!c2)&c3&!c4"
+	IsEqual(%disableInCasual_$1,0)
+	IsCasual()
+	CharacterCanDrinkPotion(__Me, $1, 1)	
+	CharacterCanDrinkPotion(__Me, $1, 0)	
+ACTIONS
+	CallFunction("StopEvaluateScore")
+	Sleep(1)
+	IF "c1"
+		IsEqual(%displaySaveAPtext_$1, 1)
+	THEN
+		DisplayCombatInfoText(__Me, %saveAPtext_$1, 2)
+	ELSE
+		Sleep(1)
+	ENDIF
+	CharacterPlayEffect(__Me, "FX_GP_Status_SkipTurn_A_Icon", "Dummy_OverheadFX")
+	CharacterEndTurn()	
+INTERRUPT
+	Reset()
+	CallFunction("StartEvaluateScore")
+	
+REACTION DrinkPotion_$1, 0
+USAGE COMBAT
+CHECK "(c1|!c2)&c3"
+	IsEqual(%disableInCasual_$1,0)
+	IsCasual()
+	CharacterCanDrinkPotion(__Me, $1, 0)
+ACTIONS
+	CallFunction("StopEvaluateScore")	
+	Set(%frequencyStartAt_$1, 0)	
+	CharacterDrinkPotion($1)
+	Sleep(2)
+	SetPriority("DrinkPotion_$1", 0)
+INTERRUPT
+	Reset()
+	CallFunction("StartEvaluateScore")
+	

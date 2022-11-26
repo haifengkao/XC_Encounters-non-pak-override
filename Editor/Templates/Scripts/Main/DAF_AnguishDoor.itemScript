@@ -1,0 +1,11 @@
+INIT
+
+ITEM:__Me
+CHARACTER:%Balberith = DAF_AnguishDemon_Fighter_1f41e408-91fa-41c1-b7eb-978e49ac0733
+
+EVENTS
+EVENT BalberithHitMe
+ON
+	OnDamage(_,_,%Balberith,_)
+ACTIONS
+	ItemDie(__Me)

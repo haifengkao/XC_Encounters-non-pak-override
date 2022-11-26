@@ -1,0 +1,107 @@
+#INCLUDE Base
+
+INIT
+USING Base
+EXTERN CHARACTER:%alphaDog=CYS_VargoBoss_fad3dbb1-869e-4199-84bd-37c1570c73d1
+EXTERN TRIGGER:%vargoMoveTo=CMB_VargoWaitsHere_72449281-903f-4a25-b6f2-333a544d269c
+EXTERN TRIGGER:%vargoMoveTo2=CMB_VargoWaitsHere2_781dba24-d41f-4a6b-b0c8-cdb9222eb047
+EXTERN TRIGGER:%vargoMoveTo3=CMB_VargoWaitsHere3_d3a9a3ca-6317-4517-886c-b3b7c2a02231
+EXTERN TRIGGER:%vargoFallbackTrigger=CMB_Vargo_GoToCombat_78baf12f-25a7-4cbb-a1e8-e0fbfb578fb2
+EXTERN INT:%boolAmVargo=1
+TRIGGER:%vargoMoveToNext
+TRIGGER:%VargoDisappearsPoint=CMB_VargoDisappears_04edae25-e8f2-4d1b-8643-70d5d511cc1d
+TRIGGER:%DoxyDisappearsPoint=CMB_DroxyDisappears_5547f587-6177-4b8b-ba02-147bbf969e89
+CHARACTER:__Me
+INT:%whereAmI=0
+
+BEHAVIOUR
+REACTION Disappear,2000
+USAGE PEACE
+CHECK "c1"
+	CharacterIsDead(%alphaDog)
+ACTIONS
+	IF "c1"
+		IsEqual(%boolAmVargo,1)
+	THEN
+		CharacterMoveTo(%VargoDisappearsPoint,1,1,1,1.5)
+	ELSE
+		CharacterMoveTo(%DoxyDisappearsPoint,1,1,1,1.5)
+	ENDIF
+	CharacterSetOffStage()
+	
+REACTION RunToTrigger,1000
+USAGE PEACE
+VARS
+	CHARACTER:_char
+CHECK "c1&c2&!c3"
+	CharacterGet(_char,__Me,5,Lowest,Distance)
+	CharacterIsPlayer(_char)
+	CharacterIsDead(%alphaDog)
+ACTIONS
+	IF "c1"
+		IsEqual(%whereAmI,0)
+	THEN
+		Set(%vargoMoveToNext,%vargoMoveTo)
+	ELIF "c1"
+		IsEqual(%whereAmI,1)
+	THEN
+		Set(%vargoMoveToNext,%vargoMoveTo2)
+	ELIF "c1"
+		IsEqual(%whereAmI,2)
+	THEN
+		Set(%vargoMoveToNext,%vargoMoveTo3)
+	ENDIF
+	Add(%whereAmI,1)
+	CharacterMoveTo(%vargoMoveToNext,1,1)
+	CharacterLookAt(_char)
+	IF "c1"
+		IsEqual(%whereAmI,3) 
+	THEN
+		CharacterSetFaction(__Me,"Good NPC")
+		CharacterPlayAnimation("emotion_panic_distress")
+		SetPriority("RunToCombatOrFlee",0)
+		SetPriority("RunToTrigger",0)
+	ELSE
+		CharacterPlayAnimation("block")
+	ENDIF
+
+REACTION RunToCombat,0
+USAGE PEACE
+CHECK "c1|c2"
+	IsEqual(%whereAmI,1)
+	IsEqual(%whereAmI,2)
+ACTIONS
+	SetPriority("RunToCombatOrFlee",0)
+	SetPriority("RunToTrigger",0)
+	CharacterMoveTo(%vargoMoveTo3,1,1)
+	Set(%whereAmI,3)
+	CharacterSetFaction(__Me,"Good NPC")
+
+REACTION RunToCombatOrFlee,900
+USAGE PEACE
+VARS
+	CHARACTER:_char
+CHECK "c1&c2&c3&!c4&(c5|c6)"
+	CharacterGet(_char,TRIGGER:%vargoFallbackTrigger,4,Random,Vitality)
+	CharacterIsInTrigger(_char,%vargoFallbackTrigger)
+	CharacterIsPlayer(_char)
+	CharacterIsDead(%alphaDog)
+	IsEqual(%whereAmI,1)
+	IsEqual(%whereAmI,2)
+ACTIONS
+	SetPriority("RunToCombat",1100)
+
+EVENTS
+EVENT OnRivalEnteredCombat
+VARS
+	CHARACTER:_char
+ON
+	OnCharacterEvent(_char,"AlphaWolfEnteredCombat")
+ACTIONS
+	SetPriority("RunToCombat",1100)
+
+EVENT OnfightOver
+ON
+	OnCombatEnded()
+ACTIONS
+	CharacterEvent(__Me,"ClearPeaceReturn")

@@ -1,0 +1,57 @@
+INIT
+
+CHARACTER:__Me
+CHARACTER:%Matriarch = Animals_Spider_Boss_B_000_e8849533-c03d-4cfb-8b33-4cfe305c772e
+EXTERN FLOAT:%WoundLevel = 0.15
+
+//-----------------------
+EVENTS
+	
+EVENT DisappearOnDie
+ON
+	OnDie(__Me,_,%Matriarch,_)
+ACTIONS 
+	CharacterSetOffStage()	
+
+EVENT SeverelyWounded
+VARS
+	FLOAT:_MyVitality
+ON
+	OnDamage(_,_,_,_)
+ACTIONS
+	IF	"c1&c2"
+		CharacterGetStat(_MyVitality,__Me,Vitality)
+		IsLessThen(_MyVitality,%WoundLevel)
+	THEN
+		CombatLogText(__Me,"CMB_LUC_SpiderBoss_Wounded",0,1)
+	ENDIF
+
+//-----------------------
+
+BEHAVIOUR
+REACTION SpiderlingIsWounded, 10
+USAGE COMBAT
+VARS
+	FLOAT:_MyVitality
+CHECK "c1&c2"
+	CharacterGetStat(_MyVitality,__Me,Vitality)
+	IsLessThen(_MyVitality,%WoundLevel)	
+ACTIONS 
+	CharacterMoveTo(%Matriarch,1,0,0,2.0)
+	CharacterEndTurn()
+	
+REACTION AttackFarthestFromSpider, 6
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+CHECK "c1&!c2"
+	CharacterGet(_Enemy,%Matriarch,null,Highest,Distance,Enemy)
+	CharacterIsDead(_Enemy)
+ACTIONS 
+	CharacterAttack(_Enemy)
+	CharacterEndTurn()
+	
+REACTION Panic, 5
+USAGE COMBAT	
+ACTIONS 
+	CharacterEndTurn()

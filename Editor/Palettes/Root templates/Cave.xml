@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<palette xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <palettes />
+  <objectids>
+    <guid>1149d2ab-e8d4-4ca1-8ef1-5b66ea3abdaa</guid>
+    <guid>7ee727ab-494f-4f1c-aa33-95455043c9a0</guid>
+    <guid>6936d6e2-e92b-46b7-8e03-d7c170606b6c</guid>
+    <guid>79abc48f-4854-4ffb-99f2-ea1d2fd17418</guid>
+    <guid>0b037ce0-35aa-4e56-b20f-c51a8e0add1c</guid>
+    <guid>0ea3aafe-de77-4592-8248-b0c1ad100e5a</guid>
+    <guid>3948c965-2d22-43d8-9c92-80bfd03c89be</guid>
+    <guid>a9caea6e-f66e-4bc6-bba2-91b7fd07aa94</guid>
+    <guid>e2081a10-f72e-4ec2-8cd4-f02093b47e75</guid>
+    <guid>4eabb1bc-7410-4524-89b0-1c42fbb6a74b</guid>
+    <guid>c39a536a-0210-43a9-a18d-8c6c42d2d2a1</guid>
+    <guid>95047702-c7a3-423a-8d26-e5b8fe43ad21</guid>
+    <guid>e9b81dc9-1f72-442a-8695-3e1227c06706</guid>
+  </objectids>
+  <name>Cave</name>
+</palette>

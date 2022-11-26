@@ -1,0 +1,59 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+ProcTriggerRegisterForPlayers(TRIGGER_CYS_ShovelThelyronWife);
+DB_Global_ItemDescriptions(ITEM_CYS_ThelyronWifeTomb,"CYS_ThelyronWifeTomb");
+KBSECTION
+IF
+CharacterUsedItemTemplate(_Player,"TOOL_Shovel_A_41486dd2-3fd5-464e-870e-844120cf0517", _)
+AND
+DB_InRegion(_Player, TRIGGER_CYS_ShovelThelyronWife)
+AND
+NOT DB_Companion(_Player)
+AND
+NOT ITEM_CYS_ShovelThelyronWifeDirt.DialogOneShot()
+THEN
+ProcDoTwoSpeakerItemDialog("CYS_ThelyronWifeTomb", _Player, ITEM_CYS_ThelyronWifeTomb);
+ITEM_CYS_ShovelThelyronWifeDirt.DialogOneShot();
+
+IF
+CharacterUsedItem(_Player, ITEM_CYS_ShovelThelyronWifeDirt)
+AND
+ItemTemplateIsInPartyInventory(_Player,"TOOL_Shovel_A_41486dd2-3fd5-464e-870e-844120cf0517",0,_Count)
+AND
+_Count > 0
+AND
+NOT DB_Companion(_Player)
+AND
+NOT ITEM_CYS_ShovelThelyronWifeDirt.DialogOneShot()
+THEN
+ProcDoTwoSpeakerItemDialog("CYS_ThelyronWifeTomb", _Player, ITEM_CYS_ThelyronWifeTomb);
+ITEM_CYS_ShovelThelyronWifeDirt.DialogOneShot();
+
+IF
+DialogEnded("CYS_ThelyronWifeTomb", _ID)
+AND
+DB_GlobalEvent("CYS_DisturbThelyronWife2")
+AND
+DB_DialogPlayers(_ID,_Player,1)
+AND
+ItemTemplateIsInPartyInventory(_Player,"TOOL_Shovel_A_41486dd2-3fd5-464e-870e-844120cf0517",1,_Count)
+AND
+_Count > 0
+AND
+GetItemhandleForItemTemplateInInventory(_Player,"TOOL_Shovel_A_41486dd2-3fd5-464e-870e-844120cf0517",_ShovelHandle)
+THEN
+CharacterSetFightMode(_Player,0,1);
+CharacterFreeze(_Player);
+CharacterPlayAnimation(_Player,"use_dig","digmoundThelyron");
+
+IF
+CharacterEvent(_Player,"digmoundThelyron")
+THEN
+ItemSetOnstage(ITEM_CYS_ShovelThelyronWifeDirt,0);
+CharacterUnfreeze(_Player);
+ItemSetEvent(ITEM_CYS_ThelyronWifeTomb, "explode");
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<palette xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <palettes />
+  <objectids>
+    <guid>31ab77bb-9e7e-42ab-a89d-d628203b8587</guid>
+    <guid>9d94e5ec-05c2-4cb6-b78c-1fa8acd192f6</guid>
+    <guid>d2ee7378-b596-4003-b245-c512c8f5cf68</guid>
+    <guid>42da9fa8-eb13-4eb6-a71d-300e4cdc97a9</guid>
+    <guid>3ff531f4-0ef9-45a5-9154-1aad5fd78c7a</guid>
+    <guid>4baec320-eb2f-4efa-be1e-e0fe12012a11</guid>
+    <guid>631f38eb-f3d1-46e7-9e4b-ba991a6f13a8</guid>
+    <guid>57b7d9c1-39fd-45d6-bfe1-85332deece10</guid>
+    <guid>7a17d2da-273a-400e-acb0-713bd343960a</guid>
+  </objectids>
+  <name>Fountains</name>
+</palette>

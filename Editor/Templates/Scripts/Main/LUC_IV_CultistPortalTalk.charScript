@@ -1,0 +1,31 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	CHARACTER:%Friend = LUC_Temple_Cultist1_5ce2e2a9-e937-4e47-90f8-298d9e6eefac
+BEHAVIOUR
+
+REACTION State_Guarding, 0
+	USAGE PEACE
+	ACTIONS
+		GetWeightedRandom(%currentAction, "Action_TalkWithFriend", INT:1, "Action_StayingPut",INT:2)
+		SetPriority(%currentAction, 1100)
+		
+REACTION Action_StayingPut, 0
+	USAGE PEACE
+	ACTIONS
+		Sleep(5)
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)		
+		
+REACTION Action_TalkWithFriend, 0
+	USAGE PEACE
+	CHECK "!c1&!c2"
+		IsInDialog(__Me)
+		IsInDialog(%Friend)
+	ACTIONS
+		DialogStart("LUC_IV_AD_CultistAtTree", %Friend, __Me)
+		Sleep(35)
+		SetPriority(%currentAction, 0)

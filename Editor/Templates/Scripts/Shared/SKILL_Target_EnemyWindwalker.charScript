@@ -1,0 +1,45 @@
+#TEMPLATE "_SKILL_Base" : Target_EnemyWindwalker
+
+INIT
+CHARACTER:__Me
+// [GLOBAL_VARS]
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_Target_EnemyWindwalker
+VARS
+	// [CALC_VARS]
+	FLOAT:_Score
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_Target_EnemyWindwalker")
+ACTIONS	
+	// [CALC_ACTIONS_PRE]
+	Set(_Score, 0.0)
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	IF "(c1)"
+	    CharacterHasStatus(__Me, BURNING) // c1
+	THEN
+	    Add(_Score, 5.0)
+	ENDIF
+	IF "(c1)"
+	    CharacterHasStatus(__Me, POISONED) // c1
+	THEN
+	    Add(_Score, 5.0)
+	ENDIF
+	// Hostile count score calculation
+	Add(_Score, 10.0) // HostileWeight
+	
+	Set(%SkillTargetChar_Target_EnemyWindwalker, __Me)
+	Add(%ActionScore_Target_EnemyWindwalker, _Score)
+	// [~CALC_ACTIONS]
+
+	
+
+	

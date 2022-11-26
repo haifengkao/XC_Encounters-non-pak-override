@@ -1,0 +1,86 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Dialogs(CHARACTER_CYS_CookMorris,"CYS_CookMorris");
+DB_OneShotPlayerTrigger(TRIGGER_CYS_Area_TriggerTurkeyDialog);
+PROC_CYS_InitQuestCook();
+KBSECTION
+PROC
+PROC_CYS_InitQuestCook()
+THEN
+CharacterSetVarFixedString(CHARACTER_CYS_CookMorris, "currentState", "State_FollowTurkey");
+CharacterSetVarFixedString(CHARACTER_CYS_ChickenRocky, "currentState", "State_RunAround");
+
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,TRIGGER_CYS_Area_TriggerTurkeyDialog)
+AND
+CharacterHasTalent(_Player, "AnimalEmpathy", 1)
+THEN
+ProcDoTwoSpeakerDialog("CYS_CookMorrisTurkey",CHARACTER_CYS_ChickenRocky, _Player);
+
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,TRIGGER_CYS_Area_TriggerTurkeyDialog)
+AND
+CharacterHasTalent(_Player, "AnimalEmpathy", 0)
+THEN
+ProcDoThreeSpeakerDialog("CYS_CookMorrisTurkeyNotPetPal",CHARACTER_CYS_ChickenRocky,CHARACTER_CYS_CookMorris, _Player);
+
+
+
+
+//REGION TURKEY WILL BE KILLED
+
+IF
+DialogEnded("CYS_CookMorrisTurkey", _)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_ChickenRocky, "hasBeenGiven", 1)
+THEN
+CharacterSetVarFixedString(CHARACTER_CYS_ChickenRocky, "currentState", "State_ReactOnDeath");
+CharacterMoveToCharacter(CHARACTER_CYS_CookMorris, CHARACTER_CYS_ChickenRocky, 1, "arrivedAtTurkey",0);
+
+IF
+DialogEnded("CYS_CookMorrisTurkeyNotPetPal", _)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_ChickenRocky, "hasBeenGiven", 1)
+THEN
+CharacterSetVarFixedString(CHARACTER_CYS_ChickenRocky, "currentState", "State_ReactOnDeath");
+CharacterMoveToCharacter(CHARACTER_CYS_CookMorris, CHARACTER_CYS_ChickenRocky, 1, "arrivedAtTurkey",0);
+
+IF
+CharacterEvent(CHARACTER_CYS_CookMorris, "arrivedAtTurkey")
+THEN
+CharacterSetScriptframe(CHARACTER_CYS_CookMorris, "killTurkey");
+
+IF
+CharacterDied(CHARACTER_CYS_ChickenRocky)
+THEN
+CharacterSetVarFixedString(CHARACTER_CYS_CookMorris, "currentState", "State_AfterQuest");
+
+
+//END_REGION
+
+//REGION TURKEY HAS BEEN SAVED
+
+IF
+DialogEnded("CYS_CookMorrisTurkey", _)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_ChickenRocky, "hasBeenReleased", 1)
+THEN
+CharacterSetVarFixedString(CHARACTER_CYS_ChickenRocky, "currentState", "State_RunAway");
+CharacterDisplayText(CHARACTER_CYS_CookMorris, "CYS_CookMorris_Story_1");
+CharacterSetVarFixedString(CHARACTER_CYS_CookMorris, "currentState", "State_AfterQuest");
+
+IF
+DialogEnded("CYS_CookMorrisTurkeyNotPetPal", _)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_ChickenRocky, "hasBeenReleased", 1)
+THEN
+CharacterSetVarFixedString(CHARACTER_CYS_ChickenRocky, "currentState", "State_RunAway");
+CharacterDisplayText(CHARACTER_CYS_CookMorris, "CYS_CookMorris_Story_1");
+CharacterSetVarFixedString(CHARACTER_CYS_CookMorris, "currentState", "State_AfterQuest");
+
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

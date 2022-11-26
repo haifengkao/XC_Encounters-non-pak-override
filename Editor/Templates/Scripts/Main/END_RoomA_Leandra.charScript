@@ -1,0 +1,209 @@
+INIT
+
+CHARACTER:__Me
+
+BEHAVIOUR
+
+// island 1 - 1 
+
+REACTION Idle, 100
+USAGE PEACE
+ACTIONS
+	CharacterPlayAnimation("still", 0, 1)
+	
+REACTION Transition12, 0
+USAGE PEACE
+ACTIONS
+	CharacterPlayAnimation("Stage_01_Rage_01", 1, 0)
+	Sleep(.5)
+	CharacterEvent(__Me, "END_RoomA_Rage1")
+	CharacterPlayAnimation("Stage_01_Despawn_01")
+	CharacterEvent(__Me, "END_RoomA_TransitionEnded12")
+
+REACTION SpawnIsland11, 0
+USAGE PEACE
+ACTIONS
+	CharacterPlayAnimation("Stage_01_Spawn_01")
+	CharacterEvent(__Me, "END_RoomA_Spawned11")
+
+// island 1 - 2
+ 
+REACTION SpawnIsland12, 0
+USAGE PEACE
+ACTIONS
+	CharacterPlayAnimation("Stage_01_Spawn_02")
+	CharacterEvent(__Me, "END_RoomA_Spawned12")
+
+
+// island 2 - 1
+
+REACTION Transition21, 0
+USAGE PEACE
+ACTIONS
+	CharacterPlayAnimation("Stage_01_Despawn_02")
+	CharacterEvent(__Me, "END_RoomA_TransitionEnded21")
+	
+REACTION SpawnIsland21, 0
+USAGE PEACE
+ACTIONS
+	CharacterPlayAnimation("Stage_02_Spawn_01")
+	CharacterEvent(__Me, "END_RoomA_Spawned21")
+
+REACTION Transition22, 0
+USAGE PEACE
+ACTIONS
+
+	CharacterPlayAnimation("Stage_02_Rage_01", 1, 0)
+	Sleep(.5)
+	CharacterEvent(__Me, "END_RoomA_Rage2")	
+	CharacterPlayAnimation("Stage_02_Despawn_01")
+	CharacterEvent(__Me, "END_RoomA_TransitionEnded22")
+
+	
+REACTION SpawnIsland22, 0
+USAGE PEACE
+ACTIONS
+	CharacterPlayAnimation("Stage_02_Spawn_02")
+	CharacterEvent(__Me, "END_RoomA_Spawned22")
+	
+	
+REACTION Transition31, 0
+USAGE PEACE
+ACTIONS
+	CharacterPlayAnimation("Stage_02_Despawn_02", 1, 0)
+	Sleep(3.8)
+	CharacterEvent(__Me, "END_RoomA_TransitionEnded31")
+	
+REACTION SpawnIsland3, 0
+USAGE PEACE
+ACTIONS
+	CharacterPlayAnimation("Stage_03_Spawn_01")
+	CharacterEvent(__Me, "END_RoomA_Spawned3")
+
+	
+EVENTS
+
+EVENT Enable
+ON
+	OnInit()
+ACTIONS
+	CharacterForceUpdate(1)
+	
+EVENT Disable
+ON
+	OnShutdown()
+ACTIONS
+	CharacterForceUpdate(0)
+
+EVENT Spawn11
+ON
+	OnCharacterEvent(__Me, "END_RoomA_Spawn11")
+ACTIONS
+	SetPriority("SpawnIsland11", 900)
+	
+EVENT Spawned11
+ON
+	OnCharacterEvent(__Me, "END_RoomA_Spawned11")
+ACTIONS
+	SetPriority("SpawnIsland11", 0)
+
+
+EVENT Transition12
+ON
+	OnCharacterEvent(__Me, "END_RoomA_Transition12")
+ACTIONS
+	SetPriority("Transition12", 1000)
+
+EVENT TransitionEnded12
+ON
+	OnCharacterEvent(__Me, "END_RoomA_TransitionEnded12")
+ACTIONS
+	SetPriority("Transition12", 0)
+	
+EVENT Spawn12
+ON
+	OnCharacterEvent(__Me, "END_RoomA_Spawn12")
+ACTIONS
+	SetPriority("SpawnIsland12", 900)	
+
+EVENT Spawned12
+ON
+	OnCharacterEvent(__Me, "END_RoomA_Spawned12")
+ACTIONS
+	SetPriority("SpawnIsland12", 0)
+	
+EVENT Transition21
+ON
+	OnCharacterEvent(__Me, "END_RoomA_Transition21")
+ACTIONS
+	SetPriority("Transition21", 1000)
+
+EVENT TransitionEnded21
+ON
+	OnCharacterEvent(__Me, "END_RoomA_TransitionEnded21")
+ACTIONS
+	SetPriority("Transition21", 0)
+
+
+EVENT Spawn21
+ON
+	OnCharacterEvent(__Me, "END_RoomA_Spawn21")
+ACTIONS
+	SetPriority("SpawnIsland21", 900)
+	
+EVENT Spawned21
+ON
+	OnCharacterEvent(__Me, "END_RoomA_Spawned21")
+ACTIONS
+	SetPriority("SpawnIsland21", 0)
+	//SetPriority("Idle", 900)
+	
+	
+EVENT Transition22
+ON
+	OnCharacterEvent(__Me, "END_RoomA_Transition22")
+ACTIONS
+	SetPriority("Transition22", 1000)
+
+EVENT TransitionEnded22
+ON
+	OnCharacterEvent(__Me, "END_RoomA_TransitionEnded22")
+ACTIONS
+	SetPriority("Transition22", 0)
+
+EVENT Spawn22
+ON
+	OnCharacterEvent(__Me, "END_RoomA_Spawn22")
+ACTIONS
+	SetPriority("SpawnIsland22", 900)
+	
+EVENT Spawned22
+ON
+	OnCharacterEvent(__Me, "END_RoomA_Spawned22")
+ACTIONS
+	SetPriority("SpawnIsland22", 0)
+
+EVENT Transition31
+ON
+	OnCharacterEvent(__Me, "END_RoomA_Transition31")
+ACTIONS
+	SetPriority("Transition31", 1000)
+	
+EVENT TransitionEnded31
+ON
+	OnCharacterEvent(__Me, "END_RoomA_TransitionEnded31")
+ACTIONS
+	SetPriority("Transition31", 0)
+	
+EVENT Spawn3
+ON
+	OnCharacterEvent(__Me, "END_RoomA_Spawn3")
+ACTIONS
+	SetPriority("SpawnIsland3", 900)
+	
+EVENT Spawned3
+ON
+	OnCharacterEvent(__Me, "END_RoomA_Spawned3")
+ACTIONS
+	SetPriority("SpawnIsland3", 0)
+

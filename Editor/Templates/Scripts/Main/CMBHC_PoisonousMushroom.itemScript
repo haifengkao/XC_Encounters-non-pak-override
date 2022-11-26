@@ -1,0 +1,9 @@
+INIT
+	ITEM:__Me
+
+EVENTS
+EVENT OnDie_CreatePoisonballExplosion
+ON
+	OnItemDestroyed(__Me)
+ACTIONS
+	ExplodeAt(__Me,Projectile_EnemyPoisonball)

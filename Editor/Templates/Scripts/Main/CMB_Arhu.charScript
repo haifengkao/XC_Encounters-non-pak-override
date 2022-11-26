@@ -1,0 +1,335 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%PurifyingFire_Target
+	CHARACTER:%HelpingHand_Target
+	CHARACTER:%ChillingTouch_Target
+	FLOAT:%Arhu_SightRange
+
+//---------
+BEHAVIOUR
+REACTION Arhu_Enemy_CastPurifyingFire_OnSelf,800
+USAGE COMBAT	
+CHECK "c1&(c2|c3|c4|c5|c6|c7)"
+	CharacterCanCast(__Me,"Target_EnemyPurifyingFire")		//c1
+	CharacterHasStatus(__Me,"BLIND")						//c2
+	CharacterHasStatus(__Me,"BLEEDING")						//c3
+	CharacterHasStatus(__Me,"CRIPPLED")						//c4
+	CharacterHasStatus(__Me,"DISEASED")						//c5
+	CharacterHasStatus(__Me,"INFECTIOUS_DISEASED")			//c6
+	CharacterHasStatus(__Me,"BURNING")						//c7
+ACTIONS
+	CharacterUseSkill("Target_EnemyPurifyingFire",__Me)
+	
+REACTION Arhu_CastPurifyingFire_OnEnemy,400
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2"
+	CharacterCanCast(__Me,"Target_EnemyPurifyingFire")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyPurifyingFire")
+ACTIONS
+	Set(%PurifyingFire_Target,null)
+	IterateCharactersInCombat(__Me,"CMB_Arhu_ScanForEnemiesWithPositiveStatuses",Lowest,Distance)
+	IF "!c1"
+		IsEqual(%PurifyingFire_Target,null)
+	THEN
+		CharacterMoveInRange(%PurifyingFire_Target,_MinRange,_MaxRange,1)
+		CharacterUseSkill("Target_EnemyPurifyingFire",%PurifyingFire_Target)
+	ELSE
+		SetPriority("Arhu_CastPurifyingFire_OnEnemy",0)
+	ENDIF
+INTERRUPT
+	Reset()
+	
+REACTION Arhu_CastFlare,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&!(c3|c4|c5|c6)&c7&c8"
+	CharacterCanCast(__Me,"Projectile_EnemyFlare")												//c1
+	CharacterGet(_ChosenTarget,__Me,%Arhu_SightRange,Lowest,FireResistance,Enemy)				//c2
+	CharacterHasStatus(_ChosenTarget,"INVULNERABLE")											//!c3
+	CharacterHasStatus(_ChosenTarget,"FROZEN")													//!c4
+	CharacterHasStatus(_ChosenTarget,"FIRE_IMMUNITY_AURA")										//!c5
+	CharacterHasStatus(_ChosenTarget,"FIRE_IMMUNITY")											//!c6	
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyFlare")					//c7
+	IsRandom(0.3)																				//c8	
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_EnemyFlare",_ChosenTarget)
+	
+REACTION Arhu_CastIceShard,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&!(c3|c4|c5|c6)&c7&c8"
+	CharacterCanCast(__Me,"Projectile_EnemyIceShard")											//c1
+	CharacterGet(_ChosenTarget,__Me,%Arhu_SightRange,Lowest,WaterResistance,Enemy)				//c2
+	CharacterHasStatus(_ChosenTarget,"INVULNERABLE")											//!c3
+	CharacterHasStatus(_ChosenTarget,"BURNING")													//!c4
+	CharacterHasStatus(_ChosenTarget,"WATER_IMMUNITY_AURA")										//!c5
+	CharacterHasStatus(_ChosenTarget,"WATER_IMMUNITY")											//!c6		
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyIceShard")					//c7
+	IsRandom(0.3)																				//c8	
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_EnemyIceShard",_ChosenTarget)
+
+REACTION Arhu_CastBlitzBolt,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&!(c3|c4|c5)&c6&c7"
+	CharacterCanCast(__Me,"Projectile_EnemyBlitzBolt")											//c1
+	CharacterGet(_ChosenTarget,__Me,%Arhu_SightRange,Lowest,AirResistance,Enemy)				//c2
+	CharacterHasStatus(_ChosenTarget,"INVULNERABLE")											//!c3
+	CharacterHasStatus(_ChosenTarget,"AIR_IMMUNITY_AURA")										//!c4
+	CharacterHasStatus(_ChosenTarget,"AIR_IMMUNITY")											//!c5
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyBlitzBolt")				//c6
+	IsRandom(0.3)																				//c7	
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_EnemyBlitzBolt",_ChosenTarget)
+
+REACTION Arhu_CastEarthShard,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&!(c3|c4|c5|c6)&c7&c8"
+	CharacterCanCast(__Me,"Projectile_EnemyEarthShard")											//c1
+	CharacterGet(_ChosenTarget,__Me,%Arhu_SightRange,Lowest,EarthResistance,Enemy)				//c2
+	CharacterHasStatus(_ChosenTarget,"PETRIFIED")												//!c3
+	CharacterHasStatus(_ChosenTarget,"INVULNERABLE")											//!c4
+	CharacterHasStatus(_ChosenTarget,"EARTH_IMMUNITY_AURA")										//!c5
+	CharacterHasStatus(_ChosenTarget,"EARTH_IMMUNITY")											//!c6
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyEarthShard")				//c7
+	IsRandom(0.3)																				//c8	
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_EnemyEarthShard",_ChosenTarget)
+	
+REACTION Arhu_CastHelpingHand_OnAlly,700
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2"
+	CharacterCanCast(__Me,"Target_HelpingHandEnemy")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyPurifyingFire")
+ACTIONS
+	Set(%HelpingHand_Target,null)
+	IterateCharactersInCombat(__Me,"CMB_Arhu_ScanForKnockedDownAllies",Lowest,Distance)
+	IF "!c1"
+		IsEqual(%HelpingHand_Target,null)
+	THEN
+		CharacterMoveInRange(%HelpingHand_Target,_MinRange,_MaxRange,1)
+		CharacterUseSkill("Target_HelpingHandEnemy",%HelpingHand_Target)
+	ELSE
+		SetPriority("Arhu_CastHelpingHand_OnAlly",0)
+	ENDIF
+INTERRUPT
+	Reset()
+
+REACTION Arhu_CastChillingTouch_OnAlly,700
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2"
+	CharacterCanCast(__Me,"Target_EnemyChillyWind")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyChillyWind")
+ACTIONS
+	Set(%ChillingTouch_Target,null)
+	IterateCharactersInCombat(__Me,"CMB_Arhu_ScanForBurningAllies",Lowest,Distance)
+	IF "!c1"
+		IsEqual(%ChillingTouch_Target,null)
+	THEN
+		CharacterMoveInRange(%ChillingTouch_Target,_MinRange,_MaxRange,1)
+		CharacterUseSkill("Target_EnemyChillyWind",%ChillingTouch_Target)
+	ELSE
+		SetPriority("Arhu_CastChillingTouch_OnAlly",0)
+	ENDIF
+INTERRUPT
+	Reset()
+	
+REACTION Arhu_CastBoost_OnSelf,300
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&!c2&c3"
+	CharacterCanCast(__Me,"Target_EnemyTargetedDamageBoost")
+	CharacterHasStatus(__Me,"BOOST")
+	IsRandom(0.3)
+ACTIONS
+	CharacterUseSkill("Target_EnemyTargetedDamageBoost",__Me)
+	
+REACTION Arhu_CastHaste_OnSelf,300
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&!(c2|c3)&c4"
+	CharacterCanCast(__Me,"Target_EnemyHaste")
+	CharacterHasStatus(__Me,"HASTED")
+	CharacterHasStatus(__Me,"WARM")
+	IsRandom(0.3)
+ACTIONS
+	CharacterUseSkill("Target_EnemyHaste",__Me)
+	
+REACTION Arhu_CastShield_Fire,0
+USAGE COMBAT
+CHECK "!c1"
+	CharacterHasStatus(__Me,"SHIELD")
+ACTIONS
+	IF "c1"
+		CharacterCanCast(__Me,"Shield_EnemyFire")
+	THEN
+		CharacterUseSkill("Shield_EnemyFire",__Me)
+	ENDIF
+	SetPriority("Arhu_CastShield_Fire",0)
+		
+REACTION Arhu_CastShield_Water,0
+USAGE COMBAT
+CHECK "!c1"
+	CharacterHasStatus(__Me,"SHIELD")
+ACTIONS
+	IF "c1"
+		CharacterCanCast(__Me,"Shield_EnemyWater")
+	THEN
+		CharacterUseSkill("Shield_EnemyWater",__Me)
+	ENDIF
+	SetPriority("Arhu_CastShield_Water",0)
+		
+REACTION Arhu_CastShield_Air,0
+USAGE COMBAT
+CHECK "!c1"
+	CharacterHasStatus(__Me,"SHIELD")
+ACTIONS
+	IF "c1"
+		CharacterCanCast(__Me,"Shield_EnemyAir")
+	THEN
+		CharacterUseSkill("Shield_EnemyAir",__Me)
+	ENDIF	
+	SetPriority("Arhu_CastShield_Air",0)
+	
+REACTION Arhu_CastShield_Earth,0
+USAGE COMBAT
+CHECK "!c1"
+	CharacterHasStatus(__Me,"SHIELD")
+ACTIONS
+	IF "c1"
+		CharacterCanCast(__Me,"Shield_EnemyEarth")
+	THEN
+		CharacterUseSkill("Shield_EnemyEarth",__Me)
+	ENDIF
+	SetPriority("Arhu_CastShield_Earth",0)
+		
+//---------
+EVENTS
+EVENT OnInit_GiveSpells_GetSightRange
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%Arhu_SightRange,__Me,Sight)
+	THEN	
+		CharacterAddSkill("Target_EnemyPurifyingFire")		
+		CharacterAddSkill("Projectile_EnemyFlare")
+		CharacterAddSkill("Projectile_EnemyIceShard")
+		CharacterAddSkill("Projectile_EnemyBlitzBolt")
+		CharacterAddSkill("Projectile_EnemyEarthShard")	
+		CharacterAddSkill("Target_HelpingHandEnemy")
+		CharacterAddSkill("Target_EnemyChillyWind")
+		CharacterAddSkill("Target_EnemyTargetedDamageBoost")			
+		CharacterAddSkill("Target_EnemyHaste")	
+		CharacterAddSkill("Shield_EnemyFire")	
+		CharacterAddSkill("Shield_EnemyWater")	
+		CharacterAddSkill("Shield_EnemyAir")	
+		CharacterAddSkill("Shield_EnemyEarth")	
+	ENDIF
+	
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("Arhu_CastHelpingHand_OnAlly",700)
+	SetPriority("Arhu_CastPurifyingFire_OnEnemy",400)
+	SetPriority("Arhu_CastChillingTouch_OnAlly",400)
+	
+EVENT OnIterateCharacter_ScanForEnemiesWithPositiveStatuses
+VARS
+	CHARACTER:_Enemy
+	FIXEDSTRING:_EnemysFaction
+ON
+	OnIterateCharacter(_Enemy,"CMB_Arhu_ScanForEnemiesWithPositiveStatuses")
+ACTIONS
+	IF "!c1&c2&(c3|c4)"
+		CharacterIsDead(_Enemy)
+		CharacterIsEnemy(__Me,_Enemy)
+		CharacterHasStatus(_Enemy,"SHIELD")
+		CharacterHasStatus(_Enemy,"HEALING")
+	THEN
+		Set(%PurifyingFire_Target,_Enemy)
+	ENDIF
+	
+EVENT OnIterateCharacter_ScanForBurningAllies
+VARS
+	CHARACTER:_Ally
+ON
+	OnIterateCharacter(_Ally,"CMB_Arhu_ScanForBurningAllies")
+ACTIONS
+	IF "!c1&c2&c3"
+		CharacterIsDead(_Ally)
+		CharacterIsAlly(__Me,_Ally)
+		CharacterHasStatus(_Ally,"BURNING")
+	THEN
+		Set(%ChillingTouch_Target,_Ally)
+	ENDIF
+
+EVENT OnIterateCharacter_ScanForKnockedDownAllies
+VARS
+	CHARACTER:_Ally
+ON
+	OnIterateCharacter(_Ally,"CMB_Arhu_ScanForKnockedDownAllies")
+ACTIONS
+	IF "!c1&c2&c3"
+		CharacterIsDead(_Ally)
+		CharacterIsAlly(__Me,_Ally)
+		CharacterHasStatus(_Ally,"KNOCKED_DOWN")
+	THEN
+		Set(%HelpingHand_Target,_Ally)
+	ENDIF
+
+EVENT OnDamage_CheckDamageType_SetShieldPrio
+VARS
+	DAMAGE:_Damage
+ON
+	OnDamage(_Damage,_,_,_)
+ACTIONS
+	IF "c1"
+		IsEqual(_Damage,"Fire")
+	THEN
+		SetPriority("Arhu_CastShield_Fire",800)
+	ELIF "c1"
+		IsEqual(_Damage,"Water")
+	THEN
+		SetPriority("Arhu_CastShield_Water",800)
+	ELIF "c1"
+		IsEqual(_Damage,"Air")
+	THEN
+		SetPriority("Arhu_CastShield_Air",800)
+	ELIF "c1"
+		IsEqual(_Damage,"Earth")
+	THEN
+		SetPriority("Arhu_CastShield_Earth",800)
+	ENDIF

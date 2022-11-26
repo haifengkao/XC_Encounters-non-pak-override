@@ -1,0 +1,58 @@
+INIT
+CHARACTER:__Me
+CHARACTER:%damageSource = null
+EXTERN FIXEDSTRING:%retaliatereactionstringondmg="CMB_RetaliateReaction"
+EXTERN INT:%displayRetaliateDmgText=1
+
+BEHAVIOUR
+REACTION Retaliate,20
+USAGE COMBAT
+CHECK "!c1"
+	IsEqual(%damageSource,null)
+ACTIONS
+	IF "c1|c2|!c3"
+		CharacterIsDead(%damageSource)
+		CharacterHasStatus(%damageSource,CHARMED)
+		CharacterCanSee(__Me,%damageSource)
+	THEN
+		Set(%damageSource,null)
+	ELSE
+		CharacterAttack(%damageSource)
+	ENDIF
+
+/*REACTION FaceMeRetDmg,20
+USAGE WAITING
+CHECK "!c1&c2"
+	IsEqual(%damageSource,null)
+	CharacterCanSee(__Me,%damageSource)
+ACTIONS
+	CharacterLookAt(%damageSource)*/
+
+EVENTS
+EVENT GetLastAttackerOnDmg
+VARS
+CHARACTER:_Char
+FIXEDSTRING:_Faction
+ON
+	OnDamage(_,_,_Char,_)
+ACTIONS
+IF "!c1&!c2&!c3&!c4&!c5"
+	IsEqual(_Char,null)
+	IsEqual(_Char,__Me)
+	CharacterIsAlly(__Me,_Char)
+	CharacterIsDead(__Me)
+	IsEqual(%damageSource,_Char)
+THEN
+	Set(%damageSource,_Char)
+	IF "c1"
+		IsEqual(%displayRetaliateDmgText,1)
+	THEN
+		DisplayText(__Me,%retaliatereactionstringondmg,4)
+	ENDIF
+ENDIF
+
+EVENT TargetedCharacterDies_SetCurrentTargetToNull
+ON
+	OnDie(%damageSource,_,_,_)
+ACTIONS
+	Set(%damageSource,null)

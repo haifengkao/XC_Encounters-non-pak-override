@@ -1,0 +1,102 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%RatKing="DAF_RatKing_71262c9b-2ac1-4ed7-bf8f-d99101f16b82"
+	CHARACTERTEMPLATE:%Rat_Chancellor_RT="Animals_Rat_King_A_Chancellor_fd8bbb36-42b0-48bf-9335-a95a4ceb1fbc"			//black
+	CHARACTERTEMPLATE:%Rat_Warchief_RT="Animals_Rat_King_A_Warchief_e30f233d-7747-4939-b3ec-b589d8b38afc"				//black
+	CHARACTERTEMPLATE:%Rat_Prince_RT="Animals_Rat_King_A_Prince_a6e45ab0-77aa-4590-815e-7eacde98e5c2"					//black
+	CHARACTERTEMPLATE:%Rat_Buffoon_RT="Animals_Rat_King_A_Buffoon_02c5ff14-71df-4c74-8f9f-a2ec59c142f2"					//gray
+	CHARACTERTEMPLATE:%Rat_Secretary_RT="Animals_Rat_King_A_Secretary_5e0c51b3-de4c-4384-b856-7222ba4ab4f9"				//gray
+	CHARACTERTEMPLATE:%Rat_FirstKnight_RT="Animals_Rat_King_A_FirstKnight_27c7f7e0-dc7a-47db-ae84-03ed771242af"			//gray
+	
+	//Chancellor nukes with fire spells (Flare, Fireball) + purifies enemy buffs 			ranged / additional scripts
+	//Warchief uses Iron Command, Fear & melees 											melee / additional scripts
+	//Prince purifies friendly debuffs + uses Crippling Blow 								melee / additional scripts
+	//Buffoon switches everyone's aura, teleports ppl 										ranged / additional scripts
+	//Secretary can Banish Summon, Mass Disease												ranged / additional scripts
+	//First Knight can Inspire, regenerate + Fortify + Bless King, use Doctor				melee
+
+//-------------------
+BEHAVIOUR
+REACTION FirstKnight_CastRegenerate_OnKing,500
+USAGE COMBAT
+VARS
+	FLOAT:_KingsHealth
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&c4"
+	CharacterCanCast(__Me,"Heal_EnemyRegenerate")
+	CharacterGetStat(_KingsHealth,%RatKing,Vitality)
+	IsLessThen(_KingsHealth,70)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Heal_EnemyRegenerate")
+ACTIONS
+	CharacterMoveInRange(%RatKing,_MinRange,_MaxRange)
+	CharacterUseSkill("Heal_EnemyRegenerate",%RatKing)
+
+REACTION FirstKnight_CastFortify_OnKing,500
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&!c2&c3"
+	CharacterCanCast(__Me,"Target_EnemyFortify")
+	CharacterHasStatus(%RatKing,"FORTIFIED")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyFortify")
+ACTIONS
+	CharacterMoveInRange(%RatKing,_MinRange,_MaxRange)
+	CharacterUseSkill("Target_EnemyFortify",%RatKing)	
+
+REACTION FirstKnight_CastBless_OnKing,500
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&!c2&c3"
+	CharacterCanCast(__Me,"Target_EnemyTargetedBless")
+	CharacterHasStatus(%RatKing,"BLESSED")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyTargetedBless")
+ACTIONS
+	CharacterMoveInRange(%RatKing,_MinRange,_MaxRange)
+	CharacterUseSkill("Target_EnemyTargetedBless",%RatKing)		
+	
+//-------------------
+EVENTS
+EVENT OnInit_AddSkills
+VARS
+	CHARACTERTEMPLATE:_MyRootTemplate
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetTemplate(__Me,_MyRootTemplate)
+	THEN
+		IF "c1"
+			IsEqual(_MyRootTemplate,%Rat_Chancellor_RT)
+		THEN
+			//CharacterAddSkill("")
+		ELIF "c1"
+			IsEqual(_MyRootTemplate,%Rat_Warchief_RT)
+		THEN
+			//CharacterAddSkill("")
+			//CharacterAddSkill("")
+		ELIF "c1"
+			IsEqual(_MyRootTemplate,%Rat_Prince_RT)
+		THEN
+			//CharacterAddSkill("")
+		ELIF "c1"
+			IsEqual(_MyRootTemplate,%Rat_Buffoon_RT)
+		THEN
+			//CharacterAddSkill("")
+			//CharacterAddSkill("")
+		ELIF "c1"
+			IsEqual(_MyRootTemplate,%Rat_Secretary_RT)
+		THEN
+			//CharacterAddSkill("")	
+		ELIF "c1"
+			IsEqual(_MyRootTemplate,%Rat_FirstKnight_RT)
+		THEN
+			CharacterAddSkill("Heal_EnemyRegenerate")				
+			CharacterAddSkill("Target_EnemyFortify")				
+			CharacterAddSkill("Target_EnemyTargetedBless")				
+		ENDIF
+	ENDIF
+		

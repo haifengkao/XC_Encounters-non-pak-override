@@ -1,0 +1,155 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_DLCDatabase(8,"LOOT_DLC_PSN_GrumiosForgottenTrickBag_3d85b286-5b7d-4146-9f50-6647610d6997");	//xbox
+DB_DLCDatabase(8,"BOOK_DLC_XBL_GrumiosForgottenTrickBag_1f953927-4587-451c-8aeb-3f873c67d997");	//xbox
+
+DB_DLCDatabase(16,"LOOT_DLC_PSN_GrumiosSecretTrickBag_d55e4332-fb2e-4df1-a119-1b80272dd9f5");	//PS4
+DB_DLCDatabase(16,"BOOK_DLC_PSN_GrumiosSecretTrickBag_b70dd91e-3c56-43b4-826c-82e0f79b2060");	//PS4
+
+DB_DLCDatabase(32,"LOOT_DLC_PSN_GrumiosLastTrickBag_db1f2b5a-e146-4ba0-b660-83b221b96a1b");	//common
+DB_DLCDatabase(32,"BOOK_DLC_BOX_GrumiosLastTrickBag_82be6400-a735-41d6-96a1-9f5945573e1a");	//common
+
+
+DB_DLCGiven(4);
+KBSECTION
+IF
+CharacterCreationFinished(CHARACTER_NULL)
+AND
+NOT DB_DLCGiven(2)
+AND
+CharacterGetHostCharacter(_Player)
+AND
+CharacterHasDLC(_Player,2,1)
+THEN
+DB_DLCGiven(2);
+ItemToCharacter(ITEM_DLC_GoldenGrail,_Player);
+
+IF
+CharacterCreationFinished(CHARACTER_NULL)
+AND
+NOT DB_DLCGiven(1)
+AND
+CharacterGetHostCharacter(_Player)
+AND
+CharacterHasDLC(_Player,1,1)
+THEN
+DB_DLCGiven(1);
+ItemToCharacter(ITEM_DLC_ZandalorTrunks,_Player);
+
+IF
+CharacterCreationFinished(CHARACTER_NULL)
+AND
+HasKickstarterDialogReward(1)
+AND
+CharacterGetHostCharacter(_Player)
+THEN
+ItemToCharacter(ITEM_CYS_KickstarterParchment,_Player);
+
+IF
+SavegameLoaded(_,_,_,_)
+AND
+NOT DB_DLCGiven(2)
+AND
+CharacterGetHostCharacter(_Player)
+AND
+CharacterHasDLC(_Player,2,1)
+AND
+ItemIsInPartyInventory(ITEM_DLC_GoldenGrail,_Player,0,0)
+THEN
+DB_DLCGiven(2);
+ItemToCharacter(ITEM_DLC_GoldenGrail,_Player);
+
+IF
+SavegameLoaded(_,_,_,_)
+AND
+NOT DB_DLCGiven(1)
+AND
+CharacterGetHostCharacter(_Player)
+AND
+CharacterHasDLC(_Player,1,1)
+AND
+ItemIsInPartyInventory(ITEM_DLC_ZandalorTrunks,_Player,0,0)
+THEN
+DB_DLCGiven(1);
+ItemToCharacter(ITEM_DLC_ZandalorTrunks,_Player);
+
+IF
+RegionStarted("Cyseal")
+AND
+NOT DB_OnlyOnce("GaveMessageBottle")
+THEN
+CreateKickstarterMessageInABottleItemAtTrigger(TRIGGER_CYS_KickstarterBottle,"FUR_Bottle_KickStarter_Bottle_A_f32ebf31-4284-4f38-b5c3-ef5a0a45f040");
+DB_OnlyOnce("GaveMessageBottle");
+
+IF
+ItemTemplateEquipped("ARM_Panty_A_Zandalor_35044a7e-fd5e-469b-937c-a22683cb6236",_Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+DB_HasZandalorTrunks(_Player);
+
+IF
+ItemTemplateUnEquipped("ARM_Panty_A_Zandalor_35044a7e-fd5e-469b-937c-a22683cb6236",_Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+NOT DB_HasZandalorTrunks(_Player);
+
+IF
+CharacterUsedItem(_,ITEM_CYS_KickstarterParchment)
+THEN
+ProcDefinePartyDialog("__KickStarter__");
+
+PROC
+ProcGiveDLC((CHARACTER)_Player,(INTEGER)_Dlc)
+AND
+NOT DB_DLCGiven(_Dlc)
+AND
+DB_DLCDatabase(_Dlc,_Item)
+THEN
+DB_DLCGiven(_Dlc);
+ItemTemplateAddToCharacter(_Item,_Player,1);
+
+IF
+DLCUnlocked(_Dlc)
+AND
+NOT DB_InCharacterCreation(1)
+AND
+NOT DB_DLCGiven(_Dlc)
+AND
+CharacterGetHostCharacter(_Player)
+AND
+DB_DLCDatabase(_Dlc,_)
+THEN
+ProcGiveDLC(_Player,_Dlc);
+
+IF
+CharacterCreationFinished(CHARACTER_NULL)
+AND
+CharacterGetHostCharacter(_Player)
+AND
+DB_DLCDatabase(_Dlc,_)
+AND
+NOT DB_DLCGiven(_Dlc)
+AND
+CharacterHasDLC(_Player,_Dlc,1)
+THEN
+ProcGiveDLC(_Player,_DLC);
+
+IF
+SavegameLoaded(_,_,_,_)
+AND
+CharacterGetHostCharacter(_Player)
+AND
+DB_DLCDatabase(_Dlc,_)
+AND
+NOT DB_DLCGiven(_Dlc)
+AND
+CharacterHasDLC(_Player,_Dlc,1)
+THEN
+ProcGiveDLC(_Player,_DLC);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

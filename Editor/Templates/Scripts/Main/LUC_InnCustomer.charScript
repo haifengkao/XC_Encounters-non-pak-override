@@ -1,0 +1,93 @@
+#INCLUDE State_Manager
+
+INIT
+
+USING State_Manager
+CHARACTER:__Me
+CHARACTER:%waitress 	 = LUC_TavernSilverglen_Waitress_b0103c0d-9f7a-4eef-9ebc-9eb7a2eefd2b
+FIXEDSTRING:%drinkAction = "Action_OrderDrinks"
+
+BEHAVIOUR
+	
+REACTION State_ActionManager, 0
+USAGE PEACE
+ACTIONS
+	GetWeightedRandom(%currentAction, %drinkAction, INT:2, "Action_Idle", INT:7)
+	SetPriority(%currentAction, 1100)
+	
+REACTION Action_OrderDrinks, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_text
+	INT:_waitressIsBusy
+ACTIONS
+	IF "c1&c2"
+		GetVar(_waitressIsBusy,%waitress,"isServingCustomer")
+		IsEqual(_waitressIsBusy, 0)
+	THEN
+		CharacterPlayAnimation("Wave_03")
+		GetRandom(_text, "GEN_CallWaitress_01", "GEN_CallWaitress_02")
+		DisplayText(__Me, _text)
+		CharacterEvent(__Me, "wantToOrderDrinks")
+		Sleep(10)
+		Set(%currentState, "State_WaitForDrinks")
+	ELSE
+		SetPriority(%currentAction, 0)
+	ENDIF
+	
+REACTION Action_Idle, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_animation
+	FLOAT:_sleepTime
+ACTIONS
+	GetRandom(_animation,"idle1","idle2","idle3","still")
+	CharacterPlayAnimation(_animation)
+	GetRandom(_sleepTime,0,0.5,1.2,1.5,3,4)
+	Sleep(_sleepTime)
+	SetPriority(%currentAction, 0)
+	
+REACTION Action_Drink, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_text
+ACTIONS
+	IF "c1"
+		IsRandom(0.5)
+	THEN
+		GetRandom(_text, "GEN_Drinking_01", "GEN_Drinking_02")
+		DisplayText(__Me, _text)
+		Sleep(10)
+	ENDIF
+	SetPriority(%currentAction, 0)
+	
+REACTION State_WaitForDrinks, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_animation
+	FLOAT:_sleepTime
+ACTIONS
+	GetRandom(_animation,"idle1","idle2","idle3","still")
+	CharacterPlayAnimation(_animation)
+	GetRandom(_sleepTime,0,0.5,1.2,1.5,3,4)
+	Sleep(_sleepTime)
+	
+EVENTS
+
+EVENT GOT_DRINK_FROM_WAITRESS
+ON
+	OnCharacterEvent(__Me, "gotDrink")
+VARS
+	FLOAT:_time
+ACTIONS
+	Set(%drinkAction, "Action_Drink")
+	GetRandom(_time, 30, 40, 60, 80)
+	StartTimer("canOrderDrinksAgain", _time, 0)
+	Set(%currentState, "State_ActionManager")
+	
+EVENT CAN_ORDER_DRINKS_AGAIN
+ON
+	OnTimer("canOrderDrinksAgain")
+ACTIONS
+	Set(%drinkAction, "Action_OrderDrinks")
+	Set(%currentState, "State_ActionManager")

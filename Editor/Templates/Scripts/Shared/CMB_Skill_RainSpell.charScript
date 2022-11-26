@@ -1,0 +1,98 @@
+#INCLUDE Base
+
+INIT
+USING Base
+CHARACTER:__Me
+CHARACTER:%rainSkillTarget=null
+EXTERN SKILL:%chooseRainSkill=null
+EXTERN INT:%frequencyRS=0
+EXTERN INT:%frequencyRSStartAt=0
+EXTERN INT:%priorityRS=300
+EXTERN INT:%storeTargetRS=1
+EXTERN COMPARE:%targetFindHowRS=Random
+EXTERN COMPAREFUNC:%targetFindWhatRS=Vitality
+EXTERN SURFACE:%targetOnSurfaceRS=null
+EXTERN RELATION:%targetRelationRS=Enemy
+EXTERN STATUS:%targetStatusRS=null
+EXTERN FIXEDSTRING:%saveAPTextRain="CMB_MageSkipsTurnToPrepare"
+EXTERN INT:%displaySaveAPTextRain=1
+
+BEHAVIOUR
+REACTION CastRainSkill,0
+VARS
+	CHARACTER:_char
+	FLOAT:_minRange
+	FLOAT:_maxRange
+	FLOAT:_hp
+USAGE COMBAT
+CHECK "c1&c2&c3&c4&!c5"
+	CharacterCanCast(__Me,%chooseRainSkill,1)
+	CharacterGetSkillRange(_minRange,_maxRange,__Me,%chooseRainSkill)
+	CharacterGet(_char,__Me,30,%targetFindHowRS,%targetFindWhatRS,%targetRelationRS)
+	CharacterGetStat(_hp,_char,Vitality)
+	CharacterHasStatus(_char,INVISIBLE)
+ACTIONS
+	IF "c1|c2|c3|c4|c5|c6"
+		IsEqual(%storeTargetRS,0)
+		IsEqual(%rainSkillTarget,null)
+		CharacterIsDead(%rainSkillTarget)
+		CharacterHasStatus(%rainSkillTarget,CHARMED)
+		CharacterIsAlly(__Me,%rainSkillTarget)
+		CharacterHasStatus(%rainSkillTarget,INVISIBLE)
+	THEN
+		Set(%rainSkillTarget,_char)
+	ENDIF
+	IF "c1"
+		CharacterCanCast(__Me,%chooseRainSkill,0)
+	THEN
+		CharacterUseSkill(%chooseRainSkill,%rainSkillTarget)
+		Set(%frequencyRSStartAt,0)
+		SetPriority("CastRainSkill",0)
+	ELSE
+		Sleep(1)
+		CharacterLookAt(%rainSkillTarget)
+		IF "c1"
+			IsEqual(%displaySaveAPTextRain,1)
+		THEN
+			DisplayCombatInfoText(__Me,%saveAPTextRain,2)
+		ELSE
+			Sleep(1)
+		ENDIF
+		CharacterPlayEffect(__Me, "FX_GP_Status_SkipTurn_A_Icon", "Dummy_OverheadFX")
+		CharacterEndTurn()
+	ENDIF
+
+EVENTS
+EVENT AddRainSkill
+ON
+	OnInit()
+ACTIONS
+	IF "!c1"
+		IsEqual(%chooseRainSkill,null)
+	THEN
+		CharacterAddSkill(%chooseRainSkill)
+	ENDIF
+	
+EVENT SetRainFrequence
+ON
+	OnTurn()
+ACTIONS
+	IF "!c1&!c2"
+		IsEqual(%storeTargetRS,1)
+		IsEqual(%storeTargetRS,0)
+	THEN
+		DebugText(__Me,"Storetarget must be 1 or 0 (on or off)")
+		Set(%storeTargetRS,1)
+	ENDIF
+	IF "c1"
+		IsEqual(%chooseRainSkill,null)
+	THEN
+		DebugText(__Me,"Skill script assigned but no skill selected")
+	ENDIF
+	IF "c1"
+		IsLessThen(%frequencyRSStartAt,%frequencyRS)
+	THEN		
+		Add(%frequencyRSStartAt,1)
+	ELSE
+		SetPriority("CastRainSkill",%priorityRS)
+	ENDIF

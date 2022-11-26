@@ -1,0 +1,10 @@
+INIT
+	ITEM:__Me
+	
+EVENTS
+
+EVENT effet
+	ON
+		OnItemEvent(__Me, "PlayEffect")
+	ACTIONS
+		PlayEffectAt(__Me,"FX_GP_StarStone_Up_A")

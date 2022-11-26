@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<save>
+    <header version="2" time="1417515244" />
+    <version major="1" minor="3" revision="0" build="0" />
+    <region id="keywordDialog">
+        <node id="root">
+            <attribute id="KeywordVoiced" value="0" type="19" />
+            <attribute id="PlayGreeting" value="0" type="19" />
+            <attribute id="keywordAutoImport" value="0" type="19" />
+            <attribute id="keywordName" value="Default_Companion" type="22" />
+            <children>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="05e4b02a-8764-4fb6-b317-f6009e0ec08d" type="22" />
+                    <attribute id="keywordContentMapValue" value="What are you, some kind of wandering butler? You can tell your boss I&apos;ll have no dealings with a go-between!" handle="h35ab471ag8806g4e2aga706g5a38809ed9d4" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="074ae1bc-3013-495a-bff1-454f58a7fdb4" type="22" />
+                    <attribute id="keywordContentMapValue" value="Greeting" handle="h7f890f24g8572g4902g90b4gd362b7e9bdf2" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="1c572159-165d-4747-bd04-d2eaa4e3c97b" type="22" />
+                    <attribute id="keywordContentMapValue" value="The creature says something incomprehensible. Perhaps the Source Hunters will know what the beast is going on about." handle="h0cdb8abdg7a3ag433cg805dgc48fcf57fa35" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="4a403364-09bc-4ff8-b08b-d3fcdee6f4ae" type="22" />
+                    <attribute id="keywordContentMapValue" value="Who the devil are you? Tell your masters I&apos;d prefer to talk to them directly!" handle="h64d98be8g287bg443egb415g2fa9554965ba" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="9944ab01-4ae1-42f5-91d7-94b1bd4a6fa5" type="22" />
+                    <attribute id="keywordContentMapValue" value="You... you&apos;ve come... with the Source Hunter. Time... is... short. Bring... the Hunter...!" handle="h8d697f3cg1895g4301gb09bg2df77a555fdd" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="f259b0c2-eed1-4a25-ae6c-3e0a676af911" type="22" />
+                    <attribute id="keywordContentMapValue" value="I may not be human, but I&apos;m no more likely than they to waste my breath on a flunky!" handle="h6b5bdc1bg5756g426egacacg69d5620c5f79" type="28" />
+                </node>
+                <node id="keywordNode">
+                    <attribute id="keywordActions" value="" type="23" />
+                    <attribute id="keywordConditions" value="" type="23" />
+                    <attribute id="keywordDisplayedText" value="074ae1bc-3013-495a-bff1-454f58a7fdb4" type="22" />
+                    <attribute id="keywordId" value="Greeting" type="22" />
+                    <attribute id="keywordLast" value="0" type="19" />
+                    <attribute id="keywordOwner" value="-1" type="4" />
+                    <attribute id="keywordShow" value="0" type="19" />
+                    <attribute id="keywordSource" value="0" type="5" />
+                    <children>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value="CONDITION IsInGroup(&quot;Dying&quot;)&#x0D;&#x0A;CHECK c" type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="9944ab01-4ae1-42f5-91d7-94b1bd4a6fa5" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value="CONDITION IsInGroup(&quot;Animal&quot;)&#x0D;&#x0A;CHECK !c" type="23" />
+                            <attribute id="keywordEmotion" value="7" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="4a403364-09bc-4ff8-b08b-d3fcdee6f4ae" type="22" />
+                                </node>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="05e4b02a-8764-4fb6-b317-f6009e0ec08d" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value="CONDITION IsInGroup(&quot;Animal&quot;)&#x0D;&#x0A;CONDITION HasTalent(1,&quot;AnimalEmpathy&quot;)&#x0D;&#x0A;CHECK c&amp;c" type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="f259b0c2-eed1-4a25-ae6c-3e0a676af911" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value="CONDITION IsInGroup(&quot;Animal&quot;)&#x0D;&#x0A;CONDITION HasTalent(1,&quot;AnimalEmpathy&quot;)&#x0D;&#x0A;CHECK c&amp;!c" type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="1c572159-165d-4747-bd04-d2eaa4e3c97b" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="keywordSpeakerNames" />
+            </children>
+        </node>
+    </region>
+</save>

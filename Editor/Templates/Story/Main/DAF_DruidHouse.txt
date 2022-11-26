@@ -1,0 +1,142 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_PlayerComments("DAF_CommentDruidHouseExplosion", "DAF_CommentDruidHouseExplosion_1_1",1,1);
+DB_PlayerComments("DAF_CommentDruidHouseExplosion", "DAF_CommentDruidHouseExplosion_2_1",2,1);
+DB_PlayerComments("DAF_CommentDruidHouseExplosion", "DAF_CommentDruidHouseExplosion_2_2",2,2);
+
+DB_PlayerComment_Trigger(TRIGGER_DAF_CommentDruidHouseExplosion,"DAF_CommentDruidHouseExplosion");
+
+ItemToContainer(ITEM_DAF_KeyHiddenFamilyCellarIN,ITEM_DAF_BeehiveWithKey,-1);
+
+db_DruidScrollArea(TRIGGER_DAF_Area_DruidVisibilitySpell,ITEM_DAF_DruidHatch);
+ProcTriggerRegisterForPlayers(TRIGGER_DAF_Area_DruidVisibilitySpell);
+
+ItemSetOnstage(ITEM_DAF_DruidHatch,0);
+ItemSetOnstage(ITEM_DAF_DruidTrapCorpse,0);
+
+DB_PlayerComments("DAF_Comment_DruidHouseCleared","DAF_Comment_DruidHouseCleared_1_1",1,1);
+DB_PlayerComments("DAF_Comment_DruidHouseCleared","DAF_Comment_DruidHouseCleared_2_1",2,1);
+DB_PlayerComments("DAF_Comment_DruidHouseCleared","DAF_Comment_DruidHouseCleared_2_2",2,2);
+
+DB_ShovelArea(TRIGGER_DAF_Point_DruidGardenTreasure,"DAF_DruidGarden",ITEM_DAF_DruidGardenTreasure);
+DB_ShovelRewardItemAppear("DAF_DruidGarden",ITEM_DAF_DruidGarden_Chest, TRIGGER_DAF_Point_DruidGardenTreasure);
+
+ItemToContainer(ITEM_DAF_PhantomAmulet,ITEM_DAF_Zandalor_Amulet_Chest,-1);
+
+ItemSetOnstage(ITEM_DAF_Druid_Mirror_On01,0);
+DB_DruidCandle(ITEM_DAF_Druid_Torch01);
+DB_DruidCandle(ITEM_DAF_Druid_Torch02);
+DB_DruidCandle(ITEM_DAF_Druid_Torch03);
+DB_DruidCandle(ITEM_DAF_Druid_Torch04);
+
+DB_ItemDialogs(ITEM_DAF_DruidChest, "DAF_DruidChestPassword");
+KBSECTION
+IF
+CharacterUsedItem(_Character,ITEM_DAF_Telescope)
+THEN
+MoviePlay(_Character,"Telescope_BlackHoleView_A.bik");
+
+//REGION Magical Chest
+
+IF
+GlobalEventSet("DAF_DruidChestOpens")
+THEN
+DAF_DruidChestOpens(1);
+NOT DB_ItemDialogs(ITEM_DAF_DruidChest, "DAF_DruidChestPassword");
+
+IF
+DialogEnded("DAF_DruidChestPassword",_)
+AND
+DAF_DruidChestOpens(1)
+THEN
+ItemUnlockAndOpen(ITEM_DAF_DruidChest);
+
+//END_REGION
+
+//REGION Invisible hatch
+IF
+ItemAddedToCharacter(ITEM_DAF_DruidHatchScroll,_Player)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_OnlyOnce("DAF_DruidHouse_ScrollPickedUp")
+THEN
+DB_OnlyOnce("DAF_DruidHouse_ScrollPickedUp");
+CharacterDisplayText(_Player,"DAF_DruidHouse_ScrollPickedUp");
+
+IF
+GameBookInterfaceClosed(ITEM_DAF_DruidHatchScroll, _Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+CharacterPlayAnimation(_Player,"Throw_Up_01","");
+ProcCheckDruidScrollResult(_Player);
+
+PROC
+ProcCheckDruidScrollResult((CHARACTER)_Player)
+AND
+DB_InRegion(_Player,_Trigger)
+AND
+db_DruidScrollArea(_Trigger,_Hatch)
+THEN
+_Player.isDruidScrollArea();
+ProcDruidScrollRewards(_Player,_Hatch,_Trigger);
+
+PROC
+ProcCheckDruidScrollResult((CHARACTER)_Player)
+AND
+NOT _Player.isDruidScrollArea()
+THEN
+CharacterDisplayText(_Player,"HOM_KeyFail_Region");
+
+PROC
+ProcCheckDruidScrollResult((CHARACTER)_Player)
+AND
+_Player.isDruidScrollArea()
+THEN
+NOT _Player.isDruidScrollArea();
+
+PROC
+ProcDruidScrollRewards((CHARACTER)_Player,(ITEM)_Hatch,(TRIGGER)_Trigger)
+AND
+ItemGetPosition(_Hatch,_X,_Y,_Z)
+THEN
+ItemSetOnstage(_Hatch,1);
+PlayEffectAtPosition("FX_GP_TeleportSmoke_A",_X,_Y,_Z);
+ProcTriggerUnregisterForPlayers(_Trigger);
+
+//END_REGION
+
+//REGION Clear out guardians
+IF
+CharacterUsedItem(_Character,ITEM_DAF_Druid_Trap_MasterSwitch)
+THEN
+GlobalSetEvent("DAF_DruidHouseGuards_Killed");
+QuestUpdate("DAF_HiddenFamily","Help2");
+Launch_PlayerComment(_Character,"DAF_Comment_DruidHouseCleared");
+
+IF
+ItemStatusChange(_DruidCandle,_,_,_)
+AND
+DB_DruidCandle(_DruidCandle)
+AND
+ItemHasStatus(ITEM_DAF_Druid_Torch01,"BURNING",1)
+AND
+ItemHasStatus(ITEM_DAF_Druid_Torch02,"BURNING",1)
+AND
+ItemHasStatus(ITEM_DAF_Druid_Torch03,"BURNING",1)
+AND
+ItemHasStatus(ITEM_DAF_Druid_Torch04,"BURNING",1)
+AND
+NOT DB_OnlyOnce("DAF_DruidMirror")
+THEN
+DB_OnlyOnce("DAF_DruidMirror");
+ItemSetOnstage(ITEM_DAF_Druid_Mirror_On01,1);
+ItemSetOnstage(ITEM_DAF_Druid_Mirror_Off01,0);
+
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

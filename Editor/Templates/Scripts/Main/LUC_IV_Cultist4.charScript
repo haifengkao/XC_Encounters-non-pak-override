@@ -1,0 +1,42 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	TRIGGER:%Portal = LUC_IV_Cultist4Portal_68291def-a44d-4470-bb6a-5ca124059dd9
+	TRIGGER:%Lookout = LUC_IV_Cultist4Lookout_5b77f99b-83d8-40bd-a0de-f6dc712601fb
+	TRIGGER:%Silverglen = LUC_IV_Cultist4Silver_7cb752a4-e8a6-40e9-a49d-6536a556ea27
+	
+BEHAVIOUR
+		
+REACTION State_Working, 0
+	USAGE PEACE
+	ACTIONS
+		GetRandom(%currentAction, "Action_Silverglen", "Action_Lookout", "Action_Portal")
+		SetPriority(%currentAction, 1100)
+
+REACTION Action_Silverglen, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterMoveTo(%Silverglen, 0)
+		CharacterLookFrom(%Silverglen)
+		CharacterPlayAnimation("Wave_01")
+		SetPriority(%currentAction, 0)
+		
+REACTION Action_Lookout, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterMoveTo(%Lookout, 0)
+		CharacterLookFrom(%Lookout)
+		CharacterPlayAnimation("Look_Left_Short_01",0)
+		CharacterPlayAnimation("Look_Right_Short_01")
+		SetPriority(%currentAction, 0)
+		
+REACTION Action_Portal, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterMoveTo(%Portal, 0)
+		CharacterLookFrom(%Portal)
+		CharacterPlayAnimation("Listen_01")
+		SetPriority(%currentAction, 0)
+	

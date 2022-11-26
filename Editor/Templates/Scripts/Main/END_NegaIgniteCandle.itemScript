@@ -1,0 +1,31 @@
+INIT
+
+ITEM:__Me
+
+	CHARACTER:%Player = null
+	
+BEHAVIOUR
+
+REACTION Ignite, 0
+USAGE PEACE
+ACTIONS
+	ItemPlayEffect(__Me, "FX_Skills_Fire_Immolate_Impact_A", "Dummy_FX")
+	IF "!c1"
+		IsEqual(%Player, null)
+	THEN
+		CharacterApplyStatus(%Player, STATUS:BURNING, 1, -1)
+		Set(%Player, null)
+	ENDIF
+	SetPriority("Ignite", 0)
+	
+	
+EVENTS
+
+EVENT Use
+VARS
+	CHARACTER:_Char
+ON
+	OnUseItem(_Char, __Me)
+ACTIONS
+	Set(%Player, _Char)
+	SetPriority("Ignite", 1000)

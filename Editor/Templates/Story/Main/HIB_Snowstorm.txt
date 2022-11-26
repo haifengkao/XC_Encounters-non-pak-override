@@ -1,0 +1,48 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_PlayerComments("HIB_CommentAbandonedCamp","HIB_CommentAbandonedCamp_1_1",1,1);
+DB_PlayerComments("HIB_CommentAbandonedCamp","HIB_CommentAbandonedCamp_2_1",2,1);
+DB_PlayerComments("HIB_CommentAbandonedCamp","HIB_CommentAbandonedCamp_2_2",2,2);
+DB_PlayerComment_Trigger(TRIGGER_HIB_CommentAbandonedCamp1,"HIB_CommentAbandonedCamp");
+DB_PlayerComment_Trigger(TRIGGER_HIB_CommentAbandonedCamp2,"HIB_CommentAbandonedCamp");
+DB_PlayerComment_Trigger(TRIGGER_HIB_CommentAbandonedCamp3,"HIB_CommentAbandonedCamp");
+DB_PlayerComment_Trigger(TRIGGER_HIB_CommentAbandonedCamp4,"HIB_CommentAbandonedCamp");
+KBSECTION
+PROC
+PROC_HIB_SnowStormOver()
+THEN
+NOT DB_OneShot_DialogTrigger_NewSystem(TRIGGER_HIB_Area_ImmaculatesInfo,"HIB_ImmaculateInfo_1",CHARACTER_HIB_ImmaculateInfo1);
+NOT DB_OneShot_DialogTrigger_NewSystem(TRIGGER_HIB_Area_ImmaculatesBarter,"HIB_ImmaculateGood1",CHARACTER_HIB_ImmaculateBarter1);
+NOT DB_OneShot_DialogTrigger_NewSystem(TRIGGER_HIB_Area_ImmaculatesCharmer,"HIB_ImmaculateCharmer2",CHARACTER_HIB_ImmaculateCharmer2);
+
+PROC
+PROC_HIB_SnowStormOver()
+AND
+DB_HIB_ImmaculatesGroups(_GroupID,_Immaculate,_Dialog)
+AND
+NOT DB_Dead(_Immaculate)
+AND
+NOT DB_Combat(_Immaculate,_)
+THEN
+NOT DB_HIB_ImmaculatesGroups(_GroupID,_Immaculate,_Dialog);
+DialogRequestStopForCharacter(_Immaculate);
+CharacterSetHasDialog(_Immaculate,0);
+DialogStartOneSpeakerDialog("HIB_AD_ImmaculatesLeaving",_Immaculate);
+CharacterDisappearOutOfSight(_Immaculate,0,0,"",1);
+
+PROC
+PROC_HIB_SnowStormOver()
+AND
+NOT DB_Dead(CHARACTER_HIB_ShamblingMound1)
+THEN
+CharacterSetFaction(CHARACTER_HIB_ShamblingMound1,"HIB_Immaculates");
+
+PROC
+PROC_HIB_SnowStormOver()
+THEN
+TriggerSetAtmosphere("cf7beab4-06e9-4203-97e0-70016639744c","Sunny");
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

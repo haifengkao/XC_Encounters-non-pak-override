@@ -1,0 +1,25 @@
+#INCLUDE DefaultCharacter
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+	USING DefaultCharacter
+	CHARACTER:__Me
+	TRIGGER:%BarArea = CYS_WilburBarArea_b3d9f0df-bea5-4716-b9ba-20163bc0f38c
+	TRIGGER:%BarPoint = CYS_WilburBarPoint_95ec1683-273c-4fd5-98b6-3e831c728441
+	
+BEHAVIOUR
+ 
+REACTION State_Working, 0
+	USAGE PEACE
+	ACTIONS
+		GetRandom(%currentAction, "Action_WalkBehindBar")
+		SetPriority(%currentAction, 1100)
+
+REACTION Action_WalkBehindBar, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterWander(%BarArea, 25, 0, %BarPoint)
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)

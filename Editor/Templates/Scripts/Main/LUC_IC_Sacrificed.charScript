@@ -1,0 +1,48 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+
+EVENTS
+
+EVENT stunned
+	ON
+		OnCharacterEvent(__Me, "isStunning")
+	ACTIONS
+	    SetPriority(beStunned, 1100)
+
+BEHAVIOUR
+
+REACTION State_WaitingForExecution, 0
+USAGE ALL
+VARS
+	FLOAT:_Wait
+	FIXEDSTRING:_Text
+ACTIONS
+	GetRandomBetween(_Wait, 2.0, 5.0)
+	IF "c1"
+		IsRandom(0.25)
+	THEN
+		GetRandom(_Text,"LUC_IC_Sacrificed1","LUC_IC_Sacrificed2","LUC_IC_Sacrificed3")
+		DisplayText(__Me,_Text,4)
+		GetRandomBetween(_Wait, 14.0, 20.0)
+	ENDIF
+	CharacterPlayAnimation("Loop_Execution_01",0,0)
+	Sleep(_Wait)
+INTERRUPT
+	Reset()
+	
+REACTION State_Killed, 0
+USAGE ALL
+ACTIONS
+	CharacterPlayAnimation("Execution_01",0,1)
+INTERRUPT
+	Reset()
+
+REACTION beStunned, 0
+USAGE PEACE
+ACTIONS
+    Sleep(3)
+    CharacterApplyStatus(__Me, "STUNNED", -1,1)
+    SetPriority(beStunned, 0)

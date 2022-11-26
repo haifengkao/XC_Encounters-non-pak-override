@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<palette xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <palettes />
+  <objectids>
+    <guid>9abb0060-f185-43a0-a703-2b6d855a076f</guid>
+    <guid>377f86f3-a703-4de1-b2c2-f308f0d9ed4b</guid>
+    <guid>1ab7914a-b047-4af0-95d0-deb16def7e43</guid>
+    <guid>3590a069-9906-4021-803f-68fb4196e1c0</guid>
+    <guid>1b3a618b-4950-49f7-afb6-bddc3c533a72</guid>
+    <guid>54109cc2-d39c-4636-afb1-a8fd9ef99fca</guid>
+    <guid>c2f1c26a-0ce5-4a26-b33e-5c57d7c46e29</guid>
+    <guid>2ed0b9a6-6bac-4dbd-adc7-cf2504ab7d3f</guid>
+    <guid>29ee27d7-9863-4ad1-8efb-fe6b65a75f2e</guid>
+    <guid>dffefdd5-1c19-4fb6-b005-21495e62481c</guid>
+    <guid>e5993ddf-d20d-49d9-85bd-ac7d64071b3c</guid>
+    <guid>9154affe-5da9-45a4-8a49-59f179c0e5a6</guid>
+    <guid>81ac7834-e8f6-497a-b0c0-ca69e765c8ad</guid>
+    <guid>1365fdce-8fa5-4ac1-ab23-e568f6190d8a</guid>
+    <guid>ce944470-e0cc-4495-8c27-d3ef239d65af</guid>
+    <guid>d764a4e0-94cb-4213-be9e-9c0829ae1822</guid>
+    <guid>1d161dc6-7b7e-4a2c-b438-eb110fb6049f</guid>
+    <guid>7737bd19-d2ab-4d16-9a6d-2570d7c7f2c9</guid>
+    <guid>a864b74e-4639-44d8-8981-961a02ab6925</guid>
+    <guid>90448033-d14f-4da5-89f9-b2f8b77dce75</guid>
+    <guid>e3ade69e-d96d-4736-a415-f4d3463e3480</guid>
+    <guid>398eab99-dddb-4457-bf0c-f5d41dea7dab</guid>
+    <guid>c50ac526-1211-47ee-8c33-93d6224aad17</guid>
+    <guid>1afe2ed7-bfaa-4d5f-9833-edfd4ade9f49</guid>
+    <guid>a1d14a0f-01d5-421e-a209-5927e0603bdc</guid>
+    <guid>7eb2723b-5d81-4576-8087-2c2e6d0abee6</guid>
+    <guid>28de50e4-1ed7-4d2b-8828-41a8120cce51</guid>
+    <guid>7b5665f9-20f0-4792-8867-e67afd07f2e5</guid>
+    <guid>4eebc8cf-9cb8-4fd6-b0d6-234b526e4230</guid>
+    <guid>50fe4b56-57bd-4e82-ac1f-368b5511ebb1</guid>
+    <guid>ca07d8ac-b87b-4e67-8159-4d7290f70e15</guid>
+    <guid>b312ca7a-2aaf-48e9-9457-0aebfa9d04e1</guid>
+  </objectids>
+  <name>Mine</name>
+</palette>

@@ -1,0 +1,51 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Dialogs(CHARACTER_CYS_Prison_Guard,"CYS_PrisonGuard");
+KBSECTION
+IF
+DialogCharacterEventSet("PlayerLeavesPrison",_Player,_)
+AND
+PlayerInPrison(_Player,_Prison)
+THEN
+DialogClearCharacterEvent("PlayerLeavesPrison",_Player,0);
+PlayerLeavesPrison(_Player,_Prison);
+
+PROC
+ProcFreePartyMembersFromPrison((STRING)_Prison)
+AND
+PlayerInPrison(_Player,_Prison)
+THEN
+PlayerLeavesPrison(_Player,_Prison);
+
+IF
+GlobalEventSet("FreePartyMembersFromJail")
+THEN
+GlobalClearEvent("FreePartyMembersFromJail");
+ProcFreePartyMembersFromPrison("PRISON_CYSEAL");
+ItemUnlockAndOpen(ITEM_CYS_PlayerJailDoor);
+
+IF
+PlayerInPrison(_Player,_)
+THEN
+DB_PlayerInPrisonCheck(_Player);
+GlobalSetEvent("GEN_PartyMemberInJail");
+
+IF
+DB_PlayerInPrisonCheck(_Player)
+AND
+NOT PlayerInPrison(_Player,_)
+THEN
+NOT DB_PlayerInPrisonCheck(_Player);
+ProcCheckIfPartyMembersInJail();
+
+PROC
+ProcCheckIfPartyMembersInJail()
+AND
+NOT PlayerInPrison(_,_)
+THEN
+GlobalClearEvent("GEN_PartyMemberInJail");
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

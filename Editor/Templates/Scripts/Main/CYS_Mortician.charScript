@@ -1,0 +1,104 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+TRIGGER:%TriggerDown1 = CYS_Point_Morticiandownstairs1_56d10cdd-700f-4c85-b0dd-9c3350ea1de7
+TRIGGER:%TriggerUp1 = CYS_Mortician_Upstairs01_0816afdf-f829-4d07-afdd-85938eafc35f
+TRIGGER:%TriggerUp2 = CYS_Mortician_Upstairs02_d1f2c7c7-6f86-4366-ba74-c3ab94c2b63c
+TRIGGER:%TriggerUp3 = CYS_Mortician_Upstairs03_b680be96-7054-490f-b2ec-2e425bd487af
+TRIGGER:%TriggerGoDown = CYS_Point_MorticianDown_69877a04-52c5-4d49-862e-c9560a26b596
+TRIGGER:%TriggerGoUp = CYS_Point_MorticianUp_e99ad390-013a-4678-b8bc-8fbf65b405fa
+
+BEHAVIOUR
+
+REACTION State_DownStairs, 0
+USAGE PEACE
+ACTIONS
+	GetWeightedRandom(%currentAction, "Action_CleanCoffins",INT:10, "Action_GoUpStairs", INT:5)
+	SetPriority(%currentAction, 1100)
+	
+REACTION State_WaitForArrest, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, "Action_CleanCoffins")
+	SetPriority(%currentAction, 1100)
+	
+REACTION State_UpStairs, 0
+USAGE PEACE
+ACTIONS
+	GetWeightedRandom(%currentAction, "Action_UseHammerOnCoffin",INT:10, "Action_PutWoodOnFire",INT:15, "Action_GoDownStairs",INT:5)
+	SetPriority(%currentAction, 1100)
+	
+REACTION Action_CleanCoffins, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%TriggerDown1,0)
+	CharacterLookFrom(%TriggerDown1)
+	CharacterPlayAnimation("WipeTable_01")
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)
+	
+REACTION Action_UseHammerOnCoffin, 0
+USAGE PEACE
+VARS
+	INT:_loopCount
+ACTIONS
+	CharacterMoveTo(%TriggerUp1,0)
+	CharacterLookFrom(%TriggerUp1)
+	GetRandom(_loopCount, 1, 2, 3, 4)
+	WHILE "c1"
+		IsGreaterThen(_loopCount, 0)
+	DO
+		CharacterPlayAnimation("Repairman_01")
+		Subtract(_loopCount, 1)
+	ENDWHILE
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)
+
+REACTION Action_PutWoodOnFire, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%TriggerUp2)
+	CharacterLookFrom(%TriggerUp2)
+	CharacterPlayAnimation("Fidget_Forward_01")
+	CharacterMoveTo(%TriggerUp3)
+	CharacterLookFrom(%TriggerUp3)
+	CharacterPlayAnimation("Fidget_Low_01")
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)
+
+REACTION Action_GoUpStairs, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%TriggerGoDown, 0)
+	CharacterTeleportTo(%TriggerGoUp)
+	Set(%currentState, "State_UpStairs")
+INTERRUPT
+	Reset()
+	
+REACTION Action_GoDownStairs, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%TriggerGoUp, 0)
+	CharacterTeleportTo(%TriggerGoDown)
+	Set(%currentState, "State_DownStairs")
+INTERRUPT
+	Reset()
+	
+EVENTS
+	
+EVENT Init
+ON
+	OnInit()
+ACTIONS	
+	CharacterForceUpdate(1)
+
+EVENT Died
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	CharacterForceUpdate(0)

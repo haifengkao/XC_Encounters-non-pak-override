@@ -1,0 +1,530 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Singleton("InitData",0);
+KBSECTION
+//REGION Stacks
+
+//Stacks are a useful tool to mimic a FILO stack structure.
+//Add items using the Stack((STRING)_ID,_Value) command.
+//At any time you can query for TopOfStackCharacter((STRING)_ID,_Value), TopOfStackItem((STRING)_ID,_Value) or TopOfStackTrigger((STRING)_ID,_Value)
+//If you wish to pop the top member of the stack, just call PopStack((STRING)_ID);
+PROC
+Stack_Internal((STRING)_ID,(STRING)_Value)
+AND
+NOT DB_StackInternalCounter(_,_ID)
+THEN
+DB_StackInternalCounter(0,_ID);
+TopOfStack(_ID,_Value);
+
+PROC
+Stack_Internal((STRING)_ID,(STRING)_Value)
+AND
+DB_StackInternalCounter(_Amount,_ID)
+AND
+IntegerSum(_Amount,1,_NewAmount)
+AND
+TopOfStack(_ID,_TopValue)
+THEN
+NOT DB_StackInternalCounter(_Amount,_ID);
+DB_StackInternalCounter(_NewAmount,_ID);
+DB_StackInternalMember(_NewAmount,_ID,_Value);
+NOT TopOfStack(_ID,_TopValue);
+TopOfStack(_ID,_Value);
+
+PROC
+PopStack((STRING)_ID)
+AND
+DB_StackInternalCounter(1,_ID)
+AND
+TopOfStack(_ID,_Value)
+THEN
+NOT TopOfStack(_ID,_Value);
+NOT DB_StackInternalCounter(1,_ID);
+NOT DB_StackInternalMember(1,_ID,_Value);
+ProcClearOldTopOfStackCharacter(_ID);
+ProcClearOldTopOfStackItem(_ID);
+ProcClearOldTopOfStackTrigger(_ID);
+
+PROC
+PopStack((STRING)_ID)
+AND
+DB_StackInternalCounter(_Amount,_ID)
+AND
+IntegerSubtract(_Amount,1,_NewAmount)
+AND
+DB_StackInternalMember(_Amount,_ID,_OldTopValue)
+AND
+DB_StackInternalMember(_NewAmount,_ID,_NewTopValue)
+THEN
+NOT DB_StackInternalCounter(_Amount,_ID);
+DB_StackInternalCounter(_NewAmount,_ID);
+NOT DB_StackInternalMember(_Amount,_ID,_OldTopValue);
+NOT TopOfStack(_ID,_OldTopValue);
+TopOfStack(_ID,_NewTopValue);
+
+PROC
+StackCharacter((STRING)_ID,(CHARACTER)_Value)
+AND
+CharacterGetUUID(_Value,_UUID)
+THEN
+StackType(_ID,"Character");
+Stack_CharacterUUID(_Value,_UUID);
+Stack_Internal(_ID,_UUID);
+
+PROC
+StackItem((STRING)_ID,(ITEM)_Value)
+AND
+ItemGetUUID(_Value,_UUID)
+THEN
+StackType(_ID,"Item");
+Stack_ItemUUID(_Value,_UUID);
+Stack_Internal(_ID,_UUID);
+
+PROC
+StackTrigger((STRING)_ID,(TRIGGER)_Value)
+AND
+TriggerGetUUID(_Value,_UUID)
+THEN
+StackType(_ID,"Trigger");
+Stack_TriggerUUID(_Value,_UUID);
+Stack_Internal(_ID,_UUID);
+
+IF
+TopOfStack(_ID,_UUID)
+AND
+StackType(_ID,"Character")
+AND
+Stack_CharacterUUID(_Value,_UUID)
+THEN
+ProcClearOldTopOfStackCharacter(_ID);
+TopOfStackCharacter(_ID,_Value);
+
+IF
+TopOfStack(_ID,_UUID)
+AND
+StackType(_ID,"Item")
+AND
+Stack_ItemUUID(_Value,_UUID)
+THEN
+ProcClearOldTopOfStackItem(_ID);
+TopOfStackItem(_ID,_Value);
+
+IF
+TopOfStack(_ID,_UUID)
+AND
+StackType(_ID,"Trigger")
+AND
+Stack_TriggerUUID(_Value,_UUID)
+THEN
+ProcClearOldTopOfStackTrigger(_ID);
+TopOfStackTrigger(_ID,_Value);
+
+PROC
+ProcClearOldTopOfStackCharacter((STRING)_ID)
+AND
+TopOfStackCharacter(_ID,_Value)
+THEN
+NOT TopOfStackCharacter(_ID,_Value);
+
+PROC
+ProcClearOldTopOfStackItem((STRING)_ID)
+AND
+TopOfStackItem(_ID,_Value)
+THEN
+NOT TopOfStackItem(_ID,_Value);
+
+PROC
+ProcClearOldTopOfStackTrigger((STRING)_ID)
+AND
+TopOfStackTrigger(_ID,_Value)
+THEN
+NOT TopOfStackTrigger(_ID,_Value);
+
+//END_REGION
+
+//REGION Default Parameters
+PROC
+CharacterLookAtCharacter((CHARACTER)_Character1,(CHARACTER)_Character2)
+THEN
+CharacterLookAtCharacter(_Character1,_Character2,0);
+
+PROC
+CharacterPlayAnimation((CHARACTER)_Character,(STRING)_String)
+THEN
+CharacterPlayAnimation(_Character,_String,"");
+
+PROC
+CharacterTeleportToPosition((CHARACTER)_Character,(REAL)_X,(REAL)_Y,(REAL)_Z)
+THEN
+CharacterTeleportToPosition(_Character,_X,_Y,_Z,"");
+
+PROC
+CharacterTeleportToTrigger((CHARACTER)_Character,(TRIGGER)_Trigger)
+THEN
+CharacterTeleportToTrigger(_Character,_Trigger,"");
+
+PROC
+CharacterApplyStatus((CHARACTER)_Character,(STRING)_Status,(REAL)_Duration)
+THEN
+CharacterApplyStatus(_Character,_Status,_Duration,0);
+
+PROC
+ItemApplyStatus((ITEM)_Item,(STRING)_Status,(REAL)_Duration)
+THEN
+ItemApplyStatus(_Item,_Status,_Duration,0);
+
+PROC
+ItemToContainer((ITEM)_Item,(ITEM)_Container)
+THEN
+ItemToContainer(_Item,_Container,1);
+
+PROC
+CharacterTeleportPartyToTrigger((TRIGGER)_Trigger,(STRING)_Event)
+THEN
+CharacterTeleportPartyToTrigger(CHARACTER_Player1,_Trigger,_Event);
+
+PROC
+CharacterTeleportPartyToTriggerMovieLoadState((TRIGGER)_Trigger,(STRING)_Event,(STRING)_MovieLoadState)
+THEN
+CharacterTeleportPartyToTriggerMovieLoadState(CHARACTER_Player1,_Trigger,_Event,_MovieLoadState);
+
+PROC
+PartyAddGold((INTEGER)_Count)
+THEN
+PartyAddGold(CHARACTER_Player1,_Count);
+
+PROC
+PartyAddActualExperience((INTEGER)_XP)
+THEN
+PartyAddActualExperience(CHARACTER_Player1,_XP);
+
+PROC
+PartyAddExperience((INTEGER)_Act,(INTEGER)_ActPart,(INTEGER)_Gain)
+THEN
+PartyAddExperience(CHARACTER_Player1,_Act,_ActPart,_Gain);
+
+PROC
+PartyAddExplorationExperience((INTEGER)_Act,(INTEGER)_ActPart,(INTEGER)_Gain)
+THEN
+PartyAddExplorationExperience(CHARACTER_Player1,_Act,_ActPart,_Gain);
+
+PROC
+PartyAddCharismaExperience((INTEGER)_Act,(INTEGER)_ActPart,(INTEGER)_Gain)
+THEN
+PartyAddCharismaExperience(CHARACTER_Player1,_Act,_ActPart,_Gain);
+//END_REGION
+
+//REGION Trigger Spotter
+IF
+DB_OneShot_DialogTrigger_NewSystem(_Trigger,_,_Spotter)
+THEN
+CharacterSetVarInteger(_Spotter,"IgnoreDialogChecks",0);
+SneakTriggerSpotter(_Trigger,_Spotter);
+
+IF
+DB_OneShot_DialogTrigger_NewSystem(_Trigger,_,_Spotter1,_Spotter2)
+THEN
+CharacterSetVarInteger(_Spotter1,"IgnoreDialogChecks",0);
+CharacterSetVarInteger(_Spotter2,"IgnoreDialogChecks",0);
+SneakTriggerSpotter(_Trigger,_Spotter1);
+SneakTriggerSpotter(_Trigger,_Spotter2);
+
+IF
+DB_OneShot_DialogTrigger_NewSystem(_Trigger,_,_Spotter1,_Spotter2,_Spotter3)
+THEN
+CharacterSetVarInteger(_Spotter1,"IgnoreDialogChecks",0);
+CharacterSetVarInteger(_Spotter2,"IgnoreDialogChecks",0);
+CharacterSetVarInteger(_Spotter3,"IgnoreDialogChecks",0);
+SneakTriggerSpotter(_Trigger,_Spotter1);
+SneakTriggerSpotter(_Trigger,_Spotter2);
+SneakTriggerSpotter(_Trigger,_Spotter3);
+
+PROC
+ProcCharInTriggerSpotted((CHARACTER)_Player,(TRIGGER)_Trigger)
+AND
+DB_OneShot_DialogTrigger_NewSystem(_Trigger,_Dialog,_Spotter)
+THEN
+ProcDoTwoSpeakerDialog(_Dialog,_Spotter,_Player);
+NOT DB_OneShot_DialogTrigger_NewSystem(_Trigger,_Dialog,_Spotter);
+
+PROC
+ProcCharInTriggerSpotted((CHARACTER)_Player,(TRIGGER)_Trigger)
+AND
+DB_OneShot_DialogTrigger_NewSystem(_Trigger,_Dialog,_Spotter1,_Spotter2)
+THEN
+ProcDoThreeSpeakerDialog(_Dialog,_Spotter1,_Spotter2,_Player);
+NOT DB_OneShot_DialogTrigger_NewSystem(_Trigger,_Dialog,_Spotter1,_Spotter2);
+
+PROC
+ProcCharInTriggerSpotted((CHARACTER)_Player,(TRIGGER)_Trigger)
+AND
+DB_OneShot_DialogTrigger_NewSystem(_Trigger,_Dialog,_Spotter1,_Spotter2,_Spotter3)
+THEN
+ProcDoFourSpeakerDialog(_Dialog,_Spotter1,_Spotter2,_Spotter3,_Player);
+NOT DB_OneShot_DialogTrigger_NewSystem(_Trigger,_Dialog,_Spotter1,_Spotter2,_Spotter3);
+//END_REGION
+
+//REGION Global Event Memory
+IF
+GlobalEventSet(_String)
+THEN
+DB_GlobalEvent(_String);
+
+IF
+GlobalEventCleared(_String)
+THEN
+NOT DB_GlobalEvent(_String);
+//END_REGION
+
+//REGION Poof / Foop
+PROC
+Poof((CHARACTER)_Character)
+AND
+CharacterGetRegion(_Character,_Region)
+AND
+DB_CurrentLevel(_Region)
+AND
+CharacterGetPosition(_Character,_X,_Y,_Z)
+THEN
+PlayEffectAtPosition("FX_GP_TeleportSmoke_A",_X,_Y,_Z);
+
+PROC
+Poof((CHARACTER)_Character)
+THEN
+CharacterSetOnStage(_Character,0);
+
+PROC
+Foop((CHARACTER)_Character)
+AND
+CharacterGetRegion(_Character,_Region)
+AND
+DB_CurrentLevel(_Region)
+AND
+CharacterGetPosition(_Character,_X,_Y,_Z)
+THEN
+PlayEffectAtPosition("FX_GP_TeleportSmoke_A",_X,_Y,_Z);
+
+PROC
+Foop((CHARACTER)_Character)
+THEN
+CharacterSetOnStage(_Character,1);
+
+IF
+CharacterEvent(_Character,"GEN_GoOffStage")
+THEN
+CharacterSetOnStage(_Character,0);
+
+PROC
+Proc_PoofOnce((CHARACTER)_Character,(STRING)_OnlyOnce)
+AND
+NOT DB_OnlyOnce(_OnlyOnce)
+THEN
+Poof(_Character);
+DB_OnlyOnce(_OnlyOnce);
+//END_REGION
+
+//REGION Uniformly distributed Randoms (Fair random with memory)
+//Fair rand requires a UUID and a maxamount. The function will return [0,Maxamount-1]
+//When no previous data found, all possible numbers are added into an array.
+//Every FairRand query returns one random number from the array and removes it.
+//Only when the array is empty, is it reseeded.
+//Output: DB_FairRand_ReturnVal(INTEGER)
+
+//Clear return value
+QRY
+QRY_GetFairRand((STRING)_UUID,(INTEGER)_Amount)
+AND
+DB_FairRand_ReturnVal((INTEGER)_Number)
+THEN
+NOT DB_FairRand_ReturnVal(_Number);
+
+//If first time or all numbers used: reseed.
+QRY
+QRY_GetFairRand((STRING)_UUID,(INTEGER)_Amount)
+AND
+NOT DB_FairRand_Available(_UUID,_Amount,_)
+THEN
+Proc_SeedFairRand(_UUID,_Amount,_Amount);
+
+//Pick a random number from the available array (Put in new array with indeces, pick random index, return number)
+//Special case: Make sure that the first pick of a list is not the same as the last pick of the previous list
+QRY
+QRY_GetFairRand((STRING)_UUID,(INTEGER)_Amount)
+THEN
+DB_FairRandAmount(0);
+
+QRY
+QRY_GetFairRand((STRING)_UUID,(INTEGER)_Amount)
+AND
+_Amount > 1
+AND
+DB_FairRand_Last_Of_Previous_Seeding(_PreviousNumber)
+AND
+DB_FairRand_Available(_UUID,_Amount,_AvailableNumber)
+AND
+_PreviousNumber != _AvailableNumber
+AND
+DB_FairRandAmount(_Count)
+AND
+IntegerSum(_Count,1,_NewCount)
+THEN
+DB_FairRand_Array(_Count,_AvailableNumber);
+NOT DB_FairRandAmount(_Count);
+DB_FairRandAmount(_NewCount);
+DB_FairAmount_ListFilled(1);
+
+QRY
+QRY_GetFairRand((STRING)_UUID,(INTEGER)_Amount)
+AND
+DB_FairRand_Last_Of_Previous_Seeding(_Number)
+THEN
+NOT DB_FairRand_Last_Of_Previous_Seeding(_Number);
+
+QRY
+QRY_GetFairRand((STRING)_UUID,(INTEGER)_Amount)
+AND
+NOT DB_FairAmount_ListFilled(1)
+AND
+DB_FairRand_Available(_UUID,_Amount,_AvailableNumber)
+AND
+DB_FairRandAmount(_Count)
+AND
+IntegerSum(_Count,1,_NewCount)
+THEN
+DB_FairRand_Array(_Count,_AvailableNumber);
+NOT DB_FairRandAmount(_Count);
+DB_FairRandAmount(_NewCount);
+
+QRY
+QRY_GetFairRand((STRING)_UUID,(INTEGER)_Amount)
+AND
+DB_FairAmount_ListFilled(1)
+THEN
+NOT DB_FairAmount_ListFilled(1);
+
+QRY
+QRY_GetFairRand((STRING)_UUID,(INTEGER)_Amount)
+AND
+DB_FairRandAmount(_Count)
+AND
+_Count > 0
+AND
+Random(_Count,_Index)
+AND
+DB_FairRand_Array(_Index,_Number)
+THEN
+NOT DB_FairRand_Available(_UUID,_Amount,_Number);
+DB_FairRand_ReturnVal(_Number);
+
+//If this was the last value in the available list, remember it, so we don't pick it first in the next list.
+QRY
+QRY_GetFairRand((STRING)_UUID,(INTEGER)_Amount)
+AND
+NOT DB_FairRand_Available(_UUID,_Amount,_)
+AND
+DB_FairRand_ReturnVal(_Number)
+THEN
+DB_FairRand_Last_Of_Previous_Seeding(_Number);
+
+//Clean up temp vars
+QRY
+QRY_GetFairRand((STRING)_UUID,(INTEGER)_MaxAmount)
+AND
+DB_FairRandAmount(_Amount)
+THEN
+NOT DB_FairRandAmount(_Amount);
+
+QRY
+QRY_GetFairRand((STRING)_UUID,(INTEGER)_Amount)
+AND
+DB_FairRand_Array(_Index,_Number)
+THEN
+NOT DB_FairRand_Array(_Index,_Number);
+
+PROC
+Proc_SeedFairRand((STRING)_UUID,(INTEGER)_MaxAmount,(INTEGER)_Amount)
+AND
+_Amount > 0
+AND
+IntegerSubtract(_Amount,1,_NewAmount)
+THEN
+DB_FairRand_Available(_UUID,_MaxAmount,_NewAmount);
+Proc_SeedFairRand(_UUID,_MaxAmount,_NewAmount);
+//END_REGION
+
+//REGION Singleton Variables //A variable which can only hold one value. All old value get overwritten.
+IF
+DB_Singleton(_VariableNam,_NewValue)
+AND
+DB_Singleton(_VariableNam,_OldValue)
+AND
+_NewValue != _OldValue
+THEN
+NOT DB_Singleton(_VariableNam,_OldValue);
+//END_REGION
+
+//REGION Only Once Rule Query
+QRY
+QueryOnlyOnce((STRING)_OnlyOnceUUID)
+AND
+NOT DB_OnlyOnce(_OnlyOnceUUID)
+THEN
+DB_OnlyOnce(_OnlyOnceUUID);
+//END_REGION
+
+//REGION Small macros
+PROC
+PROC_RemoveDialogFromCharacter((CHARACTER)_NPC)
+THEN
+DialogRequestStopForCharacter(_NPC);
+ProcRemoveAllDialogEntriesForSpeaker(_NPC);
+CharacterSetHasDialog(_NPC,0);
+CharacterSetHasDefaultDialog(_NPC,0);
+//END_REGION
+
+//REGION Counter Helper
+PROC
+Proc_CountHelper((STRING)_ID)
+AND
+NOT DB_CountHelper(_ID,_)
+THEN
+DB_CountHelper(_ID,0);
+
+PROC
+Proc_CountHelper((STRING)_ID)
+AND
+DB_CountHelper(_ID,_OldValue)
+AND
+IntegerSum(_OldValue,1,_Value)
+THEN
+NOT DB_CountHelper(_ID,_OldValue);
+DB_CountHelper(_ID,_Value);
+
+PROC
+Proc_CharCountHelper((CHARACTER)_Char,(STRING)_ID)
+AND
+NOT DB_CharCountHelper(_Char,_ID,_)
+THEN
+DB_CharCountHelper(_Char,_ID,0);
+
+PROC
+Proc_CharCountHelper((CHARACTER)_Char,(STRING)_ID)
+AND
+DB_CharCountHelper(_Char,_ID,_OldValue)
+AND
+IntegerSum(_OldValue,1,_Value)
+THEN
+NOT DB_CharCountHelper(_Char,_ID,_OldValue);
+DB_CharCountHelper(_Char,_ID,_Value);
+
+PROC
+Proc_CharCountHelperReset((CHARACTER)_Char,(STRING)_ID)
+AND
+DB_CharCountHelper(_Char,_ID,_Counter)
+THEN
+NOT DB_CharCountHelper(_Char,_ID,_Counter);
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION

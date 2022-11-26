@@ -1,0 +1,519 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+PROC_CleanUpEffects();
+
+KBSECTION
+//REGION Savegame handle fixes 
+
+IF
+RegionStarted(_)
+THEN
+PROC_InvalidateCharacterLoopEffects();
+PROC_InvalidateTriggerLoopEffects();
+PROC_InvalidateItemLoopEffects();
+PROC_InvalidateItemBeamLoopEffects();
+
+PROC
+PROC_InvalidateCharacterLoopEffects()
+AND
+LoopEffectAtCharacterDB(_character, _fxHandle,_ID,_Region,_effect,_BoneName)
+THEN
+NOT LoopEffectAtCharacterDB(_character, _fxHandle,_ID,_Region,_effect,_BoneName);
+LoopEffectAtCharacterDB(_character, -1,_ID,_Region,_effect,_BoneName);
+
+PROC
+PROC_InvalidateTriggerLoopEffects()
+AND
+LoopEffectAtTriggerDB(_trigger,_Handle,_ID,_Region,_effect)
+THEN
+NOT LoopEffectAtTriggerDB(_trigger,_Handle,_ID,_Region,_effect);
+LoopEffectAtTriggerDB(_trigger, -1,_ID,_Region,_effect);
+
+PROC
+PROC_InvalidateItemLoopEffects()
+AND
+LoopEffectAtItemDB(_item, _fxHandle,_ID,_Region,_effect)
+THEN
+NOT LoopEffectAtItemDB(_item, _fxHandle,_ID,_Region,_effect);
+LoopEffectAtItemDB(_item, -1,_ID,_Region,_effect);
+
+PROC
+PROC_InvalidateItemBeamLoopEffects()
+AND
+LoopEffectsBeamItemDB(_item,_Char,_EffectHandle,_ID,_Region,_effect,_SrcBone,_TargetBone)
+THEN
+NOT LoopEffectsBeamItemDB(_item,_Char,_EffectHandle,_ID,_Region,_effect,_SrcBone,_TargetBone);
+LoopEffectsBeamItemDB(_item,_Char,-1,_ID,_Region,_effect,_SrcBone,_TargetBone);
+
+//END_REGION
+
+/***************************/
+/*** EFFECT REGISTRATION ***/
+/***************************/
+
+PROC
+PROC_LoopEffectAtTrigger((STRING)_effect, (TRIGGER)_trigger,(STRING)_ID,(STRING)_Region)
+AND
+DB_CurrentLevel(_Region)
+AND
+PlayLoopEffectAtTrigger(_effect, _trigger, _fxHandle)
+THEN
+LoopEffectAtTriggerDB(_trigger, _fxHandle,_ID,_Region,_effect);
+
+PROC
+PROC_LoopEffectAtTrigger((STRING)_effect, (TRIGGER)_trigger,(STRING)_ID,(STRING)_Region)
+AND
+_Region!="__ANY__"
+AND
+NOT DB_CurrentLevel(_Region)
+THEN
+LoopEffectAtTriggerDB(_trigger, -1,_ID,_Region,_effect);
+
+PROC
+PROC_LoopEffectAtTrigger((STRING)_effect, (TRIGGER)_trigger,(STRING)_ID,"__ANY__")
+AND
+DB_CurrentLevel(_)
+AND
+PlayLoopEffectAtTrigger(_effect, _trigger, _fxHandle)
+THEN
+LoopEffectAtTriggerDB(_trigger, _fxHandle,_ID,"__ANY__",_effect);
+
+PROC
+PROC_LoopEffectAtTrigger((STRING)_effect, (TRIGGER)_trigger,(STRING)_ID,"__ANY__")
+AND
+NOT DB_CurrentLevel(_)
+THEN
+LoopEffectAtTriggerDB(_trigger, -1,_ID,"__ANY__",_effect);
+
+
+PROC
+PROC_LoopEffectAtCharacter((STRING)_effect, (CHARACTER)_character,(STRING)_ID,(STRING)_Region)
+THEN
+PROC_LoopEffectAtCharacter(_effect,_character,_ID,_Region,"");
+
+PROC
+PROC_LoopEffectAtCharacter((STRING)_effect, (CHARACTER)_character,(STRING)_ID,(STRING)_Region,(STRING)_BoneName)
+AND
+DB_CurrentLevel(_Region)
+AND
+CharacterPlayLoopEffect(_character, _effect, _BoneName,_fxHandle)
+THEN
+LoopEffectAtCharacterDB(_character, _fxHandle,_ID,_Region,_effect,_BoneName);
+
+PROC
+PROC_LoopEffectAtCharacter((STRING)_effect, (CHARACTER)_character,(STRING)_ID,(STRING)_Region,(STRING)_BoneName)
+AND
+_Region!="__ANY__"
+AND
+NOT DB_CurrentLevel(_Region)
+THEN
+LoopEffectAtCharacterDB(_character, -1,_ID,_Region,_effect,_BoneName);
+
+PROC
+PROC_LoopEffectAtCharacter((STRING)_EffectName, (CHARACTER)_Character,(STRING)_ID,"__ANY__",(STRING)_BoneName)
+AND
+DB_CurrentLevel(_)
+AND
+NOT QryBlockEffectInCombat(_EffectName,_Character)
+AND
+CharacterPlayLoopEffect(_Character, _EffectName, _BoneName,_fxHandle)
+THEN
+LoopEffectAtCharacterDB(_Character, _fxHandle,_ID,"__ANY__",_EffectName,_BoneName);
+
+PROC
+PROC_LoopEffectAtCharacter((STRING)_EffectName, (CHARACTER)_Character,(STRING)_ID,"__ANY__",(STRING)_BoneName)
+AND
+DB_CurrentLevel(_)
+AND
+QryBlockEffectInCombat(_EffectName,_Character)
+THEN
+LoopEffectAtCharacterDB(_Character, -1,_ID,"__ANY__",_EffectName,_BoneName);
+
+PROC
+PROC_LoopEffectAtCharacter((STRING)_EffectName, (CHARACTER)_Character,(STRING)_ID,"__ANY__",(STRING)_BoneName)
+AND
+NOT DB_CurrentLevel(_)
+THEN
+LoopEffectAtCharacterDB(_Character, -1,_ID,"__ANY__",_EffectName,_BoneName);
+
+QRY
+QryBlockEffectInCombat((STRING)_EffectName,(CHARACTER)_Character)
+AND
+DB_LoopEffectDisabledInCombat(_EffectName)
+AND
+DB_Combat(_Character,_)
+THEN
+NOOP(1);
+
+PROC
+PROC_LoopEffectAtItem((STRING)_effect, (ITEM)_item,(STRING)_ID,(STRING)_Region)
+AND
+DB_CurrentLevel(_Region)
+AND
+ItemPlayLoopEffect(_item, _effect, _fxHandle)
+THEN
+LoopEffectAtItemDB(_item, _fxHandle,_ID,_Region,_effect);
+
+PROC
+PROC_LoopEffectAtItem((STRING)_effect, (ITEM)_item,(STRING)_ID,(STRING)_Region)
+AND
+_Region!="__ANY__"
+AND
+NOT DB_CurrentLevel(_Region)
+THEN
+LoopEffectAtItemDB(_item, -1,_ID,_Region,_effect);
+
+PROC
+PROC_LoopEffectAtItem((STRING)_effect, (ITEM)_item,(STRING)_ID,"__ANY__")
+AND
+DB_CurrentLevel(_)
+AND
+ItemPlayLoopEffect(_item, _effect, _fxHandle)
+THEN
+LoopEffectAtItemDB(_item, _fxHandle,_ID,"__ANY__",_effect);
+
+PROC
+PROC_LoopEffectAtItem((STRING)_effect, (ITEM)_item,(STRING)_ID,"__ANY__")
+AND
+NOT DB_CurrentLevel(_)
+THEN
+LoopEffectAtItemDB(_item, -1,_ID,"__ANY__",_effect);
+
+PROC
+PROC_LoopBeamEffectAtItem((STRING)_effect, (ITEM)_item,(CHARACTER)_Char,(STRING)_SrcBone,(STRING)_TargetBone,(STRING)_ID,(STRING)_Region)
+AND
+_Region!="__ANY__"
+AND
+NOT DB_CurrentLevel(_Region)
+THEN
+LoopEffectsBeamItemDB(_item,_Char,-1,_ID,_Region,_effect,_SrcBone,_TargetBone);
+
+PROC
+PROC_LoopBeamEffectAtItem((STRING)_effect, (ITEM)_item,(CHARACTER)_Char,(STRING)_SrcBone,(STRING)_TargetBone,(STRING)_ID,(STRING)_Region)
+AND
+DB_CurrentLevel(_Region)
+AND
+ItemPlayLoopBeamEffect(_item,_Char,_effect,_SrcBone,_TargetBone,_EffectHandle)
+THEN
+LoopEffectsBeamItemDB(_item,_Char,_EffectHandle,_ID,_Region,_effect,_SrcBone,_TargetBone);
+
+PROC
+PROC_LoopBeamEffectAtItem((STRING)_effect, (ITEM)_item,(CHARACTER)_Char,(STRING)_SrcBone,(STRING)_TargetBone,(STRING)_ID,"__ANY__")
+AND
+ItemPlayLoopBeamEffect(_item,_Char,_effect,_SrcBone,_TargetBone,_EffectHandle)
+THEN
+LoopEffectsBeamItemDB(_item,_Char,_EffectHandle,_ID,"__ANY__",_effect,_SrcBone,_TargetBone);
+
+/***************************/
+
+/***********************/
+/*** EFFECT DELETION ***/
+/***********************/
+
+PROC
+ProcStopLoopEffect((INTEGER)_fxHandle)
+AND
+_fxHandle!=-1
+THEN
+StopLoopEffect(_fxHandle);
+
+PROC
+PROC_StopEffectAtTrigger((TRIGGER)_trigger,(STRING)_ID)
+AND
+LoopEffectAtTriggerDB(_trigger, _fxHandle,_ID,_Region,_effect)
+THEN
+ProcStopLoopEffect(_fxHandle);
+NOT LoopEffectAtTriggerDB(_trigger, _fxHandle,_ID,_Region,_effect);
+
+PROC
+PROC_StopEffectAtCharacter((CHARACTER)_character,(STRING)_ID)
+AND
+LoopEffectAtCharacterDB(_character, _fxHandle,_ID,_Region,_effect,_BoneName)
+THEN
+ProcStopLoopEffect(_fxHandle);
+NOT LoopEffectAtCharacterDB(_character, _fxHandle,_ID,_Region,_effect,_BoneName);
+
+PROC
+PROC_StopEffectAtItem((ITEM)_item,(STRING)_ID)
+AND
+LoopEffectAtItemDB(_item, _fxHandle,_ID,_Region,_effect)
+THEN
+ProcStopLoopEffect(_fxHandle);
+NOT LoopEffectAtItemDB(_item, _fxHandle,_ID,_Region,_effect);
+
+PROC
+PROC_StopLoopBeamEffectAtItem((ITEM)_item,(STRING)_ID)
+AND
+LoopEffectsBeamItemDB(_item,_Char,_EffectHandle,_ID,_Region,_effect,_SrcBone,_TargetBone)
+THEN
+ProcStopLoopEffect(_EffectHandle);
+NOT LoopEffectsBeamItemDB(_item,_Char,_EffectHandle,_ID,_Region,_effect,_SrcBone,_TargetBone);
+
+/***********************/
+
+/************************/
+/*** EFFECTS CLEAN-UP ***/
+/************************/
+
+PROC
+PROC_CleanUpEffects()
+THEN
+PROC_CleanUpEffectsAtTriggers();
+PROC_CleanUpEffectsAtCharacters();
+PROC_CleanUpEffectsAtItems();
+PROC_CleanUpBeamEffectsAtItems();
+
+PROC
+PROC_CleanUpEffectsAtTriggers()
+AND
+LoopEffectAtTriggerDB(_trigger, _,_ID,_,_)
+THEN
+PROC_StopEffectAtTrigger(_trigger,_ID);
+
+PROC
+PROC_CleanUpEffectsAtCharacters()
+AND
+LoopEffectAtCharacterDB(_Character, _,_ID,_,_,_)
+THEN
+PROC_StopEffectAtCharacter(_Character,_ID);
+
+PROC
+PROC_CleanUpEffectsAtItems()
+AND
+LoopEffectAtItemDB(_item, _,_ID,_,_)
+THEN
+PROC_StopEffectAtItem(_item,_ID);
+
+PROC
+PROC_CleanUpBeamEffectsAtItems()
+AND
+LoopEffectsBeamItemDB(_item,_Char,_EffectHandle,_ID,_Region,_effect,_SrcBone,_TargetBone)
+THEN
+PROC_StopLoopBeamEffectAtItem(_item,_ID);
+
+/************************/
+
+//REGION stopping effects for a region 
+
+PROC
+ProcStopEffectsForRegion((STRING)_Region)
+THEN
+ProcStopTriggerEffectsForRegion(_Region);
+ProcStopCharacterEffectsForRegion(_Region);
+ProcStopItemEffectsForRegion(_Region);
+ProcStopItemBeamEffectsForRegion(_Region);
+
+PROC
+ProcStopTriggerEffectsForRegion((STRING)_Region)
+AND
+LoopEffectAtTriggerDB(_trigger, _fxHandle,_ID,_Region,_effect)
+THEN
+ProcStopLoopEffect(_fxHandle);
+NOT LoopEffectAtTriggerDB(_trigger, _fxHandle,_ID,_Region,_effect);
+LoopEffectAtTriggerDB(_trigger, -1,_ID,_Region,_effect);
+
+PROC
+ProcStopCharacterEffectsForRegion((STRING)_Region)
+AND
+LoopEffectAtCharacterDB(_character, _fxHandle,_ID,_Region,_effect,_BoneName)
+THEN
+ProcStopLoopEffect(_fxHandle);
+NOT LoopEffectAtCharacterDB(_character, _fxHandle,_ID,_Region,_effect,_BoneName);
+LoopEffectAtCharacterDB(_character, -1,_ID,_Region,_effect,_BoneName);
+
+PROC
+ProcStopItemEffectsForRegion((STRING)_Region)
+AND
+LoopEffectAtItemDB(_item, _fxHandle,_ID,_Region,_effect)
+THEN
+ProcStopLoopEffect(_fxHandle);
+NOT LoopEffectAtItemDB(_item, _fxHandle,_ID,_Region,_effect);
+LoopEffectAtItemDB(_item, -1,_ID,_Region,_effect);
+
+PROC
+ProcStopItemBeamEffectsForRegion((STRING)_Region)
+AND
+LoopEffectsBeamItemDB(_item,_Char,_EffectHandle,_ID,_Region,_effect,_SrcBone,_TargetBone)
+THEN
+ProcStopLoopEffect(_EffectHandle);
+NOT LoopEffectsBeamItemDB(_item,_Char,_EffectHandle,_ID,_Region,_effect,_SrcBone,_TargetBone);
+LoopEffectsBeamItemDB(_item,_Char,-1,_ID,_Region,_effect,_SrcBone,_TargetBone);
+
+//////
+
+PROC
+ProcStopTriggerEffectsForRegion((STRING)_)
+AND
+LoopEffectAtTriggerDB(_trigger, _fxHandle,_ID,"__ANY__",_effect)
+THEN
+ProcStopLoopEffect(_fxHandle);
+NOT LoopEffectAtTriggerDB(_trigger, _fxHandle,_ID,"__ANY__",_effect);
+LoopEffectAtTriggerDB(_trigger, -1,_ID,"__ANY__",_effect);
+
+PROC
+ProcStopCharacterEffectsForRegion((STRING)_)
+AND
+LoopEffectAtCharacterDB(_character, _fxHandle,_ID,"__ANY__",_effect,_BoneName)
+THEN
+ProcStopLoopEffect(_fxHandle);
+NOT LoopEffectAtCharacterDB(_character, _fxHandle,_ID,"__ANY__",_effect,_BoneName);
+LoopEffectAtCharacterDB(_character, -1,_ID,"__ANY__",_effect,_BoneName);
+
+PROC
+ProcStopItemEffectsForRegion((STRING)_)
+AND
+LoopEffectAtItemDB(_item, _fxHandle,_ID,"__ANY__",_effect)
+THEN
+ProcStopLoopEffect(_fxHandle);
+NOT LoopEffectAtItemDB(_item, _fxHandle,_ID,"__ANY__",_effect);
+LoopEffectAtItemDB(_item, -1,_ID,"__ANY__",_effect);
+
+PROC
+ProcStopItemBeamEffectsForRegion((STRING)_)
+AND
+LoopEffectsBeamItemDB(_item,_Char,_EffectHandle,_ID,"__ANY__",_effect,_SrcBone,_TargetBone)
+THEN
+ProcStopLoopEffect(_EffectHandle);
+NOT LoopEffectsBeamItemDB(_item,_Char,_EffectHandle,_ID,"__ANY__",_effect,_SrcBone,_TargetBone);
+LoopEffectsBeamItemDB(_item,_Char,-1,_ID,"__ANY__",_effect,_SrcBone,_TargetBone);
+
+//END_REGION
+
+//REGION starting effects for a region 
+
+PROC
+ProcStartEffectsForRegion((STRING)_Region)
+THEN
+ProcStartTriggerEffectsForRegion(_Region);
+ProcStartCharacterEffectsForRegion(_Region);
+ProcStartItemEffectsForRegion(_Region);
+ProcStartItemBeamEffectsForRegion(_Region);
+
+PROC
+ProcStartTriggerEffectsForRegion((STRING)_Region)
+AND
+LoopEffectAtTriggerDB(_trigger, _fxHandle,_ID,_Region,_effect)
+AND
+PlayLoopEffectAtTrigger(_effect, _trigger, _NewfxHandle)
+THEN
+NOT LoopEffectAtTriggerDB(_trigger, _fxHandle,_ID,_Region,_effect);
+LoopEffectAtTriggerDB(_trigger, _NewfxHandle,_ID,_Region,_effect);
+
+PROC
+ProcStartCharacterEffectsForRegion((STRING)_Region)
+AND
+LoopEffectAtCharacterDB(_character, _fxHandle,_ID,_Region,_effect,_BoneName)
+AND
+NOT QryBlockEffectInCombat(_effect,_character)
+AND
+CharacterPlayLoopEffect(_character, _effect, _BoneName,_NewfxHandle)
+THEN
+NOT LoopEffectAtCharacterDB(_character, _fxHandle,_ID,_Region,_effect,_BoneName);
+LoopEffectAtCharacterDB(_character, _NewfxHandle,_ID,_Region,_effect,_BoneName);
+
+PROC
+ProcStartItemEffectsForRegion((STRING)_Region)
+AND
+LoopEffectAtItemDB(_item, _fxHandle,_ID,_Region,_effect)
+AND
+ItemPlayLoopEffect(_item, _effect, _NewfxHandle)
+THEN
+NOT LoopEffectAtItemDB(_item, _fxHandle,_ID,_Region,_effect);
+LoopEffectAtItemDB(_item, _NewfxHandle,_ID,_Region,_effect);
+
+PROC
+ProcStartItemBeamEffectsForRegion((STRING)_Region)
+AND
+LoopEffectsBeamItemDB(_item,_Char,_EffectHandle,_ID,_Region,_effect,_SrcBone,_TargetBone)
+AND
+ItemPlayLoopBeamEffect(_item,_Char,_effect,_SrcBone,_TargetBone,_NewEffectHandle)
+THEN
+NOT LoopEffectsBeamItemDB(_item,_Char,_EffectHandle,_ID,_Region,_effect,_SrcBone,_TargetBone);
+LoopEffectsBeamItemDB(_item,_Char,_NewEffectHandle,_ID,_Region,_effect,_SrcBone,_TargetBone);
+
+///////
+
+PROC
+ProcStartTriggerEffectsForRegion((STRING)_)
+AND
+LoopEffectAtTriggerDB(_trigger, _fxHandle,_ID,"__ANY__",_effect)
+AND
+PlayLoopEffectAtTrigger(_effect, _trigger, _NewfxHandle)
+THEN
+NOT LoopEffectAtTriggerDB(_trigger, _fxHandle,_ID,"__ANY__",_effect);
+LoopEffectAtTriggerDB(_trigger, _NewfxHandle,_ID,"__ANY__",_effect);
+
+PROC
+ProcStartCharacterEffectsForRegion((STRING)_)
+AND
+LoopEffectAtCharacterDB(_character, _fxHandle,_ID,"__ANY__",_effect,_BoneName)
+AND
+NOT QryBlockEffectInCombat(_effect,_character)
+AND
+CharacterPlayLoopEffect(_character, _effect, _BoneName, _NewfxHandle)
+THEN
+NOT LoopEffectAtCharacterDB(_character, _fxHandle,_ID,"__ANY__",_effect,_BoneName);
+LoopEffectAtCharacterDB(_character, _NewfxHandle,_ID,"__ANY__",_effect,_BoneName);
+
+PROC
+ProcStartItemEffectsForRegion((STRING)_)
+AND
+LoopEffectAtItemDB(_item, _fxHandle,_ID,"__ANY__",_effect)
+AND
+ItemPlayLoopEffect(_item, _effect, _NewfxHandle)
+THEN
+NOT LoopEffectAtItemDB(_item, _fxHandle,_ID,"__ANY__",_effect);
+LoopEffectAtItemDB(_item, _NewfxHandle,_ID,"__ANY__",_effect);
+
+PROC
+ProcStartItemBeamEffectsForRegion((STRING)_Region)
+AND
+LoopEffectsBeamItemDB(_item,_Char,_EffectHandle,_ID,"__ANY__",_effect,_SrcBone,_TargetBone)
+AND
+ItemPlayLoopBeamEffect(_item,_Char,_effect,_SrcBone,_TargetBone,_NewEffectHandle)
+THEN
+NOT LoopEffectsBeamItemDB(_item,_Char,_EffectHandle,_ID,"__ANY__",_effect,_SrcBone,_TargetBone);
+LoopEffectsBeamItemDB(_item,_Char,_NewEffectHandle,_ID,"__ANY__",_effect,_SrcBone,_TargetBone);
+
+//END_REGION
+
+IF
+RegionEnded(_Region)
+THEN
+ProcStopEffectsForRegion(_Region);
+
+IF
+RegionStarted(_Region)
+THEN
+ProcStartEffectsForRegion(_Region);
+
+//REGION Special case: Some effects should stop during combat
+IF
+CharacterEnteredCombat(_Character,_)
+AND
+LoopEffectAtCharacterDB(_Character, _fxHandle,_ID,_Region,_EffectName,_BoneName)
+AND
+DB_LoopEffectDisabledInCombat(_EffectName)
+THEN
+ProcStopLoopEffect(_fxHandle);
+NOT LoopEffectAtCharacterDB(_Character, _fxHandle,_ID,_Region,_EffectName,_BoneName);
+LoopEffectAtCharacterDB(_Character, -1, _ID,_Region,_EffectName,_BoneName);
+
+IF
+CharacterLeftCombat(_Character,_)
+AND
+NOT DB_Dead(_Character)
+AND
+LoopEffectAtCharacterDB(_Character, -1, _ID,_Region,_EffectName,_BoneName)
+AND
+DB_LoopEffectDisabledInCombat(_EffectName)
+AND
+CharacterPlayLoopEffect(_Character, _EffectName, _BoneName,_NewfxHandle)
+THEN
+NOT LoopEffectAtCharacterDB(_Character, -1, _ID,_Region,_EffectName,_BoneName);
+LoopEffectAtCharacterDB(_Character,_NewfxHandle,_ID,_Region,_EffectName,_BoneName);
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION

@@ -1,0 +1,21 @@
+INIT
+	CHARACTER:__Me
+	
+	
+BEHAVIOUR
+
+REACTION WanderAround, 1100
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(TRIGGER:LUC_FortuneTeller1_a00fc7d0-684a-402a-a1c6-2c2d9422b573)
+	CharacterLookAt(TRIGGER:LUC_FortuneTeller1_a00fc7d0-684a-402a-a1c6-2c2d9422b573)
+	CharacterPlayAnimation("use_craft")
+	Sleep(2)
+	CharacterMoveTo(TRIGGER:LUC_FortuneTeller2_6e205aba-4267-4d64-a4d1-6660a72fc986)
+	CharacterLookAt(TRIGGER:LUC_FortuneTeller2_6e205aba-4267-4d64-a4d1-6660a72fc986)
+	CharacterPlayAnimation("Fidget_Forward_01")
+	Sleep(3)
+	CharacterMoveTo(TRIGGER:LUC_FortuneTeller3_af640a50-b05b-4a9b-8658-a2fce348faa9)
+	CharacterLookAt(TRIGGER:LUC_FortuneTeller3_af640a50-b05b-4a9b-8658-a2fce348faa9)
+	CharacterPlayAnimation("Look_Up_Long_01")
+	Sleep(2)

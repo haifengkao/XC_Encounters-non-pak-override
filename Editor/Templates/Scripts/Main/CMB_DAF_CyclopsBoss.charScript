@@ -1,0 +1,66 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%SpiritCaller=DAF_DarkMarsh_Cyclops_Boss_a6ceaf91-c609-4e93-8ff6-90dfd8baf196
+	CHARACTER:%CyclopsReaver_01=DAF_DarkMarsh_Cyclops_Reaper_01_da154efd-e820-4451-9f24-c0178db86787
+	CHARACTER:%CyclopsReaver_02=DAF_DarkMarsh_Cyclops_Reaper_02_64785203-a3cd-4ef7-81de-6607adebfbb1
+	EXTERN INT:%Bool_IAmTheSpiritCaller=0
+	EXTERN INT:%Bool_IAmTheGhostOfTheSpiritCaller=0
+
+//--------
+BEHAVIOUR
+REACTION CyclopsReaver_CastInvulnerabilityOnSpiritCaller,700
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&!(c2|c3|c4|c5)&c6&c7&c8"
+	IsEqual(%Bool_IAmTheSpiritCaller,0)														//c1
+	CharacterIsDead(%SpiritCaller)															//!c2
+	CharacterHasStatus(__Me,"CHARMED")														//!c3
+	CharacterHasStatus(%SpiritCaller,"INVULNERABLE")										//!c4
+	CharacterHasStatus(%SpiritCaller,"CHARMED")												//!c5
+	CharacterCanSee(__Me,%SpiritCaller)														//c6
+	CharacterCanCast(__Me,"Target_EnemyTargetedInvulnerability")							//c7
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyTargetedInvulnerability")	//c8
+ACTIONS
+	CharacterMoveInRange(%SpiritCaller,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Target_EnemyTargetedInvulnerability",%SpiritCaller)
+
+REACTION SpiritCaller_CastShieldOnSelf,700
+USAGE COMBAT
+CHECK "c1&c2&c3&!c4&!c5&c6"
+	IsEqual(%Bool_IAmTheSpiritCaller,1)								//c1
+	CharacterIsDead(%CyclopsReaver_01)								//c2
+	CharacterIsDead(%CyclopsReaver_02)								//c3	
+	CharacterHasStatus(__Me,INVULNERABLE)							//!c4
+	CharacterHasStatus(__Me,SHIELD)									//!c5
+	CharacterCanCast(__Me,"Shield_EnemyAir")						//c6
+ACTIONS	
+	CharacterUseSkill("Shield_EnemyAir",__Me)
+
+//--------
+EVENTS
+EVENT OnInit_GiveMeMySpells
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		IsEqual(%Bool_IAmTheSpiritCaller,1)
+	THEN
+		CharacterAddSkill("Shield_EnemyAir")
+	ELSE
+		CharacterAddSkill("Target_EnemyTargetedInvulnerability")
+	ENDIF
+	
+EVENT OnDie_SpiritCallerComesBack
+VARS
+	CHARACTERTEMPLATE:_UndeadSpiritCaller=Cyclops_Wizard_A_GhostBoss_67b03305-ed34-4445-9dfa-58c67726114a
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	IF "c1&c2"
+		IsHardcore()
+		IsEqual(%Bool_IAmTheSpiritCaller,1)
+	THEN
+		SpawnCharacter(_,_UndeadSpiritCaller,__Me,1)
+	ENDIF

@@ -1,0 +1,29 @@
+INIT
+	ITEM:__Me
+	EXTERN SKILL:%ProjectileDie=Projectile_TurretFire
+	EXTERN SURFACE:%SurfaceType=Ooze
+	
+EVENTS
+EVENT DamageP
+ON
+	OnDamage(Piercing,_,_,_)
+ACTIONS
+	CreateSurfaceAt(__Me,%SurfaceType,1.5,1)
+
+EVENT DamageC
+ON
+	OnDamage(Crushing,_,_,_)
+ACTIONS
+	CreateSurfaceAt(__Me,%SurfaceType,1.5,1)
+	
+	EVENT DamageS
+ON
+	OnDamage(Slashing,_,_,_)
+ACTIONS
+	CreateSurfaceAt(__Me,%SurfaceType,1.5,1)
+	
+EVENT OnDie_Projectile
+ON
+	OnItemDestroyed(__Me)
+ACTIONS
+	ExplodeAt(__Me,%ProjectileDie)

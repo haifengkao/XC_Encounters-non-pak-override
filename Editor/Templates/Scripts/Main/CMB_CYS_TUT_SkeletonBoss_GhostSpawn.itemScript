@@ -1,0 +1,20 @@
+INIT
+	ITEM:__Me
+	CHARACTER:%SkeletonBoss=CYS_TUT_SkeletonBoss_30508e04-e89c-4124-b56a-f24cf3b718d0
+	CHARACTERTEMPLATE:%GhostBossRT=CYS_TUT_RagequinGhost_6d8063ca-5a4b-42d3-b101-39d36daccd02
+
+//----------------
+BEHAVIOUR
+REACTION BossIsDeadSpawnGhostVersion, 1000
+USAGE ALL
+VARS
+	FLOAT:_MyAP
+	INT:_SkeletonBossLoopFXHandle
+CHECK "c1"
+	CharacterIsDead(%SkeletonBoss)
+ACTIONS
+	PlayEffectAt(%SkeletonBoss,"FX_Env_Fire_Blue_A")
+	Sleep(1)
+	SpawnCharacter(_,%GhostBossRT,%SkeletonBoss,0)
+	Sleep(2)
+	SetPriority("BossIsDeadSpawnGhostVersion",0)

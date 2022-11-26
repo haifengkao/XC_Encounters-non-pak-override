@@ -1,0 +1,260 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+//NO LONGER USED! FLEEING HAPPENS THROUGH STORY!
+/*
+dbFleeTimer(CHARACTER_Player1,"DoFleeTeleport1");
+dbFleeTimer(CHARACTER_Player2,"DoFleeTeleport2");
+*/
+KBSECTION
+//NO LONGER USED! FLEEING HAPPENS THROUGH STORY!
+/*
+IF
+FleeCombat(_ID)
+AND
+DB_CurrentLevel(_CurrentRegion)
+THEN
+FleeCombatID(_ID);
+LaunchFleeTimerForCombat(_ID);
+
+PROC
+LaunchFleeTimerForCombat((INTEGER)_ID)
+AND
+DB_Combat(_Char,_ID)
+AND
+dbFleeTimer(_Char,_Timer)
+AND
+NOT FleeTimerHandled(_ID)
+THEN
+TimerLaunch(_Timer,350);
+FleeTimerHandled(_ID);
+
+PROC
+LaunchFleeTimerForCombat((INTEGER)_ID)
+THEN
+NOT FleeTimerHandled(_ID);
+
+IF
+TimerFinished(_Timer)
+AND
+dbFleeTimer(_,_Timer)
+AND
+FleeCombatID(_ID)
+THEN
+NOT FleeCombatID(_ID);
+TeleportToFleeRegion(_ID);
+
+PROC
+TeleportPartyMemberToTrigger((INTEGER)_ID,(INTEGER)_Index,(TRIGGER)_Dest,(INTEGER)_Max)
+AND
+CombatGetInvolvedPartyMember(_ID,1,_Char)
+THEN
+CharacterTeleportToTrigger(_Char,_Dest,"");
+CharacterFlushQueue(_Char);
+CharacterLeaveCombat(_Char);
+ProcFreeGuardsForPlayer(_Char);
+TeleportPartyMemberToTrigger(_ID,_Index,_Dest,_Max);
+
+PROC
+ProcFreeGuardsForPlayer((CHARACTER)_Char)
+AND
+SummonedGuards(_Char,_,_,_,_,_SummonID) 
+THEN
+GuardsStayAndLeaveInGroup(_Char,_SummonID);
+
+PROC
+TeleportPartyMembersToTrigger((INTEGER)_ID,(TRIGGER)_dest)
+AND
+CombatGetNumberOfInvolvedPartyMembers(_ID,_Num)
+THEN
+TeleportPartyMemberToTrigger(_ID,1,_dest,_Num);
+
+PROC
+ProcCalculatePartyMemberDistTo((INTEGER)_ID,(ITEM)_Candidate,(INTEGER)_Index)
+AND
+CombatGetInvolvedPartyMember(_ID,_Index,_Player)
+AND
+IntegerSum(_Index,1,_New)
+AND
+CharacterGetDistanceToItem(_Player,_Candidate,_Dist)
+THEN
+DB_PlayerDists(_ID,_Candidate,_Dist);
+ProcCalculatePartyMemberDistTo(_ID,_Candidate,_New);
+
+PROC
+ProcCalculateAverageDist((INTEGER)_ID,(ITEM)_Candidate)
+THEN
+DB_Dists(_ID,_Candidate,0.0,0);
+
+PROC
+ProcCalculateAverageDist((INTEGER)_ID,(ITEM)_Candidate)
+AND
+DB_PlayerDists(_ID,_Candidate,_Dist)
+AND
+DB_Dists(_ID,_Candidate,_TotalDist,_NumPlayers)
+AND
+RealSum(_Dist,_TotalDist,_SumDist)
+AND
+IntegerSum(_NumPlayers,1,_Players)
+THEN
+NOT DB_PlayerDists(_ID,_Candidate,_Dist);
+NOT DB_Dists(_ID,_Candidate,_TotalDist,_NumPlayers);
+DB_Dists(_ID,_Candidate,_SumDist,_Players);
+
+PROC
+ProcCalculateAverageDist((INTEGER)_ID,(ITEM)_Candidate)
+AND
+DB_Dists(_ID,_Candidate,_SumDist,_Players)
+AND
+Real(_Players,_FloatPlayers)
+AND
+RealDivide(_SumDist,_FloatPlayers,_AvgDist)
+THEN
+NOT DB_Dists(_ID,_Candidate,_SumDist,_Players);
+DB_AvgDist(_Id,_Candidate,_AvgDist);
+
+PROC
+ProcCompareDists((INTEGER)_ID)
+AND
+DB_AvgDist(_ID,_Candidate,_AvgDist)
+AND
+NOT DB_WaypointDist(_ID,_,_)
+THEN
+DB_WaypointDist(_ID,_Candidate,_AvgDist);
+NOT DB_AvgDist(_ID,_Candidate,_AvgDist);
+
+PROC
+ProcCompareDists((INTEGER)_ID)
+AND
+DB_WaypointDist(_ID,_Best,_Dist)
+AND
+DB_AvgDist(_ID,_Candidate,_AvgDist)
+AND
+_AvgDist<_Dist
+THEN
+NOT DB_WaypointDist(_ID,_Best,_Dist);
+NOT DB_AvgDist(_ID,_Candidate,_AvgDist);
+DB_WaypointDist(_ID,_Candidate,_AvgDist);
+
+PROC
+ProcSelectWaypointIfCloser((INTEGER)_ID,(ITEM)_Candidate)
+AND
+NOT DB_ItemVisible(_ID,_Candidate)
+THEN
+ProcCalculatePartyMemberDistTo(_ID,_Candidate,1);
+ProcCalculateAverageDist(_ID,_Candidate);
+ProcCompareDists(_ID);
+
+PROC
+ProcSelectWaypointIfCloser((INTEGER)_ID,(ITEM)_Candidate)
+THEN
+NOT DB_ItemVisible(_ID,_Candidate);
+
+PROC
+ProcCheckIfSeenByEnemies((INTEGER)_ID,(ITEM)_Item)
+AND
+DB_Combat(_Npc,_ID)
+AND
+NOT _Npc.DB_IsPlayer()
+AND
+//we don't need to check if they're hostile or not, since we join allies that we can see as well
+CharacterCanSeeItem(_Npc,_Item,1)
+THEN
+DB_ItemVisible(_ID,_Item);
+
+PROC
+ProcSelectFleeDestForCombat((INTEGER)_ID)
+AND
+DB_CurrentLevel(_CurrentRegion)
+AND
+DB_WaypointInfo(_Item,_,_)
+AND
+_Item.isunlocked()
+AND
+ItemGetRegion(_Item,_Region)
+AND
+_CurrentRegion == _Region 
+THEN
+ProcCheckIfSeenByEnemies(_ID,_Item);
+ProcSelectWaypointIfCloser(_ID,_Item);
+
+PROC
+ProcCheckForCharmedPartyMembers((INTEGER)_ID,(INTEGER)_Index)
+AND
+CombatGetInvolvedPartyMember(_ID,_Index,_Member)
+AND
+CharacterHasStatus(_Member,"CHARMED",1)
+THEN
+DB_PartyMemberIsCharmed(1);
+
+PROC
+ProcCheckForCharmedPartyMembers((INTEGER)_ID,(INTEGER)_Index)
+AND
+CombatGetInvolvedPartyMember(_ID,_Index,_Member)
+AND
+IntegerSum(_Index,1,_New)
+THEN
+ProcCheckForCharmedPartyMembers(_ID,_New);
+
+PROC
+ProcClearTeleportDestIfCharmed((INTEGER)_ID)
+AND
+DB_PartyMemberIsCharmed(1)
+AND
+DB_WaypointDist(_ID,_Best,_Dist)
+THEN
+NOT DB_PartyMemberIsCharmed(1);
+NOT DB_WaypointDist(_ID,_Best,_Dist);
+
+PROC
+ProcSelectFleeDestForCombat((INTEGER)_ID)
+THEN
+ProcCheckForCharmedPartyMembers(_ID,1);
+ProcClearTeleportDestIfCharmed(_ID);
+
+PROC
+ProcDoFleeTeleport((INTEGER)_ID)
+AND
+NOT DB_WaypointDist(_ID,_,_)
+THEN
+//didn't find a good point 
+ProcDisplayFleeFailedMessage(_ID,1);
+
+PROC
+ProcDisplayFleeFailedMessage((INTEGER)_ID,(INTEGER)_Index)
+AND
+CombatGetInvolvedPartyMember(_ID,_Index,_Player)
+AND
+IntegerSum(_Index,1,_New)
+THEN
+CharacterDisplayText(_Player,"GLO_FleeFailed");
+ProcDisplayFleeFailedMessage(_ID,_New);
+
+PROC
+ProcDoFleeTeleport((INTEGER)_ID)
+AND
+DB_WaypointDist(_ID,_Best,_Dist)
+AND
+DB_WaypointInfo(_Best,_Trigger,_)
+THEN
+NOT DB_WaypointDist(_ID,_Best,_Dist);
+TeleportPartyMembersToTrigger(_ID,_Trigger);
+//EndCombat(_ID);
+
+PROC
+ProcDoFleeTeleport((INTEGER)_ID)
+AND
+DB_AvgDist(_ID,_Candidate,_AvgDist)
+THEN
+NOT DB_AvgDist(_ID,_Candidate,_AvgDist);
+
+PROC
+TeleportToFleeRegion((INTEGER)_ID)
+THEN
+ProcSelectFleeDestForCombat(_ID);
+ProcDoFleeTeleport(_ID);
+*/
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

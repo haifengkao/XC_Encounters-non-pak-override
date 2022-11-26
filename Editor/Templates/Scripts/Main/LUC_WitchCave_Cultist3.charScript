@@ -1,0 +1,34 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+EXTERN TRIGGER:%Target = null
+
+BEHAVIOUR
+
+REACTION State_DestroyingGarden, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+	FLOAT:_Time
+ACTIONS
+	CharacterLookAt(%Target)
+	GetRandom(_Animation,"Cheer_01","Cheer_03","Flex_01","Laugh_01","Laugh_02","Victory_01","Victory_02")
+	GetRandom(_Time,5,6,7,8)
+	DialogStart("LUC_AD_WitchCaveCultists2",__Me)
+	Sleep(_Time)
+	CharacterUseSkill(Projectile_EnemyFireball,%Target)
+	Sleep(15)
+	CharacterPlayAnimation(_Animation)
+
+EVENTS
+
+EVENT SpottedPlayer
+ON
+	OnCombatStarted()
+VARS
+	FIXEDSTRING:_Text
+ACTIONS
+	GetRandom(_Text,"LUC_WitchCave_CultistSpotsPlayer_1","LUC_WitchCave_CultistSpotsPlayer_2","LUC_WitchCave_CultistSpotsPlayer_3","LUC_WitchCave_CultistSpotsPlayer_4")
+	DisplayText(__Me,_Text,5)

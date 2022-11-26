@@ -1,0 +1,496 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_LUC_GV_Gates(TRIGGER_LUC_GV_EastGate, CHARACTER_LUC_GV_EastGuardSecond);
+DB_LUC_GV_Gates(TRIGGER_LUC_GV_NorthGate, CHARACTER_LUC_GV_NorthGuardTalk);
+DB_LUC_GV_Gates(TRIGGER_LUC_GV_NorthWestGate, CHARACTER_LUC_GV_NorthWestGuardTalk);
+DB_LUC_GV_Gates(TRIGGER_LUC_GV_WestGate, CHARACTER_LUC_GV_WestGuardTalk);
+
+DB_LUC_GV_Goblins(CHARACTER_LUC_GV_ArrowSeller, "LUC_GV_Trader");
+DB_LUC_GV_Goblins(CHARACTER_LUC_GV_EquipmentTrader, "LUC_GV_Trader");
+DB_LUC_GV_Goblins(CHARACTER_LUC_GV_MagicSeller, "LUC_GV_Trader");
+DB_LUC_GV_Goblins(CHARACTER_LUC_GV_PotionSeller, "LUC_GV_PotionTrader");
+DB_LUC_GV_Goblins(CHARACTER_LUC_GV_MagicSeller, "LUC_GV_Trader");
+DB_LUC_GV_Goblins(CHARACTER_LUC_GV_Sadakandras, "LUC_GV_Sadakendras");
+
+DB_LUC_GV_GoblinsRez(CHARACTER_LUC_GV_ArrowSeller, "LUC_GV_Arrow");
+DB_LUC_GV_GoblinsRez(CHARACTER_LUC_GV_EquipmentTrader, "LUC_GV_Equip");
+DB_LUC_GV_GoblinsRez(CHARACTER_LUC_GV_MagicSeller, "LUC_GV_Magic");
+DB_LUC_GV_GoblinsRez(CHARACTER_LUC_GV_PotionSeller, "LUC_GV_Potion");
+DB_LUC_GV_GoblinsRez(CHARACTER_LUC_GV_Sadakandras, "LUC_GV_Sadakendras");
+
+PROC_LUC_GV_InitializeGoblins();
+
+DB_ItemDialogs(ITEM_LUC_GV_Totem, "LUC_GV_Totem");
+DB_Dialogs(CHARACTER_LUC_GV_SkillSeller, "LUC_GV_Shaman");
+DB_Dialogs(CHARACTER_LUC_GV_WestGuardTalk, "LUC_GV_Guards");
+DB_Dialogs(CHARACTER_LUC_GV_NorthWestGuardTalk, "LUC_GV_Guards");
+DB_Dialogs(CHARACTER_LUC_GV_NorthGuardTalk, "LUC_GV_Guards");
+DB_Dialogs(CHARACTER_LUC_GV_EastGuardSecond, "LUC_GV_Guards");
+ItemSetVarInteger(ITEM_LUC_GV_Totem, "QuestTotal", 0);
+ItemSetCanInteract(ITEM_LUC_GV_Telescope, 0);
+ItemSetOnstage(ITEM_LUC_GV_GoblinChest, 0);
+
+DB_LUC_GV_MendatoryTriggers(TRIGGER_LUC_GV_MandatoryCheck, CHARACTER_LUC_GV_EastGuardSecond);
+DB_LUC_GV_MendatoryTriggers(TRIGGER_LUC_GV_MandatoryCHeck2, CHARACTER_LUC_GV_NorthGuardTalk);
+DB_LUC_GV_MendatoryTriggers(TRIGGER_LUC_GV_MandatoryCheck3, CHARACTER_LUC_GV_NorthWestGuardTalk);
+DB_LUC_GV_MendatoryTriggers(TRIGGER_LUC_GV_MandatoryCHeck4, CHARACTER_LUC_GV_WestGuardTalk);
+
+DB_IsNotMessingAround(CHARACTER_LUC_GV_Sadakandras);
+
+DB_LUC_GoblinsVillage(CHARACTER_LUC_GV_EastGuardSecond);
+DB_LUC_GoblinsVillage(CHARACTER_LUC_GV_WestGuardTalk);
+DB_LUC_GoblinsVillage(CHARACTER_LUC_GV_NorthGuardTalk);
+DB_LUC_GoblinsVillage(CHARACTER_LUC_GV_NorthWestGuardTalk);
+DB_LUC_GoblinsVillage(CHARACTER_LUC_GV_EquipmentTrader);
+DB_LUC_GoblinsVillage(CHARACTER_LUC_GV_MagicSeller);
+DB_LUC_GoblinsVillage(CHARACTER_LUC_GV_Sadakandras);
+DB_LUC_GoblinsVillage(CHARACTER_LUC_GV_PotionSeller);
+DB_LUC_GoblinsVillage(CHARACTER_LUC_GV_ArrowSeller);
+
+SneakTriggerSpotter(TRIGGER_LUC_TalkXinogha, CHARACTER_LUC_GV_SkillSeller);
+SneakTriggerSpotter(TRIGGER_LUC_GV_EastGate, CHARACTER_LUC_GV_EastGuardSecond);
+SneakTriggerSpotter(TRIGGER_LUC_GV_WestGate, CHARACTER_LUC_GV_WestGuardTalk);
+SneakTriggerSpotter(TRIGGER_LUC_GV_NorthWestGate, CHARACTER_LUC_GV_NorthWestGuardTalk);
+SneakTriggerSpotter(TRIGGER_LUC_GV_NorthGate, CHARACTER_LUC_GV_NorthGuardTalk);
+
+DB_NoCompanionReplace(ITEM_LUC_GV_Telescope);
+
+DB_LUC_TotemDialog("LUC_DD_GV_TotemQ1");
+DB_LUC_TotemDialog("LUC_DD_GV_TotemQ2");
+DB_LUC_TotemDialog("LUC_DD_GV_TotemQ3");
+
+ItemToContainer(ITEM_LUC_GV_TotemStone, ITEM_LUC_GV_Totem, 1);
+KBSECTION
+//REGION Gates
+PROC
+ProcCharInTriggerSpotted(_Player, _Trigger)
+AND
+DB_LUC_GV_Gates(_Trigger, _Guard1)
+THEN
+ProcDoTwoSpeakerDialog("LUC_GV_Guards", _Guard1, _Player);
+
+IF
+DialogEnded("LUC_GV_Guards", _)
+AND
+CHARACTER_LUC_GV_Sadakandras.willKillPlayers()
+THEN
+SetRelationFactionToPlayers("LUC_GoblinVillage", 0);
+
+IF
+CharacterEnteredTrigger(_Player, TRIGGER_LUC_GV_AttackTrigger)
+AND
+DB_IsPlayer(_Player)
+AND
+NOT DB_IsInVillage(_Player)
+THEN
+DB_IsInVillage(_Player); 
+
+IF
+CharacterEnteredTrigger(_Player, _Trigg)
+AND
+NOT CHARACTER_LUC_GV_Sadakandras.isFriendly()
+AND
+DB_LUC_GV_MendatoryTriggers(_Trigg, _Gob)
+AND
+DB_IsInVillage(_Player)
+AND
+NOT DB_OnlyOnce("LUC_GoblinVillageAttack")
+THEN
+DB_OnlyOnce("LUC_GoblinVillageAttack");
+DialogStartOneSpeakerDialog("LUC_GoblinVillage_WarnAttack", _Gob);
+SetRelationFactionToPlayers("LUC_GoblinVillage", 0);
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_GV_AttackTrigger);
+
+IF
+DialogEnded("LUC_GV_Guards", _)
+AND
+DB_LUC_GV_MendatoryTriggers(_Trigger, _)
+THEN
+ProcTriggerRegisterForPlayers(_Trigger);
+
+IF
+DialogEnded("LUC_GV_Guards", _)
+AND
+DB_LUC_GV_Gates(_Trigger, _Guard1)
+THEN
+NOT SneakTriggerSpotter(_Trigger, _Guard1);
+ProcTriggerRegisterForPlayers(TRIGGER_LUC_GV_AttackTrigger);
+
+IF
+GlobalEventSet("LUC_GV_GuardsAreAngry")
+THEN
+CHARACTER_LUC_GV_Sadakandras.willKillPlayers();
+
+IF
+GlobalEventSet("LUC_GV_VillageFriendly")
+THEN
+CHARACTER_LUC_GV_Sadakandras.isFriendly();
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_GV_AttackTrigger);
+//END_REGION
+//REGION Totem
+IF
+GlobalEventSet("LUC_KillBjornMount")
+THEN
+ItemSetVarInteger(ITEM_LUC_GV_Totem, "QuestThreeAnswer", 2);
+
+IF
+GlobalEventSet("LUC_HealedBjornMount")
+THEN
+ItemSetVarInteger(ITEM_LUC_GV_Totem, "QuestThreeAnswer", 1);
+
+IF
+GlobalEventSet("CYS_GuardsComply")
+THEN
+ItemSetVarInteger(ITEM_LUC_GV_Totem, "QuestOneAnswer", 1);
+
+IF
+GlobalEventSet("CYS_GuardsHostile")
+THEN
+ItemSetVarInteger(ITEM_LUC_GV_Totem, "QuestOneAnswer", 2);
+
+IF
+GlobalEventSet("CYS_FishThief_LeaveFish")
+THEN
+ItemSetVarInteger(ITEM_LUC_GV_Totem, "QuestTwoAnswer", 1);
+
+IF
+GlobalEventSet("CYS_FishThief_GuardComes")
+THEN
+ItemSetVarInteger(ITEM_LUC_GV_Totem, "QuestTwoAnswer", 2);
+
+IF
+GlobalEventSet("LUC_GV_Totem1No")
+AND
+ItemGetVarInteger(ITEM_LUC_GV_Totem, "QuestOneAnswer", 2)
+THEN
+PROC_LUC_GV_PassQuestion();
+
+IF
+GlobalEventSet("LUC_GV_Totem1Yes")
+AND
+NOT ItemGetVarInteger(ITEM_LUC_GV_Totem, "QuestOneAnswer", 2)
+THEN
+PROC_LUC_GV_PassQuestion();
+
+IF
+GlobalEventSet("LUC_GV_Totem2No")
+AND
+ItemGetVarInteger(ITEM_LUC_GV_Totem, "QuestTwoAnswer", 2)
+THEN
+PROC_LUC_GV_PassQuestion();
+
+IF
+GlobalEventSet("LUC_GV_Totem2Yes")
+AND
+NOT ItemGetVarInteger(ITEM_LUC_GV_Totem, "QuestTwoAnswer", 2)
+THEN
+PROC_LUC_GV_PassQuestion();
+
+IF
+GlobalEventSet("LUC_GV_Totem3No")
+AND
+ItemGetVarInteger(ITEM_LUC_GV_Totem, "QuestThreeAnswer", 2)
+THEN
+PROC_LUC_GV_PassQuestion();
+
+IF
+GlobalEventSet("LUC_GV_Totem3Yes")
+AND
+NOT ItemGetVarInteger(ITEM_LUC_GV_Totem, "QuestThreeAnswer", 2)
+THEN
+PROC_LUC_GV_PassQuestion();
+
+PROC
+PROC_LUC_GV_PassQuestion()
+AND
+ItemGetVarInteger(ITEM_LUC_GV_Totem, "QuestTotal", _Foo)
+AND
+IntegerSum(_Foo, 1, _Bar)
+THEN
+ItemSetVarInteger(ITEM_LUC_GV_Totem, "QuestTotal", _Bar);
+
+IF
+DialogEnded("LUC_GV_Totem", _)
+AND
+NOT ItemGetVarInteger(ITEM_LUC_GV_Totem, "QuestTotal", 3)
+AND
+ItemGetVarInteger(ITEM_LUC_GV_Totem, "start", 1)
+AND
+NOT ITEM_LUC_GV_Totem.done()
+THEN
+ITEM_LUC_GV_Totem.done();
+ItemDisplayText(ITEM_LUC_GV_Totem, "LUC_GV_AngryTotem");
+ItemSetCanInteract(ITEM_LUC_GV_Totem, 0);
+
+IF
+DialogEnded("LUC_GV_Totem", _)
+AND
+ItemGetVarInteger(ITEM_LUC_GV_Totem, "QuestTotal", 3)
+AND
+ItemGetVarInteger(ITEM_LUC_GV_Totem, "start", 1)
+AND
+DB_LUC_GV_Gates(_Trigger, _Guard1)
+THEN
+NOT SneakTriggerSpotter(_Trigger, _Guard1);
+
+IF
+DialogEnded("LUC_GV_Totem", _)
+AND
+ItemGetVarInteger(ITEM_LUC_GV_Totem, "QuestTotal", 3)
+AND
+ItemGetVarInteger(ITEM_LUC_GV_Totem, "start", 1)
+AND
+NOT ITEM_LUC_GV_Totem.done()
+THEN
+ITEM_LUC_GV_Totem.done();
+GlobalSetEvent("LUC_GV_VillageFriendly");
+
+IF
+ItemDisplayTextEnded(ITEM_LUC_GV_Totem, "LUC_GV_AngryTotem")
+AND
+ItemGetVarInteger(ITEM_LUC_GV_InvisibleTotem, "InTheKilling", 1)
+THEN
+ItemSetEvent(ITEM_LUC_GV_InvisibleTotem, "ressurectGob");
+
+IF
+ItemDisplayTextEnded(ITEM_LUC_GV_Totem, "LUC_GV_AngryTotem")
+THEN
+SetRelationFactionToPlayers("LUC_GoblinVillage", 0);
+
+IF	
+DialogStarted(_Dialog, _ID)
+AND
+DB_LUC_TotemDialog(_Dialog)
+AND
+DialogGetInvolvedPlayer(_ID, 1, _Player)
+THEN
+DB_LUC_DDTotem(_Player);
+
+IF
+DialogEnded(_Dialog, _)
+AND
+DB_LUC_TotemDialog(_Dialog)
+AND
+DB_LUC_DDTotem(_Player)
+THEN
+NOT DB_LUC_DDTotem(_Player);
+
+IF
+ItemAttackedByCharacter(ITEM_LUC_GV_Totem, _Player, _)
+AND
+_Player.DB_IsPlayer()
+AND
+DB_LUC_DDTotem(_Dude)
+THEN
+DialogRequestStopForCharacter(_Dude);
+
+IF
+ItemAttackedByCharacter(ITEM_LUC_GV_Totem, _Player, _)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT CHARACTER_LUC_GV_Sadakandras.wreakingHavok()
+AND
+ItemGetVarInteger(ITEM_LUC_GV_InvisibleTotem, "InTheKilling", 1)
+THEN
+ItemSetEvent(ITEM_LUC_GV_InvisibleTotem, "ressurectGob");
+DialogRequestStopForItem("LUC_GV_Totem", ITEM_LUC_GV_Totem);
+
+IF
+ItemAttackedByCharacter(ITEM_LUC_GV_Totem, _Player, _)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT CHARACTER_LUC_GV_Sadakandras.wreakingHavok()
+THEN
+SetRelationFactionToPlayers("LUC_GoblinVillage", 0);
+GlobalSetEvent("LUC_TotemIsOutForBlood");
+CHARACTER_LUC_GV_Sadakandras.wreakingHavok();
+ItemSetOnstage(ITEM_LUC_GV_InvisibleTotem, 0);
+//END_REGION
+//REGION Traders
+PROC
+PROC_LUC_GV_InitializeGoblins()
+AND
+DB_LUC_GV_Goblins(_Gob, _Dial)
+THEN
+DB_Dialogs(_Gob, _Dial);
+DB_BigTrader(_Gob);
+
+IF
+ItemEvent(ITEM_LUC_GV_InvisibleTotem, "ressurectGob")
+AND
+DB_LUC_GV_GoblinsRez(_, _Timer)
+AND
+Random(3000, _Rand)
+THEN
+TimerLaunch(_Timer, _Rand);
+
+IF
+TimerFinished(_Timer)
+AND	
+DB_LUC_GV_GoblinsRez(_Gob, _Timer)
+THEN
+CharacterAppear(_Gob, 1);
+CharacterSetEvent(_Gob, "Resurected");
+CharacterSetHasDialog(_Gob, 1);
+
+IF
+ItemEvent(ITEM_LUC_GV_InvisibleTotem, "gatherRound")
+AND
+DB_LUC_GV_GoblinsRez(_Gob, _)
+THEN	
+CharacterSetHasDialog(_Gob, 0);
+
+IF
+ItemEvent(ITEM_LUC_GV_InvisibleTotem, "goBackTent")
+AND
+DB_LUC_GV_GoblinsRez(_Gob, _)
+THEN	
+CharacterSetHasDialog(_Gob, 1);
+//END_REGION
+//REGION Demon
+PROC
+ProcCharInTriggerSpotted(_Player, TRIGGER_LUC_TalkXinogha)
+THEN
+ProcDoTwoSpeakerDialog("LUC_GV_Shaman", CHARACTER_LUC_GV_SkillSeller, _Player);
+
+IF
+CharacterEnteredCombat(CHARACTER_LUC_GV_Sadakandras, _)
+THEN
+CHARACTER_LUC_GV_Sadakandras.willNotGiveGift();
+
+IF
+DialogEnded("LUC_GV_Shaman", _)
+AND
+CharacterGetVarInteger(CHARACTER_LUC_GV_SkillSeller, "live", 1)
+AND
+NOT CHARACTER_LUC_GV_SkillSeller.alreadyDone()
+THEN
+CHARACTER_LUC_GV_SkillSeller.alreadyDone();
+CharacterSetHasDialog(CHARACTER_LUC_GV_SkillSeller, 0);
+DB_BigTrader(CHARACTER_LUC_GV_SkillSeller);
+ProcCharacterMoveToItem(CHARACTER_LUC_GV_SkillSeller, ITEM_LUC_GV_Telescope, 0, "AtTheTotem");
+
+IF
+DialogEnded("LUC_GV_Shaman", _)
+AND
+CharacterGetVarInteger(CHARACTER_LUC_GV_SkillSeller, "fight", 1)
+AND
+NOT CHARACTER_LUC_GV_SkillSeller.alreadyDone()
+THEN
+CHARACTER_LUC_GV_SkillSeller.alreadyDone();
+ProcSetRelationToPlayers(CHARACTER_LUC_GV_SkillSeller, 0);
+
+IF
+CharacterDied(CHARACTER_LUC_GV_SkillSeller)
+THEN
+DB_ItemDialogs(ITEM_LUC_GV_Telescope, "LUC_GV_Contraption");
+ItemSetEvent(ITEM_LUC_GV_InvisibleTotem, "broken");
+ItemSetCanInteract(ITEM_LUC_GV_Telescope, 1);
+
+IF
+CharacterEvent(CHARACTER_LUC_GV_SkillSeller, "AtTheTotem")
+AND
+DB_LUC_GV_Gates(_Trigger, _Guard1)
+THEN
+NOT SneakTriggerSpotter(_Trigger, _Guard1);
+
+IF
+CharacterEvent(CHARACTER_LUC_GV_SkillSeller, "AtTheTotem")
+THEN
+CharacterDisplayText(CHARACTER_LUC_GV_SkillSeller, "LUC_GV_HappyTotem");
+GlobalSetEvent("LUC_GV_VillageFriendly");
+ITEM_LUC_GV_Totem.over();
+CharacterSetHasDialog(CHARACTER_LUC_GV_SkillSeller,1);
+
+IF
+DialogEnded("LUC_GV_Contraption", _)
+THEN
+ItemSetCanInteract(ITEM_LUC_GV_Telescope, 0);
+
+IF
+DialogEnded("LUC_GV_Contraption", _)
+AND
+ItemGetVarInteger(ITEM_LUC_GV_Telescope, "Friend", 1)
+THEN
+GlobalSetEvent("LUC_GV_VillageFriendly");
+ITEM_LUC_GV_Totem.over();
+
+IF
+DialogEnded("LUC_GV_Contraption", _)
+AND
+ItemGetVarInteger(ITEM_LUC_GV_Telescope, "Dance", 1)
+THEN
+ItemSetEvent(ITEM_LUC_GV_InvisibleTotem, "gatherRound");
+ItemDisplayText(ITEM_LUC_GV_InvisibleTotem, "LUC_GV_TotemGather");
+ItemSetVarString(ITEM_LUC_GV_InvisibleTotem, "Farce", "Dance");
+
+IF
+DialogEnded("LUC_GV_Contraption", _)
+AND
+ItemGetVarInteger(ITEM_LUC_GV_Telescope, "Gift", 1)
+THEN
+ItemDisplayText(ITEM_LUC_GV_Totem, "LUC_GV_GiftTotem");
+DB_OneShotPlayerTrigger(TRIGGER_LUC_GV_CheckGIft);
+
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,TRIGGER_LUC_GV_CheckGIft)
+AND
+NOT CHARACTER_LUC_GV_Sadakandras.willNotGiveGift()
+AND
+NOT DB_Dead(CHARACTER_LUC_GV_Sadakandras)
+THEN
+CharacterMoveToCharacter(CHARACTER_LUC_GV_Sadakandras, _Player, 1, "SadakendrasTalkGift",1);
+
+IF
+CharacterEvent(CHARACTER_LUC_GV_Sadakandras, "SadakendrasTalkGift")
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_LUC_GV_Sadakandras, _Player)
+THEN
+PROC_MendatoryDialog("LUC_GV_GiftThank", CHARACTER_LUC_GV_Sadakandras, _Player);
+ItemSetOnstage(ITEM_LUC_GV_GoblinChest, 1);
+ItemPlayEffect(ITEM_LUC_GV_GoblinChest, "FX_GP_TeleportSmoke_A");
+
+IF
+DialogEnded("LUC_GV_GiftThank", _)
+THEN
+ProcCharacterMoveToTrigger(CHARACTER_LUC_GV_Sadakandras, TRIGGER_LUC_GV_SadankarasPoint, 1, "");
+//END_REGION
+//REGION Attack Handling
+IF
+CharacterAttackedByCharacter(_Gob, _)
+AND
+DB_LUC_GoblinsVillage(_Gob)
+AND
+NOT CHARACTER_LUC_GV_Sadakandras.wreakingHavok()
+AND
+ItemGetVarInteger(ITEM_LUC_GV_InvisibleTotem, "InTheKilling", 1)
+THEN
+ItemSetEvent(ITEM_LUC_GV_InvisibleTotem, "ressurectGob");
+
+IF
+CharacterAttackedByCharacter(_Gob, _)
+AND
+DB_LUC_GoblinsVillage(_Gob)
+AND
+NOT CHARACTER_LUC_GV_Sadakandras.wreakingHavok()
+THEN
+SetRelationFactionToPlayers("LUC_GoblinVillage", 0);
+GlobalSetEvent("LUC_TotemIsOutForBlood");
+CHARACTER_LUC_GV_Sadakandras.wreakingHavok();
+ItemSetOnstage(ITEM_LUC_GV_InvisibleTotem, 0);
+
+IF
+DialogEnded("LUC_GV_Totem", _)
+AND
+ItemGetVarInteger(ITEM_LUC_GV_Totem, "shotFromHeaven", 1)
+THEN
+ItemSetEvent(ITEM_LUC_GV_InvisibleTotem, "killIntruder");
+
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

@@ -1,0 +1,157 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+//DB_Dialogs(CHARACTER_LUC_IV_Jareth,"..."); DO NOT GIVE Jareth a dialog or defaultdialog through the normal system. There are some exceptions so I handle dialog starting myself. -G
+CharacterSetHasDialog(CHARACTER_LUC_IV_Jareth,1);
+DB_NoRunAway(CHARACTER_LUC_IV_Jareth);
+NeverThreatenedDialog(CHARACTER_LUC_IV_Jareth);
+DB_IsNotMessingAround(CHARACTER_LUC_IV_Jareth);
+CharacterSetOnStage(CHARACTER_LUC_Jareth_Bairdotr, 0);
+DB_EvilDude(CHARACTER_LUC_IV_Jareth);
+DB_NoCharacterCompanionReplace(CHARACTER_LUC_IV_Jareth);
+KBSECTION
+IF
+DialogStartRequested(CHARACTER_LUC_IV_Jareth,_Character)
+THEN
+ProcJarethDialogRequest(_Character);
+
+PROC
+ProcJarethDialogRequest((CHARACTER)_Character)
+THEN
+NOT LUC_IV_JarethDialogHandled(1);
+
+PROC
+ProcJarethDialogRequest((CHARACTER)_Companion)
+AND
+DB_Companion(_Companion)
+AND
+_Companion != CHARACTER_Bairdotr
+AND
+NOT LUC_IV_JarethDialogHandled(1)
+THEN
+DialogStartTwoSpeakerDialog("Default_Companion",CHARACTER_LUC_IV_Jareth, _Companion);
+LUC_IV_JarethDialogHandled(1);
+
+PROC
+ProcJarethDialogRequest(CHARACTER_Bairdotr)
+AND
+NOT LUC_IV_JarethDialogHandled(1)
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_Bairdotr, _Character)
+THEN
+ProcCheckPartyForTrait("Independent",_Character,"Jareth_PartyHasIndependentTrait");
+GlobalSetEvent("Jareth_BairdotrPresent");
+QuestUpdate("BRD_Jareth","MeetJarethBRD");
+PROC_DoCompanionNemesisDialog("LUC_JarethBRD",CHARACTER_LUC_IV_Jareth,CHARACTER_Bairdotr);
+LUC_IV_JarethDialogHandled(1);
+
+PROC
+ProcJarethDialogRequest((CHARACTER)_Character)
+AND
+NOT LUC_IV_JarethDialogHandled(1)
+AND
+CharacterGetDistanceToCharacter(_Character,CHARACTER_Bairdotr,_Dist)
+AND
+_Dist < 10.0
+THEN
+ProcCheckPartyForTrait("Independent",_Character,"Jareth_PartyHasIndependentTrait");
+GlobalSetEvent("Jareth_BairdotrPresent");
+CharacterLookAtCharacter(CHARACTER_LUC_IV_Jareth,_Character,1);
+CharacterLookAtCharacter(_Character,CHARACTER_LUC_IV_Jareth,1);
+CharacterLookAtCharacter(CHARACTER_Bairdotr,CHARACTER_LUC_IV_Jareth,1);
+DialogStartThreeSpeakerDialog("LUC_JarethBRD",CHARACTER_LUC_IV_Jareth,_Character,CHARACTER_Bairdotr);
+QuestUpdate("BRD_Jareth","MeetJarethBRD");
+LUC_IV_JarethDialogHandled(1);
+
+PROC
+ProcJarethDialogRequest((CHARACTER)_Character)
+AND
+NOT LUC_IV_JarethDialogHandled(1)
+THEN
+CharacterLookAtCharacter(CHARACTER_LUC_IV_Jareth,_Character,1);
+CharacterLookAtCharacter(_Character,CHARACTER_LUC_IV_Jareth,1);
+DialogStartTwoSpeakerDialog("LUC_JarethAlone",CHARACTER_LUC_IV_Jareth,_Character);
+QuestUpdate("BRD_Jareth","MeetJarethAlone");
+
+IF
+DialogEnded("LUC_JarethBRD",_)
+THEN
+GlobalClearEvent("Jareth_BairdotrPresent");
+NOT DB_QueuedDialogNemesis("LUC_JarethBRD",CHARACTER_LUC_IV_Jareth,CHARACTER_Bairdotr);
+
+IF
+DialogEnded("LUC_JarethAlone",_)
+AND
+DB_GlobalEvent("JarethAggro")
+THEN
+CharacterSetFaction(CHARACTER_LUC_IV_Jareth, "Evil NPC");
+
+IF
+DialogEnded("LUC_JarethBRD",_)
+AND
+DB_GlobalEvent("BairdotrFightsAgainstJareth")
+THEN
+CharacterSetFaction(CHARACTER_LUC_IV_Jareth, "Evil NPC");
+CharacterDisplayText(CHARACTER_Bairdotr,"BRD_CC_NotChoseJareth");
+QuestUpdate("BRD_Jareth","FightBairdotrIndependent");
+CharacterSetHasDialog(CHARACTER_LUC_IV_Jareth,0);
+
+IF
+DialogEnded("LUC_JarethBRD",_)
+AND
+DB_GlobalEvent("BairdotrFightsWithJareth")
+AND
+DB_Compcount(_Count)
+AND
+IntegerSubtract(_Count,1,_New)
+THEN
+OnCompanionDismissed(CHARACTER_Bairdotr);
+ProcCancelAllCompanionDialogs(CHARACTER_Bairdotr);
+NOT DB_Companion(CHARACTER_Bairdotr);
+CharacterDetachFromGroup(CHARACTER_Bairdotr);
+CharacterMakeNPC(CHARACTER_Bairdotr);
+CharacterRemoveFromParty(CHARACTER_Bairdotr);
+NOT DB_Compcount(_Count);
+DB_Compcount(_New);
+ProcCheckPartyState();
+NOT DB_CompanionRecruited(CHARACTER_Bairdotr);
+CharacterMoveToTrigger(CHARACTER_Bairdotr, TRIGGER_LUC_BC_BairdotrPoint, 1, "atSpawningPoint");
+CharacterDisplayText(CHARACTER_Bairdotr,"BRD_CC_ChoseJareth");
+QuestUpdate("BRD_Jareth","FightBairdotrObedient");
+PROC_END_RemoveCompInDBRoomB(CHARACTER_Bairdotr);
+CharacterSetHasDialog(CHARACTER_LUC_IV_Jareth,0);
+
+IF
+CharacterEvent(CHARACTER_Bairdotr, "atSpawningPoint")
+THEN
+CharacterLookAtCharacter(CHARACTER_Bairdotr, CHARACTER_LUC_IV_Jareth, 1);
+CharacterLookAtCharacter(CHARACTER_LUC_Jareth_Bairdotr, CHARACTER_LUC_IV_Jareth, 1);
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_Bairdotr);
+CharacterSetOnStage(CHARACTER_Bairdotr,0);
+CharacterSetOnStage(CHARACTER_LUC_Jareth_Bairdotr,1);	
+CharacterMoveAllItemsToCharacter(CHARACTER_Bairdotr, CHARACTER_LUC_Jareth_Bairdotr, 0);				
+CharacterSetFaction(CHARACTER_LUC_IV_Jareth, "Evil NPC");
+CharacterSetFaction(CHARACTER_LUC_Jareth_Bairdotr, "Evil NPC");
+
+IF
+CharacterAttackedByCharacter(CHARACTER_LUC_IV_Jareth, _)
+AND
+CharacterGetFaction(CHARACTER_LUC_IV_Jareth, _Faction)
+AND
+_Faction != "Evil NPC"
+THEN
+DialogRequestStopForCharacter(CHARACTER_LUC_IV_Jareth);
+CharacterSetFaction(CHARACTER_LUC_IV_Jareth, "Evil NPC");
+NOT DB_QueuedDialogNemesis("LUC_JarethBRD",CHARACTER_LUC_IV_Jareth,CHARACTER_Bairdotr);
+CharacterSetHasDialog(CHARACTER_LUC_IV_Jareth,0);
+
+IF
+CharacterDied(CHARACTER_LUC_IV_Jareth)
+THEN
+QuestUpdate("BRD_Jareth","JarethDead");
+QuestClose("BRD_Jareth");
+ProcCancelAllCompanionDialogs(CHARACTER_Bairdotr);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

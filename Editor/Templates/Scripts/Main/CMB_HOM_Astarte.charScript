@@ -1,0 +1,301 @@
+/*
+
+	//!\\ This script isn't used anymore. //!\\ (Edouard - 31/07/2015)
+
+INIT
+	CHARACTER:__Me
+	CHARACTER:%Shrike=HOM_Shrike_8a5afb7b-08ad-4057-9a97-5bc66bb3ac6e
+	CHARACTER:%Target_Resurrection
+	CHARACTER:%Target_Regenerate
+	FLOAT:%AstarteSightRange
+
+//------------------------	
+BEHAVIOUR
+REACTION Astarte_Cast_BlessedEarth,1000
+USAGE COMBAT
+CHECK "c1"
+	CharacterCanCast(__Me,"Shout_EnemyBlessedEarth")
+ACTIONS	
+	CharacterUseSkill("Shout_EnemyBlessedEarth",__Me)
+
+REACTION Astarte_Cast_Resurrect,1000
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2"
+	CharacterCanCast(__Me,"Target_EnemyResurrect")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyResurrect")
+ACTIONS
+	Set(%Target_Resurrection,null)	
+	IterateCharacters("Iterate_DeadAllies",Lowest,Distance)
+	IF "!c1"
+		IsEqual(%Target_Resurrection,null)
+	THEN
+		DisplayText(__Me,"HOM_End_Astarte_Cast_Resurrect",2)
+		CharacterMoveInRange(%Target_Resurrection,_MinRange,_MaxRange,1)		
+		CharacterUseSkill("Target_EnemyResurrect",%Target_Resurrection)
+	ENDIF
+	SetPriority("Astarte_Cast_Resurrect",0)
+INTERRUPT
+	Reset()
+
+REACTION Astarte_Cast_Regenerate,900
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2"
+	CharacterCanCast(__Me,"Heal_EnemyRegenerate_Astarte")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Heal_EnemyRegenerate_Astarte")	
+ACTIONS
+	Set(%Target_Regenerate,null)	
+	IterateCharacters("Iterate_WoundedAllies",Lowest,Distance)
+	IF "!c1"
+		IsEqual(%Target_Regenerate,null)
+	THEN
+		DisplayText(__Me,"HOM_End_Astarte_Cast_Regenerate",2)
+		CharacterMoveInRange(%Target_Regenerate,_MinRange,_MaxRange,1)		
+		CharacterUseSkill("Heal_EnemyRegenerate_Astarte",%Target_Regenerate)
+	ENDIF
+	SetPriority("Astarte_Cast_Regenerate",0)
+INTERRUPT
+	Reset()
+
+REACTION Astarte_Cast_Bless,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&!c4&!c5&!c6&!c7&!c8&!c9&c10"
+	CharacterCanCast(__Me,"Target_EnemyTargetedBless")								//c1
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyTargetedBless")	//c2
+	CharacterGet(_Target,__Me,%AstarteSightRange,Highest,Strength,Ally)				//c3
+	CharacterIsDead(_Target)														//!c4
+	CharacterIsSummon(_Target)														//!c5
+	CharacterHasStatus(_Target,FROZEN)												//!c6
+	CharacterHasStatus(_Target,PETRIFIED)											//!c7
+	CharacterHasStatus(_Target,CHARMED)												//!c8
+	CharacterHasStatus(_Target,BLESSED)												//!c9
+	IsRandom(0.5)																	//c10	
+ACTIONS
+	DisplayText(__Me,"HOM_End_Astarte_Cast_Bless",2)
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)		
+	CharacterUseSkill("Target_EnemyTargetedBless",_Target)
+INTERRUPT
+	Reset()
+
+REACTION Astarte_Cast_PerceptionBoost,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&!c4&!c5&!c6&!c7&!c8&!c9&!c10&c11"
+	CharacterCanCast(__Me,"Target_EnemyTargetedPerception")								//c1
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyTargetedPerception")	//c2
+	CharacterGet(_Target,__Me,%AstarteSightRange,Highest,Dexterity,Ally)				//c3
+	CharacterIsDead(_Target)															//!c4
+	CharacterIsSummon(_Target)															//!c5
+	CharacterHasStatus(_Target,FROZEN)													//!c6
+	CharacterHasStatus(_Target,PETRIFIED)												//!c7
+	CharacterHasStatus(_Target,CHARMED)													//!c8
+	CharacterHasStatus(_Target,BLIND)													//!c9
+	CharacterHasStatus(_Target,WARM)													//!c10
+	IsRandom(0.3)																		//c11	
+ACTIONS
+	DisplayText(__Me,"HOM_End_Astarte_Cast_PerceptionBoost",2)
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)		
+	CharacterUseSkill("Target_EnemyTargetedPerception",_Target)
+INTERRUPT
+	Reset()
+
+REACTION Astarte_Cast_Haste,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&!c4&!c5&!c6&!c7&!c8&!c9&!c10&c11"
+	CharacterCanCast(__Me,"Target_EnemyHaste")										//c1
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyHaste")			//c2
+	CharacterGet(_Target,__Me,%AstarteSightRange,Highest,Intelligence,Ally)			//c3
+	CharacterIsDead(_Target)														//!c4
+	CharacterIsSummon(_Target)														//!c5
+	CharacterHasStatus(_Target,FROZEN)												//!c6
+	CharacterHasStatus(_Target,PETRIFIED)											//!c7
+	CharacterHasStatus(_Target,CHARMED)												//!c8
+	CharacterHasStatus(_Target,HASTED)												//!c9
+	CharacterHasStatus(_Target,WARM)												//!c10
+	IsRandom(0.4)																	//c11
+ACTIONS
+	DisplayText(__Me,"HOM_End_Astarte_Cast_Hasten",2)
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)		
+	CharacterUseSkill("Target_EnemyHaste",_Target)
+INTERRUPT
+	Reset()
+
+REACTION Astarte_Cast_Fortify,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&!c4&!c5&!c6&!c7&!c8&!c9&c10"
+	CharacterCanCast(__Me,"Target_EnemyFortify")									//c1
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyFortify")			//c2
+	CharacterGet(_Target,__Me,%AstarteSightRange,Highest,Speed,Ally)				//c3
+	CharacterIsDead(_Target)														//!c4
+	CharacterIsSummon(_Target)														//!c5
+	CharacterHasStatus(_Target,FROZEN)												//!c6
+	CharacterHasStatus(_Target,PETRIFIED)											//!c7
+	CharacterHasStatus(_Target,CHARMED)												//!c8
+	CharacterHasStatus(_Target,FORTIFIED)											//!c9
+	IsRandom(0.4)																	//c10	
+ACTIONS
+	DisplayText(__Me,"HOM_End_Astarte_Cast_Fortify",2)
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)		
+	CharacterUseSkill("Target_EnemyFortify",_Target)
+INTERRUPT
+	Reset()
+
+REACTION Astarte_Cast_StaffOfMagusEarth,100
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&!c4&!c5"
+	CharacterCanCast(__Me,Projectile_EnemyStaffOfMagusEarth)								//c1
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,Projectile_EnemyStaffOfMagusEarth)		//c2
+	CharacterGet(_Target,__Me,%AstarteSightRange,Highest,Vitality,Enemy)					//c3
+	CharacterIsDead(_Target)																//c4
+	CharacterHasStatus(_Target,INVULNERABLE)												//c5
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+	CharacterUseSkill(Projectile_EnemyStaffOfMagusEarth,_Target)
+INTERRUPT
+	Reset()
+
+//---- ASTARTE'S COMMENTS
+REACTION AstarteIsWoundedComment1,3200
+USAGE COMBAT
+VARS
+	FLOAT:_MyVitality
+CHECK "c1&c2&c3"
+	CharacterGetStat(_MyVitality,__Me,Vitality)
+	IsLessThen(_MyVitality,0.7)
+	IsGreaterThen(_MyVitality,0.5)
+ACTIONS
+	DisplayText(__Me,"HOM_End_AstarteLose1",3)
+	Sleep(3)
+	SetPriority("AstarteIsWoundedComment1",0)
+
+REACTION AstarteIsWoundedComment2,3100
+USAGE COMBAT
+VARS
+	FLOAT:_MyVitality
+CHECK "c1&c2&c3"
+	CharacterGetStat(_MyVitality,__Me,Vitality)
+	IsLessThen(_MyVitality,0.5)
+	IsGreaterThen(_MyVitality,0.3)
+ACTIONS
+	DisplayText(__Me,"HOM_End_AstarteLose2",3)
+	Sleep(3)	
+	SetPriority("AstarteIsWoundedComment1",0)	
+	SetPriority("AstarteIsWoundedComment2",0)
+
+REACTION AstarteIsWoundedComment3,3000
+USAGE COMBAT
+VARS
+	FLOAT:_MyVitality
+CHECK "c1&c2&c3"
+	CharacterGetStat(_MyVitality,__Me,Vitality)
+	IsLessThen(_MyVitality,0.3)
+	IsGreaterThen(_MyVitality,0.1)
+ACTIONS
+	DisplayText(__Me,"HOM_End_AstarteLose3",3)
+	Sleep(3)	
+	SetPriority("AstarteIsWoundedComment1",0)
+	SetPriority("AstarteIsWoundedComment2",0)	
+	SetPriority("AstarteIsWoundedComment3",0)	
+	
+REACTION Astarte_ShrikeIsDead_PlayTextAndAnim,500
+USAGE PEACE
+VARS
+	CHARACTER:_Target
+	FLOAT:_SleepValue
+	FIXEDSTRING:_ChosenText
+CHECK "c1&c2"
+	CharacterIsDead(%Shrike)
+	CharacterGet(_Target,__Me,%AstarteSightRange,Lowest,Distance,Ally)
+ACTIONS
+	GetRandom(_ChosenText,"HOM_End_Astarte_CallsPlayer_01","HOM_End_Astarte_CallsPlayer_02","HOM_End_Astarte_CallsPlayer_03","HOM_End_Astarte_CallsPlayer_04")
+	CharacterLookAt(_Target)	
+	CharacterPlayAnimation("emotion_greeting",1,0)
+	DisplayText(__Me,_ChosenText,4)
+	GetRandomBetween(_SleepValue,5,10)
+	Sleep(_SleepValue)
+INTERRUPT
+	Reset()
+
+//------------------------
+EVENTS
+EVENT OnInit_GetSightRange_AddSkillForAstarte
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%AstarteSightRange,__Me,Sight)
+	THEN
+		CharacterAddSkill("Shout_EnemyBlessedEarth")	
+		CharacterAddSkill("Target_EnemyResurrect")	
+		CharacterAddSkill("Heal_EnemyRegenerate_Astarte")
+		CharacterAddSkill("Target_EnemyTargetedBless")	
+		CharacterAddSkill("Target_EnemyTargetedPerception")
+		CharacterAddSkill("Target_EnemyHaste")
+		CharacterAddSkill("Target_EnemyFortify")
+	ENDIF	
+
+EVENT OnTurn_ResetPriorities
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("Astarte_Cast_Resurrect",1000)
+	SetPriority("Astarte_Cast_Regenerate",900)
+
+EVENT OnIterate_ScanForDeadAllies
+VARS
+	CHARACTER:_DetectedCharacter
+ON
+	OnIterateCharacter(_DetectedCharacter,"Iterate_DeadAllies")
+ACTIONS
+	IF "c1&c2&!c3"
+		CharacterIsDead(_DetectedCharacter)
+		CharacterIsAlly(__Me,_DetectedCharacter)
+		CharacterIsSummon(_DetectedCharacter)
+	THEN
+		Set(%Target_Resurrection,_DetectedCharacter)
+		Set(_DetectedCharacter,null)
+	ENDIF	
+
+EVENT OnIterate_ScanForWoundedAllies
+VARS
+	CHARACTER:_DetectedCharacter
+	FLOAT:_DetectedCharactersVitality
+ON
+	OnIterateCharacter(_DetectedCharacter,"Iterate_WoundedAllies")
+ACTIONS
+	IF "c1&!c2&!c3&c4&c5"
+		CharacterIsAlly(__Me,_DetectedCharacter)										//c1
+		IsEqual(_DetectedCharacter,__Me)												//!c2
+		CharacterIsSummon(_DetectedCharacter)											//!c3
+		CharacterGetStat(_DetectedCharactersVitality,_DetectedCharacter,Vitality)		//c4
+		IsLessThen(_DetectedCharactersVitality,0.6)	
+	THEN
+		Set(%Target_Regenerate,_DetectedCharacter)
+		Set(_DetectedCharacter,null)
+	ENDIF
+	
+*/

@@ -1,0 +1,512 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_TutorialCultists(CHARACTER_CYS_Tut_StoneCarrier1, TRIGGER_CYS_PointExitBeachDungeon_Minion1);
+DB_TutorialCultists(CHARACTER_CYS_Tut_StoneCarrier2, TRIGGER_CYS_PointExitBeachDungeon_Minion2);
+DB_TutorialCultists(CHARACTER_CYS_Tut_BlackCultistLeader, TRIGGER_CYS_PointExitBeachDungeon);
+
+DB_TutorialSkeletonGrunts(CHARACTER_CYS_TUT_SkeletonGrunt1);
+DB_TutorialSkeletonGrunts(CHARACTER_CYS_TUT_SkeletonGrunt2);
+DB_TutorialSkeletonGrunts(CHARACTER_CYS_TUT_SkeletonRanger);
+DB_TutorialSkeletonGrunts(CHARACTER_CYS_TUT_SkeletonGrunt4);
+DB_TutorialSkeletonGrunts(CHARACTER_CYS_TUT_SkeletonGrunt5);
+
+DB_TutorialAtmosphereTriggers(TRIGGER_CYS_TUT_AtmosphereKill_01);
+DB_TutorialAtmosphereTriggers(TRIGGER_CYS_TUT_AtmosphereKill_02);
+
+DB_TutorialReminder(TRIGGER_CYS_Box_TUT_Reminder1);
+DB_TutorialReminder(TRIGGER_CYS_Box_TUT_Reminder2);
+
+ItemToContainer(ITEM_CYS_TUT_BonePileNote,ITEM_CYS_TutBonePile_Room1,-1);
+ItemToContainer(ITEM_CYS_Tut_RichChestKey,ITEM_CYS_Tut_RichChestVase,-1);
+ItemToCharacter(ITEM_CYS_TUT_EndDoorKey,CHARACTER_CYS_TUT_SkeletonBoss);
+
+//REGION Pressure Plates
+ItemSetCanInteract(ITEM_CYS_Tut_PressurePlateGate,0);
+DB_CYS_Tut_PressurePlate(ITEM_CYS_TutPressurePlate_01);
+DB_CYS_Tut_PressurePlate(ITEM_CYS_TutPressurePlate_02);
+//END_REGION
+
+ItemCloseAndLock(ITEM_CYS_TUT_SecretDoor,"storylock"); 
+ItemSetCanInteract(ITEM_CYS_TUT_SecretDoor,0);
+ItemToContainer(ITEM_CYS_TutKeyRoom2,ITEM_CYS_TutChestRoom2,-1);
+
+//REGION Tutorial rats 
+DB_TutorialRat(CHARACTER_CYS_TUT_Rat1);
+DB_TutorialRat(CHARACTER_CYS_TUT_Rat2);
+DB_TutorialRat(CHARACTER_CYS_TUT_Rat3);
+DB_TutorialRat(CHARACTER_CYS_TUT_Rat4);
+DB_TutorialRat(CHARACTER_CYS_TUT_Rat5);
+//END_REGION
+
+DB_OneShotPlayerTrigger(TRIGGER_CYS_BoxTutorialCombatWait);
+DB_OneShotPlayerTrigger(TRIGGER_CYS_Box_TUT_AJourneyBegins);
+DB_OneShotPlayerTrigger(TRIGGER_CYS_Box_TUT_CorpseDiscovered);
+
+//REGION Player Comments
+DB_PlayerComments("CYS_Tut_CommentDungeonValuables","CYS_Tut_CommentDungeonValuables_1_1",1,1);
+DB_PlayerComments("CYS_Tut_CommentDungeonValuables","CYS_Tut_CommentDungeonValuables_2_1",2,1);
+DB_PlayerComments("CYS_Tut_CommentDungeonValuables","CYS_Tut_CommentDungeonValuables_2_2",2,2);
+DB_PlayerComment_Trigger(TRIGGER_CYS_Tut_CommentDungeonValuables,"CYS_Tut_CommentDungeonValuables");
+DB_PlayerComments("CYS_Tut_CommentDungeonEntrance","CYS_Tut_CommentDungeonEntrance_1_1",1,1);
+DB_PlayerComments("CYS_Tut_CommentDungeonEntrance","CYS_Tut_CommentDungeonEntrance_2_1",2,1);
+DB_PlayerComments("CYS_Tut_CommentDungeonEntrance","CYS_Tut_CommentDungeonEntrance_2_2",2,2);
+ProcTriggerRegisterForPlayers(TRIGGER_CYS_Tut_CommentDungeonEntrance);
+DB_PlayerComments("CYS_Tut_CommentSneak","CYS_Tut_CommentSneak_1_1",1,1);
+DB_PlayerComments("CYS_Tut_CommentSneak","CYS_Tut_CommentSneak_2_1",2,1);
+DB_PlayerComments("CYS_Tut_CommentSneak","CYS_Tut_CommentSneak_2_2",2,2);
+ProcTriggerRegisterForPlayers(TRIGGER_CYS_Tut_CommentSneak);
+DB_PlayerComments("CYS_Tut_CommentTraps2","CYS_Tut_CommentTraps2_1_1",1,1);
+DB_PlayerComments("CYS_Tut_CommentTraps2","CYS_Tut_CommentTraps2_2_1",2,1);
+DB_PlayerComments("CYS_Tut_CommentTraps2","CYS_Tut_CommentTraps2_2_2",2,2);
+DB_PlayerComment_Trigger(TRIGGER_CYS_Box_TUT_AJourneyBegins,"CYS_TUT_AJourneyBegins");
+DB_PlayerComments("CYS_TUT_AJourneyBegins","CYS_TUT_AJourneyBegins_1_1",1,1);
+DB_PlayerComments("CYS_TUT_AJourneyBegins","CYS_TUT_AJourneyBegins_2_1",2,1);
+DB_PlayerComments("CYS_TUT_AJourneyBegins","CYS_TUT_AJourneyBegins_2_2",2,2);
+DB_PlayerComment_Trigger(TRIGGER_CYS_Box_TUT_CorpseDiscovered,"CYS_TUT_CorpseDiscovered");
+DB_PlayerComments("CYS_TUT_CorpseDiscovered","CYS_TUT_CorpseDiscovered_1_1",1,1);
+DB_PlayerComments("CYS_TUT_CorpseDiscovered","CYS_TUT_CorpseDiscovered_2_1",2,1);
+DB_PlayerComments("CYS_TUT_CorpseDiscovered","CYS_TUT_CorpseDiscovered_2_2",2,2);
+
+DB_PlayerComments("CYS_TUT_FirstEncounterComplete","CYS_TUT_FirstEncounterComplete_1_1",1,1);
+DB_PlayerComments("CYS_TUT_FirstEncounterComplete","CYS_TUT_FirstEncounterComplete_2_1",2,1);
+DB_PlayerComments("CYS_TUT_FirstEncounterComplete","CYS_TUT_FirstEncounterComplete_2_2",2,2);
+//END_REGION
+
+CharacterSetOnStage(CHARACTER_TUT_Loot_HACK,0);
+
+//REGION Skeleton Killcounts
+KillCounter("CYS_TUT_Killcount_Skeleton",3);
+KillCounterDB(CHARACTER_CYS_TUT_SkeletonGrunt1,"CYS_TUT_Killcount_Skeleton");
+KillCounterDB(CHARACTER_CYS_TUT_SkeletonGrunt2,"CYS_TUT_Killcount_Skeleton");
+KillCounterDB(CHARACTER_CYS_TUT_SkeletonRanger,"CYS_TUT_Killcount_Skeleton");
+
+KillCounter("CYS_TUT_Killcount_Skeleton_Hardcore",5);
+KillCounterDB(CHARACTER_CYS_TUT_SkeletonGrunt1,"CYS_TUT_Killcount_Skeleton_Hardcore");
+KillCounterDB(CHARACTER_CYS_TUT_SkeletonGrunt2,"CYS_TUT_Killcount_Skeleton_Hardcore");
+KillCounterDB(CHARACTER_CYS_TUT_SkeletonRanger,"CYS_TUT_Killcount_Skeleton_Hardcore");
+KillCounterDB(CHARACTER_CYS_TUT_SkeletonGrunt4,"CYS_TUT_Killcount_Skeleton_Hardcore");
+KillCounterDB(CHARACTER_CYS_TUT_SkeletonGrunt5,"CYS_TUT_Killcount_Skeleton_Hardcore");
+//END_REGION
+
+ProcTriggerRegisterForPlayers(TRIGGER_CYS_BoxTUTDungeonEntrance);
+
+CharacterSetOnStage(CHARACTER_CYS_TUT_SkeletonBoss_Ranger_01, 0);
+CharacterSetOnStage(CHARACTER_CYS_TUT_SkeletonBoss_Ranger_02, 0);
+CharacterSetOnStage(CHARACTER_CYS_TUT_SkeletonBoss, 0);
+
+DB_EvilDude(CHARACTER_CYS_TUT_SkeletonBoss);
+
+DB_OneShotPlayerTrigger(TRIGGER_CYS_TUT_SpawnRageQuin);
+
+DB_Global_ItemDescriptions(ITEM_CYS_TUT_Tomb1, "TUT_Tomb1");
+DB_Global_ItemDescriptions(ITEM_CYS_TUT_Tomb2, "TUT_Tomb2");
+
+ItemToContainer(ITEM_CYS_UnidentifyNote, ITEM_CYS_UnidentifyCorpse, 1);
+KBSECTION
+//REGION Reminder area 
+
+IF
+DB_TutorialReminder(_Trigger)
+THEN
+TriggerRegisterForPlayers(_Trigger);
+
+IF
+CharacterEnteredTrigger(_Player,_Trigger)
+AND
+DB_TutorialReminder(_Trigger)
+AND
+CharacterGetOtherPlayer(_Player, _Other)
+AND
+CharacterGetReservedPeerID(_Player, _ID)
+AND
+CharacterGetReservedPeerID(_Other, _ID2)
+AND
+_ID == _ID2
+THEN
+ProcUnregisterRemindersForPlayer(_Other);
+
+IF
+CharacterEnteredTrigger(_Player,_Trigger)
+AND
+DB_TutorialReminder(_Trigger)
+THEN
+OpenMessageBox(_Player,"TUT_Reminder");
+//ProcUnregisterRemindersForPlayer(_Player);
+ProcUnregisterRemindersForPlayers();
+
+/*
+PROC
+ProcUnregisterRemindersForPlayer((CHARACTER)_Player)
+AND
+DB_TutorialReminder(_Trigger)
+THEN
+TriggerUnregisterForCharacter(_Trigger,_Player);
+*/
+
+PROC
+ProcUnregisterRemindersForPlayers()
+AND
+DB_TutorialReminder(_Trigger)
+THEN
+TriggerUnregisterForPlayers(_Trigger);
+
+//END_REGION 
+
+//REGION Combat intro
+PROC
+ProcOneShotTriggerEntered(_,TRIGGER_CYS_BoxTutorialCombatWait)
+AND
+NOT DB_OnlyOnce("CYS_StartTutoFight")
+THEN
+DB_OnlyOnce("CYS_StartTutoFight");
+ProcTutShowBlackCultists();
+
+IF
+CharacterEnteredCombat(CHARACTER_CYS_Tut_BlackCultistLeader,_)
+AND
+NOT DB_OnlyOnce("CYS_StartTutoFight")
+THEN
+DB_OnlyOnce("CYS_StartTutoFight");
+ProcTutShowBlackCultists();
+
+PROC
+ProcTutShowBlackCultists()
+AND
+DB_TutorialCultists(_Char,_Trig)
+THEN
+ProcCharacterMoveToTrigger(_Char,_Trig,1,"atTheSpot");
+
+IF
+CharacterEvent(_Char, "atTheSpot")
+AND
+DB_TutorialCultists(_Char,_Trig)
+THEN
+CharacterDisappearOutOfSight(_Char, -90, 1, "", 1);
+
+IF
+CharacterEnteredCombat(_Char,_)
+AND
+DB_TutorialCultists(_Char,_)
+AND
+NOT DB_OnlyOnce("CYS_StartTutoFight")
+THEN
+DB_OnlyOnce("CYS_StartTutoFight");
+
+IF
+CharacterEnteredCombat(_Char,_)
+AND
+DB_TutorialCultists(_Char,_)
+THEN
+CharacterPurgeQueue(_Char);
+
+IF
+CharacterEvent(_Char,"MoveAwayWithStone")
+THEN
+CharacterMoveToTrigger(_Char,TRIGGER_CYS_TUT_MageRunAway,1,"atEscape");
+
+IF
+CharacterEvent(_Char, "atEscape")
+THEN
+CharacterSetOnStage(_Char, 0);
+//END_REGION
+
+//REGION Summoning Skeletons
+IF
+DB_TutorialSkeletonGrunts(_Char)
+THEN
+CharacterSetOnStage(_Char,0);
+
+IF
+CharacterEvent(CHARACTER_CYS_Tut_BlackCultistLeader,"SummonGrunts")
+THEN
+TimerLaunch("CYS_TUT_DelayGrunts",1000);
+
+IF
+TimerFinished("CYS_TUT_DelayGrunts")
+THEN
+CharacterAppearAtTrigger(CHARACTER_CYS_TUT_SkeletonGrunt1,TRIGGER_CYS_Point_TutSkeletonPoint1,1);
+PlayEffectAtTrigger("FX_GP_Target_Earth_A_OneShot",TRIGGER_CYS_Point_TutSkeletonPoint1);
+TimerLaunch("CYS_TUT_DelayAppearance_Grunt",200);
+TimerLaunch("CYS_TUT_DelayAppearance_Ranger",550);
+
+IF
+TimerFinished("CYS_TUT_DelayAppearance_Grunt")
+THEN
+CharacterAppearAtTrigger(CHARACTER_CYS_TUT_SkeletonGrunt2,TRIGGER_CYS_Point_TutSkeletonPoint2,1);
+PlayEffectAtTrigger("FX_GP_Target_Earth_A_OneShot",TRIGGER_CYS_Point_TutSkeletonPoint2);
+
+IF
+TimerFinished("CYS_TUT_DelayAppearance_Ranger")
+THEN
+CharacterAppearAtTrigger(CHARACTER_CYS_TUT_SkeletonRanger,TRIGGER_CYS_Point_TutRangerPoint,1);
+PlayEffectAtTrigger("FX_GP_Target_Earth_A_OneShot",TRIGGER_CYS_Point_TutRangerPoint); 
+
+IF
+TimerFinished("CYS_TUT_DelayAppearance_Ranger")
+AND
+DB_TutorialSkeletonGrunts(_Char)
+AND
+CharacterGetClosestAlivePlayer(_Char,_Player)
+THEN
+CharacterLookAtCharacter(_Char,_Player);
+
+//--------------------------------------------- SUMMONING SKELETONS: HARDCORE
+IF
+CharacterEvent(CHARACTER_CYS_Tut_BlackCultistLeader,"SummonGrunts")
+AND
+IsHardcoreMode(1)
+THEN
+TimerLaunch("CYS_TUT_DelayGrunts_Hardcore",1500);
+
+IF
+TimerFinished("CYS_TUT_DelayGrunts_Hardcore")
+THEN
+CharacterAppearAtTrigger(CHARACTER_CYS_TUT_SkeletonGrunt4,TRIGGER_CYS_Point_TutSkeletonPoint4,1);
+PlayEffectAtTrigger("FX_GP_Target_Earth_A_OneShot",TRIGGER_CYS_Point_TutSkeletonPoint4);
+TimerLaunch("CYS_TUT_DelayAppearance_Ranger_Hardcore",550);
+
+IF
+TimerFinished("CYS_TUT_DelayAppearance_Ranger_Hardcore")
+THEN
+
+CharacterAppearAtTrigger(CHARACTER_CYS_TUT_SkeletonGrunt5,TRIGGER_CYS_Point_TutSkeletonPoint5,1);
+PlayEffectAtTrigger("FX_GP_Target_Earth_A_OneShot",TRIGGER_CYS_Point_TutSkeletonPoint5); 
+
+IF
+TimerFinished("CYS_TUT_DelayAppearance_Ranger_Hardcore")
+AND
+DB_TutorialSkeletonGrunts(_Char)
+AND
+CharacterGetClosestAlivePlayer(_Char,_Player)
+THEN
+CharacterLookAtCharacter(_Char,_Player);
+//END_REGION
+
+//REGION Black Cultist disappears
+IF
+CharacterEvent(CHARACTER_CYS_Tut_BlackCultistLeader,"Vanish")
+THEN
+CharacterMoveToTrigger(CHARACTER_CYS_Tut_BlackCultistLeader,TRIGGER_CYS_TUT_MageRunAway,1,"TUT_LaunchCombatEvent");
+CharacterSetEvent(CHARACTER_CYS_Tut_BlackCultistLeader,"TUT_DisplayCombatPopupEvent");
+CharacterSetVarInteger(CHARACTER_CYS_Tut_BlackCultistLeader, "RunningAway", 1);
+
+IF
+CharacterLostSightOfCharacter(_Player, CHARACTER_CYS_Tut_BlackCultistLeader)
+AND
+DB_IsPlayer(_Player)
+AND
+CharacterGetOtherPlayer(_Player, _OtherPlayer)
+AND
+NOT Sees(_OtherPlayer, CHARACTER_CYS_Tut_BlackCultistLeader)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_Tut_BlackCultistLeader, "RunningAway", 1)
+THEN
+CharacterSetOnStage(CHARACTER_CYS_Tut_BlackCultistLeader, 0);
+
+
+IF
+CharacterEvent(_Char, "TUT_LaunchCombatEvent")
+THEN
+CharacterSetOnStage(_Char, 0);
+//END_REGION
+
+//REGION Combat outro
+IF
+CharacterEvent(CHARACTER_CYS_TUT_SkeletonRanger,"TUT_DisplayCombatAD")
+AND
+CharacterGetClosestPlayer(CHARACTER_CYS_TUT_SkeletonRanger,_Player)
+THEN
+Launch_PlayerComment(_Player,"CYS_TUT_FirstEncounterStarted");
+
+PROC
+ReactOnKillCounter("CYS_TUT_Killcount_Skeleton")
+AND
+IsHardcoreMode(0)
+AND
+CharacterGetClosestPlayer(CHARACTER_CYS_TUT_SkeletonRanger,_Player)
+THEN
+Launch_PlayerComment(_Player,"CYS_TUT_FirstEncounterComplete");
+QuestUpdate("HOM_Starstones", "AfterTutorial");
+ProcDefinePartyDialog("CYS_DD_AfterFirstEncounter");
+
+PROC
+ReactOnKillCounter("CYS_TUT_Killcount_Skeleton_Hardcore")
+AND
+IsHardcoreMode(1)
+AND
+CharacterGetClosestPlayer(CHARACTER_CYS_TUT_SkeletonRanger,_Player)
+THEN
+Launch_PlayerComment(_Player,"CYS_TUT_FirstEncounterComplete");
+QuestUpdate("HOM_Starstones", "AfterTutorial");
+ProcDefinePartyDialog("CYS_DD_AfterFirstEncounter");
+//END_REGION
+
+//REGION Test functions
+IF
+TextEventSet("tut")
+THEN
+CharacterTeleportToTrigger(CHARACTER_Player1,TRIGGER_CYS_Start_P1,"");
+CharacterTeleportToTrigger(CHARACTER_Player2,TRIGGER_CYS_Start_P2,"");
+ProcStartTutorial();
+
+//END_REGION 
+
+//REGION Atmosphere setting 
+
+PROC
+ProcStartTutorial()
+THEN
+ProcChangeTutorialAtmosphere("Dawn");
+DB_StartTutMessages(1);
+
+PROC
+ProcChangeTutorialAtmosphere((STRING)_Atmos)
+THEN
+TriggerSetAtmosphere("d50a5e6c-e053-42b3-8e28-9ecc8948c86b",_Atmos);
+
+IF
+DB_TutorialAtmosphereTriggers(_Trigger)
+THEN
+DB_OneShotPlayerTrigger(_Trigger);
+
+PROC
+ProcOneShotTriggerEntered(_Player,_KillAtmTrigger)
+AND
+DB_TutorialAtmosphereTriggers(_KillAtmTrigger)
+THEN
+ProcChangeTutorialAtmosphere("default");
+
+PROC
+ProcPlayerLeftDungeon()
+AND
+CHARACTER_Player1.WasInTutDungeon()
+AND
+CHARACTER_Player2.WasInTutDungeon()
+THEN
+ProcChangeTutorialAtmosphere("default");
+
+IF
+TextEventSet("defatm")
+THEN
+ProcChangeTutorialAtmosphere("default");
+//END_REGION
+
+//REGION Tutorial dungeon
+IF
+CharacterUsedItem(_Player,ITEM_CYS_TutDoorRoom3_Lever)
+THEN
+ItemUnlockAndOpen(ITEM_CYS_TutDoorRoom3);
+
+IF
+ItemTemplateOpening(_,_Handle,_)
+AND
+ItemGetHandle(ITEM_CYS_TutDoorRoom3,_Handle)
+THEN
+ItemSetCanInteract(ITEM_CYS_TutDoorRoom3, 0);
+
+//END_REGION
+
+//REGION Pressure Plates
+IF
+CharacterItemEvent(_,_PressurePlate,"CYS_TutPressurePlate_On")
+AND
+DB_CYS_Tut_PressurePlate(_PressurePlate)
+THEN
+PROC_CYS_Tut_PressurePlate_Check();
+
+PROC
+PROC_CYS_Tut_PressurePlate_Check()
+AND
+ItemGetVarFloat(ITEM_CYS_TutPressurePlate_01,"CurrentPercentage",1.0)
+AND
+ItemGetVarFloat(ITEM_CYS_TutPressurePlate_02,"CurrentPercentage",1.0)
+THEN
+ItemUnlockAndOpen(ITEM_CYS_Tut_PressurePlateGate);
+
+IF
+CharacterItemEvent(_,_PressurePlate,"CYS_TutPressurePlate_Off")
+AND
+DB_CYS_Tut_PressurePlate(_PressurePlate)
+THEN
+ItemCloseAndLock(ITEM_CYS_Tut_PressurePlateGate,"Story");
+//END_REGION
+
+//REGION Secret door 
+
+IF
+CharacterUsedItem(_Player,ITEM_CYS_TutorialButton1)
+THEN
+ItemSetCanInteract(ITEM_CYS_TutorialButton1,0);
+ItemUnlockAndOpen(ITEM_CYS_TUT_SecretDoor);
+
+//END_REGION
+
+//REGION Rats 
+IF
+DB_TutorialRat(_Char)
+THEN
+DB_Dialogs(_Char,"CYS_TUT_Rat");
+
+//END_REGION
+
+//REGION Exit
+IF
+CharacterUsedItem(_Player,ITEM_CYS_Tut_SentinelGate)
+AND
+NOT DB_OnlyOnce("UnlockTutorial")
+THEN
+DB_OnlyOnce("UnlockTutorial");
+ItemUnLock(ITEM_CYS_Tut_DoorExit2);
+DB_AutoSaveTrigger(TRIGGER_CYS_AUTOSAVE_TutorialExit);
+//END_REGION
+
+//REGION Entry 
+
+IF
+CharacterEnteredTrigger(_Player,TRIGGER_CYS_BoxTUTDungeonEntrance)
+THEN
+PROC_CheckPlayTut(_Player,"TUT_TutorialLog");
+ProcUnregisterRemindersForPlayer(_Player);
+//END_REGION
+
+//REGION Ragequin
+PROC
+ProcOneShotTriggerEntered(_Player, TRIGGER_CYS_TUT_SpawnRageQuin)
+THEN
+ItemPlayAnimation(ITEM_CYS_TUT_RagequinTomb, "open");
+TimerLaunch("CYS_TUT_Ragequin", 2500);
+
+IF
+TimerFinished("CYS_TUT_Ragequin")
+THEN
+CharacterAppear(CHARACTER_CYS_TUT_SkeletonBoss, 0);
+CharacterPlayAnimation(CHARACTER_CYS_TUT_SkeletonBoss, "Spawn_02", "Spawned");
+ItemDisplayText(ITEM_CYS_TUT_RagequinTomb, "Male-Skeleton-1_SOCIAL_Comment_Undead_Guards_1_1");
+
+IF
+CharacterEvent(CHARACTER_CYS_TUT_SkeletonBoss, "Spawned")
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_CYS_TUT_SkeletonBoss, _Player)
+THEN
+PROC_MendatoryDialog("CYS_Ragequin", CHARACTER_CYS_TUT_SkeletonBoss, _Player);
+
+IF
+DialogEnded("CYS_Ragequin", _)
+THEN
+CharacterSetFaction(CHARACTER_CYS_TUT_SkeletonBoss, "Evil NPC");
+CharacterAppear(CHARACTER_CYS_TUT_SkeletonBoss_Ranger_01, 1);
+CharacterAppear(CHARACTER_CYS_TUT_SkeletonBoss_Ranger_02, 1);
+QuestUpdate("HOM_Starstones","Ragequin");
+
+IF
+CharacterTemplateDied("CYS_TUT_RagequinGhost_6d8063ca-5a4b-42d3-b101-39d36daccd02")
+AND
+_Player.DB_IsPlayer()
+THEN
+PROC_CheckPlayTut(_Player,"TUT_Tooltips");
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

@@ -1,0 +1,54 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_ForbiddenPartyAnimal(CHARACTER_HOM_ForbiddenParty_Cat);
+DB_ForbiddenPartyAnimal(CHARACTER_HOM_ForbiddenParty_Chicken);
+DB_ForbiddenPartyAnimal(CHARACTER_HOM_ForbiddenParty_Crab);
+DB_ForbiddenPartyAnimal(CHARACTER_HOM_ForbiddenParty_Dog);
+DB_ForbiddenPartyAnimal(CHARACTER_HOM_ForbiddenParty_Pig);
+DB_ForbiddenPartyAnimal(CHARACTER_HOM_ForbiddenParty_Rabbit);
+DB_ForbiddenPartyAnimal(CHARACTER_HOM_ForbiddenParty_Rat);
+DB_ForbiddenPartyAnimal(CHARACTER_HOM_ForbiddenParty_Sheep);
+KBSECTION
+IF
+DB_ForbiddenPartyAnimal(_Animal)
+THEN
+CharacterSetOnStage(_Animal,0);
+PROC_ForbiddenPartyAnimal(_Animal);
+SetStoryNpc(_Animal,1);
+DB_DisableAttackReaction(_Animal);
+CharacterTeleportToTrigger(_Animal,TRIGGER_CentralRoomEntry,"");
+
+PROC
+PROC_ForbiddenPartyAnimal((CHARACTER)_Animal)
+AND
+Random(4800,_RandSec)
+AND
+IntegerProduct(_RandSec,1000,_RandTime)
+AND
+IntegerSum(_RandTime,120000,_DelayTime)
+AND
+CharacterGetUUID(_Animal,_TimerName)
+THEN
+DB_ForbiddenPartyTimerevents(_Animal,_TimerName);
+TimerLaunch(_TimerName,_DelayTime);
+
+IF
+TimerFinished(_TimerName)
+AND
+DB_ForbiddenPartyTimerevents(_Animal,_TimerName)
+THEN
+NOT DB_ForbiddenPartyTimerevents(_Animal,_TimerName);
+CharacterTeleportToTrigger(_Animal,TRIGGER_CentralRoomEntry,"");
+Foop(_Animal);
+ProcCharacterMoveToItem(_Animal,ITEM_HOM_TeleportToForbiddenZone,0,"ArrivalAtParty");
+PROC_ForbiddenPartyAnimal(_Animal);
+
+IF
+CharacterEvent(_Animal,"ArrivalAtParty")
+THEN
+Poof(_Animal);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

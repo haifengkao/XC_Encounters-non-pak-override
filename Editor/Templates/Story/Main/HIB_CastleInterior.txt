@@ -1,0 +1,35 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+//REGION TEST
+IF
+TextEventSet("alistair")
+THEN
+GlobalSetEvent("CYS_FabulousFiveEnlist");
+
+IF
+TextEventSet("hibfive")
+THEN
+GlobalSetEvent("CYS_FabulousFiveGaveQuest");
+
+IF
+TextEventSet("killbobo")
+THEN
+CharacterDie(CHARACTER_HIB_KingBoreas,0);
+
+IF
+TextEventSet("hibstaff")
+THEN
+ItemToCharacter(ITEM_HIB_ElementalStaff,CHARACTER_Player1);
+
+IF
+TextEventSet("sua")
+THEN
+ItemToCharacter(ITEM_HIB_FireRune,CHARACTER_Player2);
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

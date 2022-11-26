@@ -1,0 +1,129 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_HopTriggers(TRIGGER_CYS_ChestHop2,TRIGGER_CYS_ChestHop3,1);
+DB_HopTriggers(TRIGGER_CYS_ChestHop3,TRIGGER_CYS_ChestHop4,0);
+DB_HopTriggers(TRIGGER_CYS_ChestHop4,TRIGGER_CYS_ChestHop5,1);
+DB_HopTriggers(TRIGGER_CYS_ChestHop5,TRIGGER_CYS_ChestHop6,0);
+DB_HopTriggers(TRIGGER_CYS_ChestHop6,TRIGGER_CYS_ChestHop7,1);
+DB_HopTriggers(TRIGGER_CYS_ChestHop7,TRIGGER_CYS_ChestHop8,0);
+DB_HopTriggers(TRIGGER_CYS_ChestHop8,TRIGGER_CYS_ChestHop9,1);
+DB_HopTriggers(TRIGGER_CYS_ChestHop9,TRIGGER_CYS_ChestHop10,0);
+DB_HopTriggers(TRIGGER_CYS_ChestHop10,TRIGGER_CYS_ChestHop11,1);
+DB_HopTriggers(TRIGGER_CYS_ChestHop11,TRIGGER_CYS_ChestHop12,0);
+DB_HopTriggers(TRIGGER_CYS_ChestHop12,TRIGGER_CYS_ChestHop13,1);
+DB_HopTriggers(TRIGGER_CYS_ChestHop13,TRIGGER_CYS_ChestHop14,0);
+DB_HopTriggers(TRIGGER_CYS_ChestHop14,TRIGGER_CYS_ChestHop15,1);
+ProcTriggerRegisterForPlayers(TRIGGER_CYS_HoppingChestStart);
+CharacterSetOnStage(CHARACTER_CYS_HoppingBomb,0);
+ItemSetOwner(ITEM_CYS_HoppingChest,CHARACTER_LUC_PickAxeHolderHack);
+ItemSetOnlyOwnerCanUse(ITEM_CYS_HoppingChest,1);
+ItemApplyStatus(ITEM_CYS_HoppingChest, "BURNING", -1.0);
+DB_NoForbiddenText(ITEM_CYS_HoppingChest);
+KBSECTION
+IF
+ItemStatusRemoved(ITEM_CYS_HoppingChest,"BURNING")
+AND
+NOT DB_OnlyOnce("CYS_HoppingChestPutOut")
+THEN
+DB_OnlyOnce("CYS_HoppingChestPutOut");
+ItemDragToTrigger(ITEM_CYS_HoppingChest,TRIGGER_CYS_ChestHop1);
+TimerLaunch("CYS_HoppingChestPutOut3",1000);
+
+IF
+TimerFinished("CYS_HoppingChestPutOut3")
+THEN
+ItemDragToTrigger(ITEM_CYS_HoppingChest,TRIGGER_CYS_ChestHop2);
+DB_CYS_HoppingFirstMove(ITEM_CYS_HoppingChest);
+
+IF
+ItemMoved(ITEM_CYS_HoppingChest)
+AND
+DB_CYS_HoppingFirstMove(ITEM_CYS_HoppingChest)
+THEN
+NOT DB_CYS_HoppingFirstMove(ITEM_CYS_HoppingChest);
+ProcTriggerRegisterForPlayers(TRIGGER_CYS_ChestHop2);
+
+
+IF
+CharacterEnteredTrigger(_Character,_Trigger)
+AND
+DB_HopTriggers(_Trigger,_NextTrigger,_ShowDialog)
+AND
+NOT DB_OnlyOnce("CYS_StopHopping")
+THEN
+ProcTriggerUnregisterForPlayers(_Trigger);
+ItemDragToTrigger(ITEM_CYS_HoppingChest,_NextTrigger);
+PROC_HoppingChestDialog(_ShowDialog);
+CYS_HC_MovingTo(_NextTrigger);
+
+IF
+ItemMoved(ITEM_CYS_HoppingChest)
+AND
+CYS_HC_MovingTo(_NextTrigger)
+THEN
+NOT CYS_HC_MovingTo(_NextTrigger);
+ProcTriggerRegisterForPlayers(_NextTrigger);
+
+PROC
+PROC_HoppingChestDialog(1)
+AND
+NOT ITEM_CYS_HoppingChest.isBusy()
+THEN
+ITEM_CYS_HoppingChest.isBusy();
+DialogStartOneSpeakerItemDialog("CYS_AD_HoppingChest",ITEM_CYS_HoppingChest);
+
+IF
+AutomatedDialogEnded("CYS_AD_HoppingChest", _)
+THEN
+NOT ITEM_CYS_HoppingChest.isBusy();
+
+IF
+CharacterUsedItemFailed(_Character,ITEM_CYS_HoppingChest)
+AND
+NOT DB_OnlyOnce("CYS_HoppingChestPutOut")
+THEN
+ItemDisplayText(ITEM_CYS_HoppingChest,"CYS_HoppingChestHot");
+
+IF
+CharacterUsedItemFailed(_Character,ITEM_CYS_HoppingChest)
+AND
+DB_OnlyOnce("CYS_HoppingChestPutOut")
+AND
+NOT DB_OnlyOnce("CYS_StopHopping")
+AND
+ItemGetPosition(ITEM_CYS_HoppingChest,_X,_Y,_Z)
+THEN
+CharacterSetOnStage(CHARACTER_CYS_HoppingBomb,1);
+CharacterTeleportToPosition(CHARACTER_CYS_HoppingBomb,_X,_Y,_Z,"");
+TimerLaunch("CYS_HoppingBombAppeared",1000);
+DB_OnlyOnce("CYS_StopHopping");
+
+IF
+TimerFinished("CYS_HoppingBombAppeared")
+THEN
+ItemSetOnlyOwnerCanUse(ITEM_CYS_HoppingChest,0);
+CharacterDisplayText(CHARACTER_CYS_HoppingBomb,"CYS_HoppingBombAppeared");
+ProcCYSRemoveHoppingTriggers();
+GoalCompleted;
+
+PROC
+ProcCYSRemoveHoppingTriggers()
+AND
+DB_HopTriggers(_Trigger,_Trigger2,_Dia)
+THEN
+ProcTriggerUnregisterForPlayers(_Trigger);
+ProcTriggerUnregisterForPlayers(_Trigger2);
+NOT DB_HopTriggers(_Trigger,_Trigger2,_Dia);
+
+IF
+ItemDestroyed(ITEM_CYS_HoppingChest)
+AND
+NOT DB_OnlyOnce("CYS_StopHopping")
+THEN
+ProcCYSRemoveHoppingTriggers();
+GoalCompleted;
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

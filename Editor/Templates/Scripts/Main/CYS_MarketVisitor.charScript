@@ -1,0 +1,91 @@
+#INCLUDE PatrollingGuard
+
+INIT
+CHARACTER:__Me
+CHARACTER:%Previous
+INT:%StateGreet = 0
+INT:%StateCheer = 0
+INT:%StateTalk = 0
+
+USING PatrollingGuard
+
+BEHAVIOUR
+
+REACTION Greet, 1080
+USAGE PEACE
+VARS 
+	CHARACTER:_Character
+	FLOAT:_Dist
+	FLOAT:_Range
+	FIXEDSTRING:_Text
+CHECK "c1&!c2&c3"
+	CharacterGet(_Character,__Me,3,Lowest,Distance,null,null,null)
+	IsEqual(%Previous,_Character)
+	IsEqual(%StateGreet,0)
+ACTIONS	
+	Set(%StateGreet,1)
+	Set(%Previous,_Character)
+	CharacterLookAt(_Character)
+	GetRandom(_Text, "CYS_Greeting_1","CYS_Greeting_2")
+	DisplayText(__Me,_Text,3)
+	CharacterPlayAnimation("emotion_greeting")
+	StartTimer("CanGreetAgain",50,0)
+	Sleep(2)
+INTERRUPT
+	Reset()
+	
+REACTION TalkToOtherVisitor, 1080
+USAGE PEACE
+VARS
+	CHARACTER:_OtherVisitor = CYS_MarketVisitor1_70dc1f9c-8d05-46ec-a2c4-1bba78dbd5db
+CHECK "c1&c2"
+	CharacterInTouchRange(__Me, _OtherVisitor)
+	IsEqual(%StateTalk,0)
+ACTIONS
+	Set(%StateTalk,1)
+	CharacterLookAt(_OtherVisitor)
+	CharacterEvent(_OtherVisitor, "CYS_StartMarketDialog")
+	CharacterPlayAnimation("emotion_greeting")
+	StartTimer("CanStartAgain",100,0)
+	Sleep(1)
+INTERRUPT
+	Reset()
+
+REACTION ReactOnArtist, 1080
+USAGE PEACE
+VARS
+	CHARACTER:_Artist = CYS_MarketArtist_97653f01-1d76-4c70-97cf-a3d2172b2b2f
+	FIXEDSTRING:_Animation
+CHECK "c1&c2&c3"
+	IsRandom(0.5)
+	CharacterInTouchRange(__Me, _Artist)
+	IsEqual(%StateCheer,0)
+ACTIONS
+	Set(%StateCheer,1)
+	CharacterLookAt(_Artist)
+	GetRandom(_Animation,"Clap_03","Cheer_01","Clap_02","Cheer_02")
+	CharacterPlayAnimation(_Animation)
+	StartTimer("ArtistCheer", 10, 0)
+
+EVENTS
+
+EVENT CanStartDialog
+ON
+	OnTimer("CanStartAgain")
+ACTIONS
+	Set(%StateTalk,0)
+
+EVENT CanCheer
+ON 
+	OnTimer("ArtistCheer")
+ACTIONS
+	Set(%StateCheer,0)
+
+EVENT CanGreet
+ON
+	OnTimer("CanGreetAgain")
+ACTIONS
+	Set(%StateGreet,0)
+
+	
+	

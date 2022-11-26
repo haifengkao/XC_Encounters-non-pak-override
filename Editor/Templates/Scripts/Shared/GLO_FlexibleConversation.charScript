@@ -1,0 +1,158 @@
+#INCLUDE State_Manager
+INIT
+	
+	USING State_Manager	
+	CHARACTER:__Me
+	FIXEDSTRING:%startingState="State_DoingVariousActions"
+	EXTERN CHARACTER:%ConversationPartner=null
+	EXTERN INT:%bool_AmPartOfConversation=0
+	EXTERN INT:%int_ConversationPriority=500
+	EXTERN STRING:%string_Dialogue=""
+	EXTERN FLOAT:%int_ConversationPause=80.0	
+	EXTERN INT:%int_HowManyActions=0
+	EXTERN ITEM:%Extra01=null
+	EXTERN ITEM:%Extra02=null
+	EXTERN ITEM:%Extra03=null
+	EXTERN INT:%int_ChancesOfAction01=1
+	EXTERN INT:%int_ChancesOfAction02=1
+	EXTERN INT:%int_ChancesOfAction03=1
+	EXTERN INT:%int_ChancesOfWait=3
+	EXTERN INT:%bool_MoveToExtra01=0
+	EXTERN INT:%bool_MoveToExtra02=0
+	EXTERN INT:%bool_MoveToExtra03=0
+	EXTERN FLOAT:%float_MinimumSleep=3.0
+	EXTERN FLOAT:%float_MaximumSleep=6.0		
+	EXTERN FIXEDSTRING:%string_Anim01=""
+	EXTERN FIXEDSTRING:%string_Anim02=""
+	EXTERN FIXEDSTRING:%string_Anim03=""
+	
+//---------------------------------
+BEHAVIOUR
+REACTION State_DoingVariousActions,0
+	USAGE PEACE
+	CHECK "!c1"
+		IsEqual(%bool_AmPartOfConversation,1)
+	ACTIONS
+		IF "c1"
+			IsEqual(%int_HowManyActions,1)
+		THEN
+			GetWeightedRandom(%currentAction,"Action_Action01",INT:%int_ChancesOfAction01,"Action_Wait",INT:%int_ChancesOfWait)
+			SetPriority(%currentAction, 1100)			
+		ELIF "c1"
+			IsEqual(%int_HowManyActions,2)
+		THEN
+			GetWeightedRandom(%currentAction,"Action_Action01",INT:%int_ChancesOfAction01,"Action_Action02",INT:%int_ChancesOfAction02,"Action_Wait",INT:%int_ChancesOfWait)
+			SetPriority(%currentAction, 1100)			
+		ELIF "c1"
+			IsEqual(%int_HowManyActions,3)
+		THEN
+			GetWeightedRandom(%currentAction,"Action_Action01",INT:%int_ChancesOfAction01,"Action_Action02",INT:%int_ChancesOfAction02,"Action_Action03",INT:%int_ChancesOfAction03,"Action_Wait",INT:%int_ChancesOfWait)
+			SetPriority(%currentAction, 1100)
+		ENDIF
+		
+REACTION Action_Action01, 0
+	USAGE PEACE
+	ACTIONS
+		IF "!c1&c2"
+			IsEqual(%Extra01,null)			
+			IsEqual(%bool_MoveToExtra01,1)
+		THEN
+			CharacterMoveTo(%Extra01,0,0,0,0.5)
+			CharacterLookAt(%Extra01)
+		ELIF "!c1"
+			IsEqual(%Extra01,null)
+		THEN
+			CharacterLookAt(%Extra01)
+		ENDIF
+		IF "!c1"
+			IsEqual(%string_Anim01,null)
+		THEN
+			CharacterPlayAnimation(%string_Anim01)
+		ENDIF
+		SetPriority(%currentAction,0)
+		
+REACTION Action_Action02, 0
+	USAGE PEACE
+	ACTIONS
+		IF "!c1&c2"
+			IsEqual(%Extra02,null)			
+			IsEqual(%bool_MoveToExtra02,1)
+		THEN
+			CharacterMoveTo(%Extra02,0,0,0,0.5)
+			CharacterLookAt(%Extra02)
+		ELIF "!c1"
+			IsEqual(%Extra02,null)
+		THEN
+			CharacterLookAt(%Extra02)
+		ENDIF
+		IF "!c1"
+			IsEqual(%string_Anim02,null)
+		THEN
+			CharacterPlayAnimation(%string_Anim02)
+		ENDIF
+		SetPriority(%currentAction,0)
+
+REACTION Action_Action03, 0
+	USAGE PEACE
+	ACTIONS
+		IF "!c1&c2"
+			IsEqual(%Extra03,null)			
+			IsEqual(%bool_MoveToExtra03,1)
+		THEN
+			CharacterMoveTo(%Extra03,0,0,0,0.5)
+			CharacterLookAt(%Extra03)
+		ELIF "!c1"
+			IsEqual(%Extra03,null)
+		THEN
+			CharacterLookAt(%Extra03)
+		ENDIF
+		IF "!c1"
+			IsEqual(%string_Anim03,null)
+		THEN
+			CharacterPlayAnimation(%string_Anim03)
+		ENDIF
+		SetPriority(%currentAction,0)	
+		
+REACTION Action_Wait, 0
+	USAGE PEACE
+	VARS
+		FLOAT:_SleepValue
+	ACTIONS
+		GetRandomBetween(_SleepValue,%float_MinimumSleep,%float_MaximumSleep)
+		Sleep(_SleepValue)
+		SetPriority(%currentAction,0)
+
+REACTION TalkAboutStuff, 0
+	USAGE PEACE
+	CHECK "c1&!c2&!c3&!c4&!c5"
+		IsEqual(%bool_AmPartOfConversation,1)
+		IsInDialog(__Me)
+		IsInDialog(%ConversationPartner)
+		CharacterIsDead(%ConversationPartner)
+		CharacterIsDead(__Me)
+	ACTIONS
+		DialogStart(%string_Dialogue,%ConversationPartner,__Me)
+		StartTimer("HIB_TiredCultists_CorpseTalk_Timer",%int_ConversationPause,0)
+		SetPriority("TalkAboutStuff",0)
+		
+//---------------------------------
+EVENTS
+EVENT OnInitSetConversationPriority
+ON
+	OnInit()
+ACTIONS
+	SetPriority("TalkAboutStuff",%int_ConversationPriority)
+	Set(%currentState,%startingState)
+	
+EVENT TalkAgainTimer
+ON
+	OnTimer("HIB_TiredCultists_CorpseTalk_Timer")
+ACTIONS
+	SetPriority("TalkAboutStuff",%int_ConversationPriority)
+	
+EVENT TakingDamageInterruptDialogue
+ON
+	OnDamage(_,_,_,_)
+	OnCombatStarted()
+ACTIONS
+	DialogRequestStop(%string_Dialogue)

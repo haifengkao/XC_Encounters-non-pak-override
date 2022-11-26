@@ -1,0 +1,56 @@
+INIT
+CHARACTER:__Me
+CHARACTER:%Bob = DAF_BO_Excecutioner_b60ca8fd-6450-45d4-83b6-c356b8e8e0ef
+
+BEHAVIOUR
+
+REACTION ReactOnPlayer, 0
+USAGE PEACE
+VARS
+	CHARACTER:_Player
+	FLOAT:_Dist
+ACTIONS
+	IF "c1&c2&c3&c4&c5&!c6"
+		GetClosestPlayer(_Player)
+		GetDistance(_Dist,__Me,_Player)
+		IsLessThen(_Dist,10.0)
+		GetDistance(_Dist,__Me,%Bob)
+		IsLessThen(_Dist,5.0)
+		IsInDialog(%Bob)
+	THEN
+		CharacterLookAt(_Player)
+		DialogStart("DAF_AD_Priest1",__Me,%Bob)
+	ENDIF
+	Sleep(10)
+	SetPriority("ReactOnPlayer",0)
+
+
+REACTION ChooseAction, 1060
+USAGE PEACE
+VARS
+	FLOAT:_Dist
+	CHARACTER:_Player
+ACTIONS
+	IF "c1&c2&!c3"
+		GetDistance(_Dist,__Me,%Bob)
+		IsLessThen(_Dist,5.0)
+		IsInDialog(%Bob)
+	THEN
+		CharacterLookAt(%Bob)
+		DialogStart("DAF_AD_Priest2",__Me,%Bob)
+	ENDIF
+	Sleep(10)
+
+EVENTS
+EVENT PlayerNoticed
+ON
+	OnCharacterEvent(__Me,"PlayerNoticed")
+ACTIONS
+	SetPriority("ReactOnPlayer",1200)
+	
+EVENT CombatStopsDialog
+ON
+	OnCombatStarted()
+ACTIONS
+	DialogRequestStop("DAF_AD_Priest1")
+	DialogRequestStop("DAF_AD_Priest2")

@@ -1,0 +1,158 @@
+INIT
+
+CHARACTER:__Me
+CHARACTERTEMPLATE:%MaleGhostTemplate=Orcs_Ghost_Male_e17fae76-472b-4c5e-9a42-04865fca3f34
+CHARACTERTEMPLATE:%FemaleGhostTemplate=Orcs_Ghost_Female_5aa2e3e3-4d81-40e7-96d1-f02567c48438
+EXTERN INT:%MaleSummoningStartsAt=3
+EXTERN INT:%MaleSummoningFrequency=3
+EXTERN INT:%MaleSummoningPriority=500
+EXTERN INT:%FemaleSummoningStartsAt=1
+EXTERN INT:%FemaleSummoningFrequency=3
+EXTERN INT:%FemaleSummoningPriority=550
+
+//-----------------------------------
+BEHAVIOUR
+REACTION SummonMaleGhost, 0
+USAGE COMBAT
+VARS
+	INT:_FailedHowManyTimes=0
+	INT:_BraoggSummonStatus=0
+	CHARACTER:_Player
+	CHARACTER:_MaleGhost
+	FLOAT:_Angle
+	FLOAT:_Dist
+	FLOAT3:_MyPosition
+	FLOAT3:_PosOffset
+CHECK "c1&!c2&!c3&!c4&!c5&!c6&!c7"
+	CharacterGet(_Player,__Me,50,Lowest,Distance,Enemy)
+	CharacterHasStatus(__Me,CHARMED)
+	CharacterHasStatus(__Me,PETRIFIED)
+	CharacterHasStatus(__Me,FEAR)
+	CharacterHasStatus(__Me,STUNNED)
+	CharacterHasStatus(__Me,MUTED)
+	CharacterHasStatus(__Me,FEAR)
+ACTIONS
+	CharacterLookAt(_Player)
+	WHILE "c1&c2"
+		IsLessThen(_BraoggSummonStatus,6)
+		IsLessThen(_FailedHowManyTimes,30)
+	DO
+		IF "c1"
+			GetPosition(__Me,_MyPosition)
+		THEN
+			Set(_PosOffset,{1;0;0}) 
+			GetRandomBetween(_Angle,-270,90)
+			GetRandomBetween(_Dist,2.5,3.5)
+			RotateY(_PosOffset,_Angle)
+			Multiply(_PosOffset,_Dist)	
+			Add(_MyPosition,_PosOffset)
+		ENDIF
+		IF "c1"
+			FindValidPosition(_MyPosition,3)	
+		THEN
+			CharacterPlayEffect(__Me,"FX_Skills_Air_ChillyWind_Prepare_A","Dummy_CastFX")
+			CharacterPlayAnimation("cast_shout_cast",0,0)	
+			IF "c1"
+				IsEqual(_BraoggSummonStatus,1)
+			THEN	
+				Sleep(3)
+				PlayEffectAt(_MyPosition,("FX_GP_TeleportSmoke_A")
+				SpawnCharacter(_MaleGhost,%MaleGhostTemplate,_MyPosition,1)
+				Set(%MaleSummoningStartsAt,0)
+				Sleep(1)
+			ENDIF
+			Add(_BraoggSummonStatus,1)
+		ELSE
+			Add(_FailedHowManyTimes,1)
+		ENDIF
+	ENDWHILE
+		IF "c1"
+			IsEqual(_FailedHowManyTimes,30)
+		THEN
+			//CharacterEndTurn()
+			SetPriority("SummonMaleGhost",0)	
+		ENDIF
+	//CharacterEndTurn()
+	SetPriority("SummonMaleGhost",0)
+
+REACTION SummonFemaleGhost, 0
+USAGE COMBAT
+VARS
+	INT:_FailedHowManyTimes=0
+	INT:_BraoggSummonStatus=0
+	CHARACTER:_Player
+	CHARACTER:_FemaleGhost
+	FLOAT:_Angle
+	FLOAT:_Dist
+	FLOAT3:_MyPosition
+	FLOAT3:_PosOffset
+CHECK "c1&!c2&!c3&!c4&!c5&!c6"
+	CharacterGet(_Player,__Me,50,Lowest,Distance,Enemy)
+	CharacterHasStatus(__Me,CHARMED)
+	CharacterHasStatus(__Me,PETRIFIED)
+	CharacterHasStatus(__Me,FEAR)
+	CharacterHasStatus(__Me,STUNNED)
+	CharacterHasStatus(__Me,MUTED)
+ACTIONS
+	CharacterLookAt(_Player)
+	WHILE "c1&c2"
+		IsLessThen(_BraoggSummonStatus,6)
+		IsLessThen(_FailedHowManyTimes,30)
+	DO
+		IF "c1"
+			GetPosition(__Me,_MyPosition)
+		THEN
+			Set(_PosOffset,{1;0;0}) 
+			GetRandomBetween(_Angle,-270,90)
+			GetRandomBetween(_Dist,2.5,3.5)
+			RotateY(_PosOffset,_Angle)
+			Multiply(_PosOffset,_Dist)	
+			Add(_MyPosition,_PosOffset)
+		ENDIF
+		IF "c1"
+			FindValidPosition(_MyPosition,3)	
+		THEN
+			CharacterPlayEffect(__Me,"FX_Skills_Air_ChillyWind_Prepare_A","Dummy_CastFX")
+			CharacterPlayAnimation("cast_shout_cast",0,0)			
+			IF "c1"
+				IsEqual(_BraoggSummonStatus,1)
+			THEN	
+				Sleep(3)
+				PlayEffectAt(_MyPosition,("FX_GP_TeleportSmoke_A")
+				SpawnCharacter(_FemaleGhost,%FemaleGhostTemplate,_MyPosition,1)
+				Set(%FemaleSummoningStartsAt,0)
+				Sleep(1)
+			ENDIF
+			Add(_BraoggSummonStatus,1)
+		ELSE
+			Add(_FailedHowManyTimes,1)
+		ENDIF
+	ENDWHILE
+		IF "c1"
+			IsEqual(_FailedHowManyTimes,30)
+		THEN
+			CharacterEndTurn()	
+		ENDIF
+	CharacterEndTurn()
+	SetPriority("SummonFemaleGhost",0)
+	
+//-------------------
+EVENTS
+EVENT SetSummoningFrequency
+ON
+	OnTurn()
+ACTIONS
+	IF "c1"
+		IsLessThen(%MaleSummoningStartsAt,%MaleSummoningFrequency)
+	THEN		
+		Add(%MaleSummoningStartsAt,1)
+	ELSE
+		SetPriority("SummonMaleGhost",%MaleSummoningPriority)
+	ENDIF	
+	IF "c1"
+		IsLessThen(%FemaleSummoningStartsAt,%FemaleSummoningFrequency)
+	THEN		
+		Add(%FemaleSummoningStartsAt,1)
+	ELSE
+		SetPriority("SummonFemaleGhost",%FemaleSummoningPriority)
+	ENDIF	

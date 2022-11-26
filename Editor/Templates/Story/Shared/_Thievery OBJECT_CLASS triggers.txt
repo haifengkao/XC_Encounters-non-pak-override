@@ -1,0 +1,409 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_DontUseDialogs("Default_DontUseMyStuff");
+KBSECTION
+/////////////////////////////////////////////////////////////////////////////////////////////
+//
+// the events triggering all
+//
+// the following rules call
+//		DisapproveTheft/3
+//		ReactOnTheft/2
+//
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
+// object class theft caught redhanded
+//
+
+// NOTE: amoral npcs never comment on thievery
+
+// 1) Upon getting the event, update the thievery facts:
+// delete facts of previous thievery detected:
+// assert new facts:
+IF
+CharacterSpottedItemTemplateTheft_Redhanded(_Player,_Spotter,_Owner,_ObjectClass,_Amount,_ClassValue,_Handle,_CrimeID,_X,_Y,_Z,_Pitch,_Yaw,_Roll,_Container)
+AND
+CharacterIsTagged(_Spotter,"Animal",0)
+AND
+NOT NoStealingReaction(_Spotter)
+AND
+NOT DB_NoDefaultBehavior(_Spotter)
+AND
+NOT DB_Combat(_Spotter,_)
+AND
+NOT DB_Amoral(_Spotter)
+AND
+NOT DB_EvilDude(_Owner)
+AND
+NOT DB_NoThieveryBehavior(_Player,1) 
+AND
+IntegerProduct(_ClassValue,_Amount,_Value)
+AND
+NOT DB_CrimeHandled(_Player,_CrimeID)
+THEN
+DeleteThieveryFacts(_Player,1);
+DB_CrimeHandled(_Player,_CrimeID);
+DB_ValueStolen(_Player,_Value);
+ObjectClassStolen(_Player,_ObjectClass,_Amount,_Handle,_Container);
+//DB_StoleFrom(_Player,_Spotter,_Owner,_Value);
+DB_StolenObjectClassOriginalTransform(_ObjectClass,_X,_Y,_Z,_Pitch,_Yaw,_Roll);
+ProcessTheftEvent(_Player,_Spotter,_Owner);
+
+//player steals while the spotter is in combat, but not with the CHARACTER_Player1
+//we fallback to make the NPC hostile to the player
+IF
+CharacterSpottedItemTemplateTheft_Redhanded(_Player,_Spotter,_Owner,_ObjectClass,_Amount,_ClassValue,_Handle,_CrimeID,_,_,_,_,_,_,_)
+AND
+NOT NoStealingReaction(_Spotter)
+AND
+CharacterIsTagged(_Spotter,"Animal",0)
+AND
+NOT DB_NoDefaultBehavior(_Spotter)
+AND
+DB_Combat(_Spotter,_ID)
+AND
+NOT DB_Combat(_Player,_ID)
+AND
+NOT DB_CrimeHandled(_Player,_CrimeID)
+THEN
+DB_CrimeHandled(_Player,_CrimeID);
+ProcMakeNPCHostile(_Player,_Spotter);
+
+/*//we either get the ADD event OR the stack event
+IF
+ItemTemplateAddedToCharacter(_ObjectClass,_Handle,_Player)
+AND
+ObjectClassStolen(_Player,_ObjectClass,_Amount,_Handle,_Container)
+AND
+DB_StoleFrom(_Player,_Spotter,_Owner,_Value)
+THEN
+NOT DB_StoleFrom(_Player,_Spotter,_Owner,_Value);
+ProcessTheftEvent(_Player,_Spotter,_Owner);
+
+//If items are stacked, the original handle is destroyed
+//so update the database and use the stack as the stolen object
+IF
+ItemStackedWith(_Handle,_NewStackHandle)
+AND
+ObjectClassStolen(_Player,_ObjectClass,_Amount,_Handle,_Container)
+AND
+DB_StoleFrom(_Player,_Spotter,_Owner,_Value)
+THEN
+NOT DB_StoleFrom(_Player,_Spotter,_Owner,_Value);
+NOT ObjectClassStolen(_Player,_ObjectClass,_Amount,_Handle,_Container);
+ObjectClassStolen(_Player,_ObjectClass,_Amount,_NewStackHandle,_Container);
+ProcessTheftEvent(_Player,_Spotter,_Owner);
+*/
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
+// object class theft by evidence (while trading)
+//
+
+// nothing: we say that's impossible
+
+
+//Object class chest usage
+
+IF
+CharacterSpottedItemTemplateUsed_Redhanded(_Player,_Spotter,_Owner,_Temp,_CrimeID)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT PlayerInPrison(_Player,_)
+AND
+CharacterIsTagged(_Spotter,"Animal",0)
+AND
+NOT NoStealingReaction(_Spotter)
+AND
+DB_Combat(_Spotter,_ID)
+AND
+NOT DB_Combat(_Player,_ID)
+AND
+NOT DB_CrimeHandled(_Player,_CrimeID)
+AND
+ItemTemplateCanSitOn(_Temp,0)
+THEN
+DB_CrimeHandled(_Player,_CrimeID);
+ProcMakeNPCHostile(_Player,_Spotter);
+
+IF
+CharacterSpottedItemTemplateUsed_Redhanded(_Player,_Spotter,_Owner,_Temp,_CrimeID)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT PlayerInPrison(_Player,_)
+AND
+CharacterIsTagged(_Spotter,"Animal",0)
+AND
+NOT DB_NoDefaultBehavior(_Spotter)
+AND
+NOT DB_Combat(_Spotter,_)
+AND
+NOT DB_Combat(_Player,_)
+AND
+NOT DB_CrimeHandled(_Player,_CrimeID)
+AND
+ItemTemplateCanSitOn(_Temp,0)
+AND
+NOT NoStealingReaction(_Spotter)
+THEN
+DB_CrimeHandled(_Player,_CrimeID);
+DeleteThieveryFacts(_Player,1);	
+ProcUseCheckCrime(_Player,_Spotter);
+
+PROC
+ProcUseCheckCrime((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_CrimeInProgress(_OtherPlayer,_Npc,_)
+AND
+_Player!=_OtherPlayer
+THEN
+DB_DoUseCrimeInterrupt(1);
+
+PROC
+ProcUseCheckCrime((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_CrimeInProgress(_,_Npc,_Reason)
+AND
+_Reason!="Using"
+THEN
+DB_DoUseCrimeInterrupt(1);
+
+PROC
+ProcUseCheckCrime((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_DoUseCrimeInterrupt(1)
+THEN
+ProcHandleCrimeInterrupt(_Player,_Npc);
+
+PROC
+ProcUseCheckCrime((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT DB_DoUseCrimeInterrupt(1)
+THEN
+ProcWarnPlayerOfUsingStuff(_Player,_Npc);
+
+PROC
+ProcWarnPlayerOfUsingStuff((CHARACTER)_Player,(CHARACTER)_Npc)
+THEN
+DB_CrimeInProgress(_Player,_Npc,"Using");
+
+PROC
+ProcWarnPlayerOfUsingStuff((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT DB_UseWarnings(_Player,_Npc,_)
+THEN
+DB_UseWarnings(_Player,_Npc,0);
+
+PROC
+ProcWarnPlayerOfUsingStuff((CHARACTER)_Player,(CHARACTER)_Npc)
+THEN
+DecreaseAttitude(_Player,_Npc,10);
+
+PROC
+ProcWarnPlayerOfUsingStuff((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_UseWarnings(_Player,_Npc,_Warns)
+AND
+IntegerSum(_Warns,1,_New)
+THEN
+NOT DB_UseWarnings(_Player,_Npc,_Warns);
+DB_UseWarnings(_Player,_Npc,_New);
+
+PROC
+PreStartDialog((CHARACTER)_Player,(CHARACTER)_Npc,(STRING)_Dialog)
+AND
+DB_DontUseDialogs(_Dialog)
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_UsingWasWarnedBefore",0);
+SetAndRememberDialogEvent(_Player,"EVENT_UsingCallingGuards",0);
+
+PROC
+PreStartDialog((CHARACTER)_Player,(CHARACTER)_Npc,(STRING)_Dialog)
+AND
+DB_DontUseDialogs(_Dialog)
+AND
+DB_UseWarnings(_Player,_Npc,_Warns)
+AND
+_Warns>1
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_UsingWasWarnedBefore",1);
+
+PROC
+PreStartDialog((CHARACTER)_Player,(CHARACTER)_Npc,(STRING)_Dialog)
+AND
+DB_DontUseDialogs(_Dialog)
+AND
+DB_UseWarnings(_Player,_Npc,_Warns)
+AND
+_Warns>2
+AND
+DB_InRegion(_Player,_Region)
+AND
+GuardedRegion(_Region,_,_,_) 
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_UsingCallingGuards",1);
+
+IF
+DialogEnded(_Dialog,_Inst)
+AND
+DB_DontUseDialogs(_Dialog)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+THEN
+NOT DB_CrimeInProgress(_Player,_Npc,"Using");
+
+PROC
+ProcWarnPlayerOfUsingStuff((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT DB_CustomDontUseDialog(_Npc, _)
+AND
+DB_UseWarnings(_Player,_Npc,_Warns)	
+AND
+_Warns<=2
+THEN	
+DialogRequestStopForCharacter(_Npc);
+NOT _Npc.DB_IsInDialog();
+ProcLaunchOverheadDialogReplacement(_Npc);
+SetAndStartDialog(_Player,_Npc,"Default_DontUseMyStuff");
+
+PROC
+ProcWarnPlayerOfUsingStuff((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_CustomDontUseDialog(_Npc, _Dialog)
+AND
+DB_UseWarnings(_Player,_Npc,_Warns)	
+AND
+_Warns<=2
+THEN	
+DialogRequestStopForCharacter(_Npc);
+ProcLaunchOverheadDialogReplacement(_Npc);
+NOT _Npc.DB_IsInDialog();
+SetAndStartDialog(_Player,_Npc,_Dialog);
+
+PROC
+ProcWarnPlayerOfUsingStuff((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_UseWarnings(_Player,_Npc,_Warns)	
+AND
+_Warns>2
+THEN	
+DialogRequestStopForCharacter(_Npc);
+NOT _Npc.DB_IsInDialog();
+NOT DB_NpcGotHelp(_Npc);
+ProcCheckIfHostile(_Player,_Npc);
+ProcCallGuardsIfNotHostile(_Player,_Npc);
+
+PROC
+ProcSetHostileGuardSummonReason((CHARACTER)_Player)
+AND
+SummonedGuards(_Player,_Region,_Type,_N,_OldReason,_ID)
+THEN
+NOT SummonedGuards(_Player,_Region,_Type,_N,_OldReason,_ID);
+SummonedGuards(_Player,_Region,_Type,_N,5,_ID);
+
+PROC
+ProcCallGuardsIfNotHostile((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_IsHostile(_Player,_Npc)
+THEN
+ProcSetHostileGuardSummonReason(_Player);
+DoRevenge(_Player,_Npc,5);	// reason is not really so important here //TODO define ACTION_THEFT_FROM_ME
+
+PROC
+ProcCallGuardsIfNotHostile((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT DB_IsHostile(_Player,_Npc)
+THEN
+OverrideGuardDialog(_Player,"Called_Guard_Disturb_peace");		// override the default guard dialog
+TryCallGuards(_Player,_Npc,1);		// reason is not really so important here //TODO define ACTION_THEFT_FROM_ME
+
+PROC
+ProcWarnPlayerOfUsingStuff((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT DB_CustomDontUseDialog(_Npc, _)
+AND
+DB_UseWarnings(_Player,_Npc,_Warns)	
+AND
+_Warns>2
+AND
+DB_NpcGotHelp(_Npc)
+THEN
+SetAndStartDialog(_Player,_Npc,"Default_DontUseMyStuff");
+
+PROC
+ProcWarnPlayerOfUsingStuff((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_CustomDontUseDialog(_Npc, _Dialog)
+AND
+DB_UseWarnings(_Player,_Npc,_Warns)	
+AND
+_Warns>2
+AND
+DB_NpcGotHelp(_Npc)
+THEN
+SetAndStartDialog(_Player,_Npc,_Dialog);
+
+IF		
+DialogEnded(_Dialog,_Inst)
+AND
+DB_DontUseDialogs(_Dialog)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+AND
+DB_UseWarnings(_Player,_Npc,_Warns)	
+AND
+_Warns>2
+AND
+DB_NpcGotHelp(_Npc)
+THEN	
+ProcCheckGuardsShowedUp(_Player,_Npc);
+NOT DB_NpcGotHelp(_Npc);
+
+PROC
+ProcCheckGuardsShowedUp((CHARACTER)_Player,(CHARACTER)_)
+THEN
+GetGuardsPronto(_Player,1);
+
+PROC
+ProcCheckGuardsShowedUp((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT DB_GotActualGuardHelp(_Player,1)
+THEN
+NOT OverrideGuardDialog(_Player,"Called_Guard_Disturb_peace");	
+ProcLaunchOverheadDialogReplacement(_Npc);
+ProcStartAttackDialog(_Player,_Npc,"I_attack_you");
+
+//failed to call guards, so go hostile
+PROC
+ProcWarnPlayerOfUsingStuff((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_UseWarnings(_Player,_Npc,_Warns)	
+AND
+_Warns>2
+AND
+NOT DB_NpcGotHelp(_Npc)
+THEN
+NOT OverrideGuardDialog(_Player,"Called_Guard_Disturb_peace");	
+ProcLaunchOverheadDialogReplacement(_Npc);
+ProcStartAttackDialog(_Player,_Npc,"I_attack_you");
+
+
+IF
+DB_CustomDontUseDialog((CHARACTER)_Char, (STRING)_Dialog)
+AND
+NOT DB_DontUseDialogs(_Dialog)
+THEN
+DB_DontUseDialogs(_Dialog);
+EXITSECTION
+
+ENDEXITSECTION

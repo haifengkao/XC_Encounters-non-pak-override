@@ -1,0 +1,119 @@
+#TEMPLATE "_SKILL_Base" : Jump_EnemyTacticalRetreat
+
+INIT
+CHARACTER:__Me
+FLOAT:%SkillTargetScore_Jump_EnemyTacticalRetreat=-1000000
+// [GLOBAL_VARS]
+INT:%ClassScore_Jump_EnemyTacticalRetreat
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_Jump_EnemyTacticalRetreat
+VARS
+	// [CALC_VARS]
+	FLOAT:_StatVitality
+	FLOAT:_SkillRangeMin
+	FLOAT:_SkillRangeMax
+	FLOAT3:_TargetPos
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_Jump_EnemyTacticalRetreat")
+ACTIONS
+	Set(%SkillTargetScore_Jump_EnemyTacticalRetreat, -1000000)
+
+	// [CALC_ACTIONS_PRE]
+	Set(%ClassScore_Jump_EnemyTacticalRetreat, 0)
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	IF "((c1&c2)|c3)&(!((c4)|c5))"
+	    CharacterGetStat(_StatVitality, __Me, Vitality) // c1
+	    IsLessThen(_StatVitality, 0.5) // c2
+	    IsLessThen(_StatVitality, 0.2) // c3
+	    CharacterHasStatus(__Me, FORTIFIED) // c4
+	    CharacterHasStatus(__Me, BLESSED) // c5
+	THEN
+	    IF "(c1)&(c2)"
+	        CharacterGetSkillRange(_SkillRangeMin, _SkillRangeMax, __Me, Jump_EnemyTacticalRetreat) // c1
+	        FindPosition(_TargetPos, __Me, _SkillRangeMax, 5.0, __Me, -1, -1, -1, 0) // c2
+	    THEN
+	        Set(%SkillTargetPos_Jump_EnemyTacticalRetreat, _TargetPos)
+	        Add(%ActionScore_Jump_EnemyTacticalRetreat, 20.0)
+	    ELSE 
+	        IterateCharactersInCombat(__Me, "CalculateTarget_Jump_EnemyTacticalRetreat", Random, Vitality)
+	        IF "!c1"
+	        	IsEqual(%SkillTargetChar_Jump_EnemyTacticalRetreat, null)
+	        THEN
+	        	Add(%ActionScore_Jump_EnemyTacticalRetreat, %SkillTargetScore_Jump_EnemyTacticalRetreat)
+	        ENDIF
+	    ENDIF
+	ENDIF
+	// [~CALC_ACTIONS]
+
+	
+
+	
+// Calculate the character we should attack
+EVENT CalculateTarget_Jump_EnemyTacticalRetreat
+VARS	
+	CHARACTER:_Char
+	// [CALC_TARGET_VARS]
+	INT:_ClassScore_Jump_EnemyTacticalRetreat
+	FLOAT:_Score
+	INT:_EnemiesInRange
+	// [~CALC_TARGET_VARS]
+ON
+	OnIterateCharacter(_Char, "CalculateTarget_Jump_EnemyTacticalRetreat")	
+ACTIONS
+	// [CALC_CHAR_TARGET_ACTIONS_PRE]
+	Set(_ClassScore_Jump_EnemyTacticalRetreat, %ClassScore_Jump_EnemyTacticalRetreat)
+	Set(_Score, 0.0)
+	// [~CALC_CHAR_TARGET_ACTIONS_PRE]
+	// [CALC_CHAR_TARGET_ACTIONS]
+	IF "(!c1&!c2&!c3)&(c4)&(!c5&c6)&(c7)"
+	    CharacterIsDead(_Char) // c1
+	    CharacterHasStatus(_Char, INVISIBLE) // c2
+	    CharacterHasStatus(_Char, SNEAKING) // c3
+	    CharacterIsBetterOrEqualClass(_Char, %ClassScore_Jump_EnemyTacticalRetreat, _ClassScore_Jump_EnemyTacticalRetreat, 4, 1, 2, 5, 3) // c4
+	    IsEqual(__Me, _Char) // c5
+	    CharacterIsAlly(__Me, _Char) // c6
+	    CharacterCount(_EnemiesInRange, _Char, 5, Enemy, null) // c7
+	THEN
+	    Set(%ClassScore_Jump_EnemyTacticalRetreat, _ClassScore_Jump_EnemyTacticalRetreat)
+	    // Hostile count score calculation
+	    Add(_Score, 10.0) // HostileWeight
+	    
+	    // NoEnemiesNearTarget score calculation
+	    IF "(c1)"
+	        IsEqual(_EnemiesInRange, 0) // c1
+	    THEN
+	        Add(_Score, 5.0)
+	    ENDIF
+	    
+	    // Can see score calculation
+	    IF "!c1"
+	    	CharacterCanSee(__Me, _Char)
+	    THEN
+	    	Add(_Score, -10.0)
+	    ENDIF
+	    
+	    IF "c1"
+	    	IsGreaterThen(_Score, %SkillTargetScore_Jump_EnemyTacticalRetreat)
+	    THEN
+	    	Set(%SkillTargetChar_Jump_EnemyTacticalRetreat, _Char)
+	    	Set(%SkillTargetScore_Jump_EnemyTacticalRetreat, _Score)
+	    ENDIF	
+	ENDIF
+	// [~CALC_CHAR_TARGET_ACTIONS]
+	
+	
+	
+	
+	
+	
+	
+	

@@ -1,0 +1,13 @@
+INIT
+CHARACTER:__Me
+
+BEHAVIOUR
+REACTION playGuitar, 1100
+USAGE PEACE
+ACTIONS
+	IF "!c1"
+		CharacterHasStatus(__Me, UNSHEATHED)
+	THEN
+		CharacterApplyStatus(__Me, UNSHEATHED, -1)
+	ENDIF
+		CharacterPlayAnimation("GuitarPlay", 0, 1)

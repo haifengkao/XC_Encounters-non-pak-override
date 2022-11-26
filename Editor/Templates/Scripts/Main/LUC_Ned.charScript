@@ -1,0 +1,86 @@
+#INCLUDE ShopKeeper
+
+INIT
+USING ShopKeeper
+CHARACTER:__Me
+CHARACTER:%Brian	   		 = LUC_Brian_73997cef-ad03-49b3-a0c1-c5fae4349260
+TRIGGER:%SellingPlace  		 = LUC_Ownership_Silverglen_Nadia_Shop_1e61fc49-886b-4ff0-8394-89b077b7d00a
+TRIGGER:%PointShelf_01 		 = LUC_Point_Nadia_Shelf_01_85c6f814-4bb5-4b9a-8053-19d7c7a68c5d
+TRIGGER:%PointShelf_02 		 = LUC_Point_Nadia_Shelf_02_01d5c613-c2d6-4376-a989-6c5bd57dbcd0
+TRIGGER:%PointShelf_03 		 = LUC_Point_Nadia_Shelf_03_02c0e474-1f00-400b-b446-e5e20efd5e86
+TRIGGER:%PointChest_01 		 = LUC_Point_NadiaChest_01_e8d2139b-5cfc-4a3a-8eaa-1272b8ed5fec
+TRIGGER:%PointChest_02 		 = LUC_Point_NadiaChest_02_23c5b342-814f-48db-a066-05fe686dfb34
+TRIGGER:%PointCloset   		 = LUC_Point_NadiaCloset_9eab4996-953f-47a4-ab2b-700ba68c5dba
+TRIGGER:%PrivateQuartersExit = LUC_Ownership_Silverglen_Nadia_GF_Exit_40c66cf0-d79e-4234-bc81-9221c11cc7d7
+ITEM:%Chest_01		   		 = FUR_Rich_Chest_A_002_672d9a7b-f9ab-4c67-a5c4-61fecba0495c
+ITEM:%Chest_02		   		 = FUR_Weaponrack_A_005_2b8bb994-f42c-4ae6-b23e-41c773ce4a38
+ITEM:%Closet		   		 = FUR_Citz_Closet_ABC_Door_A_001_f9e64805-73c2-4334-987b-ef98df690628
+
+BEHAVIOUR
+REACTION State_AfterLawrenceSpeech, 0
+USAGE PEACE
+ACTIONS
+	DialogStart("LUC_AD_NadiaAfterSpeech",__Me)
+	Sleep(15)
+
+REACTION State_ActionManager, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, "Action_FillShelf", "Action_LookIntoChest", "Action_Wander")
+	SetPriority(%currentAction, 1100)
+
+REACTION Action_FillShelf, 0
+USAGE PEACE
+VARS
+	TRIGGER:_shelf
+ACTIONS
+	GetRandom(_shelf, %PointShelf_01, %PointShelf_02, %PointShelf_03)
+	CharacterMoveTo(_shelf, 0)
+	CharacterLookFrom(_shelf)
+	GetRandom(%animationLoopCount, 1, 2, 3)
+	GetRandom(%currentAnimation, "Fidget_Book_01", "Fidget_Forward_01", "Fidget_Forward_02", "Fidget_High_01", "Fidget_High_02", "Fidget_Low_01", "Fidget_Low_02", "Fidget_Low_03")
+	Set(%currentState, "State_LoopAnimation")
+INTERRUPT
+	Reset()
+
+REACTION Action_LookIntoChest, 0
+USAGE PEACE
+VARS
+	TRIGGER:_chest
+ACTIONS
+	GetRandom(_chest, %PointChest_01, %PointChest_02)
+	CharacterMoveTo(_chest, 0)
+	CharacterLookFrom(_chest)
+	CharacterPlayAnimation("Fidget_Forward_01")
+	IF "c1"
+		IsEqual(_chest, %PointChest_01)
+	THEN
+		ItemOpen(%Chest_01)
+	ENDIF
+	GetRandom(%animationLoopCount, 1, 2, 3)
+	WHILE "c1"
+		IsGreaterThen(%animationLoopCount, 0)
+	DO
+		GetRandom(%currentAnimation, "Fidget_Low_01", "Fidget_Low_02", "Fidget_Low_03")
+		CharacterPlayAnimation(%currentAnimation)
+		Subtract(%animationLoopCount, 1)
+	ENDWHILE
+	CharacterPlayAnimation("Fidget_Forward_01")
+	IF "c1"
+		IsEqual(_chest, %PointChest_01)
+	THEN
+		ItemClose(%Chest_01)
+	ENDIF
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	Reset()
+	Set(%currentState, "State_ActionManager")
+	
+REACTION Action_Wander, 0
+USAGE PEACE
+ACTIONS
+	CharacterWander(%SellingPlace,4, 0)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	Reset()
+	Set(%currentState, "State_ActionManager")

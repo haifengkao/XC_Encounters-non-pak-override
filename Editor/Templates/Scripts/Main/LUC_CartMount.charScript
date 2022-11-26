@@ -1,0 +1,118 @@
+#INCLUDE BaseEscortScript
+
+INIT
+	USING BaseEscortScript
+	TRIGGER:%SafePoint1 = LUC_Point_BjornDest1_c4f69a91-68b4-4bde-b4e4-6b6ff16f653f
+	TRIGGER:%SafePoint2 = LUC_Point_BjornDest2_06b7b1aa-e6e4-4e71-acb8-851ad4750c5e
+	TRIGGER:%SafePoint3 = LUC_Point_BjornDest3_baa7bccb-7ecc-4a66-b654-56711e9b8c4b
+	CHARACTER:%KadMount = LUC_KadraskazMount_17c633c4-4b4f-4833-80f3-e2638db9a07d
+	
+BEHAVIOUR
+
+REACTION State_Idle, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, "Action_Idle")
+	SetPriority(%currentAction, 1100)
+
+
+REACTION State_EscortDone, 0
+USAGE PEACE
+ACTIONS
+	SetPriority("Defend_Yourself", 0)
+	SetPriority("Cower", 0)
+	GetRandom(%currentAction, "Action_Idle")
+	SetPriority(%currentAction, 1100)
+	
+REACTION State_AfterEscort, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, "Action_Wander")
+	SetPriority(%currentAction, 1100)
+	
+//////////////////////////////////////////////////////////////////
+
+REACTION Action_Wander, 0
+USAGE PEACE
+ACTIONS
+	Sleep(2.0)
+	CharacterMoveTo(TRIGGER:LUC_Point_BjornMountPoint_b7117184-2526-4e9a-b271-7adb77a6dd2f)
+  	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)	
+	
+REACTION Action_Idle, 0
+USAGE PEACE
+ACTIONS
+	Sleep(8)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)		
+
+
+REACTION Defend_Yourself,0
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+CHECK "c1&c2"
+	CharacterGet(_Enemy,__Me,null,Lowest,Distance,Enemy)
+	CharacterInWeaponRange(__Me,_Enemy)
+ACTIONS 
+	CharacterLookAt(_Enemy)
+	CharacterAttackWithoutMove(_Enemy)		
+	Sleep(1.0)
+	CharacterEndTurn()
+	
+REACTION Cower,0
+USAGE COMBAT
+VARS
+	FIXEDSTRING:_Animation
+	CHARACTER:_Enemy
+ACTIONS 
+	IF "c1"
+		CharacterGet(_Enemy,__Me,null,Lowest,Distance,Enemy)
+	THEN
+		CharacterLookAt(_Enemy)
+	ENDIF
+	GetRandom(_Animation,"idle1","idle2","idle3","still")
+	CharacterPlayAnimation(_Animation)
+	Sleep(1)
+	CharacterEndTurn()
+
+REACTION Action_TrashTalk, 0
+	USAGE PEACE
+	CHECK "!c1&!c2"
+		IsInDialog(__Me)
+		IsInDialog(%KadMount)
+	ACTIONS
+		CharacterLookAt(%KadMount)
+		DialogStart("LUC_AlfieRalfie", %KadMount, __Me)
+		Sleep(8)
+		SetPriority("Action_TrashTalk", 0)
+		
+EVENTS
+	
+EVENT EscortStart
+ON
+	OnCharacterEvent(__Me,"EscortStart")
+ACTIONS
+	SetPriority("Defend_Yourself", 1000)
+	SetPriority("Cower", 995)	
+	
+EVENT trashTalk
+ON
+	OnCharacterEvent(%KadMount,"trashTalk")
+ACTIONS
+	SetPriority("Action_TrashTalk", 10000)
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+STORY
+
+SCRIPTFRAME MoveToSafeSpot
+ACTIONS
+	SetPriority("Defend_Yourself",0)
+	SetPriority("Cower",0)
+	CharacterMoveTo(%SafePoint1, 0)
+	CharacterMoveTo(%SafePoint2, 0)
+	CharacterMoveTo(%SafePoint3, 0)
+

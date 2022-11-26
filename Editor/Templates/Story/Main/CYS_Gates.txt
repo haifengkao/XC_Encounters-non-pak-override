@@ -1,0 +1,266 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_IsGuard(CHARACTER_CYS_RaidGuard1);
+
+DB_CYSGate(ITEM_CYS_WestGate, "CYS_StoryWestGate",CHARACTER_CYS_RaidGuard1,ITEM_CYS_WestGateKey);
+DB_GateTriggers(ITEM_CYS_WestGate,TRIGGER_CYS_PointBeachRaidGuard2,TRIGGER_CYS_Area_OutsideWestGate,TRIGGER_CYS_Area_InsideWestGate,TRIGGER_CYS_PointBeachRaidGuard1);
+DB_Dialogs(CHARACTER_CYS_RaidGuard1,"CYS_OrcRaidGuards");
+
+DB_CYSGate(ITEM_CYS_EastGate, "CYS_StoryEastGate",CHARACTER_CYS_CityGuard6,ITEM_CYS_EastGateKey);
+DB_GateTriggers(ITEM_CYS_EastGate,TRIGGER_CYS_Point_EastOpenGate,TRIGGER_CYS_Box_EastGateOutside,TRIGGER_CYS_AreaCysealEntrance4,TRIGGER_CYS_Point_EastGuardPoint);
+DB_Dialogs(CHARACTER_CYS_CityGuard6,"CYS_GateGuard");
+
+DB_CYSGate(ITEM_CYS_NorthGateLeft, "CYS_StoryNorthGateLeft",CHARACTER_CYS_VillageGuard08,ITEM_CYS_NorthGateLeftKey);
+DB_GateTriggers(ITEM_CYS_NorthGateLeft,TRIGGER_CYS_Point_NorthGateLeftOpenGate,TRIGGER_CYS_Box_NorthGateLeftOutside,TRIGGER_CYS_AreaCysealEntrance2,TRIGGER_CYS_Point_NorthGateLeftGuardPoint);
+DB_Dialogs(CHARACTER_CYS_VillageGuard08,"CYS_GateGuard");
+
+DB_CYSGate(ITEM_CYS_NorthGateRight, "CYS_StoryNorthGateRight",CHARACTER_CYS_CityGuard11,ITEM_CYS_NorthGateRightKey);
+DB_GateTriggers(ITEM_CYS_NorthGateRight,TRIGGER_CYS_Point_NorthGateRightOpenGate,TRIGGER_CYS_Box_NorthGateRightOutside,TRIGGER_CYS_AreaCysealEntrance3,TRIGGER_CYS_Point_NorthGateRightGuardPoint);
+DB_Dialogs(CHARACTER_CYS_CityGuard11,"CYS_GateGuard");
+
+DB_GateTriggerRequirement(ITEM_CYS_NorthGateLeft,TRIGGER_CYS_Poly_Cyseal);
+DB_GateTriggerRequirement(ITEM_CYS_NorthGateRight,TRIGGER_CYS_Poly_Cyseal);
+DB_GateTriggerRequirement(ITEM_CYS_EastGate,TRIGGER_CYS_Poly_Cyseal);
+KBSECTION
+IF
+DB_CYSGate(_Gate, _Key,_Guard,_GateKey)
+THEN
+ItemLock(_Gate,_Key);
+ItemToCharacter(_GateKey,_Guard);
+
+IF
+DB_GateTriggers(_Gate,_OpenPoint,_Outside,_Inside,_GuardPoint)
+THEN
+ProcTriggerRegisterForPlayers(_Outside);
+ProcTriggerRegisterForPlayers(_Inside);
+
+IF
+ItemOpened(_Gate)
+AND
+DB_CYSGate(_Gate,_,_,_)
+THEN
+NOT _Gate.hasBeenClosed();
+
+IF
+DialogStartRequested(_Guard, _Player)
+AND
+DB_CYSGate(_, _, _Guard, _)
+THEN
+ProcSetGuardDialogEvents(_Guard);
+
+IF
+CharacterUsedItem(_Player,_Gate)
+AND
+_Player.DB_IsPlayer()
+AND
+DB_CYSGate(_Gate,_,_Guard,_)
+AND
+ItemIsLocked(_Gate,1)
+AND
+NOT DB_Dead(_Guard)
+AND
+DB_Dialogs(_Guard,_Dialog)
+AND
+NOT _Guard.DB_IsInDialog()
+THEN
+ProcCYSCheckIfWeNeedToDoGateDialog(_Player,_Gate);
+
+PROC
+ProcCYSCheckIfWeNeedToDoGateDialog((CHARACTER)_Player,(ITEM)_Gate)
+AND
+NOT DB_GateTriggerRequirement((ITEM)_Gate,(TRIGGER)_)
+AND
+DB_CYSGate(_Gate,_,_Guard,_)
+AND
+DB_Dialogs(_Guard,_Dialog)
+THEN
+ProcSetGuardDialogEvents(_Guard);
+ProcDoTwoSpeakerDialog(_Dialog, _Guard, _Player);
+
+PROC
+ProcCYSCheckIfWeNeedToDoGateDialog((CHARACTER)_Player,(ITEM)_Gate)
+AND
+DB_GateTriggerRequirement(_Gate,_Trigger)
+AND
+DB_InRegion(_Player,_Trigger)
+AND
+DB_CYSGate(_Gate,_,_Guard,_)
+AND
+DB_Dialogs(_Guard,_Dialog)
+THEN
+ProcSetGuardDialogEvents(_Guard);
+ProcDoTwoSpeakerDialog(_Dialog, _Guard, _Player);
+
+PROC
+ProcCYSCheckIfWeNeedToDoGateDialog((CHARACTER)_Player,(ITEM)_Gate)
+AND
+DB_GateTriggerRequirement(_Gate,_Trigger)
+AND
+NOT DB_InRegion(_Player,_Trigger)
+THEN
+//we're on the inside, trying to get in. So jsut unlock and open ITEM
+ItemUnLock(_Gate);
+ItemOpen(_Gate);
+
+PROC
+ProcSetGuardDialogEvents((CHARACTER)_Guard)
+THEN
+DB_PartySize(0);
+
+PROC
+ProcSetGuardDialogEvents((CHARACTER)_Guard)
+AND
+DB_Companion(_Player)
+AND
+DB_PartySize(_Count)
+AND
+IntegerSum(_Count,1,_New)
+THEN
+NOT DB_PartySize(_Count);
+DB_PartySize(_New);
+
+PROC
+ProcSetGuardDialogEvents((CHARACTER)_Guard)
+AND
+DB_PartySize(_Size)
+AND
+_Size<2
+THEN
+DialogSetCharacterEvent("CYS_GateParty_TooSmall",_Guard,0);
+
+PROC
+ProcSetGuardDialogEvents((CHARACTER)_Guard)
+AND
+DB_PartySize(_Size)
+AND
+_Size>=2
+THEN
+DialogClearCharacterEvent("CYS_GateParty_TooSmall",_Guard,0);
+
+PROC
+ProcSetGuardDialogEvents((CHARACTER)_Guard)
+AND
+CharacterGetLevel(CHARACTER_Player1,_Level)
+AND
+_Level<5
+THEN
+DialogSetCharacterEvent("CYS_PlayerLevel_TooSmall",_Guard,0);
+
+PROC
+ProcSetGuardDialogEvents((CHARACTER)_Guard)
+AND
+CharacterGetLevel(CHARACTER_Player1,_Level)
+AND
+_Level>=5
+THEN
+DialogClearCharacterEvent("CYS_PlayerLevel_TooSmall",_Guard,0);
+
+PROC
+ProcSetGuardDialogEvents((CHARACTER)_Guard)
+AND
+DB_PartySize(_Nr)
+THEN
+NOT DB_PartySize(_Nr);
+
+IF
+DialogEnded(_Dialog, _Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_Dialogs(_Guard,_Dialog)
+AND
+DB_CYSGate(ITEM_CYS_WestGate,_,_Guard,_)
+AND
+CharacterGetVarInteger(_Guard, "OpenGate", 1)
+AND
+CharacterGetLevel(_Player,_Level)
+AND
+_Level < 6
+THEN
+PROC_CheckPlayTut(_Player,"TUT_WestGate");
+
+IF
+DialogEnded(_Dialog, _)
+AND
+DB_Dialogs(_Guard,_Dialog)
+AND
+DB_CYSGate(_Gate,_,_Guard,_)
+AND
+CharacterGetVarInteger(_Guard, "OpenGate", 1)
+AND
+DB_GateTriggers(_Gate,_OpenPoint,_,_,_)
+THEN
+CharacterSetVarInteger(_Guard, "OpenGate", 0);
+ProcCharacterMoveToTrigger(_Guard, _OpenPoint, 0, "OpenGate");
+
+IF
+CharacterLeftTrigger(_, _Inside)
+AND
+DB_GateTriggers(_Gate,_OpenPoint,_Outside,_Inside,_GuardPoint)
+AND
+DB_CYSGate(_Gate,_,_Guard,_)
+AND
+ItemIsClosed(_Gate, 0)
+AND
+DoorIsClosing(_Gate,0)
+AND
+NOT DB_InRegion(_, _Outside)
+AND
+NOT DB_Dead(_Guard)
+AND
+NOT DB_Combat(_Guard, _)
+THEN
+ProcCharacterMoveToTrigger(_Guard, _OpenPoint, 0, "CloseGate");
+
+IF
+CharacterLeftTrigger(_, _Outside)
+AND
+DB_GateTriggers(_Gate,_OpenPoint,_Outside,_Inside,_GuardPoint)
+AND
+DB_CYSGate(_Gate,_,_Guard,_)
+AND
+ItemIsClosed(_Gate, 0)
+AND
+DoorIsClosing(_Gate,0)
+AND
+NOT DB_InRegion(_, _Inside)
+AND
+NOT DB_Dead(_Guard)
+AND
+NOT DB_Combat(_Guard, _)
+THEN
+ProcCharacterMoveToTrigger(_Guard, _OpenPoint, 0, "CloseGate");
+
+IF
+CharacterEvent(_Guard, "CloseGate")
+AND
+DB_CYSGate(_Gate,_,_Guard,_)
+THEN
+ItemClose(_Gate);
+PROC_CYS_GateGuardReturn(_Guard);
+
+IF
+CharacterEvent(_Guard, "OpenGate")
+AND
+DB_CYSGate(_Gate,_,_Guard,_)
+THEN
+ItemUnlockAndOpen(_Gate);
+CharacterSetVarInteger(_Guard,"GateOpened",1);
+PROC_CYS_GateGuardReturn(_Guard);
+
+PROC
+PROC_CYS_GateGuardReturn((CHARACTER)_Guard)
+AND
+DB_CYSGate(_Gate,_,_Guard,_)
+AND
+DB_GateTriggers(_Gate,_OpenPoint,_Outside,_Inside,_GuardPoint)
+THEN
+ProcCharacterMoveToTrigger(_Guard,_GuardPoint , 0, "");
+CharacterLookFromTrigger(_Guard, _GuardPoint,0);
+
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

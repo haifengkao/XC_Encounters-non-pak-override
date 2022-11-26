@@ -1,0 +1,367 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Dialogs(CHARACTER_CYS_IntroGuards_Bibius,CHARACTER_CYS_IntroGuards_Junius,"CYS_BibiusJunius");
+DB_Dialogs(CHARACTER_CYS_IntroGuards_Hardcore_Dog, "CYS_Tuesday");
+
+//REGION Triggers
+ProcTriggerRegisterForPlayers(TRIGGER_CYS_AreaIntroGuards);
+ProcTriggerRegisterForPlayers(TRIGGER_CYS_AreaIntroGuards2);
+ProcTriggerRegisterForPlayers(TRIGGER_CYS_IntroGuardStopFollow); 
+DB_OneShotPlayerTrigger(TRIGGER_CYS_CommentArhuFight);
+
+TriggerRegisterForCharacter(TRIGGER_CYS_CommentArhuFight,CHARACTER_CYS_IntroGuards_Bibius);
+TriggerRegisterForCharacter(TRIGGER_CYS_CommentArhuFight,CHARACTER_CYS_IntroGuards_Junius);
+//END_REGION
+
+CYS_GuardsEscort(CHARACTER_Player1,CHARACTER_CYS_IntroGuards_Bibius,TRIGGER_CYS_PointBrandon);
+CYS_GuardsEscort(CHARACTER_Player2,CHARACTER_CYS_IntroGuards_Junius,TRIGGER_CYS_PointJesse);
+
+DB_IsNotMessingAround(CHARACTER_CYS_IntroGuards_Bibius);
+DB_IsNotMessingAround(CHARACTER_CYS_IntroGuards_Junius);
+DB_IsNotMessingAround(CHARACTER_CYS_IntroGuards_Hardcore_Dog);
+
+DB_CYSGuardRefDB(CHARACTER_CYS_IntroGuards_Bibius,CHARACTER_CYS_IntroGuards_Junius);
+DB_CYSGuardRefDB(CHARACTER_CYS_IntroGuards_Junius,CHARACTER_CYS_IntroGuards_Bibius);
+
+KillCounter("CYS_IntroGuards",2);
+KillCounterDB(CHARACTER_CYS_IntroGuards_Bibius,"CYS_IntroGuards");
+KillCounterDB(CHARACTER_CYS_IntroGuards_Junius,"CYS_IntroGuards");
+DB_KillCounterGivesPartyDialog("CYS_IntroGuards",2,"CYS_PD_IntroGuards");
+
+KillCounter("CYS_IntroGuards_Hardcore",3);
+KillCounterDB(CHARACTER_CYS_IntroGuards_Bibius,"CYS_IntroGuards_Hardcore");
+KillCounterDB(CHARACTER_CYS_IntroGuards_Junius,"CYS_IntroGuards_Hardcore");
+KillCounterDB(CHARACTER_CYS_IntroGuards_Hardcore_Dog,"CYS_IntroGuards_Hardcore");
+DB_KillCounterGivesPartyDialog("CYS_IntroGuards_Hardcore",2,"CYS_PD_IntroGuards");
+
+
+DB_CYS_BibiusJunius(CHARACTER_CYS_IntroGuards_Bibius);
+DB_CYS_BibiusJunius(CHARACTER_CYS_IntroGuards_Junius);
+KBSECTION
+//REGION Dealing with the Guards
+
+//REGION Peacefull Way
+
+//REGION Meting the guards
+IF
+CharacterEvent(_Guard, "GLO_SpotterSneaker1")
+AND
+CYS_GuardsEscort(_,_Guard,_)
+AND
+CharacterGetVarCharacter(_Guard, "SpottedDude1", _Player)
+AND
+NOT CHARACTER_CYS_IntroGuards_Bibius.FirstTalk()
+THEN
+CHARACTER_CYS_IntroGuards_Bibius.FirstTalk();
+ProcDoThreeSpeakerDialog("CYS_BibiusJunius",CHARACTER_CYS_IntroGuards_Bibius,CHARACTER_CYS_IntroGuards_Junius,_Player);
+//END_REGION
+
+//REGION Deciding to Follow the guards
+IF
+GlobalEventSet("CYS_GuardsComply")
+THEN
+CHARACTER_CYS_IntroGuards_Bibius.isFriendly();
+
+IF
+DialogEnded("CYS_BibiusJunius",_)
+AND
+CHARACTER_CYS_IntroGuards_Bibius.isFriendly()
+AND
+NOT CHARACTER_CYS_IntroGuards_Bibius.AllowedPlayersThrough()
+THEN
+NOT CHARACTER_CYS_IntroGuards_Bibius.isFriendly();
+ProcCharacterMoveToTrigger(CHARACTER_CYS_IntroGuards_Bibius,TRIGGER_CYS_PointBrandon,0,"");
+ProcCharacterMoveToTrigger(CHARACTER_CYS_IntroGuards_Junius,TRIGGER_CYS_PointJesse,0,"");
+ProcCharacterMoveToTrigger(CHARACTER_CYS_IntroGuards_Hardcore_Dog,TRIGGER_CYS_AreaIntroGuards_HardcoreDog,0,"");
+CharacterSetHasDialog(CHARACTER_CYS_IntroGuards_Bibius,0);
+CharacterSetHasDialog(CHARACTER_CYS_IntroGuards_Hardcore_Dog,0);
+CharacterSetHasDialog(CHARACTER_CYS_IntroGuards_Junius,0);
+CHARACTER_CYS_IntroGuards_Bibius.AllowedPlayersThrough();
+//END_REGION
+
+//END_REGION
+
+//REGION Not-so-peacefull Way
+
+//REGION Sneaking past
+IF
+CharacterEvent(_Guard, "GLO_SpotterSneaker2")
+AND
+CYS_GuardsEscort(_,_Guard,_)
+AND
+NOT CHARACTER_CYS_IntroGuards_Bibius.Angry()
+AND
+CharacterGetVarCharacter(_Guard, "SpottedDude2", _Player)
+AND
+NOT CHARACTER_CYS_IntroGuards_Bibius.AllowedPlayersThrough()
+THEN
+CHARACTER_CYS_IntroGuards_Bibius.Angry();
+DialogRequestStopForCharacter(CHARACTER_CYS_IntroGuards_Bibius);
+CharacterDisplayText(CHARACTER_CYS_IntroGuards_Bibius,"CYS_IntroGuards_SneakWarning");
+ProcRemoveDialogEntryForSpeaker(CHARACTER_CYS_IntroGuards_Bibius,"CYS_BibiusJunius");
+ProcRemoveDialogEntryForSpeaker(CHARACTER_CYS_IntroGuards_Hardcore_Dog,"CYS_Tuesday");
+CharacterSetHasDialog(CHARACTER_CYS_IntroGuards_Bibius,0);
+CharacterSetHasDialog(CHARACTER_CYS_IntroGuards_Hardcore_Dog,0);
+CharacterSetHasDialog(CHARACTER_CYS_IntroGuards_Junius,0);
+SetRelationFactionToPlayers("CYS_BridgeGuards",0);
+QuestAdd("CYS_Bridge");
+QuestUpdate("CYS_Bridge","Update3");
+QuestClose("CYS_Bridge");
+//END_REGION
+
+IF
+CharacterEnteredCombat(_Character,_)
+AND
+CYS_GuardsEscort(_,_Character,_)
+THEN
+ProcTriggerUnregisterForPlayers(TRIGGER_CYS_AreaIntroGuards);
+ProcTriggerUnregisterForPlayers(TRIGGER_CYS_AreaIntroGuards2);
+
+IF
+CharacterEnteredCombat(CHARACTER_CYS_IntroGuards_Bibius, _)
+THEN
+CharacterPurgeQueue(CHARACTER_CYS_IntroGuards_Bibius);
+NOT CYS_GuardsEscort(CHARACTER_Player1,CHARACTER_CYS_IntroGuards_Bibius,TRIGGER_CYS_PointBrandon);
+
+IF
+CharacterEnteredCombat(CHARACTER_CYS_IntroGuards_Junius, _)
+THEN
+CharacterPurgeQueue(CHARACTER_CYS_IntroGuards_Junius);
+NOT CYS_GuardsEscort(CHARACTER_Player2,CHARACTER_CYS_IntroGuards_Junius,TRIGGER_CYS_PointJesse);
+
+//REGION Deciding to kill them
+IF
+GlobalEventSet("CYS_GuardsHostile")
+THEN
+CHARACTER_CYS_IntroGuards_Bibius.isHostile();
+
+IF
+DialogEnded("CYS_BibiusJunius",_)
+AND
+CHARACTER_CYS_IntroGuards_Bibius.isHostile()
+THEN
+NOT CHARACTER_CYS_IntroGuards_Bibius.isHostile();
+ProcRemoveDialogEntryForSpeaker(CHARACTER_CYS_IntroGuards_Bibius,"CYS_BibiusJunius");
+ProcRemoveDialogEntryForSpeaker(CHARACTER_CYS_IntroGuards_Hardcore_Dog,"CYS_Tuesday");
+CharacterSetHasDialog(CHARACTER_CYS_IntroGuards_Bibius,0);
+CharacterSetHasDialog(CHARACTER_CYS_IntroGuards_Hardcore_Dog,0);
+CharacterSetHasDialog(CHARACTER_CYS_IntroGuards_Junius,0);
+SetRelationFactionToPlayers("CYS_BridgeGuards",0);
+
+PROC
+ReactOnKillCounter("CYS_IntroGuards")
+AND
+IsHardcoreMode(0)
+THEN
+GlobalSetEvent("CYS_IntroGuardsDead");
+GoalCompleted;
+
+PROC
+ReactOnKillCounter("CYS_IntroGuards_Hardcore")
+AND
+IsHardcoreMode(1)
+THEN
+GlobalSetEvent("CYS_IntroGuardsDead");
+GoalCompleted;
+
+IF
+CharacterAttackedByCharacter(_Guard,_Player)
+AND
+_Player.DB_IsPlayer()
+AND
+DB_CYSGuardRefDB(_Guard,_OtherGuard)
+AND
+CharacterCanSeeCharacter(_OtherGuard,_Player,1)
+THEN
+NOT DB_CYSGuardRefDB(_Guard,_OtherGuard);
+SetRelationFactionToPlayers("CYS_BridgeGuards",0);
+
+//END_REGION
+
+//END_REGION
+
+//END_REGION
+
+//REGION Guards escort
+
+//REGION Starting following and stoping if leaving
+IF
+CharacterEnteredTrigger(_Player,TRIGGER_CYS_AreaIntroGuards2)
+AND
+CHARACTER_CYS_IntroGuards_Bibius.AllowedPlayersThrough()
+AND
+CYS_GuardsEscort(_Player,_Escorter,_)
+AND
+NOT CYS_IntroGuardsFollowing(_Escorter, _Player)
+THEN
+CYS_IntroGuardsFollowing(_Escorter, _Player);
+DialogRequestStop("CYS_AD_IntroGuardsPauseEscort",_Escorter);
+DialogRequestStop("CYS_AD_IntroGuards",_Escorter);
+DialogRequestStop("CYS_AD_IntroGuard_Alone",_Escorter);
+CharacterSetHasDialog(CHARACTER_CYS_IntroGuards_Junius, 0);
+CharacterSetHasDialog(CHARACTER_CYS_IntroGuards_Bibius, 0);
+CharacterSetHasDialog(CHARACTER_CYS_IntroGuards_Hardcore_Dog, 0);
+CharacterSetVarFixedString(_Escorter,"currentState","State_Escorting");
+CharacterSetVarFixedString(CHARACTER_CYS_IntroGuards_Hardcore_Dog,"currentState","State_Escorting");
+
+IF
+CharacterEnteredTrigger(_Player,TRIGGER_CYS_IntroGuardStopFollow)
+AND
+CYS_GuardsEscort(_Player,_Escorter,_OriginPoint)
+AND
+CYS_IntroGuardsFollowing(_Escorter,_Player)
+THEN
+NOT CYS_IntroGuardsFollowing(_Escorter,_Player);
+DialogStartOneSpeakerDialog("CYS_AD_IntroGuardsPauseEscort", _Escorter);
+ProcCharacterMoveToTrigger(_Escorter,_OriginPoint,1,"PauseEscorting");
+CharacterStopFollow(CHARACTER_CYS_IntroGuards_Hardcore_Dog);
+CharacterSetVarFixedString(CHARACTER_CYS_IntroGuards_Hardcore_Dog,"currentState","State_WaitingPatiently");
+
+IF
+CharacterEvent(_Escorter,"PauseEscorting")
+THEN
+CharacterStopFollow(_Escorter);
+CharacterSetVarFixedString(_Escorter,"currentState","State_GuardingBridge");
+//END_REGION
+
+//REGION See the fight and go back
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,TRIGGER_CYS_CommentArhuFight)
+AND
+CYS_GuardsEscort(_Player,_EscortGuard,_)
+AND
+CHARACTER_CYS_IntroGuards_Bibius.AllowedPlayersThrough()
+THEN
+ProcCharacterMoveToTrigger(_EscortGuard,TRIGGER_CYS_Point_IntroGuardVista,1,"CYS_IntroGuard_AtTheIntroVista");
+
+IF
+CharacterEvent(_Witness,"CYS_IntroGuard_AtTheIntroVista")
+THEN
+CharacterSetVarInteger(_Witness,"atTheVista",1);
+DialogStartOneSpeakerDialog("CYS_AD_IntroGuard_Alone",_Witness);
+
+IF
+CharacterEnteredTrigger(_Escort,TRIGGER_CYS_CommentArhuFight)
+AND
+NOT _Escort.DB_IsPlayer()
+THEN
+CharacterSetVarFixedString(_Escort,"currentState","State_WaitingPatiently");
+CharacterSetVarFixedString(CHARACTER_CYS_IntroGuards_Hardcore_Dog,"currentState","State_WaitingPatiently");
+
+IF
+AutomatedDialogEnded("CYS_AD_IntroGuard_Alone",_)
+AND
+CYS_GuardsEscort(_,_Guard,_)
+AND
+CharacterGetVarInteger(_Guard,"atTheVista",1)
+THEN
+CharacterSetVarInteger(CHARACTER_CYS_IntroGuards_Bibius,"atTheVista",0);
+CharacterSetVarInteger(CHARACTER_CYS_IntroGuards_Junius,"atTheVista",0);
+ProcCharacterMoveToTrigger(CHARACTER_CYS_IntroGuards_Bibius,TRIGGER_CYS_PointBrandon,1,"CYS_IntroGuard_EndEscorting");
+ProcCharacterMoveToTrigger(CHARACTER_CYS_IntroGuards_Junius,TRIGGER_CYS_PointJesse,1,"CYS_IntroGuard_EndEscorting");
+ProcCharacterMoveToTrigger(CHARACTER_CYS_IntroGuards_Hardcore_Dog,TRIGGER_CYS_AreaIntroGuards_HardcoreDog,1,"CYS_IntroGuard_EndEscorting");
+
+IF
+CharacterEvent(_Escorter,"CYS_IntroGuard_EndEscorting")
+AND
+CYS_GuardsEscort(_Player,_Escorter,_OriginPoint)
+THEN
+NOT CYS_GuardsEscort(_Player,_Escorter,_OriginPoint);
+_Escorter.BackToBridge();
+CharacterSetVarFixedString(_Escorter,"currentState","State_GuardingBridge");
+CharacterSetVarFixedString(CHARACTER_CYS_IntroGuards_Hardcore_Dog,"currentState","State_WaitingPatiently");
+PROC_CheckCysealBackToBridge();
+
+PROC
+PROC_CheckCysealBackToBridge()
+AND
+CHARACTER_CYS_IntroGuards_Bibius.BackToBridge()
+AND
+CHARACTER_CYS_IntroGuards_Junius.BackToBridge()
+THEN
+NOT CHARACTER_CYS_IntroGuards_Bibius.BackToBridge();
+NOT CHARACTER_CYS_IntroGuards_Junius.BackToBridge();
+CharacterSetHasDialog(CHARACTER_CYS_IntroGuards_Junius, 1);
+CharacterSetHasDialog(CHARACTER_CYS_IntroGuards_Bibius, 1);
+CharacterSetHasDialog(CHARACTER_CYS_IntroGuards_Hardcore_Dog, 1);
+//END_REGION
+
+//END_REGION
+
+
+//REGION Kitting BJ at Orc fight
+IF
+CharacterSwitchedCombat(_Char, _Old, _New)
+AND
+DB_CYS_ArhuGuard(_Char, _)
+THEN
+PROC_CYS_CheckBJFightAtOrcs();
+
+IF
+CharacterSwitchedCombat(_Char, _Old, _New)
+AND
+CYS_GuardsEscort(_, _Char, _)
+THEN
+PROC_CYS_CheckBJFightAtOrcs();
+
+PROC
+PROC_CYS_CheckBJFightAtOrcs()
+AND
+DB_CYS_BibiusJunius(_Guard)
+AND
+CharacterIsInCombat(_Guard, 1)
+AND
+CombatGetIDForCharacter(_Guard, _New)
+AND
+DB_CYS_ArhuGuard(_Char, _)
+AND
+CharacterIsInCombat(_Char, 1)
+AND
+CombatGetIDForCharacter(_Char, _New)
+AND
+CombatGetInvolvedPartyMember(_New, 1, _Player)
+AND
+CharacterGetRelationToCharacter(_Guard, _Player, 0)
+THEN
+SetRelationFactionToPlayers("CYS_ArhuGuards",0);
+
+PROC
+PROC_CYS_CheckBJFightAtOrcs()
+AND
+DB_CYS_BibiusJunius(_Guard)
+AND
+CharacterIsInCombat(_Guard, 1)
+AND
+CombatGetIDForCharacter(_Guard, _New)
+AND
+DB_CYS_ArhuGuard(_Char, _)
+AND
+CharacterIsInCombat(_Char, 1)
+AND
+CombatGetIDForCharacter(_Char, _New)
+THEN
+GlobalSetEvent("CYS_BJHelped");
+
+IF 
+CharacterEnteredCombat(_Guard, _ID)
+AND
+DB_CYS_BibiusJunius(_Guard)
+AND
+DB_CYS_ArhuGuard(_Char, _)
+AND
+CharacterIsInCombat(_Char, 1)
+AND
+CombatGetIDForCharacter(_Char, _ID)
+THEN
+GlobalSetEvent("CYS_BJHelped");
+//END_REGION
+EXITSECTION
+NOT CHARACTER_CYS_IntroGuards_Bibius.FirstTalk();
+ProcTriggerUnregisterForPlayers(TRIGGER_CYS_AreaIntroGuards);
+ProcTriggerUnregisterForPlayers(TRIGGER_CYS_AreaIntroGuards2);
+NOT DB_CYSGuardRefDB(CHARACTER_CYS_IntroGuards_Bibius,CHARACTER_CYS_IntroGuards_Junius);
+NOT DB_CYSGuardRefDB(CHARACTER_CYS_IntroGuards_Junius,CHARACTER_CYS_IntroGuards_Bibius);
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

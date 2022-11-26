@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<palette xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <palettes>
+    <EntityPalette>
+      <palettes />
+      <objectids>
+        <guid>9db83c91-820d-429c-a6a8-171125a55af3</guid>
+        <guid>308b2253-d680-45ff-9872-529b7c851532</guid>
+        <guid>e9d78abe-5f1b-42a1-954c-99bfa6b39179</guid>
+        <guid>c25df7d5-04dc-4948-8d98-c28bfec5ebcd</guid>
+        <guid>89ad5f6e-99b4-4190-9d36-255c718c37df</guid>
+        <guid>99b068ff-68dc-443a-88d9-80b909edde53</guid>
+      </objectids>
+      <name>Corpses</name>
+    </EntityPalette>
+  </palettes>
+  <objectids>
+    <guid>e88d29d9-5429-4dfc-aaa4-df29a82f02a5</guid>
+    <guid>7b3f028e-be72-458b-9608-7e57f9046528</guid>
+    <guid>0290170e-9bf6-40d7-b1e6-28c996705adf</guid>
+    <guid>82ab09e2-d135-4829-8fc0-d1f36e2489cd</guid>
+    <guid>b113845b-99a5-401e-a909-565109f86a05</guid>
+    <guid>1ba784ad-9e33-4108-bb63-74cc8e1c5bd8</guid>
+    <guid>59550918-66cd-4135-94b2-f8e1aedce960</guid>
+    <guid>b5b2357c-0d77-41e1-8444-fc03cb12eddd</guid>
+  </objectids>
+  <name>Cyseal</name>
+</palette>

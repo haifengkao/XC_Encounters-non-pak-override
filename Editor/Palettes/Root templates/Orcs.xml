@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<palette xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <palettes />
+  <objectids>
+    <guid>f3a10eb5-eb3c-4030-96fb-c2bdf63dae52</guid>
+    <guid>34b58c2e-cbd7-49e0-9b74-0b668a83c1e6</guid>
+    <guid>28bb7159-c2de-41d9-8f5c-10e68ca67993</guid>
+    <guid>5fba8d89-eb3f-4475-bd7d-3ca89b133d94</guid>
+    <guid>b0276959-c17c-415c-aebd-49b5fd855dd0</guid>
+    <guid>6a99262e-1388-4700-8418-ff49d4c7fe3b</guid>
+    <guid>130d3f92-a901-4474-92f6-cba91aacde35</guid>
+    <guid>fc9e9eac-5256-46b3-8594-5258e9c7de8b</guid>
+    <guid>99d3ee93-ca5a-4f00-869f-7efdaf2f85d9</guid>
+    <guid>0642f4dc-4b32-4eb6-972c-f48ecae806bd</guid>
+    <guid>9318d3d9-ac1d-4f96-899a-4488b66c5269</guid>
+    <guid>ffdac5ca-969a-4bec-85d3-d856cd080f70</guid>
+    <guid>a52d5bda-69fb-4601-b5f3-c2abe39f471f</guid>
+  </objectids>
+  <name>Orcs</name>
+</palette>

@@ -1,0 +1,12 @@
+INIT
+
+ITEM:__Me
+CHARACTER:%TalkingGoblin=LUC_GoblinBridges_Guard_14_34803a88-0563-45fd-928b-3ef0739ed2e1
+
+EVENTS
+
+EVENT DamageReceived
+ON
+	OnDamage(_,_,_,_)
+ACTIONS	
+	CharacterEvent(%TalkingGoblin,"LUC_GoblinBridges_Barrels")

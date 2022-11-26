@@ -1,0 +1,215 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%BrokenToys_Target
+	FIXEDSTRING:%CurrentAction = ""
+	FIXEDSTRING:%PreviousAction = ""	
+	INT:%BrokenToys_Current=3
+	INT:%BrokenToys_Desired=4
+
+//----------- 
+BEHAVIOUR
+REACTION Norok_CastDemoralizingShout,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+CHECK "c1&c2&c3"
+	IsHardcore()
+	CharacterGet(_Enemy,__Me,20,Lowest,Distance,Enemy)
+	CharacterCanCast(__Me,"Shout_EnemySlowMass_Norok")
+ACTIONS
+	CharacterUseSkill("Shout_EnemySlowMass_Norok",__Me)
+	SetPriority("Norok_CastDemoralizingShout",0)
+INTERRUPT
+	Reset()
+	
+REACTION Norok_CastBrokenToys,0
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2"
+	CharacterCanCast(__Me,"Target_EnemyBrokenToys_Norok")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyBrokenToys_Norok")
+ACTIONS
+	IF "c1&c2"
+		IsEqual(%BrokenToys_Target,null)
+		CharacterGet(%BrokenToys_Target,__Me,20,Highest,Distance,Enemy)
+	THEN
+	ENDIF
+		DisplayText(__Me,"CMB_DAF_Norok_AllMyToysAreBroken",3)
+		CharacterMoveInRange(%BrokenToys_Target,_MinRange,_MaxRange,0)
+	IF "c1"
+		CharacterCanCast(__Me,"Target_EnemyBrokenToys_Norok")
+	THEN
+		CharacterUseSkill("Target_EnemyBrokenToys_Norok",%BrokenToys_Target)
+		Set(%BrokenToys_Target,null)
+	ELSE
+		DisplayText(__Me,"CMB_DAF_Norok_TooTired",3)
+		Sleep(2)		
+		Set(%BrokenToys_Current,0)	
+		CharacterEndTurn()		
+	ENDIF
+	Set(%BrokenToys_Current,0)	
+INTERRUPT
+	ON
+		OnMovementFailed(_)
+	ACTIONS
+		SetPriority("Norok_CastBrokenToys",0)
+
+REACTION Norok_AttacksEnemyWhenRealClose,100
+USAGE COMBAT
+VARS
+	CHARACTER:_Player
+	FLOAT:_MyActionPoints
+	FLOAT:_DistanceBetwMeAndPlayer	
+CHECK "c1&c2&!c3&c4&!c5&c6"
+	CharacterGet(_Player,__Me,2,Lowest,Distance,Enemy)					//c1
+	GetDistance(_DistanceBetwMeAndPlayer,__Me,_Player)					//c2
+	IsGreaterThen(_DistanceBetwMeAndPlayer,2)							//!c3
+	CharacterGetStat(_MyActionPoints,__Me,ActionPoints)					//c4
+	IsLessThen(_MyActionPoints,3)										//!c5
+	CharacterCanSee(__Me,_Player)										//c6
+ACTIONS
+	CharacterAttack(_Player)
+	
+REACTION Norok_MovesToEnemy,50
+USAGE COMBAT
+VARS
+	CHARACTER:_Player
+	FLOAT:_DistanceBetwMeAndPlayer
+CHECK "c1&c2&c3"
+	CharacterGet(_Player,__Me,20,Lowest,Distance,Enemy)
+	GetDistance(_DistanceBetwMeAndPlayer,__Me,_Player)
+	IsGreaterThen(_DistanceBetwMeAndPlayer,4)
+ACTIONS
+	CharacterMoveTo(_Player,0)
+
+REACTION Norok_Fallback,10
+USAGE COMBAT
+ACTIONS
+	CharacterEndTurn()
+	
+REACTION Norok_Waiting_Cries,100
+USAGE WAITING
+VARS
+	FLOAT:_MyVitality
+	FIXEDSTRING:_ChosenText
+CHECK "c1&c2"
+	CharacterGetStat(_MyVitality,__Me,Vitality)
+	IsLessThen(_MyVitality,0.5)
+ACTIONS
+	IF "c1"
+		IsRandom(0.01)
+	THEN
+		GetRandom(_ChosenText,"CMB_DAF_Norok_Cries_01","CMB_DAF_Norok_Cries_02","CMB_DAF_Norok_Cries_03","CMB_DAF_Norok_Cries_04","CMB_DAF_Norok_Cries_05")
+		DisplayText(__Me,_ChosenText,3)
+	ENDIF
+	CharacterPlayAnimation("Crying_01",0,0)
+	
+REACTION ChooseAction, 1060
+USAGE PEACE
+ACTIONS
+	GetRandom(%CurrentAction, "Painting1", "Painting2", "Bodies", "Pillows", "Seat")
+	GotoIfEqual(%PreviousAction, %CurrentAction, "Start")
+	Set(%PreviousAction, %CurrentAction)
+	SetPriority(%CurrentAction, 1070)
+INTERRUPT
+	Reset()
+	
+REACTION Painting1, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(TRIGGER:DAF_Norok_Painting1_973f0904-f25c-4d2c-a12c-b68797f0967b, 0)
+	CharacterLookFrom(TRIGGER:DAF_Norok_Painting1_973f0904-f25c-4d2c-a12c-b68797f0967b,1)
+	DisplayText(__Me,"DAF_Norok_Painting1",3.0)
+	Sleep(3)
+	SetPriority("Painting1", 0)
+INTERRUPT
+	Reset()
+	
+REACTION Painting2, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(TRIGGER:DAF_Norok_Painting2_ddce2f23-c2a5-4bda-9ea5-9db558fedb87, 0)
+	CharacterLookFrom(TRIGGER:DAF_Norok_Painting2_ddce2f23-c2a5-4bda-9ea5-9db558fedb87,1)
+	DisplayText(__Me,"DAF_Norok_Painting2",3.0)
+	Sleep(3)
+	SetPriority("Painting2", 0)
+INTERRUPT
+	Reset()
+	
+REACTION Bodies, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(TRIGGER:DAF_Norok_Bodies_be28f583-b7ee-4d0d-9395-130367507eea,0)
+	CharacterLookFrom(TRIGGER:DAF_Norok_Bodies_be28f583-b7ee-4d0d-9395-130367507eea,1)
+	DisplayText(__Me,"DAF_Norok_Bodies",3.0)
+	CharacterPlayAnimation("Crying_01")
+	SetPriority("Bodies", 0)
+INTERRUPT
+	Reset()
+	
+REACTION Pillows, 0
+USAGE PEACE
+VARS
+	FLOAT:_Dist
+ACTIONS
+	DisplayText(__Me,"DAF_Norok_Pillows",3.0)
+	CharacterMoveTo(TRIGGER:DAF_Norok_Pillow_5125fa56-753b-4ebb-861a-685eed6a48ff,1,1,0,0.0)
+	CallFunction("KnockDown")	
+INTERRUPT
+	Reset()
+	
+REACTION Seat, 0
+USAGE PEACE
+VARS
+	FLOAT:_Dist
+ACTIONS
+	CharacterUseItem(ITEM:FUR_Rich_Couch_B_001_fca1dacc-d819-44d6-b651-1411eab0995b)
+	DisplayText(__Me,"DAF_Norok_Seat",3.0)
+	Sleep(5)
+	SetPriority("Seat",0)
+INTERRUPT
+	Reset()
+
+//-----------	
+EVENTS
+EVENT OnInit_IfHardcore_AddBrokenToys
+ON
+	OnInit()
+ACTIONS
+	SetPriority("Combat_AttackSetEnemy",0)						
+	SetPriority("Combat_MoveToSetEnemy",0)
+	CharacterAddSkill("Target_EnemyBrokenToys_Norok")
+	IF "c1"
+		IsHardcore()
+	THEN
+		CharacterAddSkill("Shout_EnemySlowMass_Norok")
+	ENDIF
+	
+EVENT OnTurn_SpellControl
+ON
+	OnTurn()
+ACTIONS
+	IF "c1"
+		IsLessThen(%BrokenToys_Current,%BrokenToys_Desired)
+	THEN
+		Add(%BrokenToys_Current,1)
+	ELIF "c1"
+		IsEqual(%BrokenToys_Current,%BrokenToys_Desired)
+	THEN
+		SetPriority("Norok_CastBrokenToys",1000)
+	ELIF "c1"
+		IsGreaterThen(%BrokenToys_Current,%BrokenToys_Desired)
+	THEN
+		SetPriority("Norok_CastBrokenToys",1000)
+		Set(%BrokenToys_Current,0)		
+	ENDIF
+	
+EVENT KnockDownEvent
+ON
+	OnFunction("KnockDown")
+ACTIONS
+	CharacterApplyStatus(__Me,KNOCKED_DOWN,1,1)	
+	SetPriority("Pillows",0)

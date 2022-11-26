@@ -1,0 +1,12 @@
+INIT
+	ITEM:__Me
+	EXTERN FIXEDSTRING:%DialogKey = null
+	EXTERN FLOAT:%DisplayTime = 0
+
+EVENTS
+
+EVENT OnClick
+	ON
+		OnUseItem(_,__Me)
+	ACTIONS
+		DisplayText(__Me, %DialogKey, %DisplayTime)

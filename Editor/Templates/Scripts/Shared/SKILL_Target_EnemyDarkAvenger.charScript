@@ -1,0 +1,46 @@
+#TEMPLATE "_SKILL_Base" : Target_EnemyDarkAvenger
+
+INIT
+CHARACTER:__Me
+// [GLOBAL_VARS]
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_Target_EnemyDarkAvenger
+VARS
+	// [CALC_VARS]
+	FLOAT:_SkillRangeMin
+	FLOAT:_SkillRangeMax
+	FLOAT3:_TargetPos
+	FLOAT:_Score
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_Target_EnemyDarkAvenger")
+ACTIONS	
+	// [CALC_ACTIONS_PRE]
+	Set(_Score, 0.0)
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	IF "(c1)&(c2)"
+	    CharacterGetSkillRange(_SkillRangeMin, _SkillRangeMax, __Me, Target_EnemyDarkAvenger) // c1
+	    FindPosition(_TargetPos, __Me, _SkillRangeMax, 5, __Me, 2, -1, -1, -1) // c2
+	THEN
+	    Set(%SkillTargetPos_Target_EnemyDarkAvenger, _TargetPos)
+	    Add(%ActionScore_Target_EnemyDarkAvenger, 20.0)
+	ELSE 
+	    // Hostile count score calculation
+	    Add(_Score, 10.0) // HostileWeight
+	    
+	    Set(%SkillTargetChar_Target_EnemyDarkAvenger, __Me)
+	    Add(%ActionScore_Target_EnemyDarkAvenger, _Score)
+	ENDIF
+	// [~CALC_ACTIONS]
+
+	
+
+	

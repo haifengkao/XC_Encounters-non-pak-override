@@ -1,0 +1,58 @@
+INIT
+	INT:%CurrentRound = 0
+	CHARACTER:__Me
+	CHARACTER:%Helper = CYS_Tut_StoneCarrier1_6811cf82-9822-44d4-b93d-8a8411a89dab
+	CHARACTER:%Helper2 = CYS_Tut_StoneCarrier2_22b05321-a470-47a7-b475-8b332219742f
+
+//-------------
+BEHAVIOUR
+REACTION AutomatedDialogCombat_Interrupt, 1700
+USAGE COMBAT
+CHECK "c1"
+	IsInDialog(__Me)
+ACTIONS
+	Sleep(2.0)
+
+REACTION Combat_Wait, 2000
+USAGE COMBAT
+CHECK "!c1&!c2"
+	CharacterHasStatus(Player1_dac1443f-a866-4ab3-b240-e705c0b20ec5,COMBAT)
+	CharacterHasStatus(Player2_a0af7520-57ac-4f1c-b9d7-197bceebeade,COMBAT)
+ACTIONS
+	Sleep(1.0)
+
+REACTION InitialTurn,1000 
+USAGE COMBAT
+CHECK "c1"
+	IsEqual(%CurrentRound,1)
+ACTIONS
+	CharacterSetCombatTimeout(__Me,60.0)
+	DialogStart("CYS_TUT_AD_MageStoneAD",__Me,%Helper2)
+	CharacterEvent(%Helper,"MoveAwayWithStone")
+	CharacterEvent(%Helper2,"MoveAwayWithStone")
+	Sleep(2.0)
+	SetPriority("AutomatedDialogCombat_Interrupt",0)
+	CharacterMoveTo(TRIGGER:CYS_Point_TutorialMageDest_9d291a4a-e169-4a74-ba4b-40f33ce590b0,1,1,1)
+	CharacterLookFrom(TRIGGER:CYS_Point_TutorialMageDest_9d291a4a-e169-4a74-ba4b-40f33ce590b0,0)
+	DialogStart("CYS_TUT_AD_MageSummonSkeletons",__Me)
+	CharacterEvent(__Me,"SummonGrunts") 	//summon our skeletons
+	CharacterPlayEffect(__Me,"FX_Skills_Warrior_NullifyResistance_Prepare_A")
+	CharacterUseSkill(Summon_TutorialRanger,TRIGGER:CYS_Point_TutRangerPoint_cb3da6b0-8945-4be9-aa66-b4fc9f519195)
+	Sleep(2.0)
+	CharacterEvent(__Me,"Vanish")
+	CharacterResetCombatTimeout(__Me)
+	CharacterEndTurn()
+
+//-------------		
+EVENTS
+EVENT SourceMageStartTurn
+ON
+	OnTurn()
+ACTIONS 
+	Add(%CurrentRound,1)
+	
+EVENT SourceMageInit
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill(Summon_TutorialRanger)

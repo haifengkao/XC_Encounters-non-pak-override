@@ -1,0 +1,43 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%AnguishSlave01="DAF_AnguishDemon_Slave_01_1e95eea4-b563-4d03-a37d-02cc8fea5b76"
+	CHARACTER:%AnguishSlave02="DAF_AnguishDemon_Slave_02_c81aa888-c8d4-469c-a63b-3704be6f6a5e"
+	CHARACTER:%AnguishSlave03="DAF_AnguishDemon_Slave_03_bfd79d47-a672-45b0-8273-e6884909fb1e"
+	CHARACTER:%AnguishSlave04="DAF_AnguishDemon_Slave_04_60c8de69-26ca-4052-88d2-87df0cb2f016"	
+	FLOAT:%MoonDancer_SightRange
+	
+BEHAVIOUR
+REACTION MoonDancer_CastHaste,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&!(c3|c4|c5|c6|c7|c8|c9|c10|c11|c12)&c13"
+	CharacterCanCast(__Me,"Target_EnemyHaste")												//c1
+	CharacterGet(_Target,__Me,%MoonDancer_SightRange,Lowest,Speed,Ally)						//c2
+	IsEqual(_Target,%AnguishSlave01)														//!c3
+	IsEqual(_Target,%AnguishSlave02)														//!c4
+	IsEqual(_Target,%AnguishSlave03)														//!c5
+	IsEqual(_Target,%AnguishSlave04)														//!c6
+	CharacterHasStatus(_Target,"HASTED")													//!c7
+	CharacterHasStatus(_Target,"PETRIFIED")													//!c8
+	CharacterHasStatus(_Target,"FROZEN")													//!c9
+	CharacterHasStatus(_Target,"CHARMED")													//!c10
+	CharacterHasStatus(_Target,"FEAR")														//!c11
+	CharacterHasStatus(_Target,"STUNNED")													//!c12
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyHaste")					//c13
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Target_EnemyHaste",_Target)
+
+EVENTS
+EVENT OnInit_GiveSpell_GetSightRange
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%MoonDancer_SightRange,__Me,Sight)
+	THEN
+		CharacterAddSkill("Target_EnemyHaste")
+	ENDIF

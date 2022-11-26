@@ -1,0 +1,16 @@
+INIT
+
+CHARACTER:__Me
+
+BEHAVIOUR
+
+REACTION Emotions, 200
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Anim
+CHECK "c1"
+	CharacterHasStatus(__Me, STATUS:SITTING)
+ACTIONS
+	GetRandom(_Anim, "Sit_Bored_01", "Sit_Bored_02", "Sit_Read_01")
+	CharacterPlayAnimation(_Anim)
+	Sleep(5)

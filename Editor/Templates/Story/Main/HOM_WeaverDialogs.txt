@@ -1,0 +1,227 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_HOM_BanterDialog_Zixzax(0);
+DB_HOM_BanterDialog_Arhu(0);
+DB_HOM_BanterDialog_Icara(0);
+DB_HOM_BanterDialog_Weaver(0);
+DB_HOM_BanterDialog_Weaver(1);
+
+//          Zixzax,Arhu,Icara,Weaver
+DB_HOM_BanterDialog(1,0,1,0,"HOM_AD_ZixzaxIcara");
+DB_HOM_BanterDialog(1,0,0,1,"HOM_AD_ZixzaxWeaver");
+DB_HOM_BanterDialog(1,0,0,1,"HOM_AD_ZixzaxWeaver2");
+DB_HOM_BanterDialog(1,0,0,1,"HOM_AD_ZixzaxWeaver3");
+DB_HOM_BanterDialog(1,1,0,1,"HOM_AD_ZixzaxArhuWeaver");
+DB_HOM_BanterDialog(1,1,0,1,"HOM_AD_ZixzaxArhuWeaver2");
+DB_HOM_BanterDialog(0,1,0,1,"HOM_AD_ArhuWeaver");
+DB_HOM_BanterDialog(0,1,0,1,"HOM_AD_ArhuWeaver2");
+DB_HOM_BanterDialog(0,1,1,0,"HOM_AD_ArhuIcara");
+DB_HOM_BanterDialog(0,1,1,1,"HOM_AD_ArhuIcaraWeaver");
+DB_HOM_BanterDialog(1,1,0,0,"HOM_AD_ZixzaxArhu");
+DB_HOM_BanterDialog(1,1,1,0,"HOM_AD_ZixzaxArhuIcara");
+DB_HOM_BanterDialog(1,1,1,1,"HOM_AD_ZixzaxArhuIcaraWeaver");
+KBSECTION
+IF
+CharacterEvent(CHARACTER_HOM_Weaver,"PlayHomDialog")
+THEN
+Proc_HOM_PlayRandomWeaverBanterDialog();
+
+//1.Clear out old database values
+PROC
+Proc_HOM_PlayRandomWeaverBanterDialog()
+AND
+DB_HOM_BanterDialog_Available(_Dialog,_Index)
+THEN
+NOT DB_HOM_BanterDialog_Available(_Dialog,_Index);
+
+//2. Reset the counter of valid dialogs
+PROC
+Proc_HOM_PlayRandomWeaverBanterDialog()
+AND
+DB_HOM_BanterDialog_Counter(_DialogCounter)
+THEN
+NOT DB_HOM_BanterDialog_Counter(_DialogCounter);
+
+//3. Set the counter to 0 and assume for now all chars are available
+PROC
+Proc_HOM_PlayRandomWeaverBanterDialog()
+THEN
+DB_HOM_BanterDialog_Counter(0);
+DB_HOM_BanterDialog_Zixzax(1);
+DB_HOM_BanterDialog_Arhu(1);
+DB_HOM_BanterDialog_Icara(1);
+
+//4. Remove unavailable chars
+PROC
+Proc_HOM_PlayRandomWeaverBanterDialog()
+AND
+CharacterHasStatus(CHARACTER_CYS_Zixzax,"SITTING",0)
+THEN
+NOT DB_HOM_BanterDialog_Zixzax(1);
+
+PROC
+Proc_HOM_PlayRandomWeaverBanterDialog()
+AND
+CharacterHasStatus(CHARACTER_CYS_Arhu,"SITTING",0)
+THEN
+NOT DB_HOM_BanterDialog_Arhu(1);
+
+PROC
+Proc_HOM_PlayRandomWeaverBanterDialog()
+AND
+CharacterHasStatus(CHARACTER_HOM_Icara,"SITTING",0)
+THEN
+NOT DB_HOM_BanterDialog_Icara(1);
+
+//5. Fill database with all possible dialogs
+PROC
+Proc_HOM_PlayRandomWeaverBanterDialog()
+AND
+DB_HOM_BanterDialog_Zixzax(_Zixzax)
+AND
+DB_HOM_BanterDialog_Arhu(_Arhu)
+AND
+DB_HOM_BanterDialog_Icara(_Icara)
+AND
+DB_HOM_BanterDialog_Weaver(_Weaver)
+AND
+DB_HOM_BanterDialog(_Zixzax,_Arhu,_Icara,_Weaver,_Dialog)
+AND
+DB_HOM_BanterDialog_Counter(_Counter)
+AND
+IntegerSum(_Counter,1,_NewCounter)
+THEN
+NOT DB_HOM_BanterDialog_Counter(_Counter);
+DB_HOM_BanterDialog_Counter(_NewCounter);
+DB_HOM_BanterDialog_Available(_Dialog,_Counter);
+
+//6. Pick one and play it!
+PROC
+Proc_HOM_PlayRandomWeaverBanterDialog()
+AND
+DB_HOM_BanterDialog_Counter(_Counter)
+AND
+QRY_GetFairRand("WeaverBanter",_Counter)
+AND
+DB_FairRand_ReturnVal(_Index)
+AND
+DB_HOM_BanterDialog_Available(_Dialog,_Index)
+AND
+DB_HOM_BanterDialog(_Zixzax,_Arhu,_Icara,_Weaver,_Dialog)
+THEN
+Proc_HOM_PlayWeaverBanterDialog(_Zixzax,_Arhu,_Icara,_Weaver,_Dialog);
+
+//7. Collect all needed speakers
+PROC
+Proc_HOM_PlayWeaverBanterDialog((INTEGER)_Zixzax,(INTEGER)_Arhu,(INTEGER)_Icara,(INTEGER)_Weaver,(STRING)_Dialog)
+THEN
+DB_HOM_BanterDialog_SpeakerAmount(0);
+
+PROC
+Proc_HOM_PlayWeaverBanterDialog(1,(INTEGER)_Arhu,(INTEGER)_Icara,(INTEGER)_Weaver,(STRING)_Dialog)
+AND
+DB_HOM_BanterDialog_SpeakerAmount(_Old)
+AND
+IntegerSum(_Old,1,_New)
+THEN
+NOT DB_HOM_BanterDialog_SpeakerAmount(_Old);
+DB_HOM_BanterDialog_SpeakerAmount(_New);
+DB_HOM_BanterDialog_Speaker(_New,CHARACTER_CYS_Zixzax);
+
+PROC
+Proc_HOM_PlayWeaverBanterDialog((INTEGER)_Zixzax,1,(INTEGER)_Icara,(INTEGER)_Weaver,(STRING)_Dialog)
+AND
+DB_HOM_BanterDialog_SpeakerAmount(_Old)
+AND
+IntegerSum(_Old,1,_New)
+THEN
+NOT DB_HOM_BanterDialog_SpeakerAmount(_Old);
+DB_HOM_BanterDialog_SpeakerAmount(_New);
+DB_HOM_BanterDialog_Speaker(_New,CHARACTER_CYS_Arhu);
+
+PROC
+Proc_HOM_PlayWeaverBanterDialog((INTEGER)_Zixzax,(INTEGER)_Arhu,1,(INTEGER)_Weaver,(STRING)_Dialog)
+AND
+DB_HOM_BanterDialog_SpeakerAmount(_Old)
+AND
+IntegerSum(_Old,1,_New)
+THEN
+NOT DB_HOM_BanterDialog_SpeakerAmount(_Old);
+DB_HOM_BanterDialog_SpeakerAmount(_New);
+DB_HOM_BanterDialog_Speaker(_New,CHARACTER_HOM_Icara);
+
+PROC
+Proc_HOM_PlayWeaverBanterDialog((INTEGER)_Zixzax,(INTEGER)_Arhu,(INTEGER)_Icara,1,(STRING)_Dialog)
+AND
+DB_HOM_BanterDialog_SpeakerAmount(_Old)
+AND
+IntegerSum(_Old,1,_New)
+THEN
+NOT DB_HOM_BanterDialog_SpeakerAmount(_Old);
+DB_HOM_BanterDialog_SpeakerAmount(_New);
+DB_HOM_BanterDialog_Speaker(_New,CHARACTER_HOM_Weaver);
+
+PROC
+Proc_HOM_PlayWeaverBanterDialog((INTEGER)_Zixzax,(INTEGER)_Arhu,(INTEGER)_Icara,(INTEGER)_Weaver,(STRING)_Dialog)
+AND
+DB_HOM_BanterDialog_SpeakerAmount(_Amount)
+THEN
+NOT DB_HOM_BanterDialog_SpeakerAmount(_Amount);
+Proc_HOM_PlayWeaverBanterDialog2(_Dialog,_Amount);
+
+//8. Finally play the dialog
+PROC
+Proc_HOM_PlayWeaverBanterDialog2((STRING)_Dialog,4)
+AND
+NOT CHARACTER_CYS_Zixzax.DB_IsInDialog()
+AND
+NOT CHARACTER_HOM_Icara.DB_IsInDialog()
+AND
+NOT CHARACTER_CYS_Arhu.DB_IsInDialog()
+AND
+NOT CHARACTER_HOM_Weaver.DB_IsInDialog()
+THEN
+DialogStartFourSpeakerDialog(_Dialog,CHARACTER_CYS_Zixzax,CHARACTER_HOM_Icara,CHARACTER_CYS_Arhu,CHARACTER_HOM_Weaver);
+
+PROC
+Proc_HOM_PlayWeaverBanterDialog2((STRING)_Dialog,3)
+AND
+DB_HOM_BanterDialog_Speaker(1,_Speaker1)
+AND
+DB_HOM_BanterDialog_Speaker(2,_Speaker2)
+AND
+DB_HOM_BanterDialog_Speaker(3,_Speaker3)
+AND
+NOT _Speaker1.DB_IsInDialog()
+AND
+NOT _Speaker2.DB_IsInDialog()
+AND
+NOT _Speaker3.DB_IsInDialog()
+THEN
+DialogStartThreeSpeakerDialog(_Dialog,_Speaker1,_Speaker2,_Speaker3);
+
+PROC
+Proc_HOM_PlayWeaverBanterDialog2((STRING)_Dialog,2)
+AND
+DB_HOM_BanterDialog_Speaker(1,_Speaker1)
+AND
+DB_HOM_BanterDialog_Speaker(2,_Speaker2)
+AND
+NOT _Speaker1.DB_IsInDialog()
+AND
+NOT _Speaker2.DB_IsInDialog()
+THEN
+DialogStartTwoSpeakerDialog(_Dialog,_Speaker1,_Speaker2);
+
+//9. Clean up
+PROC
+Proc_HOM_PlayWeaverBanterDialog2((STRING)_Dialog,(INTEGER)_Speakers)
+AND
+DB_HOM_BanterDialog_Speaker(_Index,_Speaker)
+THEN
+NOT DB_HOM_BanterDialog_Speaker(_Index,_Speaker);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

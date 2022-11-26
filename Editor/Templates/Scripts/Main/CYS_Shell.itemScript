@@ -1,0 +1,30 @@
+#INCLUDE State_Manager_Item
+
+INIT
+	USING State_Manager_Item
+	ITEM:__Me
+	
+BEHAVIOUR
+
+REACTION State_Shouting, 0
+	USAGE PEACE
+	ACTIONS
+		GetRandom(%currentAction, "Action_CallForHelp")
+		SetPriority(%currentAction, 1100)
+
+REACTION Action_CallForHelp, 0
+	USAGE PEACE
+	ACTIONS
+		DialogStart("CYS_AD_Shell",__Me)
+		Sleep(45)
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)
+
+EVENTS
+
+EVENT OnKeep 
+ON  
+     OnItemEvent(__Me,"CYS_ShellStopAD") 
+ACTIONS
+     Set(%currentState, "")

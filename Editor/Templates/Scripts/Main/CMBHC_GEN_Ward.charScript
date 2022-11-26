@@ -1,0 +1,225 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%OriginalAttacker=null
+	CHARACTERTEMPLATE:%FireWardTemplate="Summons_Ward_Fire_84a171b0-c44d-4689-b8fc-25e32676cd76"
+	CHARACTERTEMPLATE:%WaterWardTemplate="Summons_Ward_Water_bd8d5043-5cf7-427c-8dfc-829b7c6065d2"
+	CHARACTERTEMPLATE:%AirWardTemplate="Summons_Ward_Air_dd564396-1c61-44b9-b20a-2e35de986a2c"
+	CHARACTERTEMPLATE:%EarthWardTemplate="Summons_Ward_Earth_cabefda4-6839-44e7-8e5e-7c1942fc13ca"
+	CHARACTERTEMPLATE:%IronWardTemplate="Summons_Ward_Physical_c542a8df-8352-4cc5-a839-e5016c1f29a6"
+	CHARACTERTEMPLATE:%MagicWardTemplate="Summons_Ward_Magical_98be4473-a55a-495a-adac-0bda6dc69343"	
+	EXTERN CHARACTER:%Owner=null	
+	EXTERN INT:%RelationshipOnReset=75
+	EXTERN INT:%Bool_ShouldBeFollowingOutsideOfCombat=1	
+	EXTERN INT:%Bool_ShouldBeFollowingInCombat=1	
+	EXTERN STRING:%EnterCombat_Event="CMBHC_WardOwner_EnteredCombat"
+	FIXEDSTRING:%MyOriginalFaction
+	STATUS:%ChosenStatus="FIRE_IMMUNITY"
+	STATUS:%BonusStatus="VOID_AURA"
+	STATUS:%StatusToCure="BURNING"
+
+//----------
+BEHAVIOUR
+REACTION Ward_EndTurn,500
+USAGE COMBAT
+ACTIONS
+	Sleep(0.2)
+	CharacterEndTurn()
+	
+REACTION Ward_FollowsOwner_Peace,100
+USAGE ALL
+CHECK "c1"
+	IsEqual(%Bool_ShouldBeFollowingOutsideOfCombat,1)
+ACTIONS
+	CharacterFollow(%Owner,-1,1)
+	
+REACTION Ward_FollowsOwner_Combat,100
+USAGE COMBAT
+CHECK "c1"
+	IsEqual(%Bool_ShouldBeFollowingInCombat,1)
+ACTIONS
+	CharacterFollow(%Owner,-1,1)
+	
+REACTION Ward_FollowsOwner_Waiting,100
+USAGE WAITING
+CHECK "c1"
+	IsEqual(%Bool_ShouldBeFollowingInCombat,1)
+ACTIONS
+	CharacterFollow(%Owner,-1,1)	
+	
+REACTION Ward_Error_NoTemplate,0
+USAGE ALL
+ACTIONS
+	DebugText(__Me,"Error: invalid template!")
+	Sleep(3)
+
+REACTION Ward_Error_NoOwner,0
+USAGE ALL
+ACTIONS
+	DebugText(__Me,"Error: no owner!")
+	Sleep(3)
+
+//----------
+EVENTS
+EVENT OnInit_ApplyStatusToOwner
+VARS
+	CHARACTERTEMPLATE:_MyTemplate
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetFaction(%MyOriginalFaction,__Me)
+	THEN
+		SetPriority("Combat_AttackSetEnemy",0)
+		SetPriority("Combat_MoveToSetEnemy",0)
+	ENDIF
+	IF "c1"
+		IsEqual(%Owner,null)
+	THEN
+		SetPriority("Ward_Error_NoOwner",520)
+	ENDIF
+	IF "c1"
+		CharacterGetTemplate(__Me,_MyTemplate)
+	THEN
+		IF "c1"											//FIRE - fire imm, removes burning, hastens
+			IsEqual(_MyTemplate,%FireWardTemplate)
+		THEN
+			CharacterApplyStatus(__Me,"FIRE_IMMUNITY",-1,1)
+			Set(%ChosenStatus,"FIRE_IMMUNITY")
+			Set(%StatusToCure,"BURNING")
+			Set(%BonusStatus,"HASTED")
+		ELIF "c1"										//WATER - water imm, removes wet, heals
+			IsEqual(_MyTemplate,%WaterWardTemplate)
+		THEN
+			CharacterApplyStatus(__Me,"WATER_IMMUNITY",-1,1)
+			Set(%ChosenStatus,"WATER_IMMUNITY")
+			Set(%StatusToCure,"WET")
+			Set(%BonusStatus,"HEALING")			
+		ELIF "c1"										//AIR - air imm, boosts damage
+			IsEqual(_MyTemplate,%AirWardTemplate)
+		THEN
+			CharacterApplyStatus(__Me,"AIR_IMMUNITY",-1,1)
+			Set(%ChosenStatus,"AIR_IMMUNITY")
+			Set(%BonusStatus,"ETHEREAL_SOLES")		
+		ELIF "c1"										//EARTH - earth imm, removes poison, blesses
+			IsEqual(_MyTemplate,%EarthWardTemplate)
+		THEN
+			CharacterApplyStatus(__Me,"EARTH_IMMUNITY",-1,1)
+			Set(%ChosenStatus,"EARTH_IMMUNITY")
+			Set(%StatusToCure,"POISONED")
+			Set(%BonusStatus,"BLESSED")					
+		ELIF "c1"
+			IsEqual(_MyTemplate,%IronWardTemplate)		//IRON - slash, pierce, crush imm
+		THEN
+			CharacterApplyStatus(__Me,"PHYSICAL_IMMUNITY",-1,1)
+			Set(%ChosenStatus,"PHYSICAL_IMMUNITY")
+		ELIF "c1"
+			IsEqual(_MyTemplate,%MagicWardTemplate)		//ELEMENTAL - fire, water, air, earth imm
+		THEN
+			CharacterApplyStatus(__Me,"ELEMENTAL_IMMUNITY",-1,1)
+			Set(%ChosenStatus,"ELEMENTAL_IMMUNITY")
+		ELSE
+			SetPriority("Ward_Error_NoTemplate",510)
+		ENDIF
+		IF "!c1&!c2"
+			CharacterIsDead(__Me)
+			CharacterIsDead(%Owner)
+		THEN
+			CharacterApplyStatus(%Owner,%ChosenStatus,-1,1)
+		ENDIF
+	//----
+		IF "!(c1|c2|c3)"
+			IsEqual(%BonusStatus,"VOID_AURA")
+			CharacterIsDead(__Me)
+			CharacterIsDead(%Owner)
+		THEN
+			CharacterApplyStatus(%Owner,%BonusStatus,-1,1)
+		ENDIF
+	//----
+		IF "c1&!(c2|c3)"
+			CharacterHasStatus(%Owner,%StatusToCure)
+			CharacterIsDead(__Me)
+			CharacterIsDead(%Owner)
+		THEN
+			CharacterRemoveStatus(%Owner,%StatusToCure)
+			CharacterPlayEffect(%Owner,"FX_Skills_Fire_PurifyingFire_Impact_A")
+		ENDIF
+	ENDIF
+
+EVENT OnAttacked_SetRelationToZero
+VARS
+	CHARACTER:_Attacker
+ON
+	OnMiss(_Attacker,_,__Me,_)
+	OnDamage(_,_,_Attacker,_)
+ACTIONS
+	IF "!c1"
+		IsInCombat(__Me)
+	THEN
+		CharacterSetTemporaryHostileRelation(__Me,_Attacker)
+	ENDIF
+	/*IF "c1"
+		IsEqual(%OriginalAttacker,null)
+	THEN
+		Set(%OriginalAttacker,_Attacker)
+		//DebugText(__Me,"Attacker: [1]",%OriginalAttacker)
+		CharacterSetRelationIndivToIndiv(__Me,%OriginalAttacker,0)
+		CharacterSetRelationIndivToIndiv(%OriginalAttacker,__Me,0)
+	ENDIF*/
+
+EVENT OnCharacterEvent_ChangeFaction
+VARS
+	FIXEDSTRING:_Faction
+	CHARACTER:_OwnersEnemy
+ON
+	OnCharacterEvent(%Owner,%EnterCombat_Event)
+ACTIONS
+	IF "c1"
+		//CharacterGetFaction(_Faction,%Owner)
+		GetVar(_OwnersEnemy,%Owner,"MyEnemy")
+	THEN
+		//CharacterSetFaction(__Me,_Faction)
+		CharacterSetTemporaryHostileRelation(__Me,_OwnersEnemy)
+	ENDIF
+
+EVENT OnCombatStarted_ApplyOwnersFaction
+VARS
+	FIXEDSTRING:_Faction
+ON
+	OnCombatStarted()
+ACTIONS
+	IF "c1"
+		CharacterGetFaction(_Faction,%Owner)
+	THEN
+		//CharacterSetFaction(__Me,_Faction)
+	ENDIF
+
+EVENT OnCombatEnded_SetRelationship
+ON
+	OnCombatEnded()
+ACTIONS
+	IF "!c1"
+		IsEqual(%OriginalAttacker,null)
+	THEN
+		//CharacterSetRelationIndivToIndiv(__Me,%OriginalAttacker,%RelationshipOnReset)
+		//CharacterSetRelationIndivToIndiv(%OriginalAttacker,__Me,%RelationshipOnReset)
+	ENDIF
+	//CharacterSetFaction(__Me,%MyOriginalFaction)
+	//Set(%OriginalAttacker,null)
+	
+EVENT OnDie_Owner_IDieToo
+ON
+	OnDie(%Owner,_,_,_)
+ACTIONS
+	CharacterDie(__Me)
+	
+EVENT OnDie_RemoveStatusFromOwner
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	CharacterPlayEffect(%Owner,"FX_Skills_Fire_PurifyingFire_Impact_A")
+	CharacterRemoveStatus(%Owner,%ChosenStatus)
+	IF "c1"
+		CharacterHasStatus(%Owner,%BonusStatus)
+	THEN
+		CharacterRemoveStatus(%Owner,%BonusStatus)
+	ENDIF

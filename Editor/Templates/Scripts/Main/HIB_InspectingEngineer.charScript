@@ -1,0 +1,33 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	EXTERN CHARACTER:%inspectedCharacter=Animals_Rat_Mecha_Rodent_B_000_e86c89b0-09ed-46f9-ab13-f0fc0f1e3e01
+	EXTERN FIXEDSTRING:%InspectAnim01="Loop_Kneel_01"
+	//tired of re-writing always the same script so this one's going to be customizable :p
+
+//------------------------
+BEHAVIOUR
+
+REACTION State_Inspecting, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterLookAt(%inspectedCharacter)
+		GetWeightedRandom(%currentAction,"Action_Wait",INT:2,"Action_Inspecting",INT:3)
+		SetPriority(%currentAction, 1100)
+
+REACTION Action_Inspecting, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterPlayAnimation(%InspectAnim01)
+		SetPriority(%currentAction,0)
+		
+REACTION Action_Wait, 0
+	USAGE PEACE
+	VARS
+		FLOAT:_SleepValue
+	ACTIONS
+		GetRandomBetween(_SleepValue,5,12)
+		Sleep(_SleepValue)
+		SetPriority(%currentAction,0)

@@ -1,0 +1,17 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+CharacterAddGold(CHARACTER_Player1,500);
+CharacterAddGold(CHARACTER_Player2,500);
+
+
+KBSECTION
+IF
+DB_DyingNpcOnBed(_Char, _Bed)
+THEN
+ItemSetVisible(_Bed, 0);
+ItemSetCanInteract(_Bed, 0);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

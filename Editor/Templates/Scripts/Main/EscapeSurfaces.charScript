@@ -1,0 +1,10 @@
+INIT
+	CHARACTER:__Me
+					
+BEHAVIOUR
+REACTION EscapeSurfaces,5000
+USAGE ALL
+CHECK "c1"
+	IsInDangerousSurface(__Me)
+ACTIONS	
+	CharacterFleeFromDangerousSurface()

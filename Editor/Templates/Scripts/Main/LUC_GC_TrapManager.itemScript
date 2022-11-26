@@ -1,0 +1,30 @@
+INIT
+
+ITEM:__Me
+INT:%Counter = 0
+EXTERN STRING:%EventOn=null
+EXTERN STRING:%EventOff=null
+EVENTS
+
+EVENT load
+	ON
+		OnItemEvent(__Me, "load")
+	ACTIONS
+		Add(%Counter, 1)
+		IF "c1"
+			IsEqual(%Counter, 1)
+		THEN
+			CharacterItemEvent(null, __Me, %EventOff)
+		ENDIF
+		CharacterItemEvent(null, __Me, %EventOn)
+		
+EVENT unload
+	ON
+		OnItemEvent(__Me, "unload")
+	ACTIONS
+		Subtract(%Counter, 1)
+		IF "c1"
+			IsEqual(%Counter, 0)
+		THEN
+			CharacterItemEvent(null, __Me, %EventOff)
+		ENDIF

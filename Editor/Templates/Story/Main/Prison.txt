@@ -1,0 +1,26 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_PrisonComments("PRISON_CYSEAL","CYS_CommentPrison1",0);
+DB_PrisonComments("PRISON_CYSEAL","CYS_CommentPrison2",1);
+DB_PrisonComments("PRISON_CYSEAL","CYS_CommentPrison3",2);
+
+DB_CurrentPrisonComment("PRISON_CYSEAL",CHARACTER_Player1,0);
+DB_CurrentPrisonComment("PRISON_CYSEAL",CHARACTER_Player2,0);
+
+DB_PlayerComments("CYS_CommentPrison1","CYS_CommentPrison1_1_1",1,1);
+DB_PlayerComments("CYS_CommentPrison1","CYS_CommentPrison1_2_1",2,1);
+DB_PlayerComments("CYS_CommentPrison1","CYS_CommentPrison1_2_2",2,2);
+
+DB_PlayerComments("CYS_CommentPrison2","CYS_CommentPrison2_1_1",1,1);
+DB_PlayerComments("CYS_CommentPrison2","CYS_CommentPrison2_2_1",2,1);
+DB_PlayerComments("CYS_CommentPrison2","CYS_CommentPrison2_2_2",2,2);
+
+DB_PlayerComments("CYS_CommentPrison3","CYS_CommentPrison3_1_1",1,1);
+DB_PlayerComments("CYS_CommentPrison3","CYS_CommentPrison3_2_1",2,1);
+DB_PlayerComments("CYS_CommentPrison3","CYS_CommentPrison3_2_2",2,2);
+KBSECTION
+
+EXITSECTION
+
+ENDEXITSECTION

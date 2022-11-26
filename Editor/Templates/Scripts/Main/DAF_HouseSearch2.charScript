@@ -1,0 +1,42 @@
+INIT
+CHARACTER:__Me
+TRIGGER:%Point1 = DAF_HouseSearch5_e05a8d17-9098-4204-a6de-a6d082021b68
+TRIGGER:%Point2 = DAF_HouseSearch6_712962f5-9a9c-4b37-8dfc-e69d80510f11
+TRIGGER:%Point3 = DAF_HouseSearch7_cccd33af-eb78-46df-9acf-9c92ab0281ff
+TRIGGER:%Point4 = DAF_HouseSearch8_fd685919-0a16-474d-88e0-5c7523496343
+INT:%State = 0
+BEHAVIOUR
+
+REACTION Main, 130
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%State,1)
+ACTIONS
+	CharacterMoveTo(%Point1)
+	CharacterLookFrom(%Point1)
+	CharacterPlayAnimation("Trader_03")
+	DisplayText(__Me,"DAF_HouseSearch5",3)
+	Sleep(3)
+	
+	CharacterMoveTo(%Point2)
+	CharacterLookFrom(%Point2)
+	CharacterPlayAnimation("LoadingCart_01")
+	DisplayText(__Me,"DAF_HouseSearch6",3)
+	Sleep(3)
+	
+	CharacterMoveTo(%Point3)
+	CharacterLookFrom(%Point3)
+	CharacterPlayAnimation("Kneel_02")
+	DisplayText(__Me,"DAF_HouseSearch7",3)
+	Sleep(3)
+	
+	CharacterMoveTo(%Point4)
+	CharacterLookFrom(%Point4)
+	CharacterPlayAnimation("Fidget_Forward_02")
+	DisplayText(__Me,"DAF_HouseSearch8",3)
+	Sleep(3)
+
+STORY 
+SCRIPTFRAME DialogDone
+ACTIONS	
+	Set(%State,1)

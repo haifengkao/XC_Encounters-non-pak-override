@@ -1,0 +1,20 @@
+INIT
+
+EXTERN TRIGGER:%Trigger = null
+EXTERN FLOAT:%TimeMin = null
+EXTERN FLOAT:%TimeMax = null
+EXTERN FLOAT:%SleepMin = null
+EXTERN FLOAT:%SleepMax = null
+
+BEHAVIOUR
+
+REACTION Wander, 900
+USAGE PEACE
+VARS
+	FLOAT:_Wander
+	FLOAT:_Sleep
+ACTIONS
+	GetRandomBetween(_Wander, %TimeMin, %TimeMax)
+	CharacterWander(%Trigger, _Wander)
+	GetRandomBetween(_Sleep, %SleepMin, %SleepMax)
+	Sleep(_Wander)

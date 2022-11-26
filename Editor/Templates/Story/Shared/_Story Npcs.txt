@@ -1,0 +1,47 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+PROC
+SetStoryNpc((CHARACTER)_Npc,(INTEGER)_State)
+THEN
+CharacterMakeStoryNpc(_Npc,_State);	
+
+PROC	
+SetStoryNpc((CHARACTER)_Npc,0)
+THEN	
+NOT IsStoryNpc(_Npc);
+
+PROC	
+SetStoryNpc((CHARACTER)_Npc,1)
+THEN	
+IsStoryNpc(_Npc);
+
+PROC	
+MakeAttackable((CHARACTER)_Player,(CHARACTER)_Npc)
+THEN
+	// Dante 5-4-2002:
+	// This is added because we don't want a player with high reputation to bring
+	// _Npc's "total" RepAttitude to a value >= _MinAtt, since that would make him
+	// friendly again.
+	//
+	// So, from now on, _Npc will NOT take the hero's reputation into account anymore.
+	//
+	// If you delete the fact NoReputationEffects(_Npc), then reputation will be
+	// taken into account again next time the _Npc starts seeing the player.
+	// If you want an immediate update, call UpdateRepAttitude/3.
+	CharacterEnableReputationEffects(_Npc,0);	
+	//
+	SetStoryNpc(_Npc,0);
+	SetHatredAlignmentWithHero(_Player,_Npc);
+	CharacterAddAttitudeTowardsPlayer(_Npc,_Player,-100);
+	
+// Default arg:
+PROC	
+SetStoryNpc((CHARACTER)_Npc)
+THEN	
+SetStoryNpc(_Npc,1);
+EXITSECTION
+
+ENDEXITSECTION

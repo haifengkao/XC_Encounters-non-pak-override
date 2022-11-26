@@ -1,0 +1,25 @@
+/*
+
+Use this script together with CMB_ProtectBoss
+
+*/
+
+INIT
+EXTERN STRING:%bossname=null
+CHARACTER:__Me
+
+EVENTS
+EVENT WasAttacked
+VARS
+	CHARACTER:_char
+ON
+	OnDamage(_,_,_char,_)
+ACTIONS
+IF "(!c1&!c2&!c3&!c4)"
+	IsEqual(_char,null)
+	IsEqual(_char,__Me)
+	CharacterIsAlly(__Me,_char)
+	CharacterIsDead(__Me)
+THEN
+	CharacterEvent(_char,%bossname)
+ENDIF

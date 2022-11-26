@@ -1,0 +1,85 @@
+#INCLUDE PressurePlate
+
+INIT
+USING PressurePlate
+ITEM:__Me
+EXTERN ITEM:%Manager = null
+
+
+
+EVENTS
+
+EVENT PlateChange
+ON
+	OnItemEvent(__Me,"PressurePlateChange")
+ACTIONS
+	IF "c1"
+		IsEqual(%CurrentPercentage,1)
+	THEN
+		PlaySound(__Me, "Items_Puzzle_PressurePlate")
+		ItemEvent(%Manager,"load")
+	ELIF "c1"
+		IsEqual(%PreviousPercentage,1)
+	THEN
+		PlaySound(__Me, "Items_Puzzle_PressurePlate")
+		ItemEvent(%Manager,"unload")
+	ENDIF
+	// Start Reaction to change animation
+	Interrupt(PercentageChance)
+	SetPriority(PercentageChance,100)
+
+BEHAVIOUR
+
+REACTION PercentageChance,0
+ACTIONS
+	ItemPlayAnimationTo("PressurePlate",%CurrentPercentage,3)
+		IF "c1"
+		IsEqual(%CurrentPercentage, FLOAT:0.0)
+	THEN
+		DebugText(__Me, "0%")
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:0.1)
+	THEN
+		DebugText(__Me, "1%")
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:0.2)
+	THEN
+		DebugText(__Me, "10%")
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:0.3)
+	THEN
+		DebugText(__Me, "20%")
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:0.4)
+	THEN
+		DebugText(__Me, "30%")
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:0.5)
+	THEN
+		DebugText(__Me, "40%")
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:0.6)
+	THEN
+		DebugText(__Me, "50%")
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:0.7)
+	THEN
+		DebugText(__Me, "60%")
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:0.8)
+	THEN
+		DebugText(__Me, "70%")
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:0.9)
+	THEN
+		DebugText(__Me, "80%")
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:1)
+	THEN
+		DebugText(__Me, "90%")
+	ELSE
+		DebugText(__Me, "100%")
+	ENDIF
+	SetPriority(PercentageChance,0)
+INTERRUPT
+	Reset()

@@ -1,0 +1,207 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+//REGION CHECK FOR TREASURE
+IF
+DB_ShovelArea((TRIGGER)_Trigger,(STRING)_,(ITEM)_)
+THEN
+ProcTriggerRegisterForPlayers(_Trigger);
+
+IF
+DB_ShovelRewardItemAppear(_,_Item,_)
+THEN
+ItemSetOnstage(_Item,0);
+IF
+DB_ShovelRewardItemSpawn(_,_Item)
+THEN
+ItemSetOnstage(_Item,0);
+
+IF
+DB_ShovelRewardCharacterAppear(_,_Character)
+THEN
+CharacterSetOnStage(_Character,0);
+
+//Dig while in a trigger
+IF
+CharacterUsedItemTemplate(_Player,"TOOL_Shovel_A_41486dd2-3fd5-464e-870e-844120cf0517", _ShovelHandle)
+AND
+DB_ShovelArea(_Trigger,_,_DirtPile)
+AND
+DB_InRegion(_Player,_Trigger)
+AND
+NOT DB_Shovelling_Mound(_,_DirtPile)
+AND
+CharacterIsInFightMode(_Player,_WasInFightMode)
+THEN
+DB_Shovelling_Mound(_Player,_DirtPile);
+CharacterSetFightMode(_Player,0,1);
+CharacterFreeze(_Player);
+CharacterPlayAnimation(_Player,"use_dig","digmound");
+DB_Shovel_PlayerHadWeaponDrawn(_Player,_WasInFightMode);
+
+//Dig outside a trigger
+IF
+CharacterUsedItemTemplate(_Player,"TOOL_Shovel_A_41486dd2-3fd5-464e-870e-844120cf0517", _ShovelHandle)
+AND
+NOT DB_Shovelling_Mound(_Player,_)
+AND
+CharacterIsInFightMode(_Player,_WasInFightMode)
+THEN
+CharacterSetFightMode(_Player,0,1);
+CharacterFreeze(_Player);
+CharacterPlayAnimation(_Player,"use_dig","digmound");
+DB_Shovel_PlayerHadWeaponDrawn(_Player,_WasInFightMode);
+
+//Dig by interacting with pile without a shovel
+IF
+CharacterUsedItem(_Player,_DirtPile)
+AND
+DB_ShovelArea(_,_,_DirtPile)
+AND
+ItemTemplateIsInPartyInventory(_Player,"TOOL_Shovel_A_41486dd2-3fd5-464e-870e-844120cf0517",0,0)
+THEN
+CharacterDisplayText(_Player,"GLO_ShovelRequired");
+
+//Dig by interacting with pile with a shovel
+IF
+CharacterUsedItem(_Player,_DirtPile)
+AND
+DB_ShovelArea(_,_,_DirtPile)
+AND
+NOT DB_Shovelling_Mound(_,_DirtPile)
+AND
+ItemTemplateIsInPartyInventory(_Player,"TOOL_Shovel_A_41486dd2-3fd5-464e-870e-844120cf0517",1,_Count)
+AND
+_Count > 0
+AND
+GetItemhandleForItemTemplateInInventory(_Player,"TOOL_Shovel_A_41486dd2-3fd5-464e-870e-844120cf0517",_ShovelHandle)
+AND
+CharacterIsInFightMode(_Player,_WasInFightMode)
+THEN
+DB_Shovelling_Mound(_Player,_DirtPile);
+CharacterSetFightMode(_Player,0,1);
+CharacterFreeze(_Player);
+CharacterPlayAnimation(_Player,"use_dig","digmound");
+DB_Shovel_PlayerHadWeaponDrawn(_Player,_WasInFightMode);
+
+
+//After Dig
+IF
+CharacterEvent(_Player,"digmound")
+AND
+NOT DB_Shovelling_Mound(_Player,_)
+THEN
+CharacterDisplayText(_Player,"GEN_Shovel_Failed");
+
+IF
+CharacterEvent(_Player,"digmound")
+AND
+DB_Shovelling_Mound(_Player,_DirtMound)
+AND
+DB_ShovelArea(_Trigger,_Reward,_DirtMound)
+THEN
+NOT DB_ShovelArea(_Trigger,_Reward,_DirtMound);
+NOT DB_Shovelling_Mound(_Player,_DirtMound);
+ItemSetOnstage(_DirtMound,0);
+ProcShovelRewards(_Player,_Reward);
+
+IF
+CharacterEvent(_Player,"digmound")
+AND
+DB_Shovel_PlayerHadWeaponDrawn(_Player,1)
+THEN
+CharacterSetFightMode(_Player,1,0);
+
+IF
+CharacterEvent(_Player,"digmound")
+AND
+DB_Shovel_PlayerHadWeaponDrawn(_Player,_Value)
+THEN
+NOT DB_Shovel_PlayerHadWeaponDrawn(_Player,_Value);
+
+IF
+CharacterDied(_Player)
+AND
+DB_Shovel_PlayerHadWeaponDrawn(_Player,_Value)
+THEN
+CharacterUnfreeze(_Player);
+
+IF
+CharacterDied(_Player)
+AND
+DB_Shovelling_Mound(_Player,_DirtPile)
+THEN
+NOT DB_Shovelling_Mound(_Player,_DirtPile);
+
+IF
+CharacterEvent(_Player,"digmound")
+THEN
+CharacterUnfreeze(_Player);
+//END_REGION
+
+
+//REGION SHOVEL REWARDS
+PROC
+ProcShovelRewards((CHARACTER)_Player,(STRING)_Reward)
+AND
+DB_ShovelRewardItemAdd(_Reward,(ITEM)_Item)
+THEN
+ItemToCharacter(_Item,_Player);
+
+PROC
+ProcShovelRewards((CHARACTER)_Player,(STRING)_Reward)
+AND
+DB_ShovelRewardItemAppear(_Reward,(ITEM)_Item,(TRIGGER)_Trigger)
+THEN
+ItemSetOnstage(_Item,1);
+ItemDragToTrigger(_Item,_Trigger);
+
+PROC
+ProcShovelRewards((CHARACTER)_Player,(STRING)_Reward)
+AND
+DB_ShovelRewardCharacterAppear(_Reward,(CHARACTER)_Character)
+THEN
+CharacterAppear(_Character,1);
+
+PROC
+ProcShovelRewards((CHARACTER)_Player,(STRING)_Reward)
+AND
+DB_ShovelRewardItemSpawn(_Reward,(ITEM)_Item)
+THEN
+ItemSetOnstage(_Item,1);
+
+PROC
+ProcShovelRewards((CHARACTER)_Player,(STRING)_Reward)
+AND
+DB_ShovelRewardItemTemplate(_Reward,(STRING)_ItemTemplate,(INTEGER)_Amount)
+THEN
+ItemTemplateAddToCharacter(_ItemTemplate,_Player,_Amount);
+
+PROC
+ProcShovelRewards((CHARACTER)_Player,(STRING)_Reward)
+AND
+DB_ShovelRewardComment(_Reward,(STRING)_Comment)
+THEN
+Launch_PlayerComment(_Player,_Comment);
+
+PROC
+ProcShovelRewards((CHARACTER)_Player,(STRING)_Reward)
+AND
+DB_ShovelRewardEvent(_Reward,(STRING)_Event)
+THEN
+GlobalSetEvent(_Event);
+
+
+PROC
+ProcShovelRewards((CHARACTER)_Player,(STRING)_Reward)
+AND
+DB_ShovelRewardSurface(_Reward,(TRIGGER)_Trigger, (STRING)_Type, (REAL)_Radius)
+THEN
+TriggerCreateSurface(_Trigger, _Type, _Radius);
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "__Start"

@@ -1,0 +1,24 @@
+/*
+
+	/!\ This script isn't used anymore. /!\ 
+
+INIT
+CHARACTER:__Me
+
+BEHAVIOUR
+
+REACTION SpawnLittleFriends,100
+USAGE COMBAT
+VARS
+	CHARACTER:_Char
+CHECK "c1"
+	CharacterCanCast(__Me,Summon_EnemySmallElemental,0)
+ACTIONS
+	CharacterUseSkill(Summon_EnemySmallElemental,__Me)
+	
+EVENTS
+EVENT AddMySkill
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill(Summon_EnemySmallElemental)*/

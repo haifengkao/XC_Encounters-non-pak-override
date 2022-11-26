@@ -1,0 +1,84 @@
+INIT
+	CHARACTER:__Me
+	INT:%FXHandle_01
+	INT:%FXHandle_02
+	INT:%FXHandle_03
+	INT:%Bool_FXRestore_Summoning=0
+	TRIGGER:%SummonTrigger_01="CYS_GraveyardTunnel_FireSkel1_704c6200-4b0f-4f14-a570-7a0d6a45524e"
+	TRIGGER:%SummonTrigger_02="CYS_GraveyardTunnel_FireSkel2_982ca424-df03-4488-8c96-1ae440d82861"
+	TRIGGER:%SummonTrigger_03="CYS_GraveyardTunnel_FireSkel3_6467f2e9-b12b-46a9-9df0-f70323034b34"
+	
+//---------------
+BEHAVIOUR
+REACTION SkeletonScorcher_SummonHelp,1500
+USAGE COMBAT
+VARS
+	CHARACTER:_SpawnedSkeleton
+	FLOAT:_MyAP
+	CHARACTERTEMPLATE:_SkelFighter_RT="Undead_Skeleton_Grunt_SLW_Tunnel_14d6e33b-2fc0-4594-b082-8ebf9ccb989f"
+	CHARACTERTEMPLATE:_SkelRanger_RT="Undead_Skeleton_Grunt_BLWTunnel_30104ed4-8b3e-43a2-b2bb-06070fe046eb"
+CHECK "c1&!c2"
+	CharacterGetStat(_MyAP,__Me,ActionPoints)
+	IsLessThen(_MyAP,5)
+ACTIONS
+	CharacterPlayEffect(__Me,"FX_Skills_Fire_Fireball_Prepare_Dummy_A")
+	Set(%Bool_FXRestore_Summoning,1)
+	PlayLoopEffectAt(%FXHandle_01,%SummonTrigger_01,"FX_GP_LightPillarOrange_A")	
+	PlayLoopEffectAt(%FXHandle_02,%SummonTrigger_02,"FX_GP_LightPillarOrange_A")	
+	PlayLoopEffectAt(%FXHandle_03,%SummonTrigger_03,"FX_GP_LightPillarOrange_A")	
+	CharacterPlayAnimation("cast_ground_loop",1,1)
+	CharacterPlayAnimation("cast_ground_cast",1,1)	
+	SpawnCharacter(_SpawnedSkeleton,_SkelRanger_RT,%SummonTrigger_01,1)
+	SpawnCharacter(_SpawnedSkeleton,_SkelFighter_RT,%SummonTrigger_02,1)
+	SpawnCharacter(_SpawnedSkeleton,_SkelFighter_RT,%SummonTrigger_03,1)	
+	Sleep(1)
+	PlayEffectAt(%SummonTrigger_01,"FX_GP_Target_Fire_A")
+	PlayEffectAt(%SummonTrigger_02,"FX_GP_Target_Fire_A")
+	PlayEffectAt(%SummonTrigger_03,"FX_GP_Target_Fire_A")
+	Set(%Bool_FXRestore_Summoning,0)
+	CharacterUseActionPoints(__Me,5)
+	StopLoopEffect(%FXHandle_01)
+	StopLoopEffect(%FXHandle_02)
+	StopLoopEffect(%FXHandle_03)
+	SetPriority("SkeletonScorcher_SummonHelp",0)
+	
+REACTION SkeletonScorcher_UseFlamebreath,1200
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&c4&!c5"
+	CharacterCanCast(__Me,"Cone_EnemyScorcherFlameBreath")
+	CharacterGet(_Target,__Me,20,Lowest,FireResistance,Enemy)
+	CharacterCanSee(__Me,_Target)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Cone_EnemyScorcherFlameBreath")
+	CharacterHasStatus(_Target,"BURNING")
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Cone_EnemyScorcherFlameBreath",_Target)
+
+//---------------
+EVENTS
+EVENT OnInit_GiveSpells_RestoreFX						//FX RESTORE: RESTORING FX UPON LOADING
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill("Cone_EnemyScorcherFlameBreath")
+	IF "c1"
+		IsEqual(%Bool_FXRestore_Summoning,1)
+	THEN
+		PlayLoopEffectAt(%FXHandle_01,%SummonTrigger_01,"FX_GP_LightPillarOrange_A")	
+		PlayLoopEffectAt(%FXHandle_02,%SummonTrigger_02,"FX_GP_LightPillarOrange_A")	
+		PlayLoopEffectAt(%FXHandle_03,%SummonTrigger_03,"FX_GP_LightPillarOrange_A")	
+	ENDIF
+	
+EVENT OnCombatEnded_KillFXHandles
+ON
+	OnCombatEnded()
+	OnDie(__Me,_,_,_)	
+	OnDeactivate()
+ACTIONS
+	StopLoopEffect(%FXHandle_01)
+	StopLoopEffect(%FXHandle_02)
+	StopLoopEffect(%FXHandle_03)

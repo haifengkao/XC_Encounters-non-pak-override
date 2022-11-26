@@ -1,0 +1,478 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%ChosenPlayer=null
+	CHARACTERTEMPLATE:%Demon_Minion_RT="Demons_DAF_Raalzen_Summon_b79ff3e2-336b-401e-a939-f59cb18e2a54"
+	INT:%CurrentPhase=1
+	INT:%SafeZoneFX_Handle
+	INT:%SafeZoneFX_Handle2
+	INT:%DemonFX_Handle
+	INT:%Bool_TheBombHasBeenPlanted=0
+	EXTERN INT:%PlantTheBomb_Current=1
+	EXTERN INT:%PlantTheBomb_Desired=2
+	TRIGGER:%BombDefusalTrigger_01="DAF_ImmaFort_DemonBoss_SafeZone_01_725ebe04-ffbe-4df4-9b12-48aff1da7446"
+	TRIGGER:%BombDefusalTrigger_02="DAF_ImmaFort_DemonBoss_SafeZone_02_f36b804a-677e-4886-9f49-b52c107e27cb"
+	TRIGGER:%BombDefusalTrigger_03="DAF_ImmaFort_DemonBoss_SafeZone_03_0e9fe421-2a59-4186-94a1-805457a1f1f7"
+	TRIGGER:%BombDefusalTrigger_04="DAF_ImmaFort_DemonBoss_SafeZone_04_b7c0209c-a26f-48c3-a137-f8b33f6ff97d"
+	TRIGGER:%BombDefusalTrigger_05="DAF_ImmaFort_DemonBoss_SafeZone_05_7a39aa7c-8f8a-408e-9501-a460321d9d6e"
+	TRIGGER:%SelectedDefusalTrigger=null
+	INT:%Bool_FXRestore_BombPlanted_01=0
+	INT:%Bool_FXRestore_BombPlanted_02=0
+	INT:%Bool_FXRestore_BombPlanted_03=0
+	INT:%Bool_FXRestore_BombPlanted_04=0
+	INT:%Bool_FXRestore_BombPlanted_05=0
+	INT:%AllyCount=0
+	
+/*
+	Phase 1 - fireball, stay away, walk, summons hounds, iron command
+	Phase 2 - fireball, stay away, walk, summons demon minions, midnight oil, plants bombs, iron command
+	Phase 3 - haste, melee, run, infectious flame, mark of death
+*/
+
+//----------------
+BEHAVIOUR
+REACTION DemonBoss_Phase1_SummonFireHound,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Character
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&c4&!c5&c6"
+	IsEqual(%CurrentPhase,1)																//c1
+	CharacterCanCast(__Me,"Summon_EnemyHellHound")											//c2
+	CharacterGet(_Character,__Me,20,Highest,Distance,Enemy)									//c3
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Summon_EnemyHellHound")				//c4
+	IsCasual()																				//c5
+	IsRandom(0.4)																			//c6
+ACTIONS
+	//DebugText(__Me,"P1: summon hound")
+	CharacterMoveInRange(_Character,_MinRange,_MaxRange,0)
+	CharacterUseSkill("Summon_EnemyHellHound",_Character)
+
+REACTION DemonBoss_Phase12_CastFireball,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Character
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&c4&!c5&c6"
+	IsLessThen(%CurrentPhase,3)																//c1
+	CharacterCanCast(__Me,"Projectile_EnemyFireball")										//c2
+	CharacterGet(_Character,__Me,20,Lowest,FireResistance,Enemy)							//c3
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyFireball")				//c4
+	CharacterHasStatus(_Character,"FROZEN")													//!c5
+	IsRandom(0.3)																			//c6
+ACTIONS
+	//DebugText(__Me,"up to P2: fireball")
+	CharacterMoveInRange(_Character,_MinRange,_MaxRange,0)
+	CharacterUseSkill("Projectile_EnemyFireball",_Character)	
+	
+REACTION DemonBoss_Phase12_CastFlare,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Character
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&c4&!c5&c6"
+	IsLessThen(%CurrentPhase,3)																//c1
+	CharacterCanCast(__Me,"Projectile_EnemyFlare")											//c2
+	CharacterGet(_Character,__Me,20,Lowest,FireResistance,Enemy)							//c3
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyFlare")				//c4
+	CharacterHasStatus(_Character,"FROZEN")													//!c5
+	IsRandom(0.4)																			//c6	
+ACTIONS
+	//DebugText(__Me,"up to P2: flare")
+	CharacterMoveInRange(_Character,_MinRange,_MaxRange,0)
+	CharacterUseSkill("Projectile_EnemyFlare",_Character)
+	
+REACTION DemonBoss_Phase12_CastStaffOfMagusFire,200
+USAGE COMBAT
+VARS
+	CHARACTER:_Character
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&c4&!c5"
+	IsLessThen(%CurrentPhase,3)																//c1
+	CharacterCanCast(__Me,"Projectile_EnemyStaffOfMagusFire")								//c2
+	CharacterGet(_Character,__Me,20,Lowest,Vitality,Enemy)									//c3
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyStaffOfMagusFire")		//c4
+	CharacterHasStatus(_Character,"FROZEN")													//!c5
+ACTIONS
+	//DebugText(__Me,"up to P2: SoM Fire")
+	CharacterMoveInRange(_Character,_MinRange,_MaxRange,0)
+	CharacterUseSkill("Projectile_EnemyStaffOfMagusFire",_Character)
+	IF "c1"
+		IsRandom(0.4)
+	THEN
+		CharacterEndTurn()
+	ENDIF
+	SetPriority("DemonBoss_Phase12_CastStaffOfMagusFire",200)
+
+REACTION DemonBoss_Phase2_BombAndDefusal,0
+USAGE COMBAT
+VARS
+	FLOAT:_MyAP
+	FLOAT:_DistBtwChosenPlayerAndTrigger
+CHECK "c1&!(c2|c3|c4|c5|c6|c7)&c8&!c9&c10&c11"
+	IsEqual(%CurrentPhase,2)											//c1
+	CharacterHasStatus(__Me,"FROZEN")									//!c2
+	CharacterHasStatus(__Me,"STUNNED")									//!c3
+	CharacterHasStatus(__Me,"CHARMED")									//!c4
+	CharacterHasStatus(__Me,"PETRIFIED")								//!c5
+	CharacterHasStatus(__Me,"KNOCKED_DOWN")								//!c6
+	CharacterHasStatus(__Me,"MUTED")									//!c7
+	CharacterGetStat(_MyAP,__Me,"ActionPoints")							//c8
+	IsLessThen(_MyAP,4)													//!c9
+	CharacterGet(%ChosenPlayer,__Me,20,Lowest,FireResistance,Enemy)		//c10
+	CharacterIsPlayer(%ChosenPlayer)									//c11	
+ACTIONS
+	//DebugText(__Me,"P2: bomb")	
+	CharacterLookAt(%ChosenPlayer)
+	CharacterPlayLoopEffect(%DemonFX_Handle,__Me,"FX_Skills_Fire_Summon_Prepare_A")
+	CharacterPlayAnimation("cast_long_loop",0,1)
+	CharacterPlayAnimation("cast_long_cast",1,0)
+	StopLoopEffect(%DemonFX_Handle)	
+	IF "c1&!c2"
+		GetDistance(_DistBtwChosenPlayerAndTrigger,%BombDefusalTrigger_01,%ChosenPlayer)
+		IsLessThen(_DistBtwChosenPlayerAndTrigger,8)
+	THEN
+		//DebugText(__Me,"bomb - t1")
+		PlayLoopEffectAt(%SafeZoneFX_Handle,%BombDefusalTrigger_01,"FX_GP_GroundCircle_Gold_A")
+		PlayLoopEffectAt(%SafeZoneFX_Handle2,%BombDefusalTrigger_01,"FX_GP_LightPillarWhite_A")
+		Set(%SelectedDefusalTrigger,%BombDefusalTrigger_01)
+		Set(%Bool_FXRestore_BombPlanted_01,1)
+	ELIF "c1&!c2"
+		GetDistance(_DistBtwChosenPlayerAndTrigger,%BombDefusalTrigger_02,%ChosenPlayer)
+		IsLessThen(_DistBtwChosenPlayerAndTrigger,8)
+	THEN
+		//DebugText(__Me,"bomb - t2")
+		PlayLoopEffectAt(%SafeZoneFX_Handle,%BombDefusalTrigger_02,"FX_GP_GroundCircle_Gold_A")
+		PlayLoopEffectAt(%SafeZoneFX_Handle2,%BombDefusalTrigger_02,"FX_GP_LightPillarWhite_A")		
+		Set(%SelectedDefusalTrigger,%BombDefusalTrigger_02)
+		Set(%Bool_FXRestore_BombPlanted_02,1)
+	ELIF "c1&!c2"
+		GetDistance(_DistBtwChosenPlayerAndTrigger,%BombDefusalTrigger_03,%ChosenPlayer)
+		IsLessThen(_DistBtwChosenPlayerAndTrigger,8)
+	THEN
+		//DebugText(__Me,"bomb - t3")
+		PlayLoopEffectAt(%SafeZoneFX_Handle,%BombDefusalTrigger_03,"FX_GP_GroundCircle_Gold_A")
+		PlayLoopEffectAt(%SafeZoneFX_Handle2,%BombDefusalTrigger_03,"FX_GP_LightPillarWhite_A")		
+		Set(%SelectedDefusalTrigger,%BombDefusalTrigger_03)
+		Set(%Bool_FXRestore_BombPlanted_03,1)
+	ELIF "c1&!c2"
+		GetDistance(_DistBtwChosenPlayerAndTrigger,%BombDefusalTrigger_04,%ChosenPlayer)
+		IsLessThen(_DistBtwChosenPlayerAndTrigger,8)
+	THEN
+		//DebugText(__Me,"bomb - t4")
+		PlayLoopEffectAt(%SafeZoneFX_Handle,%BombDefusalTrigger_04,"FX_GP_GroundCircle_Gold_A")
+		PlayLoopEffectAt(%SafeZoneFX_Handle2,%BombDefusalTrigger_04,"FX_GP_LightPillarWhite_A")		
+		Set(%SelectedDefusalTrigger,%BombDefusalTrigger_04)	
+		Set(%Bool_FXRestore_BombPlanted_04,1)
+	ELIF "c1&!c2"
+		GetDistance(_DistBtwChosenPlayerAndTrigger,%BombDefusalTrigger_05,%ChosenPlayer)
+		IsLessThen(_DistBtwChosenPlayerAndTrigger,8)
+	THEN
+		//DebugText(__Me,"bomb - t5")
+		PlayLoopEffectAt(%SafeZoneFX_Handle,%BombDefusalTrigger_05,"FX_GP_GroundCircle_Gold_A")
+		PlayLoopEffectAt(%SafeZoneFX_Handle2,%BombDefusalTrigger_05,"FX_GP_LightPillarWhite_A")		
+		Set(%SelectedDefusalTrigger,%BombDefusalTrigger_05)
+		Set(%Bool_FXRestore_BombPlanted_05,1)
+	ELSE
+		//DebugText(__Me,"bomb failed!!")
+		SetPriority("DemonBoss_Phase2_BombAndDefusal",0)
+	ENDIF
+	DisplayText(__Me,"CMB_DAF_DemonBoss_BombHasBeenPlanted",4)
+	//CharacterConsume(%ChosenPlayer,"DAF_NemesisDemon_Bomb")
+	CharacterApplyStatus(%ChosenPlayer,"DEMON_BOMB",1,1)
+	Set(%Bool_TheBombHasBeenPlanted,1)
+	Set(%PlantTheBomb_Current,0)	
+	//DebugText(__Me,"bomb sequence complete!")	
+	SetPriority("DemonBoss_Phase2_BombAndDefusal",0)
+INTERRUPT
+	Reset()
+
+REACTION DemonBoss_Phase2_SummonDemon,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Character
+CHECK "c1&c2"
+	IsEqual(%CurrentPhase,2)																//c1
+	CharacterCanCast(__Me,"Summon_EnemyDemon")												//c2
+ACTIONS
+	//DebugText(__Me,"P2: summon demon")
+	CharacterUseSkill("Summon_EnemyDemon",__Me)
+
+REACTION DemonBoss_Phase2_CastMidnightOil,800
+USAGE COMBAT
+VARS
+	CHARACTER:_Character
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&!c4&c5&!c6&c7"
+	IsEqual(%CurrentPhase,2)																//c1
+	CharacterCanCast(__Me,"Target_EnemyTargetedOilSurface")									//c2
+	CharacterGet(_Character,__Me,20,Highest,Speed,Enemy)									//c3
+	IsInSurface(_Character,"Fire")															//!c4
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyTargetedOilSurface")		//c5
+	CharacterHasStatus(_Character,"SLOWED")													//!c6
+	IsRandom(0.4)																			//c7	
+ACTIONS
+	//DebugText(__Me,"P2: midnight oil")
+	CharacterMoveInRange(_Character,_MinRange,_MaxRange,0)
+	CharacterUseSkill("Target_EnemyTargetedOilSurface",_Character)
+	
+REACTION DemonBoss_Phase12_IronCommand,600
+USAGE COMBAT
+VARS
+	CHARACTER:_Character
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&c4&!c5&c6"
+	IsLessThen(%CurrentPhase,3)																//c1
+	CharacterCanCast(__Me,"Target_EnemyIronCommand")										//c2
+	CharacterGet(_Character,__Me,20,Lowest,Vitality,Enemy)									//c3
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyIronCommand")				//c4
+	CharacterHasStatus(_Character,"AGGRO_MARKED")											//!c5
+	IsRandom(0.4)																			//c6	
+ACTIONS
+	//DebugText(__Me,"up to P2: iron command")
+	Set(%AllyCount,0)
+	IterateCharacters("DAF_DemonBoss_CheckForAllies",Lowest,Distance)
+	IF "!c1"
+		IsLessThen(%AllyCount,2)
+	THEN
+		CharacterMoveInRange(_Character,_MinRange,_MaxRange,0)
+		CharacterUseSkill("Target_EnemyIronCommand",_Character)
+	ELSE
+		SetPriority("DemonBoss_Phase12_IronCommand",0)
+	ENDIF
+INTERRUPT
+	Reset()
+	
+REACTION DemonBoss_Phase3_CastHasteOnSelf,500
+USAGE COMBAT
+VARS
+	CHARACTER:_Character
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&!c2&c3&c4"
+	IsEqual(%CurrentPhase,3)
+	CharacterHasStatus(__Me,HASTED)
+	CharacterCanCast(__Me,"Target_EnemyHaste")
+	IsRandom(0.4)	
+ACTIONS
+	//DebugText(__Me,"P3: haste")
+	CharacterUseSkill("Target_EnemyHaste",__Me)
+	
+REACTION DemonBoss_Phase3_CastInfectiousFlame,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Character
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&c4&!c5&c6"
+	IsEqual(%CurrentPhase,3)																//c1
+	CharacterCanCast(__Me,"Projectile_EnemyInfectiousFlame")								//c2
+	CharacterGet(_Character,__Me,20,Lowest,FireResistance,Enemy)							//c3
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyInfectiousFlame")		//c4
+	CharacterHasStatus(_Character,"FROZEN")													//!c5
+	IsRandom(0.3)																			//c6	
+ACTIONS
+	//DebugText(__Me,"P3: infectious flame")
+	CharacterMoveInRange(_Character,_MinRange,_MaxRange,0)
+	CharacterUseSkill("Projectile_EnemyInfectiousFlame",_Character)	
+
+REACTION DemonBoss_PhaseManager,0
+USAGE COMBAT
+VARS
+	FLOAT:_MyVitality
+CHECK "c1"
+	CharacterGetStat(_MyVitality,__Me,Vitality)
+ACTIONS
+	IF "c1"
+		IsEqual(%CurrentPhase,1)
+	THEN
+		IF "c1"
+			IsLessThen(_MyVitality,0.7)
+		THEN
+			//DebugText(__Me,"Entering Phase 2!")
+			Set(%CurrentPhase,2)
+			SetPriority("DemonBoss_PhaseManager",0)
+		ELSE
+			//DebugText(__Me,"Still in Phase 1!")
+		ENDIF
+		SetPriority("DemonBoss_PhaseManager",0)
+	ELIF "c1"
+		IsEqual(%CurrentPhase,2)
+	THEN
+		IF "c1"
+			IsLessThen(_MyVitality,0.4)
+		THEN
+			//DebugText(__Me,"Entering Phase 3!")
+			Set(%CurrentPhase,3)	
+			SetPriority("Combat_AttackSetEnemy",7)
+			SetPriority("Combat_MoveToSetEnemy",6)
+			SetPriority("DemonBoss_Phase12_CastStaffOfMagusFire",0)
+			SetPriority("DemonBoss_PhaseManager",0)
+		ENDIF
+		SetPriority("DemonBoss_PhaseManager",0)
+	ELIF "c1"
+		IsEqual(%CurrentPhase,3)
+	THEN
+		SetPriority("DemonBoss_PhaseManager",0)
+	ENDIF
+INTERRUPT
+	Reset()
+	
+//----------------
+EVENTS
+EVENT OnInit_Setup_FXRestore
+ON
+	OnInit()
+ACTIONS
+	SetPriority("Combat_AttackSetEnemy",0)						
+	SetPriority("Combat_MoveToSetEnemy",0)
+	CharacterAddSkill("Target_EnemyHaste")
+	CharacterAddSkill("Summon_EnemyHellHound")
+	CharacterAddSkill("Projectile_EnemyFireball")
+	CharacterAddSkill("Projectile_EnemyFlare")
+	CharacterAddSkill("Projectile_EnemyInfectiousFlame")
+	CharacterAddSkill("Projectile_EnemyStaffOfMagusFire")
+	CharacterAddSkill("Target_EnemyTargetedOilSurface")
+	CharacterAddSkill("Summon_EnemyDemon")
+	CharacterAddSkill("Target_EnemyIronCommand")
+	IF "c1" 												//FX RESTORE: RESTORING FX UPON LOADING
+		IsEqual(%Bool_TheBombHasBeenPlanted,1)
+	THEN
+		IF "c1"
+			IsEqual(%Bool_FXRestore_BombPlanted_01,1)
+		THEN
+			PlayLoopEffectAt(%SafeZoneFX_Handle,%BombDefusalTrigger_01,"FX_GP_GroundCircle_Gold_A")
+			PlayLoopEffectAt(%SafeZoneFX_Handle2,%BombDefusalTrigger_01,"FX_GP_LightPillarWhite_A")
+		ELIF "c1"
+			IsEqual(%Bool_FXRestore_BombPlanted_02,1)
+		THEN
+			PlayLoopEffectAt(%SafeZoneFX_Handle,%BombDefusalTrigger_02,"FX_GP_GroundCircle_Gold_A")
+			PlayLoopEffectAt(%SafeZoneFX_Handle2,%BombDefusalTrigger_02,"FX_GP_LightPillarWhite_A")
+		ELIF "c1"
+			IsEqual(%Bool_FXRestore_BombPlanted_03,1)
+		THEN
+			PlayLoopEffectAt(%SafeZoneFX_Handle,%BombDefusalTrigger_03,"FX_GP_GroundCircle_Gold_A")
+			PlayLoopEffectAt(%SafeZoneFX_Handle2,%BombDefusalTrigger_03,"FX_GP_LightPillarWhite_A")
+		ELIF "c1"
+			IsEqual(%Bool_FXRestore_BombPlanted_04,1)
+		THEN
+			PlayLoopEffectAt(%SafeZoneFX_Handle,%BombDefusalTrigger_04,"FX_GP_GroundCircle_Gold_A")
+			PlayLoopEffectAt(%SafeZoneFX_Handle2,%BombDefusalTrigger_04,"FX_GP_LightPillarWhite_A")
+		ELIF "c1"
+			IsEqual(%Bool_FXRestore_BombPlanted_05,1)
+		THEN
+			PlayLoopEffectAt(%SafeZoneFX_Handle,%BombDefusalTrigger_05,"FX_GP_GroundCircle_Gold_A")
+			PlayLoopEffectAt(%SafeZoneFX_Handle2,%BombDefusalTrigger_05,"FX_GP_LightPillarWhite_A")
+		ENDIF
+	ENDIF
+
+EVENT OnTurn_GeneralControl
+VARS
+	FLOAT:_DistBetwPlayerAndSafeZone
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("DemonBoss_PhaseManager",2000)
+	SetPriority("DemonBoss_Phase12_IronCommand",600)
+	IF "c1&c2"
+		IsLessThen(%PlantTheBomb_Current,%PlantTheBomb_Desired)
+		IsEqual(%CurrentPhase,2)	
+	THEN
+		Add(%PlantTheBomb_Current,1)
+	ELSE
+		SetPriority("DemonBoss_Phase2_BombAndDefusal",1500)
+	ENDIF
+	IF "c1"
+		IsEqual(%Bool_TheBombHasBeenPlanted,1)
+	THEN
+		IF "!c1&!c2&c3&c4"
+			IsEqual(%ChosenPlayer,null)
+			CharacterIsDead(%ChosenPlayer)
+			GetDistance(_DistBetwPlayerAndSafeZone,%SelectedDefusalTrigger,%ChosenPlayer)
+			IsGreaterThen(_DistBetwPlayerAndSafeZone,3)
+		THEN
+			ExplodeAt(%ChosenPlayer,"Projectile_EnemyNemesisDemon",-1)
+			StopLoopEffect(%SafeZoneFX_Handle)			
+			StopLoopEffect(%SafeZoneFX_Handle2)			
+			Set(%Bool_TheBombHasBeenPlanted,0) 
+			Set(%ChosenPlayer,null)
+			Set(%SelectedDefusalTrigger,null)
+		ELIF "!c1&!c2"
+			IsEqual(%ChosenPlayer,null)
+			CharacterIsDead(%ChosenPlayer)
+		THEN	
+			CharacterPlayEffect(%ChosenPlayer,"FX_Skills_Fire_PurifyingFire_Impact_A")
+			StopLoopEffect(%SafeZoneFX_Handle)			
+			StopLoopEffect(%SafeZoneFX_Handle2)			
+			Set(%Bool_TheBombHasBeenPlanted,0)
+			Set(%ChosenPlayer,null)
+			Set(%SelectedDefusalTrigger,null)	
+		ENDIF
+	ENDIF
+
+EVENT OnIterateCharacter_ScanForVictimsOfSplashDamage
+VARS
+	CHARACTER:_Character
+ON
+	OnIterateCharacter(_Character,"DAF_DemonBoss_Bomb_ScanForCharsWithinSplashDamage")
+ACTIONS
+	IF "c1"
+		CharacterIsInParty(_Character)
+	THEN
+		ExplodeAt(_Character,"Projectile_EnemySuicideExplosionFire",20)
+	ENDIF
+
+EVENT OnIterateCharacter_ScanForAllies
+VARS
+	CHARACTER:_Ally
+	CHARACTERTEMPLATE:_AllyTemplate
+ON
+	OnIterateCharacter(_Ally,"DAF_DemonBoss_CheckForAllies")
+ACTIONS
+	IF "!c1&c2&c3&(c4|c5)&!(c6|c7|c8|c9|c10)"
+		CharacterIsDead(_Ally)																		//!c1
+		CharacterIsAlly(__Me,_Ally)																	//c2
+		CharacterGetTemplate(_Ally,_AllyTemplate)													//c3
+		IsEqual(_AllyTemplate,"Demons_Hellhound_A_dc4d398c-fa93-42bc-b203-fc6f3fbebcb6")			//c4
+		IsEqual(_AllyTemplate,"Demons_Hellhound_A_Summon_c66713da-c5ee-4ecb-a762-5a60431f2f67")		//c5
+		CharacterHasStatus(_Ally,"FROZEN")															//!c6
+		CharacterHasStatus(_Ally,"STUNNED")															//!c7
+		CharacterHasStatus(_Ally,"KNOCKED_DOWN")													//!c8
+		CharacterHasStatus(_Ally,"PETRIFIED")														//!c9
+		CharacterHasStatus(_Ally,"BLIND")															//!c10
+	THEN
+		//DebugText(_Ally,"Counted!")
+		Add(%AllyCount,1)
+	ENDIF
+
+EVENT OnCombatEnded_CleanUp
+ON
+	OnCombatEnded()
+ACTIONS
+	Set(%CurrentPhase,1)
+	StopLoopEffect(%SafeZoneFX_Handle)
+	StopLoopEffect(%SafeZoneFX_Handle2)
+	StopLoopEffect(%DemonFX_Handle)
+	IF "!c1"
+		IsEqual(%ChosenPlayer,null)
+	THEN
+		CharacterPlayEffect(%ChosenPlayer,"FX_Skills_Fire_PurifyingFire_Impact_A")
+		Set(%ChosenPlayer,null)
+	ENDIF
+	Set(%Bool_TheBombHasBeenPlanted,0)
+	Set(%SelectedDefusalTrigger,null)
+	
+EVENT OnDie_CleanUp
+ON
+	OnDie(__Me,_,_,_)
+	OnDeactivate()
+ACTIONS
+	StopLoopEffect(%SafeZoneFX_Handle)
+	StopLoopEffect(%SafeZoneFX_Handle2)
+	StopLoopEffect(%DemonFX_Handle)
+	

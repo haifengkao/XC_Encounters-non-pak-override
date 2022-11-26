@@ -1,0 +1,42 @@
+INIT
+CHARACTER:__Me
+TRIGGER:%Point1 = CYS_Wolgraff_Pickup1_0a01b17e-fbd6-4d5d-8d57-40f60cb33e3c
+TRIGGER:%Point2 = CYS_Wolgraff_Pickup2_dbcf72dc-1626-4cc3-8c7f-cc75a79da726
+TRIGGER:%Point3 = CYS_Wolgraff_Pickup3_85596f53-0f04-430b-af1a-a4fcc0d492b1
+INT:%Active = 1
+INT:%End = 0
+
+BEHAVIOUR
+REACTION Main, 500
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%Active,1)
+ACTIONS
+	CharacterMoveTo(%Point1)
+	CharacterLookFrom(%Point1)
+	CharacterPlayAnimation("PickCoin_01")
+	
+	CharacterMoveTo(%Point2)
+	CharacterLookFrom(%Point2)
+	CharacterPlayAnimation("PickCoin_01")
+	
+	CharacterMoveTo(%Point3)
+	CharacterLookFrom(%Point3)
+	CharacterPlayAnimation("PickCoin_01")
+
+	Sleep(4)
+	
+REACTION SourceAcademy, 500
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%End,1)
+ACTIONS
+	CharacterWander(TRIGGER:SAC_Behavior_WolgraffWander_c01f1bd5-0bcd-4a16-93d2-f48e291dcd68, 3.0)
+	Sleep(5)
+	
+EVENTS
+EVENT Hired
+ON
+	OnCharacterEvent(__Me,"Hired")
+ACTIONS
+	Set(%Active,0)

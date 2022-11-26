@@ -1,0 +1,25 @@
+#INCLUDE CYS_BurningShipHelper
+
+INIT
+USING CYS_BurningShipHelper
+TRIGGER:%Point1 = CYS_PointHelper3_1_92b7d731-509a-4d37-baf2-12e44611011f
+TRIGGER:%Point2 = CYS_PointHelper3_2_93d2f7f3-b8c1-49f2-8720-6f5de09049b3
+
+BEHAVIOUR
+	
+REACTION State_ActionManager, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, "Action_CleanBoat")
+	SetPriority(%currentAction, 1100)
+	
+REACTION Action_CleanBoat,0
+VARS
+	FIXEDSTRING:%CurrentAnimation = ""
+USAGE PEACE
+ACTIONS
+	CharacterLookFrom(%Point2)
+	GetRandom(%CurrentAnimation, "WipeTable_01", "Look_Down_Short_01", "Idle1", "Depressed_01")
+	CharacterPlayAnimation(%CurrentAnimation)
+	Sleep(1)
+	SetPriority(%currentAction, 0)

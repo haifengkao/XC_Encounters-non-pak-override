@@ -1,0 +1,81 @@
+INIT
+	CHARACTER:__Me
+	FLOAT:%CountdownToDeath
+	INT:%TurnCounter_Current=0	
+	INT:%TurnCounter_Desired=4
+	EXTERN INT:%Bool_IsBig=0
+
+//-----	
+BEHAVIOUR
+REACTION CrawlInfest_CountdownToDeath,500
+USAGE PEACE
+ACTIONS
+	IF "c1"
+		IsEqual(%Bool_IsBig,1)
+	THEN
+		StartTimer("CMB_CrawlingInfestation_Rat_CountdownToDeath_Big",18,0)
+	ELSE
+		StartTimer("CMB_CrawlingInfestation_Rat_CountdownToDeath_Small",12,0)
+	ENDIF
+	SetPriority("CrawlInfest_CountdownToDeath",0)
+
+//-----
+EVENTS
+EVENT OnInit_StartTimer
+ON
+	OnInit()
+ACTIONS
+	StartTimer("CMB_CrawlInfest_CreateBloodSurface_Timer",0.35,0)
+	
+EVENT OnTimer_CreateBloodSurface
+ON
+	OnTimer("CMB_CrawlInfest_CreateBloodSurface_Timer")
+ACTIONS
+	IF "c1"
+		IsEqual(%Bool_IsBig,1)
+	THEN
+		CreateSurfaceAt(__Me,"Blood",0.5,1.3)
+	ELSE
+		CreateSurfaceAt(__Me,"Blood",0.5,1)
+	ENDIF
+	StartTimer("CMB_CrawlInfest_CreateBloodSurface_Timer",0.35,0)
+		
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	Add(%TurnCounter_Current,1)
+	IF "c1&c2"
+		IsEqual(%TurnCounter_Current,%TurnCounter_Desired)
+		IsEqual(%Bool_IsBig,0)
+	THEN
+		StopTimer("CMB_CrawlingInfestation_Rat_CountdownToDeath_Small")
+		CharacterDie(__Me)
+	ELIF "c1&c2"
+		IsGreaterThen(%TurnCounter_Current,%TurnCounter_Desired)
+		IsEqual(%Bool_IsBig,1)
+	THEN
+		StopTimer("CMB_CrawlingInfestation_Rat_CountdownToDeath_Big")
+		CharacterDie(__Me)		
+	ENDIF	
+	
+EVENT OnTimer_Die_Big
+ON
+	OnTimer("CMB_CrawlingInfestation_Rat_CountdownToDeath_Big")
+ACTIONS
+	StopTimer("CMB_CrawlInfest_CreateBloodSurface_Timer")
+	CharacterDie(__Me)
+	
+EVENT OnTimer_Die_Small
+ON
+	OnTimer("CMB_CrawlingInfestation_Rat_CountdownToDeath_Small")
+ACTIONS
+	StopTimer("CMB_CrawlInfest_CreateBloodSurface_Timer")
+	CharacterDie(__Me)
+	
+EVENT OnCombatStarted_StopCountdownToDeath
+ON
+	OnCombatStarted()
+ACTIONS
+	StopTimer("CMB_CrawlingInfestation_Rat_CountdownToDeath")
+	SetPriority("CrawlInfest_CountdownToDeath",500)	

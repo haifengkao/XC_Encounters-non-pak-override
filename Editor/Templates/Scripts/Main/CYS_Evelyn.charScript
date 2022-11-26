@@ -1,0 +1,249 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	TRIGGER:%bed_01="CYS_Point_Evelyn_Bed_01_83fcedd5-f8b3-428f-833e-b6bb747d2e36"
+	TRIGGER:%bed_02="CYS_Point_Evelyn_Bed_02_86c5bf6a-9ce9-48e4-bee6-6cb3aa5e345e"
+	TRIGGER:%bed_03="CYS_PointThelyronPatientBoris_fff21bc1-dce4-4b72-9443-1e844131b50d"
+	TRIGGER:%bed_04="CYS_PointThelyronPatientSteven_a43787a1-88a2-4b80-9f37-ac330562dc15"
+	TRIGGER:%patientFiles="CYS_Point_Evelyn_ReadPatientFiles_84743b9c-ca22-48e5-b048-3e57c26b1f8d"
+	CHARACTER:%targetPatient=null
+	CHARACTERTEMPLATE:%EveHoundTempl="109c23a8-ac22-4fe3-8fc4-50677b4bae62"
+	CHARACTERTEMPLATE:%EveMageTempl="e4d42687-12b4-4324-bb5c-7098472a7e67"
+	CHARACTERTEMPLATE:%EveSummonerTempl="8e470dad-dbe0-4b84-ae15-b11fcff67ea2"
+	CHARACTERTEMPLATE:%EveDemonTempl="a089202d-f767-43d3-ad3b-238ad70e5eee"
+
+//------
+BEHAVIOUR
+REACTION State_Ominous, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, "Action_Mutter")
+	SetPriority(%currentAction, 1100)
+
+REACTION State_ActionManager, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, "Action_CleanBeds", "Action_ReadPatientFiles")
+	SetPriority(%currentAction, 1100)
+	
+REACTION State_Idle, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, "Action_Idle")
+	SetPriority(%currentAction, 1100)
+
+REACTION State_WaitingForDecision, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, "Action_Waiting")
+	SetPriority(%currentAction, 1100)
+	
+REACTION State_YellAtJake, 0
+	USAGE PEACE
+	ACTIONS
+		Sleep(8)
+	
+REACTION Action_CleanBeds, 0
+USAGE PEACE
+VARS
+	TRIGGER:_bed
+	FIXEDSTRING:_animation
+ACTIONS
+	GetRandom(_bed, %bed_01, %bed_02, %bed_03, %bed_04)
+	CharacterMoveTo(_bed, 0)
+	CharacterLookFrom(_bed)
+	GetRandom(_animation, "Fidget_Forward_02", "WipeTable_01")
+	CharacterPlayAnimation(_animation)
+	Sleep(3)
+	SetPriority(%currentAction, 0)
+
+REACTION Action_ReadPatientFiles, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%patientFiles, 0)
+	CharacterPlayAnimation("Fidget_Forward_01",0)
+	CharacterPlayAnimation("Stand_Read_01")
+	Sleep(3)
+	SetPriority(%currentAction, 0)
+	
+REACTION Action_Waiting, 0
+USAGE PEACE
+VARS
+	FLOAT:_SleepTime
+	FIXEDSTRING:_Animation
+	CHARACTER:_Player
+ACTIONS
+	IF "c1&!c2&c3"
+		CharacterGet(_Player,__Me,4,Lowest,Distance,Player)
+		IsInDialog(_Player)
+		IsRandom(0.4)
+	THEN
+		CharacterLookAt(_Player)
+		DialogStart("CYS_AD_EvelynAsksPlayer",__Me)
+	ENDIF
+	GetRandom(_Animation,"Think_01","Think_02")
+	CharacterPlayAnimation(_Animation)
+	GetRandom(_SleepTime,FLOAT:1.5,FLOAT:2.5,FLOAT:3.5)
+	Sleep(_SleepTime)
+	SetPriority(%currentAction, 0)
+	
+REACTION Action_Idle, 0
+USAGE PEACE
+ACTIONS
+	Sleep(2.0)
+	SetPriority(%currentAction, 0)
+
+REACTION Action_Mutter, 0
+USAGE PEACE
+VARS
+	FLOAT:_SleepTime
+	FIXEDSTRING:_Animation
+ACTIONS
+	DialogStart("CYS_AD_EvelynOminous",__Me)
+	GetRandom(_Animation,"Think_01","Think_02")
+	CharacterPlayAnimation(_Animation)
+	GetRandom(_SleepTime,FLOAT:1.5,FLOAT:2.5,FLOAT:3.5)
+	Sleep(_SleepTime)
+	SetPriority(%currentAction, 0)
+	
+REACTION EvelynsHyperSummon, 1500
+USAGE COMBAT
+VARS
+	INT:_Failures=0
+	INT:_Successes=0
+	CHARACTER:_Player
+	CHARACTER:_AirDemon
+	FLOAT:_Angle
+	FLOAT:_Dist
+	FLOAT3:_MyPosition
+	FLOAT3:_PosOffset
+	FIXEDSTRING:_Faction
+CHECK "c1&!c2&!c3&!c4&!c5&!c6&!c7&c8&c9"
+	CharacterGet(_Player,__Me,50,Lowest,Distance,Enemy)
+	CharacterHasStatus(__Me,CHARMED)
+	CharacterHasStatus(__Me,PETRIFIED)
+	CharacterHasStatus(__Me,FEAR)
+	CharacterHasStatus(__Me,STUNNED)
+	CharacterHasStatus(__Me,MUTED)
+	CharacterHasStatus(__Me,FEAR)
+	CharacterGetFaction(_Faction,__Me)
+	IsEqual(_Faction,"Evil NPC")
+ACTIONS
+	CharacterLookAt(_Player)
+	WHILE "c1&c2"
+		IsLessThen(_Successes,6)
+		IsLessThen(_Failures,30)
+	DO
+		IF "c1"
+			GetPosition(__Me,_MyPosition)
+		THEN
+			Set(_PosOffset,{1;0;0}) 
+			GetRandomBetween(_Angle,-270,90)
+			GetRandomBetween(_Dist,2.5,3.5)
+			RotateY(_PosOffset,_Angle)
+			Multiply(_PosOffset,_Dist)	
+			Add(_MyPosition,_PosOffset)
+			CharacterPlayEffect(__Me,"FX_Skills_Fire_Fireball_Prepare_Dummy_A","Dummy_L_Hand")
+		ENDIF
+		IF "!c1&!c2&!c3&!c4&!c5&!c6"
+			ContainsSurface(_MyPosition,1,Fire)
+			ContainsSurface(_MyPosition,1,CloudPoison)
+			ContainsSurface(_MyPosition,1,Ooze)
+			ContainsSurface(_MyPosition,1,Ice)
+			ContainsSurface(_MyPosition,1,CloudStatic)
+			ContainsSurface(_MyPosition,1,Electrified)
+		THEN
+			CharacterPlayAnimation("cast_shout_cast",0,0)
+			CharacterPlayEffect(__Me,"FX_Skills_Fire_Fireball_Prepare_Dummy_A","Dummy_L_Hand")
+			CharacterPlayEffect(__Me,"FX_Skills_Fire_Fireball_Prepare_Dummy_A","Dummy_R_Hand")
+			IF "c1"
+				IsEqual(_Successes,1)
+			THEN	
+				PlayEffectAt(_MyPosition,"FX_Skills_Air_Shield_Prepare_A")
+				PlayEffectAt(_MyPosition,"FX_GP_Death_Lightning_A_Medium")
+				Sleep(0.5)
+				SpawnCharacter(_AirDemon,%EveDemonTempl,_MyPosition,1)					//DEMON
+				Sleep(0.7)
+			ELIF "c1"
+				IsEqual(_Successes,2)
+			THEN
+				CharacterPlayAnimation("cast_shout_cast",0,0)
+				PlayEffectAt(_MyPosition,"FX_Creatures_Undead_Skeleton_Fire_A_Death")
+				SpawnCharacter(_,%EveMageTempl,_MyPosition,0)							//MAGE
+				Sleep(0.4)				
+			ELIF "c1"
+				IsEqual(_Successes,3)
+			THEN
+				CharacterPlayAnimation("cast_shout_cast",0,0)
+				PlayEffectAt(_MyPosition,"FX_Creatures_Undead_Skeleton_Fire_A_Death")
+				SpawnCharacter(_,%EveSummonerTempl,_MyPosition,0)						//SUMMONER
+				Sleep(0.2)
+			ELIF "c1"
+				IsEqual(_Successes,4)
+			THEN	
+				CharacterPlayAnimation("cast_shout_cast",0,0)
+				PlayEffectAt(_MyPosition,"FX_Creatures_Undead_Skeleton_Fire_A_Death")
+				SpawnCharacter(_,%EveHoundTempl,_MyPosition,0)							//HOUND 1
+				Sleep(0.1)				
+			ELIF "c1"
+				IsEqual(_Successes,5)
+			THEN
+				CharacterPlayAnimation("cast_shout_cast",0,0)
+				PlayEffectAt(_MyPosition,"FX_Creatures_Undead_Skeleton_Fire_A_Death")
+				SpawnCharacter(_,%EveHoundTempl,_MyPosition,0)							//HOUND 2
+			ENDIF
+			Add(_Successes,1)
+		ELSE
+			Add(_Failures,1)
+			//DebugText(__Me,"Failed!")
+		ENDIF
+	ENDWHILE
+	IF "c1"
+		IsEqual(_Failures,30)
+	THEN
+		Set(_Failures,0)
+		CharacterEndTurn()	
+	ENDIF
+	SetPriority("EvelynsHyperSummon",0)
+INTERRUPT
+	Reset()
+
+REACTION Evelyn_ShacklesOfPain,350	//hardcore only
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&!c2&c3&c4&c5"
+	IsHardcore()
+	CharacterHasStatus(__Me,"SHACKLES_OF_PAIN_CASTER")											//c1
+	CharacterCanCast(__Me,"Target_EnemyShacklesOfPain")											//c2
+	CharacterGet(_ChosenTarget,__Me,20,Highest,Vitality,Enemy)									//c3
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyShacklesOfPain")				//c4
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Target_EnemyShacklesOfPain",_ChosenTarget)	
+INTERRUPT
+	Reset()
+
+//------
+EVENTS
+EVENT OnInit_GiveShacklesOfPain
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill("Target_EnemyShacklesOfPain")
+	
+//------
+STORY
+SCRIPTFRAME DeliverStoneToPatient
+ACTIONS
+	IF "c1"
+		IsEqual(%targetPatient,CHARACTER:CYS_ThelyronPatientSteven_e0da7c51-0ec0-491d-8d9a-85ff09511989)
+	THEN
+		CharacterMoveTo(%bed_04,0)
+	ELSE
+		CharacterMoveTo(%bed_03,0)
+	ENDIF

@@ -1,0 +1,16 @@
+#INCLUDE Base
+INIT
+USING Base
+EXTERN INT:%IsWandering = 0
+EXTERN TRIGGER:%WanderArea = null
+EXTERN FLOAT:%WanderTime = 10
+
+BEHAVIOUR 
+
+REACTION Wander, 6
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%IsWandering, 1)
+ACTIONS
+	CharacterWander(%WanderArea, %WanderTime, 0)
+	Sleep(5)

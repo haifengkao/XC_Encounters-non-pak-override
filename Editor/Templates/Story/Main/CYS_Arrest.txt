@@ -1,0 +1,208 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+CharacterSetOnStage(CHARACTER_CYS_ArrestLegionnaire_Esmeralda,0);
+CharacterSetOnStage(CHARACTER_CYS_ArrestLegionnaire_Mortician,0);
+CharacterSetOnStage(CHARACTER_CYS_ArrestLegionnaire_Eglandaer,0);
+
+DB_CYS_ArrestNPC(CHARACTER_CYS_Esmeralda,"CYS_ArrestEsmeralda",CHARACTER_CYS_ArrestLegionnaire_Esmeralda,"CYS_AD_EsmeraldaArrest",TRIGGER_CYS_Point_EsmeInJail,"CYS_EsmeraldaInJail",ITEM_CYS_EsmeraldaJailDoor);
+DB_CYS_ArrestNPC(CHARACTER_CYS_Mortician,"CYS_MorticianArrest",CHARACTER_CYS_ArrestLegionnaire_Mortician,"CYS_AD_MorticianArrest",TRIGGER_CYS_Point_PrisonMortician,"CYS_MorticianInJail",ITEM_CYS_MorticianPrisonDoor);
+DB_CYS_ArrestNPC(CHARACTER_CYS_Eglandaer,"CYS_EglandaerGetsArrested",CHARACTER_CYS_ArrestLegionnaire_Eglandaer,"CYS_AD_EglandaerArrest",TRIGGER_CYS_Point_EglandaerJail,"CYS_EglandaerInJail",ITEM_CYS_EglandaerPrisonDoor);
+
+DB_IsNotMessingAround(CHARACTER_CYS_ArrestLegionnaire_Esmeralda);
+DB_IsNotMessingAround(CHARACTER_CYS_ArrestLegionnaire_Mortician);
+DB_IsNotMessingAround(CHARACTER_CYS_ArrestLegionnaire_Eglandaer);
+KBSECTION
+IF
+GlobalEventSet(_ArrestEvent)
+AND
+DB_CYS_ArrestNPC(_ArrestNPC,_ArrestEvent,_,_,_,_,_)
+THEN
+ArrestsNPC(CHARACTER_CYS_Aureus,_ArrestNPC);
+
+//Fix for Septimus flexing
+IF
+CharacterSawCharacter(_Player,CHARACTER_CYS_Esmeralda)
+AND
+DB_IsPlayer(_Player)
+AND
+ArrestsNPC(CHARACTER_CYS_Aureus,CHARACTER_CYS_Esmeralda)
+THEN
+CharacterSetVarFixedString(CHARACTER_CYS_Septimus,"currentState","");
+
+IF
+CharacterSawCharacter(_Player,_ArrestNPC)
+AND
+DB_IsPlayer(_Player)
+AND
+ArrestsNPC(CHARACTER_CYS_Aureus,_ArrestNPC)
+AND
+DB_CYS_ArrestNPC(_ArrestNPC,_,_ArrestLegionnaire,_,_,_,_)
+THEN
+NOT ArrestsNPC(CHARACTER_CYS_Aureus,_ArrestNPC);
+CharacterSetVarFixedString(_ArrestNPC,"currentState","");
+CharacterAppearOutOfSightTo(_ArrestLegionnaire,_ArrestNPC,270,0,"CYS_ArrestNPC_LegionnaireAppeared");
+CharacterSetHasDialog(_ArrestNPC,0);
+DialogRequestStopForCharacter(_ArrestNPC);
+CharacterPurgeQueue(_ArrestNPC);
+DB_NoDefaultBehavior(_ArrestNPC);
+NoStealingReaction(_ArrestNPC);
+
+IF
+CharacterEvent(_ArrestLegionnaire,"CYS_ArrestNPC_LegionnaireAppeared")
+AND
+DB_CYS_ArrestNPC(_ArrestNPC,_,_ArrestLegionnaire,_,_,_,_)
+THEN
+CharacterMoveToCharacter(_ArrestLegionnaire,_ArrestNPC,0,"CYS_ArrestNPC_LegionnaireNextToNPC",0);
+
+IF
+CharacterEvent(_ArrestLegionnaire,"CYS_ArrestNPC_LegionnaireNextToNPC")
+AND
+DB_CYS_ArrestNPC(_ArrestNPC,_,_ArrestLegionnaire,_,_,_,_)
+THEN
+ProcCYSCheckIfWeCanArrestNPC(_ArrestLegionnaire,_ArrestNPC);
+
+PROC
+ProcCYSCheckIfWeCanArrestNPC((CHARACTER)_ArrestLegionnaire,(CHARACTER)_ArrestNPC)
+AND
+NOT DB_Dead(_ArrestNPC)
+AND
+DB_CYS_ArrestNPC(_ArrestNPC,_,_ArrestLegionnaire,_ArrestAD,_,_,_)
+THEN
+DialogStartTwoSpeakerDialog(_ArrestAD,_ArrestLegionnaire,_ArrestNPC);
+
+//guy is already dead...
+PROC
+ProcCYSCheckIfWeCanArrestNPC((CHARACTER)_ArrestLegionnaire,(CHARACTER)_ArrestNPC)
+AND
+DB_Dead(_ArrestNPC)
+AND
+DB_CYS_ArrestNPC(_ArrestNPC,_,_,_,_,_PrisonEvent,_)
+THEN
+DialogStartOneSpeakerDialog("CYS_AD_ArrestLegionnaireDeadTarget",_ArrestLegionnaire);
+
+IF
+DB_Dead(_ArrestLegionnaire)
+AND
+DB_CYS_ArrestNPC(_ArrestNPC,_,_ArrestLegionnaire,_,_,_,_)
+AND
+NOT _ArrestNPC.InJail()
+AND
+NOT DB_Dead(_ArrestNPC)
+THEN
+CharacterPurgeQueue(_ArrestNPC);
+DialogRequestStopForCharacter(_ArrestNPC);
+DialogStartOneSpeakerDialog("CYS_AD_ArrestNPCChoseFreedom",_ArrestNPC);
+
+IF
+AutomatedDialogEnded("CYS_AD_ArrestNPCChoseFreedom",_ID)
+AND
+DB_DialogNPCs(_ID,_ArrestNPC,1)
+THEN
+CharacterDisappearOutOfSight(_ArrestNPC,270,1,"",1);
+
+IF
+AutomatedDialogEnded("CYS_AD_ArrestLegionnaireDeadTarget",_ID)
+AND
+DB_DialogNPCs(_ID,_ArrestLegionnaire,1)
+THEN
+CharacterDisappearOutOfSight(_ArrestLegionnaire,270,0,"",1);
+
+IF
+AutomatedDialogEnded(_ArrestAD,_)
+AND
+DB_CYS_ArrestNPC(_ArrestNPC,_,_ArrestLegionnaire,_ArrestAD,_,_,_)
+AND
+NOT DB_Combat(_ArrestNPC,_)
+AND
+NOT DB_CYSDoArrestInterrupted(_ArrestNPC)
+THEN
+CharacterDisappearOutOfSight(_ArrestNPC,270,0,"CYS_ArrestNPC_NPCToJail",1);
+CharacterDisappearOutOfSight(_ArrestLegionnaire,270,0,"",1);
+
+PROC
+ProcMakeNPCHostile(_, _ArrestLegionnaire )
+AND
+DB_CYS_ArrestNPC(_ArrestNPC,_,_ArrestLegionnaire,_ArrestAD,_,_,_)
+THEN
+CharacterPurgeQueue(_ArrestLegionnaire);
+DB_CYSDoArrestInterrupted(_ArrestNPC);
+
+IF
+AutomatedDialogEnded(_ArrestAD,_)
+AND
+DB_CYS_ArrestNPC(_ArrestNPC,_,_ArrestLegionnaire,_ArrestAD,_,_,_)
+AND
+DB_Combat(_ArrestNPC,_)
+THEN
+DB_CYSDoArrestInterrupted(_ArrestNPC);
+
+IF
+CharacterLeftCombat(_ArrestNPC,_)
+AND
+NOT DB_Dead(_ArrestNPC)
+AND
+DB_CYSDoArrestInterrupted(_ArrestNPC)
+AND
+DB_CYS_ArrestNPC(_ArrestNPC,_,_ArrestLegionnaire,_ArrestAD,_,_,_)
+AND
+NOT DB_Dead(_ArrestLegionnaire)
+THEN
+NOT DB_CYSDoArrestInterrupted(_ArrestNPC);
+CharacterDisappearOutOfSight(_ArrestNPC,270,0,"CYS_ArrestNPC_NPCToJail",1);
+CharacterDisappearOutOfSight(_ArrestLegionnaire,270,0,"",1);
+
+IF
+CharacterLeftCombat(_ArrestNPC,_)
+AND
+NOT DB_Dead(_ArrestNPC)
+AND
+DB_CYSDoArrestInterrupted(_ArrestNPC)
+AND
+DB_CYS_ArrestNPC(_ArrestNPC,_,_ArrestLegionnaire,_ArrestAD,_,_,_)
+AND
+DB_Dead(_ArrestLegionnaire)
+THEN
+NOT DB_CYSDoArrestInterrupted(_ArrestNPC);
+DialogRequestStopForCharacter(_ArrestNPC);
+DialogStartOneSpeakerDialog("CYS_AD_ArrestNPCChoseFreedom",_ArrestNPC);
+
+IF
+CharacterLeftCombat(_ArrestLegionnaire,_)
+AND
+NOT DB_Dead(_ArrestLegionnaire)
+AND
+DB_CYS_ArrestNPC(_ArrestNPC,_,_ArrestLegionnaire,_ArrestAD,_,_,_)
+AND
+DB_CYSDoArrestInterrupted(_ArrestNPC)
+AND
+DB_Dead(_ArrestNPC)
+THEN
+NOT DB_CYSDoArrestInterrupted(_ArrestNPC);
+DialogRequestStopForCharacter(_ArrestNPC);
+DialogStartOneSpeakerDialog("CYS_AD_ArrestLegionnaireDeadTarget",_ArrestLegionnaire);
+
+IF
+CharacterEvent(_ArrestNPC,"CYS_ArrestNPC_NPCToJail")
+AND
+DB_CYS_ArrestNPC(_ArrestNPC,_,_,_,_PrisonTrigger,_PrisonEvent,_Door)
+AND
+PrisonDataDoorKeys(ITEM_CYS_PlayerJailDoor,_Key)
+THEN
+_ArrestNPC.InJail();
+GlobalSetEvent(_PrisonEvent);
+CharacterSetHasDialog(_ArrestNPC,1);
+CharacterAppearAtTrigger(_ArrestNPC,_PrisonTrigger,0);
+CharacterSetCanFight(_ArrestNPC, 0);
+CharacterSetVarInteger(_ArrestNPC, "inJail", 1);
+NOT DB_Trader(_ArrestNPC);
+CharacterClearTradeGeneratedItems(_ArrestNPC);
+SetAttitudeToAtMax(CHARACTER_Player1,_ArrestNPC, -30);
+SetAttitudeToAtMax(CHARACTER_Player2,_ArrestNPC, -30);
+ItemClose(_Door);
+ItemLock(_Door,_Key);
+
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

@@ -1,0 +1,89 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%SpottedDude1
+	CHARACTER:%SpottedDude2
+	TRIGGER:%SpottedTrigger1 = CYS_AreaIntroGuards_83d5aeb0-2094-40ae-8fa3-254fa4d0386d
+	TRIGGER:%SpottedTrigger2 = CYS_AreaIntroGuards2_26aff591-cf11-4c19-a3c7-f356a6da21fe
+	INT:%SpottedCounter1 = 0
+	INT:%SpottedCounter2 = 0
+	
+EVENTS
+
+EVENT Initialize
+	ON
+		OnInit()
+	ACTIONS
+		IF "c1"
+			IsEqual(%SpottedCounter1, 0)
+		THEN
+			StartTimer("UpdateSneak1",0.1,-1)
+		ENDIF
+		IF "c1"
+			IsEqual(%SpottedCounter2, 0)
+		THEN
+			StartTimer("UpdateSneak2",0.1,-1)
+		ENDIF
+
+EVENT CombatStarted
+	ON
+		OnCombatStarted()
+	ACTIONS
+		StopTimer("UpdateSneak1")
+		Set(%SpottedCounter1, 1)
+		StopTimer("UpdateSneak2")
+		Set(%SpottedCounter2, 1)
+		
+EVENT Shutdown
+	ON
+		OnShutdown()
+	ACTIONS
+		StopTimer("UpdateSneak1")
+		StopTimer("UpdateSneak2")
+
+EVENT Update1
+	ON
+		OnTimer("UpdateSneak1")
+	ACTIONS
+		IterateParty("SneakingCheck1")
+		
+EVENT Update2
+	ON
+		OnTimer("UpdateSneak2")
+	ACTIONS
+		IterateParty("SneakingCheck2")
+	
+EVENT CheckSight
+VARS
+CHARACTER:_Char
+ON
+	OnIterateCharacter(_Char,"SneakingCheck1")
+ACTIONS
+	IF "c1&c2&c3&c4"
+		IsEqual(%SpottedCounter1, 0)
+		CharacterCanSee(__Me,_Char,1)
+		CharacterIsInTrigger(_Char, %SpottedTrigger1)
+		CharacterIsStoryGlobal(_Char)
+	THEN
+		Set(%SpottedCounter1, 1)
+		StopTimer("UpdateSneak1")
+		SetVar(__Me, "SpottedDude1", _Char)
+		CharacterEvent(__Me, "GLO_SpotterSneaker1")
+	ENDIF
+	
+EVENT CheckSight2
+VARS
+CHARACTER:_Char
+ON
+	OnIterateCharacter(_Char,"SneakingCheck2")
+ACTIONS
+	IF "c1&c2&c3&c4"
+		IsEqual(%SpottedCounter2, 0)
+		CharacterCanSee(__Me,_Char,1)
+		CharacterIsInTrigger(_Char, %SpottedTrigger2)
+		CharacterIsStoryGlobal(_Char)
+	THEN
+		Set(%SpottedCounter2, 1)
+		StopTimer("UpdateSneak2")
+		SetVar(__Me, "SpottedDude2", _Char)
+		CharacterEvent(__Me, "GLO_SpotterSneaker2")
+	ENDIF

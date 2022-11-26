@@ -1,0 +1,24 @@
+INIT
+	CHARACTER:__Me
+	EXTERN STRING:%Event = null
+	
+EVENTS
+
+EVENT Die
+	ON
+		OnCharacterItemEvent(_,_,%Event)
+	ACTIONS
+		IF "c1"
+			CharacterHasStatus(__Me, GALVANISED)
+		THEN
+			CharacterRemoveStatus(__Me, GALVANISED)
+		ELIF "c1"
+			CharacterHasStatus(__Me, VOID_AURA)
+		THEN
+			CharacterRemoveStatus(__Me, VOID_AURA)
+		ELIF "c1"
+			CharacterHasStatus(__Me, INVULNERABLE)
+		THEN
+			CharacterRemoveStatus(__Me, INVULNERABLE)
+		ENDIF
+		CharacterDie(__Me)

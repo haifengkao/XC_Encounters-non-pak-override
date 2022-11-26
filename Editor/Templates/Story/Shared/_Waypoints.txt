@@ -1,0 +1,70 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+IF
+DB_WaypointInfo(_Item,_Trigger,_CurrentWP)
+THEN
+RegisterWaypoint(_CurrentWP,_Item);
+
+IF
+ItemEvent(_Item,"WaypointDiscovered")
+AND
+DB_WaypointInfo(_Item,_,_)
+THEN
+ProcDoWaypointUnlock(_Item);
+
+IF
+CharacterUsedItem(_Player,_Item)
+AND
+DB_WaypointInfo(_Item,_Trigger,_CurrentWP)
+THEN
+PROC_CheckPlayTut(_Player,"TUT_Waypoint");
+ProcDoWaypointUnlock(_Item);
+OpenWaypointUI(_Player,_CurrentWP,_Item);
+
+IF
+TextEventSet("wp")
+THEN
+PROC_UnlockAllWP();
+ProcTestOpenWaypointUI();
+
+PROC
+ProcTestOpenWaypointUI()
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_Companion(_Player)
+AND
+NOT DB_OnlyOnce("openedWPUI")
+THEN
+DB_OnlyOnce("openedWPUI");
+OpenWaypointUI(_Player,"",ITEM_NULL);
+
+PROC
+ProcTestOpenWaypointUI()
+THEN
+NOT DB_OnlyOnce("openedWPUI");
+
+PROC
+PROC_UnlockAllWP()
+AND
+DB_WaypointInfo(_,_Trigger,_CurrentWP)
+THEN
+UnlockWaypoint(_CurrentWP,_Trigger);
+
+PROC
+ProcDoWaypointUnlock((ITEM)_Item)
+AND
+DB_WaypointInfo(_Item,_Trigger,_CurrentWP)
+AND
+NOT _Item.isunlocked()
+THEN
+_Item.isunlocked();
+Proc_AddExplorationEvent("GLO_Waypoint");
+UnlockWaypoint(_CurrentWP,_Trigger);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "__Start"

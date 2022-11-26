@@ -1,0 +1,25 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+CHARACTER:%Ruby = LUC_Ruby_d385b82c-5d8c-4703-b621-c8840f39e9bc
+
+BEHAVIOUR
+
+REACTION State_WithRuby, 0
+USAGE PEACE
+ACTIONS
+	CharacterLookAt(%Ruby)
+	Sleep(10)
+
+REACTION State_GuardingBridge, 0
+USAGE PEACE
+VARS
+	CHARACTER:_Player
+CHECK "c1"
+	CharacterGet(_Player,__Me,12,Lowest,Distance,Player,null,null)
+ACTIONS
+	CharacterLookAt(_Player)
+	DialogStart("LUC_AD_TrollBridge2",__Me)
+	Sleep(15)

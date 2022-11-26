@@ -1,0 +1,83 @@
+
+INIT
+	CHARACTER:__Me
+	CHARACTER:%Friend1 = LUC_BG_SittingImmaculate1_6a808a3f-6b3d-4ce9-aaa2-bddadfc58429
+	CHARACTER:%Friend2 = LUC_BG_SittingImmaculate2_d8e7d0a1-8ad2-494a-906b-f0edccff7d46
+	FIXEDSTRING:%currentAction
+	EXTERN ITEM:%Seat = null
+	INT:%Sitting = 0
+BEHAVIOUR
+
+REACTION HangingWithFriends, 130
+	USAGE PEACE
+	ACTIONS
+		GetWeightedRandom(%currentAction, "Action_TalkWithFriend", INT:1, "Action_StayingPut",INT:3)
+		SetPriority(%currentAction, 135)
+		
+REACTION Action_StayingPut, 0
+	USAGE PEACE
+	CHECK "!c1"
+		IsInDialog(__Me)
+	VARS
+		FIXEDSTRING:_Anim
+		FLOAT:_Wait
+	ACTIONS
+		GetRandom(_Anim, "Sit_Tired_01", "Sit_Idle_01", "Sit_Idle_02", "Sit_Idle_03")
+		GetRandomBetween(_Wait, 3, 6)
+		CharacterPlayAnimation(_Anim)
+		Sleep(_Wait)
+		SetPriority(%currentAction, 0)
+
+REACTION Action_TalkWithFriend, 0
+	USAGE PEACE
+	CHECK "!c1&!c2&!c3"
+		IsInDialog(__Me)
+		IsInDialog(%Friend1)
+		IsInDialog(%Friend2)
+	ACTIONS
+		Sleep(15)
+		DialogStart("LUC_BG_AD_SittingCultists", %Friend1, %Friend2, __Me)
+		SetPriority(%currentAction, 0)
+		
+REACTION Custom_AutomatedDialog_Interrupt, 1701
+USAGE PEACE
+CHECK "c1"
+	IsInDialog(__Me)
+ACTIONS
+	Sleep(2.0)
+INTERRUPT
+	Set(%Sitting,1)
+	
+REACTION WalkToBench, 150
+	VARS
+		FLOAT:_dist
+	USAGE PEACE
+	CHECK "!c1&c2&c3"
+		IsEqual(%Seat,null)
+		GetDistance(_dist,__Me,%Seat)
+		IsGreaterThen(_dist,2.0)
+	ACTIONS
+		CharacterMoveTo(%Seat)
+		CharacterUseItem(%Seat)
+		Set(%Sitting,1)
+		
+REACTION Sit, 140
+	USAGE PEACE
+	CHECK "c1"
+		IsEqual(%Sitting,0)
+	ACTIONS
+		CharacterUseItem(%Seat)
+		Set(%Sitting,1)
+		Sleep(3)
+		
+EVENTS 
+
+EVENT FightStart
+ON
+	OnCombatStarted()
+ACTIONS
+	IF "c1"
+		CharacterHasStatus(__Me, SITTING)
+	THEN
+		CharacterRemoveStatus(__Me, SITTING)
+	ENDIF

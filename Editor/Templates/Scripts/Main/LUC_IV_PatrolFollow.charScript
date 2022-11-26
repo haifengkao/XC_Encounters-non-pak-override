@@ -1,0 +1,29 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	CHARACTER:%Friend = LUC_IV_PatrolLead_a451bd54-2881-4462-b060-028744f93717
+
+BEHAVIOUR
+
+REACTION State_Patroling, 0
+	USAGE PEACE
+	ACTIONS
+		GetRandom(%currentAction, "Action_Patrol")
+		SetPriority(%currentAction, 1100)
+
+REACTION Action_Patrol, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterFollow(%Friend,1000,0)
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)
+	
+EVENTS	
+EVENT TalkToPatrol
+	ON	
+		OnCharacterEvent(__Me,"TalkToPatrol")
+	ACTIONS
+		DialogStart("LUC_IV_AD_Patrol", %Friend, __Me)

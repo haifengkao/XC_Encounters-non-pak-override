@@ -1,0 +1,146 @@
+INIT
+	CHARACTER:__Me
+
+//------------------------
+BEHAVIOUR
+REACTION HeadlessZombie_PlayerIsCloseIAttack,600
+USAGE COMBAT
+VARS
+	CHARACTER:_Player
+	FLOAT:_MyAP
+CHECK "c1&c2&!c3"
+	CharacterGet(_Player,__Me,3,Lowest,Distance,Enemy)
+	CharacterGetStat(_MyAP,__Me,ActionPoints)
+	IsLessThen(_MyAP,3)
+ACTIONS
+	CharacterAttack(_Player)
+INTERRUPT
+ON
+	OnMovementFailed(_)
+ACTIONS
+	CharacterEndTurn()
+	SetPriority("HeadlessZombie_PlayerIsCloseIAttack",0)
+
+REACTION HeadlessZombie_CreateCloudAtRandomPosition,500
+USAGE COMBAT
+VARS
+	INT:_Failures=0
+	CHARACTER:_Player
+	FLOAT3:_PosOffset
+	FLOAT3:_PlayersPosition
+	FLOAT:_Angle
+	FLOAT:_Dist
+	FLOAT:_MyAP	
+	FIXEDSTRING:_ChosenAnimation	
+CHECK "!(c1|c2|c3|c4|c5)&c6&c7&c8"
+	CharacterHasStatus(__Me,"FROZEN")						//!c1
+	CharacterHasStatus(__Me,"FEAR")							//!c2
+	CharacterHasStatus(__Me,"PETRIFIED")					//!c3
+	CharacterHasStatus(__Me,"CHARMED")						//!c4
+	CharacterHasStatus(__Me,"STUNNED")						//!c5
+	CharacterGet(_Player,__Me,20,Lowest,Distance,Enemy)		//c6
+	CharacterGetStat(_MyAP,__Me,ActionPoints)				//c7
+	IsGreaterThen(_MyAP,3)									//c8
+ACTIONS
+	WHILE "c1"
+		IsLessThen(_Failures,30)
+	DO
+		IF "c1"
+			GetPosition(_Player,_PlayersPosition)
+		THEN
+			Set(_PosOffset,{1.3;0;0}) 
+			GetRandomBetween(_Angle,-0,360)
+			GetRandomBetween(_Dist,5,8)
+			RotateY(_PosOffset,_Angle)
+			Multiply(_PosOffset,_Dist)	
+			Add(_PlayersPosition,_PosOffset)
+		ENDIF
+		IF "c1&!c2&!c3&!c4"
+			FindValidPosition(_PlayersPosition,3)
+			ContainsSurface(_PlayersPosition,1,"Ice")
+			ContainsSurface(_PlayersPosition,1,"CloudStatic")
+			ContainsSurface(_PlayersPosition,1,"Electrified")
+		THEN		
+			CharacterMoveTo(_PlayersPosition,1)
+			GetRandom(_ChosenAnimation,"attack1","attack2","attack3")
+			CharacterPlayAnimation(_ChosenAnimation)	
+			Set(_Failures,30)
+		ELSE
+			Add(_Failures,1)
+		ENDIF
+	ENDWHILE
+	IF "c1"
+		IsEqual(_Failures,30)
+	THEN
+		Set(_Failures,0)	
+		SetPriority("HeadlessZombie_CreateCloudAtRandomPosition",0)	
+	ENDIF
+INTERRUPT
+	ON
+		OnMovementFailed(_)
+	ACTIONS
+		SetPriority("HeadlessZombie_CreateCloudAtRandomPosition",0)
+	
+REACTION HeadlessZombie_DetectPlayer,0
+USAGE WAITING
+VARS
+	CHARACTER:_Player
+	FLOAT3:_MyPosition
+	FLOAT3:_PosOffset={2;2;2}
+	FLOAT:_Angle
+	FLOAT:_Dist=2.0
+	FLOAT:_SleepValue
+CHECK "!c1&!c2&!c3&!c4&!c5&c6"
+	CharacterHasStatus(__Me,FROZEN)
+	CharacterHasStatus(__Me,FEAR)
+	CharacterHasStatus(__Me,PETRIFIED)
+	CharacterHasStatus(__Me,CHARMED)
+	CharacterHasStatus(__Me,STUNNED)
+	CharacterGet(_Player,__Me,3,Lowest,Distance,Enemy)
+ACTIONS
+	CharacterLookAt(_Player)
+	Sleep(1)
+
+REACTION HeadlessZombie_FaceRandomDirections,100
+USAGE WAITING
+VARS
+	CHARACTER:_Player
+	FLOAT3:_MyPosition
+	FLOAT3:_PosOffset={2;2;2}
+	FLOAT:_Angle
+	FLOAT:_Dist=2.0
+	FLOAT:_SleepValue
+CHECK "!c1&!c2&!c3&!c4&!c5&c6"
+	CharacterHasStatus(__Me,FROZEN)
+	CharacterHasStatus(__Me,FEAR)
+	CharacterHasStatus(__Me,PETRIFIED)
+	CharacterHasStatus(__Me,CHARMED)
+	CharacterHasStatus(__Me,STUNNED)
+	GetPosition(__Me,_MyPosition)
+ACTIONS
+	GetRandomBetween(_Angle,-0,360)
+	RotateY(_PosOffset,_Angle)
+	Multiply(_PosOffset,_Dist)		
+	Add(_MyPosition,_PosOffset)
+	GetRandomBetween(_SleepValue,2,4)	
+	Sleep(_SleepValue)	
+	CharacterLookAt(_MyPosition)
+	CharacterPlayEffect(__Me,"FX_GP_QuestionMark_A")
+INTERRUPT
+	Reset()
+	
+//------------------------
+EVENTS
+EVENT OnInit_BecomeBlind
+ON
+	OnInit()
+ACTIONS
+	SetPriority("Combat_AttackSetEnemy",0)
+	SetPriority("Combat_TakeCover",0)
+	
+EVENT OnTurn_RestorePriority
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("HeadlessZombie_PlayerIsCloseIAttack",600)
+	SetPriority("HeadlessZombie_CreateCloudAtRandomPosition",500)

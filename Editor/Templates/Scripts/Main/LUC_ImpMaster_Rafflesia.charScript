@@ -1,0 +1,310 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%newRaff1
+	CHARACTER:%newRaff2
+	CHARACTER:%newRaff3
+	CHARACTER:%newRaff4
+	INT:%SpawnCD = 2
+	INT:%RaffTotalCounter = 0
+	INT:%Raff1Counter = 0
+	INT:%Raff2Counter = 0
+	INT:%Raff3Counter = 0
+	INT:%Raff4Counter = 0
+	INT:%CanSpawnRaff1 = 1
+	INT:%CanSpawnRaff2 = 1
+	INT:%CanSpawnRaff3 = 1
+	INT:%CanSpawnRaff4 = 1
+	TRIGGER:%SpawnTrigg01 = "LUC_Rafflesia_Boss_S01_a1c642a2-d9bf-423c-a0c7-43b13fcbdc1c"
+	TRIGGER:%SpawnTrigg02 = "LUC_Rafflesia_Boss_S02_08538504-3c88-4799-8af7-eb5ebfba992c"
+	TRIGGER:%SpawnTrigg03 = "LUC_Rafflesia_Boss_S03_b1832b7c-9b53-4de7-b448-7a3b39230842"
+	TRIGGER:%SpawnTrigg04 = "LUC_Rafflesia_Boss_S04_08e320db-a64a-484b-9ba9-a3a7076c1432"
+	ITEM:%plate1 = "LUC_PUZ_RafflesiaPlate_01_f528338c-022b-4ebc-98bd-77fc3ce842ea"
+	ITEM:%plate2 = "LUC_PUZ_RafflesiaPlate_02_761d1a21-e37b-47e6-98a1-9a071ad6d952"
+	ITEM:%plate3 = "LUC_PUZ_RafflesiaPlate_03_03513fd6-0ef7-4f59-b186-6bc94a04e111"
+	ITEM:%plate4 = "LUC_PUZ_RafflesiaPlate_04_bb3737b4-a8b9-4cd1-871a-6e063c04440e"
+	INT:%SummoningHandle	//need to make this global as I must be able to kill it later on (Edouard 03/2/16)
+	INT:%ReusableHandle		//idem
+
+//------------------------
+BEHAVIOUR
+REACTION Rafflesia_PlayFlavorText,1000
+USAGE COMBAT
+ACTIONS
+	CombatLogText(__Me,"CMB_LUC_Rafflesia_CombatStart",0,1)
+	SetPriority("Rafflesia_PlayFlavorText",0)
+	
+REACTION Rafflesia_SpawnKids,500
+USAGE COMBAT
+VARS
+	INT:_SummoningHandle	//now unused, but must leave these guys here to not break saves (Edouard 03/2/16)
+	INT:_ReusableHandle		//idem
+CHECK "!c1&c2&!c3"
+	CharacterHasStatus(__Me,CHARMED)
+	IsGreaterThen(%SpawnCD,1)
+	IsEqual(%RaffTotalCounter,4)
+ACTIONS
+	CharacterPlayLoopEffect(%SummoningHandle,__Me,"FX_Skills_WitchCraft_Generic_A_Prepare")
+	CharacterPlayAnimation("cast_self_cast")
+	Set(%SpawnCD,0)
+	IF "!c1&c2"
+		IsGreaterThen(%Raff1Counter,0)
+		IsEqual(%CanSpawnRaff1,1)
+	THEN
+		PlayLoopEffectAt(%ReusableHandle,%SpawnTrigg01,"FX_GP_LightPillarPurple_A")
+		SpawnCharacter(%newRaff1,Env_Artillery_Flower_B_Small_17eba34c-31cf-4dae-a539-70c0d764c23c,%SpawnTrigg01,1)
+		Add(%Raff1Counter,1)
+		Add(%RaffTotalCounter,1)
+		CombatLogText(__Me,"CMB_LUC_Rafflesia_SummonsChild",0,1)
+		CharacterPlayEffect(%newRaff1,"FX_Creatures_Animals_Zombie_Spawn_A")
+	ELIF "!c1&c2"
+		IsGreaterThen(%Raff2Counter,0)		
+		IsEqual(%CanSpawnRaff2,1)
+	THEN
+		PlayLoopEffectAt(%ReusableHandle,%SpawnTrigg02,"FX_GP_LightPillarPurple_A")
+		SpawnCharacter(%newRaff2,Env_Artillery_Flower_B_Small_17eba34c-31cf-4dae-a539-70c0d764c23c,%SpawnTrigg02,1)
+		Add(%Raff2Counter,1)
+		Add(%RaffTotalCounter,1)			
+		CombatLogText(__Me,"CMB_LUC_Rafflesia_SummonsChild",0,1)
+		CharacterPlayEffect(%newRaff2,"FX_Creatures_Animals_Zombie_Spawn_A")
+	ELIF "!c1&c2"
+		IsGreaterThen(%Raff3Counter,0)
+		IsEqual(%CanSpawnRaff3,1)
+	THEN
+		PlayLoopEffectAt(%ReusableHandle,%SpawnTrigg03,"FX_GP_LightPillarPurple_A")
+		SpawnCharacter(%newRaff3,Env_Artillery_Flower_B_Small_17eba34c-31cf-4dae-a539-70c0d764c23c,%SpawnTrigg03,1)
+		Add(%Raff3Counter,1)
+		Add(%RaffTotalCounter,1)			
+		CombatLogText(__Me,"CMB_LUC_Rafflesia_SummonsChild",0,1)
+		CharacterPlayEffect(%newRaff3,"FX_Creatures_Animals_Zombie_Spawn_A")
+	ELIF "!c1&c2"
+		IsGreaterThen(%Raff4Counter,0)
+		IsEqual(%CanSpawnRaff4,1)
+	THEN
+		PlayLoopEffectAt(%ReusableHandle,%SpawnTrigg04,"FX_GP_LightPillarPurple_A")
+		SpawnCharacter(%newRaff4,Env_Artillery_Flower_B_Small_17eba34c-31cf-4dae-a539-70c0d764c23c,%SpawnTrigg04,1)
+		Add(%Raff4Counter,1)
+		Add(%RaffTotalCounter,1)			
+		CombatLogText(__Me,"CMB_LUC_Rafflesia_SummonsChild",0,1)
+		CharacterPlayEffect(%newRaff4,"FX_Creatures_Animals_Zombie_Spawn_A")
+	ELSE
+		CharacterPlayAnimation("hit_magic")
+		CombatLogText(__Me,"CMB_LUC_Rafflesia_CantSummonChild",0,1)
+	ENDIF
+	StopLoopEffect(%ReusableHandle)
+	StopLoopEffect(%SummoningHandle)
+	CharacterEndTurn()
+INTERRUPT
+	Reset()
+	
+REACTION Rafflesia_CastOilSpray,350
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3"
+	CharacterCanCast(__Me,"Cone_EnemyBlackArtilleryFlower")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Cone_EnemyBlackArtilleryFlower")
+	CharacterGet(_Target,__Me,_MaxRange,Lowest,Vitality,Enemy)
+ACTIONS
+	CharacterUseSkill("Cone_EnemyBlackArtilleryFlower",_Target)
+
+REACTION Rafflesia_UseDrainWillpower,350
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3"
+	CharacterCanCast(__Me,"Target_DrainWillpower")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_DrainWillpower")
+	CharacterGet(_Target,__Me,_MaxRange,Lowest,Distance,Enemy)
+ACTIONS
+	CharacterUseSkill("Target_EnemyDrainWillpower",_Target)
+
+REACTION Rafflesia_UseDeadlySpores,300
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+USAGE COMBAT
+CHECK "c1&c2&c3"
+	CharacterCanCast(__Me,"Projectile_EnemyBigDeadlySpores")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyBigDeadlySpores")
+	CharacterGet(_Target,__Me,_MaxRange,Lowest,Distance,Enemy)
+ACTIONS
+	CharacterUseSkill("Projectile_EnemyBigDeadlySpores",_Target)
+
+REACTION Rafflesia_UseFear,340
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&!(c4|c5|c6|c7|c8)"
+	CharacterCanCast(__Me,"Shout_EnemyFear")								//c1
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Shout_EnemyFear")		//c2
+	CharacterGet(_Target,__Me,_MaxRange,Lowest,Distance,Enemy)				//c3
+	CharacterHasStatus(_Target,"FEAR")										//!c4
+	CharacterHasStatus(_Target,"STUNNED")									//!c5
+	CharacterHasStatus(_Target,"FROZEN")									//!c6
+	CharacterHasStatus(_Target,"KNOCKED_DOWN")								//!c7
+	CharacterHasStatus(_Target,"CHARMED")									//!c8
+ACTIONS
+	CharacterUseSkill("Shout_EnemyFear",_Target)
+
+REACTION Rafflesia_UseRemorse,350
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+CHECK "c1&c2&c3&!c4"
+	IsHardcore()																				//c1
+	CharacterCanCast(__Me,Target_EnemyRemorse)													//c2
+	CharacterGet(_Target,__Me,30,Highest,Intelligence,Enemy)									//c3
+	CharacterHasStatus(_Target,"REMORSE")														//!c4	
+ACTIONS
+	CharacterUseSkill("Target_EnemyRemorse",_Target)	
+	
+REACTION Rafflesia_CannotMoveSoEndTurn,200
+USAGE COMBAT
+ACTIONS
+	CharacterEndTurn()
+	
+//------------------------
+EVENTS
+EVENT OnInit_AddOilSkill
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill("Cone_EnemyBlackArtilleryFlower")
+	CharacterAddSkill("Projectile_EnemyBigDeadlySpores")
+	CharacterAddSkill("Target_EnemyDrainWillpower")
+	CharacterAddSkill("Shout_EnemyFear")
+	IF "c1"
+		IsHardcore()
+	THEN
+		CharacterAddSkill("Target_EnemyRemorse")
+	ENDIF
+	
+EVENT OnTurn_GeneralControl
+ON 
+	OnTurn()
+ACTIONS
+	Add(%SpawnCD,1)
+	
+EVENT OnCharItemEvent_Raff1Blocked
+ON 
+	OnCharacterItemEvent(_,%plate1,"Raff1Blocked")
+ACTIONS
+	Set(%CanSpawnRaff1,0)
+	
+EVENT OnCharItemEvent_Raff2Blocked
+ON 
+	OnCharacterItemEvent(_,%plate2,"Raff2Blocked")
+ACTIONS
+	Set(%CanSpawnRaff2,0)
+	
+EVENT OnCharItemEvent_Raff3Blocked
+ON 
+	OnCharacterItemEvent(_,%plate3,"Raff3Blocked")
+ACTIONS
+	Set(%CanSpawnRaff3,0)
+	
+EVENT OnCharItemEvent_Raff4Blocked
+ON 
+	OnCharacterItemEvent(_,%plate4,"Raff4Blocked")
+ACTIONS
+	Set(%CanSpawnRaff4,0)
+	
+//------ SPAWNING UNBLOCKED
+EVENT OnCharItemEvent_Raff1Unblocked
+ON 
+	OnCharacterItemEvent(_,%plate1,"Raff1Unblocked")
+ACTIONS
+	Set(%CanSpawnRaff1,1)
+	
+EVENT OnCharItemEvent_Raff2Unblocked
+ON 
+	OnCharacterItemEvent(_,%plate2,"Raff2Unblocked")
+ACTIONS
+	Set(%CanSpawnRaff2,1)
+	
+EVENT OnCharItemEvent_Raff3Unblocked
+ON 
+	OnCharacterItemEvent(_,%plate3,"Raff3Unblocked")
+ACTIONS
+	Set(%CanSpawnRaff3,1)
+	
+EVENT OnCharItemEvent_Raff4Unblocked
+ON 
+	OnCharacterItemEvent(_,%plate4,"Raff4Unblocked")
+ACTIONS
+	Set(%CanSpawnRaff4,1)
+
+//------ DEATH	
+EVENT OnDie_KillRaff1
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	IF "!c1"
+		CharacterHasStatus(%newRaff1,DYING)
+	THEN
+		CharacterDie(%newRaff1)
+		Subtract(%RaffTotalCounter,1)	
+	ENDIF
+	IF "!c1"
+		CharacterHasStatus(%newRaff2,DYING)
+	THEN
+		CharacterDie(%newRaff2)
+		Subtract(%RaffTotalCounter,1)	
+	ENDIF
+	IF "!c1"
+		CharacterHasStatus(%newRaff3,DYING)
+	THEN
+		CharacterDie(%newRaff3)
+		Subtract(%RaffTotalCounter,1)	
+	ENDIF	
+	IF "!c1"
+		CharacterHasStatus(%newRaff4,DYING)
+	THEN
+		CharacterDie(%newRaff4)
+		Subtract(%RaffTotalCounter,1)	
+	ENDIF
+	
+//------ FLOWERS DIE
+EVENT OnDie_LesserFlowerDies
+VARS
+CHARACTER:_Target
+ON 
+	OnDie(_Target,_,_,_)
+ACTIONS
+	IF "c1"
+		IsEqual(_Target,%newRaff1)
+	THEN
+		Set(%Raff1Counter,0)
+		Set(%newRaff1,null)
+	ELIF "c1"
+		IsEqual(_Target,%newRaff2)
+	THEN
+		Set(%Raff2Counter,0)
+		Set(%newRaff2,null)
+	ELIF "c1"
+		IsEqual(_Target,%newRaff3)
+	THEN
+		Set(%Raff3Counter,0)
+		Set(%newRaff3,null)
+	ELIF "c1"
+		IsEqual(_Target,%newRaff4)
+	THEN
+		Set(%Raff4Counter,0)
+		Set(%newRaff4,null)
+	ENDIF
+	
+EVENT OnDie_OnCombatEnded_KillLoopingFX
+ON
+	OnDie(__Me,_,_,_)
+	OnCombatEnded()
+ACTIONS
+	StopLoopEffect(INT:%SummoningHandle)
+	StopLoopEffect(	INT:%ReusableHandle)
+	DebugText(__Me,"Killing FX!")

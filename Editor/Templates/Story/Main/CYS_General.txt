@@ -1,0 +1,318 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Dialogs(CHARACTER_CYS_Gerome,"CYS_Painter");
+DB_Dialogs(CHARACTER_CYS_PainterCock,"CYS_PainterCock");
+DB_Dialogs(CHARACTER_CYS_Duke,"CYS_Duke");
+DB_Dialogs(CHARACTER_CYS_Wilbur,"CYS_Wilbur");
+DB_Dialogs(CHARACTER_CYS_Tavern_Waitress,"CYS_Waitress");
+DB_Dialogs(CHARACTER_CYS_Kelvan,"CYS_Kelvan");
+DB_Dialogs(CHARACTER_CYS_MarketJunkSeller,"CYS_JunkSeller");
+DB_Dialogs(CHARACTER_CYS_VegetableSeller,"CYS_VegetableSeller");
+DB_Dialogs(CHARACTER_CYS_CheeseSeller,"CYS_CheeseSeller");
+DB_Dialogs(CHARACTER_CYS_FishSeller,"CYS_FishSeller");
+DB_Dialogs(CHARACTER_CYS_GraveyardWidow,"CYS_GraveyardWidow");
+DB_Dialogs(CHARACTER_CYS_LibraryGuard1,"CYS_TownHallGuards");
+DB_Dialogs(CHARACTER_CYS_LibraryGuard2,"CYS_TownHallGuards");
+DB_Dialogs(CHARACTER_CYS_ZapperGuard01,"CYS_Zapper");
+DB_Dialogs(CHARACTER_CYS_ZapperGuard02,"CYS_Zapper");
+DB_Dialogs(CHARACTER_CYS_ZapperGuard03,"CYS_Zapper");
+DB_Dialogs(CHARACTER_CYS_ZapperGuard04,"CYS_Zapper");
+DB_Dialogs(CHARACTER_CYS_ZapperGuard05,"CYS_Zapper");
+DB_Dialogs(CHARACTER_CYS_Marcus,"CYS_Marcus");
+DB_Dialogs(CHARACTER_CYS_ArrowSeller,"CYS_ArrowSeller");
+DB_Dialogs(CHARACTER_CYS_Shepherd1,"CYS_Friendly_Shepherd");
+DB_Dialogs(CHARACTER_CYS_Shepherd2,"CYS_Friendly_Shepherd");
+DB_Dialogs(CHARACTER_CYS_Shereth,"CYS_Shereth");
+DB_Dialogs(CHARACTER_CYS_CuteDogFightA,"CYS_InfectedDog");
+DB_Dialogs(CHARACTER_CYS_CuteDogFightB,"CYS_InfectedDog");
+DB_Dialogs(CHARACTER_CYS_Selenia,"CYS_Selenia");
+DB_Dialogs(CHARACTER_CYS_LegionQuartermaster,"CYS_Quartermaster");
+SetDefaultThreatenedDialog(CHARACTER_CYS_CuteDogFightA, "CYS_InfectedDog");
+SetDefaultThreatenedDialog(CHARACTER_CYS_CuteDogFightB, "CYS_InfectedDog");
+DB_NoCharacterCompanionReplace(CHARACTER_CYS_CuteDogFightA);
+DB_NoCharacterCompanionReplace(CHARACTER_CYS_CuteDogFightB);
+DB_NoInitialTrade(CHARACTER_CYS_CuteDogFightA);
+DB_NoInitialTrade(CHARACTER_CYS_CuteDogFightB);
+CharacterSetHasDialog(CHARACTER_CYS_PatrollingGuardEast_1, 0);
+CharacterSetHasDialog(CHARACTER_CYS_PatrollingGuardEast_2, 0);
+CharacterSetHasDialog(CHARACTER_CYS_PatrollingGuardWest_1, 0);
+CharacterSetHasDialog(CHARACTER_CYS_PatrollingGuardWest_2, 0);
+ItemToCharacter(ITEM_CYS_InnKey, CHARACTER_CYS_Wilbur);
+ItemToCharacter(ITEM_CYS_MilitaryChest4, CHARACTER_CYS_VillageGuard01);
+
+DB_Global_ItemDescriptions(ITEM_CYS_Graveyard_Tomb01,"CYS_Descr_Tomb01");
+DB_Global_ItemDescriptions(ITEM_CYS_Graveyard_Tomb02,"CYS_Descr_Tomb02");
+DB_Global_ItemDescriptions(ITEM_CYS_Graveyard_Tomb03,"CYS_Descr_Tomb03");
+DB_Global_ItemDescriptions(ITEM_CYS_Graveyard_Tomb04,"CYS_Descr_Tomb04");
+DB_Global_ItemDescriptions(ITEM_CYS_Graveyard_Tomb05,"CYS_Descr_Tomb05");
+DB_Global_ItemDescriptions(ITEM_CYS_Graveyard_Tomb06,"CYS_Descr_Tomb06");
+DB_Global_ItemDescriptions(ITEM_CYS_Graveyard_Tomb07,"CYS_Descr_Tomb07");
+DB_Global_ItemDescriptions(ITEM_CYS_Graveyard_Tomb08,"CYS_Descr_Tomb08");
+DB_Global_ItemDescriptions(ITEM_CYS_Graveyard_Tomb09,"CYS_Descr_Tomb09");
+DB_Global_ItemDescriptions(ITEM_CYS_Graveyard_Tomb10,"CYS_Descr_Tomb10");
+DB_Global_ItemDescriptions(ITEM_CYS_Graveyard_Tomb11,"CYS_Descr_Tomb11");
+DB_Global_ItemDescriptions(ITEM_CYS_NemrisTomb,"CYS_Descr_Tomb12");
+DB_Global_ItemDescriptions(ITEM_CYS_Graveyard_Tomb13,"CYS_Descr_Tomb13");
+DB_Global_ItemDescriptions(ITEM_CYS_Graveyard_Tomb14,"CYS_Descr_Tomb14");
+
+DB_ShovelArea(TRIGGER_CYS_ShovelTuto,"CYS_FirstShovel",ITEM_CYS_ShovelTutoDirt);
+DB_ShovelRewardItemAppear("CYS_FirstShovel",ITEM_CYS_FirstShovelReward,TRIGGER_CYS_ShovelTutoPoint);
+
+ItemToContainer(ITEM_CYS_FirstFlour, ITEM_CYS_FirstBarrel,-1);
+ItemToContainer(ITEM_CYS_FirstCupWater, ITEM_CYS_FirstBarrel,-1);
+
+DB_IsGuard(CHARACTER_CYS_LibraryGuard1);
+DB_IsGuard(CHARACTER_CYS_LibraryGuard2);
+DB_IsGuard(CHARACTER_CYS_Septimus);
+DB_IsGuard(CHARACTER_CYS_PatrollingGuardEast_1);
+DB_IsGuard(CHARACTER_CYS_PatrollingGuardEast_2);
+DB_IsGuard(CHARACTER_CYS_PatrollingGuardWest_1);
+DB_IsGuard(CHARACTER_CYS_PatrollingGuardWest_2);
+DB_IsGuard(CHARACTER_CYS_FairListener1);
+DB_IsGuard(CHARACTER_CYS_FairListener2);
+DB_IsGuard(CHARACTER_CYS_FairListener3);
+DB_IsGuard(CHARACTER_CYS_Aureus);
+DB_IsGuard(CHARACTER_CYS_CharmedOrcGuard1);
+DB_IsGuard(CHARACTER_CYS_CharmedOrcGuard2);
+DB_IsGuard(CHARACTER_CYS_DrillGuard1);
+DB_IsGuard(CHARACTER_CYS_DrillGuard2);
+DB_IsGuard(CHARACTER_CYS_DrillGuard3);
+DB_IsGuard(CHARACTER_CYS_DrillGuard4);
+DB_IsGuard(CHARACTER_CYS_LegionQuartermaster);
+DB_IsGuard(CHARACTER_CYS_FishThiefGuard);
+DB_IsGuard(CHARACTER_CYS_GuardBarrackKitchen);
+DB_IsGuard(CHARACTER_CYS_LighthouseDare1);
+DB_IsGuard(CHARACTER_CYS_LighthouseDare2);
+DB_IsGuard(CHARACTER_CYS_ZapperGuard01);
+DB_IsGuard(CHARACTER_CYS_ZapperGuard02);
+DB_IsGuard(CHARACTER_CYS_ZapperGuard03);
+DB_IsGuard(CHARACTER_CYS_ZapperGuard04);
+DB_IsGuard(CHARACTER_CYS_ZapperGuard05);
+
+DB_CharacterCreationLevels("Cyseal");
+DB_CharacterCreationLevels("CharacterCreation");
+
+DB_CustomAttackDialog(CHARACTER_CYS_Zixzax,"Zixzax_I_attack_you");
+DB_CustomAttackDialog(CHARACTER_CYS_Bellegar,"Bellegar_I_attack_you");
+DB_CustomAttackDialog(CHARACTER_HOM_Icara,"Icara_I_attack_you");
+DB_CustomAttackDialog(CHARACTER_Zandalor,"Zandalor_I_attack_you");
+
+
+
+DB_NoRunAway(CHARACTER_CYS_Arhu);
+NeverThreatenedDialog(CHARACTER_CYS_ZombieJake);
+DB_NoDefaultBehavior(CHARACTER_CYS_ZombieJake);
+
+ProcTriggerRegisterForPlayers(TRIGGER_CYS_RopeCommentBug);
+
+DB_NoInitialTrade(CHARACTER_Zandalor);
+DB_NoInitialTrade(CHARACTER_HOM_Mephisto);
+DB_NoInitialTrade(CHARACTER_DAF_Grutilda);
+DB_NoInitialTrade(CHARACTER_DAF_DreadOrc_Grutilda);
+DB_NoInitialTrade(CHARACTER_HIB_Leandra);
+DB_NoInitialTrade(CHARACTER_HOM_Leandra);
+DB_NoInitialTrade(CHARACTER_LUC_M_Leandra);
+DB_NoInitialTrade(CHARACTER_HIB_Icara);
+DB_NoInitialTrade(CHARACTER_HOM_Icara);
+DB_NoInitialTrade(CHARACTER_LUC_IC_Mangoth);
+DB_NoInitialTrade(CHARACTER_DAF_AnguishDemon);
+
+DB_BigTrader(CHARACTER_CYS_Arhu);
+DB_BigTrader(CHARACTER_CYS_Aureus);
+DB_BigTrader(CHARACTER_CYS_ArrowSeller);
+DB_BigTrader(CHARACTER_CYS_Bellegar);
+DB_BigTrader(CHARACTER_CYS_CheeseSeller);
+DB_BigTrader(CHARACTER_CYS_Conrad);
+DB_BigTrader(CHARACTER_CYS_Fab_Anna);
+DB_BigTrader(CHARACTER_CYS_FishSeller);
+DB_BigTrader(CHARACTER_CYS_Gerome);
+DB_BigTrader(CHARACTER_CYS_LegionQuartermaster);
+DB_BigTrader(CHARACTER_CYS_Marcus);
+DB_BigTrader(CHARACTER_CYS_Selenia);
+DB_BigTrader(CHARACTER_CYS_Shereth);
+DB_BigTrader(CHARACTER_CYS_VegetableSeller);
+DB_BigTrader(CHARACTER_CYS_MarketJunkSeller);
+DB_BigTrader(CHARACTER_CYS_Thelyron);
+
+DB_ItemBlockGenerics(ITEM_CYS_ArcheryTarget1);
+DB_ItemBlockGenerics(ITEM_CYS_ArcheryTarget2);
+DB_ItemBlockGenerics(ITEM_CYS_ArcheryTarget3);
+DB_ItemBlockGenerics(ITEM_CYS_PracticeDummy1);
+DB_ItemBlockGenerics(ITEM_CYS_PracticeDummy2);
+DB_ItemBlockGenerics(ITEM_CYS_PracticeDummy4);
+DB_ItemBlockGenerics(ITEM_CYS_PrecticeDummy3);
+
+ItemToContainer(ITEM_CYS_ElementalMineBook,ITEM_CYS_ImpTrapperSkeleton,-1);
+
+DB_IsNotMessingAround(CHARACTER_CYS_Helper1);
+DB_IsNotMessingAround(CHARACTER_CYS_Helper3);
+DB_IsNotMessingAround(CHARACTER_CYS_SailorMerchant3);
+
+DB_InitialRecipes("CON_Ingred_Dough_A");
+KBSECTION
+IF
+CharacterCreationFinished(CHARACTER_NULL)
+AND
+DB_CurrentLevel(_Lvl)
+AND
+DB_CharacterCreationLevels(_Lvl)
+THEN
+CharacterTeleportPartyToTriggerMovieLoadState(TRIGGER_CYS_Start_P1,"MovieGameIntro_Finished","MovieGameIntro");
+ItemToCharacter(ITEM_CYS_SHGuide1, CHARACTER_Player1);
+ItemToCharacter(ITEM_CYS_SHOrder1, CHARACTER_Player1);
+ItemToCharacter(ITEM_CYS_SHGuide2, CHARACTER_Player2);
+ItemToCharacter(ITEM_CYS_SHOrder2, CHARACTER_Player2);
+CharacterAddGold(CHARACTER_Player1,200);
+CharacterAddGold(CHARACTER_Player2,200); 
+ProcUnlockInitialRecipes();
+DB_CYSDoTutorial(1);
+
+PROC
+ProcUnlockInitialRecipes()
+AND
+DB_InitialRecipes((STRING)_RecipeID)
+THEN
+CharacterUnlockRecipe(CHARACTER_Player1,_RecipeID,0);
+
+IF
+CharacterEvent(_,"MovieGameIntro_Finished")
+THEN
+QuestAdd("CYS_JakesMurder");
+QuestUpdate("CYS_JakesMurder","Start");
+QuestAdd("HOM_Starstones");
+QuestUpdate("HOM_Starstones", "Beginning");
+
+IF
+DB_CurrentLevel("Cyseal")
+AND
+DB_CYSDoTutorial(1)
+THEN
+NOT DB_CYSDoTutorial(1);
+ProcStartTutorial();
+
+IF
+CharacterCreationFinished(CHARACTER_NULL)
+AND
+_Player.DB_IsPlayer()
+THEN
+ProcSetPlayerGenderVars(_Player);
+
+PROC
+ProcSetPlayerGenderVars((CHARACTER)_Player)
+AND
+CharacterIsFemale(_Player,1)
+THEN
+DialogSetCharacterEvent("EVENT_player_is_female",_Player,0);
+
+IF
+DB_Companion(_Companion)
+AND
+CharacterIsFemale(_Companion,1)
+THEN
+DialogSetCharacterEvent("EVENT_player_is_female",_Companion,0);
+
+IF
+TimerFinished("StartTutorial")
+THEN
+DB_StartTutMessages(1);
+
+IF
+GameBookInterfaceClosed(ITEM_CYS_InfectedDogBook,_Player)
+AND
+NOT ITEM_CYS_InfectedDogBook.DidDD()
+THEN
+ITEM_CYS_InfectedDogBook.DidDD();
+ProcDefinePartyDialog("CYS_DD_InfectedDog");
+
+IF
+CharacterUsedItem(_Player,ITEM_HOM_CharCreation_Mirror)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_DefinedCompanions(_Player)
+AND
+CharacterAddToCharacterCreation(_Player,2,1)
+THEN
+DB_Illusionist(_Player);
+
+IF
+DB_Illusionist(_Player)
+AND
+DB_TeleporterPyramid(_Pyramid)
+AND
+ItemIsInCharacterInventory(_Pyramid,_Player,1)
+THEN
+PROC_TeleportingRegionBlockOn();
+
+IF
+CharacterUsedItem(_Player,ITEM_HOM_CharCreation_Mirror)
+AND
+_Player.DB_IsPlayer()
+AND
+DB_DefinedCompanions(_Player)
+THEN
+CharacterDisplayText(_Player,"GLO_ForbiddenItem");
+
+IF
+CharacterCreationFinished(_Player)
+THEN
+ProcSetGenderVar(_Player);
+
+PROC
+ProcSetGenderVar((CHARACTER)_Player)
+AND
+CharacterIsFemale(_Player,1)
+THEN
+DialogSetCharacterEvent("EVENT_player_is_female",_Player,0);
+
+PROC
+ProcSetGenderVar((CHARACTER)_Player)
+AND
+CharacterIsFemale(_Player,0)
+THEN
+DialogClearCharacterEvent("EVENT_player_is_female",_Player,0);
+
+IF
+CharacterCreationFinished(_Player)
+AND
+DB_Illusionist(_Player)
+THEN
+NOT DB_Illusionist(_Player);
+CharacterTeleportToTrigger(_Player,TRIGGER_HOM_PointCreationMirrorDest,"");
+PROC_TeleportingRegionBlockOff();
+
+IF
+DialogCharacterEventSet("gotSheared", _Sheep, _)
+THEN
+CharTimer(_Sheep,"isSheared",900000);
+CharacterSetVarInteger(_Sheep, "isSheared", 1);	
+
+IF
+CharTimerFinished(_Sheep,"isSheared")
+THEN	
+CharacterSetVarInteger(_Sheep, "isSheared", 0);
+
+IF
+CharacterEnteredTrigger(_Player, TRIGGER_CYS_RopeCommentBug)
+AND
+NOT 	DB_OnlyOnce("RopeComment")
+THEN
+CharTimer(_Player, "complainRope", 3000);
+DB_OnlyOnce("RopeComment");
+
+IF
+CharTimerFinished(_Player, "complainRope")
+AND
+DB_InRegion(_Player, TRIGGER_CYS_RopeCommentBug)
+THEN
+CharacterDisplayText(_Player, "CYS_Comment_Rope");
+
+IF
+CharacterUsedItem(_, ITEM_CYS_PaintingAbandonedHouse)
+THEN
+ItemMoveToTrigger(ITEM_CYS_PaintingAbandonedHouse, TRIGGER_CYS_PaintingAbandonedHouseTarget, 0.75, 0.0, 0);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

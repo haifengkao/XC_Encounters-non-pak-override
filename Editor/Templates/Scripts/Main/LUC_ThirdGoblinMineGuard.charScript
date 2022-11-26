@@ -1,0 +1,46 @@
+#INCLUDE DefaultCharacter
+#INCLUDE SpottingGuard
+
+INIT
+USING DefaultCharacter
+USING SpottingGuard
+CHARACTER:__Me
+CHARACTER:%SmartGuy = LUC_GoblinSmartGuy_14df33c7-fe76-46af-8b11-43e1a09a31e2
+TRIGGER:%Point1 = LUC_PointGoblinMineGuard3_1_c3ab63f8-055c-441c-b0e4-2750bd037a61
+TRIGGER:%Point2 = LUC_PointGoblinMineGuard3_2_9742959d-5294-450c-b737-21a4fd7ef62b
+TRIGGER:%Point3 = LUC_PointGoblinMineGuard3_3_053e25d1-9d78-4536-b923-7a5fc25c956a
+
+BEHAVIOUR
+REACTION WanderOff, 1000
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Point1,0)
+		IF "c1"
+			IsRandom(0.5)
+		THEN
+			CharacterEvent(%SmartGuy,"LUC_SmartGuyLookGoblin")
+			DisplayText(%SmartGuy,"LUC_ThirdGoblinMineGuard_Script_5",3) // Get back here, you!
+			Sleep(3)
+			CharacterEvent(%SmartGuy,"LUC_SmartGuyLookBridge")
+			CharacterMoveTo(%Point3,1)
+			CharacterLookFrom(%Point3)
+			Sleep(7)
+			Goto("Start")
+		ENDIF
+	DisplayText(__Me,"LUC_ThirdGoblinMineGuard_Script_0",5) //Hihi, finally some exercise.
+	CharacterMoveTo(%Point2,1)
+	CharacterEvent(%SmartGuy,"LUC_SmartGuyLookGoblin")
+	DisplayText(%SmartGuy,"LUC_ThirdGoblinMineGuard_Script_1",3) //Hey! Where are you going?
+	Sleep(1)
+	CharacterLookAt(%SmartGuy)
+	Sleep(2)
+	DisplayText(__Me,"LUC_ThirdGoblinMineGuard_Script_2",5) //Just stretching my legs, Sir. It is killing me, just standing still all day.
+	Sleep(5)
+	DisplayText(%SmartGuy,"LUC_ThirdGoblinMineGuard_Script_3",3) //Come back here at once. We have to watch for the source users!
+	Sleep(3)
+	DisplayText(__Me,"LUC_ThirdGoblinMineGuard_Script_4",3) //Ok Sir. I'm sorry, sir.
+	CharacterEvent(%SmartGuy,"LUC_SmartGuyLookBridge")
+	CharacterMoveTo(%Point3,1)
+	CharacterLookFrom(%Point3)
+	Sleep(7)
+	

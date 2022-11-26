@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<palette xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <palettes />
+  <objectids>
+    <guid>c46a033a-c2fb-4a6a-8d14-550617bdde0b</guid>
+    <guid>fff2a85e-82f6-49bf-8748-99cbc0ef7751</guid>
+    <guid>9bb9e780-1212-4c1c-b5a3-f6c05996bce0</guid>
+    <guid>38f3306c-ef0f-4775-ad9b-c7ef3b7a2900</guid>
+    <guid>6263dba8-3ad8-46ba-9830-c38a9b7a9209</guid>
+    <guid>e5185aa1-9806-4e3d-bfe1-689b653f67e9</guid>
+    <guid>ffb07c9c-5db8-43b7-a67e-04fdc26113eb</guid>
+    <guid>63c931d8-12de-4f2f-9de9-5fd289ef075c</guid>
+    <guid>32139f56-3326-445d-aee8-dfed1fb55165</guid>
+    <guid>3c327e81-3d4d-467c-8cc8-aaf29bde7b15</guid>
+    <guid>75086e11-aadd-4d08-9b49-4938fc3c11ec</guid>
+    <guid>b4e53d97-1d76-4c66-ad57-2eef8e8a9d11</guid>
+  </objectids>
+  <name>Farm</name>
+</palette>

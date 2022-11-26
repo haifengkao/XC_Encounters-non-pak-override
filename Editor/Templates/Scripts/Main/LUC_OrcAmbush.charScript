@@ -1,0 +1,125 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%LeftOrc="LUC_StoneAmbush_Orc01_b939c684-1074-4c40-9211-287884464abf"
+	FLOAT3:%myStartingPosition
+	FLOAT:%SightRange
+	EXTERN INT:%ShadowStep_Current=0
+	EXTERN INT:%ShadowStep_Desired=1
+	INT:%Bool_TeleportBack=0
+	
+//---------------------------------
+BEHAVIOUR
+REACTION OrcAmbush_ShadowStep,0
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_APAmount
+	FLOAT3:_TargetPosition
+	FLOAT3:_BackwDirection
+	FLOAT3:_TeleportDestinationOffset
+	FLOAT:_DistanceTarget
+CHECK "c1&c2&!c3&!c4&!c5&!c6"
+	CharacterGet(_Target,__Me,%SightRange,Lowest,Vitality,Enemy)
+	CharacterGetStat(_APAmount,__Me,ActionPoints)
+	IsLessThen(_APAmount,4)
+	CharacterHasStatus(__Me,FROZEN)
+	CharacterHasStatus(__Me,STUNNED)
+	CharacterHasStatus(__Me,KNOCKED_DOWN)
+ACTIONS
+	CharacterSwitchWeaponType(SmallWeapons)	//doesn't work yet (march, 6) - waiting for animation set
+	IF "c1&c2"
+		GetDistance(_DistanceTarget,__Me,_Target)
+		IsLessThen(4,_DistanceTarget)
+	THEN
+		GetPosition(_Target,_TargetPosition)
+		GetForwardDirection(_Target,_BackwDirection)
+		RotateY(_BackwDirection,180)
+		Add(_TargetPosition,_BackwDirection)		
+		CharacterPlayEffect(__Me,"FX_GP_TeleportSmoke_A")
+		CharacterTeleportTo(_TargetPosition)
+		CharacterPlayEffect(__Me,"FX_GP_TeleportSmoke_A")
+		Set(%Bool_TeleportBack,1)
+	ENDIF
+	SetPriority("OrcAmbush_AssassinAttack",500)
+	SetPriority("OrcAmbush_ShadowStep",0)
+	
+REACTION OrcAmbush_AssassinAttack,0
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+CHECK "c1"
+	CharacterGet(_Target,__Me,null,Lowest,Distance,Enemy)
+ACTIONS
+	CharacterAttack(_Target)
+	SetPriority("OrcAmbush_AssassinAttack",0)	
+
+REACTION OrcAmbush_TeleportBack,100
+USAGE WAITING
+CHECK "c1"
+	IsEqual(%Bool_TeleportBack,1)
+ACTIONS
+	CharacterPlayEffect(__Me,"FX_GP_TeleportSmoke_A")
+	CharacterTeleportTo(%myStartingPosition)
+	CharacterPlayEffect(__Me,"FX_GP_TeleportSmoke_A")
+	CharacterSwitchWeaponType(CrossBow)
+	Set(%ShadowStep_Current,0)
+	Set(%Bool_TeleportBack,0)
+		
+REACTION OrcAmbush_TalkAboutStarStone, 500
+USAGE PEACE
+CHECK "!c1&!c2&!c3&!c4"
+	IsInDialog(__Me)
+	IsInDialog(%LeftOrc)
+	CharacterIsDead(%LeftOrc)
+	CharacterIsDead(__Me)
+ACTIONS
+	DialogStart("LUC_StoneAmbush_OrcDialogue",%LeftOrc,__Me)
+	StartTimer("LUC_StoneAmbush_Dialogue_Timer",40.0,0)
+	SetPriority("OrcAmbush_TalkAboutStarStone",0)
+	
+//---------------------------------		
+EVENTS
+EVENT OnInit_GetMySightRangeForTeleport
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetSightRange(%SightRange,__Me)
+	THEN
+	ENDIF
+	
+EVENT OnCombatStarted_StopTalking_CallForBackup
+ON
+	OnCombatStarted()
+ACTIONS
+	DialogRequestStop("LUC_StoneAmbush_OrcDialogue")
+	GetPosition(__Me,%myStartingPosition)
+	DisplayText(__Me,"LUC_StoneAmbush_CallForHelp",4)
+	CharacterEvent(__Me,"LUC_StoneAmbush_SummonReinforcements")	//sent to Osiris
+	
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	GetPosition(__Me,%myStartingPosition)
+	SetPriority("OrcAmbush_AssassinAttack",0)
+	Set(%Bool_TeleportBack,0)
+	IF "c1"
+		IsLessThen(%ShadowStep_Current,%ShadowStep_Desired)
+	THEN		
+		Add(%ShadowStep_Current,1)
+	ELSE
+		SetPriority("OrcAmbush_ShadowStep",500)
+	ENDIF
+	
+EVENT OnTimer_TalkAgain
+ON
+	OnTimer("LUC_StoneAmbush_Dialogue_Timer")
+ACTIONS
+	SetPriority("OrcAmbush_TalkAboutStarStone",500)
+	
+EVENT OnDamage_InterruptDialogue
+ON
+	OnDamage(_,_,_,_)
+ACTIONS
+	DialogRequestStop("LUC_StoneAmbush_OrcDialogue")

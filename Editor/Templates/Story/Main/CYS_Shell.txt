@@ -1,0 +1,82 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_ItemDialogs(ITEM_CYS_Shell,"CYS_Shell");
+CYS_ShellRewardList(1,0,4,TRIGGER_CYS_PointShell1A);
+CYS_ShellRewardList(2,5,9,TRIGGER_CYS_PointShell1B);
+CYS_ShellRewardList(3,10,14,TRIGGER_CYS_PointShell1C);
+CYS_ShellRewardList(4,15,100,TRIGGER_CYS_PointShell1D);
+ItemSetOnstage(ITEM_CYS_PickedUpShell,0);
+ItemSetOnstage(ITEM_CYS_ShellChest,0);
+KBSECTION
+//REGION SHELL DIALOG LOGIC
+IF
+DialogEnded("CYS_Shell",_ID)
+AND
+DB_DialogPlayers(_ID,_Player,1)
+AND
+CharacterGetVarInteger(_Player,"CYS_KeepShell",1)
+THEN
+ItemSetEvent(ITEM_CYS_Shell,"CYS_ShellStopAD");
+ItemSetOnstage(ITEM_CYS_Shell,0);
+ItemSetOnstage(ITEM_CYS_PickedUpShell,1);
+ItemToCharacter(ITEM_CYS_PickedUpShell,_Player);
+QuestUpdate("CYS_Shell","Update3");
+QuestClose("CYS_Shell");
+GoalCompleted;
+
+IF
+DialogEnded("CYS_Shell",_ID)
+AND
+DB_DialogPlayers(_ID,_Player,1)
+AND
+CharacterGetVarInteger(_Player,"CYS_ShellThrow",1)
+AND
+CharacterGetAttribute(_Player,"Strength",_Value)
+THEN
+ItemSetEvent(ITEM_CYS_Shell,"CYS_ShellStopAD");
+TimerLaunch("CYS_AD_Shell",1500);
+ItemSetCanInteract(ITEM_CYS_Shell, 0);
+ProcThrowShellToSea(_Value);
+//END_REGION
+
+//REGION THROW SHELL BACK
+PROC
+ProcThrowShellToSea((INTEGER)_Value)
+AND
+CYS_ShellRewardList(_index, _low, _high, _trigger)
+AND
+_Value >= _low
+AND
+_Value <= _high
+THEN
+ItemDragToTrigger(ITEM_CYS_Shell, _trigger);
+CYS_ShellReward(_index);
+
+IF
+TimerFinished("CYS_AD_Shell")
+THEN
+ItemTeleportToTrigger(ITEM_CYS_Shell,TRIGGER_CYS_PointShellAD);
+DialogStartOneSpeakerItemDialog("CYS_AD_Shell",ITEM_CYS_Shell);
+
+IF
+AutomatedDialogEnded("CYS_AD_Shell",_)
+AND
+CYS_ShellReward(_ID)
+AND
+CYS_ShellRewardList(_ID,_, _, _)
+THEN
+NOT CYS_ShellReward(_ID);
+ItemSetOnstage(ITEM_CYS_ShellChest,1);
+ItemDragToTrigger(ITEM_CYS_ShellChest,TRIGGER_CYS_PointShell2);
+QuestUpdate("CYS_Shell","Update2");
+QuestClose("CYS_Shell");
+GoalCompleted;
+//END_REGION
+EXITSECTION
+NOT CYS_ShellRewardList(1,0,4,TRIGGER_CYS_PointShell1A);
+NOT CYS_ShellRewardList(2,5,9,TRIGGER_CYS_PointShell1B);
+NOT CYS_ShellRewardList(3,10,14,TRIGGER_CYS_PointShell1C);
+NOT CYS_ShellRewardList(4,15,100,TRIGGER_CYS_PointShell1D);
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

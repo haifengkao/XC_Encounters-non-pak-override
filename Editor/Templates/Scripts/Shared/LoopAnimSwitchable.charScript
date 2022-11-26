@@ -1,0 +1,27 @@
+INIT
+CHARACTER:__Me
+EXTERN FIXEDSTRING:%AnimationName = ""
+EXTERN TRIGGER:%Trigger = null
+EXTERN INT:%Loop = 1
+INT:%State = 1
+
+BEHAVIOUR
+
+REACTION PlayLoopAnim,100
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%State,1)
+ACTIONS
+	IF "!c1"
+		IsEqual(%Trigger,null)
+	THEN
+		CharacterLookFrom(%Trigger)
+	ENDIF
+	IF "c1"
+		IsEqual(%Loop,1)
+	THEN
+		CharacterPlayAnimation(%AnimationName,0,0)
+	ELSE
+		CharacterPlayAnimation(%AnimationName)
+	ENDIF
+	Sleep(3)

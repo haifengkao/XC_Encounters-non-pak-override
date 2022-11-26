@@ -1,0 +1,59 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	TRIGGER:%Trigger1 = CYS_WilburFireBar_6aaf3d62-f1b3-4139-bdf0-5e79146c7433
+	TRIGGER:%Outside = CYS_PolyMaxine_36d604ee-0abe-4e7e-a0e1-833567fdd7f6
+	TRIGGER:%Inside = CYS_TavernArea_0de9d744-0bdb-4099-bff5-e14dcb20f5e9
+	INT:%StateVar = 0
+	FIXEDSTRING:%Animation = ""
+
+BEHAVIOUR
+
+REACTION State_RunningOutside, 0
+	USAGE PEACE
+	ACTIONS
+		GetRandom(%currentAction, "Action_Outside")
+		SetPriority(%currentAction, 1100)
+
+REACTION State_RunningInside, 0
+	USAGE PEACE
+	ACTIONS
+		GetRandom(%currentAction, "Action_Inside")
+		SetPriority(%currentAction, 1100)
+	
+REACTION Action_Outside, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterWander(%Outside, 20, 0)
+		GetRandom(%Animation, "idle1", "idle2", "dodge")
+		CharacterPlayAnimation(%Animation)
+		Sleep(10)
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)
+
+REACTION Action_Inside, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterWander(%Inside, 20, 0)
+		GetRandom(%Animation, "idle1", "idle2", "still")
+		CharacterPlayAnimation(%Animation)
+		Sleep(10)
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)
+
+
+REACTION Waiting, 0
+USAGE PEACE
+ACTIONS
+	Sleep(5)
+	
+	
+STORY
+
+SCRIPTFRAME ShouldWanderTavern
+	ACTIONS	
+	Set(%currentState, "State_RunningInside")

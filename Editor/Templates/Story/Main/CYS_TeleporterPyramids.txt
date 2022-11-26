@@ -1,0 +1,103 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Dialogs(CHARACTER_CYS_Cecilia,"CYS_Cecilia");
+ItemToCharacter(ITEM_TeleportPyramidA,CHARACTER_HOM_AltarHack);
+
+CharacterSetOnStage(CHARACTER_CYS_Cecilia,0);
+ItemSetOnstage(ITEM_CYS_CeciliaBathtub,0);
+
+ProcTriggerRegisterForPlayers(TRIGGER_CYS_AreaBathroom);
+ProcTriggerRegisterForPlayers(TRIGGER_CYS_AreaBathroom2);
+KBSECTION
+//REGION CECILIA IN BATHTUB
+
+IF
+CharacterEnteredTrigger(_Player,TRIGGER_CYS_AreaBathroom)
+AND
+NOT CHARACTER_CYS_CeciliaBath.HadDialog(_)
+THEN
+CHARACTER_CYS_CeciliaBath.HadDialog(_Player);
+CharTimer(_Player, "CYS_CeciliaBath", 500);
+                                                                                                                           
+IF
+CharTimerFinished(_Player,"CYS_CeciliaBath")
+THEN
+ItemUnLock(ITEM_CYS_DoorCecilia);
+PROC_MendatoryDialog("CYS_Bath",CHARACTER_CYS_CeciliaBath,_Player);
+CHARACTER_CYS_Cecilia.hadBathDialog();
+GlobalSetEvent("CYS_MetCeciliaInBath");
+
+IF
+DialogEnded("CYS_Bath",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,_)
+THEN
+PROC_CheckPlayTutWithDelay(_Player,"TUT_Pyramid_2",1000);
+
+IF
+CharacterEnteredTrigger(_,TRIGGER_CYS_AreaBathroom)
+AND
+CHARACTER_CYS_CeciliaBath.HadDialog(_)
+THEN
+CharacterSetEvent(CHARACTER_CYS_CeciliaBath,"IntruderInBathroom");
+
+IF
+CharacterLeftTrigger(_Player,TRIGGER_CYS_AreaBathroom)
+THEN
+PROC_CYS_CheckCeciliaBathroom();
+
+PROC
+PROC_CYS_CheckCeciliaBathroom()
+AND
+NOT DB_InRegion(_,TRIGGER_CYS_AreaBathroom)
+AND
+CHARACTER_CYS_CeciliaBath.HadDialog(_)
+THEN
+CharacterSetEvent(CHARACTER_CYS_CeciliaBath,"IntruderLeftBathroom");
+
+IF
+CharacterLeftTrigger(_Player,TRIGGER_CYS_AreaBathroom2)
+THEN
+PROC_CYS_CheckCeciliaBathroom2();
+
+PROC
+PROC_CYS_CheckCeciliaBathroom2()
+AND
+CHARACTER_CYS_CeciliaBath.HadDialog(_Player)
+AND
+NOT DB_InRegion(_,TRIGGER_CYS_AreaBathroom2)
+AND
+NOT DB_Dead(CHARACTER_CYS_CeciliaBath)
+THEN
+NOT CHARACTER_CYS_CeciliaBath.HadDialog(_Player);
+ProcTriggerUnregisterForPlayers(TRIGGER_CYS_AreaBathroom);
+ItemSetOnstage(ITEM_CYS_CeciliaBathtub,1);
+CharacterSetOnStage(CHARACTER_CYS_CeciliaBath,0);
+CharacterSetOnStage(CHARACTER_CYS_Cecilia,1);
+ProcTriggerUnregisterForPlayers(TRIGGER_CYS_AreaBathroom2);
+GoalCompleted;
+
+IF
+RegionStarted("LucullaForest")
+AND
+NOT CHARACTER_CYS_Cecilia.hadBathDialog()
+THEN
+CharacterSetOnStage(CHARACTER_CYS_Cecilia,1);
+ItemSetOnstage(ITEM_CYS_CeciliaBathtub,1);
+ProcTriggerUnregisterForPlayers(TRIGGER_CYS_AreaBathroom);
+ProcTriggerUnregisterForPlayers(TRIGGER_CYS_AreaBathroom2);
+CharacterSetOnStage(CHARACTER_CYS_CeciliaBath,0);
+ItemUnLock(ITEM_CYS_DoorCecilia);
+
+IF
+ItemAddedToCharacter(ITEM_TeleportPyramidB, _Player)
+THEN
+QuestUpdate("CYS_Pyramids","Update2");
+QuestClose("CYS_Pyramids");
+
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

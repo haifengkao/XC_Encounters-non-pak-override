@@ -1,0 +1,182 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_OneShotPlayerTrigger(TRIGGER_HOM_Eden_TeleportFromEND);
+
+DB_Dialogs(CHARACTER_HOM_Trader_Eden, "END_InterdimentionalTrader");
+
+DB_ShovelArea(TRIGGER_HOM_ShovelEden,"HOM_EdenShovel",ITEM_HOM_ShovelEdenDirt);
+DB_ShovelRewardItemAppear("HOM_EdenShovel",ITEM_HOM_ShovelEdenChest,TRIGGER_HOM_ShovelEdenPoint);
+
+DB_PlayerComments("HOM_Comment_FirstGarden","HOM_Comment_FirstGarden_1_1",1,1);
+DB_PlayerComments("HOM_Comment_FirstGarden","HOM_Comment_FirstGarden_2_1",2,1);
+DB_PlayerComments("HOM_Comment_FirstGarden","HOM_Comment_FirstGarden_2_2",2,2);
+DB_PlayerComment_Trigger(TRIGGER_HOM_Eden_EntranceComment,"HOM_Comment_FirstGarden");
+KBSECTION
+//REGION Arrival
+IF
+CharacterDied(CHARACTER_HOM_Trader)
+THEN
+CharacterSetOnStage(CHARACTER_HOM_Trader_Eden, 0);
+
+PROC
+ProcOneShotTriggerEntered(_Player, TRIGGER_HOM_Eden_TeleportFromEND)
+AND
+DB_GlobalEvent("END_ZandalorIsFollowing")
+THEN
+CharacterTeleportToTrigger(CHARACTER_Zandalor, TRIGGER_HOM_Eden_TeleportFromEND, "FollowAgain");
+
+PROC
+ProcOneShotTriggerEntered(_Player, TRIGGER_HOM_Eden_TeleportFromEND)
+AND
+DB_GlobalEvent("END_IcaraIsFollowing")
+THEN
+CharacterTeleportToTrigger(CHARACTER_HOM_Icara, TRIGGER_HOM_Eden_TeleportFromEND, "FollowAgain");
+
+PROC
+ProcOneShotTriggerEntered(_Player, TRIGGER_HOM_Eden_TeleportFromEND)
+AND
+DB_GlobalEvent("END_IcandraIsFollowing")
+THEN
+CharacterTeleportToTrigger(CHARACTER_END_Icandra, TRIGGER_HOM_Eden_TeleportFromEND, "FollowAgain");
+
+IF
+CharacterEvent(_Char, "FollowAgain")
+AND
+DB_END_EndDudeFollows(_Char, _Player)
+THEN
+CharacterSetFollowCharacter(_Char, _Player);
+
+IF
+CharacterLeftCombat(_Char, _)
+AND
+DB_END_EndDudeFollows(_Char, _Player)
+THEN
+CharacterSetFollowCharacter(_Char, _Player);
+
+IF
+DialogEnded(_, _ID)
+AND
+DB_DialogNPCs(_ID, _Char, _)
+AND
+DB_END_EndDudeFollows(_Char, _Player)
+THEN
+CharacterSetFollowCharacter(_Char, _Player);
+
+IF
+AutomatedDialogEnded("END_AD_Icara", _ID)
+AND
+DB_END_EndDudeFollows(CHARACTER_HOM_Icara, _Player)
+THEN
+CharacterSetFollowCharacter(CHARACTER_HOM_Icara, _Player);
+
+IF
+AutomatedDialogEnded("END_AD_Zandalor", _ID)
+AND
+DB_END_EndDudeFollows(CHARACTER_Zandalor, _Player)
+THEN
+CharacterSetFollowCharacter(CHARACTER_Zandalor, _Player);
+
+IF
+CharacterResurrected(_Char)
+AND
+DB_END_EndDudeFollows(_Char, _Player)
+THEN
+CharacterSetFollowCharacter(_Char, _Player);
+
+IF
+CharacterDied(_Char)
+AND
+DB_END_EndDudeFollows(_Follower, _Char)
+AND
+CharacterGetOtherPlayer(_Char, _AliveDude)
+THEN
+CharacterStopFollow(_Follower);
+CharacterSetFollowCharacter(_Follower, _AliveDude);
+NOT DB_END_EndDudeFollows(_Follower, _Char);
+DB_END_EndDudeFollows(_Follower, _AliveDude);
+//END_REGION
+
+//REGION Test commands
+IF 
+TextEventSet("edenzandy")
+THEN
+NOT DB_NoDefaultBehavior(CHARACTER_Zandalor);
+CharacterPlayAnimation(CHARACTER_Zandalor,"knockdown_getup");
+CharacterSetVarInteger(CHARACTER_Zandalor,"State",0);
+DB_END_EndDudeFollows(CHARACTER_Zandalor, CHARACTER_Player1);
+CharacterSetAnimationOverride(CHARACTER_Zandalor, "");
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_Zandalor);
+CharacterSetHasDialog(CHARACTER_Zandalor, 0);
+GlobalSetEvent("END_ZandalorIsFollowing");
+DB_AD_Dialog(CHARACTER_Zandalor, "END_AD_Zandalor");
+ItemToCharacter(ITEM_END_DeathKnightKillWand,CHARACTER_Player1);
+CharacterTeleportPartyToTrigger(CHARACTER_Player1, TRIGGER_HOM_Eden_TeleportFromEND, "");
+//--
+ProcRemoveDialogEntryForSpeaker(CHARACTER_Jahan,"CYS_Jahan");
+DB_Dialogs(CHARACTER_Jahan,"JAH_Default");
+DB_CompanionRecruited(CHARACTER_Jahan);
+CharacterMakeCompanion(CHARACTER_Jahan,CHARACTER_Player1);
+Proc_LimitAbilitiesForCompanion(CHARACTER_Jahan);
+CharacterSetEvent(CHARACTER_Jahan,"Hired");
+DB_Companion(CHARACTER_Jahan);
+ProcSetPartyFullIfLoneWolf();
+CharacterTeleportToCharacter(CHARACTER_Jahan,CHARACTER_Player1,"");
+//--
+ProcRemoveDialogEntryForSpeaker(CHARACTER_Madoc,"CYS_Madoc");
+DB_Dialogs(CHARACTER_Madoc,"MAD_Default");
+DB_CompanionRecruited(CHARACTER_Madoc);
+CharacterMakeCompanion(CHARACTER_Madoc,CHARACTER_Player1);
+Proc_LimitAbilitiesForCompanion(CHARACTER_Madoc);
+CharacterSetEvent(CHARACTER_Madoc,"Hired");
+DB_Companion(CHARACTER_Madoc);
+ProcSetPartyFullIfLoneWolf();
+CharacterTeleportToCharacter(CHARACTER_Madoc,CHARACTER_Player1,"");
+
+IF 
+TextEventSet("edenzandyicandra")
+THEN
+NOT DB_NoDefaultBehavior(CHARACTER_Zandalor);
+CharacterPlayAnimation(CHARACTER_Zandalor,"knockdown_getup");
+CharacterSetVarInteger(CHARACTER_Zandalor,"State",0);
+DB_END_EndDudeFollows(CHARACTER_Zandalor, CHARACTER_Player1);
+CharacterSetAnimationOverride(CHARACTER_Zandalor, "");
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_Zandalor);
+CharacterSetHasDialog(CHARACTER_Zandalor, 0);
+GlobalSetEvent("END_ZandalorIsFollowing");
+DB_AD_Dialog(CHARACTER_Zandalor, "END_AD_Zandalor");
+CharacterSetOnStage(CHARACTER_END_Icandra, 1);
+CharacterSetFollowCharacter(CHARACTER_END_Icandra, CHARACTER_Player1);
+DB_END_EndDudeFollows(CHARACTER_END_Icandra, CHARACTER_Player1);
+GlobalSetEvent("END_IcandraIsFollowing");
+CharacterStopFollow(CHARACTER_HOM_Icara);
+NOT DB_END_EndDudeFollows(CHARACTER_HOM_Icara, CHARACTER_Player1);
+GlobalClearEvent("END_IcaraIsFollowing");
+QuestUpdate("HOM_Starstones", "IcandraComes");
+ItemToCharacter(ITEM_END_DeathKnightKillWand,CHARACTER_Player1);
+CharacterTeleportPartyToTrigger(CHARACTER_Player1, TRIGGER_HOM_Eden_TeleportFromEND, "");
+//--
+ProcRemoveDialogEntryForSpeaker(CHARACTER_Jahan,"CYS_Jahan");
+DB_Dialogs(CHARACTER_Jahan,"JAH_Default");
+DB_CompanionRecruited(CHARACTER_Jahan);
+CharacterMakeCompanion(CHARACTER_Jahan,CHARACTER_Player1);
+Proc_LimitAbilitiesForCompanion(CHARACTER_Jahan);
+CharacterSetEvent(CHARACTER_Jahan,"Hired");
+DB_Companion(CHARACTER_Jahan);
+ProcSetPartyFullIfLoneWolf();
+CharacterTeleportToCharacter(CHARACTER_Jahan,CHARACTER_Player1,"");
+//--
+ProcRemoveDialogEntryForSpeaker(CHARACTER_Madoc,"CYS_Madoc");
+DB_Dialogs(CHARACTER_Madoc,"MAD_Default");
+DB_CompanionRecruited(CHARACTER_Madoc);
+CharacterMakeCompanion(CHARACTER_Madoc,CHARACTER_Player1);
+Proc_LimitAbilitiesForCompanion(CHARACTER_Madoc);
+CharacterSetEvent(CHARACTER_Madoc,"Hired");
+DB_Companion(CHARACTER_Madoc);
+ProcSetPartyFullIfLoneWolf();
+CharacterTeleportToCharacter(CHARACTER_Madoc,CHARACTER_Player1,"");
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

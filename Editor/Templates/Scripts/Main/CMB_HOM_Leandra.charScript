@@ -1,0 +1,241 @@
+
+	// THIS SCRIPT ISN'T USED ANYMORE!!
+
+/*
+INIT
+	CHARACTER:__Me
+	CHARACTER:%Astarte=HOM_Astarte_ac19b375-a67e-4f36-93b1-1bf770fccccd
+	FLOAT:%LeandraSightRange
+	
+//----------------
+BEHAVIOUR
+REACTION Leandra_Cast_Blind, 400
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&!c4&c5"
+	CharacterCanCast(__Me,Target_EnemyBlind)											//c1
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,Target_EnemyBlind)					//c2
+	CharacterGet(_Target,__Me,%LeandraSightRange,Lowest,Vitality,Enemy)					//c3
+	CharacterHasStatus(_Target,BLIND)													//c4	
+	IsRandom(0.5)																		//c5	
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+	CharacterUseSkill(Target_EnemyBlind,_Target)
+INTERRUPT
+	Reset()
+
+REACTION Leandra_Cast_Bleed, 300
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&!c4&c5"
+	CharacterCanCast(__Me,Target_EnemyBleed)											//c1
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,Target_EnemyBleed)					//c2
+	CharacterGet(_Target,__Me,%LeandraSightRange,Lowest,Vitality,Enemy)					//c3
+	CharacterHasStatus(_Target,BLEEDING)												//c4	
+	IsRandom(0.5)																		//c5	
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+	CharacterUseSkill(Target_EnemyBleed,_Target)
+INTERRUPT
+	Reset()	
+	
+REACTION Leandra_Cast_Slow, 300
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&!c4&c5"
+	CharacterCanCast(__Me,Target_EnemySlow)												//c1
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,Target_EnemySlow)					//c2
+	CharacterGet(_Target,__Me,%LeandraSightRange,Highest,Speed,Enemy)					//c3
+	CharacterHasStatus(_Target,SLOWED)													//c4	
+	IsRandom(0.5)																		//c5	
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+	CharacterUseSkill(Target_EnemySlow,_Target)
+INTERRUPT
+	Reset()	
+	
+REACTION Leandra_Cast_Stun, 300
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&!c4&c5"
+	CharacterCanCast(__Me,Target_EnemyStun)												//c1
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,Target_EnemyStun)					//c2
+	CharacterGet(_Target,__Me,%LeandraSightRange,Highest,Dexterity,Enemy)				//c3
+	CharacterHasStatus(_Target,STUNNED)													//c4	
+	IsRandom(0.5)																		//c5	
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+	CharacterUseSkill(Target_EnemyStun,_Target)
+INTERRUPT
+	Reset()	
+	
+REACTION Leandra_Cast_Curse, 300
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&!c4&c5"
+	CharacterCanCast(__Me,Target_EnemyTargetedCurse)									//c1
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,Target_EnemyTargetedCurse)			//c2
+	CharacterGet(_Target,__Me,%LeandraSightRange,Highest,Strength,Enemy)				//c3
+	CharacterHasStatus(_Target,CURSED)													//c4	
+	IsRandom(0.5)																		//c5	
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+	CharacterUseSkill(Target_EnemyTargetedCurse,_Target)
+INTERRUPT
+	Reset()	
+
+REACTION Leandra_Cast_Silence_On_Astarte, 300
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&!c4&c5"
+	CharacterCanCast(__Me,Projectile_EnemySilence)										//c1
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,Projectile_EnemySilence)			//c2
+	CharacterCanSee(__Me,%Astarte)														//c3
+	CharacterHasStatus(%Astarte,MUTED)													//c4	
+	IsRandom(0.4)																		//c5	
+ACTIONS
+	CharacterMoveInRange(%Astarte,_MinRange,_MaxRange,1)
+	CharacterUseSkill(Projectile_EnemySilence,%Astarte)
+INTERRUPT
+	Reset()
+	
+REACTION Leandra_Cast_StaffOfMagusFire, 100
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+	FIXEDSTRING:_ChosenThreat	
+CHECK "c1&c2&c3&!c4"
+	CharacterCanCast(__Me,Projectile_EnemyStaffOfMagusFire)								//c1
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,Projectile_EnemyStaffOfMagusFire)	//c2
+	CharacterGet(_Target,__Me,%LeandraSightRange,Lowest,FireResistance,Enemy)			//c3	
+	CharacterHasStatus(_Target,FROZEN)													//c4		
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+	CharacterUseSkill(Projectile_EnemyStaffOfMagusFire,_Target)
+INTERRUPT
+	Reset()
+	
+//---- COMMENTS
+REACTION AstarteIsWoundedComment1,1000
+USAGE ALL
+VARS
+	FLOAT:_AstartesVitality
+CHECK "c1&c2&c3"
+	CharacterGetStat(_AstartesVitality,%Astarte,Vitality)
+	IsLessThen(_AstartesVitality,0.7)
+	IsGreaterThen(_AstartesVitality,0.5)
+ACTIONS
+	DisplayText(__Me,"HOM_End_LeandraWin1",3)
+	SetPriority("AstarteIsWoundedComment1",0)
+		
+REACTION AstarteIsWoundedComment2,950
+USAGE ALL
+VARS
+	FLOAT:_AstartesVitality
+CHECK "c1&c2&c3"
+	CharacterGetStat(_AstartesVitality,%Astarte,Vitality)
+	IsLessThen(_AstartesVitality,0.5)
+	IsGreaterThen(_AstartesVitality,0.3)
+ACTIONS
+	DisplayText(__Me,"HOM_End_LeandraWin2",3)
+	SetPriority("AstarteIsWoundedComment2",0)
+	SetPriority("AstarteIsWoundedComment1",0)	
+		
+REACTION AstarteIsWoundedComment3,900
+USAGE ALL
+VARS
+	FLOAT:_AstartesVitality
+CHECK "c1&c2&c3"
+	CharacterGetStat(_AstartesVitality,%Astarte,Vitality)
+	IsLessThen(_AstartesVitality,0.3)
+	IsGreaterThen(_AstartesVitality,0.1)
+ACTIONS
+	DisplayText(__Me,"HOM_End_LeandraWin3",3)
+	SetPriority("AstarteIsWoundedComment3",0)
+	SetPriority("AstarteIsWoundedComment2",0)
+	SetPriority("AstarteIsWoundedComment1",0)	
+	
+REACTION LeandraIsWoundedComment1,1000
+USAGE ALL
+VARS
+	FLOAT:_MyVitality
+CHECK "c1&c2&c3"
+	CharacterGetStat(_MyVitality,__Me,Vitality)
+	IsLessThen(_MyVitality,0.7)
+	IsGreaterThen(_MyVitality,0.5)
+ACTIONS
+	DisplayText(__Me,"HOM_End_LeandraLose1",3)
+	SetPriority("LeandraIsWoundedComment1",0)
+		
+REACTION LeandraIsWoundedComment2,950
+USAGE ALL
+VARS
+	FLOAT:_MyVitality
+CHECK "c1&c2&c3"
+	CharacterGetStat(_MyVitality,__Me,Vitality)
+	IsLessThen(_MyVitality,0.5)
+	IsGreaterThen(_MyVitality,0.3)
+ACTIONS
+	DisplayText(__Me,"HOM_End_LeandraLose2",3)
+	SetPriority("LeandraIsWoundedComment2",0)
+	SetPriority("LeandraIsWoundedComment1",0)	
+		
+REACTION LeandraIsWoundedComment3,900
+USAGE ALL
+VARS
+	FLOAT:_MyVitality
+CHECK "c1&c2&c3"
+	CharacterGetStat(_MyVitality,__Me,Vitality)
+	IsLessThen(_MyVitality,0.3)
+	IsGreaterThen(_MyVitality,0.1)
+ACTIONS
+	DisplayText(__Me,"HOM_End_LeandraLose3",3)
+	SetPriority("LeandraIsWoundedComment3",0)
+	SetPriority("LeandraIsWoundedComment2",0)
+	SetPriority("LeandraIsWoundedComment1",0)		
+	
+//-------------------------
+EVENTS
+EVENT OnInit_GiveSpellsAndGetSightRange
+ON
+	OnInit
+ACTIONS
+	IF "c1"
+		CharacterGetSightRange(%LeandraSightRange,__Me)
+	THEN
+		CharacterAddSkill(Target_EnemyBanishSummon)	
+		CharacterAddSkill(Target_EnemyTargetedCurse)	
+		CharacterAddSkill(Target_EnemyBleed)	
+		CharacterAddSkill(Target_EnemyBlind)	
+		CharacterAddSkill(Target_EnemySlow)	
+		CharacterAddSkill(Target_EnemyStun)	
+		CharacterAddSkill(Projectile_EnemySilence)	
+	ENDIF
+	
+EVENT WhenLeandraDiesPlayText
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	DisplayText(__Me,"HOM_End_LeandraLose4",2)
+	SetPriority("LeandraIsWoundedComment3",0)
+	SetPriority("LeandraIsWoundedComment2",0)
+	SetPriority("LeandraIsWoundedComment1",0)			

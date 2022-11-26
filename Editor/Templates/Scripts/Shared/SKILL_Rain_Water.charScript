@@ -1,0 +1,45 @@
+#TEMPLATE "_SKILL_Base" : Rain_Water
+
+INIT
+CHARACTER:__Me
+// [GLOBAL_VARS]
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_Rain_Water
+VARS
+	// [CALC_VARS]
+	FLOAT:_Score
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_Rain_Water")
+ACTIONS	
+	// [CALC_ACTIONS_PRE]
+	Set(_Score, 0.0)
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	IF "((c1))"
+	    CharacterHasStatus(__Me, BURNING) // c1
+	THEN
+	    Add(_Score, 5.0)
+	ENDIF
+	IF "((c1))"
+	    CharacterHasStatus(__Me, WET) // c1
+	THEN
+	    Add(_Score, -5.0)
+	ENDIF
+	// Hostile count score calculation
+	Add(_Score, 10.0) // HostileWeight
+	
+	Set(%SkillTargetChar_Rain_Water, __Me)
+	Add(%ActionScore_Rain_Water, _Score)
+	// [~CALC_ACTIONS]
+
+	
+
+	

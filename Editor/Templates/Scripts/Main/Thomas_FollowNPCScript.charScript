@@ -1,0 +1,9 @@
+INIT 
+CHARACTER:__Me 
+CHARACTER:%escortee = CYS_NPC_M_N_Visitor_003_ced14e3a-d319-41d7-860e-766b591f65c2 
+ 
+BEHAVIOUR 
+REACTION FollowPlayer, 1000 
+USAGE PEACE 
+ACTIONS 
+ CharacterFollow(%escortee, -1)

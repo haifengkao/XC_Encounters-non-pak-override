@@ -1,0 +1,203 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+//REGION Troll King Guards
+DB_LUC_TrollKing_Guards(CHARACTER_LUC_TrollKingGuard_01);
+DB_LUC_TrollKing_Guards(CHARACTER_LUC_TrollKingGuard_03);
+DB_LUC_TrollKing_Guards(CHARACTER_LUC_TrollKingGuard_04);
+//END_REGION
+
+SneakTriggerSpotter(TRIGGER_LUC_Area_BabyTrollsWarning,CHARACTER_LUC_BabyTroll_01);
+DB_Dialogs(CHARACTER_LUC_BabyTroll_01, "LUC_BabyTrolls");
+
+ItemSetOnstage(ITEM_LUC_TK_RealEntrance, 0);
+ProcTriggerRegisterForPlayers(TRIGGER_LUC_TK_EntranceActivator);
+
+DB_PlayerComments("LUC_TK_CommentFakeCave","LUC_TK_CommentFakeCave_1_1",1,1);
+DB_PlayerComments("LUC_TK_CommentFakeCave","LUC_TK_CommentFakeCave_2_1",2,1);
+DB_PlayerComments("LUC_TK_CommentFakeCave","LUC_TK_CommentFakeCave_2_2",2,2);
+DB_PlayerComment_Trigger(TRIGGER_LUC_TK_FakeComment, "LUC_TK_CommentFakeCave");
+
+DB_PlayerComments("LUC_CommentMaradinoBody","LUC_CommentMaradinoBody_1_1",1,1);
+DB_PlayerComments("LUC_CommentMaradinoBody","LUC_CommentMaradinoBody_2_1",2,1);
+DB_PlayerComments("LUC_CommentMaradinoBody","LUC_CommentMaradinoBody_2_2",2,2);
+DB_PlayerComment_Trigger(TRIGGER_LUC_CommentMaradinoBody, "LUC_CommentMaradinoBody");
+
+DB_PlayerComments("LUC_TK_CommentRealCave","LUC_TK_CommentRealCave_1_1",1,1);
+DB_PlayerComments("LUC_TK_CommentRealCave","LUC_TK_CommentRealCave_2_1",2,1);
+DB_PlayerComments("LUC_TK_CommentRealCave","LUC_TK_CommentRealCave_2_2",2,2);
+
+DB_IsNotMessingAround(CHARACTER_LUC_BabyTroll_01);
+DB_IsNotMessingAround(CHARACTER_LUC_TrollKing);
+DB_IsNotMessingAround(CHARACTER_LUC_TrollKingGuard_01);
+DB_IsNotMessingAround(CHARACTER_LUC_TrollKingGuard_02);
+DB_IsNotMessingAround(CHARACTER_LUC_TrollKingGuard_03);
+DB_IsNotMessingAround(CHARACTER_LUC_TrollKingGuard_04);
+DB_IsNotMessingAround(CHARACTER_LUC_TrollKingGuard_05);
+KBSECTION
+IF
+CharacterEvent(CHARACTER_LUC_BabyTroll_01, "GLO_SpotterSneaker")
+AND
+CharacterGetVarCharacter(CHARACTER_LUC_BabyTroll_01, "SpottedDude", _Player)
+THEN
+ProcDoTwoSpeakerDialog("LUC_BabyTrolls", CHARACTER_LUC_BabyTroll_01, _Player);
+
+IF
+GlobalEventSet("LUC_ShowTK")
+THEN
+ProcShowMarker("LUC_TKCaveEntry");
+
+IF
+DialogEnded("LUC_BabyTrolls",_)
+AND
+CharacterGetVarInteger(CHARACTER_LUC_BabyTroll_01,"LUC_BabyTrollHostile",1)
+THEN
+CharacterSetVarInteger(CHARACTER_LUC_BabyTroll_01,"LUC_BabyTrollHostile",0);
+ProcSetRelationToPlayers(CHARACTER_LUC_BabyTroll_01,0);
+
+IF
+ItemTemplateAddedToCharacter("LOOT_OreBar_A_BlackRock_A_e034ce03-2e35-4c1b-b47c-61385da84f22", _itemHandle, _player)
+AND
+_player.DB_IsPlayer()
+THEN
+QuestUpdate("LUC_TrollKing","Update2");
+
+IF
+ItemTemplateAddedToCharacter("LOOT_Ore_BlackRock_A_b9db80ea-0844-4b89-8074-a036b5034ab8", _itemHandle, _player)
+AND
+_player.DB_IsPlayer()
+THEN
+QuestUpdate("LUC_TrollKing","Update2");
+
+IF
+GameBookInterfaceClosed(ITEM_LUC_TK_EntranceBook,_Player)
+AND
+DB_InRegion(_Player, TRIGGER_LUC_TK_EntranceActivator)
+THEN
+ItemSetOnstage(ITEM_LUC_TK_FakeEntrance, 0);
+ItemSetOnstage(ITEM_LUC_TK_RealEntrance, 1);
+ItemPlayEffect(ITEM_LUC_TK_RealEntrance, "FX_Env_CaveEntranceMagic_A");
+Launch_PlayerComment(_Player, "LUC_TK_CommentRealCave");
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_TK_EntranceActivator);
+
+IF
+CharacterDied(CHARACTER_LUC_TrollKing)
+THEN
+GlobalSetEvent("LUC_TrollKingIsDead");
+
+IF
+DialogCharacterEventSet("ReceiveBloodCage",_Player,_)
+THEN
+ItemToCharacter(ITEM_LUC_BloodStoneCage,_Player);
+GlobalSetEvent("LUC_ReceivedBloodCage");
+
+IF
+GlobalEventSet("LUC_AddBlackrock")
+AND
+_Player.DB_IsPlayer()
+AND
+CharacterGetBaseAbility(_Player, "Blackrock",0)
+THEN
+CharacterUnlockAbility(_Player,"Blackrock");
+CharacterAddAbility(_Player,"Blackrock",1);
+DB_UnlockedBlackRock(1);
+
+IF
+DialogStarted("LUC_Brandon",_Id)
+AND
+DB_DialogPlayers(_Id,_Player,1)
+AND
+ItemTemplateIsInPartyInventory(_Player,"LOOT_Ore_BlackRock_A_b9db80ea-0844-4b89-8074-a036b5034ab8",0,_Count)
+AND
+_Count > 0
+THEN
+GlobalSetEvent("LUC_PlayerHasBlackOre");
+
+IF
+DialogStarted("LUC_Brandon",_Id)
+AND
+DB_DialogPlayers(_Id,_Player,1)
+AND
+ItemIsInPartyInventory(ITEM_LUC_BloodStoneCage,_Player,0,1)
+AND
+ItemTemplateIsInContainer(ITEM_LUC_BloodStoneCage,"LOOT_Ore_BlackRock_A_b9db80ea-0844-4b89-8074-a036b5034ab8",_Count)
+AND
+_Count > 0
+THEN
+GlobalSetEvent("LUC_PlayerHasBlackOre");
+
+IF
+DialogEnded("LUC_Brandon",_)
+THEN
+GlobalClearEvent("LUC_PlayerHasBlackOre");
+
+IF
+DialogCharacterEventSet("GiveOreToBrandon",_Player,_)
+THEN
+ProcMoveOreToBrandonAndPayThePlayer(_Player);
+
+PROC
+ProcMoveOreToBrandonAndPayThePlayer((CHARACTER)_Player)
+AND
+ItemTemplateIsInPartyInventory(_Player,"LOOT_Ore_BlackRock_A_b9db80ea-0844-4b89-8074-a036b5034ab8",1,_Count)
+AND
+_Count > 0
+AND
+IntegerProduct(_Count,100,_Gold)
+THEN
+ItemTemplateRemoveFromCharacter("LOOT_Ore_BlackRock_A_b9db80ea-0844-4b89-8074-a036b5034ab8",_Player,_Count);
+ItemTemplateAddToCharacter("LOOT_Ore_BlackRock_A_b9db80ea-0844-4b89-8074-a036b5034ab8",CHARACTER_LUC_Overseer,_Count);
+PartyAddGold(_Gold);
+
+PROC
+ProcMoveOreToBrandonAndPayThePlayer((CHARACTER)_Player)
+AND
+ItemIsInPartyInventory(ITEM_LUC_BloodStoneCage,_Player,1,1)
+AND
+ItemTemplateIsInContainer(ITEM_LUC_BloodStoneCage,"LOOT_Ore_BlackRock_A_b9db80ea-0844-4b89-8074-a036b5034ab8",_Count)
+AND
+_Count > 0
+AND
+IntegerProduct(_Count,100,_Gold)
+THEN
+ItemTemplateRemoveFromContainer("LOOT_Ore_BlackRock_A_b9db80ea-0844-4b89-8074-a036b5034ab8",ITEM_LUC_BloodStoneCage,_Count);
+ItemTemplateAddToCharacter("LOOT_Ore_BlackRock_A_b9db80ea-0844-4b89-8074-a036b5034ab8",CHARACTER_LUC_Overseer,_Count);
+PartyAddGold(_Gold);
+
+//REGION Troll King calls for help
+IF
+CharacterEnteredCombat(CHARACTER_LUC_TrollKing, _)
+THEN
+DialogRequestStopForCharacter(CHARACTER_LUC_TrollKing);
+CharacterDisplayText(CHARACTER_LUC_TrollKing,"LUC_TrollKing_CallsForHelp");
+//TimerLaunch("LUC_TrollKing_CallsForHelp_Timer",1800);
+CharacterSetEvent(CHARACTER_LUC_TrollKing,"LUC_TrollKing_CallsForHelp_Event");
+
+/*IF
+CharacterEvent(CHARACTER_LUC_TrollKing,"LUC_TrollKing_CallsForHelp_Event")
+AND
+DB_LUC_TrollKing_Guards(_Guard)
+THEN
+CharacterDisplayText(_Guard,"LUC_TrollKing_CallsForHelp_Response");
+CharacterSetCanFight(_Guard,1);
+
+IF
+TimerFinished("LUC_TrollKing_CallsForHelp_Timer")
+AND
+DB_LUC_TrollKing_Guards(_Guard)
+THEN
+ProcCharacterMoveToTrigger(_Guard,TRIGGER_LUC_Point_TrollGuard_W01,1,"LUC_TrollKing_CallsForHelp_Arrived_Event");*/
+
+IF
+CharacterEnteredCombat(_Guard,_)
+AND
+DB_LUC_TrollKing_Guards(_Guard)
+AND
+DB_StoryMoving(_Char,1)
+THEN
+CharacterPurgeQueue(_Guard);
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

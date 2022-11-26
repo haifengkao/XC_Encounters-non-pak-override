@@ -1,0 +1,17 @@
+INIT
+CHARACTER:__Me
+INT:%StartWandering = 0
+
+EXTERN TRIGGER:%Trigger = null
+
+BEHAVIOUR
+REACTION StartWander, 1050
+USAGE PEACE
+VARS
+	FLOAT:_Range = 10
+CHECK "c1"
+	IsEqual(%StartWandering,1)
+ACTIONS
+	CharacterWander(_Range,5,0,%Trigger)
+INTERRUPT
+	Reset()

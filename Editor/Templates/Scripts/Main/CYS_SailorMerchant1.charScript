@@ -1,0 +1,34 @@
+#INCLUDE CYS_BurningShipHelper
+
+INIT
+USING CYS_BurningShipHelper
+CHARACTER:%Friend = CYS_SailorMerchant3_56bc7527-002b-426c-bef9-7a75a1a98e39
+TRIGGER:%Point1 = CYS_PointSailorMerchant1_1_0d4fbfd6-f5d2-4565-bf7b-ff9917a479fd
+INT:%Dialog = 0
+
+BEHAVIOUR
+	
+REACTION State_ActionManager, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, "Action_ObserveAndTalk")
+	SetPriority(%currentAction, 1100)
+
+REACTION Action_ObserveAndTalk,0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	GetRandom(_Animation,"Look_Up_Long_01","Look_Up_Short_01","Look_Up_Short_02")
+	CharacterMoveTo(%Point1)
+	CharacterLookFrom(%Point1)
+	Sleep(2)
+	CharacterPlayAnimation(_Animation)
+	Sleep(30)
+	CharacterMoveTo(%Friend,0)
+	CharacterLookAt(%Friend)
+	CharacterEvent(%Friend,"DialogRequest")
+	Sleep(5)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	Reset()

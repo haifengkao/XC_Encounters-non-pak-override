@@ -1,0 +1,80 @@
+INIT
+
+CHARACTER:__Me
+CHARACTER:%Friend = DAF_BO_ArmoryKeyOrc_c0a1c621-96ac-4809-ad2c-fade4e57e5d2
+
+INT:%Dialog = 0
+INT:%State = 0
+
+BEHAVIOUR
+
+REACTION Dialog,1500
+USAGE PEACE
+CHECK "c1&!c2&!c3&c4"
+	IsEqual(%Dialog,1)
+	IsInDialog(%Friend)
+	IsInDialog(__Me)
+	IsEqual(%State,0)
+
+ACTIONS
+	CharacterLookAt(%Friend)
+	DialogStart("DAF_AD_BO_ArmoryKeyArgue",%Friend,__Me)
+	Set(%Dialog,0)
+	Sleep(5)
+
+REACTION Searching,1500
+USAGE PEACE
+CHECK "c1&c2"
+	IsEqual(%Dialog,0)
+	IsEqual(%State,0)
+VARS
+	FIXEDSTRING:_AnimationFind
+	FIXEDSTRING:_Text	
+ACTIONS
+	CharacterWander(TRIGGER:DAF_Area_ArmoryKeySearch_1089a101-f4cf-4837-8cdc-05e567e2cdce,7,0,__Me)
+	GetRandom(_Text,"DAF_ArmoryKeyHuman_1","DAF_ArmoryKeyHuman_2")
+	GetRandom(_AnimationFind,"Look_Down_Long_01","Bored_02")
+	CharacterPlayAnimation(_AnimationFind)
+	Sleep(5)
+	DisplayText(__Me,_Text,5)
+	Sleep(7)
+INTERRUPT
+	Reset()
+	
+REACTION OffTheHook,1200
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%State,1)
+ACTIONS
+	CharacterWander(TRIGGER:DAF_Area_ArmoryKeySearch_1089a101-f4cf-4837-8cdc-05e567e2cdce,10,0,__Me)//<-------------CHANGE THIS TO APPROPRIATE!
+INTERRUPT
+	Reset()
+	
+EVENTS
+
+EVENT StartDialog
+ON
+	OnCharacterEvent(__Me,"DAF_ArgueOverKey")
+ACTIONS
+	Set(%Dialog,1)
+	
+EVENT GaveKeyToGruthilda
+ON
+	OnGlobalEventSet("DAF_GaveGruthildaArmoryKey")
+ACTIONS
+	Set(%State,1)
+	
+EVENT GaveKeyToOrc
+ON
+	OnGlobalEventSet("DAF_GaveOrcArmoryKey")
+ACTIONS
+	Set(%State,1)
+
+EVENT CombatStopsDialog
+ON
+	OnCombatStarted()
+ACTIONS
+	DialogRequestStop("DAF_AD_BO_ArmoryKeyArgue")
+
+
+

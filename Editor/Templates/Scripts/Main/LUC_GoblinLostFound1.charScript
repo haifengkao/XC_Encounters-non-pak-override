@@ -1,0 +1,34 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter
+CHARACTER:__Me
+CHARACTER:%Goblin2 = LUC_GoblinLostFound2_cfaf4ef2-c052-46b4-b15d-bb50d0d3a525
+INT:%StateVar = 0
+
+BEHAVIOUR
+REACTION StartAD,1000
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%StateVar, 1)
+ACTIONS
+	DisplayText(__Me,"LUC_GoblinLostFound1_Script_0",3) //What do we do now? We can't break through without fire.
+	Sleep(3)
+	DisplayText(%Goblin2,"LUC_GoblinLostFound1_Script_1",3) //I don't know, but we really need to get in there. The boss won't be happy if we return without his helmet.
+	Sleep(3)
+	DisplayText(__Me,"LUC_GoblinLostFound1_Script_2",3) //Only you can drop a box of matches right into a puddle ...
+	Sleep(15)
+INTERRUPT
+	Reset()
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+STORY
+
+SCRIPTFRAME StartAD
+	ACTIONS
+	Set(%StateVar,1)
+
+SCRIPTFRAME StopAD
+	ACTIONS
+	Set(%StateVar,0)

@@ -1,0 +1,36 @@
+INIT
+CHARACTER:__Me
+EXTERN ITEM:%Campfire = null
+INT:%WarningCount = 0
+
+BEHAVIOUR
+
+REACTION LightFire, 0
+USAGE PEACE
+ACTIONS
+	CharacterLookAt(%Campfire)
+	DisplayText(__Me,"HIB_ImmaculatesFireOff_1",5)
+	CharacterMoveTo(%Campfire)
+	CharacterLookAt(%Campfire)
+	CharacterPlayAnimation("Fidget_Low_01")
+	CharacterUseItem(%Campfire)
+	SetPriority("LightFire",0)
+INTERRUPT
+	SetPriority("LightFire",0)
+
+EVENTS
+
+EVENT FireExtinguished
+ON
+	OnItemStatusRemoved(%Campfire,BURNING)
+ACTIONS
+	IF "c1"
+		IsEqual(%WarningCount,0)
+	THEN
+		Set(%WarningCount,1)
+		SetPriority("LightFire",2000)
+	ELSE
+		DisplayText(__Me,"HIB_ImmaculatesFireOff_2",5)
+		CharacterSetFaction(__Me,"HIB_Immaculates")
+	ENDIF
+	

@@ -1,0 +1,106 @@
+INIT
+
+CHARACTER:__Me
+FIXEDSTRING:%CurrentAction = "Tortured"
+ITEM:%Seat = FUR_Pris_TortureBed_A_000_7e4dde29-60a7-4e73-8174-a01afff0fb9a
+
+BEHAVIOUR
+
+REACTION ActionManager, 1070
+USAGE ALL
+ACTIONS
+	SetPriority(%CurrentAction, 1080)
+
+REACTION Tortured, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Text
+	CHARACTER:_Player
+ACTIONS
+	CharacterSetAnimationOverride(__Me,"TortureRack_Still_01")
+	GetRandom(_Text,"DAF_Nolan_1","DAF_Nolan_2","DAF_Nolan_3")
+	IF "c1&!c2"
+		GetClosestPlayer(_Player)
+		CharacterHasStatus(_Player,"COMBAT")
+	THEN
+		DisplayText(__Me,_Text,5)
+	ENDIF
+	Sleep(15)
+	SetPriority(%CurrentAction, 0)	
+INTERRUPT
+	Reset()
+
+REACTION WaitingForRescue, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+	FIXEDSTRING:_CoweringLine
+ACTIONS
+	DisplayText(__Me, "DAF_NolanCowering_01", 5)
+	CharacterMoveTo(TRIGGER:DAF_PointNolanFlee_35de9b50-9972-4211-ae50-d4ef342332fb, 1) // Should be more like a cripple walk
+	CharacterLookFrom(TRIGGER:DAF_PointNolanFlee_35de9b50-9972-4211-ae50-d4ef342332fb)
+	GetRandom(_CoweringLine, "DAF_NolanCowering_01", "DAF_NolanCowering_02", "DAF_NolanCowering_03")
+	DisplayText(__Me, _CoweringLine, 5)
+	GetRandom(_Animation,"Cower_01","Cower_01","Crying_01")
+	CharacterPlayAnimation(_Animation)
+	Sleep(13)
+INTERRUPT
+	Reset()
+	
+REACTION ThankPlayer, 0
+USAGE PEACE 
+VARS
+	FIXEDSTRING:_ThankYouLine
+ACTIONS
+	CharacterMoveTo(TRIGGER:DAF_Point_NolanFreed_4d7c0b5b-2b08-4915-a32d-e78f50f77c25,0,1,0,0.3)
+	CharacterLookFrom(TRIGGER:DAF_Point_NolanFreed_4d7c0b5b-2b08-4915-a32d-e78f50f77c25,1)
+	CharacterPlayAnimation("Surprise_02")
+	GetRandom(_ThankYouLine, "DAF_NolanPlayerThankYou_01", "DAF_NolanPlayerThankYou_02", "DAF_NolanPlayerThankYou_03")
+	DisplayText(__Me, _ThankYouLine, 5)
+	Sleep(15)
+INTERRUPT
+	Reset()
+
+EVENTS
+
+EVENT Init
+ON
+	OnInit()
+ACTIONS
+	CharacterForceUpdate(1)
+	
+EVENT Died
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	CharacterForceUpdate(0)	
+
+EVENT NolanFreed
+ON
+	OnCharacterEvent(__Me,"WaitingForRescue")
+ACTIONS
+	SetPriority(%CurrentAction, 0)
+	Set(%CurrentAction, "WaitingForRescue")
+	
+STORY
+
+SCRIPTFRAME AfterTorturersGetKilled
+ACTIONS
+	SetPriority("ActionManager", 0)
+	SetPriority(%CurrentAction, 0)
+	Set(%CurrentAction, "ThankPlayer")
+	SetPriority("ActionManager", 1070)
+	
+SCRIPTFRAME DoNothing
+ACTIONS
+	SetPriority("ActionManager", 0)
+	SetPriority(%CurrentAction, 0)
+	
+SCRIPTFRAME DAF_NolanRunsToTunnel
+ACTIONS
+	SetPriority("ActionManager", 0)
+	SetPriority(%CurrentAction, 0)
+	CharacterMoveTo(TRIGGER:DAF_Point_PrisonersNearBodyInTunnel_a5aea7c1-3746-4122-a308-08246f233df4, 1,1,1)
+	CharacterLookFrom(TRIGGER:DAF_Point_PrisonersNearBodyInTunnel_a5aea7c1-3746-4122-a308-08246f233df4)
+
+	

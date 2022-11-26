@@ -1,0 +1,110 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+//DB_Dialogs(CHARACTER_DAF_Norok,"DAF_Norok"); DO NOT GIVE DAF_Norok a dialog or defaultdialog through the normal system. THere are some exceptions so I handle dialog starting myself. -G
+CharacterSetHasDialog(CHARACTER_DAF_Norok,1);
+DB_IsNotMessingAround(CHARACTER_DAF_Norok);
+DB_NoCharacterCompanionReplace(CHARACTER_DAF_Norok);
+KBSECTION
+IF
+DialogStartRequested(CHARACTER_DAF_Norok,_)
+THEN
+NOT DAF_NorokDialogHandled(1);
+
+IF
+DialogStartRequested(CHARACTER_DAF_Norok,_Character)
+AND
+DB_GlobalEvent("DAF_NorokLeave")
+THEN
+CharacterDisplayText(_Character,"DAF_Norok_After_Madora");
+DAF_NorokDialogHandled(1);
+
+IF
+DialogStartRequested(CHARACTER_DAF_Norok,_Companion)
+AND
+DB_Companion(_Companion)
+AND
+_Companion != CHARACTER_Madoc
+THEN
+DialogStartTwoSpeakerDialog("Default_Companion",CHARACTER_DAF_Norok, _Companion);
+DAF_NorokDialogHandled(1);
+
+IF
+DialogStartRequested(CHARACTER_DAF_Norok,CHARACTER_Madoc)
+AND
+NOT DAF_NorokDialogHandled(1)
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_Madoc,_Character)
+THEN
+ProcCheckPartyForTrait("Forgiving",_Character,"Norok_PartyHasForgivingTrait");
+GlobalSetEvent("Norok_MadocPresent");
+PROC_DoCompanionNemesisDialog("DAF_Norok",CHARACTER_DAF_Norok,CHARACTER_Madoc);
+DAF_NorokDialogHandled(1);
+
+IF
+DialogStartRequested(CHARACTER_DAF_Norok,_Character)
+AND
+NOT DAF_NorokDialogHandled(1)
+AND
+CharacterGetDistanceToCharacter(_Character,CHARACTER_Madoc,_Dist)
+AND
+_Dist < 10.0
+THEN
+ProcCheckPartyForTrait("Forgiving",_Character,"Norok_PartyHasForgivingTrait");
+GlobalSetEvent("Norok_MadocPresent");
+CharacterLookAtCharacter(CHARACTER_DAF_Norok,_Character,1);
+CharacterLookAtCharacter(_Character,CHARACTER_DAF_Norok,1);
+CharacterLookAtCharacter(CHARACTER_Madoc,CHARACTER_DAF_Norok,1);
+DialogStartThreeSpeakerDialog("DAF_Norok",CHARACTER_DAF_Norok,_Character,CHARACTER_Madoc);
+DAF_NorokDialogHandled(1);
+
+IF
+DialogStartRequested(CHARACTER_DAF_Norok,_Character)
+AND
+NOT DAF_NorokDialogHandled(1)
+THEN
+CharacterLookAtCharacter(CHARACTER_DAF_Norok,_Character,1);
+CharacterLookAtCharacter(_Character,CHARACTER_DAF_Norok,1);
+DialogStartTwoSpeakerDialog("DAF_Norok",CHARACTER_DAF_Norok,_Character);
+
+IF
+DialogEnded("DAF_Norok",_)
+THEN
+GlobalClearEvent("Norok_MadocPresent");
+NOT DB_QueuedDialogNemesis("DAF_Norok",CHARACTER_DAF_Norok,CHARACTER_Madoc);
+
+IF
+DialogEnded("DAF_Norok",_)
+AND
+DB_GlobalEvent("DAF_NorokAggro")
+THEN
+ProcSetRelationToPlayers(CHARACTER_DAF_Norok,0);
+
+IF
+CharacterDied(CHARACTER_DAF_Norok)
+THEN
+QuestUpdate("MAD_Orc","OrcDead");
+QuestClose("MAD_Orc");
+
+IF
+GlobalEventSet("DAF_NorokLeave")
+THEN
+QuestUpdate("MAD_Orc","Tolerance");
+QuestClose("MAD_Orc");
+
+IF
+DialogEnded("MAD_CD_Leave",_)
+THEN
+ProcDismissMadoc();
+CharacterSetOnStage(CHARACTER_Madoc,0);
+NOT DB_CompanionRecruited(CHARACTER_Madoc);
+
+IF
+CharacterEnteredCombat(CHARACTER_DAF_Norok, _)
+THEN
+NOT DB_QueuedDialogNemesis("DAF_Norok",CHARACTER_DAF_Norok,CHARACTER_Madoc);
+
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

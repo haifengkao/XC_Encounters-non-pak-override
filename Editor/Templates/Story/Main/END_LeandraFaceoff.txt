@@ -1,0 +1,690 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_END_IcaraZandalor_TriggersAndEvents(CHARACTER_Zandalor, TRIGGER_END_RoomC_ZandalorBeforeFight, TRIGGER_END_RoomC_ZandalorLeandraDialog);
+DB_END_IcaraZandalor_TriggersAndEvents(CHARACTER_HOM_Icara, TRIGGER_END_RoomC_IcaraBeforeFight, TRIGGER_END_RoomC_IcaraLeandraDialog);
+
+DB_OneShotPlayerTrigger(TRIGGER_END_RoomC_LeandraDialog);
+DB_OneShotPlayerTrigger(TRIGGER_END_RoomB_SpawnZandalor);
+
+CharacterSetOnStage(CHARACTER_HOM_Leandra,0);
+CharacterSetHasDialog(CHARACTER_END_Icandra, 0);
+DB_END_LeandraSealedFateDialog("END_AfterLeandraFight_Zandalor_BothPlayer");
+
+DB_END_LeandraOpenFateDialog("END_AfterLeandraFight_IcaraZandalor_BothPlayer");
+
+DB_END_LeandraFightDialog("END_LeandraDialog_IcaraZandalor");
+DB_END_LeandraFightDialog("END_LeandraDialog_IcaraZandalor_OnePlayer");
+DB_END_LeandraFightDialog("END_LeandraDialog_Zandalor");
+DB_END_LeandraFightDialog("END_LeandraDialog_Zandalor_OnePlayer");
+
+CharacterSetOnStage(CHARACTER_END_Icandra, 0);
+DB_NoDefaultBehavior(CHARACTER_HOM_Leandra);
+
+ItemToCharacter(ITEM_END_DeathKnightKillWand, CHARACTER_HOM_Leandra);
+
+ProcTriggerRegisterForPlayers(TRIGGER_END_RoomC_CatchArrival);
+
+ItemSetOnstage(ITEM_END_EdenActive, 0);
+
+ItemApplyStatus(ITEM_END_EdenIncative, "INVULNERABLE", -1.0, 1);
+ItemApplyStatus(ITEM_END_EdenIncative, "VOID_AURA", -1.0, 1);
+ItemApplyStatus(ITEM_END_AfterShrikeTeleporter_Inactive, "VOID_AURA", -1.0, 1);
+
+DB_PlayerComments("HOM_Comment_BeforeDKFight","HOM_Comment_BeforeDKFight_1_1",1,1);
+DB_PlayerComments("HOM_Comment_BeforeDKFight","HOM_Comment_BeforeDKFight_2_1",2,1);
+DB_PlayerComments("HOM_Comment_BeforeDKFight","HOM_Comment_BeforeDKFight_2_2",2,2);
+DB_PlayerComment_Trigger(TRIGGER_HOM_CommentBeforeDKFight,"HOM_Comment_BeforeDKFight");
+
+ItemSetCanInteract(ITEM_END_PortalRoomB,0);
+KBSECTION
+//REGION Debug / stub
+PROC
+Proc_END_PrepRoomB()
+AND
+DB_HOMZandyIcara(CHARACTER_HOM_Icara)
+THEN
+CharacterSetOnStage(CHARACTER_HOM_Icara, 1);
+CharacterSetHasDialog(CHARACTER_HOM_Icara, 0);
+DB_END_Friends(CHARACTER_HOM_Icara);
+CharacterTeleportToTrigger(CHARACTER_HOM_Icara, TRIGGER_END_RoomB_Start_Icara, "");
+CharacterLookFromTrigger(CHARACTER_HOM_Icara, TRIGGER_END_RoomB_Start_Icara, 1);
+CharacterSetAnimationOverride(CHARACTER_HOM_Icara, "knockdown_loop");
+
+PROC
+Proc_END_PrepRoomB()
+THEN
+NOT DB_NoDefaultBehavior(CHARACTER_Zandalor);
+NOT DB_NoHostileDialog(CHARACTER_Zandalor);
+CharacterSetHasDialog(CHARACTER_Zandalor, 0);
+CharacterSetOnStage(CHARACTER_Zandalor, 1);
+CharacterTeleportToTrigger(CHARACTER_Zandalor, TRIGGER_END_RoomB_Start_Zandalor, "");
+CharacterLookFromTrigger(CHARACTER_Zandalor, TRIGGER_END_RoomB_Start_Zandalor, 1);
+CharacterSetOnStage(CHARACTER_HOM_Leandra, 1);
+CharacterSetImmortal(CHARACTER_HOM_Leandra, 1);
+CharacterTeleportToTrigger(CHARACTER_HOM_Leandra, TRIGGER_END_RoomC_LeandraBeforeFight, "");
+CharacterLookFromTrigger(CHARACTER_HOM_Leandra, TRIGGER_END_RoomC_LeandraBeforeFight, 1);
+CharacterSetAnimationOverride(CHARACTER_Zandalor, "knockdown_loop");
+
+IF
+TextEventSet("preproomb")
+THEN
+Proc_END_PrepRoomB(); 
+
+IF
+TextEventSet("LaunchRoomB")
+THEN
+Proc_END_PrepRoomB();
+GlobalSetEvent("END_LaunchRoomB");
+
+IF
+TextEventSet("RoomBWithIcara")
+THEN
+DB_END_Friends(CHARACTER_HOM_Icara);
+DB_END_Friends(CHARACTER_Zandalor);
+DB_HOMZandyIcara(CHARACTER_HOM_Icara);
+Proc_END_PrepRoomB();
+GlobalSetEvent("END_LaunchRoomB");
+
+IF
+TextEventSet("RoomBNoIcara")
+THEN
+DB_END_Friends(CHARACTER_Zandalor);
+Proc_END_PrepRoomB();
+GlobalSetEvent("END_LaunchRoomB");
+
+//END_REGION
+
+//REGION Room B
+IF
+CharacterDied(CHARACTER_HOM_Shrike)
+THEN
+ProcDefinePartyDialog("END_PD_AfterKillingShrike");
+PlayEffectAtItem("FX_GP_StarStone_Down_A", ITEM_END_AfterShrikeTeleporter_Inactive);
+ItemTimer(ITEM_END_AfterShrikeTeleporter_Inactive,"Unlock_END_Teleporter",400);
+DB_SpecialCompanionTrigger(TRIGGER_END_CC_3,"END_CC_3_ShrikeDead");
+TriggerResetAtmosphere("fa8ccf70-ad34-4c60-b6d4-8ab7fc82b589");
+QuestUpdate("END_NegaKingsCrab","Battle");
+
+IF
+CharacterDying(CHARACTER_HOM_Shrike)
+THEN
+PlayEffectAtCharacter("FX_GP_StarStone_Up_A", CHARACTER_HOM_Shrike);
+
+IF
+ItemTimerFinished(ITEM_END_AfterShrikeTeleporter_Inactive,"Unlock_END_Teleporter")
+THEN
+ItemRemoveStatus(ITEM_END_AfterShrikeTeleporter_Inactive,"VOID_AURA");
+
+IF
+ItemDestroyed(ITEM_END_AfterShrikeTeleporter_Inactive)
+THEN
+QuestUpdate("END_NegaKingsCrab","End");
+QuestClose("END_NegaKingsCrab");
+
+PROC
+ProcOneShotTriggerEntered(_Player, TRIGGER_END_RoomB_SpawnZandalor)
+THEN
+TimerLaunch("END_RoomB_SpawnZandalor", 5500);
+
+IF
+TimerFinished("END_RoomB_SpawnZandalor")
+THEN
+CharacterSetAnimationOverride(CHARACTER_Zandalor, "");
+CharacterPlayAnimation(CHARACTER_Zandalor, "knockdown_getup", "chatRoomB");
+CharacterSetFollowCharacter(CHARACTER_Zandalor, CHARACTER_Player1);
+DB_END_EndDudeFollows(CHARACTER_Zandalor, CHARACTER_Player1);
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_CYS_Zixzax);
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_Zandalor);
+CharacterSetHasDialog(CHARACTER_Zandalor, 0);
+NOT DB_AD_Dialog(CHARACTER_Zandalor,"HOM_AD_Zandalor_PortalWait");
+GlobalSetEvent("END_ZandalorIsFollowing");
+DB_AD_Dialog(CHARACTER_Zandalor, "END_AD_Zandalor");
+
+QRY
+QryIsZandalorIcaraSceneReady()
+AND
+DB_END_Friends(CHARACTER_HOM_Icara)
+AND
+CHARACTER_HOM_Icara.DB_DidRoomB()
+THEN
+DB_Noop(1);
+
+QRY
+QryIsZandalorIcaraSceneReady()
+AND
+NOT DB_END_Friends(CHARACTER_HOM_Icara)
+AND
+CHARACTER_Zandalor.DB_DidRoomB()
+THEN
+DB_Noop(1);
+
+IF
+CharacterEvent(CHARACTER_Zandalor, "chatRoomB")
+AND
+DB_END_Friends(CHARACTER_HOM_Icara)
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_Zandalor, _Player)
+THEN
+PROC_MendatoryDialog("END_RoomB_ZandalorStartIcara", CHARACTER_Zandalor, _Player);
+
+IF
+CharacterEvent(CHARACTER_Zandalor, "chatRoomB")
+AND
+NOT DB_END_Friends(CHARACTER_HOM_Icara)
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_Zandalor, _Player)
+THEN
+CHARACTER_HOM_Icara.DB_DidRoomB();
+PROC_MendatoryDialog("END_RoomB_ZandalorStartNoIcara", CHARACTER_Zandalor, _Player);
+
+IF
+DialogEnded("END_RoomB_ZandalorStartNoIcara", _)
+THEN
+CHARACTER_Zandalor.DB_DidRoomB();
+
+IF
+DialogEnded("END_RoomB_ZandalorStartIcara", _)
+THEN
+CHARACTER_Zandalor.DB_DidRoomB();
+CharacterSetAnimationOverride(CHARACTER_HOM_Icara, "");
+CharacterPlayAnimation(CHARACTER_HOM_Icara, "knockdown_getup", "chatRoomB");
+CharacterSetVarFixedString(CHARACTER_HOM_Icara, "currentState", "");
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_HOM_Icara);
+TimerLaunch("END_RoomB_ChatIcara", 500);
+
+IF
+CharacterEvent(CHARACTER_HOM_Icara, "chatRoomB")
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_HOM_Icara, _Player)
+THEN
+PROC_MendatoryDialog("END_RoomB_IcaraStart", CHARACTER_HOM_Icara, _Player);
+CharacterSetFollowCharacter(CHARACTER_HOM_Icara, CHARACTER_Player2);
+DB_END_EndDudeFollows(CHARACTER_HOM_Icara, CHARACTER_Player2);
+GlobalSetEvent("END_IcaraIsFollowing");
+DB_AD_Dialog(CHARACTER_HOM_Icara, "END_AD_Icara");
+
+IF
+DialogEnded("END_RoomB_IcaraStart", _)
+THEN
+CHARACTER_HOM_Icara.DB_DidRoomB();
+
+IF
+CharacterDied(CHARACTER_HOM_Icara)
+AND
+DB_END_Friends(CHARACTER_HOM_Icara)
+THEN
+NOT DB_END_Friends(CHARACTER_HOM_Icara);
+CHARACTER_HOM_Icara.DB_DidRoomB();
+
+IF
+CHARACTER_HOM_Icara.DB_DidRoomB()
+AND
+CHARACTER_Zandalor.DB_DidRoomB()
+THEN
+ItemSetCanInteract(ITEM_END_PortalRoomB,1);
+
+//savegame patching
+IF
+SavegameLoaded(_,_,_,_)
+AND
+NOT CHARACTER_HOM_Icara.DB_DidRoomB()
+AND
+NOT CHARACTER_Zandalor.DB_DidRoomB()
+THEN
+ItemSetCanInteract(ITEM_END_PortalRoomB,0);
+
+IF 
+CharacterUsedItem(_Player, ITEM_END_PortalRoomB)
+AND
+DB_IsPlayer(_Dude)
+THEN
+DialogRequestStopForCharacter(_Dude);
+CharacterTeleportToTrigger(_Dude, TRIGGER_END_RoomC_ToRoomB, "");
+//END_REGION
+
+//REGION Room C
+IF
+CharacterEvent(_Char, "arrivedAtRoomC")
+AND
+DB_END_IcaraZandalor_TriggersAndEvents(_Char, _, _Trig)
+THEN
+ProcCharacterMoveToTrigger(_Char, _Trig, 1, "");
+
+IF
+CharacterEnteredCombat(CHARACTER_HOM_Leandra, _)
+AND
+NOT DB_GlobalEvent("END_LeandraNormalProc")
+AND
+NOT DB_GlobalEvent("END_LeandraNormalProc")
+THEN
+NOT DB_OneShotPlayerTrigger(TRIGGER_END_RoomC_LeandraDialog);
+ProcTriggerUnregisterForPlayers(TRIGGER_END_RoomC_LeandraDialog);
+GlobalSetEvent("END_RemoveLeandraDialogs");
+
+PROC
+ProcOneShotTriggerEntered(_Player, TRIGGER_END_RoomC_LeandraDialog)
+THEN
+PROC_END_LaunchLeandraBeforFightDialog();
+
+IF
+CharacterAttackedByCharacter(CHARACTER_HOM_Leandra, _)
+AND
+NOT DB_GlobalEvent("END_RemoveLeandraDialogs")
+AND
+NOT DB_GlobalEvent("END_LeandraNormalProc")
+AND
+NOT DB_OnlyOnce("END_AttackLeandraDialog")
+THEN
+NOT DB_OneShotPlayerTrigger(TRIGGER_END_RoomC_LeandraDialog);
+ProcTriggerUnregisterForPlayers(TRIGGER_END_RoomC_LeandraDialog);
+DB_OnlyOnce("END_AttackLeandraDialog");
+PROC_END_LaunchLeandraBeforFightDialog();
+
+PROC
+PROC_END_LaunchLeandraBeforFightDialog()
+AND
+NOT DB_Dead(CHARACTER_Player1)
+THEN
+NOT CHARACTER_Player1.DB_IsInDialog();
+DialogRequestStopForCharacter(CHARACTER_Player1);
+CharacterFreeze(CHARACTER_Player1);
+CharacterTeleportToTrigger(CHARACTER_Player1, TRIGGER_END_RoomC_Player1LeandraDialog, "");
+
+PROC
+PROC_END_LaunchLeandraBeforFightDialog()
+AND
+NOT DB_Dead(CHARACTER_Player2)
+THEN
+NOT CHARACTER_Player2.DB_IsInDialog();
+DialogRequestStopForCharacter(CHARACTER_Player2);
+CharacterFreeze(CHARACTER_Player2);
+CharacterTeleportToTrigger(CHARACTER_Player2, TRIGGER_END_RoomC_Player2LeandraDialog, "");
+
+PROC
+PROC_END_LaunchLeandraBeforFightDialog()
+AND
+DB_END_Friends(CHARACTER_HOM_Icara)
+THEN
+NOT CHARACTER_HOM_Icara.DB_IsInDialog();
+DialogRequestStopForCharacter(CHARACTER_HOM_Icara);
+CharacterTeleportToTrigger(CHARACTER_HOM_Icara, TRIGGER_END_RoomC_IcaraLeandraDialog, "");
+PlayEffectAtTrigger("FX_GP_TeleportSmoke_A", TRIGGER_END_RoomC_IcaraLeandraDialog);
+
+PROC
+PROC_END_LaunchLeandraBeforFightDialog()
+THEN
+NOT CHARACTER_Zandalor.DB_IsInDialog();
+DialogRequestStopForCharacter(CHARACTER_Zandalor);
+CharacterTeleportToTrigger(CHARACTER_Zandalor, TRIGGER_END_RoomC_ZandalorLeandraDialog, "");
+PlayEffectAtTrigger("FX_GP_TeleportSmoke_A", TRIGGER_END_RoomC_ZandalorLeandraDialog);
+GlobalSetEvent("END_LeandraNormalProc");
+
+PROC
+PROC_END_LaunchLeandraBeforFightDialog()
+AND
+DB_END_Friends(CHARACTER_HOM_Icara)
+AND
+NOT DB_Dead(CHARACTER_Player1)
+AND
+NOT DB_Dead(CHARACTER_Player2)
+THEN
+ProcDoFiveSpeakerDialog("END_LeandraDialog_IcaraZandalor", CHARACTER_HOM_Leandra, CHARACTER_HOM_Icara, CHARACTER_Zandalor, CHARACTER_Player1, CHARACTER_Player2);
+CharacterPurgeQueue(CHARACTER_HOM_Leandra);
+CharacterPurgeQueue(CHARACTER_Zandalor);
+CharacterPurgeQueue(CHARACTER_HOM_Icara);
+ProcFaceEachother(CHARACTER_HOM_Leandra,CHARACTER_Zandalor);
+CharacterLookAtCharacter(CHARACTER_HOM_Icara,CHARACTER_HOM_Leandra);
+
+PROC
+PROC_END_LaunchLeandraBeforFightDialog()
+AND
+DB_END_Friends(CHARACTER_HOM_Icara)
+AND
+NOT DB_Dead(CHARACTER_Player1)
+AND
+DB_Dead(CHARACTER_Player2)
+THEN
+ProcDoFourSpeakerDialog("END_LeandraDialog_IcaraZandalor", CHARACTER_HOM_Leandra, CHARACTER_HOM_Icara, CHARACTER_Zandalor, CHARACTER_Player1);
+CharacterPurgeQueue(CHARACTER_HOM_Leandra);
+CharacterPurgeQueue(CHARACTER_Zandalor);
+CharacterPurgeQueue(CHARACTER_HOM_Icara);
+ProcFaceEachother(CHARACTER_HOM_Leandra,CHARACTER_Zandalor);
+CharacterLookAtCharacter(CHARACTER_HOM_Icara,CHARACTER_HOM_Leandra);
+
+PROC
+PROC_END_LaunchLeandraBeforFightDialog()
+AND
+DB_END_Friends(CHARACTER_HOM_Icara)
+AND
+DB_Dead(CHARACTER_Player1)
+AND
+NOT DB_Dead(CHARACTER_Player2)
+THEN
+ProcDoFourSpeakerDialog("END_LeandraDialog_IcaraZandalor", CHARACTER_HOM_Leandra, CHARACTER_HOM_Icara, CHARACTER_Zandalor, CHARACTER_Player2);
+CharacterPurgeQueue(CHARACTER_HOM_Leandra);
+CharacterPurgeQueue(CHARACTER_Zandalor);
+CharacterPurgeQueue(CHARACTER_HOM_Icara);
+ProcFaceEachother(CHARACTER_HOM_Leandra,CHARACTER_Zandalor);
+CharacterLookAtCharacter(CHARACTER_HOM_Icara,CHARACTER_HOM_Leandra);
+
+PROC
+PROC_END_LaunchLeandraBeforFightDialog()
+AND
+NOT DB_END_Friends(CHARACTER_HOM_Icara)
+AND
+NOT DB_Dead(CHARACTER_Player1)
+AND
+NOT DB_Dead(CHARACTER_Player2)
+THEN
+ProcDoFourSpeakerDialog("END_LeandraDialog_Zandalor", CHARACTER_HOM_Leandra, CHARACTER_Zandalor, CHARACTER_Player1, CHARACTER_Player2);
+CharacterPurgeQueue(CHARACTER_HOM_Leandra);
+CharacterPurgeQueue(CHARACTER_Zandalor);
+ProcFaceEachother(CHARACTER_HOM_Leandra,CHARACTER_Zandalor);
+
+PROC
+PROC_END_LaunchLeandraBeforFightDialog()
+AND
+NOT DB_END_Friends(CHARACTER_HOM_Icara)
+AND
+NOT DB_Dead(CHARACTER_Player1)
+AND
+DB_Dead(CHARACTER_Player2)
+THEN
+ProcDoThreeSpeakerDialog("END_LeandraDialog_Zandalor", CHARACTER_HOM_Leandra, CHARACTER_Zandalor, CHARACTER_Player1);
+CharacterPurgeQueue(CHARACTER_HOM_Leandra);
+CharacterPurgeQueue(CHARACTER_Zandalor);
+ProcFaceEachother(CHARACTER_HOM_Leandra,CHARACTER_Zandalor);
+
+PROC
+PROC_END_LaunchLeandraBeforFightDialog()
+AND
+NOT DB_END_Friends(CHARACTER_HOM_Icara)
+AND
+DB_Dead(CHARACTER_Player1)
+AND
+NOT DB_Dead(CHARACTER_Player2)
+THEN
+ProcDoThreeSpeakerDialog("END_LeandraDialog_Zandalor", CHARACTER_HOM_Leandra, CHARACTER_Zandalor, CHARACTER_Player2);
+CharacterPurgeQueue(CHARACTER_HOM_Leandra);
+CharacterPurgeQueue(CHARACTER_Zandalor);
+ProcFaceEachother(CHARACTER_HOM_Leandra,CHARACTER_Zandalor);
+
+IF
+DialogEnded(_Dialog, _)
+AND
+DB_END_LeandraFightDialog(_Dialog)
+THEN
+CharacterUnfreeze(CHARACTER_Player1);
+CharacterUnfreeze(CHARACTER_Player2);
+CharacterSetFaction(CHARACTER_HOM_Leandra, "Evil NPC");
+GlobalSetEvent("END_FightingLeandra");
+QuestUpdate("HOM_Starstones", "MetLeandra");
+
+IF
+CharacterEvent(CHARACTER_HOM_Leandra, "ReadyForSoulforge")
+AND
+NOT DB_Dead(CHARACTER_Zandalor)
+THEN
+CharacterSetFaction(CHARACTER_HOM_Leandra, "Story NPC");
+KillCombatFor(CHARACTER_HOM_Leandra);
+PROC_END_DoLeandraSoulForgeDialog();
+
+IF
+CharacterEvent(CHARACTER_HOM_Leandra, "ReadyForSoulforge")
+AND
+DB_Dead(CHARACTER_Zandalor)
+THEN
+CharacterSetFaction(CHARACTER_HOM_Leandra, "Story NPC");
+KillCombatFor(CHARACTER_HOM_Leandra);
+CharacterResurrect(CHARACTER_Zandalor);
+TimerLaunch("END_ZandyDeadDialogLeandra", 5300);
+
+IF
+TimerFinished("END_ZandyDeadDialogLeandra")
+THEN
+PROC_END_DoLeandraSoulForgeDialog();
+
+PROC
+PROC_END_DoLeandraSoulForgeDialog()
+AND
+DB_END_Friends(CHARACTER_HOM_Icara)
+AND
+NOT DB_Dead(CHARACTER_Player1)
+AND
+NOT DB_Dead(CHARACTER_Player2)
+THEN
+ProcDoFiveSpeakerDialog("END_AfterLeandraFight_IcaraZandalor_BothPlayer", CHARACTER_HOM_Leandra, CHARACTER_HOM_Icara, CHARACTER_Zandalor, CHARACTER_Player1, CHARACTER_Player2);
+
+PROC
+PROC_END_DoLeandraSoulForgeDialog()
+AND
+DB_END_Friends(CHARACTER_HOM_Icara)
+AND
+NOT DB_Dead(CHARACTER_Player1)
+AND
+DB_Dead(CHARACTER_Player2)
+THEN
+ProcDoFourSpeakerDialog("END_AfterLeandraFight_IcaraZandalor_BothPlayer", CHARACTER_HOM_Leandra, CHARACTER_HOM_Icara, CHARACTER_Zandalor, CHARACTER_Player1);
+
+PROC
+PROC_END_DoLeandraSoulForgeDialog()
+AND
+DB_END_Friends(CHARACTER_HOM_Icara)
+AND
+DB_Dead(CHARACTER_Player1)
+AND
+NOT DB_Dead(CHARACTER_Player2)
+THEN
+ProcDoFourSpeakerDialog("END_AfterLeandraFight_IcaraZandalor_BothPlayer", CHARACTER_HOM_Leandra, CHARACTER_HOM_Icara, CHARACTER_Zandalor, CHARACTER_Player2);
+
+PROC
+PROC_END_DoLeandraSoulForgeDialog()
+AND
+NOT DB_END_Friends(CHARACTER_HOM_Icara)
+AND
+NOT DB_Dead(CHARACTER_Player1)
+AND
+NOT DB_Dead(CHARACTER_Player2)
+THEN
+ProcDoFourSpeakerDialog("END_AfterLeandraFight_Zandalor_BothPlayer", CHARACTER_HOM_Leandra, CHARACTER_Zandalor, CHARACTER_Player1, CHARACTER_Player2);
+
+PROC
+PROC_END_DoLeandraSoulForgeDialog()
+AND
+NOT DB_END_Friends(CHARACTER_HOM_Icara)
+AND
+NOT DB_Dead(CHARACTER_Player1)
+AND
+DB_Dead(CHARACTER_Player2)
+THEN
+ProcDoThreeSpeakerDialog("END_AfterLeandraFight_Zandalor_BothPlayer", CHARACTER_HOM_Leandra, CHARACTER_Zandalor, CHARACTER_Player1);
+
+PROC
+PROC_END_DoLeandraSoulForgeDialog()
+AND
+NOT DB_END_Friends(CHARACTER_HOM_Icara)
+AND
+DB_Dead(CHARACTER_Player1)
+AND
+NOT DB_Dead(CHARACTER_Player2)
+THEN
+ProcDoThreeSpeakerDialog("END_AfterLeandraFight_Zandalor_BothPlayer", CHARACTER_HOM_Leandra, CHARACTER_Zandalor, CHARACTER_Player2);
+
+IF
+CharacterDied(CHARACTER_END_Icandra)
+AND
+DB_END_Friends(CHARACTER_HOM_Icara)
+THEN
+NOT DB_END_Friends(CHARACTER_HOM_Icara);
+GlobalSetEvent("HOM_IcandraDied");
+
+IF
+DialogEnded(_Dial, _)
+AND
+DB_END_LeandraSealedFateDialog(_Dial)
+THEN
+CharacterSetFaction(CHARACTER_HOM_Leandra, "Good NPC");
+CharacterSetImmortal(CHARACTER_HOM_Leandra, 0);
+CharacterDie(CHARACTER_HOM_Leandra, 1);
+
+IF
+DialogEnded(_Dial, _)
+AND
+DB_END_LeandraOpenFateDialog(_Dial)
+AND
+NOT DB_GlobalEvent("END_RoomC_EffectivelySoulForge")
+THEN
+CharacterSetFaction(CHARACTER_HOM_Leandra, "Good NPC");
+CharacterSetImmortal(CHARACTER_HOM_Leandra, 0);
+CharacterDie(CHARACTER_HOM_Leandra, 1);
+
+IF
+DialogEnded(_Dial, _)
+AND
+DB_END_LeandraOpenFateDialog(_Dial)
+AND
+DB_GlobalEvent("END_RoomC_EffectivelySoulForge")
+AND
+CharacterGetPosition(CHARACTER_HOM_Leandra, _X, _Y, _Z)
+THEN
+ProcStartMovie("Soulforge.bik");
+Poof(CHARACTER_HOM_Icara);
+Poof(CHARACTER_HOM_Leandra);
+CharacterAppearAtPosition(CHARACTER_END_Icandra, _X, _Y, _Z, 0);
+QuestUpdate("HOM_Starstones", "SoulforgedLeandra");
+
+IF
+MovieFinished("Soulforge.bik")
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_END_Icandra, _Player)
+THEN
+PROC_MendatoryDialog("END_DialogAfterSoulForge", CHARACTER_END_Icandra, _Player);
+
+IF
+DialogEnded("END_DialogAfterSoulForge", _)
+AND
+DB_GlobalEvent("END_IcandraFollows")
+AND
+DB_END_EndDudeFollows(CHARACTER_HOM_Icara, _Player)
+THEN
+UnlockAchievement("questee4");
+CharacterSetFollowCharacter(CHARACTER_END_Icandra, _Player);
+DB_END_EndDudeFollows(CHARACTER_END_Icandra, _Player);
+GlobalSetEvent("END_IcandraIsFollowing");
+CharacterStopFollow(CHARACTER_HOM_Icara);
+NOT DB_END_EndDudeFollows(CHARACTER_HOM_Icara, _Player);
+GlobalClearEvent("END_IcaraIsFollowing");
+QuestUpdate("HOM_Starstones", "IcandraComes");
+
+IF
+DialogEnded("END_DialogAfterSoulForge", _)
+AND
+DB_GlobalEvent("END_IcandraStays")
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_Zandalor, _Player)
+THEN
+PROC_MendatoryDialog("END_DoesZandalorShouldStayToo", CHARACTER_Zandalor, _Player);
+QuestUpdate("HOM_Starstones", "IcandraStays");
+
+IF
+DialogEnded("END_DialogAfterSoulForge", _)
+THEN
+DB_AD_Dialog(CHARACTER_Zandalor, "END_AD_Zandalor");
+DB_AD_Dialog(CHARACTER_END_Icandra, "END_AD_Icandra");
+
+IF
+GlobalEventSet("END_ZandalorStays")
+AND
+DB_END_EndDudeFollows(CHARACTER_Zandalor, _Player)
+THEN
+CharacterSetVarFixedString(CHARACTER_Zandalor, "currentState", "State_WanderBehind");
+CharacterStopFollow(CHARACTER_Zandalor);
+NOT DB_END_EndDudeFollows(CHARACTER_Zandalor, _Player);
+GlobalClearEvent("END_ZandalorIsFollowing");
+GlobalSetEvent("END_ZandyADSwitch");
+CharacterSetVarInteger(CHARACTER_END_Icandra, "ZandyHere", 1);
+QuestUpdate("HOM_Starstones", "ZandalorStayedToo");
+
+IF
+GlobalEventSet("END_IcandraStays")
+THEN
+CharacterSetVarFixedString(CHARACTER_END_Icandra, "currentState", "State_WanderBehind");
+
+IF
+CharacterDied(CHARACTER_HOM_Leandra)
+AND
+DB_END_Friends(CHARACTER_HOM_Icara)
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_HOM_Icara, _Player)
+THEN
+PROC_MendatoryDialog("END_IcaraGivesWand", CHARACTER_HOM_Icara, _Player);
+QuestUpdate("HOM_Starstones", "KilledLeandra");
+GlobalSetEvent("SAC_LeandraDeadNoSoulForged");
+
+IF
+CharacterDied(CHARACTER_HOM_Leandra)
+AND
+NOT DB_END_Friends(CHARACTER_HOM_Icara)
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_Zandalor, _Player)
+THEN
+PROC_MendatoryDialog("END_ZandalorGivesWand", CHARACTER_Zandalor, _Player);
+QuestUpdate("HOM_Starstones", "KilledLeandra");
+
+IF
+DialogEnded("END_DialogAfterSoulForge", _ID)
+AND
+DB_DialogPlayers(_ID, _Player, 1)
+THEN
+ItemToCharacter(ITEM_END_DeathKnightKillWand, _Player);
+ItemSetOnstage(ITEM_END_DeathKnightKillWand, 1);
+
+IF
+ItemStatusRemoved(ITEM_END_EdenIncative, "INVULNERABLE")
+THEN
+ItemTimer(ITEM_END_EdenIncative, "END_SpawnTimerToEden", 500);
+
+IF
+ItemTimerFinished(ITEM_END_EdenIncative, "END_SpawnTimerToEden")
+THEN
+PlayEffectAtItem("FX_GP_StarStone_Up_B", ITEM_END_EdenIncative);
+ItemSetOnstage(ITEM_END_EdenIncative, 0);
+ItemSetOnstage(ITEM_END_EdenActive, 1);
+NotifyGameProgress(99.0);
+
+IF
+CharacterEnteredTrigger(_Player, TRIGGER_END_RoomC_CatchArrival)
+AND
+DB_END_EndDudeFollows(_EndDude, _Player)
+AND
+NOT DB_END_HasBeenToRoomC(_EndDude)
+THEN
+DB_END_HasBeenToRoomC(_EndDude);
+CharacterTeleportToCharacter(_EndDude, _Player, "FollowAgain");
+
+IF
+CharacterUsedItem(_Player,ITEM_END_EdenIncative)
+AND
+DB_IsPlayer(_Player)
+AND 
+_Player != CHARACTER_Wolgraff
+AND
+QRY_CharacterIsAvailable(_Player)
+THEN
+CharacterDisplayText(_Player,"END_PortalToEdenInactive");
+
+IF
+CharacterUsedItem(CHARACTER_Wolgraff,ITEM_END_EdenIncative)
+AND
+DB_GlobalEvent("WolgraffVoiceBack")
+AND
+QRY_CharacterIsAvailable(CHARACTER_Wolgraff)
+THEN
+CharacterDisplayText(CHARACTER_Wolgraff,"END_PortalToEdenInactive");
+
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

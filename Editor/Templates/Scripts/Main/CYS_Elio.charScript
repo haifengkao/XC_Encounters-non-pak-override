@@ -1,0 +1,68 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter
+CHARACTER:__Me
+
+BEHAVIOUR
+REACTION RainIfOnFire,1020
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_Min
+	FLOAT:_Max
+CHECK "c1&c2&c3"
+	CharacterCanCast(__Me,Rain_EnemyWater)
+	CharacterGet(_Target,__Me,40,Lowest,Vitality,Ally,null,BURNING) 
+	CharacterGetSkillRange(_Min,_Max,__Me,Rain_EnemyWater)
+ACTIONS
+	CharacterMoveInRange(_Target,0,_Max,1)
+	CharacterUseSkill(Rain_EnemyWater,_Target)
+
+REACTION HealFriendly,1010
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_hp
+	FLOAT:_Min
+	FLOAT:_Max
+CHECK "c1&c2&c3&c4&c5"
+	CharacterCanCast(__Me,Heal_EnemyRegenerate)
+	CharacterGetSkillRange(_Min,_Max,__Me,Heal_EnemyRegenerate)
+	CharacterGet(_Target,__Me,null,Lowest,Vitality,Ally,null,null,null,__Me)
+	CharacterGetStat(_hp,_Target,Vitality)
+	IsLessThen(_hp,0.5)		
+ACTIONS
+	CharacterMoveInRange(_Target,0,_Max,1)
+	CharacterUseSkill(Heal_EnemyRegenerate,_Target)
+
+REACTION BlitzAttack,500
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_Min
+	FLOAT:_Max
+CHECK "c1&c2&(c3|c4|c5)&!c6&!c7&!c8&!c9"
+	CharacterCanCast(__Me,Projectile_EnemyBlitzBolt)
+	CharacterGetSkillRange(_Min,_Max,__Me,Projectile_EnemyBlitzBolt)
+	CharacterGet(_Target,__Me,20,Random,null,Enemy,null,WET,null,__Me)
+	CharacterGet(_Target,__Me,null,Random,null,Enemy,Water,null,null,__Me)
+	CharacterGet(_Target,__Me,null,Highest,Vitality,Enemy,null,null,null,__Me)	
+	CharacterHasStatus(_Target,INVISIBLE)
+	CharacterHasStatus(_Target,SNEAKING)
+	CharacterIsDead(_Target)
+	IsEqual(_Target,__Me)
+ACTIONS		
+	CharacterMoveInRange(_Target,0,_Max,1)
+	CharacterUseSkill(Projectile_EnemyBlitzBolt,_Target)
+	CharacterEndTurn()
+	
+EVENTS
+EVENT CysElioAddSkills
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill(Rain_EnemyWater)
+	CharacterAddSkill(Heal_EnemyRegenerate)
+	CharacterAddSkill(Projectile_EnemyBlitzBolt)
+

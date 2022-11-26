@@ -1,0 +1,15 @@
+INIT
+
+CHARACTER:__Me
+
+BEHAVIOUR
+
+REACTION Idle, 900
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Anim
+ACTIONS
+	GetRandom(_Anim, "11_idle1", "11_idle2", "11_idle3", "idle1", "idle2", "idle3")
+	CharacterPlayAnimation(_Anim)
+	Sleep(2)
+	Reset()

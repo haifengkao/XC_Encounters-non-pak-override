@@ -1,0 +1,26 @@
+INIT
+
+INT:%CurrentRound = 0
+INT:%BlackRockSmokeFX
+CHARACTER:__Me
+
+BEHAVIOUR
+
+REACTION InitialTurn,1000 
+USAGE COMBAT
+CHECK "c1"
+	IsEqual(%CurrentRound,1)
+ACTIONS
+	DisplayText(__Me,"TUT_RangerThreat_01",2)
+	Sleep(4)
+	CharacterEvent(__Me,"TUT_DisplayCombatAD")
+	CharacterEndTurn()
+	SetPriority("InitialTurn",0)
+	
+EVENTS
+
+EVENT SummonedSkeletonStartTurn
+ON
+	OnTurn()
+ACTIONS 
+	Add(%CurrentRound,1)

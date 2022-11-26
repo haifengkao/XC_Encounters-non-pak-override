@@ -1,0 +1,58 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+//REGION Tunnel Characters
+DB_CYS_Hardcore_Tunnel_Exploskeletons(CHARACTER_CMB_HC_GraveyardTunnel_ExploSkeleton1);
+DB_CYS_Hardcore_Tunnel_Exploskeletons(CHARACTER_CMB_HC_GraveyardTunnel_ExploSkeleton2);
+//END_REGION
+
+//REGION RainLands Characters
+DB_CYS_Hardcore_RainLandsZombies(CHARACTER_CMB_HC_RainLands_BoltStrickenZombie1);
+DB_CYS_Hardcore_RainLandsZombies(CHARACTER_CMB_HC_RainLands_BoltStrickenZombie2);
+//END_REGION
+
+PROC_CMBHC_CYS_HardcoreAmbushInit();
+KBSECTION
+PROC
+PROC_CMBHC_CYS_HardcoreAmbushInit()
+AND
+DB_CYS_Hardcore_Tunnel_Exploskeletons(_Exploskeleton)
+AND
+DB_CYS_Hardcore_RainLandsZombies(_Zombie)
+THEN
+CharacterSetOnStage(_Exploskeleton,0);
+CharacterSetOnStage(_Zombie,0);
+
+//REGION CYS Tunnel
+IF
+CharacterEvent(CHARACTER_CMB_GraveyardTunnel_Mage,"CMBHC_Cyseal_Tunnel_SpawnExploskeletons")
+THEN
+CharacterAppear(CHARACTER_CMB_HC_GraveyardTunnel_ExploSkeleton1,1);
+TimerLaunch("CMBHC_Cyseal_Tunnel_SpawnExploskeletons",200);
+
+IF
+TimerFinished("CMBHC_Cyseal_Tunnel_SpawnExploskeletons")
+THEN
+CharacterAppear(CHARACTER_CMB_HC_GraveyardTunnel_ExploSkeleton2,1);
+//END_REGION
+
+//REGION CYS RainLands
+IF
+CharacterEvent(CHARACTER_Undead_Skeleton_Grunt_2SMS_000,"CMBHC_RainyLands_BoltStrikenZombies_OnTurn")
+THEN
+CharacterSetEvent(CHARACTER_CMB_HC_RainLands_BoltStrickenZombie1,"RiseUp");
+TimerLaunch("CMBHC_Cyseal_Tunnel_SpawnBoltStrickenZombies",1000);
+
+IF
+TimerFinished("CMBHC_Cyseal_Tunnel_SpawnBoltStrickenZombies")
+THEN
+CharacterSetEvent(CHARACTER_CMB_HC_RainLands_BoltStrickenZombie2,"RiseUp");
+
+IF
+CharacterEvent(_Char, "RiseFromTheGrave")
+THEN
+CharacterAppear(_Char, 1);
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION

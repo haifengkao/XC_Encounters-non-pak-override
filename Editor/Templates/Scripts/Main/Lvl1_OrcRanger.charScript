@@ -1,0 +1,27 @@
+#INCLUDE Base
+
+INIT
+USING Base
+
+CHARACTER:__Me
+
+BEHAVIOUR
+
+REACTION Fireball,1020
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_SkillMinRange=0
+	FLOAT:_SkillMaxRange=0
+	FIXEDSTRING:_SkillText
+CHECK "c1&c2&c3"
+	CharacterCanCast(__Me,Projectile_Fireball)
+	CharacterGetSkillRange(_SkillMinRange,_SkillMaxRange,__Me,Projectile_Fireball)
+	CharacterGet(_Target,__Me,null,Highest,Vitality,Enemy,null,null)
+ACTIONS
+	CharacterMoveInRange(_Target,0,_SkillMaxRange)
+	CharacterUseSkill(Projectile_Fireball,_Target)
+	GetRandom(_SkillText, "FireballSkillText1", "FireballSkillText2", "FireballSkillText3")
+	DisplayText(__Me,_SkillText,3)
+INTERRUPT
+	Reset()

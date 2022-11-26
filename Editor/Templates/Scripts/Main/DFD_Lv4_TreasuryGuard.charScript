@@ -1,0 +1,41 @@
+INIT
+
+CHARACTER:__Me
+CHARACTER:%TreasuryDoorUsedBy
+INT:%State = 0
+
+BEHAVIOUR
+
+REACTION Guarding,1050
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%State,0)
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	Sleep(5)
+	GetRandom(_Animation,"Bored_01","Bored_02","Dust_Off_01","Yawn_01")
+	CharacterPlayAnimation(_Animation)
+	Sleep(5)
+INTERRUPT
+	Reset()
+
+REACTION ReactOnTreasuryDoorUsage, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_text
+ACTIONS
+	CharacterLookAt(%TreasuryDoorUsedBy)
+	DisplayText(__Me, "DFD_Lv4_TreasuryGuardDoorWarning", 5)
+	Sleep(5)
+	SetPriority("ReactOnTreasuryDoorUsage", 0)
+			
+STORY
+
+SCRIPTFRAME ReactOnTreasuryDoorUsage
+ACTIONS
+	SetPriority("ReactOnTreasuryDoorUsage", 1999)
+		
+	
+	
+	

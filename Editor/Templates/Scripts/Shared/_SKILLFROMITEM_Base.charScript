@@ -1,0 +1,232 @@
+INIT
+
+EXTERN FIXEDSTRING:%saveAPtext_$1="CMB_MageSkipsTurnToPrepare"
+EXTERN INT:%displaySaveAPtext_$1=1
+
+EXTERN INT:%amount_$1=1
+
+EXTERN INT:%frequency_$1=0
+EXTERN INT:%frequencyStartAt_$1=0
+EXTERN INT:%priority_$1=300
+EXTERN INT:%disableInCasual_$1=0
+
+CHARACTER:__Me
+INT:%ActionScore_$1=0
+ITEM:%SkillItem_$1=null
+SKILL:%SkillID_$1=null
+
+CHARACTER:%SkillTargetChar_$1=null
+ITEM:%SkillTargetItem_$1=null
+FLOAT3:%SkillTargetPos_$1=null
+
+INT:%SkillItemGiven_$1=0
+
+EVENTS
+EVENT AddItem_$1
+ON
+	OnInit()
+ACTIONS
+	IF "!c1"
+		IsEqual(SKILL:null,$2)
+	THEN
+		Set(%SkillID_$1,$2)
+	ENDIF
+	IF "c1"
+		IsEqual(%SkillItemGiven_$1,0)
+	THEN
+		CharacterAddToInventory(__Me, $1, %amount_$1) 
+		Set(%SkillItemGiven_$1,1)				
+		IF "c1&c2&c3" 
+			IsEqual(%SkillID_$1,null)
+			ItemGetFromInventory(%SkillItem_$1,__Me,$1)	
+			ItemGetSkillId(%SkillItem_$1,%SkillID_$1)
+		THEN
+		ENDIF
+	ENDIF
+	
+EVENT CalculateScoreWrapper_$1
+ON
+	OnFunction("CalculateScore")
+ACTIONS
+	Set(%ActionScore_$1,0)
+	IF "c1"
+		ItemGetFromInventory(%SkillItem_$1,__Me,$1)
+	THEN		 		
+	ENDIF
+	IF "(c1|!c2)&c3"		
+		IsEqual(%disableInCasual_$1,0)
+		IsCasual()
+		CharacterCanCastFromItem(__Me,%SkillItem_$1,1,%SkillID_$1)
+	THEN
+		// Calculate default score
+		IF "!c1"
+			IsLessThen(%frequencyStartAt_$1,%frequency_$1)
+		THEN
+			Set(%ActionScore_$1,%priority_$1)
+		ENDIF
+		// Give specific scripts chance to overwrite score and let them calculate the target.
+		Set(%SkillTargetChar_$1,null)
+		Set(%SkillTargetItem_$1,null)
+		Set(%SkillTargetPos_$1,null)
+		CallFunction("CalculateScore_$1")
+	ENDIF
+	// Set the waiting reaction's priority
+	IF "!c1|!c2|!c3" 
+		IsEqual(%SkillTargetChar_$1,null)
+		IsEqual(%SkillTargetItem_$1,null)
+		IsEqual(%SkillTargetPos_$1,null)
+	THEN
+		SetPriority("WaitOnCast_$1",%ActionScore_$1)
+	ELSE
+		SetPriority("WaitOnCast_$1",0)
+	ENDIF
+	// Set the casting reactions' priority
+	IF "!c1"
+		IsEqual(%SkillTargetChar_$1,null)		
+	THEN		
+		SetPriority("CastOnCharacter_$1",%ActionScore_$1)
+	ELSE
+		SetPriority("CastOnCharacter_$1",0)
+	ENDIF
+	IF "!c1"
+		IsEqual(%SkillTargetItem_$1,null)
+	THEN
+		SetPriority("CastOnItem_$1",%ActionScore_$1)
+	ELSE
+		SetPriority("CastOnItem_$1",0)
+	ENDIF
+	IF "!c1"
+		IsEqual(%SkillTargetPos_$1,null)
+	THEN
+		SetPriority("CastOnPosition_$1",%ActionScore_$1)
+	ELSE
+		SetPriority("CastOnPosition_$1",0)
+	ENDIF
+
+EVENT SetFrequence_$1
+ON
+	OnTurn()
+ACTIONS	
+	IF "c1"
+		IsLessThen(%frequencyStartAt_$1,%frequency_$1)
+	THEN		
+		Add(%frequencyStartAt_$1,1)
+	ENDIF
+	
+BEHAVIOUR
+
+REACTION WaitOnCast_$1,0
+USAGE COMBAT
+CHECK "(c1|!c2)&c3&!c4"
+	IsEqual(%disableInCasual_$1,0)
+	IsCasual()
+	CharacterCanCastFromItem(__Me,%SkillItem_$1,1,%SkillID_$1)	
+	CharacterCanCastFromItem(__Me,%SkillItem_$1,0,%SkillID_$1)
+ACTIONS
+	CallFunction("StopEvaluateScore")
+	Sleep(1)
+	IF "!c1&!c2"
+		IsEqual(%SkillTargetChar_$1,null)
+		CharacterHasStatus(%SkillTargetChar_$1,INVISIBLE)
+	THEN
+		CharacterLookAt(%SkillTargetChar_$1)
+	ELIF "!c1"
+		IsEqual(%SkillTargetItem_$1,null)
+	THEN
+		CharacterLookAt(%SkillTargetItem_$1)
+	ELIF "!c1"
+		IsEqual(%SkillTargetPos_$1,null)
+	THEN
+		CharacterLookAt(%SkillTargetPos_$1)
+	ENDIF
+	IF "c1"
+		IsEqual(%displaySaveAPtext_$1,1)
+	THEN
+		DisplayCombatInfoText(__Me,%saveAPtext_$1,2)
+	ELSE
+		Sleep(1)
+	ENDIF
+	CharacterPlayEffect(__Me, "FX_GP_Status_SkipTurn_A_Icon", "Dummy_OverheadFX")
+	CharacterEndTurn()	
+INTERRUPT
+	Reset()
+	CallFunction("StartEvaluateScore")
+	
+REACTION CastOnCharacter_$1,0
+USAGE COMBAT
+VARS
+	FLOAT:_minRange
+	FLOAT:_maxRange
+CHECK "(c1|!c2)&!c3&c4&c5"
+	IsEqual(%disableInCasual_$1,0)
+	IsCasual()
+	IsEqual(%SkillTargetChar_$1,null)
+	CharacterCanCastFromItem(__Me,%SkillItem_$1,0,%SkillID_$1)	
+	CharacterGetSkillRange(_minRange,_maxRange,__Me,%SkillID_$1)	
+ACTIONS
+	CallFunction("StopEvaluateScore")
+	Set(%frequencyStartAt_$1,0)
+	CharacterMoveInRange(%SkillTargetChar_$1,_minRange,_maxRange,1)
+	CharacterUseSkillFromItem(%SkillItem_$1,%SkillTargetChar_$1,null,%SkillID_$1)
+	SetPriority("CastOnCharacter_$1",0)
+INTERRUPT
+ON
+	OnMovementFailed(_)
+ACTIONS
+	DelayReaction("CastOnCharacter_$1", 2)
+INTERRUPT
+	Reset()
+	CallFunction("StartEvaluateScore")
+	
+REACTION CastOnItem_$1,0
+USAGE COMBAT
+VARS
+	FLOAT:_minRange
+	FLOAT:_maxRange	
+CHECK "(c1|!c2)&!c3&c4&c5"
+	IsEqual(%disableInCasual_$1,0)
+	IsCasual()
+	IsEqual(%SkillTargetItem_$1,null)
+	CharacterCanCastFromItem(__Me,%SkillItem_$1,0,%SkillID_$1)	
+	CharacterGetSkillRange(_minRange,_maxRange,__Me,%SkillID_$1)	
+ACTIONS
+	CallFunction("StopEvaluateScore")
+	Set(%frequencyStartAt_$1,0)
+	CharacterMoveInRange(%SkillTargetItem_$1,_minRange,_maxRange,1)
+	CharacterUseSkillFromItem(%SkillItem_$1,%SkillTargetItem_$1,null,%SkillID_$1)
+	SetPriority("CastOnItem_$1",0)	
+INTERRUPT
+ON
+	OnMovementFailed(_)
+ACTIONS
+	DelayReaction("CastOnItem_$1", 2)
+INTERRUPT
+	Reset()
+	CallFunction("StartEvaluateScore")
+	
+REACTION CastOnPosition_$1,0
+USAGE COMBAT
+VARS
+	FLOAT:_minRange
+	FLOAT:_maxRange	
+CHECK "(c1|!c2)&!c3&c4&c5"
+	IsEqual(%disableInCasual_$1,0)
+	IsCasual()
+	IsEqual(%SkillTargetPos_$1,null)
+	CharacterCanCastFromItem(__Me,%SkillItem_$1,0,%SkillID_$1)	
+	CharacterGetSkillRange(_minRange,_maxRange,__Me,%SkillID_$1)	
+ACTIONS
+	CallFunction("StopEvaluateScore")
+	Set(%frequencyStartAt_$1,0)
+	CharacterMoveInRange(%SkillTargetPos_$1,_minRange,_maxRange,1)
+	CharacterUseSkillFromItem(%SkillItem_$1,%SkillTargetPos_$1,null,%SkillID_$1)
+	SetPriority("CastOnPosition_$1",0)
+INTERRUPT
+ON
+	OnMovementFailed(_)
+ACTIONS
+	DelayReaction("CastOnPosition_$1", 2)
+INTERRUPT
+	Reset()
+	CallFunction("StartEvaluateScore")
+	

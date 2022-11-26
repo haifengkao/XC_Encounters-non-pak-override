@@ -1,0 +1,34 @@
+INIT
+	CHARACTER:__Me
+	ITEM:%Body = LUC_M_DreksisBody_dee4496d-2291-4beb-ab29-3a9c46e94d6b
+	ITEM:%Head = LUC_M_DreksisHead_389e057c-889c-4998-bbec-3316b2e59e99
+	
+EVENTS
+
+EVENT dead
+	ON
+		OnCharacterEvent(__Me, "dead")
+	VARS
+		FLOAT3:_Pos
+		FLOAT3:_Rot
+		FLOAT3:_LookAt
+		FLOAT3:_Offset
+	ACTIONS
+		IF "c1"
+			GetPosition(__Me, _Pos)
+		THEN
+			GetForwardDirection(__Me, _Rot)
+			ItemTeleportTo(%Body, __Me)
+			Set(_LookAt, _Pos)
+			Add(_LookAt, _Rot)
+			Multiply(_Rot, 2)
+			Subtract(_Pos, _Rot)
+			ItemTeleportTo(%Head, _Pos)
+			SetVar(%Body, "Look", _LookAt)
+			SetVar(%Head, "Look", _LookAt)
+			CharacterEvent(__Me, "Rotate")
+			ItemSetOnStage(%Head, 1)
+			ItemSetOnStage(%Body, 1)
+			PlayEffectAt(%Body, "FX_GP_TeleportSmoke_A")
+			CharacterSetOffStage()
+		ENDIF

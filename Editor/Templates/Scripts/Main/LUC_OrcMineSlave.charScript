@@ -1,0 +1,81 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter
+CHARACTER:__Me
+FIXEDSTRING:%CurrentAction = "ChooseAction"
+FIXEDSTRING:%PreviousAction = ""
+INT:%NumberOfAnimations = 1
+FIXEDSTRING:%CurrentAnimation = ""
+
+BEHAVIOUR
+
+REACTION ChooseAction, 1060
+USAGE PEACE
+ACTIONS
+	GetRandom(%CurrentAction, "Mine", "RunWheel", "PushCart")
+	GotoIfEqual(%PreviousAction, %CurrentAction, "Start")
+	Set(%PreviousAction, %CurrentAction)
+	SetPriority(%CurrentAction, 1070)
+	
+REACTION Mine, 0
+VARS
+	TRIGGER:%MiningSpot
+USAGE PEACE
+ACTIONS
+	GetRandom(%MiningSpot, TRIGGER:LUC_PointOrcMineSlaveMining01_5770b2ff-edfa-4896-8a9b-2e2e0cea1a9d, TRIGGER:LUC_PointOrcMineSlaveMining02_fc119893-b730-4a7b-a2b2-060902a5e4e0)
+	CharacterMoveTo(%MiningSpot, 0)
+	CharacterLookFrom(%MiningSpot)
+	GetRandom(%NumberOfAnimations, 1, 2, 3, 4, 5, 6)
+	Set(%CurrentAnimation, "attack1")
+	SetPriority("LoopAnimation", 1080)
+INTERRUPT
+	Reset()
+	
+REACTION LoopAnimation, 0
+VARS
+	INT:_Counter = 0
+USAGE PEACE
+ACTIONS
+	SetPriority(%CurrentAction, 0)
+	CharacterPlayAnimation(%CurrentAnimation)
+	Add(_Counter, 1)
+	IF !c1
+		IsGreaterThen(_Counter, %NumberOfAnimations)
+	THEN
+		Goto("Start")
+	ELSE
+		Set(_Counter, 0)
+		SetPriority("LoopAnimation", 0)
+	ENDIF
+
+REACTION RunWheel, 0
+VARS
+	TRIGGER:_Wheel = TRIGGER:LUC_PointOrcMineSlaveWheel_c4f3cea0-f48d-4754-857c-fc2a1f8c9ab5
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(_Wheel, 0)
+	CharacterLookFrom(_Wheel)
+	GetRandom(%NumberOfAnimations, 3, 4, 5, 6)
+	Set(%CurrentAnimation, "run")
+	SetPriority("LoopAnimation", 1070)
+INTERRUPT
+	Reset()
+	
+REACTION PushCart, 0
+VARS
+	TRIGGER:_Cart = TRIGGER:LUC_PointOrcMineSlaveCart01_7648306a-22a8-4ce9-9e16-4150eb6e3e59
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(_Cart, 0)
+	CharacterLookFrom(_Cart)
+	DisplayText(__Me, "LUC_OrcMineSlave_01", 3)
+	Sleep(3)
+	DisplayText(__Me, "LUC_OrcMineSlave_02", 3)
+	Sleep(3)
+	DisplayText(__Me, "LUC_OrcMineSlave_03", 3)
+	CharacterPlayAnimation("attack1")
+	Sleep(10)
+	SetPriority(%CurrentAction, 0)
+INTERRUPT
+	Reset()

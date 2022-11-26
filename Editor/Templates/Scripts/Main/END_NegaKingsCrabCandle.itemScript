@@ -1,0 +1,136 @@
+#INCLUDE BurningItem
+
+INIT
+USING BurningItem
+
+ITEM:__Me
+EXTERN INT:%StartLit = 1
+EXTERN STRING:%OnEvent=null
+EXTERN STRING:%OffEvent="END_NegaCrab_TurnCandlesOff"
+
+EVENTS
+
+EVENT InitTorch
+ON
+	OnInit
+VARS
+	INT:_IsStatusOn
+ACTIONS
+	IF "c1&!c2"
+		IsEqual(%StartLit,1)
+		ItemHasStatus(__Me,BURNING)
+	THEN
+		ItemApplyStatus(__Me,BURNING)
+		Set(%StartLit,0)
+		IF "c1"
+			GetVar(_IsStatusOn,__Me,"IsStatusOn")
+		THEN
+			SetVar(__Me,"IsStatusOn",INT:1)
+		ENDIF
+	ELSE
+		IF "c1&!c2"
+			GetVar(_IsStatusOn,__Me,"IsStatusOn")
+			ItemHasStatus(__Me,BURNING)
+		THEN
+			SetVar(__Me,"IsStatusOn",INT:0)
+		ENDIF
+	ENDIF
+
+EVENT ToggleLight
+ON
+	OnUseItem(_,__Me)
+VARS
+	INT:_IsStatusOn
+ACTIONS
+	IF "!c1" 
+		ItemHasStatus(__Me,BURNING)
+	THEN
+		ItemApplyStatus(__Me,BURNING)
+		IF "c1"
+			GetVar(_IsStatusOn,__Me,"IsStatusOn")
+		THEN
+			SetVar(__Me,"IsStatusOn",INT:1)
+		ENDIF
+	ELSE
+		ItemRemoveStatus(__Me,BURNING)
+		IF "c1"
+			GetVar(_IsStatusOn,__Me,"IsStatusOn")
+		THEN
+			SetVar(__Me,"IsStatusOn",INT:0)
+		ENDIF
+	ENDIF
+
+EVENT LightOnFire
+ON
+	OnDamage(Fire,_,_,_)
+VARS
+	INT:_IsStatusOn
+ACTIONS
+	IF "!c1"
+		ItemHasStatus(__Me,BURNING)
+	THEN
+		ItemApplyStatus(__Me,BURNING)
+		IF "c1"
+			GetVar(_IsStatusOn,__Me,"IsStatusOn")
+		THEN
+			SetVar(__Me,"IsStatusOn",INT:1)
+		ENDIF
+	ENDIF
+
+EVENT Extinguish
+ON
+	OnItemStatusRemoved(__Me,BURNING)
+VARS
+	INT:_IsStatusOn
+ACTIONS
+	IF "c1"
+		GetVar(_IsStatusOn,__Me,"IsStatusOn")
+	THEN
+		SetVar(__Me,"IsStatusOn",INT:0)
+	ENDIF
+	
+EVENT Light
+ON
+	OnItemStatus(__Me,BURNING)
+VARS
+	INT:_IsStatusOn
+ACTIONS
+	IF "c1"
+		GetVar(_IsStatusOn,__Me,"IsStatusOn")
+	THEN
+		SetVar(__Me,"IsStatusOn",INT:1)
+	ENDIF
+	
+EVENT TorchOnEvent
+	ON
+		OnCharacterItemEvent(_,_,%OnEvent)
+VARS
+	INT:_IsStatusOn
+	ACTIONS
+		IF "!c1" 
+		ItemHasStatus(__Me,BURNING)
+		THEN
+		ItemApplyStatus(__Me,BURNING)
+			IF "c1"
+			GetVar(_IsStatusOn,__Me,"IsStatusOn")
+			THEN
+			SetVar(__Me,"IsStatusOn",INT:1)
+			ENDIF
+		ENDIF
+	
+EVENT TorchOffEvent
+	ON
+		OnGlobalEventSet("END_NegaCrab_TurnCandlesOff")
+VARS
+	INT:_IsStatusOn
+	ACTIONS
+		IF "c1" 
+		ItemHasStatus(__Me,BURNING)
+		THEN
+		ItemRemoveStatus(__Me,BURNING)
+			IF "c1"
+			GetVar(_IsStatusOn,__Me,"IsStatusOn")
+			THEN
+			SetVar(__Me,"IsStatusOn",INT:0)
+			ENDIF
+		ENDIF

@@ -1,0 +1,63 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+ProcTriggerRegisterForPlayers(TRIGGER_DAF_TavernEntrance);
+TriggerRegisterForCharacter(TRIGGER_DAF_Area_OwnershipGrutilda,CHARACTER_DAF_Grutilda);
+KBSECTION
+IF
+CharacterEnteredTrigger(_Character,TRIGGER_DAF_TavernEntrance)
+AND
+Sees(_,_Character)
+AND
+Boolean("FirstTimeDAFTavernEntrance")
+AND
+NOT Boolean("DAFBouncersTalking")
+THEN
+Boolean("DAFBouncersTalking");
+DialogStartTwoSpeakerDialog("DAF_AD_TavernEntrance2",CHARACTER_DAF_BO_ScoutOrc1,CHARACTER_DAF_BO_ScoutOrc2);
+
+IF
+CharacterEnteredTrigger(_Character,TRIGGER_DAF_TavernEntrance)
+AND
+Sees(_,_Character)
+AND
+NOT Boolean("FirstTimeDAFTavernEntrance")
+THEN
+Boolean("DAFBouncersTalking");
+Boolean("FirstTimeDAFTavernEntrance");
+DialogStartTwoSpeakerDialog("DAF_AD_TavernEntrance1",CHARACTER_DAF_BO_ScoutOrc1,CHARACTER_DAF_BO_ScoutOrc2);
+
+IF
+AutomatedDialogEnded("DAF_AD_TavernEntrance1",_)
+THEN
+TimerLaunch("ReactivateTavernEntranceComment",10000);
+
+IF
+AutomatedDialogEnded("DAF_AD_TavernEntrance2",_)
+THEN
+TimerLaunch("ReactivateTavernEntranceComment",10000);
+
+IF
+TimerFinished("ReactivateTavernEntranceComment")
+THEN
+NOT Boolean("DAFBouncersTalking");
+
+IF
+CharacterEnteredTrigger(CHARACTER_DAF_Grutilda,TRIGGER_DAF_Area_OwnershipGrutilda)
+THEN
+CharacterSetEvent(CHARACTER_DAF_Grutilda,"InHerOffice");
+
+IF
+CharacterLeftTrigger(CHARACTER_DAF_Grutilda,TRIGGER_DAF_Area_OwnershipGrutilda)
+THEN
+CharacterSetEvent(CHARACTER_DAF_Grutilda,"LeftHerOffice");
+
+IF
+DialogCharacterEventSet(_Flag,CHARACTER_DAF_GrutildaGoblin,_Inst)
+THEN
+DialogClearCharacterEvent(_Flag,CHARACTER_DAF_GrutildaGoblin,_Inst);
+CharacterSetEvent(CHARACTER_DAF_GrutildaGoblin,_Flag);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

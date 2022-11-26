@@ -1,0 +1,30 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+CHARACTER:%Lawrence = LUC_Lawrence_e0dbe4a1-34e5-4de2-8bd6-32cbe3cec5b2
+CHARACTER:%Nadia = LUC_Nadia_bfa657f0-2815-4fb6-a2bb-168fa4094416
+
+BEHAVIOUR
+
+REACTION State_ListeningToNadia, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+	FLOAT:_Time
+ACTIONS
+	CharacterLookAt(%Nadia)
+	GetRandom(_Time,3,4,5,6)
+	GetRandom(_Animation,"Revolt_01","Revolt_02","Intimidate_01")
+	CharacterPlayAnimation(_Animation)
+	DialogStart("LUC_AD_NadiaMiners",__Me)
+	Sleep(_Time)
+
+STORY
+
+SCRIPTFRAME KillLawrence
+ACTIONS	
+	CharacterMoveTo(%Lawrence)
+	CharacterAttack(%Lawrence, 1)
+	CharacterDie(%Lawrence)

@@ -1,0 +1,121 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager 
+	FIXEDSTRING:%PreviousCellAnim = ""
+	CHARACTER:__Me
+	
+EVENTS
+
+EVENT Initialize
+	ON
+		OnInit()
+	ACTIONS
+		StartTimer("checkMyCell", 0.1, -1)
+		
+EVENT Shutdown
+	ON
+		OnShutdown()
+	ACTIONS
+		StopTimer("checkMyCell")
+		
+EVENT checkMyCell
+	ON
+		OnTimer("checkMyCell")
+	ACTIONS
+		IterateCharactersNear(__Me, 10, "foundSomeone")
+
+EVENT foundSomeone
+	VARS
+		CHARACTER:_Dude
+		FIXEDSTRING:_Faction
+	ON
+		OnIterateCharacter(_Dude, "foundSomeone")
+	ACTIONS
+		IF "c1&c2&c3"
+			CharacterIsInTrigger(_Dude, LUC_BoxOrcCell_63641fd2-0cae-4df2-acfd-23ce4c95474f)
+			CharacterGetFaction(_Faction, _Dude)
+			IsEqual(_Faction, "LUC_PrisonGuard")
+		THEN
+			StopTimer("checkMyCell")
+			CharacterSetFaction(__Me, "LUC_IV_OrcOutside")
+		ENDIF
+	
+BEHAVIOUR
+
+REACTION State_Imprison, 0
+	USAGE PEACE
+	ACTIONS
+		GetRandom(%currentAction, "Action_Walk")
+		SetPriority(%currentAction, 1100)
+		
+REACTION State_StuckInCell, 0
+	USAGE PEACE
+	ACTIONS
+		GetRandom(%currentAction, "Action_Stuck")
+		SetPriority(%currentAction, 1100)
+		
+REACTION State_OutOfPrison, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterDisappear(90)
+	
+REACTION Action_GreetFriendly,0
+USAGE PEACE
+VARS
+	CHARACTER:_char
+	FLOAT:_dist
+CHECK "c1"
+	CharacterGet(_char,__Me,4,Lowest,Distance,Ally,null,null)
+ACTIONS
+	IF "!c1&!c2&!c3"
+		CharacterIsDead(_char)
+		IsInDialog(_char)
+		CharacterIsPlayer(_char)
+	THEN
+		CharacterLookAt(_char)
+		DialogStart("LUC_AD_FreeOrcPrisonerGreets",__Me,_char)
+		Sleep(35)
+	ENDIF
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)		
+	
+REACTION Action_Walk, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterWander(FLOAT:4, 15, 0, TRIGGER:LUC_Point_Behavior_PrisonerIV_4f19de12-5fdb-496e-aca8-004800f4e07f)
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)		
+		
+REACTION Action_Stuck, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+	FLOAT:_SleepTime
+	CHARACTER:_Player
+	TRIGGER:_Target=LUC_Point_OrcPrisonerTarget_8690e183-5184-4cfd-bdae-e79794cbd79d
+ACTIONS
+	CharacterMoveTo(_Target,0)
+	GetWeightedRandom(_Animation,"still",INT:50,"idle1",INT:30,"idle2",INT:30,"idle3",INT:30)
+	IF "c1"
+		IsEqual(_Animation,%PreviousCellAnim)
+	THEN
+		Goto("Start")
+	ENDIF
+	Set(%PreviousCellAnim,_Animation)
+	CharacterPlayAnimation(_Animation)
+	IF "c1&c2&!c3"
+		CharacterGet(_Player,__Me,5,Lowest,Distance,Player)
+		IsRandom(0.3)
+		IsInDialog(_Player)
+	THEN
+		CharacterLookAt(_Player)
+		DialogStart("LUC_AD_OrcPrisonerQuestion",__Me)
+	ENDIF
+	GetRandom(_SleepTime,0,0.5,1.2,1.5,3,4)
+	Sleep(_SleepTime)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)		

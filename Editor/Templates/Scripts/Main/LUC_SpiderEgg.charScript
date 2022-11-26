@@ -1,0 +1,44 @@
+INIT
+	CHARACTER:__Me
+	CHARACTERTEMPLATE:%Spiderling_Sand="Animals_Spider_A_Hatched_e3f1f82c-8266-4fc4-9a42-2564e9c9d996"
+	CHARACTERTEMPLATE:%%Spiderling_Green="Animals_Spider_A_Hatched_Green_dcb213f0-db60-474f-bf12-0c3e923b5a5a"
+
+	//this script is used only in the case of the Worshipped Spider Eggs in Luculla
+	//for the generic egg script, see CMB_SpiderEgg
+
+//--------------	
+BEHAVIOUR
+REACTION PanicHatching, 0
+USAGE ALL
+VARS
+	FLOAT:_Wait
+ACTIONS
+	GetRandomBetween(_Wait, 0, 3)
+	Sleep(_Wait)
+	CharacterEvent(__Me, "hatch")
+	Sleep(4)
+	
+//--------------
+EVENTS
+EVENT PanicHatch
+ON
+	OnCharacterEvent(__Me, "panicHatch")
+ACTIONS
+	SetPriority("PanicHatching", 10000)
+
+EVENT Hatching
+VARS
+	CHARACTER:_SpawnedSpider
+	CHARACTERTEMPLATE:_ChosenSpiderTemplate
+ON
+	OnCharacterEvent(__Me, "hatch")
+ACTIONS
+	IF "!(c1&c2)"
+		CharacterIsDead(__Me)
+		CharacterHasStatus(__Me,"FROZEN")
+	THEN
+		CharacterPlayEffect(__Me,"FX_GP_Hit_Ooze_A_Large")
+		CharacterDie(__Me)
+		GetWeightedRandom(_ChosenSpiderTemplate,%Spiderling_Sand,INT:2,%%Spiderling_Green,INT:1)
+		SpawnCharacter(_SpawnedSpider,_ChosenSpiderTemplate,__Me,0)	
+	ENDIF

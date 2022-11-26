@@ -1,0 +1,12 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+TriggerRegisterForItems(TRIGGER_CYS_NickHeadShowZone);
+TriggerRegisterForItems(TRIGGER_LUC_IT_MageTriggerArea);
+TriggerRegisterForItems(TRIGGER_LUC_IT_WarriorTriggerArea);
+TriggerRegisterForItems(TRIGGER_LUC_IT_RangerTriggerArea);
+KBSECTION
+
+EXITSECTION
+
+ENDEXITSECTION

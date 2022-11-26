@@ -1,0 +1,166 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%AllyOfDifferentType
+	FLOAT:%MySightRange	
+	
+BEHAVIOUR
+REACTION EnchantedArmor_KillDefaultCharacter,2000
+USAGE COMBAT
+CHECK "!c1"
+	CharacterIsSummon(__Me)
+ACTIONS
+	//DebugText(__Me,"Looking around!")
+	Set(%AllyOfDifferentType,null)
+	IterateCharactersNear(__Me,20,"CMBHC_CYS_IterateForNonEnchantedAllies",Lowest,Distance)
+	//DebugText(__Me,"Found: [1]!",%AllyOfDifferentType)
+	IF "!c1"
+		IsEqual(%AllyOfDifferentType,null)
+	THEN
+		SetPriority("Combat_AttackSetEnemy",0)
+		SetPriority("Combat_MoveToSetEnemy",0)		
+	ENDIF
+	SetPriority("EnchantedArmor_KillDefaultCharacter",0)
+INTERRUPT
+	Reset()
+
+REACTION EnchantedArmor_CastCurse,500
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "(!c1|c2)&c3&c4&!(c5|c6|c7|c8)&c9&c10"
+	IsEqual(%AllyOfDifferentType,null)													//!c1
+	CharacterIsSummon(__Me)																//c2
+	CharacterCanCast(__Me,"Target_EnemyTargetedCurse_EA")								//c3
+	CharacterGet(_Target,__Me,%MySightRange,Highest,Strength,Enemy)						//c4
+	CharacterHasStatus(_Target,"CURSED")												//!c5
+	CharacterHasStatus(_Target,"FROZEN")												//!c6
+	CharacterHasStatus(_Target,"BLIND")													//!c7
+	CharacterHasStatus(_Target,"PETRIFIED")												//!c8
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyTargetedCurse_EA")		//c9
+	IsRandom(0.33)																		//c10
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Target_EnemyTargetedCurse_EA",_Target)
+
+REACTION EnchantedArmor_CastBlind,500
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "(!c1|c2)&c3&c4&!(c5|c6|c7|c8)&c9&c10"
+	IsEqual(%AllyOfDifferentType,null)													//!c1
+	CharacterIsSummon(__Me)																//c2
+	CharacterCanCast(__Me,"Target_EnemyBlind_EA")										//c3
+	CharacterGet(_Target,__Me,%MySightRange,Highest,Dexterity,Enemy)					//c4
+	CharacterHasStatus(_Target,"BLIND")													//!c5
+	CharacterHasStatus(_Target,"FROZEN")												//!c6
+	CharacterHasStatus(_Target,"CURSED")												//!c7
+	CharacterHasStatus(_Target,"PETRIFIED")												//!c8
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyBlind_EA")				//c9
+	IsRandom(0.33)																		//c10
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Target_EnemyBlind_EA",_Target)
+
+REACTION EnchantedArmor_CastStun,500
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "(!c1|c2)&c3&c4&!(c5|c6|c7|c8)&c9&c10"
+	IsEqual(%AllyOfDifferentType,null)													//!c1
+	CharacterIsSummon(__Me)																//c2
+	CharacterCanCast(__Me,"Target_EnemyStun_EA")										//c3
+	CharacterGet(_Target,__Me,%MySightRange,Highest,Strength,Enemy)						//c4
+	CharacterHasStatus(_Target,"STUNNED")												//!c5
+	CharacterHasStatus(_Target,"KNOCKED_DOWN")											//!c6
+	CharacterHasStatus(_Target,"FROZEN")												//!c7
+	CharacterHasStatus(_Target,"PETRIFIED")												//!c8
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyStun_EA")				//c9
+	IsRandom(0.33)																		//c10
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Target_EnemyStun_EA",_Target)
+
+REACTION EnchantedArmor_CastInstantPressure,500
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "(!c1|c2)&c3&c4&!c5&c6"
+	IsEqual(%AllyOfDifferentType,null)													//!c1
+	CharacterIsSummon(__Me)																//c2
+	CharacterCanCast(__Me,"Target_EnemyInstantPressure_EA")								//c3
+	CharacterGet(_Target,__Me,%MySightRange,Lowest,Vitality,Enemy)						//c4
+	CharacterHasStatus(_Target,"BLIND")													//!c5
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyInstantPressure_EA")	//c6
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Target_EnemyInstantPressure_EA",_Target)
+	
+REACTION EnchantedArmor_CastStaffOfMagusAir,400
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "(!c1|c2)&c3&c4&c5"
+	IsEqual(%AllyOfDifferentType,null)															//!c1
+	CharacterIsSummon(__Me)																		//c2
+	CharacterCanCast(__Me,"Projectile_EnemyStaffOfMagusAir_EA")									//c3
+	CharacterGet(_Target,__Me,%MySightRange,Lowest,Vitality,Enemy)								//c4
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyStaffOfMagusAir_EA")		//c5
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_EnemyStaffOfMagusAir_EA",_Target)
+	IF "c1"
+		IsRandom(0.3)
+	THEN
+		CharacterEndTurn()
+	ENDIF
+	
+EVENTS
+EVENT OnInit_GetSightRange_GiveSpells
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%MySightRange,__Me,Sight)
+	THEN
+		CharacterAddSkill("Target_EnemyTargetedCurse_EA")
+		CharacterAddSkill("Target_EnemyBlind_EA")
+		CharacterAddSkill("Target_EnemyStun_EA")
+		CharacterAddSkill("Target_EnemyInstantPressure_EA")
+		CharacterAddSkill("Projectile_EnemyStaffOfMagusAir_EA")
+	ENDIF
+	
+EVENT OnTurn_RestoreDefaultCharacterFunctionalities
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("EnchantedArmor_KillDefaultCharacter",2000)
+	SetPriority("Combat_AttackSetEnemy",7)
+	SetPriority("Combat_MoveToSetEnemy",6)
+	
+EVENT OnIterateCharacter_LookAroundForNonEnchantedAllies
+VARS
+	CHARACTER:_Ally
+	CHARACTERTEMPLATE:_AllysCharTemplate
+	CHARACTERTEMPLATE:_MyCharTemplate="DarkMinions_WalkingArmour_A_5aa5b4ee-a7c6-4fd7-ab8c-833aca9aa18c"
+ON
+	OnIterateCharacter(_Ally,"CMBHC_CYS_IterateForNonEnchantedAllies")
+ACTIONS
+	IF "c1&!c2&c3&!c4"
+		CharacterIsAlly(__Me,_Ally)
+		CharacterIsDead(_Ally)
+		CharacterGetTemplate(_Ally,_AllysCharTemplate)
+		IsEqual(_AllysCharTemplate,_MyCharTemplate)
+	THEN
+		//DebugText(_Ally,"Gotcha!")
+		Set(%AllyOfDifferentType,_Ally)
+	ENDIF

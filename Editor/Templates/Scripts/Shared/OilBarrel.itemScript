@@ -1,0 +1,18 @@
+INIT
+ITEM:__Me
+EXTERN SKILL:%ExplosionProjectile=Projectile_EnemyFireball
+EXTERN INT:%CasterLevel=20
+
+EVENTS 
+
+EVENT ReceiveFireDamage
+VARS
+	CHARACTER:_Target
+ON
+	OnDamage(Fire, _, _Target, _)
+ACTIONS
+	IF "!c1"
+		ItemHasStatus(__Me,FROZEN)
+	THEN
+		ExplodeAt(__Me,%ExplosionProjectile,%CasterLevel,_Target)
+	ENDIF

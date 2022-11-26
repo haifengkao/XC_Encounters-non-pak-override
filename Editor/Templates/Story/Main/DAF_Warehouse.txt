@@ -1,0 +1,104 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+ProcTriggerRegisterForPlayers(TRIGGER_DAF_Warehouse_Entrance);
+ProcTriggerRegisterForPlayers(TRIGGER_DAF_Warehouse);
+DB_DAF_WarehouseWarnings(0);
+
+ItemToCharacter(ITEM_DAF_WarehouseKey,CHARACTER_DAF_WarehouseGuard2);
+KBSECTION
+IF
+CharacterEnteredTrigger(_Player,TRIGGER_DAF_Warehouse_Entrance)
+AND
+Sees(CHARACTER_DAF_WarehouseGuard,_Player)
+AND
+DB_DAF_WarehouseWarnings(_WarningNr)
+THEN
+Proc_ReactToPlayerEnteringDAF_Warehouse(_Player,_WarningNr);
+
+IF
+CharacterSawCharacter(_Player,CHARACTER_DAF_WarehouseGuard)
+AND
+DB_InRegion(_Player,TRIGGER_DAF_Warehouse_Entrance)
+AND
+DB_DAF_WarehouseWarnings(_WarningNr)
+THEN
+Proc_ReactToPlayerEnteringDAF_Warehouse(_Player,_WarningNr);
+
+PROC
+Proc_ReactToPlayerEnteringDAF_Warehouse((CHARACTER)_Player,0)
+AND
+NOT DB_GlobalEvent("DAF_BloodstoneQuestStarted")
+THEN
+ProcDoTwoSpeakerDialog("DAF_WarehouseEntryWarning",CHARACTER_DAF_WarehouseGuard,_Player);
+NOT DB_DAF_WarehouseWarnings(0);
+DB_DAF_WarehouseWarnings(1);
+
+PROC
+Proc_ReactToPlayerEnteringDAF_Warehouse((CHARACTER)_Player,1)
+AND
+NOT DB_GlobalEvent("DAF_BloodstoneQuestStarted")
+THEN
+CharacterDisplayText(CHARACTER_DAF_WarehouseGuard,"DAF_WarehouseEntryWarning2");
+NOT DB_DAF_WarehouseWarnings(1);
+DB_DAF_WarehouseWarnings(2);
+
+PROC
+Proc_ReactToPlayerEnteringDAF_Warehouse((CHARACTER)_Player,2)
+AND
+NOT DB_GlobalEvent("DAF_BloodstoneQuestStarted")
+THEN
+CharacterDisplayText(CHARACTER_DAF_WarehouseGuard,"DAF_WarehouseEntryWarning3");
+ProcSetRelationToPlayers(CHARACTER_DAF_WarehouseGuard, 0);
+GoalCompleted;
+
+PROC
+Proc_ReactToPlayerEnteringDAF_Warehouse((CHARACTER)_Player,_)
+AND
+DB_GlobalEvent("DAF_BloodstoneQuestStarted")
+AND
+NOT DB_OnlyOnce("DAF_WarehouseEntryWarningAfterPermission")
+THEN
+ProcDoTwoSpeakerDialog("DAF_WarehouseEntryWarning",CHARACTER_DAF_WarehouseGuard,_Player);
+DB_OnlyOnce("DAF_WarehouseEntryWarningAfterPermission");
+
+IF
+DB_InRegion(_Player,TRIGGER_DAF_Warehouse)
+AND
+Sees(CHARACTER_DAF_WarehouseGuard,_Player)
+AND
+NOT DB_GlobalEvent("DAF_BloodstoneQuestStarted")
+THEN
+ProcSetRelationToPlayers(CHARACTER_DAF_WarehouseGuard, 0);
+GoalCompleted;
+
+IF
+DAF_War(1)
+THEN
+GoalCompleted;
+
+IF
+GlobalEventSet("DAF_BloodstoneQuestStarted")
+THEN
+ItemClearOwner(ITEM_DAF_WarehouseDoor);
+
+IF
+CharacterUsedItem(_Character,ITEM_DAF_WarehouseDoor)
+AND
+Sees(CHARACTER_DAF_WarehouseGuard2,_Character)
+AND
+DB_GlobalEvent("DAF_BloodstoneQuestStarted")
+AND
+NOT DB_GlobalEvent("DAF_WarehouseDoorKeyReceived")
+THEN
+ProcDoTwoSpeakerDialog("DAF_WarehouseGuard2",CHARACTER_DAF_WarehouseGuard2,_Character);
+
+IF
+DialogCharacterEventSet("DAF_WarehouseKeyGiven",_Character,_)
+THEN
+ItemToCharacter(ITEM_DAF_WarehouseKey,_Character);
+GlobalSetEvent("DAF_WarehouseDoorKeyReceived");
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

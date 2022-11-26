@@ -1,0 +1,39 @@
+#TEMPLATE "_POTION_Base" : CON_Potion_Air_Res_Medium_A
+
+INIT
+CHARACTER:__Me
+// [GLOBAL_VARS]
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_CON_Potion_Air_Res_Medium_A
+VARS
+	// [CALC_VARS]
+	FLOAT:_StatAirResistance
+	FLOAT:_Score
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_CON_Potion_Air_Res_Medium_A")
+ACTIONS		
+	// [CALC_ACTIONS_PRE]
+	Set(_Score, 0.0)
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	IF "((c1)|c2)&(!(c3&c4))"
+	    CharacterHasBeenHitBy(__Me, Air) // c1
+	    CharacterHasHadStatus(__Me, STUNNED) // c2
+	    CharacterGetStat(_StatAirResistance, __Me, AirResistance) // c3
+	    IsGreaterThen(_StatAirResistance, 50) // c4
+	THEN
+	    Add(_Score, %ActionScore_CON_Potion_Air_Res_Medium_A)
+	ENDIF
+	// [~CALC_ACTIONS]
+
+	Cast(%ActionScore_CON_Potion_Air_Res_Medium_A, _Score)
+
+

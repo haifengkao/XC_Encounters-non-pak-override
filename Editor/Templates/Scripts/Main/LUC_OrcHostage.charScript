@@ -1,0 +1,112 @@
+#INCLUDE DefaultCharacter
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+INIT
+USING DefaultCharacter
+INT:%isExecutioner = 0
+CHARACTER:__Me
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+EVENTS
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+BEHAVIOUR
+
+REACTION KillFirstHostage, 1050
+USAGE COMBAT
+VARS
+	CHARACTER:_Hostage1 = LUC_Hostage1_0bed38a6-1aef-4faa-a70e-7b913e262e3d
+CHECK "c1&!c2"
+	IsEqual(%isExecutioner, 1)
+	CharacterHasStatus(_Hostage1,DYING)
+ACTIONS
+	CharacterMoveTo(_Hostage1, 0)
+	CharacterAttack(_Hostage1)
+	CharacterDie(_Hostage1)
+	CharacterEndTurn()
+	
+REACTION KillSecondHostage, 1040
+USAGE COMBAT
+VARS
+	CHARACTER:_Hostage2 = LUC_Hostage2_d0e03418-411a-4d37-a49b-dafcdcc5e1ff
+CHECK "c1&!c2"
+	IsEqual(%isExecutioner, 1)
+	CharacterHasStatus(_Hostage2,DYING)
+ACTIONS
+	CharacterMoveTo(_Hostage2, 0)
+	CharacterAttack(_Hostage2)
+	CharacterDie(_Hostage2)
+	CharacterEndTurn()
+	
+REACTION KillThirdHostage, 1030
+USAGE COMBAT
+VARS
+	CHARACTER:_Hostage3 = LUC_Hostage3_6fc3eb40-8e11-4da0-a42b-d675449b75b8
+CHECK "c1&!c2"
+	IsEqual(%isExecutioner, 1)
+	CharacterHasStatus(_Hostage3,DYING)
+ACTIONS
+	CharacterMoveTo(_Hostage3, 0)
+	CharacterAttack(_Hostage3)
+	CharacterDie(_Hostage3)
+	CharacterEndTurn()
+	
+REACTION KillFourthHostage, 1020
+USAGE COMBAT
+VARS
+	CHARACTER:_Hostage4 = LUC_Hostage4_c3bebd0a-1e45-46a0-9849-8e1e484ae5d8
+CHECK "c1&!c2"
+	IsEqual(%isExecutioner, 1)
+	CharacterHasStatus(_Hostage4,DYING)
+ACTIONS
+	CharacterMoveTo(_Hostage4, 0)
+	CharacterAttack(_Hostage4)
+	CharacterDie(_Hostage4)
+	CharacterEndTurn()
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+STORY
+
+SCRIPTFRAME KillHostages
+VARS
+	CHARACTER:_Hostage1 = LUC_Hostage1_0bed38a6-1aef-4faa-a70e-7b913e262e3d
+	CHARACTER:_Hostage2 = LUC_Hostage2_d0e03418-411a-4d37-a49b-dafcdcc5e1ff
+	CHARACTER:_Hostage3 = LUC_Hostage3_6fc3eb40-8e11-4da0-a42b-d675449b75b8
+	CHARACTER:_Hostage4 = LUC_Hostage4_c3bebd0a-1e45-46a0-9849-8e1e484ae5d8
+ACTIONS	
+	IF "!c1"
+		CharacterHasStatus(_Hostage1,DYING)
+	THEN
+		CharacterMoveTo(_Hostage1, 0)
+		CharacterAttack(_Hostage1)
+		CharacterDie(_Hostage1)
+		Sleep(2)
+	ENDIF
+	
+	IF "!c1"
+		CharacterHasStatus(_Hostage2,DYING)
+	THEN
+		CharacterMoveTo(_Hostage2, 0)
+		CharacterAttack(_Hostage2)
+		CharacterDie(_Hostage2)
+		Sleep(2)
+	ENDIF
+	
+	IF "!c1"
+		CharacterHasStatus(_Hostage3,DYING)
+	THEN
+		CharacterMoveTo(_Hostage3, 0)
+		CharacterAttack(_Hostage3)
+		CharacterDie(_Hostage3)
+		Sleep(2)
+	ENDIF
+	
+	IF "!c1"
+		CharacterHasStatus(_Hostage4,DYING)
+	THEN
+		CharacterMoveTo(_Hostage4, 0)
+		CharacterAttack(_Hostage4)
+		CharacterDie(_Hostage4)
+		Sleep(2)
+	ENDIF

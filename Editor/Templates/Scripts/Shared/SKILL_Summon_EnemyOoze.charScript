@@ -1,0 +1,35 @@
+#TEMPLATE "_SKILL_Base" : Summon_EnemyOoze
+
+INIT
+CHARACTER:__Me
+// [GLOBAL_VARS]
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_Summon_EnemyOoze
+VARS
+	// [CALC_VARS]
+	FLOAT:_Score
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_Summon_EnemyOoze")
+ACTIONS	
+	// [CALC_ACTIONS_PRE]
+	Set(_Score, 0.0)
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	// Hostile count score calculation
+	Add(_Score, 10.0) // HostileWeight
+	
+	Set(%SkillTargetChar_Summon_EnemyOoze, __Me)
+	Add(%ActionScore_Summon_EnemyOoze, _Score)
+	// [~CALC_ACTIONS]
+
+	
+
+	

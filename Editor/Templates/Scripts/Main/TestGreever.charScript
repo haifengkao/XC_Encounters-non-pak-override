@@ -1,0 +1,15 @@
+INIT
+
+CHARACTER:__Me
+FIXEDSTRING:%CurrentAction = "ChooseAction"
+
+BEHAVIOUR
+
+REACTION ChooseAction, 1060
+USAGE PEACE
+ACTIONS
+	CharacterPlayAnimation("Sigh_01")
+	CharacterMoveTo(TRIGGER:Greever_Jahan_770f6e25-06f2-44cf-b722-ddabd39d7f67)
+	CharacterPlayAnimation("Fidget_Low_01")
+	CharacterMoveTo(TRIGGER:StartPoint_000_a16c6849-7ab1-41c9-8045-5dedffa978fb)
+	Sleep(5)

@@ -1,0 +1,46 @@
+INIT
+	CHARACTER:__Me
+
+	//This script is meant to be used by the spider
+	//in case it spawns inside of the hut
+	//and cannot see any target.
+
+//--------	
+BEHAVIOUR
+REACTION ShadowSpider_GetTargetAndGo,500
+USAGE PEACE
+VARS
+	CHARACTER:_Target
+	FLOAT3:_TargetPosition
+	FLOAT3:_PosOffset
+	FLOAT:_Angle
+	FLOAT:_Dist
+CHECK "c1&c2"
+	CharacterGet(_Target,__Me,20,Lowest,Distance,Enemy)
+	GetPosition(_Target,_TargetPosition)
+ACTIONS
+	CharacterPlayEffect(__Me,"FX_Skills_WitchCraft_Generic_A_Prepare")
+	GetRandomBetween(_Angle,0,360)
+	GetRandomBetween(_Dist,1,2.5)
+	Set(_PosOffset,{1.2;0;0})
+	RotateY(_PosOffset,_Angle)
+	Multiply(_PosOffset,_Dist)
+	Add(_TargetPosition,_PosOffset)	
+	Sleep(0.8)
+	CharacterPlayEffect(__Me,"FX_GP_TeleportSmoke_A")
+	CharacterTeleportTo(_TargetPosition)
+	CharacterPlayEffect(__Me,"FX_GP_TeleportSmoke_A")
+
+//--------	
+EVENTS
+EVENT OnCombatStarted_KillGetTargetPrio
+ON
+	OnCombatStarted()
+ACTIONS
+	SetPriority("ShadowSpider_GetTargetAndGo",0)
+	
+EVENT OnCombatEnded_RestoreGetTargetPrio
+ON
+	OnCombatEnded()
+ACTIONS
+	SetPriority("ShadowSpider_GetTargetAndGo",500)	

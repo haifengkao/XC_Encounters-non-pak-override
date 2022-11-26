@@ -1,0 +1,48 @@
+INIT
+	CHARACTER:__Me
+
+//------------------------	
+BEHAVIOUR
+REACTION BloomRaff_UseDeadlySpores,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Character
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&c4"
+	CharacterCanCast(__Me,"Projectile_EnemySmallDeadlySpores")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemySmallDeadlySpores")
+	CharacterGet(_Character,__Me,_MaxRange,Lowest,Distance,Enemy)
+	CharacterCanSee(__Me,_Character)
+ACTIONS
+	CharacterUseSkill("Projectile_EnemySmallDeadlySpores",_Character)
+	
+REACTION BloomRaff_UseMarkOfDeath,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Character
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&c4&c5&c6"
+	IsHardcore()
+	CharacterCanCast(__Me,"Target_EnemyMarkOfDeath")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyMarkOfDeath")
+	CharacterGet(_Character,__Me,_MaxRange,Lowest,Distance,Enemy)
+	CharacterCanSee(__Me,_Character)
+	IsRandom(0.2)
+ACTIONS
+	CharacterUseSkill("Target_EnemyMarkOfDeath",_Character)	
+	
+REACTION BloomRaff_CannotMoveSoEndTurn,200
+USAGE COMBAT
+ACTIONS
+	CharacterEndTurn()
+	
+//------------------------
+EVENTS
+EVENT OnInit_AddSkills
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill("Projectile_EnemySmallDeadlySpores")
+	CharacterAddSkill("Target_EnemyMarkOfDeath")	

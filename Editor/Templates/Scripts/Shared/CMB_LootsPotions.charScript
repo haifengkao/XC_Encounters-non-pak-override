@@ -1,0 +1,25 @@
+INIT
+
+CHARACTER:__Me
+EXTERN INT:%LootPotionPriority=300
+
+BEHAVIOUR
+
+REACTION LootPotion,0
+USAGE COMBAT
+VARS
+ITEM:_item
+CHECK "c1|c2|c3|c4"
+	ItemGet(_item,__Me,10,Lowest,Distance,"68b40462-247a-44fd-87d0-c2eea2f49ed1")
+	ItemGet(_item,__Me,10,Lowest,Distance,"d2781168-5862-4e6d-95a3-47d9bd9e8dba")
+	ItemGet(_item,__Me,10,Lowest,Distance,"944e4b8c-1736-4ff6-8fa6-d7ceda9941da")
+	ItemGet(_item,__Me,10,Lowest,Distance,"f71dfdf9-fbcc-45d9-bdcd-f0ead513263a")
+ACTIONS
+	CharacterPickUpItem(_item)
+
+/*EVENTS
+EVENT SetLootPotionPriority
+ON
+	OnInit()
+ACTIONS
+	SetPriority("LootPotion",%LootPotionPriority)*/

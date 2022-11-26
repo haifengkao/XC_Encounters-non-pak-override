@@ -1,0 +1,24 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+CharacterSetOnStage(CHARACTER_LUC_MaradinoBoss_01,0);
+KBSECTION
+//REGION Spawn Maradino After Stealing Blood Stone
+PROC
+ProcLaunchAmbush(TRIGGER_LUC_MaradinoAmbush, _Player)
+THEN
+CharacterAppear(CHARACTER_LUC_MaradinoBoss_01, 0);
+CharacterPlayEffect(CHARACTER_LUC_MaradinoBoss_01,"FX_GP_TeleportSmoke_A");
+CharacterSetEvent(CHARACTER_LUC_MaradinoBoss_01,"LUC_MaradinosFollowersWakeUp");
+
+IF
+ItemAddedToCharacter(ITEM_LUC_ImpMaster_BloodStone,_Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+AmbushTrigger(TRIGGER_LUC_MaradinoAmbush, ITEM_LUC_MaradinoInvisibleAmbush);
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

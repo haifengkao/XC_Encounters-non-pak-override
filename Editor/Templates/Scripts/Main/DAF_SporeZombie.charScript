@@ -1,0 +1,51 @@
+INIT
+CHARACTER:__Me
+INT:%NorthernTriggerEntered=0
+INT:%EasternTriggerEntered=0
+INT:%SouthernTriggerEntered=0
+//CHARACTER:%Player=a0af7520-57ac-4f1c-b9d7-197bceebeade
+
+//------------------------
+EVENTS
+EVENT NorthernTriggerEntered
+ON
+	OnGlobalEventSet("DAF_SporeZombieAmbush_Trigger_Entered_North")
+ACTIONS
+	Set(%NorthernTriggerEntered,1)
+	//DebugText(%Player,"Script - Northern Signal Received!")
+	
+EVENT EasternTriggerEntered
+ON
+	OnGlobalEventSet("DAF_SporeZombieAmbush_Trigger_Entered_East")
+ACTIONS
+	Set(%EasternTriggerEntered,1)
+	//DebugText(%Player,"Script - Eastern Signal Received!")
+	
+EVENT SouthernTriggerEntered
+ON
+	OnGlobalEventSet("DAF_SporeZombieAmbush_Trigger_Entered_South")
+ACTIONS
+	Set(%SouthernTriggerEntered,1)
+	//DebugText(%Player,"Script - Southern Signal Received!")
+	
+EVENT OnDieSpawnSporeSombies
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	IF "c1"
+		IsEqual(%NorthernTriggerEntered,1)
+	THEN
+		GlobalSetEvent("DAF_SporeZombieAmbush_Spawn_N_Characters")
+		//DebugText(%Player,"Script - Northern Signal Sent!")
+	ELIF "c1"
+		IsEqual(%EasternTriggerEntered,1)
+	THEN
+		GlobalSetEvent("DAF_SporeZombieAmbush_Spawn_E_Characters")
+		//DebugText(%Player,"Script - Eastern Signal Sent!")
+	ELIF "c1"
+		IsEqual(%SouthernTriggerEntered,1)
+	THEN
+		GlobalSetEvent("DAF_SporeZombieAmbush_Spawn_S_Characters")
+		//DebugText(%Player,"Script - Southern Signal Sent!")
+	ENDIF
+	

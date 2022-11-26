@@ -1,0 +1,23 @@
+INIT
+
+ITEM:__Me
+EXTERN ITEM:%Volcano = null
+EXTERN FLOAT3:%Offset = {0;0;0}
+
+EVENTS
+
+EVENT UpdateShooting
+ON
+	OnItemEvent(__Me,"HIB_VolcanoShoot")
+VARS 
+	FLOAT3:_Dir
+	SKILL:_Skill
+	INT:_Level
+ACTIONS
+	IF "c1&c2"
+		GetVar(_Skill,%Volcano,"ProjectileSkill")
+		GetVar(_Level,%Volcano,"CasterLevel")
+	THEN
+		GetForwardDirection(__Me,_Dir)
+		ShootLocalProjectile(_Skill,__Me,%Offset,_Dir,_Level)
+	ENDIF

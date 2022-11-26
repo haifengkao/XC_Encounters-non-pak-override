@@ -1,0 +1,57 @@
+INIT 
+	CHARACTER:__Me
+	FLOAT:%MySightRange	
+	INT:%FXHandle_CoolFX
+	
+//------------------------
+BEHAVIOUR
+REACTION CyclSpotter_PartyWiper, 11000
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+CHECK "!(c1|c2|c3|c4)&c5"
+	CharacterHasStatus(__Me,"CHARMED")									//c1
+	CharacterHasStatus(__Me,"KNOCKED_DOWN")								//c2
+	CharacterHasStatus(__Me,"FEAR")										//c3
+	CharacterHasStatus(__Me,"FROZEN")									//c4
+	CharacterGet(_Target,__Me,%MySightRange,Lowest,Distance,Enemy)		//c5
+ACTIONS
+	CharacterLookAt(_Target)
+	Sleep(0.5)
+	CharacterMoveTo(_Target,1)
+	ExplodeAt(_Target,"Projectile_EnemyCyclopsFloater",-1)
+	CharacterDie(__Me,Incinerate)
+
+//------------------------		
+EVENTS
+EVENT OnInit_GetSightRange
+ON
+	OnInit()
+VARS
+	FLOAT:_Range
+ACTIONS
+	IF "c1"
+		CharacterGetSightRange(%MySightRange,__Me)
+	THEN
+		StartTimer("DAF_Cyclops_Spotter_InitialTimer",0.5,0)
+	ENDIF
+	
+EVENT OnCharacterApplyStatus_PlayLoopFX
+ON
+	OnTimer("DAF_Cyclops_Spotter_InitialTimer")
+ACTIONS
+	CharacterPlayLoopEffect(%FXHandle_CoolFX,__Me,"FX_Skills_WitchCraft_A_PurpleSmoke_A","Bone_Head")
+
+EVENT OnDamage_Explode_ScanForExplodables
+ON
+	OnDamage(_,_,_,_)
+ACTIONS
+	ExplodeAt(__Me,"Projectile_EnemyCyclopsFloater",-1)
+	CharacterDie(__Me,Incinerate)
+	
+EVENT OnDie_StopLoopFX
+ON
+	OnDie(__Me,_,_,_)
+	OnDeactivate()
+ACTIONS
+	StopLoopEffect(%FXHandle_CoolFX)

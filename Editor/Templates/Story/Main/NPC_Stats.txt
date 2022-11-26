@@ -1,0 +1,59 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Pets(CHARACTER_CYS_Maxine,CHARACTER_CYS_Cecil);
+DB_Pets(CHARACTER_CYS_BertiaChicken1,CHARACTER_CYS_Bertia);
+DB_Pets(CHARACTER_CYS_BertiaChicken2,CHARACTER_CYS_Bertia);
+DB_Pets(CHARACTER_CYS_BertiaChicken3,CHARACTER_CYS_Bertia);
+DB_Pets(CHARACTER_CYS_PainterCock,CHARACTER_CYS_Gerome);
+
+DB_NoInitialTrade(CHARACTER_HIB_ImmaculateBarter2);
+DB_NoInitialTrade(CHARACTER_LUC_GV_SkillSeller);
+DB_NoInitialTrade(CHARACTER_LUC_IV_Attenberah);
+DB_NoInitialTrade(CHARACTER_LUC_GV_ArrowSeller);
+DB_NoInitialTrade(CHARACTER_LUC_GV_EquipmentTrader);
+DB_NoInitialTrade(CHARACTER_LUC_GV_MagicSeller);
+DB_NoInitialTrade(CHARACTER_LUC_GV_PotionSeller);
+DB_NoInitialTrade(CHARACTER_LUC_GV_MagicSeller);
+DB_NoInitialTrade(CHARACTER_LUC_GV_Sadakandras);
+DB_NoInitialTrade(CHARACTER_LUC_GeneralMiner1);
+DB_NoInitialTrade(CHARACTER_LUC_GeneralMiner2);
+DB_NoInitialTrade(CHARACTER_LUC_GeneralMiner3);
+DB_NoInitialTrade(CHARACTER_LUC_GeneralMiner4);
+DB_NoInitialTrade(CHARACTER_LUC_GeneralMiner5);
+DB_NoInitialTrade(CHARACTER_LUC_GeneralMiner6);
+DB_NoInitialTrade(CHARACTER_LUC_GeneralMiner7);
+DB_NoInitialTrade(CHARACTER_LUC_GeneralMiner8);
+DB_NoInitialTrade(CHARACTER_LUC_GeneralMiner9);
+DB_NoInitialTrade(CHARACTER_LUC_GeneralMiner10);
+DB_NoInitialTrade(CHARACTER_LUC_MinerPlatform);
+DB_NoInitialTrade(CHARACTER_LUC_FuseMiner01);
+DB_NoInitialTrade(CHARACTER_LUC_FuseMiner02);
+DB_NoInitialTrade(CHARACTER_LUC_FuseMiner03);
+
+KBSECTION
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// An evil dude is an npc whose alignment relations define him to be agressive towards a good guy -
+// let's take Lanilor as the definition of a good guy.
+// Note: this does not mean that the evil dude will be agressive towards the player - au contraire!
+// The evil dude will be smart enough to feign friendlyness to the player in an attempt to mislead him.
+// This is done automatically at game start by calling SetFriendlyAlignmentWithHero(_Npc);
+PROC
+SetEvilDudeStatus((CHARACTER)_Npc) 
+AND
+NOT DB_EvilDude(_Npc)
+AND
+//TODO: really?
+CharacterGetRelationToCharacter(_Npc,CHARACTER_CYS_Arhu,_Alignment)
+THEN
+SetEvilDudeStatus_1(_Npc,_Alignment);
+
+PROC
+SetEvilDudeStatus_1((CHARACTER)_Npc,(INTEGER)_Alignment)
+AND
+_Alignment < 25
+THEN	
+DB_EvilDude(_Npc);
+EXITSECTION
+
+ENDEXITSECTION

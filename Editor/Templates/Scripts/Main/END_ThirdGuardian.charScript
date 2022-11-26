@@ -1,0 +1,9 @@
+INIT
+
+CHARACTER:__Me
+
+STORY 
+
+SCRIPTFRAME ShrikeTakesMyPlace
+ACTIONS
+	CharacterDie(__Me, Acid)

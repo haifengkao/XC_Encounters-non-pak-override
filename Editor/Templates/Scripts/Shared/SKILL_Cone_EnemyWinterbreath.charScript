@@ -1,0 +1,129 @@
+#TEMPLATE "_SKILL_Base" : Cone_EnemyWinterbreath
+
+INIT
+CHARACTER:__Me
+FLOAT:%SkillTargetScore_Cone_EnemyWinterbreath=-1000000
+// [GLOBAL_VARS]
+INT:%ClassScore_Cone_EnemyWinterbreath
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_Cone_EnemyWinterbreath
+VARS
+	// [CALC_VARS]
+	FLOAT:_SkillRangeMin
+	FLOAT:_SkillRangeMax
+	FLOAT:_SkillImpactRange
+	FLOAT3:_TargetPos
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_Cone_EnemyWinterbreath")
+ACTIONS
+	Set(%SkillTargetScore_Cone_EnemyWinterbreath, -1000000)
+
+	// [CALC_ACTIONS_PRE]
+	Set(%ClassScore_Cone_EnemyWinterbreath, 0)
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	IF "(c1)&(c2)&(c3)"
+	    CharacterGetSkillRange(_SkillRangeMin, _SkillRangeMax, __Me, Cone_EnemyWinterbreath) // c1
+	    CharacterGetSkillImpactRange(_SkillImpactRange, __Me, Cone_EnemyWinterbreath) // c2
+	    FindPosition(_TargetPos, __Me, _SkillRangeMax, _SkillImpactRange, __Me, -1, 0, 2, -1) // c3
+	THEN
+	    Set(%SkillTargetPos_Cone_EnemyWinterbreath, _TargetPos)
+	    Add(%ActionScore_Cone_EnemyWinterbreath, 20.0)
+	ELIF "(c1)"
+	    FindSurface(_TargetPos, __Me, _SkillRangeMin, _SkillRangeMax, Water, __Me, 2, 0, 10) // c1
+	THEN
+	    Set(%SkillTargetPos_Cone_EnemyWinterbreath, _TargetPos)
+	    Add(%ActionScore_Cone_EnemyWinterbreath, 20.0)
+	ELSE 
+	    IterateCharactersInCombat(__Me, "CalculateTarget_Cone_EnemyWinterbreath", Random, Vitality)
+	    IF "!c1"
+	    	IsEqual(%SkillTargetChar_Cone_EnemyWinterbreath, null)
+	    THEN
+	    	Add(%ActionScore_Cone_EnemyWinterbreath, %SkillTargetScore_Cone_EnemyWinterbreath)
+	    ENDIF
+	ENDIF
+	// [~CALC_ACTIONS]
+
+	
+
+	
+// Calculate the character we should attack
+EVENT CalculateTarget_Cone_EnemyWinterbreath
+VARS	
+	CHARACTER:_Char
+	// [CALC_TARGET_VARS]
+	INT:_ClassScore_Cone_EnemyWinterbreath
+	FLOAT:_StatWaterResistance
+	FLOAT:_Score
+	INT:_EnemiesInRange
+	// [~CALC_TARGET_VARS]
+ON
+	OnIterateCharacter(_Char, "CalculateTarget_Cone_EnemyWinterbreath")	
+ACTIONS
+	// [CALC_CHAR_TARGET_ACTIONS_PRE]
+	Set(_ClassScore_Cone_EnemyWinterbreath, %ClassScore_Cone_EnemyWinterbreath)
+	Set(_Score, 0.0)
+	// [~CALC_CHAR_TARGET_ACTIONS_PRE]
+	// [CALC_CHAR_TARGET_ACTIONS]
+	IF "(!c1&!c2&!c3)&((c4)|c5)&(!(((((c6&c7)|c8)|c9)|c10)|c11))&(c12)&(c13)"
+	    CharacterIsDead(_Char) // c1
+	    CharacterHasStatus(_Char, INVISIBLE) // c2
+	    CharacterHasStatus(_Char, SNEAKING) // c3
+	    CharacterHasStatus(_Char, AGGRO_MARKED) // c4
+	    CharacterIsBetterOrEqualClass(_Char, %ClassScore_Cone_EnemyWinterbreath, _ClassScore_Cone_EnemyWinterbreath, 5, 4, 3, 2, 1) // c5
+	    CharacterGetStat(_StatWaterResistance, _Char, WaterResistance) // c6
+	    IsGreaterThen(_StatWaterResistance, 50) // c7
+	    CharacterHasStatus(_Char, KNOCKED_DOWN) // c8
+	    CharacterHasStatus(_Char, PETRIFIED) // c9
+	    CharacterHasStatus(_Char, STUNNED) // c10
+	    CharacterHasStatus(_Char, FROZEN) // c11
+	    CharacterIsEnemy(__Me, _Char) // c12
+	    CharacterCount(_EnemiesInRange, _Char, 5, Enemy, null) // c13
+	THEN
+	    Set(%ClassScore_Cone_EnemyWinterbreath, _ClassScore_Cone_EnemyWinterbreath)
+	    IF "(c1)"
+	        CharacterHasStatus(_Char, AGGRO_MARKED) // c1
+	    THEN
+	        Add(_Score, 5.0)
+	    ENDIF
+	    // Hostile count score calculation
+	    Add(_Score, 10.0) // HostileWeight
+	    
+	    // SeveralEnemiesInRange score calculation
+	    IF "(!c1)"
+	        IsLessThen(_EnemiesInRange, 2) // c1
+	    THEN
+	        Add(_Score, 5.0)
+	    ENDIF
+	    
+	    // Can see score calculation
+	    IF "!c1"
+	    	CharacterCanSee(__Me, _Char)
+	    THEN
+	    	Add(_Score, -10.0)
+	    ENDIF
+	    
+	    IF "c1"
+	    	IsGreaterThen(_Score, %SkillTargetScore_Cone_EnemyWinterbreath)
+	    THEN
+	    	Set(%SkillTargetChar_Cone_EnemyWinterbreath, _Char)
+	    	Set(%SkillTargetScore_Cone_EnemyWinterbreath, _Score)
+	    ENDIF	
+	ENDIF
+	// [~CALC_CHAR_TARGET_ACTIONS]
+	
+	
+	
+	
+	
+	
+	
+	

@@ -1,0 +1,612 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+//REGION Shadow Buildup Database
+DB_LUC_ShadowBuildup(CHARACTER_LUCS_ShadowBuildup_Grunt01,TRIGGER_LUC_ShadowBuildup_T01,TRIGGER_LUC_ShadowBuildup_D01,"LUC_ShadowBuildupTimer_01");
+DB_LUC_ShadowBuildup(CHARACTER_LUCS_ShadowBuildup_Grunt02,TRIGGER_LUC_ShadowBuildup_T02,TRIGGER_LUC_ShadowBuildup_D02,"LUC_ShadowBuildupTimer_02");
+//END_REGION
+
+//REGION Player Comments
+DB_OneShotPlayerTrigger(TRIGGER_LUC_ShadowBuildup_T04);
+DB_PlayerComments("LUC_EnteredShadowZone","LUC_EnteredShadowZone_1_1",1,1);
+DB_PlayerComments("LUC_EnteredShadowZone","LUC_EnteredShadowZone_2_1",2,1);
+DB_PlayerComments("LUC_EnteredShadowZone","LUC_EnteredShadowZone_2_2",2,2);
+
+DB_PlayerComments("LUC_ShadowFight_Finished","LUC_ShadowFight_Finished_1_1",1,1);
+DB_PlayerComments("LUC_ShadowFight_Finished","LUC_ShadowFight_Finished_2_1",2,1);
+DB_PlayerComments("LUC_ShadowFight_Finished","LUC_ShadowFight_Finished_2_2",2,2);
+
+DB_PlayerComments("LUC_WC_FoundMaradinoSpell","LUC_WC_FoundMaradinoSpell_1_1",1,1);
+DB_PlayerComments("LUC_WC_FoundMaradinoSpell","LUC_WC_FoundMaradinoSpell_2_1",2,1);
+DB_PlayerComments("LUC_WC_FoundMaradinoSpell","LUC_WC_FoundMaradinoSpell_2_2",2,2);
+
+DB_PlayerComments("LUC_WC_BarrierRemoved","LUC_WC_BarrierRemoved_1_1",1,1);
+DB_PlayerComments("LUC_WC_BarrierRemoved","LUC_WC_BarrierRemoved_2_1",2,1);
+DB_PlayerComments("LUC_WC_BarrierRemoved","LUC_WC_BarrierRemoved_2_2",2,2);
+//END_REGION
+
+//REGION Dialog Database
+DB_LUC_ShadowDial(CHARACTER_LUCS_ShadowFight1_Grunt01,"LUC_ShadowFight_01","LUC_TextTimer01","LUC_TextTimer02");
+DB_LUC_ShadowDial(CHARACTER_LUCS_ShadowFight1_Grunt02,"LUC_ShadowFight_02","LUC_TextTimer02","LUC_TextTimer03");
+DB_LUC_ShadowDial(CHARACTER_LUCS_ShadowFight1_Grunt03,"LUC_ShadowFight_03","LUC_TextTimer03","LUC_TextTimer04");
+DB_LUC_ShadowDial(CHARACTER_LUCS_ShadowFight1_Grunt04,"LUC_ShadowFight_04","LUC_TextTimer04","NoTimer");
+DB_LUC_ShadowDial(CHARACTER_LUCS_ShadowFight2_Caster01,"LUC_ShadowFight_05","LUC_TextTimer05","LUC_TextTimer06");
+DB_LUC_ShadowDial(CHARACTER_LUCS_ShadowFight2_Caster02,"LUC_ShadowFight_06","LUC_TextTimer06","LUC_TextTimer07");
+DB_LUC_ShadowDial(CHARACTER_LUCS_ShadowFight2_Mage01,"LUC_ShadowFight_07","LUC_TextTimer07","NoTimer");
+//END_REGION
+
+//REGION Shadow Fight Database
+DB_LUC_ShadowFight(CHARACTER_LUCS_ShadowFight1_Grunt01,"Wave01"); //wave 01
+DB_LUC_ShadowFight(CHARACTER_LUCS_ShadowFight1_Grunt02,"Wave01");
+DB_LUC_ShadowFight(CHARACTER_LUCS_ShadowFight1_Grunt03,"Wave01");
+DB_LUC_ShadowFight(CHARACTER_LUCS_ShadowFight1_Grunt04,"Wave01");
+DB_LUC_ShadowFight(CHARACTER_LUCS_ShadowFight2_Grunt01,"Wave02"); //wave 02
+//DB_LUC_ShadowFight(CHARACTER_LUCS_ShadowFight2_Grunt02,"Wave02");
+DB_LUC_ShadowFight(CHARACTER_LUCS_ShadowFight2_Caster01,"Wave02");
+DB_LUC_ShadowFight(CHARACTER_LUCS_ShadowFight2_Caster02,"Wave02");
+DB_LUC_ShadowFight(CHARACTER_LUCS_ShadowFight2_Caster03,"Wave02");
+DB_LUC_ShadowFight(CHARACTER_LUCS_ShadowFight2_Mage01,"Wave02");
+//END_REGION
+
+//REGION ShadowFight Killcounts
+KillCounter("LUC_KillCount_ShadowFight1",4);
+KillCounterDB(CHARACTER_LUCS_ShadowFight1_Grunt01,"LUC_KillCount_ShadowFight1");
+KillCounterDB(CHARACTER_LUCS_ShadowFight1_Grunt02,"LUC_KillCount_ShadowFight1");
+KillCounterDB(CHARACTER_LUCS_ShadowFight1_Grunt03,"LUC_KillCount_ShadowFight1");
+KillCounterDB(CHARACTER_LUCS_ShadowFight1_Grunt04,"LUC_KillCount_ShadowFight1");
+KillCounter("LUC_KillCount_ShadowFight2",5);
+KillCounterDB(CHARACTER_LUCS_ShadowFight2_Grunt01,"LUC_KillCount_ShadowFight2");
+//KillCounterDB(CHARACTER_LUCS_ShadowFight2_Grunt02,"LUC_KillCount_ShadowFight2");
+KillCounterDB(CHARACTER_LUCS_ShadowFight2_Caster01,"LUC_KillCount_ShadowFight2");
+KillCounterDB(CHARACTER_LUCS_ShadowFight2_Caster02,"LUC_KillCount_ShadowFight2");
+KillCounterDB(CHARACTER_LUCS_ShadowFight2_Caster03,"LUC_KillCount_ShadowFight2");
+KillCounterDB(CHARACTER_LUCS_ShadowFight2_Mage01,"LUC_KillCount_ShadowFight2");
+//END_REGION
+
+//REGION Mushroom Databases
+DB_BlueMushroom(CHARACTER_LUC_BlueMushroom01);
+DB_BlueMushroom(CHARACTER_LUC_BlueMushroom02);
+
+DB_Dialogs(CHARACTER_LUC_BlueMushroom01, "LUC_BlueMushroom");
+DB_Dialogs(CHARACTER_LUC_BlueMushroom02, "LUC_BlueMushroom");
+//END_REGION
+
+PROC_LUC_ShadowBuildupInit();
+PROC_LUC_ShadowFightInit();
+AmbushTrigger(TRIGGER_LUC_WC_AreaSpawnSumonner, ITEM_LUC_WC_Summoner1Invisible2);
+DB_Dialogs(CHARACTER_LUC_WitchCabin_BOMage1, "LUC_WC_ShadowSummoner");
+
+ProcTriggerRegisterForPlayers(TRIGGER_LUC_AreaSpellBarrier);
+
+DB_NoDefaultBehavior(CHARACTER_LUC_WitchCabin_BOMage1);
+DB_IsNotMessingAround(CHARACTER_LUC_BlueMushroom01);
+DB_IsNotMessingAround(CHARACTER_LUC_BlueMushroom01_Minion01);
+DB_IsNotMessingAround(CHARACTER_LUC_BlueMushroom01_Minion02);
+DB_IsNotMessingAround(CHARACTER_LUC_BlueMushroom01_Minion03);
+DB_IsNotMessingAround(CHARACTER_LUC_BlueMushroom01_Minion04);
+DB_IsNotMessingAround(CHARACTER_LUC_BlueMushroom02);
+DB_IsNotMessingAround(CHARACTER_LUC_BlueMushroom02_Minion01);
+DB_IsNotMessingAround(CHARACTER_LUC_BlueMushroom02_Minion02);
+DB_IsNotMessingAround(CHARACTER_LUC_BlueMushroom02_Minion03);
+DB_IsNotMessingAround(CHARACTER_LUC_BlueMushroom02_Minion04);
+
+DB_NoDefaultBehavior(CHARACTER_LUCS_ShadowBuildup_Grunt01);
+DB_NoDefaultBehavior(CHARACTER_LUCS_ShadowBuildup_Grunt02);
+
+DB_LUC_HelperDome(ITEM_LUC_InvisibleForceField1);
+DB_LUC_HelperDome(ITEM_LUC_InvisibleForceField2);
+DB_LUC_HelperDome(ITEM_LUC_InvisibleForceField3);
+DB_LUC_HelperDome(ITEM_LUC_InvisibleForceField4);
+DB_LUC_HelperDome(ITEM_LUC_InvisibleForceField5);
+DB_LUC_HelperDome(ITEM_LUC_InvisibleForceField6);
+DB_LUC_HelperDome(ITEM_LUC_InvisibleForceField7);
+DB_LUC_HelperDome(ITEM_LUC_InvisibleForceField8);
+
+DB_NoInitialTrade(CHARACTER_LUC_BlueMushroom02);
+DB_NoInitialTrade(CHARACTER_LUC_BlueMushroom01);
+
+SneakTriggerSpotter(TRIGGER_LUC_WC_ShadowMeeting, CHARACTER_LUC_WitchCabin_BOMage1);
+
+ItemSetOnstage(ITEM_LUC_MaradinoBarrier,0);
+
+CharacterSetCanFight(CHARACTER_LUC_WitchCabin_BOMage1, 0);
+KBSECTION
+//REGION Player TRIGGER_CYS_Area_CommentBeachFight
+PROC
+ProcOneShotTriggerEntered(_Player, TRIGGER_LUC_ShadowBuildup_T04)
+AND
+CHARACTER_HIB_Icara.Known()
+THEN
+Launch_PlayerComment(_Player, "LUC_EnteredShadowZone");
+
+IF
+GlobalEventSet("LORE_WhiteWitch")
+THEN
+CHARACTER_HIB_Icara.Known();
+
+IF
+TextEventSet("flagIcara")
+THEN
+GlobalSetEvent("LORE_WhiteWitch");
+//END_REGION
+
+//REGION Init - Register triggers
+PROC
+PROC_LUC_ShadowBuildupInit()
+AND
+DB_LUC_ShadowBuildup(_,_Trigger,_,_)					
+THEN
+DB_OneShotPlayerTrigger(_Trigger);
+//END_REGION
+
+//REGION ShadowFight Init - Set Shadows off stage
+PROC
+PROC_LUC_ShadowFightInit()
+AND
+DB_LUC_ShadowFight(_Shadow,_)
+THEN
+CharacterSetOnStage(_Shadow,0);
+//END_REGION
+
+//REGION ShadowBuildup - Player enters Trigger 01 or 02, timer starts
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,(TRIGGER)_Trigger)
+AND
+DB_LUC_ShadowBuildup(_,_Trigger,_,_timer)
+THEN	
+TimerLaunch(_timer,750);
+
+IF
+CharacterAttackedByCharacter(_Shade, _Player)
+AND
+DB_LUC_ShadowBuildup(_Shade,_Trigger,_,_Timer)
+AND
+NOT 	CHARACTER_LUCS_ShadowBuildup_Grunt01.moved()
+THEN
+TimerLaunch(_timer,750);
+TriggerUnregisterForPlayers(TRIGGER_LUC_ShadowBuildup_T01);
+TriggerUnregisterForPlayers(TRIGGER_LUC_ShadowBuildup_T02);
+//END_REGION
+
+//REGION ShadowBuildup - Timer is up, Shadows leave
+IF
+TimerFinished(_timer)
+AND
+DB_LUC_ShadowBuildup(_Shadow,_,_Destination1,_timer)
+THEN
+ProcCharacterMoveToTrigger(_Shadow,_Destination1,1,"LUC_ShadowBuildup_Arrived");
+//END_REGION
+
+//REGION ShadowBuildup - Shadows arrived at Destination 01, TP to Destination 02
+IF
+CharacterEvent(_Shadow, "LUC_ShadowBuildup_Arrived")
+AND
+DB_LUC_ShadowBuildup(_Shadow,_,_,_)
+THEN	
+PROC_ShadowBuildup_Next();	//using a PROC here so it does it to everyone
+
+//END_REGION
+
+//REGION ShadowBuildup - Unregister triggers & prepare Shadows for next step
+PROC
+PROC_ShadowBuildup_Next()
+THEN
+CharacterTeleportToTrigger(CHARACTER_LUCS_ShadowBuildup_Grunt01,TRIGGER_LUC_ShadowBuildup_D03, "");
+CharacterSetOnStage(CHARACTER_LUCS_ShadowBuildup_Grunt02, 0);
+TriggerUnregisterForPlayers(TRIGGER_LUC_ShadowBuildup_T01);
+TriggerUnregisterForPlayers(TRIGGER_LUC_ShadowBuildup_T02);
+DB_OneShotPlayerTrigger(TRIGGER_LUC_ShadowBuildup_T03);
+CHARACTER_LUCS_ShadowBuildup_Grunt01.moved();
+//END_REGION
+
+//REGION ShadowBuildup - Player enters Trigger 03
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,TRIGGER_LUC_ShadowBuildup_T03)
+THEN	
+ProcCharacterMoveToTrigger(CHARACTER_LUCS_ShadowBuildup_Grunt01,TRIGGER_LUC_ShadowBuildup_D06,1,"LUC_ShadowBuildup_FinalDest");	
+
+IF
+CharacterAttackedByCharacter(CHARACTER_LUCS_ShadowBuildup_Grunt01, _Player)
+AND
+CHARACTER_LUCS_ShadowBuildup_Grunt01.moved()
+THEN
+ProcCharacterMoveToTrigger(CHARACTER_LUCS_ShadowBuildup_Grunt01,TRIGGER_LUC_ShadowBuildup_D06,1,"LUC_ShadowBuildup_FinalDest");
+TriggerUnregisterForPlayers(TRIGGER_LUC_ShadowBuildup_T03);
+//END_REGION
+
+//REGION ShadowBuildup - Shadows arrived at final Destination, hide them forever
+IF
+CharacterEvent(CHARACTER_LUCS_ShadowBuildup_Grunt01, "LUC_ShadowBuildup_FinalDest")
+THEN
+CharacterSetOnStage(CHARACTER_LUCS_ShadowBuildup_Grunt01,0);
+
+//END_REGION
+
+//REGION ShadowFight - Spawning 1st wave of Shadows & play flavor texts
+PROC
+ProcCharInTriggerSpotted( _Player, TRIGGER_LUC_WC_ShadowMeeting)
+AND
+NOT CHARACTER_LUC_WitchCabin_BOMage1.didIntro()
+AND
+NOT CHARACTER_LUC_WitchCabin_BOMage1.isNotAtStart()
+THEN
+CHARACTER_LUC_WitchCabin_BOMage1.didIntro();
+ProcDoTwoSpeakerDialog("LUC_WC_ShadowSummoner", CHARACTER_LUC_WitchCabin_BOMage1, _Player);
+
+IF
+DialogEnded("LUC_WC_ShadowSummoner", _)
+AND
+CharacterGetVarInteger(CHARACTER_LUC_WitchCabin_BOMage1, "isHappy", 1)
+THEN
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_LUC_WitchCabin_BOMage1);
+CharacterSetOnStage(CHARACTER_LUC_WitchCabin_BOMage1, 0);
+ProcUnregisterTriggerForPlayer(TRIGGER_LUC_WC_AreaSpawnSumonner);
+NOT DB_OneShotPlayerTrigger(TRIGGER_LUC_WC_AreaSpawnSumonner);
+GlobalSetEvent("LUC_NoBarrierRaised");
+
+IF
+DialogEnded("LUC_WC_ShadowSummoner", _)
+AND
+CharacterGetVarInteger(CHARACTER_LUC_WitchCabin_BOMage1, "isAngry", 1)
+THEN
+CharacterTeleportToTrigger(CHARACTER_LUC_WitchCabin_BOMage1, TRIGGER_LUC_PointWitchCellarOut, "playPuffEffect");
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_LUC_WitchCabin_BOMage1);
+
+PROC
+ProcLaunchAmbush(TRIGGER_LUC_WC_AreaSpawnSumonner, _)
+AND
+NOT CharacterGetVarInteger(CHARACTER_LUC_WitchCabin_BOMage1, "isHappy", 1)
+AND
+NOT DB_Dead(CHARACTER_LUC_WitchCabin_BOMage1)
+THEN
+CharacterSetHasDialog(CHARACTER_LUC_WitchCabin_BOMage1, 0);
+DialogRequestStopForCharacter(CHARACTER_LUC_WitchCabin_BOMage1);
+CharacterTeleportToTrigger(CHARACTER_LUC_WitchCabin_BOMage1, TRIGGER_LUC_WC_SummonerSpawn, "playPuffEffect");
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_LUC_WitchCabin_BOMage1);
+CharacterDisplayText(CHARACTER_LUC_WitchCabin_BOMage1, "LUC_SummonerSpeech1");
+CHARACTER_LUC_WitchCabin_BOMage1.doingWave1();
+CHARACTER_LUC_WitchCabin_BOMage1.isNotAtStart();
+
+IF
+CharacterDisplayTextEnded(CHARACTER_LUC_WitchCabin_BOMage1, "LUC_SummonerSpeech1")
+AND
+NOT DB_OnlyOnce("LUC_SummonerWave1")
+THEN
+DB_OnlyOnce("LUC_SummonerWave1");
+CharacterPlayAnimation(CHARACTER_LUC_WitchCabin_BOMage1, "cast_shout_cast", "Wave01");
+PlayEffectAtCharacter("FX_Skills_WitchCraft_Generic_A_Cast_A", CHARACTER_LUC_WitchCabin_BOMage1);
+CharacterSetEvent(CHARACTER_LUC_WitchCabin_BOMage1,"CMBHC_LUC_ShadowSummoner_Intro_Event");
+
+IF
+CharacterAttackedByCharacter(CHARACTER_LUC_WitchCabin_BOMage1, _)
+AND
+CHARACTER_LUC_WitchCabin_BOMage1.doingWave1()
+AND
+NOT DB_OnlyOnce("LUC_SummonerWave1")
+THEN
+DB_OnlyOnce("LUC_SummonerWave1");
+DialogRequestStopForCharacter(CHARACTER_LUC_WitchCabin_BOMage1);
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_LUC_WitchCabin_BOMage1);
+CharacterTeleportToTrigger(CHARACTER_LUC_WitchCabin_BOMage1, TRIGGER_LUC_WC_SummonerSpawn, "playPuffEffect");
+CharacterLeaveCombat(CHARACTER_LUC_WitchCabin_BOMage1);
+CharacterSetEvent(CHARACTER_LUC_WitchCabin_BOMage1, "Wave01");
+
+IF
+CharacterEvent(CHARACTER_LUC_WitchCabin_BOMage1, "Wave01")
+AND
+DB_LUC_ShadowFight(_Shadow, "Wave01")
+AND
+CharacterGetClosestAlivePlayer(_Shadow,_Player)
+THEN
+CharacterAppear(_Shadow,1);
+CharacterLookAtCharacter(_Shadow,_Player,0);
+
+IF
+CharacterEvent(CHARACTER_LUC_WitchCabin_BOMage1, "Wave01")
+THEN
+NOT CHARACTER_LUC_WitchCabin_BOMage1.doingWave1();
+TimerLaunch("LUC_TextTimer01",2000);
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_LUC_WitchCabin_BOMage1);
+CharacterTeleportToTrigger(CHARACTER_LUC_WitchCabin_BOMage1, TRIGGER_LUC_PointWitchCellarOut, "");
+
+//END_REGION
+
+//REGION ShadowFight - Spawning waves of Shadows
+PROC
+ReactOnKillCounter("LUC_KillCount_ShadowFight1")
+AND
+NOT DB_Dead(CHARACTER_LUC_WitchCabin_BOMage1)
+THEN
+AmbushTrigger(TRIGGER_LUC_WC_ShadowFight_Wave02, ITEM_LUC_WC_Summoner2Invisible);
+
+PROC
+ProcLaunchAmbush(TRIGGER_LUC_WC_ShadowFight_Wave02, _)
+THEN
+CharacterTeleportToTrigger(CHARACTER_LUC_WitchCabin_BOMage1, TRIGGER_LUC_WC_SummonerSpawn_02, "playPuffEffect");
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_LUC_WitchCabin_BOMage1);
+CharacterDisplayText(CHARACTER_LUC_WitchCabin_BOMage1, "LUC_SummonerSpeech2");
+CHARACTER_LUC_WitchCabin_BOMage1.doingWave2();
+
+IF
+CharacterDisplayTextEnded(CHARACTER_LUC_WitchCabin_BOMage1, "LUC_SummonerSpeech2")
+AND
+NOT DB_OnlyOnce("LUC_SummonerWave2")
+THEN
+DB_OnlyOnce("LUC_SummonerWave2");
+CharacterPlayAnimation(CHARACTER_LUC_WitchCabin_BOMage1, "cast_shout_cast", "Wave02");
+PlayEffectAtCharacter("FX_Skills_WitchCraft_Generic_A_Cast_A", CHARACTER_LUC_WitchCabin_BOMage1);
+CharacterSetEvent(CHARACTER_LUC_WitchCabin_BOMage1,"CMBHC_LUC_ShadowSummoner_Intro_Event");
+
+IF
+CharacterAttackedByCharacter(CHARACTER_LUC_WitchCabin_BOMage1, _)
+AND
+CHARACTER_LUC_WitchCabin_BOMage1.doingWave2()
+AND
+NOT DB_OnlyOnce("LUC_SummonerWave2")
+THEN
+DB_OnlyOnce("LUC_SummonerWave2");
+DialogRequestStopForCharacter(CHARACTER_LUC_WitchCabin_BOMage1);
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_LUC_WitchCabin_BOMage1);
+CharacterTeleportToTrigger(CHARACTER_LUC_WitchCabin_BOMage1, TRIGGER_LUC_PointWitchCellarOut, "playPuffEffect");
+CharacterLeaveCombat(CHARACTER_LUC_WitchCabin_BOMage1);
+CharacterSetEvent(CHARACTER_LUC_WitchCabin_BOMage1, "Wave02");
+
+IF
+CharacterAttackedByCharacter(CHARACTER_LUC_WitchCabin_BOMage1, _)
+AND
+CHARACTER_LUC_WitchCabin_BOMage1.doingWave3()
+AND
+NOT DB_OnlyOnce("LUC_SummonerWave3")
+THEN
+DB_OnlyOnce("LUC_SummonerWave3");
+DialogRequestStopForCharacter(CHARACTER_LUC_WitchCabin_BOMage1);
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_LUC_WitchCabin_BOMage1);
+CharacterTeleportToTrigger(CHARACTER_LUC_WitchCabin_BOMage1, TRIGGER_LUC_PointWitchCellarOut, "playPuffEffect");
+CharacterLeaveCombat(CHARACTER_LUC_WitchCabin_BOMage1);
+
+IF
+CharacterEvent(CHARACTER_LUC_WitchCabin_BOMage1, "Wave02")
+AND
+DB_LUC_ShadowFight(_Shadow, "Wave02")
+THEN
+CharacterAppear(_Shadow,1);
+
+IF
+CharacterEvent(CHARACTER_LUC_WitchCabin_BOMage1, "Wave02")
+THEN
+NOT CHARACTER_LUC_WitchCabin_BOMage1.doingWave2();
+TimerLaunch("LUC_TextTimer05",2000);
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_LUC_WitchCabin_BOMage1);
+CharacterTeleportToTrigger(CHARACTER_LUC_WitchCabin_BOMage1, TRIGGER_LUC_PointWitchCellarOut, "");
+
+PROC
+ReactOnKillCounter("LUC_KillCount_ShadowFight2")
+AND
+NOT DB_Dead(CHARACTER_LUC_WitchCabin_BOMage1)
+THEN
+CHARACTER_LUC_WitchCabin_BOMage1.doingWave3();
+CharacterTeleportToTrigger(CHARACTER_LUC_WitchCabin_BOMage1, TRIGGER_LUC_WC_SummonerSpawn_02, "playPuffEffect");
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_LUC_WitchCabin_BOMage1);
+CharacterDisplayText(CHARACTER_LUC_WitchCabin_BOMage1, "LUC_SummonerSpeech4");
+//END_REGION
+
+//REGION ShadowFight - Play flavor texts
+IF
+TimerFinished(_TimerEnded)
+AND
+DB_LUC_ShadowDial(_Shadow,_Text,_TimerEnded,_TimerStarted)
+THEN
+CharacterDisplayText(_Shadow,_Text);
+TimerLaunch(_TimerStarted,900);
+//END_REGION
+
+//REGION ShadowFight - ShadowFight complete: PlayerComments
+IF
+CharacterEnteredCombat(CHARACTER_LUC_WitchCabin_BOMage1, _)
+AND
+NOT DB_GlobalEvent("LUC_FinishedBOMage")
+AND
+CharacterGetVarInteger(CHARACTER_LUC_WitchCabin_BOMage1, "isHappy", 0)
+THEN
+CharacterLeaveCombat(CHARACTER_LUC_WitchCabin_BOMage1);
+
+IF
+CharacterDisplayTextEnded(CHARACTER_LUC_WitchCabin_BOMage1, "LUC_SummonerSpeech4")
+THEN
+TimerLaunch("LUC_WC_CommentShadowFight", 2000);
+NOT CHARACTER_LUC_WitchCabin_BOMage1.doingWave3();
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_LUC_WitchCabin_BOMage1);
+CharacterTeleportToTrigger(CHARACTER_LUC_WitchCabin_BOMage1, TRIGGER_LUC_PointWitchCellarOut, "");
+GlobalSetEvent("LUC_FinishedBOMage");
+CharacterSetCanFight(CHARACTER_LUC_WitchCabin_BOMage1, 1);
+
+
+IF
+TimerFinished("LUC_WC_CommentShadowFight")
+AND
+CharacterGetClosestPlayer(CHARACTER_LUCS_ShadowFight2_Mage01, _Player)
+AND
+CharacterGetDistanceToCharacter(CHARACTER_LUCS_ShadowFight2_Mage01, _Player, _Dist)
+AND
+_Dist < 15
+THEN
+Launch_PlayerComment(_Player, "LUC_ShadowFight_Finished");	
+
+//END_REGION
+
+IF
+CharacterAttackedByCharacter(CHARACTER_LUC_WitchCabin_BOMage1, _Player)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT CHARACTER_LUC_WitchCabin_BOMage1.isNotAtStart()
+AND
+NOT DB_Dead(CHARACTER_LUC_WitchCabin_BOMage1)
+THEN
+DialogRequestStopForCharacter(CHARACTER_LUC_WitchCabin_BOMage1);
+CharacterSetHasDialog(CHARACTER_LUC_WitchCabin_BOMage1, 0);
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_LUC_WitchCabin_BOMage1);
+CharacterTeleportToTrigger(CHARACTER_LUC_WitchCabin_BOMage1, TRIGGER_LUC_PointWitchCellarOut, "playPuffEffect");
+CharacterSetHitpointsPercentage(CHARACTER_LUC_WitchCabin_BOMage1, 100);
+CHARACTER_LUC_WitchCabin_BOMage1.isNotAtStart();
+
+IF
+CharacterEvent(CHARACTER_LUC_WitchCabin_BOMage1, "playPuffEffect")
+THEN
+CharacterLeaveCombat(CHARACTER_LUC_WitchCabin_BOMage1);
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_LUC_WitchCabin_BOMage1);
+
+//REGION Mushrooms
+IF
+CharacterDied(_Mushroom)
+AND
+DB_BlueMushroom(_Mushroom)
+THEN
+NOT DB_BlueMushroom(_Mushroom);
+PROC_LUC_CheckMushroomLeft();
+
+PROC
+PROC_LUC_CheckMushroomLeft()
+AND
+NOT DB_BlueMushroom(_)
+AND
+ItemGetClosestPlayer(ITEM_LUC_WitchDoor, _Player)
+THEN
+ItemSetEvent(ITEM_LUC_WitchCabinForceField, "shutDown");
+PROC_LUC_HideHelperDome();
+GlobalSetEvent("LUC_BarrierGone");
+QuestUpdate("LUC_BlueMushroom", "EndDestroy");
+QuestClose("LUC_BlueMushroom");
+
+IF
+DialogEnded("LUC_BlueMushroom", _ID)
+AND
+DB_DialogPlayers(_ID, _Player, 1)
+AND
+DB_GlobalEvent("LUC_GiveBarrierSpell")
+AND
+NOT DB_OnlyOnce("LUC_GiveBarrierSpell")
+THEN
+DB_OnlyOnce("LUC_GiveBarrierSpell");
+ItemSetOnstage(ITEM_LUC_MaradinoBarrier, 1);
+ItemToCharacter(ITEM_LUC_MaradinoBarrier, _Player);
+//END_REGION
+
+IF
+ItemAddedToCharacter(ITEM_LUC_MaradinoBarrier, _Player)
+AND
+DB_IsPlayer(_Player)
+THEN
+QuestAdd("LUC_BlueMushroom");
+QuestUpdate("LUC_BlueMushroom", "GotSpell");
+
+IF
+GameBookInterfaceClosed(ITEM_LUC_MaradinoBarrier, _Player)
+AND
+DB_InRegion(_Player, TRIGGER_LUC_AreaSpellBarrier)
+THEN
+ItemSetEvent(ITEM_LUC_WitchCabinForceField, "shutDown");
+PROC_LUC_HideHelperDome();
+GlobalSetEvent("LUC_BarrierGone");
+Launch_PlayerComment(_Player, "LUC_WC_BarrierRemoved");
+QuestUpdate("LUC_BlueMushroom", "EndSavedMushroom");
+QuestClose("LUC_BlueMushroom");
+
+IF
+CharacterEnteredTrigger(_Player, TRIGGER_LUC_AreaSpellBarrier)
+THEN
+QuestUpdate("LUC_WhiteWitch","HouseFound");
+
+IF
+Sees(_,CHARACTER_LUC_WitchCabin_BOMage1)
+AND
+NOT DB_Dead(CHARACTER_LUC_WitchCabin_BOMage1)
+AND
+NOT CharacterGetVarInteger(CHARACTER_LUC_WitchCabin_BOMage1, "isHappy", 1)
+AND
+CharacterGetFaction(CHARACTER_LUC_WitchCabin_BOMage1,_Fact)
+AND
+_Fact!="Evil NPC"
+AND
+NOT DB_Combat(CHARACTER_LUC_WitchCabin_BOMage1,_)
+AND
+CharacterGetPosition(CHARACTER_LUC_WitchCabin_BOMage1,_x,_y,_z)
+AND
+TriggerGetPosition(TRIGGER_LUC_PointWitchCellarOut,_xt,_yt,_zt)
+AND
+RealSubtract(_x,_xt,_dx)
+AND
+RealSubtract(_y,_yt,_dy)
+AND
+RealSubtract(_z,_zt,_dz)
+AND
+RealProduct(_dx,_dx,_sqrDx)
+AND
+RealProduct(_dy,_dy,_sqrDy)
+AND
+RealProduct(_dz,_dz,_sqrDz)
+AND
+RealSum(_sqrDx,_sqrDy,_sqrDxy)
+AND
+RealSum(_sqrDxy,_sqrDz,_sqrDist)
+AND
+_sqrDist<=1.0
+THEN
+CharacterTeleportToTrigger(CHARACTER_LUC_WitchCabin_BOMage1, TRIGGER_LUC_WC_ImmaculateDoor, "playPuffEffect");
+CharacterDisplayText(CHARACTER_LUC_WitchCabin_BOMage1, "LUC_WitchImmaculateAngry");
+CharacterSetFaction(CHARACTER_LUC_WitchCabin_BOMage1,"Evil NPC");
+
+PROC
+PROC_LUC_HideHelperDome()
+AND
+DB_LUC_HelperDome(_Wall)
+THEN
+ItemSetOnstage(_Wall, 0);
+
+IF
+DialogEnded("LUC_BlueMushroom", _)
+AND
+DB_GlobalEvent("LUC_ShroomFight")
+THEN
+CharacterSetFaction(CHARACTER_LUC_BlueMushroom01, "Evil NPC");
+CharacterSetFaction(CHARACTER_LUC_BlueMushroom02, "Evil NPC");
+CharacterSetFaction(CHARACTER_LUC_BlueMushroom01_Minion01, "Evil NPC");
+CharacterSetFaction(CHARACTER_LUC_BlueMushroom01_Minion02, "Evil NPC");
+CharacterSetFaction(CHARACTER_LUC_BlueMushroom01_Minion03, "Evil NPC");
+CharacterSetFaction(CHARACTER_LUC_BlueMushroom01_Minion04, "Evil NPC");
+CharacterSetFaction(CHARACTER_LUC_BlueMushroom01_Minion05, "Evil NPC");
+CharacterSetFaction(CHARACTER_LUC_BlueMushroom02_Minion01, "Evil NPC");
+CharacterSetFaction(CHARACTER_LUC_BlueMushroom02_Minion02, "Evil NPC");
+CharacterSetFaction(CHARACTER_LUC_BlueMushroom02_Minion03, "Evil NPC");
+CharacterSetFaction(CHARACTER_LUC_BlueMushroom02_Minion04, "Evil NPC");
+CharacterSetFaction(CHARACTER_LUC_BlueMushroom02_Minion05, "Evil NPC");
+
+IF
+DialogStartRequested(_Mushroom,_Player)
+AND
+DB_BlueMushroom(_Mushroom)
+AND
+DB_BlueMushroom(_OtherMushroom)
+AND
+_Mushroom!=_OtherMushroom
+AND
+_OtherMushroom.DB_IsInDialog()
+THEN
+GlobalSetEvent("LUC_MushroomsBusy");
+
+IF
+DialogEnded("LUC_BlueMushroom",_Inst)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+AND
+DB_BlueMushroom(_Mushroom)
+AND
+_Mushroom!=_Npc
+AND
+NOT _Mushroom.DB_IsInDialog()
+THEN
+GlobalClearEvent("LUC_MushroomsBusy");
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

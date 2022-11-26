@@ -1,0 +1,126 @@
+INIT
+
+CHARACTER:__Me
+
+	CHARACTER:%Esmeralda = END_NegaEsmeralda_37a37a87-0f61-41af-a198-a96ccb95c74e
+	TRIGGER:%Look = END_Point_Behavior_NegaDukeOfFerol_6f3fb4e7-f717-4432-b384-75e17fe741ca
+	FIXEDSTRING:%Animation
+	FIXEDSTRING:%PrevAnimation
+
+BEHAVIOUR
+
+REACTION Flirt, 1000 
+USAGE PEACE
+VARS
+	FLOAT:_Sleep
+	FIXEDSTRING:_Animation
+	INT:_Loop
+ACTIONS
+	CharacterMoveTo(%Look)
+	CharacterLookFrom(%Look)
+	CharacterLookAt(%Esmeralda)
+	
+	GetRandomBetween(_Loop, 1, 3)
+	Label("Label_Loop1")
+	IF "c1"
+		IsGreaterThen(_Loop, 0)
+	THEN
+		Subtract(_Loop, 1)
+		CallFunction("FuncSetIdleAnim")
+		CharacterPlayAnimation(%Animation)
+		Goto("Label_Loop1")
+	ENDIF
+	
+	IF "c1"
+		CharacterCanSee(__Me, %Esmeralda, 1)
+	THEN
+		SetVar(%Esmeralda, "DialogLookAtChar", __Me)
+		CharacterLookAt(%Esmeralda)
+	ELSE
+		CharacterLookFrom(%Look)
+	ENDIF
+	CharacterPlayAnimation("Kneel_02", "Victory_01", "Flex_01")
+	
+	GetRandomBetween(_Loop, 3, 5)
+	Label("Label_Loop2")
+	IF "c1"
+		IsGreaterThen(_Loop, 0)
+	THEN
+		Subtract(_Loop, 1)
+		CallFunction("FuncSetIdleAnim")
+		CharacterPlayAnimation(%Animation)
+		Goto("Label_Loop2")
+	ENDIF
+	
+	IF "c1"
+		CharacterCanSee(__Me, %Esmeralda, 1)
+	THEN
+		CharacterLookAt(%Esmeralda)
+		SetVar(%Esmeralda, "DialogLookAtChar", __Me)
+		IF "c1"
+			IsRandom(.6)
+		THEN
+			DialogStart("END_AD_NegaKingsCrab_DukeEsmeralda_Flirt", __Me, %Esmeralda )
+		ENDIF
+	ELSE
+		CharacterLookFrom(%Look)
+		CharacterPlayAnimation("Look_Left_Short_01")
+		CharacterPlayAnimation("Look_Right_Short_01")
+		DialogStart("END_AD_NegaKingsCrab_DukeOfFerol_MissedEsmeralda", __Me)	
+	ENDIF
+
+	GetRandomBetween(_Loop, 3, 6)
+	Label("Label_Loop3")
+	IF "c1"
+		IsGreaterThen(_Loop, 0)
+	THEN
+		Subtract(_Loop, 1)
+		CallFunction("FuncSetIdleAnim")
+		CharacterPlayAnimation(%Animation)
+		Goto("Label_Loop3")
+	ENDIF
+
+	IF "c1&c2"
+		CharacterCanSee(__Me, %Esmeralda, 1)
+		IsRandom(.3)
+	THEN
+		SetVar(%Esmeralda, "DialogLookAtChar", __Me)
+		CharacterLookAt(%Esmeralda)
+		DialogStart("END_AD_NegaKingsCrab_DukeOfFerol_Esmeralda", __Me)
+		GetRandom(_Animation, "Worship_01", "emotion_thankful", "emotion_flirt")
+	ELSE
+		CallFunction("FuncSetIdleAnim")
+		CharacterPlayAnimation(%Animation)
+	ENDIF
+	CharacterPlayAnimation(_Animation)	
+	GetRandomBetween(_Loop, 3, 7)
+	Label("Label_Loop4")
+	IF "c1"
+		IsGreaterThen(_Loop, 0)
+	THEN
+		Subtract(_Loop, 1)
+		CallFunction("FuncSetIdleAnim")
+		CharacterPlayAnimation(%Animation)
+		Goto("Label_Loop4")
+	ENDIF
+
+	Reset()
+
+EVENTS
+
+EVENT FuncIdle
+ON
+	OnFunction("FuncSetIdleAnim")
+VARS
+	FIXEDSTRING:_Anim
+ACTIONS
+	GetRandom(_Anim, "still", "Yes_02" ,"idle3", "Victory_01", "Flex_01", "Point_01", "Clap_01", "Bow_01")
+	IF "!c1"
+		IsEqual(_Anim, %PrevAnimation)
+	THEN
+		Set(%Animation, _Anim)
+		Set(%PrevAnimation, %Animation)
+	ELSE
+		CallFunction("FuncSetIdleAnim")
+	ENDIF
+	

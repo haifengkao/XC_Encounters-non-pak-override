@@ -1,0 +1,179 @@
+INIT
+
+CHARACTER:__Me
+EXTERN INT:%Rotating = 0
+EXTERN INT:%Active = 1
+EXTERN FLOAT:%RotationSleep = 8
+EXTERN TRIGGER:%Point1 = null
+EXTERN TRIGGER:%Point2 = null
+INT:%EffectHandle = 0
+EXTERN STRING:%Event = "HIB_SentinelSpotted"
+
+BEHAVIOUR
+
+REACTION Watching, 0
+USAGE ALL
+CHECK "c1"
+	IsEqual(%Active,1)
+VARS
+	CHARACTER:_Player
+ACTIONS
+	IF "c1"
+        IsEqual(%EffectHandle, 0)
+    THEN
+	    CharacterPlayLoopEffect(%EffectHandle,__Me,"FX_GP_Light_Green_A","Dummy_CastFX")
+	ENDIF
+	IF "c1"
+		IsEqual(%Rotating,1)
+	THEN
+		CharacterLookAt(%Point1)
+		Sleep(%RotationSleep)
+		CharacterLookAt(%Point2)
+		Sleep(%RotationSleep)
+	ENDIF
+INTERRUPT
+	StopLoopEffect(%EffectHandle)
+	Set(%EffectHandle, 0)
+	Reset()
+
+REACTION Alarmed, 0
+USAGE ALL
+CHECK "c1"
+	IsEqual(%Active,2)
+ACTIONS    
+	IF "c1"
+        IsEqual(%EffectHandle, 0)
+    THEN
+	    CharacterPlayLoopEffect(%EffectHandle,__Me,"FX_GP_Light_Red_A","Dummy_CastFX")
+	ENDIF
+	Sleep(10)
+INTERRUPT
+	StopLoopEffect(%EffectHandle)
+	Set(%EffectHandle, 0)
+	Reset()
+
+REACTION Inactive, 0
+USAGE ALL
+CHECK "c1"
+	IsEqual(%Active,0)
+ACTIONS
+	Sleep(10)
+
+EVENTS
+
+EVENT Init
+ON
+	OnInit()
+ACTIONS
+	Set(%EffectHandle, 0)
+	CharacterApplyStatus(__Me,GALVANISED,-1)
+	StartTimer("spotsneaker", 0.1, -1)
+	IF "c1"
+		IsEqual(%Active,0)
+	THEN
+		SetPriority("Inactive",1000)
+		CharacterSetCanSpotSneakers(__Me,0)
+	ELIF "c1"
+		IsEqual(%Active,1)
+	THEN
+		SetPriority("Watching",1000)
+		CharacterSetCanSpotSneakers(__Me,1)
+	ELSE
+		SetPriority("Alarmed",1000)
+		CharacterSetCanSpotSneakers(__Me,0)
+	ENDIF
+
+EVENT Shutdown
+ON
+	OnShutdown()
+ACTIONS
+	StopLoopEffect(%EffectHandle)
+	StopTimer("spotsneaker")
+	
+EVENT OnSpotting
+VARS
+	CHARACTER:_Player
+ON
+	OnSight(_Player)
+ACTIONS
+	IF "c1&c2"
+		CharacterIsPlayer(_Player)
+		IsEqual(%Active,1)
+	THEN
+		Set(%Active,2)
+		SetPriority("Watching",0)
+		SetPriority("Alarmed",1000)
+		DisplayText(__Me,"HIB_SentinelSpotted",5.0)
+		CharacterItemEvent(__Me,null,%Event)
+	ENDIF
+
+EVENT OnDamage
+ON
+	OnDamage(_,_,_,_)
+ACTIONS
+	IF "c1"
+		IsEqual(%Active,1)
+	THEN
+		Set(%Active,2)
+		SetPriority("Watching",0)
+		SetPriority("Alarmed",1000)
+		DisplayText(__Me,"HIB_SentinelSpotted",5.0)
+		CharacterItemEvent(__Me,null,%Event)
+	ENDIF
+
+EVENT TurnOff
+ON
+	OnCharacterItemEvent(__Me,_,"HIB_SentinelInactive")
+ACTIONS
+	CharacterSetCanSpotSneakers(__Me,0)
+	Set(%Active,0)
+	SetPriority("Watching",0)
+	SetPriority("Alarmed",0)
+	SetPriority("Inactive",1000)
+	StopLoopEffect(%EffectHandle)
+	Set(%EffectHandle, 0)
+
+EVENT TurnOn
+ON
+	OnCharacterItemEvent(__Me,_,"HIB_SentinelActive")
+ACTIONS
+	CharacterSetCanSpotSneakers(__Me,1)
+	Set(%Active,1)
+	SetPriority("Inactive",0)
+	SetPriority("Alarmed",0)
+	SetPriority("Watching",1000)
+
+EVENT Alarm
+ON
+	OnCharacterItemEvent(__Me,_,"HIB_SentinelAlarm")
+ACTIONS
+	CharacterSetCanSpotSneakers(__Me,0)
+	Set(%Active,2)
+	SetPriority("Inactive",0)
+	SetPriority("Watching",0)
+	SetPriority("Alarmed",1000)
+	
+EVENT PartyMemberIterator
+VARS 
+	CHARACTER:_Player
+ON
+	OnIterateCharacter(_Player,"CheckForPartyMember")
+ACTIONS
+	IF "c1&c2&c3&!c4"
+		CharacterIsPlayer(_Player)
+		IsEqual(%Active,1)
+		CharacterCanSee(__Me,_Player,1)
+		CharacterIsDead(_Player)
+	THEN
+		Set(%Active,2)
+		SetPriority("Watching",0)
+		SetPriority("Alarmed",1000)
+		DisplayText(__Me,"HIB_SentinelSpotted",5.0)
+		CharacterItemEvent(__Me,null,%Event)
+	ENDIF
+
+EVENT LaunchIterator
+ON 
+	OnTimer("spotsneaker")
+ACTIONS
+	IterateCharactersNear(__Me,15.0,"CheckForPartyMember")

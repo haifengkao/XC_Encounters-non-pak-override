@@ -1,0 +1,187 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+ProcTriggerRegisterForPlayers(TRIGGER_LUC_Poly_Arhu_Entrance);
+ProcTriggerRegisterForPlayers(TRIGGER_LUC_Arhu_Mines);
+ProcTriggerRegisterForPlayers(TRIGGER_LUC_Arhu_EndMines);
+KBSECTION
+//REGION Pipeline
+PROC
+Proc_ArhuExMachina((CHARACTER)_Player,(STRING)_Dialog,(INTEGER)_Angle)
+AND
+NOT DB_Combat(_Player,_)
+AND
+NOT DB_IsInDialog(_Player)
+AND
+NOT DB_ArhuExMachinaDialogDone(_Dialog)
+AND
+NOT DB_GlobalEvent("GLO_ArhuKilled")
+AND
+NOT DB_GlobalEvent("ArhuInDAFCage")
+THEN
+CharacterSetVarItem(CHARACTER_CYS_Arhu,"Seat",ITEM_NULL);
+CharacterSetVarFixedString(CHARACTER_CYS_Arhu,"currentState","");
+DB_ArhuExMachinaDialogDone(_Dialog);
+DialogRequestStopForCharacter(CHARACTER_CYS_Arhu);
+CharacterSetHasDialog(CHARACTER_CYS_Arhu,0);
+Proc_RunUpAndChat(CHARACTER_CYS_Arhu,_Player,_Dialog,_Angle,"AEM_Fail","AEM_Done");
+DB_ArhuExMachina_Busy(1);
+
+IF
+CharacterEvent(_Arhu,"AEM_Fail")
+AND
+NOT DB_ArhuExMachinaDialogDone("CYS_Arhu_AfterHomestead")
+THEN
+CharacterSetEvent(_Arhu, "AEM_Done");
+
+IF
+CharacterEvent(_Arhu,"AEM_Fail")
+AND
+DB_ArhuExMachinaDialogDone("CYS_Arhu_AfterHomestead")
+THEN
+NOT DB_ArhuExMachinaDialogDone("CYS_Arhu_AfterHomestead");
+
+//Teleport to homestead if unlocked
+IF
+CharacterEvent(_Arhu,"AEM_Done")
+AND
+DB_ArhuExMachinaDialogDone("LUC_Arhu_StartLuculla")
+THEN
+CharacterSetHasDialog(_Arhu,1);
+CharacterTeleportToTrigger(CHARACTER_CYS_Arhu,TRIGGER_HOM_Arhu,"");
+CharacterSetOnStage(CHARACTER_CYS_Arhu,1);
+CharacterLookAtCharacter(CHARACTER_CYS_Arhu,CHARACTER_HOM_Weaver,1);
+GlobalSetEvent("HOM_ArhuInHomestead");
+CharacterSetVarFixedString(CHARACTER_CYS_Arhu,"currentState","");
+CharacterSetVarItem(CHARACTER_CYS_Arhu,"Seat",ITEM_Hom_Chair_Arhu);
+NOT DB_ArhuExMachina_Busy(1);
+
+//Teleport back to cyseal if homestead not yet unlocked
+IF
+CharacterEvent(_Arhu,"AEM_Done")
+AND
+NOT DB_ArhuExMachinaDialogDone("LUC_Arhu_StartLuculla")
+THEN
+CharacterSetHasDialog(CHARACTER_CYS_Arhu,1);
+CharacterSetOnStage(CHARACTER_CYS_Arhu,1);
+CharacterTeleportToTrigger(CHARACTER_CYS_Arhu,TRIGGER_CYS_PointArhu,"");
+CharacterSetVarFixedString(CHARACTER_CYS_Arhu,"currentState","State_UpStairs");
+NOT DB_ArhuExMachina_Busy(1);
+//END_REGION
+
+//REGION Queuing Arhu events until subregion left
+PROC
+PROC_Delayed_ArhuExMachina((CHARACTER)_Player,(STRING)_Dialog)
+AND
+DB_QueuedAEM(_OldPlayer,_OldDiag)
+THEN
+NOT DB_QueuedAEM(_OldPlayer,_OldDiag);
+
+PROC
+PROC_Delayed_ArhuExMachina((CHARACTER)_Player,(STRING)_Dialog)
+THEN
+DB_QueuedAEM(_Player,_Dialog);
+
+IF 
+CharacterEnteredRegion(_Player,_Region)
+AND
+DB_QueuedAEM(_Player,_Dialog)
+THEN
+TimerCancel("AEM_Try");
+TimerLaunch("AEM_Try",1000);
+
+IF
+CharacterLeftTrigger(_Player,_Trigger)
+AND
+DB_Subregion(_Trigger,_,_)
+AND
+DB_QueuedAEM(_Player,_Dialog)
+THEN
+TimerCancel("AEM_Try");
+TimerLaunch("AEM_Try",1000);
+
+//Exception: Don't play an AEM in the homestead until Arhu has moved there.
+IF
+TimerFinished("AEM_Try")
+AND
+DB_CurrentLevel(_Region)
+AND
+_Region != "Homestead"
+AND
+NOT DB_ArhuExMachinaDialogDone("CYS_Arhu_AfterHomestead")
+AND
+DB_QueuedAEM(_Player,_Dialog)
+AND
+NOT DB_Combat(_Player,_)
+AND
+NOT DB_IsInDialog(_Player)
+AND
+NOT DB_ArhuExMachina_Busy(1)
+THEN
+NOT DB_QueuedAEM(_Player,_Dialog);
+Proc_ArhuExMachina(_Player,_Dialog,0);
+
+IF
+TimerFinished("AEM_Try")
+AND
+DB_ArhuExMachinaDialogDone("CYS_Arhu_AfterHomestead")
+AND
+DB_QueuedAEM(_Player,_Dialog)
+AND
+NOT DB_Combat(_Player,_)
+AND
+NOT DB_IsInDialog(_Player)
+AND
+NOT DB_ArhuExMachina_Busy(1)
+THEN
+NOT DB_QueuedAEM(_Player,_Dialog);
+Proc_ArhuExMachina(_Player,_Dialog,0);
+
+IF
+TimerFinished("AEM_Try")
+AND
+DB_QueuedAEM(_Player,_Dialog)
+THEN
+TimerCancel("AEM_Try");
+TimerLaunch("AEM_Try",1000);
+//END_REGION
+
+//REGION Arhu Encounters
+IF
+CharacterLeftRegion(_Character,"Homestead")
+AND
+_Character.DB_IsPlayer()
+THEN
+DB_Singleton("IsArhuCat",0);
+Proc_ArhuExMachina(_Character,"CYS_Arhu_AfterHomestead",0);
+
+IF
+DialogEnded("CYS_Arhu_AfterHomestead",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+THEN
+ItemToCharacter(ITEM_TeleportPyramidA,_Player);
+QuestAdd("CYS_Pyramids");
+QuestUpdate("CYS_Pyramids","Update1");
+DB_TeleporterPyramidUnlocked(ITEM_TeleportPyramidA);
+ProcGivePyramidManuals();
+QuestUpdate("HOM_Starstones","ArhuAfterHOM");
+
+
+IF
+DialogEnded("CYS_Arhu_AfterJake",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+THEN
+Launch_PlayerComment(_Player,"CYS_CommentArhuScared");
+
+IF
+CharacterEnteredTrigger(_Character,TRIGGER_LUC_Poly_Arhu_Entrance)
+THEN
+Proc_ArhuExMachina(_Character,"LUC_Arhu_StartLuculla",0);
+GlobalSetEvent("LUC_AEM_Start");
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

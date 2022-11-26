@@ -1,0 +1,55 @@
+INIT
+
+CHARACTER:__Me
+
+	ITEM:%Bench = END_Behavior_NegaKingsCrab_JakeBench_dbf810aa-e7e6-40e6-a2a8-07c54b03981f
+	INT:%Sit = 0
+	TRIGGER:%Stand = END_Point_Behavior_NegaJake_83462b09-ee5f-4990-a23a-164d42fed31d
+	
+BEHAVIOUR
+
+REACTION Mutter, 1000
+USAGE PEACE
+VARS
+	FLOAT:_Distance
+	FIXEDSTRING:_Animation
+	FLOAT:_Sleep
+ACTIONS
+	IF "!c1&c2&c3"
+		ItemIsDestroyed(%Bench)
+		GetDistance(_Distance, TRIGGER:END_Point_Behavior_NegaJake_83462b09-ee5f-4990-a23a-164d42fed31d, %Bench)
+		IsLessThen(_Distance, 2.0)
+	THEN
+		IF "!c1"
+			CharacterHasStatus(__Me, SITTING)
+		THEN
+			CharacterUseItem(%Bench)
+			Set(%Sit, 1)
+		ENDIF
+	ELSE
+		Set(%Sit, 0)
+		CharacterMoveTo(%Stand)
+		CharacterLookFrom(%Stand)
+	ENDIF
+	
+	GetRandom(_Sleep, 20.0, 30.0)
+	Sleep(_Sleep)
+	
+	IF "c1"
+		IsRandom(0.3)
+	THEN
+		DialogStart("END_AD_NegaJake_Mutters", __Me)
+	ENDIF
+	IF "c1"
+		IsEqual(%Sit, 1)
+	THEN
+		GetRandom(_Animation, "Sit_No_01", "Sit_Annoyed_01", "Sit_Angry_01", "Sit_Reject_01", "Sit_Sigh_01")
+	ELSE	
+		GetRandom(_Animation, "Think_02", "Think_01", "Annoyed_01", "Depressed_01")	
+	ENDIF
+	CharacterPlayAnimation(_Animation)
+	GetRandom(_Sleep, 20.0, 30.0)
+	Sleep(_Sleep)
+	Reset()
+INTERRUPT
+	Reset()

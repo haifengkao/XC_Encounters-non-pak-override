@@ -1,0 +1,160 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+//REGION Phantom Forest Ghost Killcount
+KillCounter("DAF_PhantomForest_Ghosts_Killcount",9);
+KillCounterDB(CHARACTER_DAF_PhantomForest_Ghost_Deer_01,"DAF_PhantomForest_Ghosts_Killcount");
+KillCounterDB(CHARACTER_DAF_PhantomForest_Ghost_Boar_01,"DAF_PhantomForest_Ghosts_Killcount");
+KillCounterDB(CHARACTER_DAF_PhantomForest_Ghost_Wolf_01,"DAF_PhantomForest_Ghosts_Killcount");
+KillCounterDB(CHARACTER_DAF_PhantomForest_Ghost_Poacher_01,"DAF_PhantomForest_Ghosts_Killcount");
+KillCounterDB(CHARACTER_DAF_PhantomForest_Ghost_Poacher_02,"DAF_PhantomForest_Ghosts_Killcount");
+KillCounterDB(CHARACTER_DAF_PhantomForest_Ghost_Poacher_03,"DAF_PhantomForest_Ghosts_Killcount");
+KillCounterDB(CHARACTER_DAF_PhantomForest_Ghost_Poacher_04,"DAF_PhantomForest_Ghosts_Killcount");
+KillCounterDB(CHARACTER_DAF_PhantomForest_Ghost_Poacher_05,"DAF_PhantomForest_Ghosts_Killcount");
+KillCounterDB(CHARACTER_DAF_PhantomForest_Ghost_Poacher_06,"DAF_PhantomForest_Ghosts_Killcount");
+//END_REGION
+
+//REGION Spider Ambush Chars
+DB_DAF_ChestAmbush(CHARACTER_DAF_ChestAmbush_ForestSpider_01);
+DB_DAF_ChestAmbush(CHARACTER_DAF_ChestAmbush_ForestSpider_02);
+DB_DAF_ChestAmbush(CHARACTER_DAF_ChestAmbush_ForestSpider_03);
+DB_DAF_ChestAmbush(CHARACTER_DAF_ChestAmbush_ForestSpider_04);
+//END_REGION
+
+//REGION Cyclops Database
+DB_DAF_DarkMarsh_Cyclops("Cyclops_BoneFighter_A_Strong_96adbc95-7fb6-48ae-97a3-88a63dc80f5f",TRIGGER_DAF_DarkMarsh_CyclopsSpawn_Fighter,5);
+DB_DAF_DarkMarsh_Cyclops("Cyclops_Wizard_A_Strong_62ce589b-3e57-420c-bf3e-0e31e9f8da93",TRIGGER_DAF_DarkMarsh_CyclopsSpawn_Mage,10);
+DB_DAF_DarkMarsh_Cyclops("Cyclops_Warrior_A_Strong_dd9d4bbd-d6c1-447b-b61a-35c0d3a024a4",TRIGGER_DAF_DarkMarsh_CyclopsSpawn_Warrior,15);
+DB_DAF_DarkMarsh_Cyclops("Cyclops_BoneCaster_Fem_A_Strong_90487563-4719-4a86-ae23-590dd1e4fecf",TRIGGER_DAF_DarkMarsh_CyclopsSpawn_Witch,20);
+DB_DAF_DarkMarsh_Cyclops("Cyclops_BoneCasterSkeleton_A_Strong_2c146695-4bff-40b8-a3ec-ce4799187850",TRIGGER_DAF_DarkMarsh_CyclopsSpawn_Ghoul,25);
+//END_REGION 
+
+//REGION Corrupted Plants Database
+/*DB_DAF_PhantomForest_CorruptedPlants(CHARACTER_DAF_PhantomForest_Flower01);
+DB_DAF_PhantomForest_CorruptedPlants(CHARACTER_DAF_PhantomForest_Flower02);
+DB_DAF_PhantomForest_CorruptedPlants(CHARACTER_DAF_PhantomForest_Flower03);
+DB_DAF_PhantomForest_CorruptedPlants(CHARACTER_DAF_PhantomForest_Flower04);*/
+//END_REGION
+ItemSetOnstage(ITEM_DAF_PhantomForest_Ghost_Chest, 0);
+//REGION Spore Databases
+DB_DAF_PhantomForest_SporeGuys(CHARACTER_DAF_PhantomForest_SporeZombie_N_Add_01,"DAF_SporeZombieAmbush_Spawn_N_Characters");
+DB_DAF_PhantomForest_SporeGuys(CHARACTER_DAF_PhantomForest_SporeZombie_N_Add_02,"DAF_SporeZombieAmbush_Spawn_N_Characters");
+DB_DAF_PhantomForest_SporeGuys(CHARACTER_DAF_PhantomForest_SporeZombie_E_Add_01,"DAF_SporeZombieAmbush_Spawn_E_Characters");
+DB_DAF_PhantomForest_SporeGuys(CHARACTER_DAF_PhantomForest_SporeZombie_E_Add_02,"DAF_SporeZombieAmbush_Spawn_E_Characters");
+DB_DAF_PhantomForest_SporeGuys(CHARACTER_DAF_PhantomForest_SporeZombie_S_Add_01,"DAF_SporeZombieAmbush_Spawn_S_Characters");
+DB_DAF_PhantomForest_SporeGuys(CHARACTER_DAF_PhantomForest_SporeZombie_S_Add_02,"DAF_SporeZombieAmbush_Spawn_S_Characters");
+DB_DAF_PhantomForest_SporeTriggers(TRIGGER_DAF_PhantomForest_SporeAmbush_Box_North,"DAF_SporeZombieAmbush_Trigger_Entered_North");
+DB_DAF_PhantomForest_SporeTriggers(TRIGGER_DAF_PhantomForest_SporeAmbush_Box_East,"DAF_SporeZombieAmbush_Trigger_Entered_East");
+DB_DAF_PhantomForest_SporeTriggers(TRIGGER_DAF_PhantomForest_SporeAmbush_Box_South,"DAF_SporeZombieAmbush_Trigger_Entered_South");
+//END_REGION 
+
+DB_DAF_DarkMarsh_Arithmetics(0);
+PROC_DAF_ChestAmbushInit();
+PROC_DAF_SporeAmbushInit();
+PROC_DAF_CorruptedPlantsAmbushInit();
+AmbushTrigger(TRIGGER_DAF_DarkMarsh_ChestAmbush_T01, ITEM_DAF_DarkMarsh_ChestAmbush_AmbushInvisHelper);
+KBSECTION
+PROC
+ReactOnKillCounter("DAF_PhantomForest_Ghosts_Killcount")
+THEN
+GlobalSetEvent("DAF_DarkMarsh_Ghosts_EndingEvent");
+ItemSetOnstage(ITEM_DAF_PhantomForest_Ghost_Chest, 1);
+CharacterSetOnStage(CHARACTER_DAF_PhantomForest_Ghost_Poacher_01,0);
+PlayEffectAtItem("FX_GP_TeleportSmoke_A", ITEM_DAF_PhantomForest_Ghost_Chest);
+TriggerSetAtmosphere("8c302489-10cc-4a70-8413-6126cf8485eb","ForestDark");
+
+//REGION INIT - SporeAmbushInit - Set Spore Zombies off stage + register players (these are not ambush triggers)
+PROC
+PROC_DAF_SporeAmbushInit()
+AND
+DB_DAF_PhantomForest_SporeGuys(_Zombie,_)		
+AND
+DB_DAF_PhantomForest_SporeTriggers(_Trigger,_)
+THEN
+CharacterSetOnStage(_Zombie,0);
+ProcTriggerRegisterForPlayers(_Trigger);
+//END_REGION
+
+//REGION INIT - CorruptedPlantsAmbushInit - Set plants off stage / make them appear
+/*PROC
+PROC_DAF_CorruptedPlantsAmbushInit()
+AND
+DB_DAF_PhantomForest_CorruptedPlants(_Plant)					
+THEN
+CharacterSetOnStage(_Plant,0);
+ProcTriggerRegisterForPlayers(TRIGGER_DAF_PhantomForest_CorruptedPlants_Trigger);
+
+IF
+CharacterEnteredTrigger(_Player,TRIGGER_DAF_PhantomForest_CorruptedPlants_Trigger)
+AND
+DB_DAF_PhantomForest_CorruptedPlants(_Plant)
+THEN
+//CharacterSetOnStage(_Plant,1);
+CharacterAppear(_Plant,1);
+ProcTriggerUnregisterForPlayers(TRIGGER_DAF_PhantomForest_CorruptedPlants_Trigger);
+NOT DB_DAF_PhantomForest_CorruptedPlants(_Plant);*/
+//END_REGION
+
+//REGION INIT - ChestAmbushInit - Set spiders off stage
+PROC
+PROC_DAF_ChestAmbushInit()
+AND
+DB_DAF_ChestAmbush(_Spider)					
+THEN
+CharacterSetOnStage(_Spider,0);
+//END_REGION
+
+//REGION Spore Ambush
+IF
+CharacterEnteredTrigger(_Player,_Trigger)
+AND
+DB_DAF_PhantomForest_SporeTriggers(_Trigger,_Event)
+THEN
+GlobalSetEvent(_Event);
+ProcTriggerUnregisterForPlayers(_Trigger);
+NOT DB_DAF_PhantomForest_SporeTriggers(_Trigger,_Event);
+
+IF 
+GlobalEventSet(_Event)
+AND
+DB_DAF_PhantomForest_SporeGuys(_Zombie,_Event)
+THEN
+CharacterSetOnStage(_Zombie,1);
+CharacterPlayEffect(_Zombie,"FX_Creatures_Animals_Zombie_Spawn_A");
+//END_REGION
+
+//REGION Dark Marsh
+IF
+CharacterEvent(_,"DAF_DarkMarsh_CyclopsDied_Event")
+AND
+DB_DAF_DarkMarsh_Arithmetics(_Counter)
+AND
+IntegerSum(_Counter,1,_UpdatedCounter)	//taking _Counter, add 1, replace _Counter with _UpdatedCounter
+THEN
+NOT DB_DAF_DarkMarsh_Arithmetics(_Counter);
+DB_DAF_DarkMarsh_Arithmetics(_UpdatedCounter);
+
+IF
+DB_DAF_DarkMarsh_Arithmetics(_Counter)
+AND
+DB_DAF_DarkMarsh_Cyclops(_NewCyclopsRT,_Trigger,_Counter)
+AND
+CharacterIsDead(CHARACTER_DAF_DarkMarsh_Cyclops_Boss,0)
+THEN
+CharacterCreateAtTrigger(_Trigger,_NewCyclopsRT,1);
+//CharacterDebugText(CHARACTER_Player1,"Event received!");
+//END_REGION
+
+//REGION Chest Ambush (North of Dark Marsh)
+PROC
+ProcLaunchAmbush(TRIGGER_DAF_DarkMarsh_ChestAmbush_T01, _Player)
+AND
+DB_DAF_ChestAmbush(_Spider)
+THEN
+CharacterAppear(_Spider,1);
+	NOT DB_DAF_ChestAmbush(_Spider);
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

@@ -1,0 +1,116 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_CustomForbiddenDoorDialog(CHARACTER_CYS_WarehouseSergeant,"CYS_Warehouse_SergeantCurtius");
+DB_Dialogs(CHARACTER_CYS_WarehouseSergeant,"CYS_Warehouse_SergeantCurtius");
+DB_Dialogs(CHARACTER_CYS_WarehouseGuard1,"CYS_Warehouse_Florius");
+DB_Dialogs(CHARACTER_CYS_WarehouseGuard2,"CYS_Warehouse_Horatius");
+
+ItemSetOwner(ITEM_CYS_PortWarehouseDoorNormal,CHARACTER_CYS_WarehouseSergeant);
+KBSECTION
+//REGION DECOY GUARDS
+IF
+GlobalEventSet("CYS_WarehouseGuardsAngry")
+THEN
+CHARACTER_CYS_WarehouseGuard1.isGuard1Angry();
+CharacterSetHasDialog(CHARACTER_CYS_WarehouseGuard2,0);
+CharacterSetHasDialog(CHARACTER_CYS_WarehouseGuard1,0);
+
+IF
+DialogEnded("CYS_Warehouse_Florius",_)
+AND
+CHARACTER_CYS_WarehouseGuard1.isGuard1Angry()
+THEN
+NOT CHARACTER_CYS_WarehouseGuard1.isGuard1Angry();
+CharacterDisplayText(CHARACTER_CYS_WarehouseGuard1,"CYS_WarehouseQuarrel_0");
+CharacterMoveToCharacter(CHARACTER_CYS_WarehouseGuard1,CHARACTER_CYS_WarehouseGuard2,1,"HasArrived",0);
+
+IF
+CharacterEvent(CHARACTER_CYS_WarehouseGuard1,"HasArrived")
+THEN
+CharacterLookAtCharacter(CHARACTER_CYS_WarehouseGuard1,CHARACTER_CYS_WarehouseGuard2,0);
+CharacterLookAtCharacter(CHARACTER_CYS_WarehouseGuard2,CHARACTER_CYS_WarehouseGuard1,0);
+DialogStartTwoSpeakerDialog("CYS_AD_WarehouseGuardsQuarrel",CHARACTER_CYS_WarehouseGuard1,CHARACTER_CYS_WarehouseGuard2);
+
+IF
+GlobalEventSet("CYS_WarehouseSergeantIntervenes")
+THEN
+DialogRequestStopForCharacter(CHARACTER_CYS_WarehouseSergeant);
+CharacterDisplayText(CHARACTER_CYS_WarehouseSergeant,"CYS_WarehouseQuarrel_1");
+CharacterMoveToCharacter(CHARACTER_CYS_WarehouseSergeant,CHARACTER_CYS_WarehouseGuard1,1,"HasArrived",0);
+CharacterSetHasDialog(CHARACTER_CYS_WarehouseSergeant,0);
+DialogRequestStop("CYS_AD_WarehouseGuardsQuarrel",CHARACTER_CYS_WarehouseGuard1);
+
+IF
+CharacterEvent(CHARACTER_CYS_WarehouseSergeant,"HasArrived")
+THEN
+DialogStartThreeSpeakerDialog("CYS_AD_WarehouseGuardsQuarrel2",CHARACTER_CYS_WarehouseSergeant,CHARACTER_CYS_WarehouseGuard1,CHARACTER_CYS_WarehouseGuard2);
+
+IF
+AutomatedDialogEnded("CYS_AD_WarehouseGuardsQuarrel2",_)
+THEN
+ProcCharacterMoveToTrigger(CHARACTER_CYS_WarehouseSergeant,TRIGGER_CYS_Forbidden_WarehouseRichRoom_Exit,0,"HasArrived2");
+CharacterSetHasDialog(CHARACTER_CYS_WarehouseGuard2,1);
+CharacterSetHasDialog(CHARACTER_CYS_WarehouseGuard1,1);
+
+IF
+CharacterEvent(CHARACTER_CYS_WarehouseSergeant,"HasArrived2")
+THEN
+CharacterSetHasDialog(CHARACTER_CYS_WarehouseSergeant,1);
+//END_REGION
+
+//REGION CURTIUS OPENS DOOR
+IF
+DialogEnded("CYS_Warehouse_SergeantCurtius",_)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_WarehouseSergeant,"openWareHouseDoor",1)
+THEN
+CharacterSetVarInteger(CHARACTER_CYS_WarehouseSergeant,"openWareHouseDoor",0);
+ItemSetOnlyOwnerCanUse(ITEM_CYS_PortWarehouseDoorRich,0);
+NOT DB_ForbiddenDoors("CYS_Warehouse",ITEM_CYS_PortWarehouseDoorRich);
+NOT DB_ForbiddenAreaTriggers("CYS_Warehouse",TRIGGER_CYS_Forbidden_WarehouseRichRoom,TRIGGER_CYS_Forbidden_WarehouseRichRoom_Exit);
+ProcTriggerUnregisterForPlayers(TRIGGER_CYS_Forbidden_WarehouseRichRoom);
+//TriggerSetItemOwner(TRIGGER_CYS_Forbidden_WarehouseRichRoom,CHARACTER_NULL);
+ItemClearOwner(ITEM_CYS_PortWarehouseDoorRich);
+ItemSetOnstage(ITEM_CYS_SgtWilliam_MagicDoorLock, 0);
+ItemUnlockAndOpen(ITEM_CYS_PortWarehouseDoorRich);
+
+IF
+ItemEvent(ITEM_CYS_PortWarehouseDoorRich,"unlocked")
+THEN
+ItemSetOnstage(ITEM_CYS_SgtWilliam_MagicDoorLock, 0);
+ItemSetOnstage(ITEM_CYS_WarehousePurpleLight, 0);
+
+PROC
+PreStartDialog((CHARACTER)_Player,CHARACTER_CYS_WarehouseSergeant,"CYS_Warehouse_SergeantCurtius")
+THEN
+ProcCYSSetWarehouseDoorEvent(_Player);
+
+PROC
+ProcCYSSetWarehouseDoorEvent((CHARACTER)_Player)
+AND
+DB_UseForbiddenDoor(ITEM_CYS_PortWarehouseDoorRich,_Player)
+THEN
+GlobalSetEvent("CYS_SelectedWarehouseDoorRich");
+
+PROC
+ProcCYSSetWarehouseDoorEvent((CHARACTER)_Player)
+AND
+DB_UseForbiddenDoor(ITEM_CYS_PortWarehouseDoorNormal,_Player)
+THEN
+GlobalSetEvent("CYS_SelectedWarehouseDoorNormal");
+
+//END_REGION
+
+//REGION GUARDS ATTACK
+IF
+DialogEnded("CYS_Warehouse_SergeantCurtius",_)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_WarehouseSergeant,"CYS_FightSergeantWilliam",1)
+THEN
+SetRelationFactionToPlayers("CYS_HarbourWarehouse",0);
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

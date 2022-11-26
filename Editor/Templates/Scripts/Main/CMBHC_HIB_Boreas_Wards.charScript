@@ -1,0 +1,105 @@
+INIT
+	CHARACTER:__Me
+	CHARACTERTEMPLATE:%FireWardTemplate="Boreas_Ward_Fire_14f5b089-48ba-4bb8-899f-aa8997c28da7"
+	CHARACTERTEMPLATE:%WaterWardTemplate="Boreas_Ward_Water_52c2556e-5867-4203-b7cb-7a68f5863469"
+	CHARACTERTEMPLATE:%AirWardTemplate="Boreas_Ward_Air_1ffd2759-352d-4aa3-bef1-688ab199d58c"
+	CHARACTERTEMPLATE:%EarthWardTemplate="Boreas_Ward_Earth_a31e2072-7662-4b21-a216-4c3a5392f73a"	
+	CHARACTER:%Boreas="HIB_KingBoreas_52fa7fac-bcfa-4efa-892e-ee4359acb657"
+	STATUS:%ChosenStatus="FIRE_IMMUNITY"
+	STATUS:%BonusStatus="VOID_AURA"
+	STATUS:%StatusToCure="BURNING"
+
+//----------
+BEHAVIOUR
+REACTION Ward_EndTurn,500
+USAGE COMBAT
+ACTIONS
+	Sleep(0.2)
+	CharacterEndTurn()
+	
+REACTION Ward_FollowsBoreas,100
+USAGE ALL
+ACTIONS
+	CharacterFollow(%Boreas,-1,1)
+
+//----------
+EVENTS
+EVENT OnInit_ApplyStatusToBoreas
+VARS
+	CHARACTERTEMPLATE:_MyTemplate
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetTemplate(__Me,_MyTemplate)
+	THEN
+		IF "c1"											//FIRE - fire imm, removes burning, hastens
+			IsEqual(_MyTemplate,%FireWardTemplate)
+		THEN
+			CharacterApplyStatus(__Me,"FIRE_IMMUNITY",-1,1)
+			Set(%ChosenStatus,"FIRE_IMMUNITY")
+			Set(%StatusToCure,"BURNING")
+			Set(%BonusStatus,"HASTED")
+		ELIF "c1"										//WATER - water imm, removes wet, heals
+			IsEqual(_MyTemplate,%WaterWardTemplate)
+		THEN
+			CharacterApplyStatus(__Me,"WATER_IMMUNITY",-1,1)
+			Set(%ChosenStatus,"WATER_IMMUNITY")
+			Set(%StatusToCure,"WET")
+			Set(%BonusStatus,"HEALING")			
+		ELIF "c1"										//AIR - air imm, boosts damage
+			IsEqual(_MyTemplate,%AirWardTemplate)
+		THEN
+			CharacterApplyStatus(__Me,"AIR_IMMUNITY",-1,1)
+			Set(%ChosenStatus,"AIR_IMMUNITY")
+			Set(%BonusStatus,"ETHEREAL_SOLES")		
+		ELIF "c1"										//EARTH - earth imm, removes poison, blesses
+			IsEqual(_MyTemplate,%EarthWardTemplate)
+		THEN
+			CharacterApplyStatus(__Me,"EARTH_IMMUNITY",-1,1)
+			Set(%ChosenStatus,"EARTH_IMMUNITY")
+			Set(%StatusToCure,"POISONED")
+			Set(%BonusStatus,"BLESSED")					
+		ENDIF
+		IF "!c1&!c2"
+			CharacterIsDead(__Me)
+			CharacterIsDead(%Boreas)
+		THEN
+			CharacterApplyStatus(%Boreas,%ChosenStatus,-1,1)
+		ENDIF
+	//----
+		IF "!(c1|c2|c3)"
+			IsEqual(%BonusStatus,"VOID_AURA")
+			CharacterIsDead(__Me)
+			CharacterIsDead(%Boreas)			
+		THEN
+			CharacterApplyStatus(%Boreas,%BonusStatus,-1,1)
+		ENDIF
+	//----
+		IF "c1&!(c2|c3)"
+			CharacterHasStatus(%Boreas,%StatusToCure)
+			CharacterIsDead(__Me)
+			CharacterIsDead(%Boreas)			
+		THEN
+			CharacterRemoveStatus(%Boreas,%StatusToCure)
+			CharacterPlayEffect(%Boreas,"FX_Skills_Fire_PurifyingFire_Impact_A")
+		ENDIF
+	ENDIF
+
+EVENT OnDie_Boreas_IDieToo
+ON
+	OnDie(%Boreas,_,_,_)
+ACTIONS
+	CharacterDie(__Me)
+	
+EVENT OnDie_RemoveStatusFromBoreas
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	CharacterPlayEffect(%Boreas,"FX_Skills_Fire_PurifyingFire_Impact_A")
+	CharacterRemoveStatus(%Boreas,%ChosenStatus)
+	IF "c1"
+		CharacterHasStatus(%Boreas,%BonusStatus)
+	THEN
+		CharacterRemoveStatus(%Boreas,%BonusStatus)
+	ENDIF

@@ -1,0 +1,30 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+IF
+DB_Subregion((TRIGGER)_Trigger,(STRING)_,(INTEGER)_)
+THEN
+ProcTriggerRegisterForPlayers(_Trigger);
+
+IF
+CharacterEnteredTrigger(_Character,_Trigger)
+AND
+DB_Subregion(_Trigger,_Message,_ShowMarker)
+THEN
+CharacterEnteredSubRegion(_Character,_Message);
+ProcCheckSetRegionMarker(_Message,_ShowMarker);
+
+PROC
+ProcCheckSetRegionMarker((STRING)_Message,1)
+THEN
+ProcShowMarker(_Message);
+
+
+
+
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "__Start"

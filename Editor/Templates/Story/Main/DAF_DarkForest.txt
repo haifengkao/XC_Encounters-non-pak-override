@@ -1,0 +1,352 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_DAF_DeadTreePeople(ITEM_DAF_DeadTreeFigure_01, "DAF_DeadTreeFigure_01");
+DB_DAF_DeadTreePeople(ITEM_DAF_DeadTreeFigure_02, "DAF_DeadTreeFigure_02");
+DB_DAF_DeadTreePeople(ITEM_DAF_DeadTreeFigure_03, "DAF_DeadTreeFigure_03");
+DB_DAF_DeadTreePeople(ITEM_DAF_DeadTreeFigure_04, "DAF_DeadTreeFigure_04");
+DB_DAF_DeadTreePeople(ITEM_DAF_DeadTreeFigure_05, "DAF_DeadTreeFigure_05");
+DB_DAF_DeadTreePeople(ITEM_DAF_DeadTreeFigure_07, "DAF_DeadTreeFigure_07");
+DB_DAF_DeadTreePeople(ITEM_DAF_DeadTreeFigure_08, "DAF_DeadTreeFigure_08");
+
+ItemToCharacter(ITEM_DAF_IcaraRing,CHARACTER_HIB_Icara);
+DB_Dialogs(CHARACTER_DAF_LeandraCat,"DAF_LeandraCat");
+DB_Dialogs(CHARACTER_DAF_Swampdeer,"DAF_Swampdeer");
+ItemToCharacter(ITEM_DAF_Portal_Crystal,CHARACTER_DAF_HiddenFamilyFather);
+ItemToCharacter(ITEM_DAF_Whitewitch_Message,CHARACTER_DAF_HiddenFamilyFather);
+
+ProcTriggerRegisterForPlayers(TRIGGER_DAF_AEM_BeforeLog);
+ProcTriggerRegisterForPlayers(TRIGGER_DAF_Poly_GhostScare);
+ProcTriggerRegisterForPlayers(TRIGGER_DAF_SlowBox);
+ProcTriggerRegisterForPlayers(TRIGGER_DAF_Comment_Trunk1);
+DB_OneShotPlayerTrigger(TRIGGER_DAF_Comment_PastBarrier);
+DB_TriggerGivesPartyDialog(TRIGGER_DAF_Log_DD,"DAF_DD_Log");
+
+DB_ShovelArea(TRIGGER_DAF_ShovelDiggingSpot1,"DAF_DiggingSpot1",ITEM_DAF_ShovelDiggingSpot1Pile);
+DB_ShovelRewardItemAppear("DAF_DiggingSpot1",ITEM_DAF_ShovelDiggingSpot1Chest,TRIGGER_DAF_ShovelDiggingSpot1Point);
+DB_ShovelArea(TRIGGER_DAF_ShovelDiggingSpot4,"DAF_DiggingSpot4",ITEM_DAF_ShovelDiggingSpot4Pile);
+DB_ShovelRewardItemAppear("DAF_DiggingSpot4",ITEM_DAF_ShovelDiggingSpot4Chest,TRIGGER_DAF_ShovelDiggingSpot4Point);
+DB_ShovelArea(TRIGGER_DAF_ShovelDiggingSpot3,"DAF_DiggingSpot3",ITEM_DAF_ShovelDiggingSpot3Pile);
+DB_ShovelRewardItemAppear("DAF_DiggingSpot3",ITEM_DAF_ShovelDiggingSpot3Chest,TRIGGER_DAF_ShovelDiggingSpot3Point);
+DB_ShovelArea(TRIGGER_DAF_ShovelDiggingSpot2,"DAF_DiggingSpot2",ITEM_DAF_ShovelDiggingSpot2Pile);
+DB_ShovelRewardItemAppear("DAF_DiggingSpot2",ITEM_DAF_ShovelDiggingSpot2Chest,TRIGGER_DAF_ShovelDiggingSpot2Point);
+DB_ShovelArea(TRIGGER_DAF_ShovelDiggingSpot5,"DAF_DiggingSpot5",ITEM_DAF_ShovelDiggingSpot5Pile);
+DB_ShovelRewardItemAppear("DAF_DiggingSpot5",ITEM_DAF_ShovelDiggingSpot5Chest,TRIGGER_DAF_ShovelDiggingSpot5Point);
+
+DB_PlayerComments("DAF_Comment_ReadPriestDiary","DAF_Comment_ReadPriestDiary_1_1",1,1);
+DB_PlayerComments("DAF_Comment_ReadPriestDiary","DAF_Comment_ReadPriestDiary_2_1",2,1);
+DB_PlayerComments("DAF_Comment_ReadPriestDiary","DAF_Comment_ReadPriestDiary_2_2",2,2);
+KBSECTION
+IF
+TextEventSet("icararing")
+THEN
+ItemToCharacter(ITEM_DAF_IcaraRing,CHARACTER_Player1);
+
+IF
+DB_DAF_DeadTreePeople(_item, _flag)
+THEN
+ItemSetVarInteger(_item, _flag, 1);
+DB_ItemDialogs(_item, "DAF_DeadTreePeople");
+DialogSetItemEvent("Group_Dying",_item,0);
+
+IF
+DialogEnded("DAF_BO_HiddenFamily",_ID)
+AND
+DB_DialogPlayers(_ID,_Player,1)
+AND
+DB_GlobalEvent("DAF_ToldSecretMessage")
+AND 
+NOT DB_OnlyOnce("DAF_CatFlash")
+THEN
+DB_OnlyOnce("DAF_CatFlash");
+CharacterPlayEffect(CHARACTER_DAF_LeandraCat,"FX_GP_StarStone_Up_A");
+ItemToCharacter(ITEM_DAF_Portal_Crystal,_Player);
+
+IF
+CharacterUsedItem(_Player,ITEM_DAF_DruidPortal_Cellar)
+AND
+ITEM_DAF_DruidPortal_Cellar.Fixed()
+THEN
+CharacterTeleportToTrigger(_Player,TRIGGER_DAF_DruidPortal_IN);
+
+IF
+CharacterUsedItem(_Player,ITEM_DAF_DruidPortal_Cellar)
+AND
+NOT ITEM_DAF_DruidPortal_Cellar.Fixed()
+AND
+ItemIsInPartyInventory(ITEM_DAF_Portal_Crystal,_Player,0,0)
+THEN
+CharacterDisplayText(_Player,"DAF_PortalNotWorking");
+
+IF
+CharacterUsedItem(_Player,ITEM_DAF_DruidPortal_Cellar)
+AND
+NOT ITEM_DAF_DruidPortal_Cellar.Fixed()
+AND
+ItemIsInPartyInventory(ITEM_DAF_Portal_Crystal,_Player,1,1)
+THEN
+ITEM_DAF_DruidPortal_Cellar.Fixed();
+CharacterDisplayText(_Player,"DAF_PortalFixed");
+ItemDestroy(ITEM_DAF_Portal_Crystal);
+
+IF
+DialogStarted("DAF_BO_HiddenFamily",_)
+AND
+ItemIsInPartyInventory(ITEM_DAF_IcaraRing,CHARACTER_Player1,0,1)
+THEN
+GlobalSetEvent("DAF_PartyHasIcaraRing");
+
+IF
+DialogEnded("DAF_BO_HiddenFamily",_)
+THEN
+GlobalClearEvent("DAF_PartyHasIcaraRing");
+
+IF
+DialogCharacterEventSet("DAF_BO_TakeIcaraRing",_Character,_)
+AND
+ItemIsInPartyInventory(ITEM_DAF_IcaraRing,_Character,1,1)
+THEN
+NOOP(1);
+
+IF
+CharacterEnteredTrigger(_Character,TRIGGER_DAF_Poly_GhostScare)
+AND
+ItemIsInCharacterInventory(ITEM_DAF_PhantomAmulet,_Character,0)
+THEN
+CharacterDie(_Character,0);
+
+IF
+CharacterEnteredTrigger(_Character,TRIGGER_DAF_Poly_GhostScare)
+THEN
+_Character.InGhostScareTrigger();
+
+IF
+CharacterLeftTrigger(_Character,TRIGGER_DAF_Poly_GhostScare)
+THEN
+NOT _Character.InGhostScareTrigger();
+
+IF
+CharacterResurrected(_Character)
+AND
+_Character.InGhostScareTrigger()
+AND
+ItemIsInCharacterInventory(ITEM_DAF_PhantomAmulet,_Character,0)
+THEN
+CharacterDie(_Character,0);
+
+IF
+ItemAddedToCharacter(ITEM_DAF_PhantomAmulet,_Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+QuestUpdate("DAF_Zandalor","Amulet");
+
+IF
+CharacterEnteredTrigger(_Character,TRIGGER_DAF_SlowBox)
+AND
+ItemIsInCharacterInventory(ITEM_DAF_PhantomAmulet,_Character,0)
+THEN
+CharacterApplyStatus(_Character,"SLOWED",-1.0,1);
+CharacterApplyStatus(_Character,"POISONED",-1.0,1);
+
+IF
+CharacterLeftTrigger(_Character,TRIGGER_DAF_SlowBox)
+THEN
+CharacterRemoveStatus(_Character,"SLOWED");
+CharacterRemoveStatus(_Character,"POISONED");
+ProcCancelPartyDialog("DAF_DD_Log");
+
+IF
+CharacterEnteredTrigger(_Character,TRIGGER_DAF_SlowBox)
+AND
+ItemIsInCharacterInventory(ITEM_DAF_PhantomAmulet,_Character,0)
+AND
+NOT DB_OnlyOnce("DAF_Comment_Trunk1")
+THEN
+DB_OnlyOnce("DAF_Comment_Trunk1");
+CharacterDisplayText(_Character,"DAF_Comment_Trunk1");
+
+IF
+CharacterEnteredTrigger(_Character,TRIGGER_DAF_Comment_Trunk1)
+AND
+ItemIsInCharacterInventory(ITEM_DAF_PhantomAmulet,_Character,0)
+AND
+NOT DB_OnlyOnce("DAF_Comment_Trunk2_NoAmulet")
+THEN
+DB_OnlyOnce("DAF_Comment_Trunk2_NoAmulet");
+CharacterDisplayText(_Character,"DAF_Comment_Trunk2_NoAmulet");
+
+IF
+CharacterEnteredTrigger(_Character,TRIGGER_DAF_Log_DD)
+AND
+ItemIsInCharacterInventory(ITEM_DAF_PhantomAmulet,_Character,0)
+THEN
+Launch_PlayerComment(_Character,"DAF_Comment_Trunk3");
+
+IF
+CharacterEnteredTrigger(_Character,TRIGGER_DAF_AEM_BeforeLog)
+AND
+ItemIsInCharacterInventory(ITEM_DAF_PhantomAmulet,_Character,1)
+THEN
+Proc_ArhuExMachina(_Character,"DAF_Arhu_BeforeLog",0);
+
+IF
+DialogEnded("DAF_Arhu_BeforeLog",_)
+THEN
+ProcDefinePartyDialog("DAF_PD_AfterArhuTale");
+QuestAdd("CYS_Cassandra");
+QuestUpdate("CYS_Cassandra","Update5");
+QuestClose("CYS_Cassandra");
+
+IF
+CharacterEnteredTrigger(_Character,TRIGGER_DAF_AEM_BeforeLog)
+AND
+ItemIsInCharacterInventory(ITEM_DAF_PhantomAmulet,_Character,1)
+THEN
+DialogRequestStopForCharacter(CHARACTER_DAF_Arhu);
+DialogRequestStopForCharacter(CHARACTER_DAF_Arhu_Cat);
+Poof(CHARACTER_DAF_Arhu);
+Poof(CHARACTER_DAF_Arhu_Cat);
+
+IF
+CharacterEnteredTrigger(_Character,TRIGGER_DAF_Comment_Trunk1)
+AND
+ItemIsInCharacterInventory(ITEM_DAF_PhantomAmulet,_Character,1)
+AND
+NOT DB_OnlyOnce("DAF_Comment_Trunk2_Amulet")
+THEN
+DB_OnlyOnce("DAF_Comment_Trunk2_Amulet");
+CharacterDisplayText(_Character,"DAF_Comment_Trunk2_Amulet");
+
+IF
+TextEventSet("dfamulet")
+THEN
+ItemToCharacter(ITEM_DAF_PhantomAmulet,CHARACTER_Player1);
+
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,TRIGGER_DAF_Comment_PastBarrier)
+THEN
+CharacterDisplayText(_Player,"DAF_Comment_PastBarrier");
+QuestUpdate("DAF_Zandalor","Forest");
+PROC_ArhuToDafCage();
+UnlockAchievement("quest36");
+
+IF
+TextEventSet("arhucage")
+THEN
+PROC_ArhuToDafCage();
+
+PROC
+PROC_ArhuToDafCage()
+THEN
+CharacterTeleportToTrigger(CHARACTER_CYS_Arhu,TRIGGER_DAF_Arhu_Cage_Pos,"ArhuTeleportedToCage");
+DB_Singleton("IsArhuCat",1);
+GlobalSetEvent("ArhuInDAFCage");
+GlobalSetEvent("ArhuRefusesToMorphToHuman");
+CharacterSetVarFixedString(CHARACTER_CYS_Arhu,"currentState","State_Caged_Cat");
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_CYS_Arhu);
+DB_Dialogs(CHARACTER_CYS_Arhu,"DAF_Arhu_Caged");
+CharacterSetOnStage(CHARACTER_LUC_Arhu,0);
+CharacterSetOnStage(CHARACTER_LUC_Arhu_Cat,0);
+CharacterSetOnStage(CHARACTER_DAF_Arhu,0);
+CharacterSetOnStage(CHARACTER_DAF_Arhu_Cat,0);
+CharacterSetOnStage(CHARACTER_HIB_Arhu,0);
+CharacterSetOnStage(CHARACTER_HIB_Arhu_Cat,0);
+CharacterSetCanFight(CHARACTER_CYS_Arhu,0);
+
+IF
+CharacterEvent(CHARACTER_CYS_Arhu,"ArhuTeleportedToCage")
+THEN
+CharacterLookFromTrigger(CHARACTER_CYS_Arhu,TRIGGER_DAF_Arhu_Cage_Pos,1);
+CharacterSetCanFight(CHARACTER_CYS_Arhu,0);
+
+IF
+CharacterUsedItem(_Character,ITEM_DAF_TitanHead)
+THEN
+ProcDoTwoSpeakerItemDialog("DAF_TitanHead",_Character,ITEM_DAF_TitanHead);
+
+IF
+GameBookInterfaceClosed(ITEM_DAF_TitanDictionary, _Char)
+THEN
+GlobalSetEvent("UnderstandTitan");
+
+IF
+DialogEnded("DAF_TitanHead",_ID)
+AND
+NOT DB_GlobalEvent("UnderstandTitan")
+AND
+DB_DialogPlayers(_ID,_Player,1)
+THEN
+Launch_PlayerComment(_Player,"DAF_CommentDontUnderstandTitan");
+
+IF
+CharacterUsedItem(_Character,ITEM_DAF_KickstarterTree)
+AND
+NOT DB_Combat(_Character, _)
+THEN
+KickstarterTreeUsed(_Character);
+
+IF
+ItemDestroyed(ITEM_DAF_HortunCharlaTotem)
+THEN
+PlayEffectAtCharacter("FX_GP_StarStone_Up_B", CHARACTER_DAF_Skeleton_Trader);
+CharacterDie(CHARACTER_CYS_Brian, 1);
+DialogRequestStopForCharacter(CHARACTER_DAF_Skeleton_Trader);
+CharacterDie(CHARACTER_DAF_Skeleton_Trader, 1);
+GlobalSetEvent("DAF_DestroyedhortunCharlaTotem");
+Foop(CHARACTER_DAF_HortunGhost);
+Foop(CHARACTER_DAF_CharlaGhost);
+DB_DoHortunCharlaAD(100);
+
+IF
+CharacterWentOnStage(CHARACTER_DAF_CharlaGhost, 1)
+AND
+DB_DoHortunCharlaAD(100)
+THEN
+NOT DB_DoHortunCharlaAD(100);
+DialogStartTwoSpeakerDialog("DAF_AD_HortunCharlaReunited", CHARACTER_DAF_HortunGhost, CHARACTER_DAF_CharlaGhost);
+
+IF
+AutomatedDialogEnded("DAF_AD_HortunCharlaReunited", _)
+THEN
+Poof(CHARACTER_DAF_HortunGhost);
+Poof(CHARACTER_DAF_CharlaGhost);
+
+IF
+GameBookInterfaceClosed(ITEM_DAF_PriestDiary, _Char)
+AND
+NOT DB_GlobalEvent("DAF_ReadCordeliaDiary")
+THEN
+Launch_PlayerComment(_Char, "DAF_Comment_ReadPriestDiary");
+GlobalSetEvent("DAF_ReadCordeliaDiary");
+QuestAdd("DAF_HortunCharla");
+QuestUpdate("DAF_HortunCharla", "StartDiary");
+
+IF
+ItemAddedToCharacter(ITEM_DAF_HortunCharlaTotem, _Player)
+AND
+DB_IsPlayer(_Player)
+AND
+NOT DB_GlobalEvent("DAF_PossessTotem")
+THEN
+GlobalSetEvent("DAF_PossessTotem");
+
+IF
+GlobalEventSet("DAF_PossessTotem")
+AND
+NOT DB_GlobalEvent("DAF_ReadCordeliaDiary")
+THEN
+QuestAdd("DAF_HortunCharla");
+QuestUpdate("DAF_HortunCharla", "StartTotem");
+
+IF
+GlobalEventSet("DAF_PossessTotem")
+AND
+DB_GlobalEvent("DAF_ReadCordeliaDiary")
+THEN
+QuestUpdate("DAF_HortunCharla", "FoundTotem");
+
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

@@ -1,0 +1,95 @@
+INIT
+ITEM:__Me
+
+FLOAT:%CurrentPercentage=0
+FLOAT:%PreviousPercentage=0
+FLOAT:%NewWeight=0
+	
+EXTERN STRING:%EventOn=null
+EXTERN STRING:%EventOff=null
+
+CHARACTER:%Player1 = Player1_dac1443f-a866-4ab3-b240-e705c0b20ec5
+CHARACTER:%Player2 = Player2_a0af7520-57ac-4f1c-b9d7-197bceebeade
+
+EVENTS
+
+EVENT Initialize
+ON
+	OnInit
+ACTIONS
+	StartTimer("UpdatePressurePlate",0.1,-1)
+
+EVENT Shutdown
+ON
+	OnShutdown
+ACTIONS
+	StopTimer("UpdatePressurePlate")
+
+EVENT Update
+VARS
+	FLOAT:_PreviousWeight
+ON
+	OnTimer("UpdatePressurePlate")
+ACTIONS
+	IF "!c1"
+		ItemIsMoving(__Me)
+	THEN
+		Set(%NewWeight,0)
+		IterateCharactersOnObject(__Me,"PressurePlateCheck")
+		Set(%PreviousPercentage,%CurrentPercentage)
+		Set(%CurrentPercentage,%NewWeight)
+		IF "!c1"
+			IsEqual(%CurrentPercentage,%PreviousPercentage)
+		THEN
+			ItemEvent(__Me,"PressurePlateChange")
+		ENDIF
+	ENDIF
+	
+EVENT WeightCalc
+VARS
+CHARACTER:_Char
+ON
+	OnIterateCharacter(_Char,"PressurePlateCheck")
+ACTIONS
+	IF "(!c1&!c2&!c3&(c4|c5))"
+		IsEqual(_Char,null)
+		CharacterIsFloating(_Char)
+		CharacterIsDead(_Char)
+		IsEqual(_Char,%Player1)//companions are players too, we want just players....
+		IsEqual(_Char,%Player2)
+	THEN
+		Set(%NewWeight,1)
+	ENDIF
+
+EVENT PlateChange
+ON
+	OnItemEvent(__Me,"PressurePlateChange")
+ACTIONS
+	IF "c1&!c2"
+		IsEqual(%CurrentPercentage,1)
+		IsEqual(%EventOn,null)
+	THEN
+		PlaySound(__Me, "Items_Puzzle_PressurePlate")
+		CharacterItemEvent(null,__Me,%EventOn)
+		ItemPlayEffect(__Me, "FX_GP_CameraShake_B")
+		DisplayText(__Me,"GLO_PressurePlateActivated",2.0)
+	ELIF "c1&!c2"
+		IsEqual(%PreviousPercentage,1)
+		IsEqual(%EventOff,null)
+	THEN
+		PlaySound(__Me, "Items_Puzzle_PressurePlate")
+		CharacterItemEvent(null,__Me,%EventOff)
+		ItemPlayEffect(__Me, "FX_GP_CameraShake_B")
+	ENDIF
+	// Start Reaction to change animation
+	Interrupt(PercentageChance)
+	SetPriority(PercentageChance,100)
+
+BEHAVIOUR
+
+REACTION PercentageChance,0
+ACTIONS
+	ItemPlayAnimationTo("PressurePlate",%CurrentPercentage,5)
+	SetPriority(PercentageChance,0)
+INTERRUPT
+	Reset()

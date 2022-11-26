@@ -1,0 +1,42 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	TRIGGER:%Stone = LUC_IV_Cultist2Stone_f4448184-f5a8-466b-959e-847578b54a83
+	TRIGGER:%Road = LUC_IV_Cultist2Road_3ab259a7-9948-4836-aa81-887e67d61d0e
+	TRIGGER:%Village = LUC_IV_Cultist2Village_13605672-abca-4e5b-8c26-096bf03361e8
+	
+BEHAVIOUR
+		
+REACTION State_Working, 0
+	USAGE PEACE
+	ACTIONS
+		GetRandom(%currentAction, "Action_Stone", "Action_Road", "Action_Village")
+		SetPriority(%currentAction, 1100)
+
+REACTION Action_Stone, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterMoveTo(%Stone, 0)
+		CharacterLookFrom(%Stone)
+		CharacterPlayAnimation("Worship_01")
+		SetPriority(%currentAction, 0)
+		
+REACTION Action_Road, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterMoveTo(%Road, 0)
+		CharacterLookFrom(%Road)
+		CharacterPlayAnimation("Look_Left_Short_01",0)
+		CharacterPlayAnimation("Look_Right_Short_01")
+		SetPriority(%currentAction, 0)
+		
+REACTION Action_Village, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterMoveTo(%Village, 0)
+		CharacterLookFrom(%Village)
+		CharacterPlayAnimation("Listen_01") //CHange to look in the distance when we got it
+		SetPriority(%currentAction, 0)
+	

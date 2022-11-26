@@ -1,0 +1,96 @@
+INIT
+
+CHARACTER:__Me
+EXTERN INT:%0Fire_1Ice_2Earth_3Air_4Rand=0
+EXTERN INT:%summoningFrequency=0
+EXTERN INT:%summoningStartsAtTurn=0
+EXTERN INT:%skillPriority=200
+CHARACTER:%SummonedCreature
+
+//-----------------------
+
+EVENTS
+EVENT GiveSpellsOnInit
+ON 
+	OnInit()
+ACTIONS
+	IF "c1"
+		IsEqual(%0Fire_1Ice_2Earth_3Air_4Rand,0)
+	THEN	
+		CharacterAddSkill(Summon_EnemyFire)
+		ELIF "c1"
+			IsEqual(%0Fire_1Ice_2Earth_3Air_4Rand,1)
+		THEN
+			CharacterAddSkill(Summon_EnemyIce)
+		ELIF "c1"
+			IsEqual(%0Fire_1Ice_2Earth_3Air_4Rand,2)
+		THEN
+			CharacterAddSkill(Summon_EnemyEarth)
+		ELIF "c1"
+			IsEqual(%0Fire_1Ice_2Earth_3Air_4Rand,3)
+		THEN
+			CharacterAddSkill(Summon_EnemyAir)
+			ELSE
+				GetRandomBetween(%0Fire_1Ice_2Earth_3Air_4Rand,0,4)
+	ENDIF
+	
+EVENT SetSummoning
+ON
+	OnTurn()
+ACTIONS
+	IF "c1"
+		IsLessThen(%summoningStartsAtTurn,%summoningFrequency)
+	THEN		
+		Add(%summoningStartsAtTurn,1)
+	ELSE
+		SetPriority("SummonCreature",%skillPriority)
+	ENDIF
+		
+//-----------------------
+
+BEHAVIOUR
+
+REACTION SummonCreature,0
+USAGE COMBAT
+VARS
+	INT:_Element
+	CHARACTER:_Enemy
+CHECK "!c1&!c2&c3&!c4"
+	CharacterHasStatus(__Me,CHARMED)
+	CharacterHasStatus(__Me,DYING)
+	CharacterGet(_Enemy,__Me,null,Lowest,WaterResistance,Enemy)
+	CharacterIsDead(_Enemy)
+ACTIONS													
+	IF "!c1"									
+		IsEqual(%0Fire_1Ice_2Earth_3Air_4Rand,4)
+	THEN
+		Set(_Element,%0Fire_1Ice_2Earth_3Air_4Rand)
+	ELSE
+		GetRandomBetween(_Element,0,3)
+	ENDIF
+	IF "c1&c2"		//FIRE									
+		IsEqual(_Element,0)
+		CharacterCanCast(__Me,Summon_EnemyFire)
+	THEN
+		CharacterUseSkill(Summon_EnemyFire,_Enemy)		
+	ELIF "c1&c2"	//ICE
+		IsEqual(_Element,1)
+		CharacterCanCast(__Me,Summon_EnemyIce)
+	THEN
+		CharacterUseSkill(Summon_EnemyIce,_Enemy)
+	ELIF "c1&c2"	//EARTH
+		IsEqual(_Element,2)
+		CharacterCanCast(__Me,Summon_EnemyEarth)
+	THEN
+		CharacterUseSkill(Summon_EnemyEarth,_Enemy)
+	ELIF "c1&c2"	//AIR
+		IsEqual(_Element,3)
+		CharacterCanCast(__Me,Summon_EnemyAir)
+	THEN
+		CharacterUseSkill(Summon_EnemyAir,_Enemy)
+		ELSE
+			CharacterAttack(_Enemy)
+			CharacterEndTurn()
+	ENDIF
+	Set(%summoningStartsAtTurn,0)
+	SetPriority("SummonCreature",0)	

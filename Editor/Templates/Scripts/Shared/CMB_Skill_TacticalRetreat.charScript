@@ -1,0 +1,149 @@
+INIT
+	CHARACTER:__Me
+	EXTERN INT:%TacRetreat_Current=0
+	EXTERN INT:%TacRetreat_Desired=0
+	EXTERN FLOAT:%VitalityThreshold=0.6
+	EXTERN COMPARE:%TRCompareHow=Highest
+	EXTERN COMPAREFUNC:%TRCompareWhat=Strength
+
+//----------------
+BEHAVIOUR 
+REACTION UseTacticalRetreatToGoToAlly,0
+USAGE COMBAT
+VARS
+	CHARACTER:_NearbyEnemy
+	CHARACTER:_ChosenAlly	
+	FLOAT3:_TacRetreatDestination
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+	FLOAT:_MyVitality
+	FLOAT:_Angle
+	FLOAT:_Dist		
+	FLOAT3:_PosOffset={1.3;0;0}	
+CHECK "c1&(c2|(c3&c4&c5))&c6&c7&c8"
+	CharacterCanCast(__Me,"Jump_EnemyTacticalRetreat")													//c1
+	IsInDangerousSurface(__Me)																			//c2
+	CharacterGet(_NearbyEnemy,__Me,4,Lowest,Distance,Enemy)												//c3
+	CharacterGetStat(_MyVitality,__Me,Vitality)															//c4
+	IsLessThen(_MyVitality,%VitalityThreshold)															//c5
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Jump_EnemyTacticalRetreat")						//c6
+	CharacterGet(_ChosenAlly,__Me,_MaxRange,%TRCompareHow,%TRCompareWhat,Ally,None)						//c7
+	GetPosition(_ChosenAlly,_TacRetreatDestination)														//c8		
+ACTIONS 
+	IF "c1"
+		FindValidPosition(_TacRetreatDestination,3,__Me)
+	THEN
+		GetRandomBetween(_Angle,0,360)
+		GetRandomBetween(_Dist,2,4)
+		RotateY(_PosOffset,_Angle)
+		Multiply(_PosOffset,_Dist)	
+		Add(_TacRetreatDestination,_PosOffset)
+		CharacterUseSkill("Jump_EnemyTacticalRetreat",_TacRetreatDestination)
+		Sleep(1)
+		IF "!c1"
+			IsEqual(_NearbyEnemy,null)
+		THEN
+			CharacterLookAt(_NearbyEnemy)
+		ELIF "c1&c2"
+			IsEqual(_NearbyEnemy,null)
+			CharacterGet(_NearbyEnemy,__Me,30,Lowest,Distance,Enemy)
+		THEN
+			CharacterLookAt(_NearbyEnemy)
+		ENDIF
+		Set(%TacRetreat_Current,0)
+		SetPriority("UseTacticalRetreatToGoToAlly",0)
+		SetPriority("UseTacticalRetreatToGetAway",0)		
+	ELSE
+		SetPriority("UseTacticalRetreatToGoToAlly",0)
+		SetPriority("UseTacticalRetreatToGetAway",0)		
+	ENDIF
+INTERRUPT
+	Reset()
+	
+REACTION UseTacticalRetreatToGetAway,0
+USAGE COMBAT
+VARS
+	CHARACTER:_NearbyEnemy
+	INT:_Failures=0
+	FLOAT3:_TacRetreatDestination
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+	FLOAT:_MyVitality
+	FLOAT:_Angle
+	FLOAT:_Dist		
+	FLOAT3:_PosOffset	
+CHECK "c1&(c2|(c3&c4&c5))&c6"
+	CharacterCanCast(__Me,"Jump_EnemyTacticalRetreat")													//c1	
+	IsInDangerousSurface(__Me)																			//c2
+	CharacterGet(_NearbyEnemy,__Me,4,Lowest,Distance,Enemy)												//c3
+	CharacterGetStat(_MyVitality,__Me,Vitality)															//c4
+	IsLessThen(_MyVitality,%VitalityThreshold)															//c5
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Jump_EnemyTacticalRetreat")						//c6		
+ACTIONS 
+	WHILE "c1"
+		IsLessThen(_Failures,20)
+	DO
+		IF "c1"
+			GetPosition(__Me,_TacRetreatDestination)
+		THEN
+			Set(_PosOffset,{1;0;0})
+			GetRandomBetween(_Angle,0,360)
+			GetRandomBetween(_Dist,10,_MaxRange)
+			RotateY(_PosOffset,_Angle)
+			Multiply(_PosOffset,_Dist)
+			Add(_TacRetreatDestination,_PosOffset)
+		ENDIF
+		IF "c1&c2"
+			IsSurface(_TacRetreatDestination,4,None)
+			FindValidPosition(_TacRetreatDestination,10,__Me)			
+		THEN
+			CharacterMoveInRange(_TacRetreatDestination,_MinRange,_MaxRange,1)
+			CharacterUseSkill("Jump_EnemyTacticalRetreat",_TacRetreatDestination)
+			Sleep(1)
+			IF "!c1"
+				IsEqual(_NearbyEnemy,null)
+			THEN
+				CharacterLookAt(_NearbyEnemy)
+			ELIF "c1&c2"
+				IsEqual(_NearbyEnemy,null)
+				CharacterGet(_NearbyEnemy,__Me,30,Lowest,Distance,Enemy)
+			THEN
+				CharacterLookAt(_NearbyEnemy)
+			ENDIF			
+			Set(%TacRetreat_Current,0)
+			SetPriority("UseTacticalRetreatToGoToAlly",0)
+			SetPriority("UseTacticalRetreatToGetAway",0)
+		ELSE
+			Add(_Failures,1)
+		ENDIF
+	ENDWHILE
+	IF "c1"
+		IsEqual(_Failures,20)
+	THEN
+		Set(_Failures,0)	
+		SetPriority("UseTacticalRetreatToGoToAlly",0)
+		SetPriority("UseTacticalRetreatToGetAway",0)		
+	ENDIF	
+INTERRUPT
+	Reset()	
+	
+//----------------
+EVENTS
+EVENT GiveTacticalRetreat
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill("Jump_EnemyTacticalRetreat")
+	
+EVENT SetTacticalRetreatFrequency
+ON
+	OnTurn()
+ACTIONS
+	IF "c1"
+		IsLessThen(%TacRetreat_Current,%TacRetreat_Desired)
+	THEN		
+		Add(%TacRetreat_Current,1)
+	ELSE
+		SetPriority("UseTacticalRetreatToGoToAlly",450)
+		SetPriority("UseTacticalRetreatToGetAway",400)
+	ENDIF

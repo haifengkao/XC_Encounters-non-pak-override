@@ -1,0 +1,264 @@
+INIT
+
+CHARACTER:__Me
+CHARACTER:%Playervar = null
+EXTERN CHARACTER:%OtherSentinel = null
+EXTERN INT:%Rotating = 0
+EXTERN INT:%Active = 1
+EXTERN FLOAT:%RotationSleep = 8
+EXTERN TRIGGER:%Point1 = null
+EXTERN TRIGGER:%Point2 = null
+EXTERN TRIGGER:%PointTargetTele = null
+INT:%EffectHandle = 0
+INT:%IHaveSomeone = 0
+INT:%AlreadyWaiting = 0
+INT:%WaitForAck = 0
+INT:%CurrentPoint = 0
+INT:%Waiting = 0
+
+BEHAVIOUR
+
+REACTION WaitForAck,1100
+USAGE ALL
+CHECK "c1"
+	IsEqual(%WaitForAck,1)
+ACTIONS
+	Sleep(0.5f)
+INTERRUPT	
+	StopLoopEffect(%EffectHandle)
+	Set(%EffectHandle, 0)
+
+REACTION DoWait, 1100
+USAGE ALL
+CHECK "c1"
+	IsEqual(%Waiting,1)
+ACTIONS
+	DebugText(__Me, "Waiting")
+	Sleep(%RotationSleep)
+	Set(%Waiting,0)
+INTERRUPT
+	StopLoopEffect(%EffectHandle)
+	Set(%EffectHandle, 0)
+	Set(%Waiting,0)
+	
+REACTION Watching, 0
+USAGE ALL
+CHECK "c1"
+	IsEqual(%Active,1)
+VARS
+	CHARACTER:_Player
+	TRIGGER:_LookPoint
+ACTIONS
+    IF "c1"
+        IsEqual(%EffectHandle, 0)
+    THEN
+	    CharacterPlayLoopEffect(%EffectHandle,__Me,"FX_GP_Light_Green_A","Dummy_CastFX")
+	ENDIF
+    IF "c1"
+		IsEqual(%Rotating,1)
+	THEN
+		DebugText(__Me, "looking")
+		GetElement(_LookPoint,%CurrentPoint,%Point1,%Point2)
+		CharacterLookAt(_LookPoint)
+		CallFunction("SetAckNeeded")
+	ENDIF
+INTERRUPT
+	IF "!c1&!c2"
+		IsEqual(%WaitForAck,1)
+		IsEqual(%Waiting,1)
+	THEN
+		StopLoopEffect(%EffectHandle)
+		Set(%EffectHandle, 0)
+	ENDIF
+    Reset()
+
+REACTION Alarmed, 0
+USAGE ALL
+CHECK "c1"
+	IsEqual(%Active,2)
+ACTIONS
+    IF "c1"
+        IsEqual(%EffectHandle, 0)
+    THEN
+	    CharacterPlayLoopEffect(%EffectHandle,__Me,"FX_GP_Light_Red_A","Dummy_CastFX")
+	ENDIF
+    Sleep(10)
+INTERRUPT
+	StopLoopEffect(%EffectHandle)
+	Set(%EffectHandle, 0)
+    Reset()
+
+EVENTS
+
+EVENT DoAck
+ON	
+OnCharacterEvent(__Me,"doAck")
+ACTIONS
+Set(%WaitForAck,0)
+Set(%Waiting,1)
+
+EVENT SetAckNeeded
+VARS
+	INT:_OtherPoint
+ON
+	OnFunction("SetAckNeeded")
+ACTIONS
+	Add(%CurrentPoint ,1)
+	IF "c1"
+		IsEqual(%CurrentPoint,2)
+	THEN
+		Set(%CurrentPoint,0)
+	ENDIF
+	IF "c1&c2"
+		GetVar(_OtherPoint,%OtherSentinel,"CurrentPoint")
+		IsEqual(_OtherPoint,%CurrentPoint)
+	THEN
+		Set(%WaitForAck,0)
+		Set(%Waiting,1)
+		CharacterEvent(%OtherSentinel, "doAck")
+	ELSE
+		Set(%WaitForAck,1)
+	ENDIF
+	
+EVENT Init
+ON
+	OnInit()
+ACTIONS
+	Set(%EffectHandle, 0)
+	CharacterApplyStatus(__Me,GALVANISED,-1)
+	StartTimer("spotsneaker", 0.1, -1)
+	IF "c1"
+		IsEqual(%Active,1)
+	THEN
+		SetPriority("Watching",1000)
+		CharacterSetCanSpotSneakers(__Me,1)
+	ELSE
+		SetPriority("Alarmed",1000)
+		CharacterSetCanSpotSneakers(__Me,0)
+	ENDIF
+
+EVENT Shutdown
+ON
+	OnShutdown()
+ACTIONS
+	StopLoopEffect(%EffectHandle)
+	Set(%EffectHandle, 0)
+	StopTimer("spotsneaker")
+	
+EVENT OnDamage
+VARS 
+	CHARACTER:_Player
+ON
+	OnDamage(_,_,_,_)
+ACTIONS
+	IF "c1"
+		IsEqual(%Active,1)
+	THEN
+		Set(%Active,2)
+        SetPriority("Watching",0)
+		Interrupt("Watching")
+        SetPriority("Alarmed",1000)
+		DebugText(CHARACTER:Player1_dac1443f-a866-4ab3-b240-e705c0b20ec5, "spotting")
+		CharacterEvent(__Me, "spottedSomeone")
+		DisplayText(__Me,"HIB_SentinelSpotted",5.0)
+	ENDIF
+
+EVENT PartyMemberIterator
+VARS 
+	CHARACTER:_Player
+ON
+	OnIterateCharacter(_Player,"CheckForPartyMember")
+ACTIONS
+	IF "c1&c2&!c3"
+		CharacterIsPlayer(_Player)
+		CharacterCanSee(__Me,_Player,1)
+		CharacterIsDead(_Player)
+	THEN
+		Set(%IHaveSomeone, 1)
+		IF "c1"
+			IsEqual(%Active,1)
+		THEN
+			Set(%Active,2)
+			SetPriority("Watching",0)
+			Interrupt("Watching")
+			Set(%WaitForAck,0)
+			Set(%Waiting,0)
+            SetPriority("Alarmed",1000)
+            DisplayText(__Me,"HIB_SentinelSpotted",5.0)
+			StopTimer("backToNormal")
+			Set(%AlreadyWaiting, 0)
+			Set(%Playervar,_Player)
+			DebugText(CHARACTER:Player1_dac1443f-a866-4ab3-b240-e705c0b20ec5, "spotting")
+			CharacterEvent(__Me, "spottedSomeone")
+			CharacterPlayEffect(__Me,"FX_Skills_Air_Teleport_Prepare_A")
+			StartTimer("SentDelayTimer",1,0)
+		ENDIF
+	ENDIF	
+
+	
+EVENT LaunchIterator
+ON 
+	OnTimer("spotsneaker")
+ACTIONS
+	Set(%IHaveSomeone, 0)
+	IterateCharactersNear(__Me,15.0,"CheckForPartyMember")
+	IF "c1&c2&!c3"
+		IsEqual(%IHaveSomeone, 0)
+		IsEqual(%Active,2)
+		IsEqual(%AlreadyWaiting,1)
+	THEN
+		StartTimer("backToNormal", 2.0, 0)
+		Set(%AlreadyWaiting, 1)
+	ENDIF
+	
+EVENT backToNormal
+ON
+	OnTimer("backToNormal")
+ACTIONS
+	CharacterSetCanSpotSneakers(__Me,1)
+	Set(%Active,1)
+	SetPriority("Alarmed",0)
+	Interrupt("Alarmed")
+ 	DebugText(CHARACTER:Player1_dac1443f-a866-4ab3-b240-e705c0b20ec5, "normal")
+	SetPriority("Watching",1000)
+	CharacterEvent(__Me, "ItsCool")
+	Set(%AlreadyWaiting, 0)
+	
+EVENT itsCool
+ON
+	OnCharacterEvent(%OtherSentinel, "ItsCool")
+ACTIONS
+	CharacterSetCanSpotSneakers(__Me,1)
+	Set(%Active,1)
+	SetPriority("Alarmed",0)
+	Interrupt("Alarmed")
+	StopTimer("backToNormal")
+	DebugText(CHARACTER:Player1_dac1443f-a866-4ab3-b240-e705c0b20ec5, "normal")
+    SetPriority("Watching",1000)
+	Set(%AlreadyWaiting, 0)
+
+	
+EVENT spottedSomeone
+ON
+	OnCharacterEvent(%OtherSentinel, "spottedSomeone")
+ACTIONS
+	Set(%Active,2)
+	SetPriority("Watching",0)
+	Interrupt("Watching")
+	SetPriority("Alarmed",1000)
+	Set(%WaitForAck,0)
+	Set(%Waiting,0)
+	DebugText(CHARACTER:Player1_dac1443f-a866-4ab3-b240-e705c0b20ec5, "spotting")
+	DisplayText(__Me,"HIB_SentinelSpotted",5.0)
+	StopTimer("backToNormal")
+	Set(%AlreadyWaiting, 0)
+	
+EVENT DelayTimer
+ON
+	OnTimer("SentDelayTimer")
+ACTIONS
+	CharacterPlayEffect(__Me,"FX_GP_Wollocks_Totem_Cast_A")
+	PlayEffectAt(%Playervar,"FX_GP_TeleportSmoke_A")
+	TeleportTo(%Playervar,%PointTargetTele,1)
+	PlayEffectAt(%Playervar,"FX_GP_TeleportSmoke_A")
+	CharacterApplyStatus(%Playervar,KNOCKED_DOWN,-2,1)

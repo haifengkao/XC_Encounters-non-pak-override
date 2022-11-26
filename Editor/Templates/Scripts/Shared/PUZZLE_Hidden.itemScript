@@ -1,0 +1,66 @@
+INIT
+ITEM:__Me
+INT:%CurrentIsVisible=0
+INT:%NewIsVisible=0
+EXTERN INT:%DisplayMessage = 1
+
+EVENTS
+
+EVENT InitializeHidden
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		IsEqual(%CurrentIsVisible,0)
+	THEN
+		StartTimer("UpdateHidden",0.2,-1)
+	ENDIF
+	SetVisible(__Me,%CurrentIsVisible)
+	
+EVENT ShutdownHidden
+ON
+	OnShutdown()
+ACTIONS
+	StopTimer("UpdateHidden")
+
+EVENT UpdateHidden
+ON
+	OnTimer("UpdateHidden")
+ACTIONS
+	Set(%NewIsVisible,0)
+	IterateParty("HiddenObjectCheck")
+	IF "!c1"
+		IsEqual(%CurrentIsVisible,%NewIsVisible)
+	THEN
+		Set(%CurrentIsVisible,%NewIsVisible)
+		SetVisible(__Me,%CurrentIsVisible)
+	ENDIF
+	
+	IF "c1"
+		IsEqual(%CurrentIsVisible,1)
+	THEN
+		StopTimer("UpdateHidden")
+	ENDIF
+
+EVENT CheckHidden
+VARS
+CHARACTER:_Char
+FLOAT:_TrapDetection
+FLOAT:_Dist
+ON
+	OnIterateCharacter(_Char,"HiddenObjectCheck")
+ACTIONS
+	IF "c1&!c2&c3&c4&c5" 
+		IsEqual(%NewIsVisible,0)
+		CharacterIsDead(_Char)
+		CharacterGetStat(_TrapDetection,_Char,TrapDetection)
+		GetDistance(_Dist,_Char,__Me)
+		IsLessThen(_Dist,_TrapDetection)
+	THEN
+		Set(%NewIsVisible,1)
+		IF "c1"
+			IsEqual(%DisplayMessage,1)
+		THEN
+			CharacterEvent(_Char,"HiddenTrapReveal")
+		ENDIF
+	ENDIF

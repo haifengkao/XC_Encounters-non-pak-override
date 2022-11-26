@@ -1,0 +1,57 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_OneShot_DialogTrigger_NewSystem(TRIGGER_DAF_Area_BOGateGuard1,"DAF_BO_GateGuard1",CHARACTER_DAF_BO_GateGuard1);
+
+DB_OneShot_DialogTrigger_NewSystem(TRIGGER_DAF_Area_OutsideGate,"DAF_Skeleton_Trader",CHARACTER_DAF_Skeleton_Trader);
+DB_Dialogs(CHARACTER_DAF_Skeleton_Trader, "DAF_Skeleton_Trader");
+DB_Dialogs(CHARACTER_DAF_BO_GateGuard1, "DAF_BO_GateGuard1");
+
+ItemToCharacter(ITEM_DAF_DoorVillageEntranceKey1,CHARACTER_DAF_BO_GateGuard1);
+
+ItemToCharacter(ITEM_DAF_Immaculate_Token_Thelyron,CHARACTER_CYS_Thelyron);
+ItemToCharacter(ITEM_DAF_Immaculate_Token_Evelyn,CHARACTER_CYS_ZombieJake);
+ItemToCharacter(ITEM_DAF_Immaculate_Token_Attenberah,CHARACTER_LUC_IV_Attenberah);
+ItemToCharacter(ITEM_DAF_Immaculate_Token_Troll,CHARACTER_DAF_TrollBridge);
+KBSECTION
+//REGION At The Gate 
+IF
+DialogEnded("DAF_BO_GateGuard1",_)
+AND
+DB_GlobalEvent("DAF_Gateguards_Entrance")
+AND
+NOT DB_OnlyOnce("DAF_OpenedGate")
+THEN
+DB_OnlyOnce("DAF_OpenedGate");
+ItemUnlockAndOpen(ITEM_DAF_DoorVillageEntrance1);
+Proc_SendJinxicaIfOutside();
+
+IF
+DialogEnded("DAF_BO_GateGuard1",_Dialog)
+AND
+DB_GlobalEvent("DAF_Gateguards_Aggressive")
+THEN
+SetRelationFactionToPlayers("DAF_VillageBO_GateGuard",0);
+
+IF
+ItemOpened(ITEM_DAF_DoorVillageEntrance1)
+AND
+NOT DB_GlobalEvent("DAF_Gateguards_Entrance")
+THEN
+SetRelationFactionToPlayers("DAF_VillageBO_GateGuard",0);
+Proc_SendJinxicaIfOutside();
+
+PROC
+Proc_SendJinxicaIfOutside()
+AND
+NOT DB_GlobalEvent("DAF_JinxikaLeftForVillage")
+THEN
+GlobalSetEvent("DAF_JinxikaLeftForVillage");
+//END_REGION
+
+
+
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

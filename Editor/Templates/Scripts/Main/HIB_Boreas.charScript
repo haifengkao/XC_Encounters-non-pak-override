@@ -1,0 +1,335 @@
+INIT
+	CHARACTER:__Me
+	STRING:%SurfaceType = "Ice"
+	EXTERN INT:%SeasonChange_Current = 1
+	EXTERN INT:%SeasonChange_Desired = 2
+	CHARACTERTEMPLATE:%TinyFireSummonRT="Elementals_Rock_Fire_5501f0c1-e456-4b85-b1e5-22c0f728bd5c"
+	CHARACTERTEMPLATE:%TinyIceSummonRT="Elementals_Rock_Ice_b5584a8f-65ee-4f3e-9f2e-a02918970775"
+	CHARACTERTEMPLATE:%TinyAirSummonRT="Elementals_Rock_Air_ec092a04-f886-410a-9296-ee7a87e577cd"
+	CHARACTERTEMPLATE:%TinyEarthSummonRT="Elementals_Rock_Earth_1f9f846f-4cdf-4884-8610-11e5f73ec7c3"
+	CHARACTERTEMPLATE:%Boreas_Ward_Fire="Boreas_Ward_Fire_14f5b089-48ba-4bb8-899f-aa8997c28da7"
+	CHARACTERTEMPLATE:%Boreas_Ward_Water="Boreas_Ward_Water_52c2556e-5867-4203-b7cb-7a68f5863469"
+	CHARACTERTEMPLATE:%Boreas_Ward_Air="Boreas_Ward_Air_1ffd2759-352d-4aa3-bef1-688ab199d58c"
+	CHARACTERTEMPLATE:%Boreas_Ward_Earth="Boreas_Ward_Earth_a31e2072-7662-4b21-a216-4c3a5392f73a"
+	
+	//priority of Boreas's _SummonElemental reaction types is increased through Osiris
+	//BoreasCastle.txt > CharacterSetReactionPriority(CHARACTER_HIB_KingBoreas,_SummoningSpell,500);
+	//no AP cost for this spell because the whole Osiris part would have to be rewritten
+
+BEHAVIOUR
+REACTION Boreas_SummonFireElementals,0		//FIRE
+USAGE COMBAT
+VARS
+	INT:_SpawnLoops = 1
+	CHARACTER:_PlayerA
+	CHARACTER:_PlayerB
+	CHARACTER:_Summon1
+	CHARACTER:_Summon2
+	CHARACTER:_BoreasWard
+	FLOAT3:_PlayerPosition
+	FLOAT3:_BoreasTPPosition
+	FLOAT3:_Summon1SpawnPosition
+	FLOAT3:_Summon2SpawnPosition
+	FLOAT3:_PosOffset
+	FLOAT:_Angle
+	FLOAT:_Dist
+	INT:_FXHandle1
+	INT:_FXHandle2
+	INT:_FXHandle3
+CHECK "c1&c2"
+	CharacterGet(_PlayerA,__Me,30,Highest,Distance,Enemy)
+	CharacterGet(_PlayerB,__Me,30,Lowest,Distance,Enemy)
+ACTIONS
+	CharacterUseSkill("Summon_EnemyBoreasFire",_PlayerA)
+	//Sleep(1)
+	//CharacterPlayAnimation("cast_target_cast",1,0)
+	CharacterPlayEffect(__Me, "FX_Creatures_Skills_BoreasSummon_Cast_A", "Dummy_Root")
+	WHILE "!c1"
+		IsGreaterThen(_SpawnLoops,2)
+	DO
+		GetPosition(_PlayerB,_PlayerPosition)
+		GetRandomBetween(_Angle,0,360)
+		GetRandomBetween(_Dist,2,3)
+		Set(_PosOffset,{1;0;0})
+		RotateY(_PosOffset,_Angle)
+		Multiply(_PosOffset,_Dist)
+		IF "c1"
+			IsEqual(_SpawnLoops,1)	
+		THEN	
+			Set(_Summon1SpawnPosition,_PlayerPosition)			
+			Add(_Summon1SpawnPosition,_PosOffset)
+		ELIF "c1"
+			IsEqual(_SpawnLoops,2)	
+		THEN	
+			Set(_Summon2SpawnPosition,_PlayerPosition)			
+			Add(_Summon2SpawnPosition,_PosOffset)			
+		ENDIF
+		Add(_SpawnLoops,1)	
+	ENDWHILE
+	Set(_SpawnLoops,0)	
+	PlayEffectAt(_Summon1SpawnPosition, "FX_Creatures_Skills_BoreasSummon_Fire_A")
+	SpawnCharacter(_Summon1,%TinyFireSummonRT,_Summon1SpawnPosition,0)
+	CharacterPlayLoopEffect(_FXHandle1,_Summon1,"FX_Creatures_Env_Elemental_RocksFire_A")
+	PlayEffectAt(_Summon1SpawnPosition, "FX_Creatures_Skills_BoreasSummon_Fire_A")
+	SpawnCharacter(_Summon2,%TinyFireSummonRT,_Summon2SpawnPosition,0)
+	CharacterPlayLoopEffect(_FXHandle2,_Summon2,"FX_Creatures_Env_Elemental_RocksFire_A")
+	IF "c1"
+		IsHardcore()
+	THEN
+		SpawnCharacter(_BoreasWard,%Boreas_Ward_Fire,__Me,1)
+		CharacterPlayLoopEffect(_FXHandle3,_BoreasWard,"FX_Creatures_Env_Elemental_RocksFire_A")
+	ENDIF
+	StopLoopEffect(_FXHandle1)
+	StopLoopEffect(_FXHandle2)
+	StopLoopEffect(_FXHandle3)
+	Set(%SeasonChange_Current,0)
+	//CharacterEndTurn()
+	SetPriority("Boreas_SummonFireElementals",0)
+INTERRUPT
+	Reset()
+	
+REACTION Boreas_SummonIceElementals,0		//ICE
+USAGE COMBAT
+VARS
+	INT:_SpawnLoops = 1
+	CHARACTER:_PlayerA
+	CHARACTER:_PlayerB
+	CHARACTER:_Summon1
+	CHARACTER:_Summon2
+	CHARACTER:_BoreasWard
+	FLOAT3:_PlayerPosition
+	FLOAT3:_BoreasTPPosition
+	FLOAT3:_Summon1SpawnPosition
+	FLOAT3:_Summon2SpawnPosition
+	FLOAT3:_PosOffset
+	FLOAT:_Angle
+	FLOAT:_Dist
+	INT:_FXHandle1
+	INT:_FXHandle2
+	INT:_FXHandle3
+CHECK "c1&c2"
+	CharacterGet(_PlayerA,__Me,30,Highest,Distance,Enemy)
+	CharacterGet(_PlayerB,__Me,30,Lowest,Distance,Enemy)
+ACTIONS
+	CharacterUseSkill("Summon_EnemyBoreasIce",_PlayerA)
+	//Sleep(1)
+	//CharacterPlayAnimation("cast_target_cast",1,0)
+	CharacterPlayEffect(__Me, "FX_Creatures_Skills_BoreasSummon_Cast_A", "Dummy_Root")
+	WHILE "!c1"
+		IsGreaterThen(_SpawnLoops,2)
+	DO
+		GetPosition(_PlayerB,_PlayerPosition)
+		GetRandomBetween(_Angle,0,360)
+		GetRandomBetween(_Dist,2,3)
+		Set(_PosOffset,{1;0;0})
+		RotateY(_PosOffset,_Angle)
+		Multiply(_PosOffset,_Dist)
+		IF "c1"
+			IsEqual(_SpawnLoops,1)	
+		THEN	
+			Set(_Summon1SpawnPosition,_PlayerPosition)			
+			Add(_Summon1SpawnPosition,_PosOffset)
+		ELIF "c1"
+			IsEqual(_SpawnLoops,2)	
+		THEN	
+			Set(_Summon2SpawnPosition,_PlayerPosition)			
+			Add(_Summon2SpawnPosition,_PosOffset)			
+		ENDIF
+		Add(_SpawnLoops,1)	
+	ENDWHILE
+	Set(_SpawnLoops,0)	
+	PlayEffectAt(_Summon1SpawnPosition, "FX_Creatures_Skills_BoreasSummon_Water_A")
+	SpawnCharacter(_Summon1,%TinyIceSummonRT,_Summon1SpawnPosition,0)
+	CharacterPlayLoopEffect(_FXHandle1,_Summon1,"FX_Creatures_Env_Elemental_RocksIce_A")
+	PlayEffectAt(_Summon1SpawnPosition, "FX_Creatures_Skills_BoreasSummon_Water_A")
+	SpawnCharacter(_Summon2,%TinyIceSummonRT,_Summon2SpawnPosition,0)
+	CharacterPlayLoopEffect(_FXHandle2,_Summon2,"FX_Creatures_Env_Elemental_RocksIce_A")
+	IF "c1"
+		IsHardcore()
+	THEN
+		SpawnCharacter(_BoreasWard,%Boreas_Ward_Water,__Me,1)
+		CharacterPlayLoopEffect(_FXHandle3,_BoreasWard,"FX_Creatures_Env_Elemental_RocksIce_A")
+	ENDIF	
+	StopLoopEffect(_FXHandle1)
+	StopLoopEffect(_FXHandle2)
+	StopLoopEffect(_FXHandle3)
+	Set(%SeasonChange_Current,0)	
+	//CharacterEndTurn()
+	SetPriority("Boreas_SummonIceElementals",0)
+INTERRUPT
+	Reset()
+	
+REACTION Boreas_SummonAirElementals,0		//AIR
+USAGE COMBAT
+VARS
+	INT:_SpawnLoops = 1
+	CHARACTER:_PlayerA
+	CHARACTER:_PlayerB
+	CHARACTER:_Summon1
+	CHARACTER:_Summon2
+	CHARACTER:_BoreasWard
+	FLOAT3:_PlayerPosition
+	FLOAT3:_BoreasTPPosition
+	FLOAT3:_Summon1SpawnPosition
+	FLOAT3:_Summon2SpawnPosition
+	FLOAT3:_PosOffset
+	FLOAT:_Angle
+	FLOAT:_Dist
+	INT:_FXHandle1
+	INT:_FXHandle2
+	INT:_FXHandle3
+CHECK "c1&c2"
+	CharacterGet(_PlayerA,__Me,30,Highest,Distance,Enemy)
+	CharacterGet(_PlayerB,__Me,30,Lowest,Distance,Enemy)
+ACTIONS
+	CharacterUseSkill("Summon_EnemyBoreasAir",_PlayerA)
+	//Sleep(1)
+	//CharacterPlayAnimation("cast_target_cast",1,0)
+	CharacterPlayEffect(__Me, "FX_Creatures_Skills_BoreasSummon_Cast_A", "Dummy_Root")
+	WHILE "!c1"
+		IsGreaterThen(_SpawnLoops,2)
+	DO
+		GetPosition(_PlayerB,_PlayerPosition)
+		GetRandomBetween(_Angle,0,360)
+		GetRandomBetween(_Dist,2,3)
+		Set(_PosOffset,{1;0;0})
+		RotateY(_PosOffset,_Angle)
+		Multiply(_PosOffset,_Dist)
+		IF "c1"
+			IsEqual(_SpawnLoops,1)	
+		THEN	
+			Set(_Summon1SpawnPosition,_PlayerPosition)			
+			Add(_Summon1SpawnPosition,_PosOffset)
+		ELIF "c1"
+			IsEqual(_SpawnLoops,2)	
+		THEN	
+			Set(_Summon2SpawnPosition,_PlayerPosition)			
+			Add(_Summon2SpawnPosition,_PosOffset)			
+		ENDIF
+		Add(_SpawnLoops,1)	
+	ENDWHILE
+	Set(_SpawnLoops,0)
+	PlayEffectAt(_Summon1SpawnPosition, "FX_Creatures_Skills_BoreasSummon_Air_A")
+	SpawnCharacter(_Summon1,%TinyAirSummonRT,_Summon1SpawnPosition,0)
+	CharacterPlayLoopEffect(_FXHandle1,_Summon1,"FX_Creatures_Env_Elemental_RocksWind_A")
+	PlayEffectAt(_Summon1SpawnPosition, "FX_Creatures_Skills_BoreasSummon_Air_A")
+	SpawnCharacter(_Summon2,%TinyAirSummonRT,_Summon2SpawnPosition,0)
+	CharacterPlayLoopEffect(_FXHandle2,_Summon2,"FX_Creatures_Env_Elemental_RocksWind_A")
+	IF "c1"
+		IsHardcore()
+	THEN
+		SpawnCharacter(_BoreasWard,%Boreas_Ward_Air,__Me,1)
+		CharacterPlayLoopEffect(_FXHandle3,_BoreasWard,"FX_Creatures_Env_Elemental_RocksWind_A")
+	ENDIF		
+	StopLoopEffect(_FXHandle1)
+	StopLoopEffect(_FXHandle2)
+	StopLoopEffect(_FXHandle3)
+	Set(%SeasonChange_Current,0)	
+	//CharacterEndTurn()
+	SetPriority("Boreas_SummonAirElementals",0)
+INTERRUPT
+	Reset()
+	
+REACTION Boreas_SummonEarthElementals,0		//EARTH
+USAGE COMBAT
+VARS
+	INT:_SpawnLoops = 1
+	CHARACTER:_PlayerA
+	CHARACTER:_PlayerB
+	CHARACTER:_Summon1
+	CHARACTER:_Summon2
+	CHARACTER:_BoreasWard
+	FLOAT3:_PlayerPosition
+	FLOAT3:_BoreasTPPosition
+	FLOAT3:_Summon1SpawnPosition
+	FLOAT3:_Summon2SpawnPosition
+	FLOAT3:_PosOffset
+	FLOAT:_Angle
+	FLOAT:_Dist
+	INT:_FXHandle1
+	INT:_FXHandle2
+	INT:_FXHandle3
+CHECK "c1&c2"
+	CharacterGet(_PlayerA,__Me,30,Highest,Distance,Enemy)
+	CharacterGet(_PlayerB,__Me,30,Lowest,Distance,Enemy)
+ACTIONS
+	CharacterUseSkill("Summon_EnemyBoreasEarth",_PlayerA)
+	//Sleep(1)
+	//CharacterPlayAnimation("cast_target_cast",1,0)
+	CharacterPlayEffect(__Me, "FX_Creatures_Skills_BoreasSummon_Cast_A", "Dummy_Root")
+	WHILE "!c1"
+		IsGreaterThen(_SpawnLoops,2)
+	DO
+		GetPosition(_PlayerB,_PlayerPosition)
+		GetRandomBetween(_Angle,0,360)
+		GetRandomBetween(_Dist,2,3)
+		Set(_PosOffset,{1;0;0})
+		RotateY(_PosOffset,_Angle)
+		Multiply(_PosOffset,_Dist)
+		IF "c1"
+			IsEqual(_SpawnLoops,1)	
+		THEN	
+			Set(_Summon1SpawnPosition,_PlayerPosition)			
+			Add(_Summon1SpawnPosition,_PosOffset)
+		ELIF "c1"
+			IsEqual(_SpawnLoops,2)	
+		THEN	
+			Set(_Summon2SpawnPosition,_PlayerPosition)			
+			Add(_Summon2SpawnPosition,_PosOffset)			
+		ENDIF
+		Add(_SpawnLoops,1)	
+	ENDWHILE
+	Set(_SpawnLoops,0)
+	PlayEffectAt(_Summon1SpawnPosition, "FX_Creatures_Skills_BoreasSummon_Earth_A")
+	SpawnCharacter(_Summon1,%TinyEarthSummonRT,_Summon1SpawnPosition,0)
+	CharacterPlayLoopEffect(_FXHandle1,_Summon1,"FX_Creatures_Summons_ElementalEarth_A_SpinningRocks")
+	PlayEffectAt(_Summon1SpawnPosition, "FX_Creatures_Skills_BoreasSummon_Earth_A")
+	SpawnCharacter(_Summon2,%TinyEarthSummonRT,_Summon2SpawnPosition,0)
+	CharacterPlayLoopEffect(_FXHandle2,_Summon2,"FX_Creatures_Summons_ElementalEarth_A_SpinningRocks")
+	IF "c1"
+		IsHardcore()
+	THEN
+		SpawnCharacter(_BoreasWard,%Boreas_Ward_Earth,__Me,1)
+		CharacterPlayLoopEffect(_FXHandle3,_BoreasWard,"FX_Creatures_Summons_ElementalEarth_A_SpinningRocks")
+	ENDIF		
+	StopLoopEffect(_FXHandle1)
+	StopLoopEffect(_FXHandle2)	
+	StopLoopEffect(_FXHandle3)	
+	Set(%SeasonChange_Current,0)	
+	//CharacterEndTurn()
+	SetPriority("Boreas_SummonEarthElementals",0)
+INTERRUPT
+	Reset()
+		
+//---------------
+EVENTS
+EVENT OnInit_GiveSummonSpells
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill("Summon_EnemyBoreasFire")
+	CharacterAddSkill("Summon_EnemyBoreasIce")
+	CharacterAddSkill("Summon_EnemyBoreasAir")
+	CharacterAddSkill("Summon_EnemyBoreasEarth")
+	
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	IF "c1&!c2"
+		IsLessThen(%SeasonChange_Current,%SeasonChange_Desired)
+		CharacterIsDead(__Me)
+	THEN
+		Add(%SeasonChange_Current,1)
+	ELIF "c1&!(c2|c3|c4|c5|c6|c7)"
+		IsEqual(%SeasonChange_Current,%SeasonChange_Desired)			//c1
+		CharacterIsDead(__Me)											//c2
+		CharacterHasStatus(__Me,"STUNNED")								//c3
+		CharacterHasStatus(__Me,"CHARMED")								//c4
+		CharacterHasStatus(__Me,"KNOCKED_DOWN")							//c5
+		CharacterHasStatus(__Me,"PETRIFIED")							//c6
+		CharacterHasStatus(__Me,"FEAR")									//c7
+	THEN
+		CharacterEvent(__Me,"HIB_WardenSurfaceSpawn")
+		Set(%SeasonChange_Current,0)
+	ENDIF

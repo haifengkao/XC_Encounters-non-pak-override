@@ -1,0 +1,13 @@
+INIT
+
+CHARACTER:__Me
+ITEM:%Portal = END_DKPortal_Active_97598d2f-60af-4c9f-a9f9-a299689042a0
+
+EVENTS
+
+EVENT Die
+ON
+	OnItemEvent(%Portal,"HOM_KillDKEden")
+ACTIONS
+	PlayEffectAt(__Me, "FX_GP_StarStone_Down_A")
+	CharacterDie(__Me, Explode)

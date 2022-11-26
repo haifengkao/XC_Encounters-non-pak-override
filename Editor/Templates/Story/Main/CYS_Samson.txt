@@ -1,0 +1,69 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Dialogs(CHARACTER_CYS_SamsonGhost,"CYS_SamsonGhost");
+
+DB_EventGivesPartyDialog("CYS_GetSamsonDD","CYS_DD_AfterLighthouse");
+KBSECTION
+IF
+DialogEnded("CYS_BC_Desdemona", _)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_BC_Desdemona, "isPissed", 1)
+THEN
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_CYS_BC_Desdemona);
+CharacterTeleportToCharacter(CHARACTER_CYS_BC_Desdemona, CHARACTER_CYS_SamsonGhost,"");
+CharacterSetHasDialog(CHARACTER_CYS_BC_Desdemona, 0);
+CharacterSetHasDialog(CHARACTER_CYS_SamsonGhost, 0);
+DB_OneShotPlayerTrigger(TRIGGER_CYS_DesdeSamsonFight);
+CharacterSetReactionPriority(CHARACTER_CYS_SamsonGhost, "Waiting", 50000);
+
+PROC
+ProcOneShotTriggerEntered(_Player, TRIGGER_CYS_DesdeSamsonFight)
+THEN
+PROC_MendatoryDialogThreeSpeaker("CYS_DesdeAfterSamson", CHARACTER_CYS_BC_Desdemona,CHARACTER_CYS_SamsonGhost, _Player);
+
+IF
+DialogEnded("CYS_DesdeAfterSamson", _)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_BC_Desdemona, "CYS_BC_DesdemonaStays", 1)
+THEN
+DialogStartTwoSpeakerDialog("CYS_AD_DesdeSamsonMad", CHARACTER_CYS_BC_Desdemona, CHARACTER_CYS_SamsonGhost);
+
+IF
+DialogEnded("CYS_DesdeAfterSamson", _)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_BC_Desdemona, "CYS_BC_DesdemonaHoE", 1)
+THEN
+DialogStartTwoSpeakerDialog("CYS_AD_DesdemonaSamsonYeah", CHARACTER_CYS_BC_Desdemona, CHARACTER_CYS_SamsonGhost);
+
+IF
+AutomatedDialogEnded("CYS_AD_DesdemonaSamsonYeah", _)
+THEN
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_CYS_BC_Desdemona);
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_CYS_SamsonGhost);
+CharacterSetOnStage(CHARACTER_CYS_BC_Desdemona, 0);
+CharacterSetOnStage(CHARACTER_CYS_SamsonGhost, 0);
+QuestUpdate("CYS_Samson", "Update3");
+QuestClose("CYS_Samson");
+    Proc_CompanionComment(CHARACTER_Jahan,"JAH_CC_SamsonMad",CHARACTER_CYS_SamsonGhost);
+
+IF
+AutomatedDialogEnded("CYS_AD_DesdeSamsonMad", _)
+THEN
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_CYS_BC_Desdemona);
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_CYS_SamsonGhost);
+CharacterSetOnStage(CHARACTER_CYS_BC_Desdemona, 0);
+CharacterSetOnStage(CHARACTER_CYS_SamsonGhost, 0);
+QuestUpdate("CYS_Samson", "Update5");
+QuestClose("CYS_Samson");
+    Proc_CompanionComment(CHARACTER_Jahan,"JAH_CC_SamsonYeah",CHARACTER_CYS_SamsonGhost);
+
+IF
+TextEventSet("Samson")
+THEN
+GlobalSetEvent("CYS_KnowsSamsonKiller");
+ProcDoTwoSpeakerDialog("CYS_BC_Desdemona", CHARACTER_CYS_BC_Desdemona, CHARACTER_Player1);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

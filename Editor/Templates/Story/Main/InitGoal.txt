@@ -1,0 +1,44 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_DefinedCompanions(CHARACTER_Madoc);
+DB_DefinedCompanions(CHARACTER_Jahan);
+DB_DefinedCompanions(CHARACTER_Bairdotr);
+DB_DefinedCompanions(CHARACTER_Wolgraff);
+DB_DefinedCompanions(CHARACTER_Henchman1);
+DB_DefinedCompanions(CHARACTER_Henchman2);
+DB_DefinedCompanions(CHARACTER_Henchman3);
+DB_DefinedCompanions(CHARACTER_Henchman4);
+DB_DefinedCompanions(CHARACTER_Henchman5);
+DB_DefinedCompanions(CHARACTER_Henchman6);
+DB_DefinedCompanions(CHARACTER_Henchman7);
+DB_DefinedCompanions(CHARACTER_Henchman8);
+DB_DefinedCompanions(CHARACTER_Henchman9);
+DB_DefinedCompanions(CHARACTER_Henchman10);
+
+// Hacks for giant Leandra sequence
+CharacterLockMovement(CHARACTER_END_RoomALeandra,1);
+CharacterLockMovement(CHARACTER_END_LeandraVoice,1);
+SetStoryNPC(CHARACTER_END_LeandraVoice,1);
+CharacterSetVisible(CHARACTER_END_LeandraVoice,0);
+KBSECTION
+//This is annoying, we put it here because otherwise we start
+//executing before the engine is ready..
+PROC
+SetupShopTriggers()
+THEN
+DB_ShopRegion("Cyseal",TRIGGER_CYS_Ownership_Cyseal_Esmeralda_Shop,CHARACTER_CYS_Esmeralda,"Gero");
+DB_ShopRegion("Cyseal",TRIGGER_CYS_Ownership_Market_CheeseTrader,CHARACTER_CYS_CheeseSeller,"Gero");
+DB_ShopRegion("Cyseal",TRIGGER_CYS_Ownership_Market_FishTrader,CHARACTER_CYS_FishSeller,"Gero");
+DB_ShopRegion("Cyseal",TRIGGER_CYS_Ownership_Market_MiscTrader,CHARACTER_CYS_MarketJunkSeller,"Gero");
+DB_ShopRegion("Cyseal",TRIGGER_CYS_Ownership_Market_VegetableTrader,CHARACTER_CYS_VegetableSeller,"Gero");
+DB_ShopRegion("Cyseal",TRIGGER_CYS_Ownership_Market_WeaponTrader,CHARACTER_CYS_ArrowSeller,"Gero");
+DB_ShopRegion("Cyseal",TRIGGER_CYS_Shop_Brian,CHARACTER_CYS_Brian,"CYS_Brian_Gero");
+DB_ShopRegion("LucullaForest",TRIGGER_LUC_Ownership_Silverglen_Nadia_Shop,CHARACTER_LUC_Nadia,"Gero");
+DB_ShopRegion("LucullaForest",TRIGGER_LUC_Ownership_Blacksmith,CHARACTER_LUC_IV_BlacksmithApprentice,"Gero");
+DB_ShopRegion("DarkForest",TRIGGER_DAF_SkeletonShop,CHARACTER_DAF_Skeleton_Trader,"Gero");
+
+
+EXITSECTION
+
+ENDEXITSECTION

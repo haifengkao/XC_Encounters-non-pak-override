@@ -1,0 +1,54 @@
+INIT
+
+CHARACTER:__Me
+
+INT:%State = 0
+
+BEHAVIOUR
+
+REACTION Recruiting,1050
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%State,0)
+VARS
+	FIXEDSTRING:_Animation
+	FIXEDSTRING:_Text
+ACTIONS
+	IF "c1"
+		IsEqual(%State,0)
+	THEN
+	    CharacterWander(TRIGGER:CYS_AreaKelvanMineRectruiter_4e8a2fae-09cc-4b3f-8ae5-a5906707668b,3)
+		IF "c1"
+			IsRandom(0.4)
+		THEN
+			GetRandom(_Text,"CYS_Kelvan_MineRecruiter_2")
+			DisplayText(__Me,_Text,5)
+		ENDIF
+		GetRandom(_Animation,"Intimidate_01","Wave_03", "Trader_03", "Halt_01")
+		CharacterPlayAnimation(_Animation)
+		Sleep(5)
+	ENDIF	
+INTERRUPT
+	Reset()
+	
+REACTION ReactOnPeoplePassingBy, 1060
+USAGE PEACE
+VARS
+	FLOAT:_touchRange
+	CHARACTER:_character
+	FIXEDSTRING:_text
+CHECK "c1&c2"
+	CharacterGetTouchRange(_touchRange, __Me)
+	CharacterGet(_character,__Me,_touchRange, Lowest, Distance)
+ACTIONS
+	CharacterFollow(_character, 2, 0)
+	IF "c1"
+		IsRandom(0.4)
+	THEN
+		GetRandom(_text, "CYS_Kelvan_MineRecruiter_3")
+		DisplayText(__Me, _text)
+	ENDIF
+	CharacterMoveTo(TRIGGER:CYS_AreaKelvanMineRecruiter_4e8a2fae-09cc-4b3f-8ae5-a5906707668b, 0)
+	Sleep(5)
+INTERRUPT
+	Reset()

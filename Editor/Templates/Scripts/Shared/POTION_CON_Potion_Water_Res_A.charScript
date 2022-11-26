@@ -1,0 +1,39 @@
+#TEMPLATE "_POTION_Base" : CON_Potion_Water_Res_A
+
+INIT
+CHARACTER:__Me
+// [GLOBAL_VARS]
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_CON_Potion_Water_Res_A
+VARS
+	// [CALC_VARS]
+	FLOAT:_StatWaterResistance
+	FLOAT:_Score
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_CON_Potion_Water_Res_A")
+ACTIONS		
+	// [CALC_ACTIONS_PRE]
+	Set(_Score, 0.0)
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	IF "((c1)|c2)&(!(c3&c4))"
+	    CharacterHasBeenHitBy(__Me, Water) // c1
+	    CharacterHasHadStatus(__Me, FROZEN) // c2
+	    CharacterGetStat(_StatWaterResistance, __Me, WaterResistance) // c3
+	    IsGreaterThen(_StatWaterResistance, 50) // c4
+	THEN
+	    Add(_Score, %ActionScore_CON_Potion_Water_Res_A)
+	ENDIF
+	// [~CALC_ACTIONS]
+
+	Cast(%ActionScore_CON_Potion_Water_Res_A, _Score)
+
+

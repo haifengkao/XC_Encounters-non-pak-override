@@ -1,0 +1,51 @@
+/* 
+	/!\ THIS SCRIPT ISN'T USED! /!\
+	
+INIT
+	CHARACTER:__Me
+	EXTERN INT:%HatchCountdownStartsAtTurn = 0
+	EXTERN INT:%HatchCountdown = 2
+	
+//------------------------
+BEHAVIOUR
+REACTION SpiderEgg_SkipTurn, 100
+USAGE ALL	
+ACTIONS 
+	CharacterEndTurn()
+
+//------------------------
+EVENTS
+EVENT OnInit_OnCombatEnded_PeaceHatchTimer
+ON
+	OnInit()
+	OnCombatEnded()
+ACTIONS
+	StartTimer("CMB_LUC_SpiderBoss_EggHatchTimer",12,0)
+	
+EVENT OnTimer_PeaceHatch
+ON
+	OnTimer("CMB_LUC_SpiderBoss_EggHatchTimer")
+ACTIONS
+	CharacterDie(__Me)
+	CharacterPlayEffect(__Me,"FX_GP_Footstep_A_Large_Ooze")
+	CharacterPlayEffect(__Me,"FX_GP_Hit_Ooze_A_Medium")
+	SpawnCharacter(_,LUC_SpiderBoss_Spiderling_d4c7abfb-1cd9-4f34-b156-a0919ecfa992,__Me,1)
+	CombatLogText(__Me,"CMB_LUC_SpiderBoss_Hatching",0,1)	
+	
+EVENT OnTurn_CombatHatchTimer
+ON
+	OnTurn()
+ACTIONS
+	IF "c1"
+		IsLessThen(%HatchCountdownStartsAtTurn,%HatchCountdown)
+	THEN		
+		Add(%HatchCountdownStartsAtTurn,1)
+		CombatLogText(__Me,"CMB_LUC_SpiderBoss_Laid",0,1)
+	ELSE
+		CharacterDie(__Me)
+		CharacterPlayEffect(__Me,"FX_GP_Footstep_A_Large_Ooze")
+		CharacterPlayEffect(__Me,"FX_GP_Hit_Ooze_A_Medium")
+		SpawnCharacter(_,LUC_SpiderBoss_Spiderling_d4c7abfb-1cd9-4f34-b156-a0919ecfa992,__Me,1)
+		CombatLogText(__Me,"CMB_LUC_SpiderBoss_Hatching",0,1)		
+	ENDIF
+*/

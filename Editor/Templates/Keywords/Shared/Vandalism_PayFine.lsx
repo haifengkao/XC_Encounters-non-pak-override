@@ -1,0 +1,496 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<save>
+    <header version="2" time="1417696248" />
+    <version major="1" minor="3" revision="0" build="0" />
+    <region id="keywordDialog">
+        <node id="root">
+            <attribute id="KeywordVoiced" value="0" type="19" />
+            <attribute id="PlayGreeting" value="0" type="19" />
+            <attribute id="keywordAutoImport" value="0" type="19" />
+            <attribute id="keywordName" value="Vandalism_PayFine" type="22" />
+            <children>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="0ac35041-1caf-4317-ba04-35748cb64e59" type="22" />
+                    <attribute id="keywordContentMapValue" value="A wise decision. Unfortunately, since this is not the first time we&apos;ve had to fine you for vandalism, we will have to ask you to pay a fine of 1000 gold pieces." handle="hef7d2a6fgc40eg478dgb325g73bc2bcad2f0" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="1b5b3c9b-0fba-4279-bb15-c5ecb5a45416" type="22" />
+                    <attribute id="keywordContentMapValue" value="I think I&apos;ll carry out an execution of my own, right here and now." handle="h07f905eag5fbag4623gbf1cg201158feca2e" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="43c6d630-ac49-44de-9191-26ad46b2ca83" type="22" />
+                    <attribute id="keywordContentMapValue" value="A sensible course of action, citizen. Unfortunately, since this is not the first time we&apos;ve had to speak to you about this sort of thing, we will have to ask you to pay a fine of 250 gold pieces." handle="h719a8931g3d16g4bdeg8ed8gebb094fa72eb" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="47a21bbc-7e6d-4457-8d75-c9843c545fc0" type="22" />
+                    <attribute id="keywordContentMapValue" value="Thank you citizen. Farewell. And try to keep out of trouble, would you?" handle="h37677157g8ca1g43f9g9346gd44e8be2fd58" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="4933ed1a-6463-417e-b2f9-43cf5730eb46" type="22" />
+                    <attribute id="keywordContentMapValue" value="Greetings ma&apos;am. May we ask what&apos;s going on &apos;ere then?" handle="h3ae46266gbbd5g40efg91a0g5ae519d320cb" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="64fda3a4-7014-4c45-ac8e-ace88add017d" type="22" />
+                    <attribute id="keywordContentMapValue" value="Will do! Let&apos;s go, felon!" handle="h5f2617d3g99c6g438dga725g6e8ce56f7b84" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="69b55832-ad24-407f-b164-2bf39d842f7e" type="22" />
+                    <attribute id="keywordContentMapValue" value="A wise decision, citizen. Now, I&apos;m going to let you off with a warning this time, so you needn&apos;t pay me anything. Anybody can make a little mistake, but if you make it again, there&apos;ll be either a heavy fine or a jail sentence waiting for you. Understood?" handle="h6782422egf9c3g46f3gbdb9gde8072dc725e" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="6bac2ab4-a4cf-4a36-82ba-c9c22a07f610" type="22" />
+                    <attribute id="keywordContentMapValue" value="Are you willing to pay for the damages you&apos;ve caused?" handle="hfe2a93acg0115g414egad0eg87dc8d0227e5" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="6eba373a-d6d0-4c9f-ad67-448d92d50ec2" type="22" />
+                    <attribute id="keywordContentMapValue" value="Then I&apos;m afraid we&apos;ll have to charge you. Guards! CHARGE!" handle="h0e4ece95gf38cg480cga3aagd6fecc1c5e16" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="731f195e-f9ef-46a4-929a-5a4fa63bafc9" type="22" />
+                    <attribute id="keywordContentMapValue" value="Fine: here&apos;s the gold." handle="hb2d2f903g1b24g440dga72dg7ae6f5a5bce6" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="78be69b8-80b1-4da3-aa7b-039eb25c92c6" type="22" />
+                    <attribute id="keywordContentMapValue" value="Greeting" handle="h7f890f24g8572g4902g90b4gd362b7e9bdf2" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="8880e017-0b44-4ad2-8d82-1684d641a8b1" type="22" />
+                    <attribute id="keywordContentMapValue" value="I&apos;m afraid I just can&apos;t pay that sum." handle="hcda4fc88g88adg476bg9798g3afeb4502a70" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="8a595965-2f3a-462a-a651-04146251047d" type="22" />
+                    <attribute id="keywordContentMapValue" value="Not really, no." handle="h8eda110dg639eg4e79gaa89g3de8ba8c0a21" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="8ca56a5f-a8a0-4837-9825-347d6eef9384" type="22" />
+                    <attribute id="keywordContentMapValue" value="You&apos;re showing some commonsense at last, citizen. You are, however, a habitual criminal. I am therefore going to demand the maximum penalty allowed for such offences. You will pay 5,000 gold pieces, immediately, or face a lengthy period of imprisonment." handle="h75bdda77g44b3g42a2g8429g3f68725b8b09" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="a22528ff-1490-415d-9a21-d6198df7080c" type="22" />
+                    <attribute id="keywordContentMapValue" value="You might as well escort me to jail." handle="h1f1b6f27gb9f4g421dg80abg84edda45ce33" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="ae229a5a-d86c-4302-ab18-0b49048df89d" type="22" />
+                    <attribute id="keywordContentMapValue" value="I suppose I am, yes." handle="h2b0b7b1fg0053g416dg9958g0d2aa2329792" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="bf78208b-7b30-4c46-94c8-99773dcd34d7" type="22" />
+                    <attribute id="keywordContentMapValue" value="That&apos;s too bad! Follow us quietly to jail or we&apos;ll be forced to carry out a summary execution. Understood?" handle="h0a3dfefagb845g469eg994ag1e5eed85bec8" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="d4569e0a-3e51-42c0-9a0b-c63d959d66d3" type="22" />
+                    <attribute id="keywordContentMapValue" value="Very well, it&apos;s your choice. Follow us quietly to jail or we&apos;ll be forced to carry out a summary execution. Understood?" handle="h11889298g9a97g4c74g949cgd8f53e9bfdcf" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="f3371ca3-3b21-43e5-9f6b-d26878304f3d" type="22" />
+                    <attribute id="keywordContentMapValue" value="Very well, it&apos;s your choice. Follow us quietly to jail or we&apos;ll be forced to carry out a summary execution. Understood?" handle="h11889298g9a97g4c74g949cgd8f53e9bfdcf" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="f8c2f55e-3dd7-4ae7-b6c4-ca898fc5edef" type="22" />
+                    <attribute id="keywordContentMapValue" value="Greetings, sir. May we ask what&apos;s going on &apos;ere then?" handle="h54784a79g8865g4e11ga564g2cc287485a0f" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="fbc73257-a6d4-42e6-b1a5-6993b589f459" type="22" />
+                    <attribute id="keywordContentMapValue" value="I refuse to pay that fine!" handle="h4800bfdfg138dg40f8gb7efg1fc73b68cf41" type="28" />
+                </node>
+                <node id="keywordNode">
+                    <attribute id="keywordActions" value="" type="23" />
+                    <attribute id="keywordConditions" value="" type="23" />
+                    <attribute id="keywordDisplayedText" value="78be69b8-80b1-4da3-aa7b-039eb25c92c6" type="22" />
+                    <attribute id="keywordId" value="Greeting" type="22" />
+                    <attribute id="keywordLast" value="0" type="19" />
+                    <attribute id="keywordOwner" value="-1" type="4" />
+                    <attribute id="keywordShow" value="0" type="19" />
+                    <attribute id="keywordSource" value="0" type="5" />
+                    <children>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsCharacterFlag(&quot;EVENT_player_is_female&quot;,1,1)&#x0D;&#x0A;CHECK !c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="f8c2f55e-3dd7-4ae7-b6c4-ca898fc5edef" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsCharacterFlag(&quot;EVENT_player_is_female&quot;,1,1)&#x0D;&#x0A;CHECK c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="4933ed1a-6463-417e-b2f9-43cf5730eb46" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value="" type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="1" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordSubnode">
+                                    <attribute id="Object" value="Yes" type="22" />
+                                </node>
+                                <node id="keywordSubnode">
+                                    <attribute id="Object" value="No" type="22" />
+                                </node>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="6bac2ab4-a4cf-4a36-82ba-c9c22a07f610" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="keywordNode">
+                    <attribute id="keywordActions" value="" type="23" />
+                    <attribute id="keywordConditions" value="" type="23" />
+                    <attribute id="keywordDisplayedText" value="ae229a5a-d86c-4302-ab18-0b49048df89d" type="22" />
+                    <attribute id="keywordId" value="Yes" type="22" />
+                    <attribute id="keywordLast" value="0" type="19" />
+                    <attribute id="keywordOwner" value="-1" type="4" />
+                    <attribute id="keywordShow" value="0" type="19" />
+                    <attribute id="keywordSource" value="0" type="5" />
+                    <children>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value='ACTION SetCharacterFlag(&quot;EVENT_vandalism_guards_leave_peacefully&quot;,1,1)' type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsCharacterFlag(&quot;EVENT_vandalism_fine_high&quot;,1,1)&#x0D;&#x0A;CONDITION IsCharacterFlag(&quot;EVENT_vandalism_fine_low&quot;,1,1)&#x0D;&#x0A;CONDITION IsCharacterFlag(&quot;EVENT_vandalism_fine_medium&quot;,1,1)&#x0D;&#x0A;CHECK !c&amp;!c&amp;!c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="69b55832-ad24-407f-b164-2bf39d842f7e" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsCharacterFlag(&quot;EVENT_vandalism_fine_low&quot;,1,1)&#x0D;&#x0A;CHECK c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="1" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordSubnode">
+                                    <attribute id="Object" value="refuse_pay_fine" type="22" />
+                                </node>
+                                <node id="keywordSubnode">
+                                    <attribute id="Object" value="pay_fine" type="22" />
+                                </node>
+                                <node id="keywordSubnode">
+                                    <attribute id="Object" value="cant_pay_fine" type="22" />
+                                </node>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="43c6d630-ac49-44de-9191-26ad46b2ca83" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsCharacterFlag(&quot;EVENT_vandalism_fine_medium&quot;,1,1)&#x0D;&#x0A;CHECK c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="1" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordSubnode">
+                                    <attribute id="Object" value="pay_fine" type="22" />
+                                </node>
+                                <node id="keywordSubnode">
+                                    <attribute id="Object" value="cant_pay_fine" type="22" />
+                                </node>
+                                <node id="keywordSubnode">
+                                    <attribute id="Object" value="refuse_pay_fine" type="22" />
+                                </node>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="0ac35041-1caf-4317-ba04-35748cb64e59" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsCharacterFlag(&quot;EVENT_vandalism_fine_high&quot;,1,1)&#x0D;&#x0A;CHECK c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="1" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordSubnode">
+                                    <attribute id="Object" value="pay_fine" type="22" />
+                                </node>
+                                <node id="keywordSubnode">
+                                    <attribute id="Object" value="cant_pay_fine" type="22" />
+                                </node>
+                                <node id="keywordSubnode">
+                                    <attribute id="Object" value="refuse_pay_fine" type="22" />
+                                </node>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="8ca56a5f-a8a0-4837-9825-347d6eef9384" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="keywordNode">
+                    <attribute id="keywordActions" value="" type="23" />
+                    <attribute id="keywordConditions" value="" type="23" />
+                    <attribute id="keywordDisplayedText" value="8a595965-2f3a-462a-a651-04146251047d" type="22" />
+                    <attribute id="keywordId" value="No" type="22" />
+                    <attribute id="keywordLast" value="0" type="19" />
+                    <attribute id="keywordOwner" value="-1" type="4" />
+                    <attribute id="keywordShow" value="0" type="19" />
+                    <attribute id="keywordSource" value="0" type="5" />
+                    <children>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value="" type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="1" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordSubnode">
+                                    <attribute id="Object" value="Fight" type="22" />
+                                </node>
+                                <node id="keywordSubnode">
+                                    <attribute id="Object" value="Jail" type="22" />
+                                </node>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="d4569e0a-3e51-42c0-9a0b-c63d959d66d3" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="keywordNode">
+                    <attribute id="keywordActions" value="" type="23" />
+                    <attribute id="keywordConditions" value='CONDITION IsCharacterFlag(&quot;EVENT_vandalism_player_can_pay_fine&quot;,1,1)&#x0D;&#x0A;CHECK c' type="23" />
+                    <attribute id="keywordDisplayedText" value="731f195e-f9ef-46a4-929a-5a4fa63bafc9" type="22" />
+                    <attribute id="keywordId" value="pay_fine" type="22" />
+                    <attribute id="keywordLast" value="0" type="19" />
+                    <attribute id="keywordOwner" value="-1" type="4" />
+                    <attribute id="keywordShow" value="0" type="19" />
+                    <attribute id="keywordSource" value="0" type="5" />
+                    <children>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value='ACTION SetCharacterFlag(&quot;EVENT_vandalism_player_pays_fine&quot;,1,1)&#x0D;&#x0A;ACTION SetCharacterFlag(&quot;EVENT_vandalism_guards_leave_peacefully&quot;,1,1)' type="23" />
+                            <attribute id="keywordConditions" value="" type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="47a21bbc-7e6d-4457-8d75-c9843c545fc0" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="keywordNode">
+                    <attribute id="keywordActions" value="" type="23" />
+                    <attribute id="keywordConditions" value='CONDITION IsCharacterFlag(&quot;EVENT_vandalism_player_can_pay_fine&quot;,1,1)&#x0D;&#x0A;CHECK !c' type="23" />
+                    <attribute id="keywordDisplayedText" value="8880e017-0b44-4ad2-8d82-1684d641a8b1" type="22" />
+                    <attribute id="keywordId" value="cant_pay_fine" type="22" />
+                    <attribute id="keywordLast" value="0" type="19" />
+                    <attribute id="keywordOwner" value="-1" type="4" />
+                    <attribute id="keywordShow" value="0" type="19" />
+                    <attribute id="keywordSource" value="0" type="5" />
+                    <children>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value="" type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="1" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordSubnode">
+                                    <attribute id="Object" value="Jail" type="22" />
+                                </node>
+                                <node id="keywordSubnode">
+                                    <attribute id="Object" value="Fight" type="22" />
+                                </node>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="bf78208b-7b30-4c46-94c8-99773dcd34d7" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="keywordNode">
+                    <attribute id="keywordActions" value="" type="23" />
+                    <attribute id="keywordConditions" value="" type="23" />
+                    <attribute id="keywordDisplayedText" value="fbc73257-a6d4-42e6-b1a5-6993b589f459" type="22" />
+                    <attribute id="keywordId" value="refuse_pay_fine" type="22" />
+                    <attribute id="keywordLast" value="0" type="19" />
+                    <attribute id="keywordOwner" value="-1" type="4" />
+                    <attribute id="keywordShow" value="0" type="19" />
+                    <attribute id="keywordSource" value="0" type="5" />
+                    <children>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value="" type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="1" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordSubnode">
+                                    <attribute id="Object" value="Jail" type="22" />
+                                </node>
+                                <node id="keywordSubnode">
+                                    <attribute id="Object" value="Fight" type="22" />
+                                </node>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="f3371ca3-3b21-43e5-9f6b-d26878304f3d" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="keywordNode">
+                    <attribute id="keywordActions" value="" type="23" />
+                    <attribute id="keywordConditions" value="" type="23" />
+                    <attribute id="keywordDisplayedText" value="1b5b3c9b-0fba-4279-bb15-c5ecb5a45416" type="22" />
+                    <attribute id="keywordId" value="Fight" type="22" />
+                    <attribute id="keywordLast" value="0" type="19" />
+                    <attribute id="keywordOwner" value="-1" type="4" />
+                    <attribute id="keywordShow" value="0" type="19" />
+                    <attribute id="keywordSource" value="0" type="5" />
+                    <children>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value='ACTION SetCharacterFlag(&quot;EVENT_vandalism_player_fights&quot;,1,1)' type="23" />
+                            <attribute id="keywordConditions" value="" type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="6eba373a-d6d0-4c9f-ad67-448d92d50ec2" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="keywordNode">
+                    <attribute id="keywordActions" value="" type="23" />
+                    <attribute id="keywordConditions" value="" type="23" />
+                    <attribute id="keywordDisplayedText" value="a22528ff-1490-415d-9a21-d6198df7080c" type="22" />
+                    <attribute id="keywordId" value="Jail" type="22" />
+                    <attribute id="keywordLast" value="0" type="19" />
+                    <attribute id="keywordOwner" value="-1" type="4" />
+                    <attribute id="keywordShow" value="0" type="19" />
+                    <attribute id="keywordSource" value="0" type="5" />
+                    <children>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value='ACTION SetCharacterFlag(&quot;EVENT_vandalism_player_to_prison&quot;,1,1)' type="23" />
+                            <attribute id="keywordConditions" value="" type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="64fda3a4-7014-4c45-ac8e-ace88add017d" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="keywordSpeakerNames">
+                    <children>
+                        <node id="keywordSpeakerName">
+                            <attribute id="Name" value="GROUP_ArrestingGuards" type="23" />
+                        </node>
+                        <node id="keywordSpeakerName">
+                            <attribute id="Name" value="" type="23" />
+                        </node>
+                        <node id="keywordSpeakerName">
+                            <attribute id="Name" value="" type="23" />
+                        </node>
+                        <node id="keywordSpeakerName">
+                            <attribute id="Name" value="" type="23" />
+                        </node>
+                    </children>
+                </node>
+            </children>
+        </node>
+    </region>
+</save>

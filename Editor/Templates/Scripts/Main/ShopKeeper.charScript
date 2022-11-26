@@ -1,0 +1,74 @@
+#INCLUDE State_Manager
+
+INIT
+
+USING State_Manager
+CHARACTER:%spottedCharacter 	 = null
+EXTERN TRIGGER:%ownedArea		 = null
+EXTERN FIXEDSTRING:%defaultState = ""
+CHARACTER:__Me
+FLOAT3:%lastNoisePos = null
+
+BEHAVIOUR
+
+REACTION State_Default, 0
+USAGE PEACE
+ACTIONS
+	Sleep(3)
+	
+REACTION State_SpotCharacter, 0
+USAGE PEACE
+VARS
+	CHARACTER:_closestPlayer = null
+CHECK "c1"
+	GetClosestPlayer(_closestPlayer, %lastNoisePos)
+ACTIONS
+	IF "c1"
+		GetClosestPlayer(_closestPlayer, %lastNoisePos)
+	THEN
+		IF "c1&c2"
+			IsEqual(%spottedCharacter, null)
+			CharacterIsInTrigger(_closestPlayer, %ownedArea)
+		THEN
+			Set(%spottedCharacter, _closestPlayer)
+			Set(%currentState, "State_LookAtSpottedCharacter")
+		ELSE
+			Set(%currentState, %defaultState)			
+		ENDIF
+	ELSE
+		Set(%currentState, %defaultState)
+	ENDIF
+	
+REACTION State_LookAtSpottedCharacter, 0
+USAGE PEACE
+ACTIONS
+	IF "c1"
+		CharacterCanSee(__Me, %spottedCharacter)
+	THEN
+		CharacterFollow(%spottedCharacter, 1, 0)
+	ELSE
+		Set(%currentState, "State_LookForCharacter")
+	ENDIF
+	
+REACTION State_LookForCharacter, 0
+USAGE PEACE
+ACTIONS
+	IF "c1"
+		CharacterIsInTrigger(%spottedCharacter, %ownedArea)
+	THEN
+		WHILE "!c1"
+			CharacterCanSee(__Me, %spottedCharacter)
+		DO
+			CharacterFollow(%spottedCharacter, 1, 1)
+		ENDWHILE
+	ENDIF
+	Set(%currentState, "State_SpotCharacter")
+
+REACTION Hearing_State_ReactOnItem, 0
+USAGE PEACE
+VARS
+	FLOAT:_sightRange
+ACTIONS
+	CharacterMoveInRange(%lastNoisePos, 1, 3, 1)
+	Set(%currentState, "State_SpotCharacter")
+	//Set(%currentHearState, "Hearing_State_Reset")	

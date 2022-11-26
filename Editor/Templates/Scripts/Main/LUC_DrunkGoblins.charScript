@@ -1,0 +1,177 @@
+#INCLUDE State_Manager
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	CHARACTER:%MyFriendThePlant = "Env_Artillery_Flower_A_Luculla_015_70b9bf00-3186-446d-b05d-915e6f4e7030"
+	EXTERN TRIGGER:%Anchor = null
+
+//-----------------
+BEHAVIOUR
+REACTION State_Drunk, 0
+USAGE PEACE
+ACTIONS
+	CharacterLookAt(%MyFriendThePlant,0)
+	GetWeightedRandom(%currentAction,"Action_Use",INT:6,"Action_MiscAnim",INT:1,"Action_Wait",INT:1)
+	SetPriority(%currentAction, 1100)
+		
+REACTION Action_Use, 0
+USAGE PEACE
+ACTIONS
+	CharacterPlayAnimation(Use_01)
+	SetPriority(%currentAction,0)
+
+REACTION Action_MiscAnim, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_anim
+ACTIONS
+	GetRandom(_anim,"Trade_01","Trade_02","Trade_03")
+	CharacterPlayAnimation(_anim)
+	SetPriority(%currentAction,0)
+		
+REACTION Action_Wait, 0
+USAGE PEACE
+VARS
+	FLOAT:_SleepValue
+ACTIONS
+	GetRandomBetween(_SleepValue,0,2)
+	Sleep(_SleepValue)
+	SetPriority(%currentAction,0)
+		
+REACTION DrunkGob_Peace_CompletelySmashed, 500
+USAGE PEACE
+ACTIONS
+	IF "!c1"
+		IsHardcore()
+	THEN
+		CharacterPlayAnimation("knockdown_loop",0,1)
+	ENDIF		
+		
+REACTION DrunkGob_Peace_EnterCombat, 0
+USAGE PEACE
+VARS
+	FLOAT:_Timer
+ACTIONS
+	GetRandomBetween(_Timer,0,1)
+	Sleep(_Timer)	
+	CharacterSetCanFight(__Me,1,1)
+	SetPriority("DrunkGob_Peace_EnterCombat",0)
+
+REACTION DrunkGob_Peace_Hardcore_Wandering,1500
+USAGE PEACE
+VARS
+	FLOAT:_RandomRange
+	FLOAT:_RandomDuration
+	FLOAT:_RandomSleep
+CHECK "!c1&c2&c3"
+	IsEqual(%Anchor,null)
+	IsRandom(0.5)
+	IsHardcore()
+ACTIONS
+	GetRandomBetween(_RandomRange,2,5)
+	GetRandomBetween(_RandomDuration,2,5)
+	CharacterWander(_RandomRange,_RandomDuration,0,%Anchor)
+	GetRandomBetween(_RandomSleep,2,7)
+	Sleep(_RandomSleep)
+				
+REACTION DrunkGob_Regenerate, 0
+USAGE COMBAT
+VARS
+	FLOAT:_MyHP
+	FLOAT:_MyAP
+CHECK "c1&c2&c3&!(c4|c5|c6|c7|c8|c9|c10)"
+	CharacterGetStat(_MyHP,__Me,Vitality)						//c1
+	IsLessThen(_MyHP,0.7)										//c2
+	CharacterCanSee(__Me,%MyFriendThePlant)						//c3
+	CharacterIsDead(%MyFriendThePlant)							//!c4
+	CharacterHasStatus(__Me,"FROZEN")							//!c5
+	CharacterHasStatus(__Me,"FEAR")								//!c6
+	CharacterHasStatus(__Me,"KNOCKED_DOWN")						//!c7
+	CharacterHasStatus(__Me,"PETRIFIED")						//!c8
+	CharacterHasStatus(__Me,"CHARMED")							//!c9
+	CharacterHasStatus(__Me,"STUNNED")							//!c10
+ACTIONS
+	CharacterMoveTo(%MyFriendThePlant,1,0,0,0.1)		
+	IF "c1&!c2"
+		CharacterGetStat(_MyAP,__Me,ActionPoints)
+		IsLessThen(_MyAP,3)
+	THEN
+		CharacterLookAt(%MyFriendThePlant,0)
+		CharacterPlayAnimation("Use_01")
+		CharacterHeal(__Me,0.2)
+		CharacterApplyStatus(__Me,"POISONED",3,1)
+		CharacterUseActionPoints(__Me,3)
+		PlayEffectAt(__Me,"FX_Skills_Earth_PoisonDart_Prepare_A")
+		CharacterPlayAnimation("Dance_01",1,1)
+	ENDIF
+	SetPriority("DrunkGob_Regenerate",0)
+		
+REACTION DrunkGob_Idle_Combat_Drunk, 10
+USAGE WAITING
+VARS 
+	FIXEDSTRING:_Animation
+	FLOAT:_SleepTime
+ACTIONS
+	IF "!c1"
+		CharacterHasStatus(__Me, SNEAKING)
+	THEN
+		GetWeightedRandom(_Animation,"still",INT:30,"hit",INT:20,"idle3",INT:5)
+		CharacterPlayAnimation(_Animation)
+		IF "c1"
+			IsEqual(_Animation,"hit")
+		THEN
+			DisplayText(__Me,"LUC_DrunkGoblins_Hiccup",1.4)
+		ENDIF
+		GetRandom(_SleepTime,11)
+		Sleep(_SleepTime)
+	ENDIF
+	
+//-----------------	
+EVENTS
+EVENT OnInit_Drunk
+ON
+	OnInit()
+ACTIONS
+	IF "!c1"
+		IsHardcore()
+	THEN
+		CharacterApplyStatus(__Me,DRUNK,-1)
+	ENDIF
+
+EVENT OnCharacterEvent_WakeUp
+ON
+	OnCharacterEvent(%MyFriendThePlant,"EnteredCombat")
+ACTIONS
+	SetPriority("DrunkGob_Peace_EnterCombat",1500)
+	
+EVENT OnDamage_SetCanFightToTrue
+VARS
+	CHARACTER:_Char
+ON
+	OnDamage(_,_,_Char,_)
+ACTIONS
+	IF "!c1&c2"
+		IsEqual(_Char, null)
+		CharacterCheckRelation(_Char, Party)
+	THEN
+		CharacterSetCanFight(__Me,1,1)
+	ENDIF
+	
+EVENT OnCombatEnded_SetCanFightToFalse
+ON
+	OnCombatEnded()
+ACTIONS
+	CharacterSetCanFight(__Me,0)
+	
+EVENT OnDamage_IfWounded_IncreaseDrinkPrio
+VARS
+	FLOAT:_MyHealth
+ON
+	OnDamage(_,_,_,_)
+ACTIONS
+	IF "c1&c2"
+		CharacterGetStat(_MyHealth,__Me,Vitality)
+		IsLessThen(_MyHealth,0.6)
+	THEN
+		SetPriority("DrunkGob_Regenerate",500)
+	ENDIF	

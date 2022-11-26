@@ -1,0 +1,140 @@
+#TEMPLATE "_SKILL_Base" : Projectile_EnemyIceShard
+
+INIT
+CHARACTER:__Me
+FLOAT:%SkillTargetScore_Projectile_EnemyIceShard=-1000000
+// [GLOBAL_VARS]
+INT:%ClassScore_Projectile_EnemyIceShard
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_Projectile_EnemyIceShard
+VARS
+	// [CALC_VARS]
+	FLOAT:_SkillRangeMin
+	FLOAT:_SkillRangeMax
+	FLOAT3:_TargetPos
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_Projectile_EnemyIceShard")
+ACTIONS
+	Set(%SkillTargetScore_Projectile_EnemyIceShard, -1000000)
+
+	// [CALC_ACTIONS_PRE]
+	Set(%ClassScore_Projectile_EnemyIceShard, 0)
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	IF "(c1)&(c2)"
+	    CharacterGetSkillRange(_SkillRangeMin, _SkillRangeMax, __Me, Projectile_EnemyIceShard) // c1
+	    FindSurface(_TargetPos, __Me, _SkillRangeMin, _SkillRangeMax, Water, __Me, 3, 0, 10) // c2
+	THEN
+	    Set(%SkillTargetPos_Projectile_EnemyIceShard, _TargetPos)
+	    Add(%ActionScore_Projectile_EnemyIceShard, 20.0)
+	ELSE 
+	    IterateCharactersInCombat(__Me, "CalculateTarget_Projectile_EnemyIceShard", Random, Vitality)
+	    IF "!c1"
+	    	IsEqual(%SkillTargetChar_Projectile_EnemyIceShard, null)
+	    THEN
+	    	Add(%ActionScore_Projectile_EnemyIceShard, %SkillTargetScore_Projectile_EnemyIceShard)
+	    ENDIF
+	ENDIF
+	// [~CALC_ACTIONS]
+
+	
+
+	
+// Calculate the character we should attack
+EVENT CalculateTarget_Projectile_EnemyIceShard
+VARS	
+	CHARACTER:_Char
+	// [CALC_TARGET_VARS]
+	INT:_ClassScore_Projectile_EnemyIceShard
+	FLOAT:_StatWaterResistance
+	FLOAT:_Score
+	FLOAT:_SkillRangeMin
+	FLOAT:_SkillRangeMax
+	FLOAT:_DistanceToChar
+	FLOAT:_DistanceScore
+	// [~CALC_TARGET_VARS]
+ON
+	OnIterateCharacter(_Char, "CalculateTarget_Projectile_EnemyIceShard")	
+ACTIONS
+	// [CALC_CHAR_TARGET_ACTIONS_PRE]
+	Set(_ClassScore_Projectile_EnemyIceShard, %ClassScore_Projectile_EnemyIceShard)
+	Set(_Score, 0.0)
+	// [~CALC_CHAR_TARGET_ACTIONS_PRE]
+	// [CALC_CHAR_TARGET_ACTIONS]
+	IF "(!c1&!c2&!c3)&(((c4)|c5)|c6)&(!(((c7&c8)|c9)|c10))&(c11)&(c12)&(c13)"
+	    CharacterIsDead(_Char) // c1
+	    CharacterHasStatus(_Char, INVISIBLE) // c2
+	    CharacterHasStatus(_Char, SNEAKING) // c3
+	    CharacterHasStatus(_Char, CHILLED) // c4
+	    CharacterHasStatus(_Char, AGGRO_MARKED) // c5
+	    CharacterIsBetterOrEqualClass(_Char, %ClassScore_Projectile_EnemyIceShard, _ClassScore_Projectile_EnemyIceShard, 5, 4, 5, 4, 5) // c6
+	    CharacterGetStat(_StatWaterResistance, _Char, WaterResistance) // c7
+	    IsGreaterThen(_StatWaterResistance, 50) // c8
+	    CharacterHasStatus(_Char, FROZEN) // c9
+	    CharacterHasStatus(_Char, BURNING) // c10
+	    CharacterIsEnemy(__Me, _Char) // c11
+	    CharacterGetSkillRange(_SkillRangeMin, _SkillRangeMax, __Me, Projectile_EnemyIceShard) // c12
+	    GetDistance(_DistanceToChar, __Me, _Char) // c13
+	THEN
+	    Set(%ClassScore_Projectile_EnemyIceShard, _ClassScore_Projectile_EnemyIceShard)
+	    IF "(c1)"
+	        CharacterHasStatus(_Char, CHILLED) // c1
+	    THEN
+	        Add(_Score, 5.0)
+	    ENDIF
+	    IF "(c1)"
+	        CharacterHasStatus(_Char, AGGRO_MARKED) // c1
+	    THEN
+	        Add(_Score, 5.0)
+	    ENDIF
+	    // Hostile count score calculation
+	    Add(_Score, 10.0) // HostileWeight
+	    
+	    // Range score calculation
+	    Set(_DistanceScore, _DistanceToChar)
+	    IF "(c1)"
+	        IsGreaterThen(_DistanceScore, _SkillRangeMax) // c1
+	    THEN
+	        Subtract(_DistanceScore, _SkillRangeMax)
+	        Multiply(_DistanceScore, -1.0)
+	    ELIF "(c1)"
+	        IsLessThen(_DistanceScore, _SkillRangeMin) // c1
+	    THEN
+	        Subtract(_DistanceScore, _SkillRangeMin)
+	        Multiply(_DistanceScore, 1.0)
+	    ELSE 
+	        Set(_DistanceScore, 0.0)
+	    ENDIF
+	    Add(_Score, _DistanceScore)
+	    
+	    // Can see score calculation
+	    IF "!c1"
+	    	CharacterCanSee(__Me, _Char)
+	    THEN
+	    	Add(_Score, -10.0)
+	    ENDIF
+	    
+	    IF "c1"
+	    	IsGreaterThen(_Score, %SkillTargetScore_Projectile_EnemyIceShard)
+	    THEN
+	    	Set(%SkillTargetChar_Projectile_EnemyIceShard, _Char)
+	    	Set(%SkillTargetScore_Projectile_EnemyIceShard, _Score)
+	    ENDIF	
+	ENDIF
+	// [~CALC_CHAR_TARGET_ACTIONS]
+	
+	
+	
+	
+	
+	
+	
+	

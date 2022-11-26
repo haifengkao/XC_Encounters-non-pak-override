@@ -1,0 +1,30 @@
+INIT
+CHARACTER:__Me
+INT:%AlreadyShot=0
+EXTERN CHARACTER:%CheckIfDead=null
+
+BEHAVIOUR
+REACTION ShootBarrel, 1200
+USAGE COMBAT
+CHECK "c1"
+	IsEqual(%AlreadyShot,0)
+ACTIONS
+	CharacterAttack(ITEM:CONT_Barrel_Ooze_A_001_3ba438c3-48e6-436f-af1b-10058dad68ad)
+	Set(%AlreadyShot,1)
+	
+REACTION ShootFireArrow, 1100
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_SkillMinRange=0
+	FLOAT:_SkillMaxRange=0
+CHECK "!c1&(c2&c3&c4&c5)"
+	IsEqual(%CheckIfDead,null)
+	CharacterIsDead(%CheckIfDead)
+	CharacterCanCast(__Me,Projectile_ExplosionArrow)
+	CharacterGet(_Target,__Me,60,Lowest,Distance,Enemy,null,null) 
+	CharacterGetSkillRange(_SkillMinRange,_SkillMaxRange,__Me,Projectile_ExplosionArrow)
+ACTIONS
+	CharacterMoveInRange(_Target,_SkillMinRange,_SkillMaxRange)
+	CharacterUseSkill(Projectile_ExplosionArrow,_Target)
+	SetPriority("ShootFireArrow",0)

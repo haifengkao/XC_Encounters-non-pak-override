@@ -1,0 +1,46 @@
+INIT
+
+CHARACTER:__Me
+
+	ITEM:%Bench = END_Behavior_NegaKingsCrab_Weaver_Stool_adfe5883-f90e-45f4-873f-0d6242e3476a
+	INT:%Sit = 0
+	TRIGGER:%Stand = END_Point_Behavior_NegaKingsCrab_WeaverOfTime_436b0d06-5e3b-4d1e-af5f-df01f41d57db
+	INT:%Handle = 0
+	
+BEHAVIOUR
+
+REACTION Mutter, 1000
+USAGE PEACE
+VARS
+	FLOAT:_Distance
+	FIXEDSTRING:_Animation
+ACTIONS
+	IF "!c1&c2&c3"
+		ItemIsDestroyed(%Bench)
+		GetDistance(_Distance, %Bench, %Stand)
+		IsLessThen(_Distance, 2.0)
+	THEN
+		IF "!c1"
+			CharacterHasStatus(__Me, SITTING)
+		THEN
+			CharacterUseItem(%Bench)
+			Set(%Sit, 1)
+		ENDIF
+	ELSE
+		Set(%Sit, 0)
+		CharacterMoveTo(%Stand)
+		CharacterLookFrom(%Stand)
+	ENDIF
+	
+	
+	IF "c1"
+		IsEqual(%Sit, 1)
+	THEN
+		GetRandom(_Animation, "Sit_No_01", "Sit_Annoyed_01", "Sit_Angry_01", "Sit_Reject_01", "Sit_Sigh_01")
+	ELSE	
+		GetRandom(_Animation, "Think_02", "Think_01", "Annoyed_01", "Depressed_01")	
+	ENDIF
+	CharacterPlayAnimation(_Animation)
+	Sleep(5)
+	Reset()
+

@@ -1,0 +1,46 @@
+INIT
+	TRIGGER:%TriggerInside = TriggerInside_516fc261-a801-45dd-9c51-53b381856d33
+	TRIGGER:%TriggerOutside = TriggerOutside_58260723-bbcc-4aee-8f16-cd7dd5718d4b
+	TRIGGER:%TriggerInside2 = TriggerInside2_5be5659d-fd96-479f-abc9-e69c63416a41
+	INT:%CurrentWaypoint = 0
+	INT:%NumWaypoints = 2
+	CHARACTER:__Me
+
+BEHAVIOUR
+
+REACTION PingPong, 100000
+USAGE ALL
+VARS
+	TRIGGER:_CurrentTrigger = null
+	FLOAT:_Dist=0.0
+ACTIONS
+	WHILE "c1"
+		IsLessThen(%CurrentWaypoint,%NumWaypoints)
+	DO
+		GetElement(_CurrentTrigger,%CurrentWaypoint,%TriggerInside,%TriggerOutside)
+		IF "!c1"
+			IsEqual(_CurrentTrigger, null)
+		THEN
+			CharacterMoveTo(_CurrentTrigger,0)
+			IF "c1&c2"
+				GetDistance(_Dist,__Me,_CurrentTrigger)
+				IsGreaterThen(_Dist,4.0)
+			THEN
+				Sleep(0.1)
+			ELSE
+				Add(%CurrentWaypoint, 1)
+				IF "c1"
+					IsEqual(%CurrentWaypoint,%NumWaypoints)
+				THEN
+					Set(%CurrentWaypoint,0)
+				ENDIF
+			ENDIF
+		ELSE
+			Add(%CurrentWaypoint, 1)
+			IF "c1"
+				IsEqual(%CurrentWaypoint,%NumWaypoints)
+			THEN
+				Set(%CurrentWaypoint,0)
+			ENDIF
+		ENDIF
+	ENDWHILE

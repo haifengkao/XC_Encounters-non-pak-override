@@ -1,0 +1,256 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Dialogs(CHARACTER_CYS_Helper1,"CYS_Helpers");
+DB_Dialogs(CHARACTER_CYS_Helper2,"CYS_Helpers");
+DB_Dialogs(CHARACTER_CYS_Helper3,"CYS_Helpers");
+
+DB_Dialogs(CHARACTER_CYS_CaptainJack,"CYS_CaptainJack");
+
+DB_CYS_ScaredWorkers(CHARACTER_CYS_SailorMerchant1, TRIGGER_CYS_PointSailorMerchant1_1);
+DB_CYS_ScaredWorkers(CHARACTER_CYS_SailorMerchant3, TRIGGER_CYS_Point_SailorMerchant_3);
+DB_CYS_ScaredWorkers(CHARACTER_CYS_RuinedWorker1, TRIGGER_CYS_Point_RuinedWorkers_01);
+DB_CYS_ScaredWorkers(CHARACTER_CYS_RuinedWorker2, TRIGGER_CYS_Point_RuinedWorkers_02);
+DB_CYS_ScaredWorkers(CHARACTER_CYS_RuinedWorker3, TRIGGER_CYS_Point_RuinedWorkers_03);
+
+DB_CYS_PersonsToAskHelpTo(CHARACTER_CYS_Helper3, TRIGGER_CYS_PointHelpers2, TRIGGER_CYS_PointHelper3_2, "CYS_WorkerShoutingForHelp_01", 1);
+DB_CYS_PersonsToAskHelpTo(CHARACTER_CYS_Helper1, TRIGGER_CYS_Point_RoofworkersHelp_01, TRIGGER_CYS_PointHelper1Behaviour1, "CYS_WorkerShoutingForHelp_02", 1);
+
+DB_CYS_FriendOfHelper(CHARACTER_CYS_Helper1, CHARACTER_CYS_Helper2, TRIGGER_CYS_Point_RoofworkersHelp_02, TRIGGER_CYS_PointHelper1_2);
+
+ProcTriggerRegisterForPlayers(TRIGGER_CYS_Area_SinkShip);
+
+DB_OneShotPlayerTrigger(TRIGGER_CYS_BoxMakeItRain);
+DB_OneShotPlayerTrigger(TRIGGER_CYS_TriggerBurningShipScene);
+KBSECTION
+IF
+DB_CYS_ScaredWorkers(_character, _)
+THEN
+CharacterSetHasDialog(_character, 0);
+CharacterSetVarFixedString(_character, "currentState", "State_ExtinguishingBoat");
+
+PROC
+ProcCheckOtherPlayersInTrigger(_Player,TRIGGER_CYS_Area_SinkShip)
+AND
+NOT DB_OtherPlayersInRegion(TRIGGER_CYS_Area_SinkShip,1)
+THEN
+GlobalSetEvent("CYS_PlayersEnteredCyseal");
+
+IF
+DB_InRegion(_Player,TRIGGER_CYS_Poly_Cyseal)
+AND
+NOT DB_InRegion(_Player,TRIGGER_CYS_Area_SinkShip)
+THEN
+ProcCheckOtherPlayersInTrigger(_Player,TRIGGER_CYS_Area_SinkShip);
+
+PROC
+ProcCheckOtherPlayersInTrigger(_Player,TRIGGER_CYS_Area_SinkShip)
+AND
+NOT DB_OtherPlayersInRegion(TRIGGER_CYS_Area_SinkShip,1)
+AND
+NOT TRIGGER_CYS_BoxMakeItRain.hasRained()
+THEN
+ItemDestroy(ITEM_CYS_BurningShip);
+
+
+//REGION WORKER ASKING FOR HELP SCENE
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_,TRIGGER_CYS_BoxMakeItRain)
+THEN
+QuestAdd("CYS_BurningShip");
+QuestUpdate("CYS_BurningShip", "Update1");
+
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_,TRIGGER_CYS_TriggerBurningShipScene)
+THEN
+CharacterSetHasDialog(CHARACTER_CYS_Helper1, 0);
+CharacterSetHasDialog(CHARACTER_CYS_Helper2, 0);
+CHARACTER_CYS_WorkerShoutingHelp_01.BurningShipSceneStarted();
+PROC_CYS_TriggerWorkerAskingNextForHelpScene();
+ItemApplyStatus(ITEM_CYS_BurningShip, "BURNING", -1.0);
+
+IF
+ItemStatusChange(ITEM_CYS_BurningShip,"BURNING",_,_)
+THEN
+PROC_LoopEffectAtItem("FX_Item_Cys_BurningShip_Sound_A", ITEM_CYS_BurningShip,"CYS_BurningShip","Cyseal");
+
+PROC
+PROC_CYS_TriggerWorkerAskingNextForHelpScene()
+AND
+DB_CYS_PersonsToAskHelpTo(_character, _, _, _, _)
+AND
+NOT DB_CYS_CurrentPersonToAskHelpTo(_)
+THEN
+CharacterMoveToCharacter(CHARACTER_CYS_WorkerShoutingHelp_01, _character, 1, "ArrivedAtHelper",0);
+DB_CYS_CurrentPersonToAskHelpTo(_character);
+
+PROC
+PROC_CYS_TriggerWorkerAskingNextForHelpScene()
+AND
+NOT DB_CYS_PersonsToAskHelpTo(_, _, _, _, _)
+THEN
+ProcCharacterMoveToTrigger(CHARACTER_CYS_WorkerShoutingHelp_01, TRIGGER_CYS_PointHelpers3, 1, "CYS_ArrivedAtBurningBoat");
+CHARACTER_CYS_WorkerShoutingHelp_01.startedExtinguishing();
+
+IF
+CharacterEvent(CHARACTER_CYS_WorkerShoutingHelp_01, "ArrivedAtHelper")
+AND
+DB_CYS_CurrentPersonToAskHelpTo(_character)
+AND
+DB_CYS_PersonsToAskHelpTo(_character, _trigger, _returnPoint, _text, _help)
+THEN
+CharacterLookAtCharacter(CHARACTER_CYS_WorkerShoutingHelp_01, _character,0);
+CharacterDisplayText(CHARACTER_CYS_WorkerShoutingHelp_01, _text);
+NOT DB_CYS_CurrentPersonToAskHelpTo(_character);
+NOT DB_CYS_PersonsToAskHelpTo(_character, _trigger, _returnPoint, _text, _help);
+PROC_CYS_CheckIfWorkerHelpsOrNot(_character, _trigger, _returnPoint, _help);
+
+IF
+CharacterDisplayTextEnded(CHARACTER_CYS_WorkerShoutingHelp_01, _)
+AND
+NOT CHARACTER_CYS_WorkerShoutingHelp_01.startedExtinguishing()
+AND
+CHARACTER_CYS_WorkerShoutingHelp_01.BurningShipSceneStarted()
+THEN
+PROC_CYS_TriggerWorkerAskingNextForHelpScene();
+PROC_CYS_MoveBurningBoatHelpers();
+//END_REGION
+
+//REGION HELPERS JOIN
+PROC
+PROC_CYS_CheckIfWorkerHelpsOrNot((CHARACTER)_character, (TRIGGER)_trigger, (TRIGGER)_returnPoint, 1)
+THEN
+DB_CYS_BurningBoatHelpers(_character, _trigger, _returnPoint);
+PROC_CYS_CheckForHelperFriends(_character);
+
+PROC
+PROC_CYS_CheckForHelperFriends((CHARACTER)_character)
+AND
+DB_CYS_FriendOfHelper(_character, _friend, _trigger, _returnPoint)
+THEN
+DB_CYS_BurningBoatHelpers(_friend, _trigger, _returnPoint);
+
+PROC
+PROC_CYS_MoveBurningBoatHelpers()
+AND
+DB_CYS_BurningBoatHelpers(_character, _trigger, _)
+AND
+NOT _character.isExtinguishing()
+THEN
+ProcCharacterMoveToTrigger(_character, _trigger, 1, "CYS_ArrivedAtBurningBoat");
+_character.isExtinguishing();
+
+IF
+CharacterEvent(_character, "CYS_ArrivedAtBurningBoat")
+AND
+CHARACTER_CYS_WorkerShoutingHelp_01.BurningShipSceneStarted()
+AND
+NOT TRIGGER_CYS_BoxMakeItRain.hasRained()
+THEN
+CharacterSetVarFixedString(_character, "currentState", "State_ExtinguishingBoat");
+CharacterSetHasDialog(_character, 0);
+//END_REGION
+
+//REGION MAKE IT RAIN / LEAVE QUEST AREA
+IF
+ItemStatusRemoved(ITEM_CYS_BurningShip,"BURNING")
+AND
+NOT TRIGGER_CYS_BoxMakeItRain.hasRained()
+AND
+DB_CYS_ScaredWorkers(_Worker, _)
+AND
+NOT DB_Dead(_Worker)
+AND
+NOT DB_OnlyOnce("CYS_SW_Cheer")
+THEN
+DB_OnlyOnce("CYS_SW_Cheer");
+ItemPlaySound(ITEM_CYS_BurningShip, "Scripted_Cys_BurningShip_Saved");
+
+IF
+ItemStatusRemoved(ITEM_CYS_BurningShip,"BURNING")
+AND
+NOT TRIGGER_CYS_BoxMakeItRain.hasRained()
+THEN
+PROC_StopEffectAtItem(ITEM_CYS_BurningShip,"Cys_BurningShip");
+ItemPlaySound(ITEM_CYS_BurningShip,"Scripted_Cys_BurningShip_Fire_Stop");
+TRIGGER_CYS_BoxMakeItRain.hasRained();
+GlobalSetEvent("CYS_ShipIsExtuingished");
+CharacterSetVarFixedString(CHARACTER_CYS_WorkerShoutingHelp_01, "questAction", "Action_Happy");
+PROC_CYS_ChangeWorkBehaviour("State_Happy");
+GlobalSetEvent("CYS_BurningShipQuestDone");
+QuestUpdate("CYS_BurningShip", "Update2");
+QuestClose("CYS_BurningShip");
+ProcTriggerUnregisterForPlayers(TRIGGER_CYS_TriggerBurningShipScene);
+NOT DB_OneShotPlayerTrigger(TRIGGER_CYS_TriggerBurningShipScene); //because this might not have triggerd yet and we don't want to leave these around
+
+IF
+ItemDestroyed(ITEM_CYS_BurningShip)
+AND
+CHARACTER_CYS_WorkerShoutingHelp_01.BurningShipSceneStarted()
+THEN
+NOT CHARACTER_CYS_WorkerShoutingHelp_01.BurningShipSceneStarted();
+TRIGGER_CYS_BoxMakeItRain.hasRained();
+GlobalSetEvent("CYS_ShipIsSunken");
+ItemRemoveStatus(ITEM_CYS_BurningShip,"BURNING");
+ItemPlaySound(ITEM_CYS_BurningShip,"Scripted_Cys_ShipSinking");
+CharacterSetVarFixedString(CHARACTER_CYS_WorkerShoutingHelp_01, "questAction", "Action_Cry");
+PROC_CYS_ChangeWorkBehaviour("State_Sad"); 
+GlobalSetEvent("CYS_BurningShipQuestDone");
+QuestUpdate("CYS_BurningShip", "Update3");
+QuestClose("CYS_BurningShip");
+//END_REGION
+
+//REGION WORKER/HELPER BEHAVIOUR
+PROC
+PROC_CYS_ChangeWorkBehaviour((STRING)_state)
+THEN
+PROC_CYS_ChangeWorkerBehaviour(_state);
+PROC_CYS_ChangeHelperBehaviour(_state);
+DB_Dialogs(CHARACTER_CYS_WorkerShoutingHelp_01, "CYS_Helpers");
+CharacterSetVarFixedString(CHARACTER_CYS_WorkerShoutingHelp_01, "currentState", _state);
+CharacterSetHasDialog(CHARACTER_CYS_WorkerShoutingHelp_01, 1);
+
+PROC
+PROC_CYS_ChangeWorkerBehaviour((STRING)_state)
+AND
+DB_CYS_ScaredWorkers(_worker, _trigger)
+THEN
+CharacterSetVarTrigger(_worker,"lookDir",_trigger);
+CharacterSetVarFixedString(_worker, "currentState", _state);
+DB_CYS_ReturningToOriginalPoint(_worker, _trigger);
+
+PROC
+PROC_CYS_ChangeHelperBehaviour((STRING)_state)
+AND
+DB_CYS_BurningBoatHelpers(_helper, _, _returnPoint)
+THEN
+CharacterSetVarFixedString(_helper, "currentState", _state);
+DB_CYS_ReturningToOriginalPoint(_helper, _returnPoint);
+
+IF
+CharacterEvent(_worker, "returnToTrigger")
+AND
+DB_CYS_ReturningToOriginalPoint(_worker, _trigger)
+THEN
+ProcCharacterMoveToTrigger(_worker, _trigger, 0, "arrivedAtOriginalPoint");
+
+IF
+CharacterEvent(CHARACTER_CYS_WorkerShoutingHelp_01, "returnToTrigger")
+THEN
+CharacterSetVarFixedString(CHARACTER_CYS_WorkerShoutingHelp_01, "currentState", "State_ActionManager");
+
+IF
+CharacterEvent(_worker, "arrivedAtOriginalPoint")
+AND
+DB_CYS_ReturningToOriginalPoint(_worker, _trigger)
+THEN
+CharacterSetHasDialog(_worker, 1);
+NOT DB_CYS_ReturningToOriginalPoint(_worker, _trigger);
+CharacterSetVarFixedString(_worker, "currentState", "State_ActionManager");
+
+
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

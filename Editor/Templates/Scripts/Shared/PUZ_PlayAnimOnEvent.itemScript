@@ -1,0 +1,54 @@
+INIT
+	ITEM:__Me
+	EXTERN STRING:%AnimEventState0=null
+	EXTERN STRING:%AnimEventState1=null
+	EXTERN STRING:%AnimEventState1extra=null
+	EXTERN FIXEDSTRING:%Animation=PressurePlate
+	FLOAT:%AnimState=0
+
+EVENTS
+
+EVENT AnimateOnEvent0
+	ON
+		OnCharacterItemEvent(_,_,%AnimEventState0)
+	ACTIONS
+		IF "c1"
+			IsEqual(%AnimState,0)
+		THEN
+			Interrupt(PercentageChance)
+			SetPriority(PercentageChance,10)
+			Set(%AnimState,1)
+		ENDIF
+
+EVENT AnimateOnEvent1
+	ON
+		OnCharacterItemEvent(_,_,%AnimEventState1)
+	ACTIONS
+		IF "c1"
+			IsEqual(%AnimState,1)
+		THEN
+			Interrupt(PercentageChance)
+			SetPriority(PercentageChance,11)
+			Set(%AnimState,0)
+		ENDIF
+
+EVENT AnimateOnEvent1extra //for Noxious Bulb trap
+	ON
+		OnCharacterItemEvent(_,_,%AnimEventState1extra)
+	ACTIONS
+		IF "c1"
+			IsEqual(%AnimState,1)
+		THEN
+			Interrupt(PercentageChance)
+			SetPriority(PercentageChance,11)
+			Set(%AnimState,0)
+		ENDIF
+		
+BEHAVIOUR
+
+REACTION PercentageChance,0
+ACTIONS
+	ItemPlayAnimationTo(%Animation,%AnimState,5)
+	SetPriority(PercentageChance,0)
+INTERRUPT
+	Reset()

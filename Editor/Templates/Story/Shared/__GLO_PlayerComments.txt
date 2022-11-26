@@ -1,0 +1,330 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+//REGION COMMENT TRIGGERS
+IF
+DB_PlayerComment_Trigger(_Trigger,_)
+THEN
+DB_OneShotPlayerOnlyTrigger(_Trigger);
+
+IF
+DB_PlayerOnlyComment_Trigger((TRIGGER)_Trigger,(STRING)_)
+THEN
+DB_OneShotPlayerOnlyTrigger(_Trigger);
+
+PROC
+ProcOneShotTriggerEntered(_Player,_Trigger)
+AND
+DB_PlayerOnlyComment_Trigger(_Trigger,_Comment)
+THEN
+Launch_PlayerComment(_Player,_Comment);
+
+PROC
+ProcOneShotTriggerEntered(_Player,_Trigger)
+AND
+DB_PlayerComment_Trigger(_Trigger,_Comment)
+THEN
+Launch_PlayerComment(_Player,_Comment);
+//END_REGION
+
+//REGION COMMENT EVENTS
+IF
+DialogCharacterEventSet(_Event,_Player,_ID)
+AND
+DB_PlayerComment_Event((STRING)_Event,(STRING)_Comment)
+THEN
+NOT DB_PlayerComment_Event(_Event,_Comment);
+_Player.makesComment(_Comment,_ID);
+
+IF
+DialogEnded(_,_ID)
+AND
+_Player.makesComment(_Comment,_ID)
+THEN
+NOT _Player.makesComment(_Comment,_ID);
+Launch_PlayerComment(_Player,_Comment);
+//END_REGION
+
+/***********************/
+/*** Player Comments ***/
+/***********************/
+//TEMP function
+
+QRY
+QryGetAvailablePlayerOtherThan((CHARACTER)_Player)
+AND
+DB_IsPlayer(_Player)
+AND
+DB_IsPlayer(_OtherPlayer)
+AND
+_Player!=_OtherPlayer
+AND
+NOT DB_Companion(_OtherPlayer)
+AND
+NOT DB_Dead(_OtherPlayer)
+AND
+NOT DB_AvailablePlayer(_)
+THEN
+DB_AvailablePlayer(_OtherPlayer);
+
+PROC
+Launch_PlayerComment((CHARACTER)_,(STRING)_)
+AND
+DB_AvailablePlayer(_OtherPlayer)
+THEN
+NOT DB_AvailablePlayer(_OtherPlayer);
+
+PROC
+Launch_PlayerComment((CHARACTER)_Player,(STRING)_Comment)
+AND
+QryGetAvailablePlayerOtherThan(_Player)
+AND
+DB_AvailablePlayer(_OtherPlayer)
+THEN
+Launch_PlayerComment(_Player,_OtherPlayer,_Comment);
+
+PROC
+Launch_PlayerComment((CHARACTER)_Player,(STRING)_Comment)
+AND
+NOT DB_AvailablePlayer(_)
+THEN
+Launch_PlayerComment(_Player,_Player,_Comment);
+
+PROC
+Launch_PlayerComment((CHARACTER)_Player,(CHARACTER)_Player2,(STRING)_Comment)
+AND
+NOT DB_Companion(_Player)
+AND
+NOT DB_Companion(_Player2)
+AND
+_Player.DB_IsPlayer()
+AND
+_Player2.DB_IsPlayer()
+AND
+NOT DB_PlayerComments_Speaker(_Comment,_,_)
+AND
+CharacterGetDistanceToCharacter(_Player,_Player2,_Distance)
+THEN
+DB_PlayerComments_Speaker(_Comment,_Player,_Player2);
+Check_PlayerComments_Distance(_Comment,_Player,_Distance);
+
+PROC
+Launch_SinglePlayerComment((CHARACTER)_Player,(STRING)_Comment)
+AND
+ShutUpPlayers(1)
+THEN
+DB_DelaySinglePlayerComment(_Comment,_Player);
+TimerLaunch("DelaySinglePlayerComment",5000);
+
+IF
+TimerFinished("DelaySinglePlayerComment")
+AND
+DB_DelaySinglePlayerComment(_Comment,_Player)
+THEN
+NOT DB_DelaySinglePlayerComment(_Comment,_Player);
+Launch_SinglePlayerComment(_Player,_Comment);
+
+PROC
+Launch_SinglePlayerComment((CHARACTER)_Player,(STRING)_Comment)
+AND
+NOT ShutUpPlayers(1)
+AND
+NOT DB_Companion(_Player)
+AND
+NOT DB_PlayerComments_Speaker(_Comment,_,_)
+AND
+DB_PlayerComments((STRING)_Comment,(STRING)_Text,1,1)
+THEN
+DB_PlayerComments_Speaker(_Comment,_Player,_Player);
+ProcDisableEventText(_Comment,_Player);
+TimerLaunch("ShutUpPlayers",30000);
+ShutUpPlayers(1);
+CharacterDisplayText(_Player,_Text);
+
+PROC
+Check_PlayerComments_Distance((STRING)_Comment,(CHARACTER)_Player,(REAL)_Distance)
+AND
+ShutUpPlayers(1)
+THEN
+DB_DelayPlayerComment(_Comment,_Player);
+TimerLaunch("DelayPlayerComment",5000);
+
+IF
+TimerFinished("DelayPlayerComment")
+AND
+DB_DelayPlayerComment(_Comment,_Player)
+AND
+DB_PlayerComments_Speaker(_Comment,_Player,_Player2)
+AND
+CharacterGetDistanceToCharacter(_Player,_Player2,_Distance)
+THEN
+NOT DB_DelayPlayerComment(_Comment,_Player);
+Check_PlayerComments_Distance(_Comment,_Player,_Distance);
+
+PROC
+Check_PlayerComments_Distance((STRING)_Comment,(CHARACTER)_Player,(REAL)_Distance)
+AND
+NOT ShutUpPlayers(1)
+AND
+_Distance > 10.0
+AND
+DB_PlayerComments(_Comment,_Text,1,1)
+THEN
+ProcDisableEventText(_Comment,_Player);
+TimerLaunch("ShutUpPlayers",30000);
+ShutUpPlayers(1);
+CharacterDisplayText(_Player,_Text);
+
+PROC
+Check_PlayerComments_Distance((STRING)_Comment,(CHARACTER)_Player,(REAL)_Distance)
+AND
+NOT ShutUpPlayers(1)
+AND
+_Distance <= 10.0
+AND
+DB_PlayerComments_Speaker(_Comment,_Player,_Player2)
+THEN
+ProcCheckDualPlayerComment_Distance(_Comment,_Player,_Player2);
+
+PROC
+ProcCheckDualPlayerComment_Distance((STRING)_comment,(CHARACTER)_Player,(CHARACTER)_Player2)
+AND
+_Player!=_Player2
+AND
+DB_PlayerComments(_Comment,_Text,2,1)
+THEN
+ProcDisableEventText(_Comment,_Player);
+ProcDisableEventText(_Comment,_Player2);
+TimerLaunch("ShutUpPlayers",30000);
+ShutUpPlayers(1);
+CharacterDisplayText(_Player,_Text);
+
+PROC
+ProcCheckDualPlayerComment_Distance((STRING)_comment,(CHARACTER)_Player,(CHARACTER)_Player)
+AND
+DB_PlayerComments(_Comment,_Text,1,1)
+THEN
+ProcDisableEventText(_Comment,_Player);
+TimerLaunch("ShutUpPlayers",30000);
+ShutUpPlayers(1);
+CharacterDisplayText(_Player,_Text);
+
+
+IF
+CharacterDisplayTextEnded(_,_Text)
+AND
+DB_PlayerComments(_Comment,_Text,_PlayerAmount,_Current)
+AND
+IntegerSum(_Current,1,_New)
+THEN
+Check_PlayerComments_IsNext(_Comment,_PlayerAmount,_New);
+
+PROC
+Check_PlayerComments_IsNext((STRING)_Comment,(INTEGER)_PlayerAmount,(INTEGER)_New)
+AND
+NOT DB_PlayerComments(_Comment,_,_PlayerAmount,_New)
+AND
+DB_PlayerComments_Speaker(_Comment,_Player,_Player2)
+THEN
+NOT DB_PlayerComments_Speaker(_Comment,_Player,_Player2);
+PROC_CleanUpPlayerComments(_Comment);
+
+PROC
+Check_PlayerComments_IsNext((STRING)_Comment,(INTEGER)_PlayerAmount,(INTEGER)_New)
+AND
+DB_PlayerComments(_Comment,_Text,_PlayerAmount,_New)
+THEN
+Check_PlayerComments_DisplayNext(_Comment,_Text,_PlayerAmount,_New);
+
+PROC
+Check_PlayerComments_DisplayNext((STRING)_Comment,(STRING)_Text,(INTEGER)_PlayerAmount,(INTEGER)_New)
+AND
+_PlayerAmount == 1
+AND
+DB_PlayerComments_Speaker(_Comment,_Player,_)
+THEN
+CharacterDisplayText(_Player,_Text);
+
+PROC
+Check_PlayerComments_DisplayNext((STRING)_Comment,(STRING)_Text,(INTEGER)_PlayerAmount,(INTEGER)_New)
+AND
+_PlayerAmount == 2
+AND
+DB_PlayerComments_Speaker(_Comment,_Player,_Player2)
+THEN
+CharacterDisplayText(_Player2,_Text);
+NOT DB_PlayerComments_Speaker(_Comment,_Player,_Player2);
+DB_PlayerComments_Speaker(_Comment,_Player2,_Player);
+
+PROC
+PROC_CleanUpPlayerComments((STRING)_Name)
+AND
+NOT DB_RepeatPlayerComment(_Name)
+AND
+DB_PlayerComments(_Name, _Text, _PlayerAmount, _Index)
+THEN
+NOT DB_PlayerComments(_Name, _Text, _PlayerAmount, _Index);
+
+PROC
+PROC_CleanUpPlayerComments((STRING)_Name)
+THEN
+TimerCancel("ShutUpPlayers");
+NOT ShutUpPlayers(1);
+ProcEnableEventText(_Name);
+
+IF
+TimerFinished("ShutUpPlayers")
+THEN
+NOT ShutUpPlayers(1);
+
+PROC
+ProcDisableEventText((STRING)_Comment,(CHARACTER)_Player)
+THEN
+DB_DisabledEventTextFor(_Comment,_Player);
+DB_BlockTextSpam(_Player);
+CharTimerCancel(_Player,"BlockTextSpam");
+
+PROC
+ProcEnableEventText((STRING)_Comment)
+AND
+DB_DisabledEventTextFor(_Comment,_Player)
+THEN
+NOT DB_DisabledEventTextFor(_Comment,_Player);
+CharTimer(_Player,"BlockTextSpam",2000);
+
+
+/***********************/
+
+/*******************************/
+/*** CYS Beach Gate Comments ***/
+/*******************************/
+
+IF 
+CharacterEnteredTrigger(_Player, _Trigger)
+AND
+DB_PlayerComment_Trigger(_Trigger, "CYS_CommentBeachGate")
+THEN
+GlobalSetEvent("LORE_CYS_BeachGate");
+ProcTriggerUnregisterForPlayers(_Trigger);
+
+
+/////////////////////////////////
+//////////Comment DF Tree//////////
+/////////////////////////////////////
+IF
+CharacterEvent(_Player,"DAF_PlayersSeesFirstTree")
+THEN
+Launch_PlayerComment(_Player, "DAF_CommentDFTree");
+
+
+
+
+
+
+
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "__Start"

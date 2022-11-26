@@ -1,0 +1,90 @@
+INIT
+
+ITEM:__Me
+EXTERN ITEM:%Scale1 = null
+EXTERN ITEM:%Scale2 = null
+EXTERN STRING:%EventEqual = null
+EXTERN STRING:%EventUnequal = null
+FLOAT:%Scale1Weight = 0
+FLOAT:%Scale2Weight = 0
+FLOAT:%Scale1Percentage = 0
+FLOAT:%Scale2Percentage = 0
+FLOAT:%CurrentPercentage = 0.5
+FLOAT:%PreviousPercentage = 0.5
+
+EVENTS
+
+EVENT Initialize
+ON
+	OnInit
+ACTIONS
+	Interrupt(PercentageChance)
+	SetPriority(PercentageChance,100)
+
+EVENT Update
+VARS
+	FLOAT:_TotalWeight
+ON
+	OnItemEvent(__Me,"ScaleWeightChange")
+ACTIONS
+	IF "c1&c2&c3&c4"
+		GetVar(%Scale1Weight,%Scale1,"NewWeight")
+		GetVar(%Scale2Weight,%Scale2,"NewWeight")
+		GetVar(%Scale1Percentage,%Scale1,"CurrentPercentage")
+		GetVar(%Scale2Percentage,%Scale2,"CurrentPercentage")
+	THEN
+		Set(%PreviousPercentage,%CurrentPercentage)
+		IF "c1"
+			IsEqual(%Scale1Weight,%Scale2Weight)
+		THEN
+			Set(%CurrentPercentage,0.5)
+		ELSE
+			Set(_TotalWeight,%Scale1Weight)
+			Add(_TotalWeight,%Scale2Weight)
+			IF "c1"
+				IsGreaterThen(%Scale2Weight,%Scale1Weight)
+			THEN
+				Set(%CurrentPercentage,%Scale1Weight)
+				Divide(%CurrentPercentage,_TotalWeight)
+				Clamp(%CurrentPercentage,0,1)
+			ELSE
+				Set(%CurrentPercentage,%Scale2Weight)
+				Divide(%CurrentPercentage,_TotalWeight)
+				Clamp(%CurrentPercentage,0,1)
+				Subtract(%CurrentPercentage,1)
+				Multiply(%CurrentPercentage,-1)
+			ENDIF
+		ENDIF
+		IF "!c1"
+			IsEqual(%CurrentPercentage,%PreviousPercentage)
+		THEN
+			ItemEvent(__Me,"ScaleIndicatorChange")
+		ENDIF
+	ENDIF
+
+EVENT CompareScales
+ON
+	OnItemEvent(__Me,"ScaleIndicatorChange")
+ACTIONS
+	IF "c1&c2&c3"
+		IsEqual(%CurrentPercentage,0.5)
+		IsEqual(%Scale1Percentage,1)
+		IsEqual(%Scale2Percentage,1)
+	THEN
+		CharacterItemEvent(null,__Me,%EventEqual)
+	ELIF "c1"
+		IsEqual(%PreviousPercentage,0.5)
+	THEN
+		CharacterItemEvent(null,__Me,%EventUnequal)
+	ENDIF
+	Interrupt(PercentageChance)
+	SetPriority(PercentageChance,100)
+
+BEHAVIOUR
+
+REACTION PercentageChance,0
+ACTIONS
+	ItemPlayAnimationTo("Lever",%CurrentPercentage,3)	
+	SetPriority(PercentageChance,0)
+INTERRUPT
+	Reset()

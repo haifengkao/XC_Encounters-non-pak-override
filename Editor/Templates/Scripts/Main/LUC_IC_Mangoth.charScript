@@ -1,0 +1,73 @@
+INIT
+
+	CHARACTER:__Me
+	CHARACTER:%Sacrificed1 = LUC_IC_Sacrificed1_bb154987-8ffc-4ca2-82ea-c5af3bdf109f
+	CHARACTER:%Sacrificed2 = LUC_IC_Sacrificed2_66e08f17-d0bf-4a87-90e8-5b9c5ad60885
+	CHARACTER:%Sacrificed3 = LUC_IC_Sacrificed3_c75cadfb-4a2e-4e65-ac35-14d31386f6f1
+	CHARACTER:%Sacrificed4 = LUC_IC_Sacrificed4_0166eeac-09c0-4fa1-863e-b28d15fbcfd3
+	
+EVENTS
+
+EVENT GiveSpell
+	ON
+		OnInit()
+	ACTIONS
+		CharacterAddSkill(Projectile_MangothSacrificeSpell)
+
+EVENT killFirstDude
+	ON
+		OnCharacterEvent(__Me, "KillFirst")
+	ACTIONS
+		CharacterEvent(%Sacrificed1, "isStunning")
+		SetPriority("KillFirstGuy", 1100)
+		
+EVENT killSecondDude
+	ON
+		OnCharacterEvent(__Me, "KillSecond")
+	ACTIONS
+		CharacterEvent(%Sacrificed2, "isStunning")
+		SetPriority("KillSecondGuy", 1100)
+		
+EVENT killThirdDude
+	ON
+		OnCharacterEvent(__Me, "KillThird")		
+	ACTIONS
+		CharacterEvent(%Sacrificed3, "isStunning")
+		SetPriority("KillThirdGuy", 1100)
+		
+EVENT killFourthDude
+	ON
+		OnCharacterEvent(__Me, "KillFourth")
+	ACTIONS
+		CharacterEvent(%Sacrificed4, "isStunning")
+		SetPriority("KillFourthGuy", 1100)
+		
+BEHAVIOUR
+
+REACTION KillFirstGuy, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterUseSkill(Projectile_MangothSacrificeSpell, %Sacrificed1)
+		CharacterEvent(%Sacrificed1, "BeZapped")
+		SetPriority("KillFirstGuy", 0)
+		
+REACTION KillSecondGuy, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterUseSkill(Projectile_MangothSacrificeSpell, %Sacrificed2)
+		CharacterEvent(%Sacrificed2, "BeZapped")
+		SetPriority("KillSecondGuy", 0)
+		
+REACTION KillThirdGuy, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterUseSkill(Projectile_MangothSacrificeSpell, %Sacrificed3)
+		CharacterEvent(%Sacrificed3, "BeZapped")
+		SetPriority("KillThirdGuy", 0)
+		
+REACTION KillFourthGuy, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterUseSkill(Projectile_MangothSacrificeSpell, %Sacrificed4)
+		CharacterEvent(%Sacrificed4, "BeZapped")
+		SetPriority("KillFourthGuy", 0)

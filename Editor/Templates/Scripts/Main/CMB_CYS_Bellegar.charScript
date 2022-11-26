@@ -1,0 +1,484 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%PurifyingFire_Target
+	CHARACTER:%HelpingHand_Target
+	CHARACTER:%ChillingTouch_Target
+	CHARACTER:%Resurrect_Target	
+	FLOAT:%Bellegar_SightRange
+	
+//---------	
+BEHAVIOUR
+REACTION Bellegar_Enemy_CastNullResistance,1000				//ENEMIES
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2"
+	CharacterCanCast(__Me,"Shout_EnemyNullResistance")
+	CharacterGet(_ChosenTarget,__Me,%Bellegar_SightRange,Highest,FireResistance,Enemy)
+ACTIONS
+	DebugText(__Me,"NullRes!")
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Shout_EnemyNullResistance",_ChosenTarget)
+
+REACTION Bellegar_Enemy_CastFlare,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&!(c3|c4|c5|c6|c7)&c8&c9"
+	CharacterCanCast(__Me,"Projectile_EnemyFlare")												//c1
+	CharacterGet(_ChosenTarget,__Me,%Bellegar_SightRange,Lowest,FireResistance,Enemy)			//c2
+	CharacterHasStatus(_ChosenTarget,"INVULNERABLE")											//!c3
+	CharacterHasStatus(_ChosenTarget,"VOID_AURA")												//!c4
+	CharacterHasStatus(_ChosenTarget,"FROZEN")													//!c5
+	CharacterHasStatus(_ChosenTarget,"FIRE_IMMUNITY_AURA")										//!c6
+	CharacterHasStatus(_ChosenTarget,"FIRE_IMMUNITY")											//!c7	
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyFlare")					//c8
+	IsRandom(0.3)																				//c9	
+ACTIONS
+	DebugText(__Me,"Flare!")
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_EnemyFlare",_ChosenTarget)
+	
+REACTION Bellegar_Enemy_CastIceShard,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&!(c3|c4|c5|c6|c7)&c8&c9"
+	CharacterCanCast(__Me,"Projectile_EnemyIceShard")											//c1
+	CharacterGet(_ChosenTarget,__Me,%Bellegar_SightRange,Lowest,WaterResistance,Enemy)			//c2
+	CharacterHasStatus(_ChosenTarget,"INVULNERABLE")											//!c3
+	CharacterHasStatus(_ChosenTarget,"VOID_AURA")												//!c4
+	CharacterHasStatus(_ChosenTarget,"BURNING")													//!c5
+	CharacterHasStatus(_ChosenTarget,"WATER_IMMUNITY_AURA")										//!c6
+	CharacterHasStatus(_ChosenTarget,"WATER_IMMUNITY")											//!c7		
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyIceShard")					//c8
+	IsRandom(0.3)																				//c9	
+ACTIONS
+	DebugText(__Me,"Ice Shard!")
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_EnemyIceShard",_ChosenTarget)
+
+REACTION Bellegar_Enemy_CastBlitzBolt,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&!(c3|c4|c5|c6)&c7&c8"
+	CharacterCanCast(__Me,"Projectile_EnemyBlitzBolt")											//c1
+	CharacterGet(_ChosenTarget,__Me,%Bellegar_SightRange,Lowest,AirResistance,Enemy)			//c2
+	CharacterHasStatus(_ChosenTarget,"INVULNERABLE")											//!c3
+	CharacterHasStatus(_ChosenTarget,"VOID_AURA")												//!c4
+	CharacterHasStatus(_ChosenTarget,"AIR_IMMUNITY_AURA")										//!c5
+	CharacterHasStatus(_ChosenTarget,"AIR_IMMUNITY")											//!c6
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyBlitzBolt")				//c7
+	IsRandom(0.3)																				//c8	
+ACTIONS
+	DebugText(__Me,"Blitz Bolt!")
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_EnemyBlitzBolt",_ChosenTarget)
+	
+REACTION Bellegar_Enemy_CastEarthShard,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&!(c3|c4|c5|c6|c7)&c8&c9"
+	CharacterCanCast(__Me,"Projectile_EnemyEarthShard")											//c1
+	CharacterGet(_ChosenTarget,__Me,%Bellegar_SightRange,Lowest,EarthResistance,Enemy)			//c2
+	CharacterHasStatus(_ChosenTarget,"PETRIFIED")												//!c3
+	CharacterHasStatus(_ChosenTarget,"INVULNERABLE")											//!c4
+	CharacterHasStatus(_ChosenTarget,"VOID_AURA")												//!c5
+	CharacterHasStatus(_ChosenTarget,"EARTH_IMMUNITY_AURA")										//!c6
+	CharacterHasStatus(_ChosenTarget,"EARTH_IMMUNITY")											//!c7
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyEarthShard")				//c8
+	IsRandom(0.3)																				//c9	
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_EnemyEarthShard",_ChosenTarget)
+	
+REACTION Bellegar_Enemy_CastSoMWater,200
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&!(c3|c4|c5|c6|c7)&c8"
+	CharacterCanCast(__Me,"Projectile_EnemyStaffOfMagusWater")									//c1
+	CharacterGet(_ChosenTarget,__Me,%Bellegar_SightRange,Lowest,WaterResistance,Enemy)			//c2
+	CharacterHasStatus(_ChosenTarget,"INVULNERABLE")											//!c3
+	CharacterHasStatus(_ChosenTarget,"VOID_AURA")												//!c4
+	CharacterHasStatus(_ChosenTarget,"BURNING")													//!c5
+	CharacterHasStatus(_ChosenTarget,"WATER_IMMUNITY_AURA")										//!c6
+	CharacterHasStatus(_ChosenTarget,"WATER_IMMUNITY")											//!c7		
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyStaffOfMagusWater")		//c8	
+ACTIONS
+	DebugText(__Me,"SoM Water!")
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_EnemyStaffOfMagusWater",_ChosenTarget)
+	
+REACTION Bellegar_Enemy_MarkOfDeath,250
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&!c4&c5"
+	IsHardcore()																				//c1
+	CharacterCanCast(__Me,"Target_EnemyMarkOfDeath")											//c2
+	CharacterGet(_ChosenTarget,__Me,%Bellegar_SightRange,Highest,Vitality,Enemy)				//c3
+	CharacterHasStatus(_ChosenTarget,"MARK_OF_DEATH")											//!c4
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyMarkOfDeath")					//c5	
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Target_EnemyMarkOfDeath",_ChosenTarget)
+	
+REACTION Bellegar_Enemy_ShacklesOfPain,200
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&!(c4|c5)&c6"
+	IsHardcore()																				//c1
+	CharacterCanCast(__Me,"Target_EnemyShacklesOfPain")											//c2
+	CharacterGet(_ChosenTarget,__Me,%Bellegar_SightRange,Highest,Vitality,Enemy)				//c3
+	CharacterHasStatus(_ChosenTarget,"MARK_OF_DEATH")											//!c4
+	CharacterHasStatus(_ChosenTarget,"SHACKLES_OF_PAIN")										//!c5
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyShacklesOfPain")				//c6	
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Target_EnemyShacklesOfPain",_ChosenTarget)
+	
+REACTION Bellegar_Enemy_CastMeteorShower,800
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+	FLOAT:_MyHP
+	FLOAT:_MyAP
+CHECK "c1&c2&c3&!c4&c5&c6&c7&c8"
+	CharacterGetStat(_MyHP,__Me,"Vitality")														//c1
+	IsLessThen(_MyHP,0.5)																		//c2
+	CharacterGetStat(_MyAP,__Me,"ActionPoints")													//c3
+	IsLessThen(_MyAP,12)																		//!c4	
+	CharacterCanCast(__Me,"Shield_EnemyFire")													//c5
+	CharacterCanCast(__Me,"ProjectileStrike_MeteorShower")										//c6
+	CharacterGet(_ChosenTarget,__Me,%Bellegar_SightRange,Lowest,Distance,Enemy)					//c7
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"ProjectileStrike_MeteorShower")			//c8	
+ACTIONS
+	DebugText(__Me,"HP > 0.5, MetShower!")
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	IF "c1"
+		CharacterHasStatus(__Me,"SHIELD")
+	THEN
+		CharacterRemoveStatus(__Me,"SHIELD")
+	ENDIF
+	CharacterUseSkill("Shield_EnemyFire",__Me)
+	CharacterUseSkill("ProjectileStrike_MeteorShower",_ChosenTarget)
+	
+REACTION Bellegar_Ally_CastResurrect,1100					//ALLIES
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2"
+	CharacterCanCast(__Me,"Target_EnemyResurrect")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyResurrect")
+ACTIONS
+	Set(%Resurrect_Target,null)
+	//DebugText(__Me,"Scanning for dead allies!")	
+	IterateCharacters("CMB_Bellegar_ScanForDeadAllies",Lowest,Distance)
+	IF "!c1"
+		IsEqual(%Resurrect_Target,null)
+	THEN
+		DebugText(__Me,"Resurrection!")
+		CharacterMoveInRange(%Resurrect_Target,_MinRange,_MaxRange,1)
+		CharacterUseSkill("Target_EnemyResurrect",%Resurrect_Target)
+	ELSE
+		SetPriority("Bellegar_Ally_CastResurrect",0)
+	ENDIF
+INTERRUPT
+	Reset()
+	
+REACTION Bellegar_Ally_CastPurifyingFire,800
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2"
+	CharacterCanCast(__Me,"Target_EnemyPurifyingFire")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyPurifyingFire")
+ACTIONS
+	Set(%PurifyingFire_Target,null)
+	IterateCharactersInCombat(__Me,"CMB_Bellegar_ScanForAlliesWithNegativeStatuses",Lowest,Distance)
+	IF "!c1"
+		IsEqual(%PurifyingFire_Target,null)
+	THEN
+		DebugText(__Me,"PurFire!")
+		CharacterMoveInRange(%PurifyingFire_Target,_MinRange,_MaxRange,1)
+		CharacterUseSkill("Target_EnemyPurifyingFire",%PurifyingFire_Target)
+	ELSE
+		SetPriority("Bellegar_Ally_CastPurifyingFire",0)
+	ENDIF
+INTERRUPT
+	Reset()	
+	
+REACTION Bellegar_Ally_CastHelpingHand,700
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2"
+	CharacterCanCast(__Me,"Target_HelpingHandEnemy")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyPurifyingFire")
+ACTIONS
+	Set(%HelpingHand_Target,null)
+	IterateCharactersInCombat(__Me,"CMB_Bellegar_ScanForKnockedDownAllies",Lowest,Distance)
+	IF "!c1&c2"
+		IsEqual(%HelpingHand_Target,null)
+		CharacterCanSee(__Me,%HelpingHand_Target)
+	THEN
+		DebugText(__Me,"Helping Hand!")
+		CharacterMoveInRange(%HelpingHand_Target,_MinRange,_MaxRange,1)
+		CharacterUseSkill("Target_HelpingHandEnemy",%HelpingHand_Target)
+	ELSE
+		SetPriority("Bellegar_Ally_CastHelpingHand",0)
+	ENDIF
+INTERRUPT
+	Reset()
+
+REACTION Bellegar_Ally_CastChillingTouch,700
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2"
+	CharacterCanCast(__Me,"Target_EnemyChillyWind")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyChillyWind")
+ACTIONS
+	Set(%ChillingTouch_Target,null)
+	IterateCharactersInCombat(__Me,"CMB_Bellegar_ScanForBurningAllies",Lowest,Distance)
+	IF "!c1&c2"
+		IsEqual(%ChillingTouch_Target,null)
+		CharacterCanSee(__Me,%ChillingTouch_Target)
+	THEN
+		DebugText(__Me,"ChillTouch!")
+		CharacterMoveInRange(%ChillingTouch_Target,_MinRange,_MaxRange,1)
+		CharacterUseSkill("Target_EnemyChillyWind",%ChillingTouch_Target)
+	ELSE
+		SetPriority("Bellegar_Ally_CastChillingTouch",0)
+	ENDIF
+INTERRUPT
+	Reset()
+	
+REACTION Bellegar_Ally_CastBoost,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&!(c3|c4|c5|c6|c7|c8)&c9"
+	CharacterCanCast(__Me,"Target_EnemyTargetedDamageBoost")									//c1
+	CharacterGet(_ChosenTarget,__Me,%Bellegar_SightRange,Highest,Strength,Ally)					//c2
+	CharacterHasStatus(_ChosenTarget,"BOOST")													//!c4
+	CharacterHasStatus(_ChosenTarget,"PETRIFIED")												//!c5
+	CharacterHasStatus(_ChosenTarget,"FROZEN")													//!c6
+	CharacterHasStatus(_ChosenTarget,"CHARMED")													//!c7
+	CharacterHasStatus(_ChosenTarget,"FEAR")													//!c8
+	CharacterHasStatus(_ChosenTarget,"STUNNED")													//!c9
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyTargetedDamageBoost")			//c10
+ACTIONS
+	DebugText(__Me,"Damage Boost!")
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Target_EnemyTargetedDamageBoost",_ChosenTarget)
+	
+REACTION Bellegar_Ally_CastHaste,900						//SELF
+USAGE COMBAT
+VARS
+	FLOAT:_MyHP
+CHECK "c1&!c2&c3&c4"
+	CharacterCanCast(__Me,"Target_EnemyHaste")
+	CharacterHasStatus(__Me,"HASTED")
+	CharacterGetStat(_MyHP,__Me,"Vitality")
+	IsLessThen(_MyHP,0.5)
+ACTIONS
+	DebugText(__Me,"HP > 0.5, Haste on self!")
+	CharacterUseSkill("Target_EnemyHaste",__Me)
+	
+REACTION Bellegar_Self_CastShield_Fire,0
+USAGE COMBAT
+CHECK "!c1"
+	CharacterHasStatus(__Me,"SHIELD")
+ACTIONS
+	IF "c1"
+		CharacterCanCast(__Me,"Shield_EnemyFire")
+	THEN
+		CharacterUseSkill("Shield_EnemyFire",__Me)
+	ENDIF
+	SetPriority("Bellegar_Self_CastShield_Fire",0)
+		
+REACTION Bellegar_Self_CastShield_Water,0
+USAGE COMBAT
+CHECK "!c1"
+	CharacterHasStatus(__Me,"SHIELD")
+ACTIONS
+	IF "c1"
+		CharacterCanCast(__Me,"Shield_EnemyWater")
+	THEN
+		CharacterUseSkill("Shield_EnemyWater",__Me)
+	ENDIF
+	SetPriority("Bellegar_Self_CastShield_Water",0)
+		
+REACTION Bellegar_Self_CastShield_Air,0
+USAGE COMBAT
+CHECK "!c1"
+	CharacterHasStatus(__Me,"SHIELD")
+ACTIONS
+	IF "c1"
+		CharacterCanCast(__Me,"Shield_EnemyAir")
+	THEN
+		CharacterUseSkill("Shield_EnemyAir",__Me)
+	ENDIF	
+	SetPriority("Bellegar_Self_CastShield_Air",0)
+	
+REACTION Bellegar_Self_CastShield_Earth,0
+USAGE COMBAT
+CHECK "!c1"
+	CharacterHasStatus(__Me,"SHIELD")
+ACTIONS
+	IF "c1"
+		CharacterCanCast(__Me,"Shield_EnemyEarth")
+	THEN
+		CharacterUseSkill("Shield_EnemyEarth",__Me)
+	ENDIF
+	SetPriority("Bellegar_Self_CastShield_Earth",0)
+			
+//---------
+EVENTS
+EVENT OnInit_GiveSpells_GetSightRange
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%Bellegar_SightRange,__Me,Sight)
+	THEN
+		CharacterAddSkill("Shout_EnemyNullResistance")	
+		CharacterAddSkill("Target_EnemyPurifyingFire")	
+		CharacterAddSkill("Target_EnemyResurrect")	
+		CharacterAddSkill("ProjectileStrike_MeteorShower")
+		CharacterAddSkill("Projectile_EnemyFlare")
+		CharacterAddSkill("Projectile_EnemyIceShard")
+		CharacterAddSkill("Projectile_EnemyBlitzBolt")
+		CharacterAddSkill("Projectile_EnemyEarthShard")	
+		CharacterAddSkill("Projectile_EnemyStaffOfMagusWater")	
+		CharacterAddSkill("Target_EnemyMarkOfDeath")	
+		CharacterAddSkill("Target_EnemyShacklesOfPain")	
+		CharacterAddSkill("Target_EnemyTargetedDamageBoost")
+		CharacterAddSkill("Target_HelpingHandEnemy")
+		CharacterAddSkill("Target_EnemyChillyWind")			
+		CharacterAddSkill("Target_EnemyHaste")	
+		CharacterAddSkill("Shield_EnemyFire")	
+		CharacterAddSkill("Shield_EnemyWater")	
+		CharacterAddSkill("Shield_EnemyAir")	
+		CharacterAddSkill("Shield_EnemyEarth")	
+	ENDIF
+	
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("Bellegar_Ally_CastResurrect",1100)
+	SetPriority("Bellegar_Ally_CastHelpingHand",700)
+	SetPriority("Bellegar_Ally_CastChillingTouch",700)	
+	SetPriority("Bellegar_Ally_CastPurifyingFire",550)
+	
+EVENT OnIterateCharacter_ScanForAlliesWithNegativeStatuses
+VARS
+	CHARACTER:_Ally
+ON
+	OnIterateCharacter(_Ally,"CMB_Bellegar_ScanForAlliesWithNegativeStatuses")
+ACTIONS
+	IF "!c1&c2&(c3|c4|c5|c6)"
+		CharacterIsDead(_Ally)
+		CharacterIsAlly(__Me,_Ally)
+		CharacterHasStatus(_Ally,"FROZEN")
+		CharacterHasStatus(_Ally,"CHARMED")
+		CharacterHasStatus(_Ally,"STUNNED")
+		CharacterHasStatus(_Ally,"PETRIFIED")
+	THEN
+		Set(%PurifyingFire_Target,_Ally)
+	ENDIF
+	
+EVENT OnIterateCharacter_ScanForBurningAllies
+VARS
+	CHARACTER:_Ally
+ON
+	OnIterateCharacter(_Ally,"CMB_Bellegar_ScanForBurningAllies")
+ACTIONS
+	IF "!c1&c2&c3"
+		CharacterIsDead(_Ally)
+		CharacterIsAlly(__Me,_Ally)
+		CharacterHasStatus(_Ally,"BURNING")
+	THEN
+		Set(%ChillingTouch_Target,_Ally)
+	ENDIF	
+	
+EVENT OnIterateCharacter_ScanForKnockedDownAllies
+VARS
+	CHARACTER:_Ally
+ON
+	OnIterateCharacter(_Ally,"CMB_Bellegar_ScanForKnockedDownAllies")
+ACTIONS
+	IF "!c1&c2&c3"
+		CharacterIsDead(_Ally)
+		CharacterIsAlly(__Me,_Ally)
+		CharacterHasStatus(_Ally,"KNOCKED_DOWN")
+	THEN
+		Set(%HelpingHand_Target,_Ally)
+	ENDIF	
+	
+EVENT OnIterateCharacter_ScanForDeadAllies
+VARS
+	CHARACTER:_Ally
+ON
+	OnIterateCharacter(_Ally,"CMB_Bellegar_ScanForDeadAllies")
+ACTIONS
+	IF "c1&c2"
+		CharacterIsDead(_Ally)
+		CharacterIsAlly(__Me,_Ally)
+	THEN
+		Set(%Resurrect_Target,_Ally)
+	ENDIF
+	
+EVENT OnDamage_CheckDamageType_SetShieldPrio
+VARS
+	DAMAGE:_Damage
+ON
+	OnDamage(_Damage,_,_,_)
+ACTIONS
+	IF "c1"
+		IsEqual(_Damage,"Fire")
+	THEN
+		SetPriority("Bellegar_Self_CastShield_Fire",900)
+	ELIF "c1"
+		IsEqual(_Damage,"Water")
+	THEN
+		SetPriority("Bellegar_Self_CastShield_Water",900)
+	ELIF "c1"
+		IsEqual(_Damage,"Air")
+	THEN
+		SetPriority("Bellegar_Self_CastShield_Air",900)
+	ELIF "c1"
+		IsEqual(_Damage,"Earth")
+	THEN
+		SetPriority("Bellegar_Self_CastShield_Earth",900)
+	ENDIF

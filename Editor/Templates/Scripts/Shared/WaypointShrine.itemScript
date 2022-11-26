@@ -1,0 +1,31 @@
+INIT
+ITEM:__Me
+EXTERN INT:%IgnoreSight = 0
+
+EVENTS
+
+EVENT Iterator
+VARS 
+	CHARACTER:_Char
+ON
+	OnIterateCharacter(_Char,"WaypointDiscover")
+ACTIONS
+	IF "c1&(c2|c3)"
+		CharacterIsPlayer(_Char)
+		IsEqual(%IgnoreSight,1)
+		CharacterCanSee(_Char,__Me)
+	THEN
+		ItemEvent(__Me,"WaypointDiscovered")
+		SetPriority("Discover",0)
+	ENDIF
+
+BEHAVIOUR
+REACTION Discover, 10
+USAGE ALL
+ACTIONS
+	IterateCharactersNear(__Me,18,"WaypointDiscover")
+	Sleep(1.0)
+INTERRUPT
+	Reset()
+	
+	

@@ -1,0 +1,430 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Affinity(0);
+
+DB_NumAffectionDialogsThisLevel(0);
+DB_MaxAffectionDialogsPerLevel(2);
+
+DB_AffectionTypeDefs("GLO_IncreasePositive","Flirtatious","GLO_DominateFlirtatious");
+DB_AffectionTypeDefs("GLO_IncreasePositiveMinus","Friend","GLO_DominateFriend");
+DB_AffectionTypeDefs("GLO_IncreaseNegativePlus","Neutral","GLO_DominateNeutral");
+DB_AffectionTypeDefs("GLO_IncreaseNegative","Negative","GLO_DominateNegative");
+KBSECTION
+IF
+_Player.DB_IsPlayer()
+AND
+NOT DB_Companion(_Player)
+AND
+_OtherPlayer.DB_IsPlayer()
+AND
+_Player!=_OtherPlayer
+AND
+NOT DB_Companion(_OtherPlayer)
+AND
+NOT DB_Affection(_Player,_OtherPlayer,_)
+THEN
+DB_Affection(_Player,_OtherPlayer,0);
+DB_Affection(_OtherPlayer,_Player,0);
+
+//REGION Affinity
+IF
+DialogEnded(_, _Id)
+AND
+StatCurrentDialogDB(_PlayerEvent, _Player, _Id)
+AND
+NOT DB_HandledAffinityDialog(_Id)
+THEN
+DB_HandledAffinityDialog(_Id);
+ProcCheckAffinityForDialog(_Id);
+
+IF
+DialogEnded(_, _Id)
+THEN
+NOT DB_HandledAffinityDialog(_Id);
+
+PROC
+ProcCheckAffinityForDialog((INTEGER)_Id)
+AND
+StatCurrentDialogDB(_PlayerEvent, _Player, _Id)
+AND
+_OtherPlayer.DB_IsPlayer()
+AND
+NOT DB_Companion(_OtherPlayer)
+AND
+_OtherPlayer!=_Player
+AND
+StatCurrentDialogDB(_OtherPlayerEvent, _OtherPlayer, _Id)
+THEN
+NOT StatCurrentDialogDB(_OtherPlayerEvent, _OtherPlayer, _Id);
+NOT StatCurrentDialogDB(_PlayerEvent, _Player, _Id);
+ProcProcessAffinity(_Player,_PlayerEvent,_OtherPlayer,_OtherPlayerEvent);
+
+PROC
+ProcProcessAffinity((CHARACTER)_Player,(STRING)_PlayerEvent,(CHARACTER)_OtherPlayer,(STRING)_OtherPlayerEvent)
+AND
+_PlayerEvent!=_OtherPlayerEvent
+THEN
+ProcAddAffinity(-1);
+
+PROC
+ProcProcessAffinity((CHARACTER)_Player,(STRING)_PlayerEvent,(CHARACTER)_OtherPlayer,(STRING)_OtherPlayerEvent)
+AND
+_PlayerEvent==_OtherPlayerEvent
+THEN
+ProcAddAffinity(1);
+
+PROC
+ProcAddAffinity((INTEGER)_Delta)
+AND
+DB_Affinity(_Old)
+AND
+IntegerSum(_Old,_Delta,_New)
+THEN
+NOT DB_Affinity(_Old);
+DB_Affinity(_New);
+//END_REGION
+
+//REGION Affection
+
+IF
+DialogCharacterEventSet("GLO_IncreaseAffection",_Player,_ID)
+AND
+ DB_DialogPlayers(_ID,_OtherPlayer,_)
+AND
+_OtherPlayer!=_Player
+THEN
+DialogClearCharacterEvent("GLO_IncreaseAffection",_Player,0);
+DB_AffectionAdd(_Player,_OtherPlayer,1);
+
+IF
+DialogCharacterEventSet("GLO_DecreaseAffection",_Player,_ID)
+AND
+ DB_DialogPlayers(_ID,_OtherPlayer,_)
+AND
+_OtherPlayer!=_Player
+THEN
+DialogClearCharacterEvent("GLO_DecreaseAffection",_Player,0);
+DB_AffectionAdd(_Player,_OtherPlayer,-1);
+
+IF
+DialogEnded(_,_)
+AND
+DB_AffectionAdd(_Player,_OtherPlayer,_Add)
+THEN
+NOT DB_AffectionAdd(_Player,_OtherPlayer,_Add);
+ProcAddAffection(_Player,_OtherPlayer,_Add);
+
+PROC
+ProcAddAffection((CHARACTER)_Player,(CHARACTER)_Target,(INTEGER)_Delta)
+AND
+DB_Affection(_Player,_Target,_Old)
+AND
+IntegerSum(_Old,_Delta,_New)
+THEN
+NOT DB_Affection(_Player,_Target,_Old);
+DB_Affection(_Player,_Target,_New);
+
+PROC
+ProcTriggerAffectionDialog((CHARACTER)_SrcChar,(STRING)_Dialog)
+AND
+NOT DB_PartyDialogs(_,_)		//party dialogs block it
+AND
+DB_AffectionTriggers((STRING)_Dialog)
+THEN
+ProcCheckIfWeCanPlayAffectionDialog(_SrcChar,_Dialog);
+ProcPlayAffectionDialog(_SrcChar,_Dialog);
+
+PROC
+ProcPlayAffectionDialog((CHARACTER)_SrcChar,(STRING)_Dialog)
+AND
+DB_PlayDialog(1)
+THEN
+ProcDefineAffectionDialog(_SrcChar,_Dialog);
+
+PROC
+ProcPlayAffectionDialog((CHARACTER)_SrcChar,(STRING)_Dialog)
+THEN
+NOT DB_PlayDialog(1);
+
+PROC
+ProcCheckIfWeCanPlayAffectionDialog((CHARACTER)_Src,(STRING)_Dialog)
+AND
+CharacterGetLevel(_Src,_Level)
+AND
+_Level>2
+AND
+NOT DB_DualDialogsDisabled(1)
+AND
+NOT DB_AffectionDialog(_,_,_)
+AND
+DB_NumAffectionDialogsThisLevel(_Num)
+AND
+DB_MaxAffectionDialogsPerLevel(_Max)
+AND
+_Num<_Max
+AND
+NOT DB_Dead(_Src)
+AND
+_Other.DB_IsPlayer()
+AND
+NOT DB_Companion(_Other)
+AND
+_Other!=_Src
+AND
+NOT DB_Dead(_Other)
+THEN
+DB_PlayDialog(1);
+
+IF
+CharacterLeveledUp(_Char)
+AND
+_Char.DB_IsPlayer()
+AND
+DB_NumAffectionDialogsthisLevel(_Num)
+THEN
+NOT DB_NumAffectionDialogsThisLevel(_Num);
+DB_NumAffectionDialogsThisLevel(0);
+
+PROC
+ProcDefineAffectionDialog((CHARACTER)_SrcChar,(STRING)_Dialog)
+AND
+NOT DB_DualDialogsDisabled(1)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_Companion(_Player)
+AND
+_Player!=_SrcChar
+AND
+NOT DB_AffectionDialog(_Dialog,_SrcChar,_)
+THEN
+PROC_CheckPlayTutWithDelay("TUT_DualDialog",500);
+PROC_LoopEffectAtCharacter("FX_GP_ExclamationMark_A",_Player,"AffectionExclamationMark","__ANY__");
+PROC_LoopEffectAtCharacter("FX_GP_ExclamationMark_A",_SrcChar,"AffectionExclamationMark","__ANY__");
+CharacterSetHasDialog(_Player,1);
+CharacterSetHasDialog(_SrcChar,1);
+DB_AffectionDialog(_Dialog,_SrcChar,_Player);
+
+IF
+DialogStartRequested(_Player1,_Player2)
+AND
+NOT _Player1.DB_IsInDialog()
+AND
+NOT _Player2.DB_IsInDialog()
+AND
+_Player1.DB_IsPlayer()
+AND
+_Player2.DB_IsPlayer()
+AND
+NOT DB_Companion(_Player2)
+AND
+NOT DB_Companion(_Player1)
+AND
+DB_AffectionDialog(_Dialog,_SrcChar,_Player)
+THEN
+ProcPartyDialogCheck(_Dialog,_Player,_SrcChar);
+
+IF
+DialogStarted(_DualDialog,_)
+AND
+DB_AffectionDialog(_DualDialog,_SrcChar,_Player)
+AND
+DB_NumAffectionDialogsThisLevel(_Num)
+AND
+IntegerSum(_Num,1,_New)
+THEN
+NOT DB_NumAffectionDialogsThisLevel(_Num);
+DB_NumAffectionDialogsthisLevel(_New);
+PROC_StopEffectAtCharacter(_SrcChar,"AffectionExclamationMark");
+PROC_StopEffectAtCharacter(_Player,"AffectionExclamationMark");
+NOT DB_AffectionDialog(_DualDialog,_SrcChar,_Player);
+NOT DB_AffectionTriggers(_DualDialog);
+CharacterSetHasDialog(_Player,0);
+CharacterSetHasDialog(_SrcChar,0);
+
+IF
+DB_PartyDialogs(_Player,_Dialog)
+THEN
+ProcStopAffectionDialog();
+
+PROC 
+ProcStopAffectionDialog()
+AND
+DB_AffectionDialog(_DualDialog,_SrcChar,_Player)
+THEN
+NOT DB_AffectionDialog(_DualDialog,_SrcChar,_Player);
+PROC_StopEffectAtCharacter(_SrcChar,"AffectionExclamationMark");
+PROC_StopEffectAtCharacter(_Player,"AffectionExclamationMark");
+//CharacterPlayEffect(_SrcChar,"FX_GP_TeleportSmoke_A");
+//CharacterPlayEffect(_Player,"FX_GP_TeleportSmoke_A");
+ProcCheckPlayersHaveDialog();
+
+PROC
+ProcCheckPlayersHaveDialog()
+AND
+NOT DB_PartyDialogs(_,_)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_Companion(_Player)
+THEN
+CharacterSetHasDialog(_Player,0);
+
+IF
+CharacterDied(_Player)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_Companion(_Player)
+THEN
+ProcStopAffectionDialog();
+
+
+
+//END_REGION
+
+//REGION New affinity stuff 
+
+IF
+DB_AffectionTraitTrigger((STRING)_Trait,(INTEGER)_Lvl,(STRING)_Dialog)
+THEN
+DB_AffectionTriggers(_Dialog);
+
+IF 
+CharacterTraitChanged(_Player,_Trait)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_Companion(_Player)
+AND
+DB_AffectionTraitTrigger(_Trait,_Trigger,_AffecionDialog)
+AND
+CharacterHasTrait(_player,_Trait,_Lvl)
+AND
+_Lvl>=_Trigger
+THEN
+ProcTriggerAffectionDialog(_player,_AffecionDialog);
+
+PROC
+ProcCalculateAffinity((CHARACTER)_Player1,(CHARACTER)_Player2)
+AND
+DB_AffinityDB(_Old,_Player1,_Player2)
+THEN
+NOT DB_AffinityDB(_Old,_Player1,_Player2);
+
+PROC
+ProcCalculateAffinity((CHARACTER)_Player1,(CHARACTER)_Player2)
+THEN
+DB_AffinityDB(0,_Player1,_Player2);
+
+PROC
+ProcCalculateAffinity((CHARACTER)_Player1,(CHARACTER)_Player2)
+AND
+DB_AffectionTraitTrigger(_Trait,_,_)
+AND
+CharacterGetTrait(_Player1,_Trait,_Lvl)
+AND
+CharacterGetTrait(_Player2,_Trait,_OtherLvl)
+AND
+_Lvl>0
+AND
+_Lvl == _OtherLvl
+AND
+DB_AffinityDB(_Count,_Player1,_Player2)
+AND
+IntegerSum(_Count,1,_New)
+THEN
+NOT DB_AffinityDB(_Count,_Player1,_Player2);
+DB_AffinityDB(_New,_Player1,_Player2);
+
+PROC
+ProcCalculateAffinity((CHARACTER)_Player1,(CHARACTER)_Player2)
+AND
+DB_AffinityDB(_Count,_Player1,_Player2)
+AND
+_Count>=5
+THEN
+GlobalSetEvent("GLO_PlayersAffine");
+
+PROC
+ProcCalculateAffinity((CHARACTER)_Player1,(CHARACTER)_Player2)
+AND
+DB_AffinityDB(_Count,_Player1,_Player2)
+AND
+_Count<5
+THEN
+GlobalClearEvent("GLO_PlayersAffine");
+
+//END_REGION
+
+//REGION Affection types 
+
+IF
+DB_AffectionTypeDefs(_,_Type,_)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_Companion(_Player)
+THEN
+DB_AffectionTypeCounts(_Type,_Player,0);
+
+IF
+DialogCharacterEventSet(_Flag,_Player,_)
+AND
+DB_AffectionTypeDefs(_Flag,_Type,_)
+AND
+DB_AffectionTypeCounts(_Type,_Player,_count)
+AND
+IntegerSum(_Count,1,_New)
+THEN
+DialogClearCharacterEvent(_Flag,_Player,0);
+NOT DB_AffectionTypeCounts(_Type,_Player,_count);
+DB_AffectionTypeCounts(_Type,_Player,_New);
+
+PROC
+ProcCalculateDominantAffectionType((CHARACTER)_Player)
+AND
+DB_DominatingCount(_Player,_Type,_Count)
+THEN
+NOT DB_DominatingCount(_Player,_Type,_Count);
+
+PROC
+ProcCalculateDominantAffectionType((CHARACTER)_Player)
+AND
+DB_AffectionTypeDefs(_,_,_DomFlag)
+THEN
+DialogClearCharacterEvent(_DomFlag,_Player,0);
+
+PROC
+ProcCalculateDominantAffectionType((CHARACTER)_Player)
+THEN
+DB_DominatingCount(_Player,"",-1);
+
+PROC
+ProcCalculateDominantAffectionType((CHARACTER)_Player)
+AND
+DB_AffectionTypeCounts(_Type,_Player,_Count)
+AND
+DB_DominatingCount(_Player,_DomType,_DomCount)
+AND
+_Count>_DomCount
+THEN
+NOT DB_DominatingCount(_Player,_DomType,_DomCount);
+DB_DominatingCount(_Player,_Type,_Count);
+
+PROC
+ProcCalculateDominantAffectionType((CHARACTER)_Player)
+AND
+DB_DominatingCount(_Player,_Type,_Count)
+AND
+DB_AffectionTypeDefs(_,_Type,_DomFlag)
+THEN
+DialogSetCharacterEvent(_DomFlag,_Player,0);
+
+//END_REGION 
+
+
+EXITSECTION
+
+ENDEXITSECTION

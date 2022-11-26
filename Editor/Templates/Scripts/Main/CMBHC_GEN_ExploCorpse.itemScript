@@ -1,0 +1,96 @@
+INIT
+	ITEM:__Me
+	EXTERN STRING:%ExploCorpse_EventName="Explosive_Corpse"
+	EXTERN SKILL:%ExploCorpse_Projectile="Projectile_Fireball"
+	EXTERN INT:%ExploCorpse_Level=20
+
+//---------------
+EVENTS
+EVENT Explosion_Event
+ON
+	OnItemEvent(__Me,%ExploCorpse_EventName)
+ACTIONS
+	ExplodeAt(__Me,%ExploCorpse_Projectile,%ExploCorpse_Level)
+	ItemDie(__Me)
+	
+EVENT Explosion_Damage
+VARS
+	ITEMTEMPLATE:_MyTemplate
+	ITEMTEMPLATE:_Corpse_Feverish_01_RT="COR_Zombie_Explode_A_a8157d6e-1d74-4acd-ad0f-d1314dc0bb1b"
+	ITEMTEMPLATE:_Corpse_Feverish_02_RT="COR_Zombie_Explode_B <806d6816-bff3-4dd7-8bf1-e648bf10badc"
+	ITEMTEMPLATE:_Corpse_Bloated_01_RT="COR_Zombie_Gas_A_ec256fe4-4436-4480-9ac1-8e4ace37f81b"
+	ITEMTEMPLATE:_Corpse_Bloated_02_RT="COR_Zombie_Gas_B_f90d1ab1-8754-4dea-8afa-8e633737dfb7"
+ON
+	OnDamage(_,_,_,_)	//could get attacker's level and apply it to the explosion, but doesn't really make sense
+ACTIONS
+	IF "!(c1|c2|c3)&c4"
+		ItemIsDestroyed(__Me)
+		ItemHasStatus(__Me,"FROZEN")
+		ItemHasStatus(__Me,"PETRIFIED") 
+		ItemGetTemplate(__Me,_MyTemplate)
+	THEN
+		ExplodeAt(__Me,%ExploCorpse_Projectile,%ExploCorpse_Level)
+		IF "c1|c2"
+			IsEqual(_MyTemplate,_Corpse_Feverish_01_RT)
+			IsEqual(_MyTemplate,_Corpse_Feverish_02_RT)
+		THEN
+			PlaySound(__Me,"Char_Feverish_Corpse_explode_2f50c6ab-3ad8-46ea-a306-ad8d72cc4407")
+		ELIF "c1|c2"
+			IsEqual(_MyTemplate,_Corpse_Bloated_01_RT)
+			IsEqual(_MyTemplate,_Corpse_Bloated_02_RT)
+		THEN
+			PlaySound(__Me,"Char_Bloated_Corpse_explode_16b29e76-c0a1-4ae5-a5be-91e47a31e678")
+		ENDIF
+		ItemDie(__Me)	
+	ENDIF
+	
+/*
+EVENT OnActivate_StartTimer
+ON
+	OnActivate()
+ACTIONS
+	IF "!(c1|c2|c3)"
+		ItemIsDestroyed(__Me)
+		ItemHasStatus(__Me,"FROZEN")
+		ItemHasStatus(__Me,"PETRIFIED")
+	THEN
+		StartTimer("CMBHC_GEN_ExploCorpse_Timer",0.5,0)
+	ENDIF
+
+EVENT OnTimer_GetCharacter_RestartTimer
+VARS
+	CHARACTER:_Character
+	CHARACTERTEMPLATE:_DetectedTemplate
+	CHARACTERTEMPLATE:_NonExplosiveTemplate_01="Demons_Hellhound_A_dc4d398c-fa93-42bc-b203-fc6f3fbebcb6"
+	CHARACTERTEMPLATE:_NonExplosiveTemplate_02="Demons_Hellhound_A_Summon_c66713da-c5ee-4ecb-a762-5a60431f2f67"
+	CHARACTERTEMPLATE:_NonExplosiveTemplate_03="CYS_Shambling_Mound_Lava_f75718a3-08e1-4b11-8a89-de6b95d7ed9c"
+	CHARACTERTEMPLATE:_NonExplosiveTemplate_04="CYS_ShMoundLava_FireRockSummon_cb8b8fe4-d7ff-47cd-9a34-a4e1ade95327"
+ON
+	OnTimer("CMBHC_GEN_ExploCorpse_Timer")
+ACTIONS
+	IF "!(c1|c2|c3)"
+		ItemIsDestroyed(__Me)
+		ItemHasStatus(__Me,"FROZEN")
+		ItemHasStatus(__Me,"PETRIFIED")
+	THEN
+		IF "c1&c2&!(c3|c4|c5|c6)"
+			CharacterGet(_Character,__Me,2,Lowest,Distance)
+			CharacterGetTemplate(_Character,_DetectedTemplate)
+			IsEqual(_DetectedTemplate,_NonExplosiveTemplate_01)
+			IsEqual(_DetectedTemplate,_NonExplosiveTemplate_02)
+			IsEqual(_DetectedTemplate,_NonExplosiveTemplate_03)
+			IsEqual(_DetectedTemplate,_NonExplosiveTemplate_04)
+		THEN
+			ExplodeAt(__Me,%ExploCorpse_Projectile,%ExploCorpse_Level)
+			ItemDie(__Me)	
+		ELSE
+			StartTimer("CMBHC_GEN_ExploCorpse_Timer",0.5,0)
+		ENDIF
+	ENDIF
+	
+EVENT OnDeactivate_StopTimer
+ON
+	OnDeactivate()
+ACTIONS
+	StopTimer("CMBHC_GEN_ExploCorpse_Timer")
+*/

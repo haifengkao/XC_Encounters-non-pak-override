@@ -1,0 +1,150 @@
+INIT
+
+CHARACTER:__Me
+CHARACTER:%Guard = DAF_BO_PrisonGuard2_7aeeaf52-8945-46f9-ae14-188ff65c0425
+TRIGGER:%Point1 = DAF_PointTorturePrisoner1_1_854ce80e-8fd0-42be-bd7f-2e48c771e18c
+TRIGGER:%Point2 = DAF_PointTorturePrisoner1_2_740038a1-18c9-4c45-8ada-1076e31c6184
+ITEM:%Door = DAF_DoorWarehouse2_f2d2a6d0-5128-4dcf-aef5-a9e6244f4bbd
+ITEM:%Bed = FUR_Poor_Bed_A_000_d57fb9e2-76b0-48f4-a159-1207856e9fe0
+INT:%State = 0
+INT:%TunnelSafe = 0
+EXTERN TRIGGER:%PointNearTunnelBodies = null
+EXTERN INT:%DisablePrisonBehaviour = 0
+
+BEHAVIOUR
+
+REACTION CowerInTunnel, 1070
+USAGE PEACE
+CHECK "c1&c2"
+	IsEqual(%State, 2)
+	IsEqual(%TunnelSafe, 0)
+VARS
+	FIXEDSTRING:_Animation
+	FIXEDSTRING:_Text
+ACTIONS
+	GetRandom(_Animation,"Cower_01","Cower_01","Crying_01")
+	GetRandom(_Text,"DAF_BO_TunnelCowering_01", "DAF_BO_TunnelCowering_02", "DAF_BO_TunnelCowering_03")
+	DisplayText(__Me,_Text,5)
+	CharacterPlayAnimation(_Animation)
+	Sleep(12)
+	
+REACTION StandInTunnel, 1070
+USAGE PEACE
+CHECK "c1&c2"
+	IsEqual(%State, 2)
+	IsEqual(%TunnelSafe, 1)
+ACTIONS
+	Sleep(5)
+	
+REACTION SleepInCell, 1050
+USAGE PEACE
+CHECK "c1&c2"
+	IsEqual(%State,0)
+	IsEqual(%DisablePrisonBehaviour, 2)
+VARS
+	FIXEDSTRING:_Animation
+	FIXEDSTRING:_Text
+	ITEM:_Pile = PUZ_Dirtpile_A_000_12c1f2f8-b060-414c-8dcc-db4627c6ef62
+ACTIONS
+	ItemSetOnStage(_Pile,0)
+	CharacterUseItem(%Bed)
+	Sleep(15)
+	CharacterUseItem(ITEM:FUR_Poor_Bar_Stool_B_005_04f3dc3c-523f-4cae-bbed-98260e7aa238)
+	Sleep(5)
+	CharacterMoveItem(%Bed,FLOAT3:{471.65;-54.7;394.46})
+	CharacterMoveTo(_Pile,0,1,0,0.5)
+	CharacterLookAt(_Pile,1)
+	CharacterPlayAnimation("use_dig")
+	ItemSetOnStage(_Pile,1)
+	CharacterMoveTo(%Point1)
+	CharacterMoveItem(%Bed,FLOAT3:{471.65;-54.7;397.36})
+		
+	
+REACTION ShoutAtDoor,1050
+USAGE PEACE
+CHECK "c1&c2"
+	IsEqual(%State,0)
+	IsEqual(%DisablePrisonBehaviour, 0)
+VARS
+	FIXEDSTRING:_Animation
+	FIXEDSTRING:_Text
+ACTIONS
+	CharacterMoveTo(%Point2)
+	CharacterLookFrom(%Point2)
+	Sleep(2)
+	GetRandom(_Animation,"BehindBars_01","BehindBars_02")
+	GetRandom(_Text,"DAF_TorturePrisoner_1","DAF_TorturePrisoner_2")
+	DisplayText(__Me,_Text,5)
+	CharacterEvent(%Guard,"PrisonerShouting")
+	Goto("PlayAnimation")
+
+	Label("PlayAnimation")
+	CharacterPlayAnimation(_Animation)
+	Sleep(2)
+	Goto("PlayAnimation")
+INTERRUPT
+	Reset()	
+
+REACTION BackInCell,1060
+USAGE PEACE
+CHECK "c1|(c2&(c3|c4))"
+	IsEqual(%DisablePrisonBehaviour, 1)
+	IsEqual(%DisablePrisonBehaviour, 0)
+	IsEqual(%State,1)
+	CharacterIsDead(CHARACTER:DAF_BO_PrisonGuard2_7aeeaf52-8945-46f9-ae14-188ff65c0425)
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	Sleep(2)
+	IF "!c1"
+		CharacterHasStatus(__Me,"SITTING")
+	THEN
+		CharacterUseItem(ITEM:FUR_Poor_Bar_Stool_B_008_b027fd0a-79db-4a0f-99c5-449c984a9f9d)
+	ENDIF
+	Sleep(15)
+	IF "c1"
+		IsRandom(0.25)
+	THEN
+		Set(%State,0)
+	ENDIF
+INTERRUPT
+	Reset()
+
+EVENTS
+
+EVENT Init
+ON
+	OnInit()
+ACTIONS
+	CharacterForceUpdate(1)
+	
+EVENT Died
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	CharacterForceUpdate(0)	
+
+EVENT GuardAtDoor
+ON
+	OnCharacterEvent(__Me,"GuardAtDoor")
+ACTIONS
+	Set(%State,1)
+	
+EVENT PrisonersInTunnel
+ON
+	OnGlobalEventSet("DAF_BO_TorturePrisonersEscaped")
+ACTIONS
+	Set(%State, 2)
+	
+EVENT TunnelSafe
+ON
+	OnGlobalEventSet("DAF_BO_TortureTunnelSafe")
+ACTIONS
+	Set(%TunnelSafe, 1)
+	
+STORY 
+
+SCRIPTFRAME EscapeToTunnel
+ACTIONS
+	CharacterMoveTo(%PointNearTunnelBodies, 1,1,1)
+	CharacterLookFrom(%PointNearTunnelBodies)

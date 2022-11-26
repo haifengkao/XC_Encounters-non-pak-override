@@ -1,0 +1,113 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter
+CHARACTER:__Me
+FIXEDSTRING:%CurrentAction = "ChooseAction"
+FIXEDSTRING:%PreviousAction = ""
+INT:%NumberOfAnimations = 1
+FIXEDSTRING:%CurrentAnimation = ""
+EXTERN TRIGGER:%MiningSpot = null
+EXTERN TRIGGER:%Cart = null
+EXTERN TRIGGER:%Anchor = null
+INT:%State = 0
+
+BEHAVIOUR
+
+REACTION Cower, 1070
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%State,2)
+VARS
+	FIXEDSTRING:_Animation
+	FLOAT:_Sleep
+ACTIONS
+	CharacterMoveTo(%MiningSpot,1)
+	CharacterLookAt(TRIGGER:LUC_PointFuseMiners_412a9148-691c-451d-b4db-a1e09afd22de)	
+	GetRandom(_Animation,"Cower_01","Cower_02")
+	GetRandom(_Sleep,4,5,6,7,8,9)
+	CharacterPlayAnimation(_Animation)
+	Sleep(_Sleep)
+INTERRUPT
+	Reset()
+
+REACTION ChooseAction, 1060
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%State,0)
+ACTIONS
+	CharacterSwitchWeaponType(OneHanded)
+	CharacterApplyStatus(__Me,UNSHEATHED,-1)
+	GetRandom(%CurrentAction, "Mine", "LoadCart")
+	GotoIfEqual(%PreviousAction, %CurrentAction, "Start")
+	Set(%PreviousAction, %CurrentAction)
+	SetPriority(%CurrentAction, 1070)
+	
+REACTION Mine, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%MiningSpot, 0)
+	CharacterLookFrom(%MiningSpot)
+	GetRandom(%NumberOfAnimations, 2, 2, 2)
+	Set(%CurrentAnimation, "Mining_01")
+	SetPriority("LoopAnimation", 1080)
+INTERRUPT
+	Reset()
+	
+REACTION LoopAnimation, 0
+VARS
+	INT:_Counter = 0
+USAGE PEACE
+ACTIONS
+	SetPriority(%CurrentAction, 0)
+	CharacterPlayAnimation(%CurrentAnimation)
+	Add(_Counter, 1)
+	IF "!c1"
+		IsGreaterThen(_Counter, %NumberOfAnimations)
+	THEN
+		Goto("Start")
+	ELSE
+		Set(_Counter, 0)
+		SetPriority("LoopAnimation", 0)
+	ENDIF
+INTERRUPT
+	SetPriority("LoopAnimation", 0)
+	
+REACTION LoadCart, 0
+//VARS
+	//FIXEDSTRING:_TextToDisplay, "LUC_M_FuseCartLoading_01"
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Cart,0)
+	CharacterLookFrom(%Cart)
+	CharacterRemoveStatus(__Me,UNSHEATHED)
+	StartTimer("LUC_M_DisplayGrunt",1.5,0)
+	//GetRandom(_TextToDisplay, "LUC_M_FuseCartLoading_01", "LUC_M_FuseCartLoading_02", "LUC_M_FuseCartLoading_03")
+	//DisplayText(__Me, _TextToDisplay, 3)
+	CharacterPlayAnimation("LoadingCart_01")
+	SetPriority(%CurrentAction, 0)
+INTERRUPT
+	Reset()
+
+EVENTS
+
+EVENT FightStarts
+ON
+	OnCharacterEvent(__Me,"FightStarts")
+ACTIONS
+	Set(%State,2)
+	
+EVENT FightStops
+ON
+	OnCharacterEvent(__Me,"FightStops")
+ACTIONS
+	Set(%State,0)
+	
+EVENT GruntTimerIsUp
+VARS
+	FIXEDSTRING:_TextToDisplay = "LUC_M_FuseCartLoading_01"
+ON
+	OnTimer("LUC_M_DisplayGrunt")
+ACTIONS
+	GetRandom(_TextToDisplay, "LUC_M_FuseCartLoading_01", "LUC_M_FuseCartLoading_02", "LUC_M_FuseCartLoading_03")
+	DisplayText(__Me, _TextToDisplay, 3)	

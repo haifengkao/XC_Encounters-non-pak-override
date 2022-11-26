@@ -1,0 +1,107 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+CHARACTER:%FirstTarget = CYS_Arhu_Orc4_7030c21e-c4a9-43e4-b59f-4dba0fc82698
+EXTERN TRIGGER:%PointFriend = null
+EXTERN TRIGGER:%PointEnemy = null
+INT:%GuardsAlive = 1
+INT:%CYS_GuardAtDeadOrc = 0
+INT:%CYS_GuardAtDeadGuard = 0
+
+BEHAVIOUR
+
+REACTION State_AtBridge, 0
+USAGE PEACE
+VARS 
+	FIXEDSTRING:_Animation
+ACTIONS
+	IF "c1"
+		IsEqual(%GuardsAlive,1)
+	THEN
+		GetRandom(_Animation,"Annoyed_01","Revolt_01","Revolt_02")
+		CharacterPlayAnimation(_Animation)
+	ELSE
+		CharacterPlayAnimation("Think_01")
+	ENDIF
+	Sleep(2)
+	DialogStart("CYS_AD_GuardCheckingBridge",__Me)
+	IF "c1"
+		CharacterIsDead(CYS_IntroGuards_Bibius_ae7a49c0-8aff-41e8-ad0d-e1edceb0f41c)
+	THEN
+		CharacterEvent(CYS_IntroGuards_Junius_1d8192ef-dff6-47c9-8c2f-ba44e76f4b78, "ShamefullReply")
+	ELIF "c1"
+		CharacterIsDead(CYS_IntroGuards_Junius_1d8192ef-dff6-47c9-8c2f-ba44e76f4b78)
+	THEN
+		CharacterEvent(CYS_IntroGuards_Bibius_ae7a49c0-8aff-41e8-ad0d-e1edceb0f41c, "ShamefullReply")
+	ELIF "c1"
+		IsRandom(0.5)
+	THEN
+		CharacterEvent(CYS_IntroGuards_Bibius_ae7a49c0-8aff-41e8-ad0d-e1edceb0f41c, "ShamefullReply")
+	ELSE
+		CharacterEvent(CYS_IntroGuards_Junius_1d8192ef-dff6-47c9-8c2f-ba44e76f4b78, "ShamefullReply")
+	ENDIF
+	Sleep(20)
+	
+REACTION State_AfterFight, 0
+USAGE PEACE
+VARS 
+	TRIGGER:_Point
+	FIXEDSTRING:_Animation
+	FLOAT:_Sleep
+ACTIONS
+	GetRandom(_Point,%PointFriend,%PointEnemy)
+	CharacterMoveTo(_Point, 0, 1, 1)
+	CharacterLookFrom(_Point)
+	GetRandomBetween(_Sleep, 5, 10)
+	Sleep(_Sleep)
+	IF "c1"
+		IsEqual(_Point,%PointFriend)
+	THEN
+		GetRandom(_Animation,"Crying_01","Look_Down_Long_01","Salute_01")
+		Set(%CYS_GuardAtDeadGuard,1)
+	ELSE	
+		GetRandom(_Animation,"Cheer_01","Flex_01","Intimidate_01","Taunt_01","Taunt_02")
+		Set(%CYS_GuardAtDeadOrc,1)
+	ENDIF
+	DialogStart("CYS_AD_GuardAfterFight",__Me)
+	CharacterPlayAnimation(_Animation)
+	GetRandomBetween(_Sleep, 15, 25)
+	CharacterWander(FLOAT:15.0, _Sleep, 0, _Point)
+
+REACTION State_FightingFirstOrc, 1600
+USAGE COMBAT
+VARS 
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&!c2"
+	CharacterGetWeaponRange(_MinRange,_MaxRange,__Me)
+	CharacterIsDead(%FirstTarget)
+ACTIONS
+	DialogStart("CYS_AD_GuardDuringFight",__Me)
+	CharacterMoveInRange(%FirstTarget,_MinRange,_MaxRange,1)
+	CharacterAttack(%FirstTarget)
+	CharacterEndTurn()
+	
+REACTION State_FightingOtherOrcs, 1500
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+CHECK "c1&!c2"
+	CharacterGet(_Enemy,__Me,null,Lowest,Distance,Enemy)
+	CharacterIsDead(_Enemy)
+ACTIONS 
+	CharacterAttack(_Enemy)	
+INTERRUPT
+ON
+	OnMovementFailed(_)
+ACTIONS
+	SetPriority("State_FightingOtherOrcs",0)
+	
+EVENTS
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("State_FightingOtherOrcs",1500)

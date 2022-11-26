@@ -1,0 +1,90 @@
+#INCLUDE State_Manager
+
+INIT
+
+USING State_Manager
+
+CHARACTER:__Me
+
+	TRIGGER:%Orders = SAC_Behavior_YardInstructorOrders_5ed9b76e-9e59-430b-ad33-932d7d1dd0dc
+	TRIGGER:%Train = SAC_Behavior_YardTraining_91aaaf3d-ca16-4fba-97d3-7f57bc01903d
+	INT:%Training = 0
+	INT:%Repeat = 0
+	
+BEHAVIOUR
+
+REACTION State_Order, 0
+USAGE PEACE
+ACTIONS
+	IF "c1"
+		IsEqual(%Training, 1)
+	THEN
+		Set(%currentAction, "Action_Train")
+	ELSE
+		Set(%currentAction, "Action_GiveOrder")
+	ENDIF
+	SetPriority(%currentAction, 1100)
+	
+
+REACTION Action_GiveOrder, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Orders)
+	CharacterLookFrom(%Orders)
+	CharacterPlayAnimation("Look_Right_Short_01")
+	CharacterPlayAnimation("Look_Left_Short_01")
+	
+	IF "c1"
+		IsEqual(%Repeat, 1)
+	THEN
+		Sleep(45)
+		DialogStart("SAC_AD_YardInstructor_RepeatTraining", __Me)
+	ELSE
+		DialogStart("SAC_AD_YardInstructor_Orders", __Me)
+		GlobalSetEvent("SAC_YardInstructor_StartTraining")
+	ENDIF
+	StartTimer("SAC_YardLoop", 85, 1)
+	Set(%Repeat, 1)
+	Set(%Training, 1)
+	Sleep(5)
+	SetPriority(%currentAction, 0)
+
+
+REACTION Action_Train, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Train)
+	CharacterLookFrom(%Train)
+	IF "c1"
+		IsRandom(.6)
+	THEN
+		CharacterPlayAnimation("Look_Right_Long_01")
+		CharacterPlayAnimation("Look_Left_Long_01")
+	ENDIF
+	
+	Sleep(5)
+	
+	IF "c1"
+		IsRandom(.7)
+	THEN
+		DialogStart("SAC_AD_YardInstructor_Training", __Me)
+	ENDIF
+	Sleep(3)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)	
+	Reset()
+
+EVENTS
+	
+EVENT TrainingEnd
+ON
+	OnTimer("SAC_YardLoop")
+ACTIONS
+	Set(%Training, 0)
+	DialogStart("SAC_AD_YardInstructor_Rest", __Me)
+	SetPriority(%currentAction, 0)
+
+
+	
+	

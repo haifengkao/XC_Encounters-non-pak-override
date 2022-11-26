@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<palette xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <palettes />
+  <objectids>
+    <guid>46f517ab-ce59-455e-abee-ca680a0ff0c3</guid>
+    <guid>e250d4d3-faab-40c7-9510-92009246d3ab</guid>
+    <guid>71e425f1-b199-4605-8477-7b2ad41db218</guid>
+    <guid>690a6c50-dce0-4a2c-8b5c-604f0b6027a4</guid>
+    <guid>7fcceff5-902b-4b2d-b29d-cd8bc146bc46</guid>
+    <guid>f9b74aa3-333d-42e9-9089-1def0bea6325</guid>
+    <guid>e9aa74b9-825c-4757-97f7-b0ceefe53e7e</guid>
+    <guid>9c909414-c8ec-4bfb-898c-8e8bd8fdf816</guid>
+    <guid>ef5b0eae-3ca0-4e77-81e0-02f0acfc65ff</guid>
+    <guid>c0e2868f-d697-4424-83c6-0c5b4cfda718</guid>
+    <guid>7513699f-f386-4cb7-a53b-720846a6ffae</guid>
+    <guid>3cc9d51b-aa04-480c-b352-de986baf0615</guid>
+    <guid>bd704b19-ba78-4039-a2c6-dd70aa9bda6d</guid>
+    <guid>c6493adc-f410-4500-8ef4-bc419a8fbfbe</guid>
+    <guid>6dce1e1c-b10d-4710-aa53-e69c0046c772</guid>
+    <guid>225273ab-9578-47a2-a991-c8307d4dce0f</guid>
+  </objectids>
+  <name>Decals</name>
+</palette>

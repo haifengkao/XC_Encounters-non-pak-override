@@ -1,0 +1,55 @@
+INIT
+ITEM:__Me
+
+EXTERN SKILL:%ProjectileSkill=null
+EXTERN INT:%CasterLevel=-1
+EXTERN FLOAT3:%Offset={0;0;0}
+EXTERN STRING:%TurretEventOn=null
+EXTERN STRING:%TurretEventOff=null
+EXTERN INT:%IsOn = 1
+EXTERN FLOAT:%SleepTime = 1
+EXTERN FLOAT:%DelayTime = 0
+FLOAT:%SavedDelayTime = 0
+
+EVENTS
+
+EVENT TurnOff
+ON
+	OnCharacterItemEvent(_,_,%TurretEventOff)
+ACTIONS
+	Set(%IsOn,0)
+	Interrupt("Shooting")
+
+EVENT TurnOn
+ON
+	OnCharacterItemEvent(_,_,%TurretEventOn)
+ACTIONS
+	IF "!c1"
+		IsEqual(%SavedDelayTime,0)
+	THEN
+		Set(%DelayTime,%SavedDelayTime)
+	ENDIF
+	Set(%IsOn,1)
+	Interrupt("Shooting")
+
+BEHAVIOUR
+
+REACTION Shooting, 1000
+VARS 
+	FLOAT3:_Dir
+CHECK "c1"
+	IsEqual(%IsOn,1)
+ACTIONS
+	Check()
+	IF "!c1"
+		IsEqual(%DelayTime,0)
+	THEN
+		Sleep(%DelayTime)
+		Set(%SavedDelayTime,%DelayTime)
+		Set(%DelayTime,0)
+	ENDIF
+	GetForwardDirection(__Me,_Dir)
+	ShootLocalProjectile(%ProjectileSkill,__Me,%Offset,_Dir,%CasterLevel)
+	Sleep(%SleepTime)
+INTERRUPT
+	Reset()

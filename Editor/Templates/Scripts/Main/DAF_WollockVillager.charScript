@@ -1,0 +1,145 @@
+INIT
+CHARACTER:__Me
+CHARACTER:%Escortee = Player2_a0af7520-57ac-4f1c-b9d7-197bceebeade
+FIXEDSTRING:%CurrentAction = "ChooseAction"
+FIXEDSTRING:%PreviousAction = ""
+TRIGGER:%PrayPoint_01 = DAF_PrayPoint_01_ee6d6aa4-a887-493b-b9ae-b8bdc6ead7f9
+TRIGGER:%PrayPoint_02 = DAF_PrayPoint_02_a3e2ce48-6332-4b6e-98c6-b39b63355b47
+TRIGGER:%PrayPoint_03 = DAF_PrayPoint_03_bff781a5-a4dd-464c-b535-db7c436d72bf
+TRIGGER:%PrayPoint_04 = DAF_PrayPoint_04_e3262af3-7ba1-4588-91d6-ee547faf6f82
+TRIGGER:%Pray_WayPoint_01 = DAF_Point_PrayWayPoint_01_7453a31a-d5f8-49e1-95ff-12b359d216ce
+TRIGGER:%Pray_WayPoint_02 = DAF_Point_PrayWayPoint_02_e690b578-49b3-4097-bbc3-5a70b187298f
+CHARACTER:%ConversationPartner = null
+INT:%FirstConversation = 0
+INT:%CanStartDialog = 1
+
+BEHAVIOUR
+
+REACTION TalkToWollock, 1080
+VARS
+	CHARACTER:_character
+	STRING:_dialog
+USAGE PEACE
+CHECK "c1&c2&!c3&!c4"
+	IsEqual(%CanStartDialog, 1)
+	CharacterGet(_character, __Me, 4, Lowest, Distance, Ally)
+	IsEqual(%ConversationPartner, _character)
+	IsInDialog(_character)
+ACTIONS
+	Set(%ConversationPartner, _character)
+	IF "!c1&!c2"
+		CharacterIsPlayer(%ConversationPartner)
+		IsEqual(%FirstConversation, 0)
+	THEN
+		CharacterLookAt(%ConversationPartner)
+		Set(%CanStartDialog, 0)
+		StartTimer("WollockConversationTimer", 10, 0)
+		GetRandom(_dialog, "DAF_WollockVillagerConversation", "DAF_WollockVillagerConversation_02")
+		DialogStart(_dialog, __Me, %ConversationPartner)
+	ENDIF
+	Set(%FirstConversation, 1)
+
+REACTION ChooseAction, 1060
+USAGE PEACE
+ACTIONS
+	GetRandom(%CurrentAction, "Patrol", "Pray")
+	GotoIfEqual(%PreviousAction, %CurrentAction, "Start")
+	Set(%PreviousAction, %CurrentAction)
+	SetPriority(%CurrentAction, 1070)
+
+REACTION Patrol, 0
+USAGE PEACE
+VARS
+	TRIGGER:_Point
+	FIXEDSTRING:_Text
+ACTIONS
+	GetRandom(_Text,"DAF_WollocksVillager_Generic_01","DAF_WollocksVillager_Generic_02","DAF_WollocksVillager_Generic_03","DAF_WollocksVillager_Generic_04")
+	CharacterWander(FLOAT:8,5,0)
+	Sleep(3)
+	DisplayText(__Me,_Text,5)
+	Sleep(6)
+	SetPriority(%CurrentAction, 0)
+INTERRUPT
+	Reset()
+	
+REACTION Pray, 0
+USAGE PEACE
+CHECK "c1"
+	IsRandom(0.3)
+VARS
+	TRIGGER:_Point
+	TRIGGER:_WayPoint
+ACTIONS
+	CharacterMoveTo(TRIGGER:DAF_Area_WollockVillageEntrance_0cd98612-f86e-4a87-95ef-cf53180345c5, 0)
+	GetRandom(_WayPoint, %Pray_WayPoint_01, %Pray_WayPoint_02)
+	CharacterMoveTo(_WayPoint, 0)
+	GetRandom(_Point, %PrayPoint_01, %PrayPoint_02, %PrayPoint_03, %PrayPoint_04)
+	CharacterMoveTo(_Point, 0)
+	CharacterPlayAnimation("melee1")
+	DisplayText(__Me, "DAF_WollockPray", 5)
+	Sleep(3)
+	CharacterPlayAnimation("melee1")
+	DisplayText(__Me, "DAF_WollockPray", 5)
+	Sleep(3)
+	CharacterMoveTo(_WayPoint, 0)
+	CharacterMoveTo(TRIGGER:DAF_Area_WollockVillageEntrance_0cd98612-f86e-4a87-95ef-cf53180345c5, 0)
+	SetPriority(%CurrentAction, 0)
+INTERRUPT
+	Reset()
+
+REACTION ReactOnPlayer2, 2100
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Text
+CHECK "c1"
+	CharacterInTouchRange(__Me, Player2_a0af7520-57ac-4f1c-b9d7-197bceebeade)
+ACTIONS
+	CharacterFollow(%Escortee,4,1)
+	IF "c1"
+		IsRandom(0.5)
+	THEN
+		GetRandom(_Text,"DAF_WollocksVillager_Female_01","DAF_WollocksVillager_Female_02")
+		DisplayText(__Me,_Text,5)
+	ENDIF
+INTERRUPT
+	Reset()
+
+	
+REACTION ReactOnPlayer1, 2000
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Text
+	CHARACTER:_Player1 = Player1_dac1443f-a866-4ab3-b240-e705c0b20ec5
+CHECK "c1"
+		CharacterInTouchRange(__Me, Player1_dac1443f-a866-4ab3-b240-e705c0b20ec5)
+ACTIONS
+	CharacterFleeFrom(RELATION:Player, 4)
+	IF "c1"
+		IsRandom(0.5)
+	THEN
+		GetRandom(_Text,"DAF_Temp_WollocksVillager_Male_01","DAF_Temp_WollocksVillager_Male_02")
+		DisplayText(__Me,_Text,5)
+	ENDIF
+INTERRUPT
+	Reset()
+
+EVENTS
+
+EVENT ConversationTimer
+ON
+	OnTimer("WollockConversationTimer")
+ACTIONS
+	Set(%CanStartDialog, 1)
+
+EVENT PauseBehaviour
+ON
+	OnCharacterEvent(__Me, "DAF_WV_PauseBehaviour")
+ACTIONS
+	SetPriority(%CurrentAction, 0) 
+	SetPriority("ChooseAction", 0)
+	
+EVENT ResumeBehaviour
+ON
+	OnCharacterEvent(__Me, "DAF_WV_ResumeBehaviour")
+ACTIONS
+	SetPriority("ChooseAction", 1060)

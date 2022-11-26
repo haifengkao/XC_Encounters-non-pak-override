@@ -1,0 +1,575 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+/*
+
+DefaultDialog((NPC)_Npc,(DIALOG)_Dialog,(INTEGER)_CloseButtonEnabled):
+defines the normal dialog of the _Npc with the player.
+If not defined, the npc will not start a dialog with the player when clicked on.
+
+HostileDialog((NPC)_Npc,(DIALOG)_Dialog):
+define the dialog of _Npc when he is hostile with the player
+("hostile" is attitude <= -75)
+If HostileDialog/2 not defined for this _Npc, a default hostile dialog will be used
+
+ThreathenedDialog((NPC)_Npc,(DIALOG)_Dialog):
+define a dialog of _Npc when he is addressed by the player with the
+sword in the hand.
+If ThreatenedDialog/2 not defined for this _Npc, the normal default threatened dialog is started.
+
+If the normal dialog is started, the following dialog events are initialized
+BEFORE the dialog is effectively started:
+1 event =TRUE if he CAN and WANTS TO, FALSE otherwise:
+	npc_can_heal
+4 events reflecting the current attitude. 3 are FALSE, 1 is TRUE:
+	npc_is_best_friend
+	npc_is_helpful
+	npc_is_positive
+	npc_is_negative
+
+To bypass the system above, you can
+1) not define DefaultDialog/3. This prevents any dialog from being started.
+2) add a fact OverrideDialog((NPC)_Npc,(DIALOG)_Dialog), which overrides the system.
+Removing the fact causes fallback to the default system.
+	Use:  example: Otho warns the player about the Drudanae, so a script is started
+			where Otho walks to the player. If the player clicks on Otho before the script
+			frame ends, the default dialog is started, which is not the desired effect.
+*/
+
+/*
+In the goal nodes of the individual npcs,
+dialog events are linked to get different effects:
+
+DialogEvent_QuestData((INTEGER)_QuestID,(DIALOG_EVENT)_DialogEvent,(INTEGER)_Value,(INTEGER)_QuestStatus)
+	(see Rewards) setting _DialogEvent to _Value causes quest to be considered
+			- accepted, failed or succeeded (see QUESTLOG_STATE_... defs).
+			- quests getting accepted cause diary entries
+			- quests getting completed cause rewards to be allocated
+
+DialogEvent_triggers_Attack((DIALOG_EVENT)_DialogEvent,(NPC)_Attacker)
+	(see NPC actions) setting event causes _Attacker to attack player
+
+Killed_sets_DialogEvent((NPC)_Npc,(DIALOG_EVENT)_DialogEvent)
+	(see Dialogs) killing _Npc sets _DialogEvent
+
+*/
+///////////////////////////////////////////////////////////////////////
+// Buffer Dialog events
+IF
+DialogCharacterEventSet(_Event,_Character,_)
+THEN	
+DialogConditionTrue(_Character,_Event);
+
+IF	
+DialogCharacterEventCleared(_Event,_Character,_)
+THEN
+NOT DialogConditionTrue(_Character,_Event);
+
+///////////////////////////////////////////////////////////////////////
+// IMPORTANT!!!
+// Since there is no callback if we set dialog events, we should always
+// use SetAndRememberDialogEvent instead of calling SetDialogEvent directly
+//
+PROC
+SetAndRememberDialogEvent((CHARACTER)_Character,(STRING)_Event,1)
+AND
+NOT EngineCallsAreDisabled(1)
+THEN
+DialogSetCharacterEvent(_Event,_Character,0);
+DialogConditionTrue(_Character,_Event);
+
+PROC
+SetAndRememberDialogEvent((CHARACTER)_Character,(STRING)_Event,0)
+AND
+NOT EngineCallsAreDisabled(1)
+THEN	
+DialogClearCharacterEvent(_Event,_Character,0);
+NOT DialogConditionTrue(_Character,_Event);
+
+// a de facto shortcut that was used so many times that I finally added it *grin*:
+PROC
+SetAndRememberDialogEvent((CHARACTER)_Character,(STRING)_Event)
+THEN
+SetAndRememberDialogEvent(_Character,_Event,1);
+
+///////////////////////////////////////////////////////////////////////
+// SetDialogEvents
+
+// Reset random of previously started dialog:
+PROC
+SetEggDialogEvents(1,(CHARACTER)_Player)
+AND
+DialogRandom1(_Player,0)
+THEN
+DialogClearCharacterEvent("EVENT_dialog_random1_1",_Player,0);
+NOT DialogRandom1(_Player,0);
+
+PROC
+SetEggDialogEvents(1,(CHARACTER)_Player) 
+AND
+DialogRandom1(_Player,1)
+THEN
+DialogClearCharacterEvent("EVENT_dialog_random1_2",_Player,0);
+NOT DialogRandom1(_Player,1);
+
+PROC
+SetEggDialogEvents(1,(CHARACTER)_Player) 
+AND
+DialogRandom1(_Player,2)
+THEN
+DialogClearCharacterEvent("EVENT_dialog_random1_3",_Player,0);
+NOT DialogRandom1(_Player,2);
+
+PROC	
+SetEggDialogEvents(1,(CHARACTER)_Player) 
+AND 
+DialogRandom2(_Player,0)
+THEN
+DialogClearCharacterEvent("EVENT_dialog_random2_1",_Player,0);
+NOT DialogRandom2(_Player,0);
+
+PROC
+SetEggDialogEvents(1,(CHARACTER)_Player) 
+AND
+DialogRandom2(_Player,1)
+THEN
+DialogClearCharacterEvent("EVENT_dialog_random2_2",_Player,0);
+NOT DialogRandom2(_Player,1);
+
+PROC	
+SetEggDialogEvents(1,(CHARACTER)_Player) 
+AND
+DialogRandom2(_Player,2)
+THEN
+DialogClearCharacterEvent("EVENT_dialog_random2_3",_Player,0);
+NOT DialogRandom2(_Player,2);
+
+PROC	
+SetEggDialogEvents(1,(CHARACTER)_Player) 
+AND 
+DialogRandom3(_Player,0)
+THEN	
+DialogClearCharacterEvent("EVENT_dialog_random3_1",_Player,0);
+NOT DialogRandom3(_Player,0);
+
+PROC	
+SetEggDialogEvents(1,(CHARACTER)_Player) 
+AND 
+DialogRandom3(_Player,1)
+THEN
+DialogClearCharacterEvent("EVENT_dialog_random3_2",_Player,0);
+NOT DialogRandom3(_Player,1);
+
+// determine 3 random numbers and clear the dialog events for threatened behavior
+PROC 
+SetEggDialogEvents(1,(CHARACTER)_Player)
+AND
+Random(3,_R1)
+AND
+Random(3,_R2) 
+AND
+Random(2,_R3)
+THEN
+DialogRandom1(_Player,_R1);
+DialogRandom2(_Player,_R2);
+DialogRandom3(_Player,_R3);
+DialogClearCharacterEvent("EVENT_npc_player_attacks",_Player,0);
+DialogClearCharacterEvent("EVENT_npc_player_puts_down_weapons_for",_Player,0);
+DialogClearCharacterEvent("EVENT_npc_is_story_npc",_Player,0);		// an egg is never a story npc (and hence can always be attacked)
+
+// set random
+PROC
+SetEggDialogEvents(1,(CHARACTER)_Player)
+AND
+DialogRandom1(_Player,0)
+THEN
+DialogSetCharacterEvent("EVENT_dialog_random1_1",_Player,0);
+
+PROC 
+SetEggDialogEvents(1,(CHARACTER)_Player)
+AND
+DialogRandom1(_Player,1)
+THEN
+DialogSetCharacterEvent("EVENT_dialog_random1_2",_Player,0);
+
+PROC 
+SetEggDialogEvents(1,(CHARACTER)_Player)
+AND
+DialogRandom1(_Player,2)
+THEN
+DialogSetCharacterEvent("EVENT_dialog_random1_3",_Player,0);
+
+PROC
+SetEggDialogEvents(1,(CHARACTER)_Player)
+AND
+DialogRandom2(_Player,0)
+THEN
+DialogSetCharacterEvent("EVENT_dialog_random2_1",_Player,0);
+
+PROC 
+SetEggDialogEvents(1,(CHARACTER)_Player)
+AND
+DialogRandom2(_Player,1)
+THEN
+DialogSetCharacterEvent("EVENT_dialog_random2_2",_Player,0);
+
+PROC 
+SetEggDialogEvents(1,(CHARACTER)_Player)
+AND
+DialogRandom2(_Player,2)
+THEN
+DialogSetCharacterEvent("EVENT_dialog_random2_3",_Player,0);
+
+PROC 
+SetEggDialogEvents(1,(CHARACTER)_Player)
+AND 
+DialogRandom3(_Player,0)
+THEN
+DialogSetCharacterEvent("EVENT_dialog_random3_1",_Player,0);
+
+PROC
+SetEggDialogEvents(1,(CHARACTER)_Player)
+AND
+DialogRandom3(_Player,1)
+THEN
+DialogSetCharacterEvent("EVENT_dialog_random3_2",_Player,0);
+
+// set day time events
+PROC
+SetEggDialogEvents(1,(CHARACTER)_Player)
+AND
+Time(_,_Hour,_)
+AND
+_Hour < 6
+THEN
+DialogSetCharacterEvent("EVENT_time_night",_Player,0);
+DialogClearCharacterEvent("EVENT_time_morning",_Player,0);
+DialogClearCharacterEvent("EVENT_time_afternoon",_Player,0);
+DialogClearCharacterEvent("EVENT_time_evening",_Player,0);
+
+PROC 
+SetEggDialogEvents(1,(CHARACTER)_Player)
+AND
+Time(_,_Hour,_) 
+AND
+_Hour >= 6
+AND
+_Hour < 12
+THEN	
+DialogClearCharacterEvent("EVENT_time_night",_Player,0);
+DialogSetCharacterEvent("EVENT_time_morning",_Player,0);
+DialogClearCharacterEvent("EVENT_time_afternoon",_Player,0);
+DialogClearCharacterEvent("EVENT_time_evening",_Player,0);
+
+PROC 
+SetEggDialogEvents(1,(CHARACTER)_Player)
+AND
+Time(_,_Hour,_)
+AND
+_Hour >= 12
+AND
+_Hour < 18
+THEN	
+DialogClearCharacterEvent("EVENT_time_night",_Player,0);
+DialogClearCharacterEvent("EVENT_time_morning",_Player,0);
+DialogSetCharacterEvent("EVENT_time_afternoon",_Player,0);
+DialogClearCharacterEvent("EVENT_time_evening",_Player,0);
+
+PROC
+SetEggDialogEvents(1,(CHARACTER)_Player)
+AND
+Time(_,_Hour,_)
+AND
+_Hour >= 18
+THEN
+DialogClearCharacterEvent("EVENT_time_night",_Player,0);
+DialogClearCharacterEvent("EVENT_time_morning",_Player,0);
+DialogClearCharacterEvent("EVENT_time_afternoon",_Player,0);
+DialogSetCharacterEvent("EVENT_time_evening",_Player,0);
+
+// set DIALOG_EVENT_in_guarded_area:
+PROC 
+SetEggDialogEvents(1,(CHARACTER)_Player)
+THEN
+DialogClearCharacterEvent("EVENT_in_guarded_area",_Player,0);
+
+PROC 
+SetEggDialogEvents(1,(CHARACTER)_Player)
+AND
+DB_InRegion(_Player,_Region) 
+AND
+GuardedRegion(_Region,_,_,_)
+THEN
+DialogSetCharacterEvent("EVENT_in_guarded_area",_Player,0);
+
+// set reputation events (useful for egg dialogs only - are superceded by attitude events for NPC dialogs)
+PROC	
+ProcUpdateReputationDialogFlags((CHARACTER)_Character)
+AND
+CharacterGetReputation(_Character,_Rep)
+THEN
+ProcUpdateReputationDialogFlags(_Character,_Rep) ;
+
+PROC	
+ProcUpdateReputationDialogFlags((CHARACTER)_Character,(INTEGER)_Rep) 
+AND
+_Rep < -25
+THEN
+SetAndRememberDialogEvent(_Character,"EVENT_reputation_infamous",1);
+SetAndRememberDialogEvent(_Character,"_EVENT_reputation_negative",0);
+SetAndRememberDialogEvent(_Character,"_EVENT_reputation_low",0);
+SetAndRememberDialogEvent(_Character,"_EVENT_reputation_good",0);
+SetAndRememberDialogEvent(_Character,"_EVENT_reputation_famous",0);
+
+PROC	
+ProcUpdateReputationDialogFlags((CHARACTER)_Character,(INTEGER)_Rep) 
+AND
+_Rep >= -25
+AND
+_Rep < 0
+THEN
+SetAndRememberDialogEvent(_Character,"EVENT_reputation_negative",1);
+SetAndRememberDialogEvent(_Character,"EVENT_reputation_infamous",0);
+SetAndRememberDialogEvent(_Character,"EVENT_reputation_low",0);
+SetAndRememberDialogEvent(_Character,"EVENT_reputation_good",0);
+SetAndRememberDialogEvent(_Character,"EVENT_reputation_famous",0);
+
+PROC	
+ProcUpdateReputationDialogFlags((CHARACTER)_Character,(INTEGER)_Rep) 
+AND
+_Rep >= 0 
+AND
+_Rep < 20
+THEN
+SetAndRememberDialogEvent(_Character,"EVENT_reputation_low",1);
+SetAndRememberDialogEvent(_Character,"EVENT_reputation_infamous",0);
+SetAndRememberDialogEvent(_Character,"EVENT_reputation_negative",0);
+SetAndRememberDialogEvent(_Character,"EVENT_reputation_good",0);
+SetAndRememberDialogEvent(_Character,"EVENT_reputation_famous",0);
+
+PROC	
+ProcUpdateReputationDialogFlags((CHARACTER)_Character,(INTEGER)_Rep) 
+AND 
+_Rep >= 20
+AND
+_Rep < 40
+THEN
+SetAndRememberDialogEvent(_Character,"EVENT_reputation_good",1);
+SetAndRememberDialogEvent(_Character,"EVENT_reputation_infamous",0);
+SetAndRememberDialogEvent(_Character,"EVENT_reputation_negative",0);
+SetAndRememberDialogEvent(_Character,"EVENT_reputation_low",0);
+SetAndRememberDialogEvent(_Character,"EVENT_reputation_famous",0);
+
+PROC	
+ProcUpdateReputationDialogFlags((CHARACTER)_Character,(INTEGER)_Rep) 
+AND
+_Rep >= 40
+THEN
+SetAndRememberDialogEvent(_Character,"EVENT_reputation_famous",1);
+SetAndRememberDialogEvent(_Character,"EVENT_reputation_infamous",0);
+SetAndRememberDialogEvent(_Character,"EVENT_reputation_negative",0);
+SetAndRememberDialogEvent(_Character,"EVENT_reputation_low",0);
+SetAndRememberDialogEvent(_Character,"EVENT_reputation_good",0);
+
+// Helper function: set can_heal if the npc posesses this skill
+PROC	
+SetDialogEvents_1((CHARACTER)_Npc)
+AND
+CanHeal(_Npc)
+THEN	
+DialogSetCharacterEvent("EVENT_npc_can_heal",_Npc,0);
+
+PROC
+SetDialogEvents_1((CHARACTER)_Npc) 
+AND
+NOT CanHeal(_Npc)
+THEN
+DialogClearCharacterEvent("EVENT_npc_can_heal",_Npc,0);
+
+PROC
+SetDialogEvents((CHARACTER)_Player,(CHARACTER)_Npc)
+THEN	
+SetEggDialogEvents(1,_Player);
+
+PROC
+SetDialogEvents((CHARACTER)_,(CHARACTER)_Npc) 
+AND
+ _Npc.DB_EvilDude()
+THEN	
+DialogSetCharacterEvent("EVENT_npc_is_evil_dude",_Npc,0);
+
+PROC
+SetDialogEvents((CHARACTER)_,(CHARACTER)_Npc)
+AND
+NOT _Npc.DB_EvilDude()
+THEN
+DialogClearCharacterEvent("EVENT_npc_is_evil_dude",_Npc,0);
+
+PROC
+SetDialogEvents((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT DB_IsHostile(_Player,_Npc)
+THEN
+SetDialogEvents_1(_Npc);
+DialogClearCharacterEvent("EVENT_npc_is_hostile",_Npc,0);
+
+PROC
+SetDialogEvents((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+DB_IsHostile(_Player,_Npc)
+THEN	
+DialogSetCharacterEvent("EVENT_npc_is_hostile",_Npc,0);
+
+PROC
+SetDialogEvents((CHARACTER)_,(CHARACTER)_Npc)
+AND
+_Npc.DoesNotWantToTrade()
+THEN
+DialogSetCharacterEvent("EVENT_npc_does_not_want_to_trade",_Npc,0);
+
+PROC
+SetDialogEvents((CHARACTER)_,(CHARACTER)_Npc)
+AND
+NOT _Npc.DoesNotWantToTrade()
+THEN
+DialogClearCharacterEvent("EVENT_npc_does_not_want_to_trade",_Npc,0);
+
+PROC	
+SetDialogEvents((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+CharacterGetRepAttitudeTowardsPlayer(_Npc,_Player,_Att)
+AND
+_Att >= 90	//TODO DEFINE ATTITUDE_BEST_FRIEND
+THEN	
+DialogSetCharacterEvent("EVENT_npc_is_best_friend",_Npc,0);
+DialogClearCharacterEvent("EVENT_npc_is_helpful",_Npc,0);
+DialogClearCharacterEvent("EVENT_npc_is_positive",_Npc,0);
+DialogClearCharacterEvent("EVENT_npc_is_negative",_Npc,0);
+
+PROC
+SetDialogEvents((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+CharacterGetRepAttitudeTowardsPlayer(_Npc,_Player,_Att)
+AND
+_Att >= 70 	//TODO DEFINE ATTITUDE_HELPFUL
+AND
+_Att < 90	//TODO DEFINE ATTITUDE_BEST_FRIEND
+THEN
+DialogClearCharacterEvent("EVENT_npc_is_best_friend",_Npc,0);
+DialogSetCharacterEvent("EVENT_npc_is_helpful",_Npc,0);
+DialogClearCharacterEvent("EVENT_npc_is_positive",_Npc,0);
+DialogClearCharacterEvent("EVENT_npc_is_negative",_Npc,0);
+
+PROC
+SetDialogEvents((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+CharacterGetRepAttitudeTowardsPlayer(_Npc,_Player,_Att)
+AND
+_Att >= 0 
+AND
+_Att < 70		//TODO DEFINE ATTITUDE_HELPFUL
+THEN
+DialogClearCharacterEvent("EVENT_npc_is_best_friend",_Npc,0);
+DialogClearCharacterEvent("EVENT_npc_is_helpful",_Npc,0);
+DialogSetCharacterEvent("EVENT_npc_is_positive",_Npc,0);
+DialogClearCharacterEvent("EVENT_npc_is_negative",_Npc,0);
+
+PROC
+SetDialogEvents((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+CharacterGetRepAttitudeTowardsPlayer(_Npc,_Player,_Att)
+AND
+_Att < 0
+AND
+_Att > -75
+THEN
+DialogClearCharacterEvent("EVENT_npc_is_best_friend",_Npc,0);
+DialogClearCharacterEvent("EVENT_npc_is_helpful",_Npc,0);
+DialogClearCharacterEvent("EVENT_npc_is_positive",_Npc,0);
+DialogSetCharacterEvent("EVENT_npc_is_negative",_Npc,0);
+
+// A dialog event added, independent from the non-overlapping categories above: hostile - negative - postive - helpful - best_friend
+// Only condition: if somebody is Hostile, then he is also RealAngry.
+PROC	
+SetDialogEvents((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+CharacterGetRepAttitudeTowardsPlayer(_Npc,_Player,_Att)
+AND
+_Att <= -50
+THEN
+DialogSetCharacterEvent("EVENT_npc_is_real_angry",_Npc,0);
+
+PROC
+SetDialogEvents((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+CharacterGetRepAttitudeTowardsPlayer(_Npc,_Player,_Att)
+AND
+_Att > -50
+THEN	
+DialogClearCharacterEvent("EVENT_npc_is_real_angry",_Npc,0);
+
+PROC	
+SetDialogEvents((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+// get dialog about to be started:
+DialogRunning(_Dialog,_Npc,_Player)
+AND
+RanDialog(_Player,_Dialog)
+THEN
+DialogSetCharacterEvent("EVENT_npc_talks_second_time",_Npc,0);
+
+PROC
+SetDialogEvents((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+// get dialog about to be started:
+DialogRunning(_Dialog,_Npc,_Player)
+AND
+NOT RanDialog(_Player,_Dialog)
+THEN	
+DialogClearCharacterEvent("EVENT_npc_talks_second_time",_Npc,0);
+
+/* Has become obsolete because no party members:
+PROC	SetDialogEvents((NPC)_Npc) AND PartyMember(_Npc)
+THEN	SetPartyMemberDialogEvents(_Npc);
+
+PROC	SetDialogEvents((NPC)_Npc) AND NOT PartyMember(_Npc)
+THEN	SetDialogEvent(DIALOG_EVENT_npc_is_party_member,0);*/
+
+PROC
+SetDialogEvents((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+IsStoryNpc(_Npc)
+THEN	
+DialogSetCharacterEvent("EVENT_npc_is_story_npc",_Npc,0);		// is always reset to 0 by SetEggDialogEvents
+
+/* Has become obsolete because no party members:
+// party member related dialog events (only called IF npc is party member):
+PROC	SetPartyMemberDialogEvents((NPC)_Npc)
+THEN	SetDialogEvent(DIALOG_EVENT_npc_is_party_member,1);
+
+PROC	SetPartyMemberDialogEvents((NPC)_Npc) AND PartyMemberWaiting(_Npc)
+THEN	SetDialogEvent(DIALOG_EVENT_npc_is_waiting,1);
+
+PROC	SetPartyMemberDialogEvents((NPC)_Npc) AND NOT PartyMemberWaiting(_Npc)
+THEN	SetDialogEvent(DIALOG_EVENT_npc_is_waiting,0);
+
+// asserting PartyMemberCannotWait(_Npc) prevents the dialogs from giving the option "wait here"
+PROC	SetPartyMemberDialogEvents((NPC)_Npc) AND PartyMemberCannotWait(_Npc)
+THEN	SetDialogEvent(DIALOG_EVENT_party_member_can_wait,0);
+
+PROC	SetPartyMemberDialogEvents((NPC)_Npc) AND NOT PartyMemberCannotWait(_Npc)
+THEN	SetDialogEvent(DIALOG_EVENT_party_member_can_wait,1);
+
+// asserting PartyMemberCannotLeave(_Npc) prevents the dialogs from giving the option "leave"
+PROC	SetPartyMemberDialogEvents((NPC)_Npc) AND PartyMemberCannotLeave(_Npc)
+THEN	SetDialogEvent(DIALOG_EVENT_party_member_can_leave,0);
+
+PROC	SetPartyMemberDialogEvents((NPC)_Npc) AND NOT PartyMemberCannotLeave(_Npc)
+THEN	SetDialogEvent(DIALOG_EVENT_party_member_can_leave,1);*/
+
+
+EXITSECTION
+
+ENDEXITSECTION

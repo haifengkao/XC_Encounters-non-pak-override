@@ -1,0 +1,154 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_ShovelArea(TRIGGER_CYS_ShovelWereSheep,"CYS_ShovelWereSheep",ITEM_CYS_ShovelWereSheepDirt);		
+DB_ShovelRewardItemAppear("CYS_ShovelWereSheep",ITEM_CYS_WereSheep_Book,TRIGGER_CYS_ShovelWereSheep);
+
+DB_ShovelArea(TRIGGER_LUC_ShovelWereSheep,"LUC_ShovelWereSheep",ITEM_LUC_WereSheepBodyPile);		
+CharacterSetOnStage(CHARACTER_LUC_WeresheepGhost,0);
+DB_IsNotMessingAround(CHARACTER_LUC_WeresheepGhost);
+DB_Dialogs(CHARACTER_LUC_WeresheepGhost, "WER_SheepGhost");
+CharacterSetHasDialog(CHARACTER_LUC_WeresheepGhost,0);
+NeverThreatenedDialog(CHARACTER_LUC_WeresheepGhost);
+
+CharacterSetOnStage(CHARACTER_DAF_ZombieWeresheep,0);
+DB_IsNotMessingAround(CHARACTER_DAF_ZombieWeresheep);
+TriggerRegisterForItems(TRIGGER_DAF_WeresheepBodyTrigger);
+
+ItemToCharacter(ITEM_DAF_WeresheepWool,CHARACTER_DAF_ZombieWeresheep);
+
+CannotTrade(CHARACTER_LUC_WeresheepGhost);
+DB_NoInitialTrade(CHARACTER_DAF_ZombieWeresheep);
+KBSECTION
+IF
+GameBookInterfaceClosed(ITEM_CYS_WereSheep_Book,_)
+THEN
+QuestAdd("WER_Weresheep");
+QuestUpdate("WER_Weresheep","Start");
+
+IF
+GameBookInterfaceClosed(ITEM_HIB_WearesheepLocation,_)
+THEN
+QuestAdd("WER_Weresheep");
+QuestUpdate("WER_Weresheep","HIBScroll");
+
+IF
+GameBookInterfaceClosed(ITEM_LUC_WeresheepRecipe,_)
+THEN
+QuestAdd("WER_Weresheep");
+QuestUpdate("WER_Weresheep","WeresheepRecipe");
+
+PROC
+ProcShovelRewards(_Player,"LUC_ShovelWereSheep")
+THEN
+CharacterAppearAtTrigger(CHARACTER_LUC_WeresheepGhost,TRIGGER_LUC_ShovelWereSheep,1);
+PlayEffectAtTrigger("FX_GP_TeleportSmoke_A",TRIGGER_LUC_ShovelWereSheep);
+TimerLaunch("LUC_StartWeresheepGhostDialog",500);
+
+IF
+TimerFinished("LUC_StartWeresheepGhostDialog")
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_LUC_WeresheepGhost,_Player)
+AND
+NOT DB_Combat(CHARACTER_LUC_WeresheepGhost,_)
+THEN
+CharacterSetHasDialog(CHARACTER_LUC_WeresheepGhost,1);
+PROC_MendatoryDialog("WER_SheepGhost", CHARACTER_LUC_WeresheepGhost, _Player);
+
+IF
+ItemTemplateEnteredTrigger("CON_Herb_Stardust_A_21943084-4c5d-46cc-a2bf-0fd9859319c1",_Hand,TRIGGER_DAF_WeresheepBodyTrigger,_,_)
+AND
+NOT Once("DAF_SummonWeresheep")
+THEN
+TriggerUnregisterForItems(TRIGGER_DAF_WeresheepBodyTrigger);
+Once("DAF_SummonWeresheep");
+DB_WereSheepPlayer(_Hand);
+TimerLaunch("DAF_ZombieWere",500);
+
+IF
+TimerFinished("DAF_ZombieWere")
+AND
+DB_WereSheepPlayer(_Hand)
+AND
+ItemHandleGetPosition(_Hand,_X,_Y,_Z)
+THEN
+CharacterAppearAtTrigger(CHARACTER_DAF_ZombieWeresheep,TRIGGER_DAF_WeresheepAppearTrigger,1);
+CharacterMoveToPosition(CHARACTER_DAF_ZombieWeresheep,_X,_Y,_Z,1,"DAF_ZombieWereArriveEvent");
+
+IF
+CharacterEvent(CHARACTER_DAF_ZombieWeresheep,"DAF_ZombieWereArriveEvent")
+AND
+CharacterGetClosestPlayer(CHARACTER_DAF_ZombieWeresheep, _Player)
+AND
+NOT DB_Combat(_Player, _)
+THEN
+DB_Dialogs(CHARACTER_DAF_ZombieWeresheep,"WER_SheepZombie");
+DB_OneShot_DialogTrigger(TRIGGER_DAF_BoxWereZombieDialog,"WER_SheepZombie",CHARACTER_DAF_ZombieWeresheep);
+
+IF
+CharacterEvent(CHARACTER_DAF_ZombieWeresheep,"DAF_ZombieWereArriveEvent")
+AND
+DB_WereSheepPlayer(_Hand)
+THEN
+NOT DB_WereSheepPlayer(_Hand);
+
+IF
+CharacterAttackedByCharacter(CHARACTER_DAF_ZombieWeresheep,_)
+THEN
+//Freak out!
+GlobalSetEvent("DAF_WeresheepAttacks");
+CharacterPurgeQueue(CHARACTER_DAF_ZombieWeresheep);
+CharacterSetFaction(CHARACTER_DAF_ZombieWeresheep,"Evil NPC");
+RemoveOneShotDialog(TRIGGER_DAF_BoxWereZombieDialog);
+
+IF
+CharacterAttackedByCharacter(CHARACTER_DAF_ZombieWeresheep,_)
+AND
+DB_WereSheepPlayer(_Hand)
+THEN
+NOT DB_WereSheepPlayer(_Hand);
+
+IF
+DialogEnded("WER_SheepZombie",_)
+AND
+DB_GlobalEvent("DAF_WeresheepAttacks")
+THEN
+CharacterSetHasDialog(CHARACTER_DAF_ZombieWeresheep,0);
+CharacterSetFaction(CHARACTER_DAF_ZombieWeresheep,"Evil NPC");
+
+IF
+DialogEnded("WER_SheepZombie",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_GlobalEvent("DAF_WeresheepLeaves")
+THEN
+ItemToCharacter(ITEM_DAF_WeresheepWool,_Player);
+CharacterSetHasDialog(CHARACTER_DAF_ZombieWeresheep,0);
+CharacterDisappearOutOfSight(CHARACTER_DAF_ZombieWeresheep,0,1,"",1);
+
+IF
+ItemAddedToCharacter(ITEM_DAF_WeresheepWool,_Player)
+AND
+_Player.DB_IsPlayer()
+AND
+DB_GlobalEvent("DAF_WeresheepAttacks")
+AND
+NOT DB_GlobalEvent("DAF_WeresheepLeaves")
+THEN
+QuestAdd("WER_Weresheep");
+QuestUpdate("WER_Weresheep","ZombieFailureWool");
+
+IF
+ItemTemplateCombinedWithItemTemplate("Quest_WER_OriginalWeresheepWool_02b03028-2d14-43d1-b1c9-238c187a72ab","2m_DungeonPrison_A_Smith_Fireplace_A_Item_b7f00fad-8fd6-47c5-bbc7-2b71e15e795a",_Player,_)
+THEN
+ItemTemplateAddToCharacter("ARM_Leather_C_Boots_A_Tx_00_587893e5-0381-4a22-a0dc-b87b72efa1f7",_Player,1);
+ItemTemplateAddToCharacter("ARM_Leather_C_Bracers_A_Tx_00_af87ddeb-75d3-4fbd-98d9-c8c72ca398bf",_Player,1);
+ItemTemplateAddToCharacter("ARM_Leather_C_Helmet_A_Tx_00_c28d8b15-3ed0-4c5b-973f-18b9f0de269b",_Player,1);
+ItemTemplateAddToCharacter("ARM_Leather_C_Torso_A_Tx_00_392f1acc-3fe0-4bbc-83f4-6d0854055546",_Player,1);
+QuestUpdate("WER_Weresheep", "ArmorForged");
+QuestClose("WER_Weresheep");
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

@@ -1,0 +1,29 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_CustomEvent2DisplayText(CHARACTER_Wolgraff,"HiddenPerceptionReveal","GEN_HiddenPerceptionReveal_Wolgraff");
+DB_CustomEvent2DisplayText(CHARACTER_Wolgraff,"HiddenPerceptionReveal2","GEN_HiddenPerceptionReveal_Wolgraff");
+DB_CustomEvent2DisplayText(CHARACTER_Wolgraff,"HiddenPerceptionReveal3","GEN_HiddenPerceptionReveal_Wolgraff");
+DB_CustomEvent2DisplayText(CHARACTER_Wolgraff,"HiddenPerceptionReveal4","GEN_HiddenPerceptionReveal_Wolgraff");
+DB_CustomEvent2DisplayText(CHARACTER_Wolgraff,"HiddenTrapReveal","GEN_HiddenTrapReveal_Wolgraff");
+DB_CustomEvent2DisplayText(CHARACTER_Wolgraff,"HiddenTrapReveal2","GEN_HiddenTrapReveal_Wolgraff");
+DB_CustomEvent2DisplayText(CHARACTER_Wolgraff,"HiddenTrapReveal3","GEN_HiddenTrapReveal_Wolgraff");
+DB_CustomEvent2DisplayText(CHARACTER_Wolgraff,"HiddenTrapReveal4","GEN_HiddenTrapReveal_Wolgraff");
+DB_CustomEvent2DisplayText(CHARACTER_Wolgraff,"FakePerceptionReveal","GEN_FakePerceptionReveal_Wolgraff");
+DB_CustomEvent2DisplayText(CHARACTER_Wolgraff,"FakePerceptionReveal2","GEN_FakePerceptionReveal_Wolgraff");
+DB_CustomEvent2DisplayText(CHARACTER_Wolgraff,"FakePerceptionReveal3","GEN_FakePerceptionReveal_Wolgraff");
+DB_CustomEvent2DisplayText(CHARACTER_Wolgraff,"FakePerceptionReveal4","GEN_FakePerceptionReveal_Wolgraff");
+DB_CustomEvent2DisplayText(CHARACTER_Wolgraff,"AmbushReveal","GLO_AmbushDetected_Wolgraff");
+DB_CustomEvent2DisplayText(CHARACTER_Wolgraff,"AmbushReveal2","GLO_AmbushDetected_Wolgraff");
+DB_CustomEvent2DisplayText(CHARACTER_Wolgraff,"AmbushReveal3","GLO_AmbushDetected_Wolgraff");
+DB_CustomEvent2DisplayText(CHARACTER_Wolgraff,"AmbushReveal4","GLO_AmbushDetected_Wolgraff");
+KBSECTION
+IF
+DB_GlobalEvent("WolgraffVoiceBack")
+AND
+DB_CustomEvent2DisplayText(CHARACTER_Wolgraff,_Event,_Text)
+THEN
+NOT DB_CustomEvent2DisplayText(CHARACTER_Wolgraff,_Event,_Text);
+EXITSECTION
+
+ENDEXITSECTION

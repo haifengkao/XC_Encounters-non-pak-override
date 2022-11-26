@@ -1,0 +1,197 @@
+INIT
+	ITEM:__Me
+	ITEM:%Manager = LUC_IT_Platform1_ce961d23-5738-4178-b351-cd53f1841409
+	EXTERN ITEM:%Door = null
+	EXTERN FLOAT:%MaxWeight=50
+
+	FLOAT:%CurrentPercentage=0
+	FLOAT:%PreviousPercentage=0
+	FLOAT:%NewWeight=0
+
+EVENTS
+
+EVENT Initialize
+ON
+	OnInit
+ACTIONS
+	StartTimer("UpdatePressurePlate",0.1,-1)
+
+EVENT Shutdown
+ON
+	OnShutdown
+ACTIONS
+	StopTimer("UpdatePressurePlate")
+
+EVENT Update
+VARS
+	FLOAT:_PreviousWeight
+ON
+	OnTimer("UpdatePressurePlate")
+ACTIONS
+	IF "!c1"
+		ItemIsMoving(__Me)
+	THEN
+		Set(%NewWeight,0)
+		IterateCharactersOnObject(__Me,"PressurePlateCheck")
+		IterateItemsOnObject(__Me,"PressurePlateCheck")	
+		Set(%PreviousPercentage,%CurrentPercentage)
+		Set(%CurrentPercentage,%NewWeight)
+		Divide(%CurrentPercentage,%MaxWeight)		
+		IF "!c1"
+			IsEqual(%CurrentPercentage,%PreviousPercentage)
+		THEN
+			ItemEvent(__Me,"PressurePlateChange")
+		ENDIF
+	ENDIF
+	
+EVENT WeightCalc
+VARS
+	CHARACTER:_Char
+	ITEM:_Item
+	FLOAT:_Weight
+ON
+	OnIterateCharacter(_Char,"PressurePlateCheck")
+	OnIterateItem(_Item,"PressurePlateCheck")
+ACTIONS
+	IF "(!c1&c2)|(!c3&!c4&!c5&!c6&c7)"
+		IsEqual(_Char,null)
+		CharacterGetStat(_Weight,_Char,Weight)
+		IsEqual(_Item,null)
+		ItemIsMoving(_Item)
+		ItemIsFalling(_Item)
+		ItemIsDestroyed(_Item)
+		ItemGetStat(_Weight,_Item,Weight)
+	THEN
+		Add(%NewWeight,_Weight)
+	ENDIF
+	
+EVENT PlateChange
+ON
+	OnItemEvent(__Me,"PressurePlateChange")
+ACTIONS
+	IF "c1"
+		IsEqual(%CurrentPercentage,1)
+	THEN
+		PlaySound(__Me, "Items_Puzzle_PressurePlate")
+		ItemEvent(%Manager, "AddDoor")
+		ItemEvent(%Door, "shutDown")
+		ItemPlayEffect(__Me, "FX_GP_CameraShake_B")
+		DisplayText(__Me,"GLO_PressurePlateActivated",2.0)
+	ELIF "c1"
+		IsEqual(%PreviousPercentage,1)
+	THEN
+		PlaySound(__Me, "Items_Puzzle_PressurePlate")
+		ItemEvent(%Manager, "SubDoor")
+		ItemEvent(%Door, "playFX")
+		ItemSetOnStage(%Door, 1)
+		ItemPlayEffect(__Me, "FX_GP_CameraShake_B")
+	ENDIF
+	// Start Reaction to change animation
+	Interrupt(PercentageChance)
+	SetPriority(PercentageChance,100)
+	
+BEHAVIOUR
+
+REACTION PercentageChance,0
+ACTIONS
+	IF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:1)
+	THEN
+		ItemPlayAnimationTo("PressurePlate",%CurrentPercentage, 5)
+	ELSE
+		ItemPlayAnimationTo("PressurePlate",1,10)
+	ENDIF
+	IF "c1"
+		IsEqual(%CurrentPercentage, FLOAT:0.0)
+	THEN
+		DisplayText(__Me, "GEN_Percent0",3.0)
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:0.1)
+	THEN
+		DisplayText(__Me, "GEN_Percent1",3.0)
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:0.2)
+	THEN
+		DisplayText(__Me, "GEN_Percent10",3.0)
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:0.3)
+	THEN
+		DisplayText(__Me, "GEN_Percent20",3.0)
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:0.4)
+	THEN
+		DisplayText(__Me, "GEN_Percent30",3.0)
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:0.5)
+	THEN
+		DisplayText(__Me, "GEN_Percent40",3.0)
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:0.6)
+	THEN
+		DisplayText(__Me, "GEN_Percent50",3.0)
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:0.7)
+	THEN
+		DisplayText(__Me, "GEN_Percent60",3.0)
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:0.8)
+	THEN
+		DisplayText(__Me, "GEN_Percent70",3.0)
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:0.9)
+	THEN
+		DisplayText(__Me, "GEN_Percent80",3.0)
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:1)
+	THEN
+		DisplayText(__Me, "GEN_Percent90",3.0)
+	ELIF "c1"
+		IsEqual(%CurrentPercentage, FLOAT:1)
+	THEN
+		DisplayText(__Me, "GEN_Percent100",3.0)
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:1.1)
+	THEN
+		DisplayText(__Me, "GEN_Percent101",3.0)
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:1.2)
+	THEN
+		DisplayText(__Me, "GEN_Percent110",3.0)
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:1.3)
+	THEN
+		DisplayText(__Me, "GEN_Percent120",3.0)
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:1.4)
+	THEN
+		DisplayText(__Me, "GEN_Percent130",3.0)
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:1.5)
+	THEN
+		DisplayText(__Me, "GEN_Percent140",3.0)
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:1.6)
+	THEN
+		DisplayText(__Me, "GEN_Percent150",3.0)
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:1.7)
+	THEN
+		DisplayText(__Me, "GEN_Percent160",3.0)
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:1.8)
+	THEN
+		DisplayText(__Me, "GEN_Percent170",3.0)
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:1.9)
+	THEN
+		DisplayText(__Me, "GEN_Percent180",3.0)
+	ELIF "c1"
+		IsLessThen(%CurrentPercentage, FLOAT:2)
+	THEN
+		DisplayText(__Me, "GEN_Percent190",3.0)
+	ELSE
+		DisplayText(__Me, "GEN_PercentOver200",3.0)
+	ENDIF
+	SetPriority(PercentageChance,0)
+INTERRUPT
+	Reset()

@@ -1,0 +1,32 @@
+#TEMPLATE "_SKILL_Base" : Summon_EnemyNetherJester
+
+INIT
+CHARACTER:__Me
+// [GLOBAL_VARS]
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_Summon_EnemyNetherJester
+VARS
+	// [CALC_VARS]
+	FLOAT:_Score
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_Summon_EnemyNetherJester")
+ACTIONS	
+	// [CALC_ACTIONS_PRE]
+	Set(_Score, 0.0)
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	Set(%SkillTargetChar_Summon_EnemyNetherJester, __Me)
+	Add(%ActionScore_Summon_EnemyNetherJester, _Score)
+	// [~CALC_ACTIONS]
+
+	
+
+	

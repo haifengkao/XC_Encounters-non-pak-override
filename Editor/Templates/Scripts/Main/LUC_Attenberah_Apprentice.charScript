@@ -1,0 +1,48 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	EXTERN ITEM:%workStation = null
+
+//------------------------
+BEHAVIOUR
+REACTION State_Fear, 0
+USAGE PEACE
+ACTIONS
+	CharacterLookAt(%workStation)
+	GetWeightedRandom(%currentAction,"Action_Cower",INT:2,"Action_Working",INT:5,"Action_Sigh",INT:1,"Action_Wait",INT:1)
+	SetPriority(%currentAction, 1100)
+
+REACTION Action_Cower, 0
+USAGE PEACE
+ACTIONS
+	CharacterPlayAnimation(emotion_cower_scared)
+	SetPriority(%currentAction,0)
+
+REACTION Action_Working, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_anim
+ACTIONS
+	GetRandom(_anim,"use_inspect","Look_Down_Long_01","use_craft")
+	CharacterPlayAnimation(_anim)
+	SetPriority(%currentAction,0)
+	
+REACTION Action_Sigh, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_anim
+ACTIONS
+	GetRandom(_anim,"Sigh_01")
+	CharacterPlayAnimation(_anim)
+	SetPriority(%currentAction,0)
+	
+REACTION Action_Wait, 0
+USAGE PEACE
+VARS
+	FLOAT:_SleepValue
+ACTIONS
+	GetRandomBetween(_SleepValue,0,2)
+	Sleep(_SleepValue)
+	SetPriority(%currentAction,0)

@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<save>
+    <header version="1" time="1319536588" />
+    <region id="Templates">
+        <node id="root">
+            <children>
+                <node id="CustomVisualTemplate">
+                    <attribute id="MapKey" value="TranslateGizmo" type="22" />
+                    <attribute id="Visual" value="6a58e4df-a20b-4d08-a373-4c79435ac330" type="22" />
+                    <attribute id="Effect" value="" type="22" />
+                </node>        
+				<node id="CustomVisualTemplate">
+                    <attribute id="MapKey" value="RotateGizmo" type="22" />
+                    <attribute id="Visual" value="fd15addd-36b9-4f38-a8f2-de25ff23a914" type="22" />
+                    <attribute id="Effect" value="" type="22" />
+                </node>        				
+			</children>
+        </node>
+    </region>
+</save>

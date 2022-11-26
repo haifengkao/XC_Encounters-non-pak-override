@@ -1,0 +1,4 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter

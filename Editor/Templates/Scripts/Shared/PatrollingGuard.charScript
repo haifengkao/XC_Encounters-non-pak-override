@@ -1,0 +1,76 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter
+CHARACTER:__Me
+EXTERN INT:%Random = 0
+EXTERN TRIGGER:%Trigger01 = null
+EXTERN TRIGGER:%Trigger02 = null
+EXTERN TRIGGER:%Trigger03 = null
+EXTERN TRIGGER:%Trigger04 = null
+EXTERN TRIGGER:%Trigger05 = null
+EXTERN INT:%Running = 0
+
+BEHAVIOUR
+
+REACTION RandomPatrol, 1040
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%Random, 1)
+VARS
+	TRIGGER:%CurrentTrigger = null
+ACTIONS
+Label("Select")
+	GetRandom(%CurrentTrigger, %Trigger01, %Trigger02, %Trigger03, %Trigger04, %Trigger05)
+	GotoIfEqual(%CurrentTrigger,null,"Select")
+	CharacterMoveTo(%CurrentTrigger,%Running)
+	Sleep(3)
+	Reset()
+
+//Always check if the triggers provided are not null!!
+REACTION Patrol, 1050
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%Random, 0)
+ACTIONS
+	IF "!c1"
+		IsEqual(%Trigger01, null)
+	THEN
+		CharacterMoveTo(%Trigger01, %Running)
+		Sleep(2)
+	ENDIF
+	
+	IF "!c1"
+		IsEqual(%Trigger02, null)
+	THEN
+		CharacterMoveTo(%Trigger02, %Running)
+		Sleep(2)
+	ENDIF
+	
+	IF "!c1"
+		IsEqual(%Trigger03, null)
+	THEN
+		CharacterMoveTo(%Trigger03, %Running)
+		Sleep(2)
+	ENDIF
+	
+	IF "!c1"
+		IsEqual(%Trigger04, null)
+	THEN
+		CharacterMoveTo(%Trigger04, %Running)
+		Sleep(2)
+	ENDIF
+	
+	IF "!c1"
+		IsEqual(%Trigger05, null)
+	THEN
+		CharacterMoveTo(%Trigger05, %Running)
+		Sleep(2)
+	ENDIF
+	
+	Goto(Start)
+
+EVENTS
+
+STORY
+

@@ -1,0 +1,40 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	TRIGGER:%Trigger1 = CYS_PointGuardBarracksCook_e0587eb1-9afe-45c5-b0d4-8fff2a0bba91
+	TRIGGER:%Trigger2 = CYS_PointGuardBarracksCook2_99bb1554-8b33-4641-851a-8f2f10ae43d8
+
+BEHAVIOUR
+
+REACTION State_Wandering, 0
+	USAGE PEACE
+	ACTIONS
+		GetRandom(%currentAction, "Action_Cooking", "Action_Wandering")
+		SetPriority(%currentAction, 1100)
+		
+REACTION Action_Cooking, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterMoveTo(%Trigger1,0)
+		DisplayText(__Me,"CYS_GuardBarracksCook_Script_0",5)
+		CharacterPlayAnimation("Fidget_Low_01")
+		DisplayText(__Me,"CYS_GuardBarracksCook_Script_1",5)
+		CharacterPlayAnimation("Fidget_Low_02")
+		CharacterMoveTo(%Trigger2,0)
+		CharacterLookFrom(%Trigger2)
+		CharacterPlayAnimation("Fidget_Forward_01")
+		CharacterPlayAnimation("Cooking_01")
+		CharacterPlayAnimation("Idle1")
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)
+		
+REACTION Action_Wandering, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterWander(FLOAT:2.0,4,0)
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)

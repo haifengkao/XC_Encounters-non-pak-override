@@ -1,0 +1,126 @@
+INIT
+	CHARACTER:__Me
+	ITEM:%Trap
+	INT:%MyTraps = 0
+	CHARACTERTEMPLATE:%SkeletonImpRootTemplate="Imps_Skeleton_A_e0aa1752-7709-435f-839b-d0e301ee421f"
+
+//------------------------
+BEHAVIOUR
+REACTION LayDownTrap, 400
+USAGE COMBAT
+VARS 
+	INT:_Successes=0
+	FLOAT:_Range
+	CHARACTER:_Enemy
+	FLOAT3:_MyPosition
+	FLOAT3:_EnemyDir
+	FLOAT3:_PosOffset
+	FLOAT:_Angle
+	FLOAT:_Dist
+	CHARACTERTEMPLATE:_MyTemplate
+CHECK "c1&c2&c3"
+	IsLessThen(%MyTraps,4)						
+	CharacterGet(_Enemy,__Me,15,Lowest,Distance,Enemy)
+	GetPosition(__Me,_MyPosition)
+ACTIONS
+	WHILE "c1"
+		IsLessThen(_Successes,7)
+	DO
+		//DebugText(__Me,"Scanning Surroundings!")
+		Set(_PosOffset,{1;0;0}) 
+		GetRandomBetween(_Angle,90,270)
+		GetRandomBetween(_Dist,2,4)
+		RotateY(_PosOffset,_Angle)
+		Multiply(_PosOffset,_Dist)	
+		Add(_MyPosition,_PosOffset)
+		IF "c1"
+			FindValidPosition(_MyPosition,4)
+		THEN
+			CharacterMoveTo(_MyPosition,1)
+			Set(_Successes,7)
+			//DebugText(__Me,"Scanning Successful!")
+		ELSE 
+			Add(_Successes,1)
+			//DebugText(__Me,"Scanning Failed...")
+		ENDIF
+	ENDWHILE
+	Sleep(0.7)
+	CharacterLookAt(_Enemy,0)
+	GetDirection(__Me,_Enemy,_EnemyDir)
+	Multiply(_EnemyDir,FLOAT:2)
+	Add(_MyPosition,_EnemyDir)			
+	IF "c1&!c2&!c3&!c4&!c5"
+		FindValidPosition(_MyPosition,4)
+		CharacterGet(_,_MyPosition,3,Lowest,Distance,Ally)
+		ContainsSurface(_MyPosition,1,Fire)
+		ContainsSurface(_MyPosition,1,Ooze)
+		ContainsSurface(_MyPosition,1,Lava)
+	THEN
+		//DebugText(__Me,"Valid Position Found!")
+		CharacterPlayEffect(__Me,"FX_Skills_Ranger_Infect_Prepare_A")
+		CharacterPlayAnimation(cast_target_cast)
+		PlayEffectAt(_MyPosition,FX_GP_BoneImpact_A)	
+		PlaySound(__Me,"Skill_Enemy_GoblinMine_Cast")
+		SpawnItem(PUZ_Trap_Mine_B_14e581ef-3ce9-4e38-8cea-7ca33890d7c5,_MyPosition,%Trap)
+		PlayEffectAt(_MyPosition,"FX_GP_Footstep_A_Large_Sand")
+		PlayEffectAt(_MyPosition,"FX_GP_Footstep_A_Large_Dirt")
+		IF "c1&c2"
+			CharacterGetTemplate(__Me,_MyTemplate)
+			IsEqual(_MyTemplate,%SkeletonImpRootTemplate)
+		THEN
+			CombatLogText(__Me,"CMB_SkelPlantsMine",0,1)
+		ENDIF
+		Add(%MyTraps,1)
+	ENDIF	
+	Sleep(0.7)	
+	//DebugText(__Me,"Sequence Complete!")
+	Set(_Successes,0)
+	CharacterFleeFrom(Enemy,5)
+	CharacterEndTurn()
+	SetPriority("LayDownTrap",0)									//kill it for now, next turn will increase it again	
+INTERRUPT
+	Reset()
+
+REACTION RunAway, 150
+USAGE COMBAT
+VARS 
+	FLOAT:_myVitality
+CHECK "c1&c2"
+	CharacterGetStat(_myVitality,__Me,Vitality)			
+	IsLessThen(_myVitality,0.3) 									
+ACTIONS
+	Sleep(1.0)
+	CharacterFleeFrom(Enemy,10)
+	CharacterEndTurn()
+INTERRUPT
+	Reset()
+
+REACTION BasicAttack, 100											//I've run out of traps
+USAGE COMBAT
+VARS 
+	FLOAT:_Range
+	CHARACTER:_Enemy
+CHECK "c1"
+	CharacterGet(_Enemy,__Me,_Range,Lowest,Vitality,Enemy)			//get the most damaged enemy
+ACTIONS
+	Sleep(1.0)
+	CharacterAttack(_Enemy)											//and attack them
+	CharacterFleeFrom(Enemy,5)
+INTERRUPT
+	Reset()
+	
+//--------------------------
+EVENTS
+
+EVENT OnInit_SetDefaultAttackToZero
+ON
+	OnInit()
+ACTIONS
+	SetPriority("Combat_AttackSetEnemy",0)
+	SetPriority("Combat_MoveToSetEnemy",0)	
+
+EVENT OnTurn_IncreasePrioOfLandingMines
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("LayDownTrap",400)

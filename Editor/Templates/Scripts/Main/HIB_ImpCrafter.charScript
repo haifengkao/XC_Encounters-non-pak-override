@@ -1,0 +1,18 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+
+BEHAVIOUR
+
+REACTION State_Dying, 0
+USAGE PEACE
+ACTIONS
+	IF "!c1"
+		CharacterHasStatus(__Me,"LYING")
+	THEN
+		CharacterUseItem(ITEM:HIB_Impcrafter_Invisibed_c9e64bc0-28f7-43e0-b508-bb922fa6365e)
+	ENDIF
+	Sleep(5)
+	DialogStart("HIB_AD_ImpCrafter",__Me)

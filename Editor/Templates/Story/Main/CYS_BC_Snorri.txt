@@ -1,0 +1,123 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+CharacterSetOnStage(CHARACTER_CYS_BC_Snorri, 0);
+DB_Dialogs(CHARACTER_CYS_BC_Snorri, "CYS_BC_Snorri");
+ItemSetOnstage(ITEM_CYS_SnorriHugeBall, 0);
+DB_NoDefaultBehavior(CHARACTER_CYS_BC_Snorri);
+KBSECTION
+IF
+CharacterMovedItem(_Player, ITEM_CYS_SnorriTombstone)
+AND
+NOT ITEM_CYS_SnorriTombstone.alreadyMoved()
+THEN
+CharacterAppearAtTrigger(CHARACTER_CYS_BC_Snorri, TRIGGER_CYS_SnorriSpawn, 1);
+PlayEffectAtTrigger("FX_GP_TeleportSmoke_A", TRIGGER_CYS_SnorriSpawn);
+DB_SnorriDialog(_Player);
+ITEM_CYS_SnorriTombstone.alreadyMoved();
+
+IF
+CharacterWentOnStage(CHARACTER_CYS_BC_Snorri, 1)
+AND
+DB_SnorriDialog(_Player)
+THEN
+NOT DB_SnorriDialog(_Player);
+ProcDoTwoSpeakerDialog("CYS_BC_Snorri", CHARACTER_CYS_BC_Snorri, _Player);
+
+IF
+DialogEnded("CYS_BC_Snorri", _)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_BC_Snorri, "startChallenge", 1)
+THEN
+CharacterSetHasDialog(CHARACTER_CYS_BC_Snorri,0);
+CharacterDisplayText(CHARACTER_CYS_BC_Snorri, "CYS_SnorriFirstItem");
+
+IF
+CharacterUsedItem(_Char, ITEM_CYS_SnorriHugeBall)
+THEN
+CharacterAttackItem(_Char, ITEM_CYS_SnorriHugeBall);
+
+IF
+CharacterDisplayTextEnded(CHARACTER_CYS_BC_Snorri, "CYS_SnorriFirstItem")
+THEN
+ItemSetOnstage(ITEM_CYS_SnorriHugeBall, 1);
+ItemPlayEffect(ITEM_CYS_SnorriHugeBall, "FX_GP_TeleportSmoke_A");
+CharacterSetHasDialog(CHARACTER_CYS_BC_Snorri, 0);
+TimerLaunch("CYS_SnorriChallenge", 35000);
+
+IF
+CharacterDestroyedItem(_Char, ITEM_CYS_SnorriHugeBall)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_BC_Snorri, "startChallenge", 1)
+THEN
+CharacterDisplayText(CHARACTER_CYS_BC_Snorri, "CYS_SnorriLeave");
+TimerCancel("CYS_SnorriChallenge");
+
+IF
+TimerFinished("CYS_SnorriChallenge")
+THEN
+CharacterSetVarInteger(CHARACTER_CYS_BC_Snorri, "startChallenge", 0);
+CharacterDisplayText(CHARACTER_CYS_BC_Snorri, "CYS_SnorriBrag");
+
+IF
+CharacterDisplayTextEnded(CHARACTER_CYS_BC_Snorri, "CYS_SnorriBrag")
+AND
+NOT DB_SnorriAttacks(1)
+THEN
+ProcCharacterMoveToItem(CHARACTER_CYS_BC_Snorri, ITEM_CYS_SnorriHugeBall, 0, "DestroyBall");
+
+IF
+CharacterEvent(CHARACTER_CYS_BC_Snorri, "DestroyBall")
+THEN
+CharacterAttackItem(CHARACTER_CYS_BC_Snorri, ITEM_CYS_SnorriHugeBall);
+
+IF
+CharacterDestroyedItem(_Char, ITEM_CYS_SnorriHugeBall)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_BC_Snorri, "startChallenge", 0)
+AND
+_Char != CHARACTER_CYS_BC_Snorri
+THEN
+DB_SnorriAttacks(1);
+CharacterPurgeQueue(CHARACTER_CYS_BC_Snorri);
+ProcSetRelationToPlayers(CHARACTER_CYS_BC_Snorri, 0);
+QuestUpdate("CYS_BC_Snorri", "Update4");
+QuestClose("CYS_BC_Snorri");
+
+IF
+ItemAttackedByCharacter(ITEM_CYS_SnorriHugeBall, CHARACTER_CYS_BC_Snorri, _)
+THEN
+ItemDestroy(ITEM_CYS_SnorriHugeBall);
+TimerLaunch("CYS_SnorriBreak", 1000);
+
+IF
+TimerFinished("CYS_SnorriBreak")
+THEN
+CharacterDisplayText(CHARACTER_CYS_BC_Snorri, "CYS_SnorriFight");
+
+IF
+CharacterDisplayTextEnded(CHARACTER_CYS_BC_Snorri, "CYS_SnorriFight")
+THEN
+ProcSetRelationToPlayers(CHARACTER_CYS_BC_Snorri, 0);
+QuestUpdate("CYS_BC_Snorri", "Update3");
+QuestClose("CYS_BC_Snorri");
+
+IF
+CharacterDisplayTextEnded(CHARACTER_CYS_BC_Snorri, "CYS_SnorriLeave")
+THEN
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_CYS_BC_Snorri);
+CharacterSetOnStage(CHARACTER_CYS_BC_Snorri, 0);
+ProcRewardQuestMedium(TRIGGER_CYS_SnorriSpawn);
+QuestUpdate("CYS_BC_Snorri", "Update2");
+QuestClose("CYS_BC_Snorri");
+
+IF
+CharacterAttackedByCharacter(CHARACTER_CYS_BC_Snorri, _)
+THEN
+TimerCancel("CYS_SnorriChallenge");
+CharacterSetFaction(CHARACTER_CYS_BC_Snorri, "Evil NPC");
+CharacterSetVarInteger(CHARACTER_CYS_BC_Snorri, "startChallenge", 0);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

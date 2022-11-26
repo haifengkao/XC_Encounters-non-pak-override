@@ -1,0 +1,48 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Dialogs(CHARACTER_CYS_Charlene,"CYS_Charlene");
+
+DB_PlayerComments("CYS_CommentTomsBody","CYS_CommentTomsBody_1_1",1,1);
+DB_PlayerComments("CYS_CommentTomsBody","CYS_CommentTomsBody_2_1",2,1);
+DB_PlayerComments("CYS_CommentTomsBody","CYS_CommentTomsBody_2_2",2,2);
+DB_PlayerComments("CYS_CommentTomsBodyKnown","CYS_CommentTomsBodyKnown_1_1",1,1);
+DB_PlayerComments("CYS_CommentTomsBodyKnown","CYS_CommentTomsBodyKnown_2_1",2,1);
+DB_PlayerComments("CYS_CommentTomsBodyKnown","CYS_CommentTomsBodyKnown_2_2",2,2);
+
+ItemToContainer(ITEM_CYS_TomOrder,ITEM_CYS_Tom,-1);
+KBSECTION
+IF
+GlobalEventSet("CYS_KnowsTom")
+THEN
+ITEM_CYS_Tom.isKnown();
+
+IF
+CharacterUsedItem(_Player,ITEM_CYS_TomOrder)
+THEN
+GlobalSetEvent("CYS_FoundTomBody");
+QuestUpdate("CYS_TomsBody","Update2");
+
+IF
+GameBookInterfaceClosed(ITEM_CYS_TomOrder,_Player)
+AND
+NOT ITEM_CYS_Tom.isDiscovered()
+AND
+ITEM_CYS_Tom.isKnown()
+THEN
+ITEM_CYS_Tom.isDiscovered();
+Launch_PlayerComment(_Player,"CYS_CommentTomsBodyKnown");
+
+IF
+GameBookInterfaceClosed(ITEM_CYS_TomOrder,_Player)
+AND
+NOT ITEM_CYS_Tom.isDiscovered()
+AND
+NOT ITEM_CYS_Tom.isKnown()
+THEN
+ITEM_CYS_Tom.isDiscovered();
+Launch_PlayerComment(_Player,"CYS_CommentTomsBody");
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

@@ -1,0 +1,502 @@
+#INCLUDE DefaultCharacter
+INIT
+	USING DefaultCharacter	//required for OVERRIDE below
+	CHARACTER:__Me
+	CHARACTER:%Leandra="HOM_Leandra_111ff690-48fc-4341-909e-815fd4e16936"
+	CHARACTER:%Zandalor="Zandalor_2535a516-8e0f-4c00-abe6-285e545fdc9b"
+	CHARACTER:%DeathKnightBane_Target
+	CHARACTER:%Regenerate_Target
+	CHARACTER:%CleansingWater_Target
+	CHARACTER:%ChillingTouch_Target
+	CHARACTER:%Resurrect_Target
+	FLOAT:%Icara_SightRange
+	INT:%AmountOfWoundedAllies=0
+
+//---------
+BEHAVIOUR
+REACTION Icara_Enemy_CastDeathKnightBane,500
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2"
+	CharacterCanCast(__Me,"Target_EnemyDeathKnightBane")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyDeathKnightBane")
+ACTIONS
+	IF "(c1|c2)&c3&c4"
+		IsEqual(%DeathKnightBane_Target,null)
+		CharacterIsDead(%DeathKnightBane_Target)
+		CharacterGet(%DeathKnightBane_Target,__Me,50,Lowest,Vitality,Enemy)
+		CharacterHasStatus(%DeathKnightBane_Target,"INVULNERABLE")
+	THEN
+		CharacterMoveInRange(%DeathKnightBane_Target,_MinRange,_MaxRange,1)
+		IF "c1"
+			IsRandom(0.3)
+		THEN
+		DisplayText(__Me,"HOM_Combat_Icara_DKBane",3)
+		ENDIF
+		CharacterUseSkill("Target_EnemyDeathKnightBane",%DeathKnightBane_Target)
+	ELIF "c1"
+		CharacterHasStatus(%DeathKnightBane_Target,"INVULNERABLE")
+	THEN
+		CharacterMoveInRange(%DeathKnightBane_Target,_MinRange,_MaxRange,1)
+		IF "c1"
+			IsRandom(0.3)
+		THEN
+			DisplayText(__Me,"HOM_Combat_Icara_DKBane",3)
+		ENDIF
+		CharacterUseSkill("Target_EnemyDeathKnightBane",%DeathKnightBane_Target)
+	ELSE
+		SetPriority("Icara_Enemy_CastDeathKnightBane",0)
+	ENDIF
+INTERRUPT
+	Reset()
+
+REACTION Icara_CastRegenerate,800
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2"
+	CharacterCanCast(__Me,"Heal_EnemyRegenerate_Astarte")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Heal_EnemyRegenerate_Astarte")
+ACTIONS
+	Set(%Regenerate_Target,null)
+	IterateCharactersInCombat(__Me,"CMB_Icara_ScanForWoundedAllies",Lowest,Vitality)
+	IF "!c1&c2&c3"
+		IsEqual(%Regenerate_Target,null)
+		CharacterCanCast(__Me,"Target_EnemyMassHeal")
+		IsGreaterThen(%AmountOfWoundedAllies,1)
+	THEN
+		SetPriority("Icara_CastMassHealing",1000)
+	ELIF "!c1"
+		IsEqual(%Regenerate_Target,null)
+	THEN
+		CharacterMoveInRange(%Regenerate_Target,_MinRange,_MaxRange,1)
+		DisplayText(__Me,"HOM_Combat_Icara_Heal",3)		
+		CharacterUseSkill("Heal_EnemyRegenerate_Astarte",%Regenerate_Target)
+	ELSE
+		SetPriority("Icara_CastRegenerate",0)
+	ENDIF
+INTERRUPT
+	Reset()
+	
+REACTION Icara_CastWaterShield,750
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2"
+	CharacterCanCast(__Me,"Shield_EnemyWater")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Shield_EnemyWater")
+ACTIONS
+	Set(%Regenerate_Target,null)
+	IterateCharactersInCombat(__Me,"CMB_Icara_ScanForWoundedAllies",Lowest,Vitality)
+	IF "!c1&c2&c3"
+		IsEqual(%Regenerate_Target,null)
+		CharacterCanCast(__Me,"Target_EnemyMassHeal")
+		IsGreaterThen(%AmountOfWoundedAllies,1)
+	THEN
+		SetPriority("Icara_CastMassHealing",1000)
+	ELIF "!c1&!c2"
+		IsEqual(%Regenerate_Target,null)
+		CharacterHasStatus(%Regenerate_Target,"SHIELD")
+	THEN
+		CharacterMoveInRange(%Regenerate_Target,_MinRange,_MaxRange,1)
+		DisplayText(__Me,"HOM_Combat_Icara_WaterShield",3)	
+		CharacterUseSkill("Shield_EnemyWater",%Regenerate_Target)
+	ELSE
+		SetPriority("Icara_CastWaterShield",0)
+	ENDIF
+INTERRUPT
+	Reset()	
+	
+REACTION Icara_CastMassHealing,0
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "!c1&c2&c3&c4"
+	IsEqual(%Regenerate_Target,null)
+	IsGreaterThen(%AmountOfWoundedAllies,1)
+	CharacterCanCast(__Me,"Target_EnemyMassHeal")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyMassHeal")
+ACTIONS
+	CharacterMoveInRange(%Regenerate_Target,_MinRange,_MaxRange,1)
+	DisplayText(__Me,"HOM_Combat_Icara_Heal",3)		
+	CharacterUseSkill("Target_EnemyMassHeal",%Regenerate_Target)
+	Set(%AmountOfWoundedAllies,0)
+	SetPriority("Icara_CastMassHealing",0)
+	
+REACTION Icara_CastCleansingWater,700
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2"
+	CharacterCanCast(__Me,"Target_EnemyCleansingWater")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyCleansingWater")
+ACTIONS
+	Set(%CleansingWater_Target,null)
+	IterateCharactersInCombat(__Me,"CMB_Icara_ScanForAlliesWithNegativeStatuses",Lowest,Distance)
+	IF "!c1"
+		IsEqual(%CleansingWater_Target,null)
+	THEN
+		CharacterMoveInRange(%CleansingWater_Target,_MinRange,_MaxRange,1)
+		DisplayText(__Me,"HOM_Combat_Icara_CleansWater",3)		
+		CharacterUseSkill("Target_EnemyCleansingWater",%CleansingWater_Target)
+	ELSE
+		SetPriority("Icara_CastCleansingWater",0)
+	ENDIF
+INTERRUPT
+	Reset()
+
+REACTION Icara_CastChillingTouch,700
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2"
+	CharacterCanCast(__Me,"Target_EnemyChillyWind")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyChillyWind")
+ACTIONS
+	Set(%ChillingTouch_Target,null)
+	IterateCharactersInCombat(__Me,"CMB_Icara_ScanForBurningAllies",Lowest,Distance)
+	IF "!c1"
+		IsEqual(%ChillingTouch_Target,null)
+	THEN
+		CharacterMoveInRange(%ChillingTouch_Target,_MinRange,_MaxRange,1)
+		DisplayText(__Me,"HOM_Combat_Icara_ChillingTouch",3)
+		CharacterUseSkill("Target_EnemyChillyWind",%ChillingTouch_Target)
+	ELSE
+		SetPriority("Icara_CastChillingTouch",0)
+	ENDIF
+INTERRUPT
+	Reset()
+
+REACTION Icara_CastResurrect,900
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2"
+	CharacterCanCast(__Me,"Target_EnemyResurrect")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyResurrect")
+ACTIONS
+	Set(%Resurrect_Target,null)
+	//DebugText(__Me,"Scanning for dead allies!")
+	IterateCharacters("CMB_Icara_ScanForDeadAllies",Lowest,Distance)
+	IF "!c1"
+		IsEqual(%Resurrect_Target,null)
+	THEN
+		CharacterMoveInRange(%Resurrect_Target,_MinRange,_MaxRange,1)
+		DisplayText(__Me,"HOM_Combat_Icara_Resurrect",3)
+		CharacterUseSkill("Target_EnemyResurrect",%Resurrect_Target)
+	ELSE
+		SetPriority("Icara_CastResurrect",0)
+	ENDIF
+INTERRUPT
+	Reset()
+	
+REACTION Icara_CastPerceptionBoost,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&c4&c5"
+	CharacterCanCast(__Me,"Target_EnemyTargetedPerception")										//c1
+	CharacterGet(_ChosenTarget,__Me,%Icara_SightRange,Highest,Dexterity,Ally)					//c2
+	CharacterIsInParty(_ChosenTarget)															//c3
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyTargetedPerception")			//c4
+	IsRandom(0.4)																				//c5
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Target_EnemyTargetedPerception",_ChosenTarget)
+
+REACTION Icara_CastFortify,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&!c4&c5&c6"
+	CharacterCanCast(__Me,"Target_EnemyFortify")												//c1
+	CharacterGet(_ChosenTarget,__Me,%Icara_SightRange,Lowest,Constitution,Ally)					//c2
+	CharacterIsInParty(_ChosenTarget)															//c3
+	CharacterHasStatus(_ChosenTarget,"FORTIFIED")												//!c4
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyFortify")						//c5
+	IsRandom(0.4)																				//c6
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	IF "c1"
+		IsRandom(0.3)
+	THEN
+		DisplayText(__Me,"HOM_Combat_Icara_Fortify",3)
+	ENDIF
+	CharacterUseSkill("Target_EnemyFortify",_ChosenTarget)
+	
+REACTION Icara_CastStaffOfMagusWater,200
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&!(c3|c4|c5|c6|c7)&c8"
+	CharacterCanCast(__Me,"Projectile_EnemyStaffOfMagusWater")									//c1
+	CharacterGet(_ChosenTarget,__Me,%Icara_SightRange,Lowest,WaterResistance,Enemy)				//c2
+	CharacterHasStatus(_ChosenTarget,"INVULNERABLE")											//!c3
+	CharacterHasStatus(_ChosenTarget,"VOID_AURA")												//!c4
+	CharacterHasStatus(_ChosenTarget,"BURNING")													//!c5
+	CharacterHasStatus(_ChosenTarget,"WATER_IMMUNITY_AURA")										//!c6
+	CharacterHasStatus(_ChosenTarget,"WATER_IMMUNITY")											//!c7		
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyStaffOfMagusWater")		//c8	
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_EnemyStaffOfMagusWater",_ChosenTarget)
+	
+REACTION Icara_Fallback,50
+USAGE COMBAT
+ACTIONS
+	CharacterFleeFrom(Enemy,8)
+	CharacterEndTurn()
+	
+REACTION Icara_Waiting_LookAtEnemy,500
+USAGE WAITING
+VARS
+	CHARACTER:_Enemy
+	FIXEDSTRING:_Text
+CHECK "c1"
+	CharacterGet(_Enemy,__Me,20,Highest,Strength,Enemy)
+ACTIONS
+	CharacterLookAt(_Enemy)
+	IF "c1"
+		IsRandom(0.05)
+	THEN
+		GetWeightedRandom(_Text,"HOM_Combat_Icara_Wait_01",INT:1,"HOM_Combat_Icara_Wait_02",INT:1,"HOM_Combat_Icara_Wait_03",INT:1,"HOM_Combat_Icara_Wait_04",INT:1,"HOM_Combat_Icara_Wait_05",INT:1,"",INT:3)
+		DisplayText(__Me,_Text,3)
+	ENDIF
+	Sleep(10)
+		
+//---------
+EVENTS
+EVENT DefaultIterateSetTarget OVERRIDE 				//don't attack anything invulnerable
+VARS 
+	CHARACTER:_Char
+	CHARACTER:_previousSetTarget
+	FLOAT:_targetDistance
+	INT:_alreadyTargetedBy
+	FLOAT:_targetClosestThisScore=0
+	FLOAT:_movement
+ON
+	OnIterateCharacter(_Char,"DefaultSetTargetClosestIterator")
+ACTIONS
+	IF "!c1&!c2&c3&c4&c5&!(c6|c7|c8|c9)"
+		CharacterIsDead(_Char)
+		IsEqual(__Me,_Char)
+		CharacterIsEnemy(__Me,_Char)
+		GetDistance(_targetDistance,__Me,_Char)
+		CharacterGetHostileCount(_alreadyTargetedBy,_Char)
+		CharacterHasStatus(_Char,"INVISIBLE")
+		CharacterHasStatus(_Char,"SNEAKING")
+		CharacterHasStatus(_Char,"INVULNERABLE")
+		CharacterHasStatus(_Char,"VOID_AURA")
+	THEN
+		IF "c1&c2"
+			CharacterGetEnemy(_previousSetTarget,__Me)
+			IsEqual(_previousSetTarget,_Char)
+		THEN
+			Multiply(_targetDistance,0.8)
+		ENDIF
+		IF "c1"
+			IsEqual(_alreadyTargetedBy,0)
+		THEN
+			Multiply(_targetDistance,0.5)
+		ENDIF
+		IF "c1"
+			IsEqual(_alreadyTargetedBy,1)
+		THEN
+			Multiply(_targetDistance,0.6)
+		ENDIF
+		IF "c1"
+			CharacterIsSummon(_Char)
+		THEN
+			Multiply(_targetDistance,1.5)
+		ENDIF	
+		IF "c1&!c2"
+			IsGreaterThen(_alreadyTargetedBy,1)
+			CharacterHasStatus(_Char,AGGRO_MARKED)
+		THEN
+			Add(_alreadyTargetedBy,0.6)
+			Multiply(_alreadyTargetedBy,_alreadyTargetedBy)
+			Multiply(_targetDistance,_alreadyTargetedBy)
+		ENDIF
+		IF "c1&c2"
+			IsGreaterThen(_alreadyTargetedBy,3)
+			CharacterHasStatus(_Char,AGGRO_MARKED)
+		THEN
+			Multiply(_targetDistance,2)
+		ENDIF
+		IF "!c1"
+			CharacterCanSee(__Me,_Char)
+		THEN
+			Multiply(_targetDistance,3)
+		ENDIF
+		IF "c1&!c2"
+			CharacterHasTalent(_Char,Stench)
+			CharacterHasStatus(_Char,AGGRO_MARKED)
+		THEN
+			Multiply(_targetDistance,4)
+		ENDIF
+		IF "c1&c2"
+			CharacterHasTalent(_Char,Stench)
+			CharacterHasStatus(_Char,AGGRO_MARKED)
+		THEN
+			Multiply(_targetDistance,2)
+		ENDIF
+		Set(_targetClosestThisScore,_targetDistance)
+		IF "!c1"
+			IsGreaterThen(_targetClosestThisScore,%setTargetDefaultBestScore)
+		THEN
+			Set(%setTargetDefaultBestScore,_targetClosestThisScore)
+			CharacterSetEnemy(__Me,_Char)
+		ENDIF
+	ENDIF
+	
+EVENT DontAttackAlliesOrInvisibles OVERRIDE 		//nor will you attack anything invulnerable
+VARS
+	CHARACTER:_Target
+ON
+	OnTurn()
+ACTIONS
+	IF "c1&(c2|c3|c4|c5)"
+		CharacterGetEnemy(_Target,__Me)
+		CharacterIsAlly(__Me,_Target)
+		CharacterHasStatus(_Target,"INVISIBLE")
+		CharacterHasStatus(_Target,"INVULNERABLE")
+		CharacterHasStatus(_Target,"VOID_AURA")
+	THEN
+		CharacterSetEnemy(__Me,null)
+		Set(%defaultEvaluateTarget,1)
+	ENDIF
+	
+EVENT OnInit_GiveSpells_GetSightRange
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%Icara_SightRange,__Me,Sight)
+	THEN
+		SetPriority("Combat_AttackSetEnemy",0)
+		SetPriority("Combat_MoveToSetEnemy",0)
+		CharacterAddSkill("Target_EnemyDeathKnightBane")		
+		CharacterAddSkill("Heal_EnemyRegenerate_Astarte")		
+		CharacterAddSkill("Shield_EnemyWater")		
+		CharacterAddSkill("Target_EnemyMassHeal")		
+		CharacterAddSkill("Target_EnemyCleansingWater")		
+		CharacterAddSkill("Target_EnemyResurrect")
+		CharacterAddSkill("Target_EnemyFortify")
+		CharacterAddSkill("Target_EnemyChillyWind")		
+		CharacterAddSkill("Target_EnemyTargetedPerception")	
+		CharacterAddSkill("Projectile_EnemyStaffOfMagusWater")
+	ENDIF
+	
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("Icara_Enemy_CastDeathKnightBane",500)
+	SetPriority("Icara_CastRegenerate",800)
+	SetPriority("Icara_CastWaterShield",750)
+	SetPriority("Icara_CastCleansingWater",700)
+	SetPriority("Icara_CastResurrect",900)
+	SetPriority("Icara_CastChillingTouch",700)
+	
+EVENT OnIterateCharacter_ScanForAlliesWithNegativeStatuses
+VARS
+	CHARACTER:_Ally
+ON
+	OnIterateCharacter(_Ally,"CMB_Icara_ScanForAlliesWithNegativeStatuses")
+ACTIONS
+	IF "!c1&c2&(c3|c4|c5|c6|c7|c8)"
+		CharacterIsDead(_Ally)								//c1
+		CharacterIsAlly(__Me,_Ally)							//c2
+		CharacterHasStatus(_Ally,"BLIND")					//c3
+		CharacterHasStatus(_Ally,"BLEEDING")				//c4
+		CharacterHasStatus(_Ally,"CRIPPLED")				//c5
+		CharacterHasStatus(_Ally,"DISEASED")				//c6
+		CharacterHasStatus(_Ally,"INFECTIOUS_DISEASED")		//c7
+		CharacterHasStatus(_Ally,"MUTED")					//c8
+	THEN
+		Set(%CleansingWater_Target,_Ally)
+	ENDIF	
+	
+EVENT OnIterateCharacter_ScanForWoundedAllies
+VARS
+	CHARACTER:_Ally
+	FLOAT:_AllysVitality
+	CHARACTERTEMPLATE:_Ally_RT
+	CHARACTERTEMPLATE:_ArcaneVortex_RT="Leandra_Elemental_Arcane_6db254a8-356d-4e6f-b518-846b064f5f4e"
+ON
+	OnIterateCharacter(_Ally,"CMB_Icara_ScanForWoundedAllies")
+ACTIONS
+	IF "!c1&c2&c3&!c4&c5&c6&!(c7|c8)"
+		CharacterIsDead(_Ally)								//!c1
+		CharacterIsAlly(__Me,_Ally)							//c2
+		CharacterGetTemplate(_Ally,_Ally_RT)				//c3
+		IsEqual(_Ally_RT,_ArcaneVortex_RT)					//!c4
+		CharacterGetStat(_AllysVitality,_Ally,Vitality)		//c5
+		IsLessThen(_AllysVitality,0.5)						//c6
+		CharacterHasStatus(_Ally,"HEALING")					//!c7
+		CharacterHasTalent(_Ally,"Zombie")					//!c8		//added by Edouard on 4/01/2015
+	THEN
+		Set(%Regenerate_Target,_Ally)
+		Add(%AmountOfWoundedAllies,1)
+	ENDIF	
+	
+EVENT OnIterateCharacter_ScanForBurningAllies
+VARS
+	CHARACTER:_Ally
+ON
+	OnIterateCharacter(_Ally,"CMB_Icara_ScanForBurningAllies")
+ACTIONS
+	IF "!c1&c2&c3&!c4"
+		CharacterIsDead(_Ally)
+		CharacterIsAlly(__Me,_Ally)
+		CharacterHasStatus(_Ally,"BURNING")
+		IsInSurface(_Ally,"Fire")
+	THEN
+		Set(%ChillingTouch_Target,_Ally)
+	ENDIF	
+	
+EVENT OnIterateCharacter_ScanForDeadAllies
+VARS
+	CHARACTER:_Ally
+ON
+	OnIterateCharacter(_Ally,"CMB_Icara_ScanForDeadAllies")
+ACTIONS
+	IF "c1&c2&!c3"
+		CharacterIsDead(_Ally)
+		CharacterIsAlly(__Me,_Ally)
+		CharacterIsSummon(_Ally)
+	THEN
+		Set(%Resurrect_Target,_Ally)
+	ENDIF	
+
+EVENT OnDie_Zandalor_DisplayText
+ON
+	OnDie(%Zandalor,_,_,_)
+ACTIONS
+	DisplayText(__Me,"HOM_Combat_Zandalor_Died",3)
+	
+EVENT OnDie_DisplayText
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	DisplayText(__Me,"HOM_Combat_Icara_Died",3)
+
+EVENT OnDie_Leandra_DisplayText
+ON
+	OnDie(%Leandra,_,_,_)
+ACTIONS
+	DisplayText(__Me,"HOM_Combat_Icara_LeandraDied",3)

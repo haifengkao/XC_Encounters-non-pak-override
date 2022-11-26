@@ -1,0 +1,32 @@
+INIT
+
+CHARACTER:__Me
+
+//------------------------
+EVENTS
+EVENT OnInitApplyGhostMaterial
+ON
+	OnInit()
+ACTIONS
+	SetMaterial(__Me,3c7f47ad-4fc2-4e9d-a3c2-b5f9c10b0d4a,-1,1,1,1)
+		
+EVENT OnDiePlayCoolEffectAndDisappear
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	PlayEffectAt(__Me,"FX_Creatures_Ghost_A_Death")
+	CharacterSetOffStage()
+	
+//------------------------
+BEHAVIOUR
+REACTION LookAtTarget, 1500
+USAGE ALL
+VARS
+	CHARACTER:_Enemy
+CHECK "c1"
+	CharacterGet(_Enemy,__Me,20,Lowest,Distance,Enemy)
+ACTIONS
+	CharacterLookAt(_Enemy)
+	SetPriority("LookAtTarget",0)
+
+	

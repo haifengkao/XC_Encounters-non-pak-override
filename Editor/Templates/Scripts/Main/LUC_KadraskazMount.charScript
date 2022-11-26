@@ -1,0 +1,62 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%Master = LUC_Kadraskaz_223563b3-0be1-415f-8237-9bf7503eb1b0
+	INT:%AlfieHere = 0
+	CHARACTER:%Alfie = LUC_BjornMount_7e974707-a22e-4dc7-aad0-c2ec145b62b2
+	
+BEHAVIOUR
+
+REACTION FleeFromKadra, 0
+	USAGE PEACE
+	ACTIONS 
+		CharacterFleeFrom(Ally, 10)
+		
+		
+REACTION WalkToObjectif, 500
+	USAGE PEACE
+	ACTIONS 
+		CharacterFollow(%Master, 20,0)
+		
+
+REACTION Action_Wander, 100
+	USAGE PEACE
+	ACTIONS
+		IF "c1&c2&!c3&!c4"
+			IsEqual(%AlfieHere, 1)
+			IsRandom(0.3)
+			CharacterIsDead(%Alfie)
+			IsInDialog(%Alfie)
+		THEN
+			CharacterMoveTo(%Alfie)
+			CharacterLookAt(%Alfie)
+			CharacterEvent(__Me, "trashTalk")
+		ELSE
+			CharacterMoveTo(TRIGGER:LUC_KadraskazMountExit_3b4c36ac-dff8-41d3-9d04-ae9a00330002)
+			Sleep(3)
+		ENDIF
+			
+EVENTS
+
+EVENT atSilverglen
+	ON
+		OnCharacterEvent(%Master, "atTheShop")
+	ACTIONS
+		SetPriority("WalkToObjectif", 0)
+		
+EVENT AlfieIsDone
+	ON
+		OnCharacterEvent(__Me, "AlfieIsHere")
+	ACTIONS
+		Set(%AlfieHere, 1)	
+		
+EVENT fleekad
+	ON
+		OnCharacterEvent(%Master, "fleeRalfie")
+	ACTIONS
+		SetPriority(FleeFromKadra, 1000)
+		
+EVENT comekad
+	ON
+		OnCharacterEvent(%Master, "comeRalfie")
+	ACTIONS
+		SetPriority(FleeFromKadra, 0)

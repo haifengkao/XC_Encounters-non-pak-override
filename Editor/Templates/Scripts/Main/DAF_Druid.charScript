@@ -1,0 +1,23 @@
+#INCLUDE Base
+
+INIT
+USING Base
+CHARACTER:__Me
+
+
+BEHAVIOUR
+
+REACTION Patrol,1050
+USAGE PEACE
+VARS
+	TRIGGER:_Point
+	FIXEDSTRING:_Text
+ACTIONS
+	
+	GetRandom(_Text,"DAF_Druid_1","DAF_Druid_2","DAF_Druid_3")
+	CharacterWander(TRIGGER:DAF_Area_PathDruid_c3d00b60-e77b-41b9-99f7-74dfd9dae0fd,3,0,__Me)
+	Sleep(3)
+	DisplayText(__Me,_Text,5)
+	Sleep(8)
+INTERRUPT
+	Reset()

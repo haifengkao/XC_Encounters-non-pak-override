@@ -1,0 +1,10 @@
+INIT
+ITEM:__Me
+
+EVENTS
+
+EVENT MagicalDamageReceived
+ON
+	OnDamage(_, _, _, _) //Need to implement something to check for all source dmg
+ACTIONS
+	ItemEvent(__Me, "HasBeenHitBySourceMagic")

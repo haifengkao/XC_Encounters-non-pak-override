@@ -1,0 +1,54 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%Shrike=HOM_Shrike_8a5afb7b-08ad-4057-9a97-5bc66bb3ac6e
+	EXTERN INT:%Bool_CastBlessOnShrike=0
+	EXTERN INT:%Bool_CastHasteOnShrike=0
+
+//----------------
+BEHAVIOUR
+REACTION ShadowCreature_Cast_BlessOnShrike, 600
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&c4&!c5&!c6"
+	IsEqual(%Bool_CastBlessOnShrike,1)													//c1
+	CharacterCanCast(__Me,Target_EnemyTargetedBless)									//c2
+	CharacterCanSee(__Me,%Shrike)														//c3
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,Target_EnemyTargetedBless)			//c4
+	CharacterIsDead(%Shrike)															//c5
+	CharacterHasStatus(%Shrike,BLESSED)													//c6
+ACTIONS
+	CharacterMoveInRange(%Shrike,_MinRange,_MaxRange,1)		
+	CharacterUseSkill(Target_EnemyTargetedBless,%Shrike)
+INTERRUPT
+	Reset()
+	
+REACTION ShadowCreature_Cast_HasteOnShrike, 600											//FORCE END TURN!!
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&c4&!c5&!c6&!c7"
+	IsEqual(%Bool_CastHasteOnShrike,1)													//c1
+	CharacterCanCast(__Me,Target_EnemyHaste)											//c2
+	CharacterCanSee(__Me,%Shrike)														//c3
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,Target_EnemyHaste)					//c4
+	CharacterIsDead(%Shrike)															//c5
+	CharacterHasStatus(%Shrike,WARM)													//c6
+	CharacterHasStatus(%Shrike,HASTED)													//c7
+ACTIONS
+	CharacterMoveInRange(%Shrike,_MinRange,_MaxRange,1)		
+	CharacterUseSkill(Target_EnemyHaste,%Shrike)
+INTERRUPT
+	Reset()	
+
+//----------------
+EVENTS
+EVENT OnInit_GiveSpellsAndGetSightRange
+ON
+	OnInit
+ACTIONS
+	CharacterAddSkill(Target_EnemyTargetedBless)
+	CharacterAddSkill(Target_EnemyHaste)
+	

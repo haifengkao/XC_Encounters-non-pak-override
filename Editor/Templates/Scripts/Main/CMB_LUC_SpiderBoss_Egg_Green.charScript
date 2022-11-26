@@ -1,0 +1,42 @@
+INIT
+
+CHARACTER:__Me
+CHARACTERTEMPLATE:%Spiderling_Green=LUC_SpiderBoss_Spiderling_Green_b4a231d7-c16e-4033-9141-77158021b1e7
+INT:%HatchCountdownStartsAtTurn = 0
+INT:%HatchCountdown=2
+
+//------------------------
+EVENTS
+EVENT GetRandomHatchingValue
+ON
+	OnInit()
+ACTIONS
+	GetRandomBetween(%HatchCountdown,1,2)
+	
+EVENT ItsMyTurn
+ON
+	OnTurn()
+ACTIONS
+	IF "!c1"
+		CharacterIsDead(__Me)
+	THEN
+		IF "c1&!c2"
+			IsLessThen(%HatchCountdownStartsAtTurn,%HatchCountdown)
+			CharacterHasStatus(__Me,FROZEN)
+		THEN		
+			Add(%HatchCountdownStartsAtTurn,1)
+			//DebugText(__Me,"+1!")
+			CharacterEndTurn()
+			//CombatLogText(__Me,"CMB_LUC_SpiderBoss_Laid",0,1)
+		ELIF "c1&!c2"
+			IsEqual(%HatchCountdownStartsAtTurn,%HatchCountdown)
+			CharacterHasStatus(__Me,FROZEN)
+		THEN
+			CharacterPlayEffect(__Me,"FX_GP_Hit_Ooze_A_Large")
+			CharacterDie(__Me) 
+			SpawnCharacter(_,%Spiderling_Green,__Me,0)
+			//CombatLogText(__Me,"CMB_LUC_SpiderBoss_Hatching",0,1)
+		ELSE
+			CharacterEndTurn()
+		ENDIF
+	ENDIF

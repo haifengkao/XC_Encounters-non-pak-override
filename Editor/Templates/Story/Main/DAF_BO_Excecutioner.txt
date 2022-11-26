@@ -1,0 +1,184 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+ProcTriggerRegisterForPlayers(TRIGGER_DAF_Area_Priest);
+SneakTriggerSpotter(TRIGGER_DAF_Area_Priest,CHARACTER_DAF_BeggingPriest);
+SneakTriggerSpotter(TRIGGER_DAF_Area_Priest,CHARACTER_DAF_BO_Excecutioner);
+DB_Dialogs(CHARACTER_DAF_BO_Excecutioner,"DAF_BO_Excecutioner");
+
+ItemSetOnstage(ITEM_DAF_Corpse_BO_OrcTrader,0);
+ItemSetOnstage(ITEM_DAF_Corpse_BO_ArmoryOrc,0);
+ItemSetOnstage(ITEM_DAF_Corpse_BO_Ratcatcher,0);
+ItemSetOnstage(ITEM_DAF_Corpse_BO_Lover,0);
+
+//DB_DAF_Executioner_Victims(_victim,_executeEventForGrutilda,_ADBetweenVictimAndGrutilda,_GrutildaCommentOnCorpse,_ExecutionerCommentOnCorpse);
+DB_DAF_Executioner_Victims(CHARACTER_DAF_BO_OrcTrader,"DAF_ExcecuteTrader","DAF_AD_BO_GruthildaTrader","DAF_GrutildaCommentsOnKilledTrader","DAF_ExecutionerCommentTraderBody");
+DB_DAF_Executioner_Victims(CHARACTER_DAF_BO_ArmoryKeyOrc,"DAF_GaveGruthildaArmoryKey","DAF_AD_BO_GruthildaArmoryOrc","DAF_GrutildaCommentsOnKilledArmoryKeyOrc","DAF_ExecutionerCommentArmoryOrcBody");
+DB_DAF_Executioner_Victims(CHARACTER_DAF_Ratcatcher,"DAF_ExecuteRatcatcher","DAF_AD_BO_GrutildaRatcatcher","DAF_GrutildaCommentsOnKilledRatcatcher","DAF_ExecutionerCommentRatcatcherBody");
+DB_DAF_Executioner_Victims(CHARACTER_DAF_Orc_Lover,"DAF_GrutildaKnowsAboutLovers","DAF_AD_BO_GrutildaLover","DAF_GrutildaCommentsOnKilledLover","DAF_ExecutionerCommentLoverBody");
+
+DB_DAF_Executioner_VictimDisplay(CHARACTER_DAF_BO_OrcTrader,ITEM_DAF_Corpse_BO_OrcTrader,TRIGGER_DAF_Point_ExecutionDisplayTrader,"DAF_BO_TraderExecuted");
+DB_DAF_Executioner_VictimDisplay(CHARACTER_DAF_BO_ArmoryKeyOrc,ITEM_DAF_Corpse_BO_ArmoryOrc,TRIGGER_DAF_Point_ExecutionDisplayArmoryOrc,"DAF_BO_ArmoryOrcExecuted");
+DB_DAF_Executioner_VictimDisplay(CHARACTER_DAF_Ratcatcher,ITEM_DAF_Corpse_BO_Ratcatcher,TRIGGER_DAF_Point_ExecutionDisplayRatcatcher,"DAF_BO_RatcatcherExecuted");
+DB_DAF_Executioner_VictimDisplay(CHARACTER_DAF_Orc_Lover,ITEM_DAF_Corpse_BO_Lover,TRIGGER_DAF_Point_ExecutionDisplayLover,"DAF_BO_LoverExecuted");
+
+DB_PlayerComments("DAF_CommentGrutildaExecutions","DAF_CommentGrutildaExecutions_1_1",1,1);
+DB_PlayerComments("DAF_CommentGrutildaExecutions","DAF_CommentGrutildaExecutions_2_1",2,1);
+DB_PlayerComments("DAF_CommentGrutildaExecutions","DAF_CommentGrutildaExecutions_2_2",2,2);
+KBSECTION
+IF
+GlobalEventSet(_GrutildaKillsVictim)
+AND
+NOT CHARACTER_DAF_Grutilda.goExecuteVictim()
+AND
+DB_DAF_Executioner_Victims(_victim,_GrutildaKillsVictim,_dialog,_grutildaComment,_executionerComment)
+THEN
+DB_DAF_Executioner_VictimsToExecute(_victim,_dialog,_grutildaComment,_executionerComment);
+CHARACTER_DAF_Grutilda.goExecuteVictim();
+
+IF
+DialogEnded("DAF_Grutilda", _ID)
+AND
+CHARACTER_DAF_Grutilda.goExecuteVictim()
+AND
+DB_DialogPlayers(_ID,_Player,1)
+AND
+DB_DAF_Executioner_VictimsToExecute(_Victim,_Dialog,_,_)
+AND
+NOT DB_Dead(_Victim)
+THEN
+CharacterMoveToCharacter(CHARACTER_DAF_Grutilda,_Victim,0,"DAF_GrutildaOnHerWayToVictim",0);
+CharacterSetHasDialog(_Victim,0);
+CharacterSetHasDialog(CHARACTER_DAF_Grutilda,0);
+IncreaseAttitude(_player,CHARACTER_DAF_Grutilda,10);
+
+IF
+CharacterEvent(CHARACTER_DAF_Grutilda,"DAF_GrutildaOnHerWayToVictim")
+AND
+DB_DAF_Executioner_VictimsToExecute(_Victim,_Dialog,_,_)
+AND
+NOT DB_Dead(_Victim)
+THEN
+CharacterLookAtCharacter(CHARACTER_DAF_Grutilda,_Victim,0);
+CharacterLookAtCharacter(_Victim,CHARACTER_DAF_Grutilda,0);
+DialogStartTwoSpeakerDialog(_Dialog,CHARACTER_DAF_Grutilda,_Victim);
+
+IF
+AutomatedDialogEnded(_Dialog, _)
+AND
+DB_DAF_Executioner_VictimsToExecute(_Victim,_Dialog,_,_)
+AND
+NOT DB_Dead(_Victim)
+THEN
+CharacterAttackCharacter(CHARACTER_DAF_Grutilda,_Victim);
+
+IF
+CharacterAttackedByCharacter(_Victim,CHARACTER_DAF_Grutilda)
+AND
+DB_DAF_Executioner_Victims(_Victim,_,_,_,_)
+THEN
+CHARACTER_DAF_Grutilda.VictimExecuted();
+CharacterDie(_Victim,0);
+
+IF
+CharacterDied(_Victim)
+AND
+DB_DAF_Executioner_VictimsToExecute(_Victim,_,_GrutildaComment,_)
+THEN
+NOT CHARACTER_DAF_Grutilda.VictimExecuted();
+CharacterDisplayText(CHARACTER_DAF_Grutilda,_GrutildaComment);
+PROC_DAF_ExecutionerCollectBodies();
+
+PROC
+PROC_DAF_ExecutionerCollectBodies()
+AND 
+DB_DAF_Executioner_VictimsToExecute(_victim, _, _, _)
+AND
+NOT CHARACTER_DAF_BO_Excecutioner.isCollectingABody()
+THEN
+CHARACTER_DAF_BO_Excecutioner.isCollectingABody();
+CharacterSetHasDialog(CHARACTER_DAF_BO_Excecutioner,0);
+CharacterMoveToCharacter(CHARACTER_DAF_BO_Excecutioner,_victim,0,"DAF_BO_ExecutionerPickedUpVictim",0);
+
+IF
+CharacterDisplayTextEnded(CHARACTER_DAF_Grutilda,_GrutildaComment)
+AND
+DB_DAF_Executioner_VictimsToExecute(_,_,_GrutildaComment,_)
+THEN
+ProcCharacterMoveToTrigger(CHARACTER_DAF_Grutilda,TRIGGER_DAF_PointGrutilda1,0,"DAF_BO_GrutildaBackFromExecution");
+
+IF
+CharacterEvent(CHARACTER_DAF_Grutilda,"DAF_BO_GrutildaBackFromExecution")
+THEN
+NOT CHARACTER_DAF_Grutilda.goExecuteVictim();
+CharacterSetHasDialog(CHARACTER_DAF_Grutilda,1);
+
+IF
+CharacterEvent(CHARACTER_DAF_BO_Excecutioner,"DAF_BO_ExecutionerPickedUpVictim")
+AND
+DB_DAF_Executioner_VictimsToExecute(_Victim,_,_,_ExecutionerComment)
+AND
+DB_Dead(_Victim)
+THEN
+DB_DAF_Executioner_VictimsPickedUp(_Victim);
+CharacterSetOnStage(_Victim,0);
+CharacterDisplayText(CHARACTER_DAF_BO_Excecutioner,_ExecutionerComment);
+
+IF
+CharacterDisplayTextEnded(CHARACTER_DAF_BO_Excecutioner,_ExecutionerComment)
+AND
+DB_DAF_Executioner_VictimsToExecute(_Victim,_,_,_ExecutionerComment)
+AND
+DB_DAF_Executioner_VictimsPickedUp(_Victim)
+AND
+DB_DAF_Executioner_VictimDisplay(_Victim,_,_DisplayTrigger,_)
+THEN
+ProcCharacterMoveToTrigger(CHARACTER_DAF_BO_Excecutioner,_DisplayTrigger,0,"DAF_BO_PutVictimUpOnDisplay");
+
+IF
+CharacterEvent(CHARACTER_DAF_BO_Excecutioner,"DAF_BO_PutVictimUpOnDisplay")
+AND
+DB_DAF_Executioner_VictimsToExecute(_Victim,_Dialog,_GrutildaComment,_ExecutionerComment)
+AND
+DB_DAF_Executioner_VictimsPickedUp(_Victim)
+AND
+DB_DAF_Executioner_VictimDisplay(_Victim,_Corpse,_,_DialogEvent)
+AND
+DB_DAF_Executioner_Victims(_Victim,_GrutildaKillsVictim,_Dialog,_GrutildaComment,_ExecutionerComment)
+THEN
+ProcCharacterMoveToTrigger(CHARACTER_DAF_BO_Excecutioner,TRIGGER_DAF_Point_BO_ExcecutionerDefualt,0,"DAF_BO_ExecutionOfVictimDone");
+ItemSetOnstage(_Corpse,1);
+GlobalSetEvent(_DialogEvent);
+NOT DB_DAF_Executioner_VictimsToExecute(_Victim,_Dialog,_GrutildaComment,_ExecutionerComment);
+NOT DB_DAF_Executioner_Victims(_Victim,_GrutildaKillsVictim,_Dialog,_GrutildaComment,_ExecutionerComment);
+NOT CHARACTER_DAF_BO_Excecutioner.isCollectingABody();
+NOT DB_DAF_Executioner_VictimsPickedUp(_Victim);
+PROC_DAF_ExecutionerCollectBodies();
+
+IF
+CharacterEvent(CHARACTER_DAF_BO_Excecutioner,"DAF_BO_ExecutionOfVictimDone")
+THEN
+CharacterSetHasDialog(CHARACTER_DAF_BO_Excecutioner,1);
+
+PROC
+ProcCharInTriggerSpottedByChar((CHARACTER)_Player,TRIGGER_DAF_Area_Priest,(CHARACTER)_Spotter)
+THEN
+CharacterSetEvent(CHARACTER_DAF_BeggingPriest,"PlayerNoticed");
+TimerLaunch("DAF_Sneak_BeggingPriest_Restart",10000);
+
+IF
+TimerFinished("DAF_Sneak_BeggingPriest_Restart")
+THEN
+SneakTriggerSpotter(TRIGGER_DAF_Area_Priest,CHARACTER_DAF_BeggingPriest);
+SneakTriggerSpotter(TRIGGER_DAF_Area_Priest,CHARACTER_DAF_BO_Excecutioner);
+CharacterSetEvent(CHARACTER_DAF_BeggingPriest,"RestartSpotting");
+CharacterSetEvent(CHARACTER_DAF_BO_Excecutioner,"RestartSpotting");
+
+IF
+DAF_War(1)
+THEN
+ProcTriggerUnregisterForPlayers(TRIGGER_DAF_Area_Priest);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

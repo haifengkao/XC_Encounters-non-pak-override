@@ -1,0 +1,57 @@
+INIT
+CHARACTER:__Me
+EXTERN INT:%UsePhoenixDiveStartAt=0
+EXTERN INT:%UsePhoenixDiveFrequency=2
+EXTERN INT:%bool_TryToTelepIntoHarmfulSurface=1
+EXTERN INT:%bool_TryToTelepNearStrongestAlly=1
+EXTERN COMPARE:%TeleportStatCompareHow=Highest
+EXTERN COMPAREFUNC:%TeleportStatCompareWhat=Distance
+
+//----------------
+BEHAVIOUR 
+REACTION UsePhoenixDive,0
+USAGE COMBAT
+VARS
+	CHARACTER:_Player
+	CHARACTER:_NearbyAlly
+	FLOAT3:_PhoenixDiveDestination
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&!c3&c4&!c5&!c6&c7&c8"
+	CharacterCanCast(__Me,Jump_EnemyPhoenixDive)														//c1	
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,Jump_EnemyPhoenixDive)								//c2
+	CharacterGet(_NearbyAlly,__Me,3,Lowest,Distance,Ally)												//c3
+	CharacterGet(_Player,__Me,_MaxRange,%TeleportStatCompareHow,%TeleportStatCompareWhat,Enemy,None)	//c4
+	CharacterIsDead(_Player)																			//c5
+	IsInDangerousSurface(_Player)																		//c6
+	GetPosition(_Player,_PhoenixDiveDestination)														//c7
+	FindValidPosition(_PhoenixDiveDestination,5,__Me)													//c8
+ACTIONS 
+	CharacterMoveInRange(_Player,_MinRange,_MaxRange,1)
+	CharacterUseSkill(Jump_EnemyPhoenixDive,_Player,_PhoenixDiveDestination)
+	Sleep(1)
+	Set(%UsePhoenixDiveStartAt,0)
+	CharacterEndTurn()
+	SetPriority("UsePhoenixDive",0)
+INTERRUPT
+	Reset()
+	
+//----------------
+EVENTS
+EVENT GiveTeleportSpell
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill(Jump_EnemyPhoenixDive)
+	
+EVENT SetTeleportFrequency
+ON
+	OnTurn()
+ACTIONS
+	IF "c1"
+		IsLessThen(%UsePhoenixDiveStartAt,%UsePhoenixDiveFrequency)
+	THEN		
+		Add(%UsePhoenixDiveStartAt,1)
+	ELSE
+		SetPriority("UsePhoenixDive",400)
+	ENDIF

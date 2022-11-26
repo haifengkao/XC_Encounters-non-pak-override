@@ -1,0 +1,31 @@
+INIT
+	CHARACTER:__Me
+	EXTERN TRIGGER:%WanderZone = null
+	CHARACTER:%CatChased = null
+	
+BEHAVIOUR
+
+REACTION WanderAround, 1000
+	USAGE PEACE
+	ACTIONS
+		CharacterWander(%WanderZone, 20)
+
+REACTION ChaseACat, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterFollow(%CatChased, 1, 1)
+
+EVENTS
+
+EVENT startChase
+	ON
+		OnCharacterEvent(__Me, "startTheChase")
+	ACTIONS
+		SetPriority(ChaseACat, 1100)
+	
+EVENT stopChase
+	ON
+		OnCharacterEvent(%CatChased, "endChase")
+	ACTIONS
+		Set(%CatChased, null)
+		SetPriority(ChaseACat, 0)

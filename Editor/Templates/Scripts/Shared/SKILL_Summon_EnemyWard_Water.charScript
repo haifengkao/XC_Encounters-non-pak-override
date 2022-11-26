@@ -1,0 +1,32 @@
+#TEMPLATE "_SKILL_Base" : Summon_EnemyWard_Water
+
+INIT
+CHARACTER:__Me
+// [GLOBAL_VARS]
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_Summon_EnemyWard_Water
+VARS
+	// [CALC_VARS]
+	FLOAT:_Score
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_Summon_EnemyWard_Water")
+ACTIONS	
+	// [CALC_ACTIONS_PRE]
+	Set(_Score, 0.0)
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	Set(%SkillTargetChar_Summon_EnemyWard_Water, __Me)
+	Add(%ActionScore_Summon_EnemyWard_Water, _Score)
+	// [~CALC_ACTIONS]
+
+	
+
+	

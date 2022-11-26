@@ -1,0 +1,144 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+/////////////////////////////////////////////////////////////////////////////////////////////
+//
+// the events triggering all
+//
+// the following rules call
+//		ProcessTheftEvent/2
+//
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
+// Handle the events triggering all:
+//
+
+// NOTE: amoral npcs never comment on thievery
+
+IF	
+CharacterSpottedItemTheft_Redhanded(_Offender,_Spotter,_Owner,_Object,_Value,_Handle,_CrimeID,_X,_Y,_Z,_Pitch,_Yaw,_Roll,_Container)
+AND
+CharacterIsTagged(_Spotter,"Animal",0)
+AND
+NOT DB_NoDefaultBehavior(_Spotter)
+AND
+NOT NoStealingReaction(_Spotter)
+AND
+NOT DB_Combat(_Spotter,_)
+AND
+NOT DB_Amoral(_Spotter)
+AND
+NOT DB_EvilDude(_Owner)
+AND
+NOT DB_NoThieveryBehavior(_Offender,1)
+AND
+NOT DB_ObjectCustomBehavior(_Object)
+AND
+NOT DB_CrimeHandled(_Offender,_CrimeID)
+THEN
+DeleteThieveryFacts(_Offender,1);
+DB_CrimeHandled(_Offender,_CrimeID);
+//DB_StoleFrom(_Offender,_Spotter,_Owner,_Value);
+DB_ObjectStolen(_Offender,_Object,_Handle,_Container);
+DB_StolenObjectOriginalTransform(_Object,_X,_Y,_Z,_Pitch,_Yaw,_Roll);
+ProcessObjectTheftEvent(_Offender,_Spotter,_Owner,_Object,_Value,_Handle);
+
+//player steals while the spotter is in combat, but not with the CHARACTER_Player1
+//we fallback to make the NPC hostile to the player
+IF
+CharacterSpottedItemTheft_Redhanded(_Offender,_Spotter,_Owner,_Object,_Value,_Handle,_CrimeID,_,_,_,_,_,_,_)
+AND
+NOT NoStealingReaction(_Spotter)
+AND
+DB_Combat(_Spotter,_ID)
+AND
+CharacterIsTagged(_Spotter,"Animal",0)
+AND
+NOT DB_Combat(_Offender,_ID)
+THEN
+DB_CrimeHandled(_Offender,_CrimeID);
+ProcMakeNPCHostile(_Offender,_Spotter);
+
+IF
+CharacterSpottedItemTheft_ByEvidence(_Offender,_Spotter,_Owner,_Object,_Value,_Handle)
+AND
+NOT DB_Amoral(_Spotter)
+AND
+NOT DB_EvilDude(_Owner)
+AND
+NOT DB_NoThieveryBehavior(_Offender,1)
+THEN
+DeleteThieveryFacts(_Offender,1);
+DB_ObjectTheft_ByEvidence(_Offender,1);		// remember that theft was detected during trade
+//DB_StoleFrom(_Offender,_Spotter,_Owner,_Value);
+DB_ObjectStolen(_Offender,_Object,_Handle,0);
+ProcessObjectTheftEvent(_Offender,_Spotter,_Owner,_Object,_Value,_Handle);
+
+//If items are stacked, the original handle is destroyed
+//so update the database and use the stack as the stolen object
+IF
+ItemStackedWith(_ItemHandle,_StackedHandle)
+AND
+DB_ObjectStolen(_Player,_Onject,_ItemHandle,_Container)
+THEN
+NOT DB_ObjectStolen(_Player,_Onject,_ItemHandle,_Container);
+DB_ObjectStolen(_Player,_Onject,_StackedHandle,_Container);
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
+// ProcessObjectTheftEvent((NPC)_Spotter,(NPC)_Owner,(OBJECT)_Object,(INTEGER)_Value)
+//
+
+/*
+IF
+ItemTemplateAddedToCharacter(_ObjectClass,_Handle,_Player)
+AND
+DB_ObjectStolen(_Player,_Object,_Handle,_)
+AND
+DB_StoleFrom(_Player,_Spotter,_Owner,_Value)
+THEN
+NOT DB_StoleFrom(_Player,_Spotter,_Owner,_Value);
+ProcessObjectTheftEvent(_Player,_Spotter,_Owner,_Object,_Value,_Handle);
+
+IF
+ItemStackedWith(_Handle,_NewStackHandle)
+AND
+DB_ObjectStolen(_Player,_Object,_NewStackHandle,_)
+AND
+DB_StoleFrom(_Player,_Spotter,_Owner,_Value)
+THEN
+NOT DB_StoleFrom(_Player,_Spotter,_Owner,_Value);
+ProcessObjectTheftEvent(_Player,_Spotter,_Owner,_Object,_Value,_Handle);
+*/
+//
+// 1) Upon getting the event, assert the object related thievery facts:
+//
+PROC
+ProcessObjectTheftEvent((CHARACTER)_Player,(CHARACTER)_,(CHARACTER)_,(ITEM)_Object,(INTEGER)_Value,(INTEGER)_Handle)
+THEN
+DB_ValueStolen(_Player,_Value);
+
+PROC
+ProcessObjectTheftEvent((CHARACTER)_Player,_,_,_Object,_,_) 
+AND
+DB_FamousObject(_Object,(INTEGER)_Fame)
+AND
+IntegerDivide(_Fame,4,_Bonus)
+THEN
+DB_BonusFame(_Player,_Bonus);
+
+//
+// 2) decide how to react:
+//
+PROC
+ProcessObjectTheftEvent((CHARACTER)_Player,_Spotter,_Owner,_,_,_)
+THEN
+ProcessTheftEvent(_Player,_Spotter,_Owner);
+EXITSECTION
+
+ENDEXITSECTION

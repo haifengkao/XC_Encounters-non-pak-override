@@ -1,0 +1,36 @@
+INIT
+ITEM:__Me 
+
+EXTERN STRING:%BurnEffect = "FX_GP_Status_Burning_A_Effect1"
+EXTERN FIXEDSTRING:%BurnEffectBone = ""
+
+INT:%BurningFX = null
+
+EVENTS
+
+EVENT LoadBurningItem
+ON
+	OnLoaded(_,_,_,_)
+ACTIONS
+	Set(%BurningFX,null)
+
+EVENT CreateBurningVisuals
+ON	
+	OnStatusCreateVisuals(BURNING)
+ACTIONS
+	IF "c1"
+		IsEqual(%BurningFX,null)
+	THEN
+		ItemPlayLoopEffect(%BurningFX,__Me,%BurnEffect,%BurnEffectBone)
+	ENDIF
+
+EVENT DestroyBurningVisuals
+ON
+	OnStatusDestroyVisuals(BURNING)
+ACTIONS
+	IF "!c1"
+		IsEqual(%BurningFX,null)
+	THEN
+		StopLoopEffect(%BurningFX)
+		Set(%BurningFX,null)
+	ENDIF

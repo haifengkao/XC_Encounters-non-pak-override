@@ -1,0 +1,117 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%InvisibleThug_01="CYS_DietmarThug3_f1c49e74-c41b-4679-ac4c-94717eb7840c"
+	CHARACTER:%InvisibleThug_02="CYS_DietmarThug4_34b808ae-a5ba-4bf6-ac52-c16711bb9561"
+	CHARACTER:%InvisibleThug_03="CYS_DietmarThug5_c53f83f7-d830-48ea-8cfb-8ad3fb7054ec"
+	CHARACTER:%InvisibleThug_04="CYS_DietmarThug6_8ddb3c1f-8015-42e1-8b06-c47f7fc1212b"
+	INT:%Bool_MakeEveryoneVisible=0
+	
+//-----------------------
+BEHAVIOUR
+REACTION Dietmar_CallsForHelp,1500
+USAGE COMBAT
+VARS
+	FLOAT:_DietmarVitality
+CHECK "!(c1|c2|c3|c4|c5)&c6&c7"
+	CharacterHasStatus(__Me,"FROZEN")						//!c1
+	CharacterHasStatus(__Me,"CHARMED")						//!c2
+	CharacterHasStatus(__Me,"FEAR")							//!c3
+	CharacterHasStatus(__Me,"PETRIFIED")					//!c4
+	CharacterHasStatus(__Me,"STUNNED")						//!c5
+	CharacterGetStat(_DietmarVitality,__Me,Vitality)		//c6
+	IsLessThen(_DietmarVitality,0.6)						//c7
+ACTIONS
+	IF "c1|c2|c3|c4"
+		CharacterHasStatus(%InvisibleThug_01,"INVISIBLE")
+		CharacterHasStatus(%InvisibleThug_02,"INVISIBLE")
+		CharacterHasStatus(%InvisibleThug_03,"INVISIBLE")
+		CharacterHasStatus(%InvisibleThug_04,"INVISIBLE")
+	THEN
+		Sleep(1)
+		DisplayText(__Me,"CYS_Dietmar_CallForHelp",3)
+		Sleep(2)
+		IF "c1"
+			CharacterHasStatus(%InvisibleThug_01,"INVISIBLE")
+		THEN
+			CharacterSetCanFight(%InvisibleThug_01,1)
+			PlayEffectAt(%InvisibleThug_01,"FX_GP_TeleportSmoke_A")
+			CharacterRemoveStatus(%InvisibleThug_01,"INVISIBLE")
+			Sleep(0.4)
+		ENDIF
+		IF "c1"
+			CharacterHasStatus(%InvisibleThug_02,"INVISIBLE")
+		THEN
+			CharacterSetCanFight(%InvisibleThug_02,1)
+			PlayEffectAt(%InvisibleThug_02,"FX_GP_TeleportSmoke_A")
+			CharacterRemoveStatus(%InvisibleThug_02,"INVISIBLE")
+			Sleep(0.8)
+		ENDIF
+		IF "c1"
+			CharacterHasStatus(%InvisibleThug_03,"INVISIBLE")
+		THEN
+			CharacterSetCanFight(%InvisibleThug_03,1)
+			PlayEffectAt(%InvisibleThug_03,"FX_GP_TeleportSmoke_A")
+			CharacterRemoveStatus(%InvisibleThug_03,"INVISIBLE")
+			Sleep(0.3)
+		ENDIF
+		IF "c1"
+			CharacterHasStatus(%InvisibleThug_04,"INVISIBLE")
+		THEN
+			CharacterSetCanFight(%InvisibleThug_04,1)
+			PlayEffectAt(%InvisibleThug_04,"FX_GP_TeleportSmoke_A")
+			CharacterRemoveStatus(%InvisibleThug_04,"INVISIBLE")
+		ENDIF
+		Set(%Bool_MakeEveryoneVisible,1)
+		SetPriority("Dietmar_CallsForHelp",0)
+	ELSE
+		SetPriority("Dietmar_CallsForHelp",0)
+	ENDIF
+	
+//-----------------------
+EVENTS
+EVENT OnInit_TurnInvisible
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		IsEqual(%Bool_MakeEveryoneVisible,0)
+	THEN
+		CharacterApplyStatus(%InvisibleThug_01,"INVISIBLE",-1)
+		CharacterApplyStatus(%InvisibleThug_02,"INVISIBLE",-1)
+		CharacterApplyStatus(%InvisibleThug_03,"INVISIBLE",-1)
+		CharacterApplyStatus(%InvisibleThug_04,"INVISIBLE",-1)	
+	ENDIF
+	
+EVENT OnDie_EveryoneBecomesVisible
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	IF "c1"
+		CharacterHasStatus(%InvisibleThug_01,"INVISIBLE")
+	THEN
+		CharacterSetCanFight(%InvisibleThug_01,1)
+		PlayEffectAt(%InvisibleThug_01,"FX_GP_TeleportSmoke_A")
+		CharacterRemoveStatus(%InvisibleThug_01,"INVISIBLE")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(%InvisibleThug_02,"INVISIBLE")
+	THEN
+		CharacterSetCanFight(%InvisibleThug_02,1)
+		PlayEffectAt(%InvisibleThug_02,"FX_GP_TeleportSmoke_A")
+		CharacterRemoveStatus(%InvisibleThug_02,"INVISIBLE")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(%InvisibleThug_03,"INVISIBLE")
+	THEN
+		CharacterSetCanFight(%InvisibleThug_03,1)
+		PlayEffectAt(%InvisibleThug_03,"FX_GP_TeleportSmoke_A")
+		CharacterRemoveStatus(%InvisibleThug_03,"INVISIBLE")
+	ENDIF
+	IF "c1"
+		CharacterHasStatus(%InvisibleThug_04,"INVISIBLE")
+	THEN
+		CharacterSetCanFight(%InvisibleThug_04,1)
+		PlayEffectAt(%InvisibleThug_04,"FX_GP_TeleportSmoke_A")
+		CharacterRemoveStatus(%InvisibleThug_04,"INVISIBLE")
+	ENDIF
+	Set(%Bool_MakeEveryoneVisible,1)	

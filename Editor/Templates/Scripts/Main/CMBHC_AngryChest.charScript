@@ -1,0 +1,112 @@
+INIT
+	CHARACTER:__Me
+	ITEMTEMPLATE:%GoldItem=LOOT_Gold_Big_A_1c3c9c74-34a1-4685-989e-410dc080be6f
+	EXTERN INT:%GoldAmount=200
+
+//------------------------	
+BEHAVIOUR
+REACTION AngryChest_WaitsPatiently,500
+USAGE PEACE
+VARS
+	CHARACTER:_Target
+CHECK "c1&c2"
+	CharacterGet(_Target,__Me,5,Highest,Distance)
+	CharacterIsPlayer(_Target)
+ACTIONS
+	CharacterSetFaction(__Me,"Evil NPC")
+
+REACTION AngryChest_UseGoldProjectile,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	INT:_Loop_Steps=0
+	INT:_DesiredAmountOfGold
+	ITEM:_SpawnedGold
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+	FLOAT3:_PosOffset
+	FLOAT3:_TargetPosition
+	FLOAT:_Angle
+	FLOAT:_Dist	
+CHECK "!c1&c2&c3&c4"
+	IsLessThen(%GoldAmount,6)															//!c1
+	CharacterCanCast(__Me,"Projectile_EnemyGoldSpit")									//c2
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyGoldSpit")			//c3
+	CharacterGet(_Target,__Me,_MaxRange,Highest,Distance,Enemy)							//c4
+ACTIONS
+	GetRandomBetween(_DesiredAmountOfGold,1,6)
+	CharacterUseSkill("Projectile_EnemyGoldSpit",_Target)
+	Subtract(%GoldAmount,_DesiredAmountOfGold)
+	Set(_Loop_Steps,0)	
+	IF "c1"
+		GetPosition(_Target,_TargetPosition)
+	THEN
+		WHILE "!c1"
+			IsEqual(_Loop_Steps,_DesiredAmountOfGold)
+		DO
+			Set(_PosOffset,{1.3;0;0}) 
+			GetRandomBetween(_Angle,0,360)
+			GetRandomBetween(_Dist,0.5,1.2)
+			RotateY(_PosOffset,_Angle)
+			Multiply(_PosOffset,_Dist)	
+			Add(_TargetPosition,_PosOffset)
+			PlayEffectAt(_TargetPosition,"FX_GP_Footstep_A_Large_Dirt")
+			SpawnItem(%GoldItem,_TargetPosition,_SpawnedGold)					
+			Subtract(%GoldAmount,1)
+			Add(_Loop_Steps,1)
+		ENDWHILE
+	ELSE
+		SetPriority("AngryChest_UseGoldProjectile",0)
+	ENDIF
+INTERRUPT
+	Reset()
+	
+REACTION AngryChest_GetCharacterRealClose_AndBite,200
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+CHECK "c1"
+	CharacterGet(_Target,__Me,4,Lowest,Vitality,Enemy)
+ACTIONS
+	CharacterAttackWithoutMove(_Target)
+	
+REACTION AngryChest_CannotMoveSoEndTurn,100
+USAGE COMBAT
+ACTIONS
+	CharacterEndTurn()
+
+//------------------------
+EVENTS
+EVENT OnInit_SetUpAngryChest
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill("Projectile_EnemyGoldSpit")
+	SetPriority("Combat_AttackSetEnemy",0)
+	SetPriority("Combat_MoveToSetEnemy",0)
+
+EVENT OnTurn_RestorePriority
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("AngryChest_UseGoldProjectile",300)
+
+EVENT OnDie_CreateGoldWhereIStood
+VARS
+	ITEM:_SpawnedGold
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	IF "c1"
+		IsGreaterThen(%GoldAmount,0)
+	THEN
+		SpawnItem(%GoldItem,__Me,_SpawnedGold)								//specify that it's %GoldAmount gold that's created (gold remaining in the chest)
+		ItemSetAmount(_SpawnedGold,%GoldAmount)
+	ENDIF
+	
+EVENT OnCombatEnded_ResetFaction
+ON
+	OnCombatEnded()
+	OnDeactivate()
+ACTIONS
+	CharacterSetFaction(__Me,"Neutral")

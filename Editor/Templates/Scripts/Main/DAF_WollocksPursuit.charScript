@@ -1,0 +1,42 @@
+#INCLUDE DAF_WollockVillager
+
+INIT
+USING DAF_WollockVillager REACTION ReactOnPlayer2, 2100 
+USING DAF_WollockVillager REACTION ReactOnPlayer1, 2000 
+CHARACTER:__Me
+CHARACTER:%Friend = DAF_WollockPursuit_001_3b7004be-553d-4c81-ac8f-1adb65100ec3
+TRIGGER:%Point01 = DAF_Point_Pursuit_001_340a2cca-990a-46a3-9eeb-ed61b862fad2
+TRIGGER:%Point02 = DAF_Point_Pursuit_002_59640c4a-14ca-417b-9ed8-b36578ae0e62
+TRIGGER:%Point03 = DAF_Point_Pursuit_003_aa9e5765-6774-48cb-96fe-350a149d7f73
+EXTERN INT:%IsFollowing = 0
+
+BEHAVIOUR
+
+REACTION RunToPoint, 1100
+USAGE PEACE
+VARS
+	TRIGGER:_point
+	FIXEDSTRING:_text
+CHECK "c1"
+	IsEqual(%IsFollowing, 0)
+ACTIONS
+	GetRandom(_text, "GEN_Laugh_01", "GEN_Laugh_02")
+	DisplayText(__Me, _text, 5)
+	GetRandom(_point, %Point01, %Point02, %Point03)
+	CharacterMoveTo(_point, 1)
+INTERRUPT
+	Reset()
+
+	
+REACTION FollowFriend, 1100
+USAGE PEACE
+VARS
+	FIXEDSTRING:_text
+CHECK "c1"
+	IsEqual(%IsFollowing, 1)
+ACTIONS
+	GetRandom(_text, "DAF_WollocksPursuit_01", "DAF_WollocksPursuit_02", "DAF_WollocksPursuit_03")
+	DisplayText(__Me, _text, 5)
+	CharacterFollow(%Friend, 4)
+INTERRUPT
+	Reset()

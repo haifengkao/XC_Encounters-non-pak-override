@@ -1,0 +1,21 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+TRIGGER:%Point1 = CYS_PointVictoria1_a1ed1508-a803-44ff-b5b2-8ace70691fe6
+TRIGGER:%Point2 = CYS_PointVictoria2_85cc383a-3897-40d3-bab4-925f79a4cb47
+TRIGGER:%Point3 = CYS_PointVictoria3_caa4247d-ca0b-41f5-976b-f9382286ee72
+
+BEHAVIOUR
+
+REACTION State_OrganizingLibrary, 0
+USAGE PEACE
+VARS
+	TRIGGER:_Point
+ACTIONS
+	GetRandom(_Point,%Point1,%Point2,%Point3)
+	CharacterMoveTo(_Point)
+	CharacterLookFrom(_Point)
+	Sleep(5)
+	DialogStart("CYS_AD_OrcLibrarian",__Me)

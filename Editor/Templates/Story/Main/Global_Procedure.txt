@@ -1,0 +1,307 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_GlobalProgression(0.0);
+KBSECTION
+//REGION Startstone zapping
+IF
+CharacterItemHandleEvent(_Player,_ItemHandle,"GLO_StarStoneZap")
+THEN
+PROC_StarstoneZappingByItemHandle(_Player,_ItemHandle);
+
+PROC
+PROC_StarstoneZappingByCharacter( (CHARACTER)_PlayerZapped, (CHARACTER)_Zapper)
+AND
+CharacterGetUUID(_Zapper,_ZapID)
+AND
+StringConcatenate("GLO_StarStoneEffect",_ZapID,_EffectTimer)
+AND
+StringConcatenate("GLO_StarStoneOver",_ZapID,_OverTimer)
+THEN
+Proc_AddExplorationEvent("GLO_Starstone");
+DB_StarstoneEffect(_EffectTimer,0,_OverTimer,_PlayerZapped);
+CharacterPlayEffect(_Zapper,"FX_GP_StarStone_Up_A");
+TimerLaunch(_EffectTimer, 2500);
+
+PROC
+PROC_StarstoneZappingByItem( (CHARACTER)_PlayerZapped, (ITEM)_ItemZapper)
+AND
+ItemGetHandle(_ItemZapper, _ItemHandle)
+THEN
+PROC_StarstoneZappingByItemHandle(_PlayerZapped,_ItemHandle);
+
+PROC
+PROC_StarstoneZappingByItemHandle( (CHARACTER)_PlayerZapped, (INTEGER)_ItemZapper)
+AND
+IntegertoString(_ItemZapper,_ZapString)
+AND
+StringConcatenate("GLO_StarStoneEffect",_ZapString,_EffectTimer)
+AND
+StringConcatenate("GLO_CheckFirstStarStoneZap",_ZapString,_FirstTimer)
+AND
+StringConcatenate("GLO_StarStoneReplacement",_ZapString,_ReplaceTimer)
+AND
+StringConcatenate("GLO_StarStoneOver",_ZapString,_OverTimer)
+THEN
+Proc_AddExplorationEvent("GLO_Starstone");
+TimerLaunch(_EffectTimer, 2500);
+TimerLaunch(_FirstTimer,2100);
+TimerLaunch(_ReplaceTimer, 1000);
+DB_ZappingItems(_ItemZapper);
+DB_FirstStarStoneZap(_FirstTimer);
+DB_StarstoneReplace(_ReplaceTimer,_ItemZapper);
+DB_StarstoneEffect(_EffectTimer,_ItemZapper,_OverTimer,_PlayerZapped);
+
+IF
+TimerFinished(_FirstTimer)
+AND
+DB_FirstStarStoneZap(_FirstTimer)
+THEN
+NOT DB_FirstStarStoneZap(_FirstTimer);
+Proc_TeleportToHomesteadTheFirstTimePlayersAreZapped();
+
+IF
+TimerFinished(_ReplaceTimer)
+AND
+DB_StarstoneReplace(_ReplaceTimer,_ItemZapper)
+AND
+ItemHandleGetPosition(_ItemZapper,_X,_Y,_Z)
+AND
+CreateItemTemplateAtPosition("Quest_Stone_Star_Depleted_A_c6d8d1e7-ee24-4e3d-8cca-6996564b284b", _X, _Y, _Z, _ItemAfterZapping)
+THEN
+NOT DB_StarstoneReplace(_ReplaceTimer,_ItemZapper);
+ItemHandleSetOnStage(_ItemZapper, 0);
+ItemHandleSetEvent(_ItemAfterZapping, "GLO_hasJustZapped");
+Proc_RememberLastDepletedStarStone(_ItemAfterZapping);
+
+IF
+CharacterDisplayTextEnded(_Player, "GLO_CommentZapped_1_1")
+THEN
+DB_PlayerComments("GLO_CommentZapped","GLO_CommentZapped_1_1",1,1);
+
+IF
+CharacterDisplayTextEnded(_Player, "GLO_CommentZapped_2_2")
+THEN
+DB_PlayerComments("GLO_CommentZapped","GLO_CommentZapped_2_1",2,1);
+DB_PlayerComments("GLO_CommentZapped","GLO_CommentZapped_2_2",2,2);
+
+IF
+TimerFinished(_EffectTimer)
+AND
+DB_StarstoneEffect(_EffectTimer,_ItemZapper,_,_)
+AND
+_Player.DB_IsPlayer()
+THEN
+CharacterPlayEffect(_Player, "FX_GP_StarStone_Down_A");
+
+IF
+TimerFinished(_EffectTimer)
+AND
+DB_StarstoneEffect(_EffectTimer,_ItemZapper,_OverTimer,_)
+THEN
+Proc_HOM_UnlockMajorRoom();
+TimerLaunch(_OverTimer, 2000);
+
+IF
+TimerFinished(_OverTimer)
+AND
+DB_StarstoneEffect(_EffectTimer,_ItemZapper,_OverTimer,_)
+AND
+_Player.DB_IsPlayer()
+THEN
+CharacterResurrect(_Player);
+CharacterPlayEffect(_Player, "FX_GP_Regenerate");
+Proc_RemoveHarmfullStatuses(_Player);
+CharacterSetVarInteger(_Player,"GLO_HasRot", 0);
+CharacterSetHitpointsPercentage(_Player, 100);
+
+IF
+TimerFinished(_OverTimer)
+AND
+DB_StarstoneEffect(_EffectTimer,_ItemZapper,_OverTimer,_Player)
+THEN
+NOT DB_StarstoneEffect(_EffectTimer,_ItemZapper,_OverTimer,_Player);
+Launch_PlayerComment(_Player,"GLO_CommentZapped");
+PROC_AddCompletionStone();
+
+PROC
+PROC_AddCompletionStone()
+AND
+DB_GlobalProgression(_Num)
+AND
+_Num < 96.0
+AND
+RealSum(_Num, 8.0, _Sum)
+THEN
+NOT DB_GlobalProgression(_Num);
+DB_GlobalProgression(_Sum);
+NotifyGameProgress(_Sum);
+
+PROC
+Proc_RemoveHarmfullStatuses((CHARACTER)_Player)
+THEN
+CharacterRemoveStatus(_Player, "BURNING");
+CharacterRemoveStatus(_Player, "FROZEN");
+CharacterRemoveStatus(_Player, "POISONED");
+CharacterRemoveStatus(_Player, "STUNNED");
+CharacterRemoveStatus(_Player, "WET");
+CharacterRemoveStatus(_Player, "MUTED");
+CharacterRemoveStatus(_Player, "CHARMED");
+CharacterRemoveStatus(_Player, "FEAR");
+CharacterRemoveStatus(_Player, "BLACKROCKED");
+CharacterRemoveStatus(_Player, "CRIPPLED");
+CharacterRemoveStatus(_Player, "CURSED");
+CharacterRemoveStatus(_Player, "WEAK");
+CharacterRemoveStatus(_Player, "SLOWED");
+CharacterRemoveStatus(_Player, "DISEASED");
+CharacterRemoveStatus(_Player, "DRUNK");
+CharacterRemoveStatus(_Player, "CHILLED");
+CharacterRemoveStatus(_Player, "WARM");
+CharacterRemoveStatus(_Player, "BLEEDING");
+CharacterRemoveStatus(_Player, "BLIND");
+CharacterRemoveStatus(_Player, "SMELLY");
+CharacterRemoveStatus(_Player, "CLEAN");
+CharacterRemoveStatus(_Player, "INFECTIOUS_DISEASED");
+CharacterRemoveStatus(_Player, "PETRIFIED");
+
+PROC
+ProcUseBloodStone((CHARACTER)_Player,(CHARACTER)_Target,(INTEGER)_Handle)
+AND
+DB_DefinedCompanions(_Player)
+THEN
+ItemHandleDrop(_Handle);
+Proc_LaunchBloodStoneEffect(_Target,_Handle);
+
+PROC
+ProcUseBloodStone((CHARACTER)_Player,(CHARACTER)_Target,(INTEGER)_Handle)
+AND
+NOT DB_DefinedCompanions(_Player)
+THEN
+ProcShowBloodStonePlayerMessage(_Player);
+ItemHandleDrop(_Handle);
+ItemHandleSetCanInteract(_Handle,0);
+CharacterFreeze(_Player);
+DB_StarStonePlayer(_Player,_Target,_Handle);
+CharTimer(_Player,"BloodStoneZap",2000);
+
+
+PROC
+ProcUseBloodStone((CHARACTER)_Player,(CHARACTER)_Target)
+AND
+DB_DefinedCompanions(_Player)
+AND
+GetItemhandleForItemTemplateInInventory(_Player, "Quest_Stone_Blood_B_b3f5e7ac-2bf5-4d89-9163-8e52f9a10ac5", _Handle)
+THEN
+ItemHandleDrop(_Handle);
+Proc_LaunchBloodStoneEffect(_Target,_Handle);
+
+PROC
+ProcShowBloodStonePlayerMessage((CHARACTER)_Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+CharacterDisplayText(_Player,"GLO_PlayerUsedBloodStone");
+
+PROC
+ProcUseBloodStone((CHARACTER)_Player,(CHARACTER)_Target)
+AND
+NOT DB_DefinedCompanions(_Player)
+AND
+GetItemhandleForItemTemplateInInventory(_Player, "Quest_Stone_Blood_B_b3f5e7ac-2bf5-4d89-9163-8e52f9a10ac5", _Handle)
+THEN
+ProcShowBloodStonePlayerMessage(_Player);
+ItemHandleDrop(_Handle);
+ItemHandleSetCanInteract(_Handle,0);
+CharacterFreeze(_Player);
+DB_StarStonePlayer(_Player,_Target,_Handle);
+CharTimer(_Player,"BloodStoneZap",2000);
+
+IF
+CharTimerFinished(_Player, "BloodStoneZap")
+AND
+DB_StarStonePlayer(_Player,_Target,_Handle)
+THEN
+CharacterUnfreeze(_Player);
+NOT DB_StarStonePlayer(_Player,_Target,_Handle);
+Proc_LaunchBloodStoneEffect(_Target,_Handle);
+
+IF
+CharacterUsedItemTemplate(_Player,"Quest_Stone_Blood_B_b3f5e7ac-2bf5-4d89-9163-8e52f9a10ac5",_ItemHandle)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_DefinedCompanions(_Player)
+AND
+ItemHandleIsInCharacterInventory(_ItemHandle, _Player, 1)
+THEN
+ProcUseBloodStone(_Player, _Player,_ItemHandle);
+
+IF
+CharacterUsedItemTemplate(_Companion,"Quest_Stone_Blood_B_b3f5e7ac-2bf5-4d89-9163-8e52f9a10ac5",_ItemHandle)
+AND
+DB_DefinedCompanions(_Companion)
+AND
+ItemHandleIsInCharacterInventory(_ItemHandle, _Companion, 1)
+THEN
+ProcUseBloodStone(_Companion, _Companion,_ItemHandle);
+
+IF
+CharacterUsedItemTemplate(_Companion,"Quest_Stone_Blood_B_b3f5e7ac-2bf5-4d89-9163-8e52f9a10ac5",_ItemHandle)
+AND
+DB_DefinedCompanions(_Companion)
+AND
+ItemHandleIsInCharacterInventory(_ItemHandle, _Companion, 0)
+THEN
+Proc_LaunchBloodStoneEffect(_Companion, _ItemHandle);
+
+PROC
+Proc_LaunchBloodStoneEffect((CHARACTER)_PlayerZapped, (INTEGER)_ItemZapper)
+AND
+IntegertoString(_ItemZapper,_ZapString)
+AND
+StringConcatenate("GLO_BloodStoneEffect",_ZapString,_EffectTimer)
+AND
+StringConcatenate("GLO_BloodStoneReplacement",_ZapString,_ReplaceTimer)
+AND
+StringConcatenate("GLO_BloodStoneOver",_ZapString,_OverTimer)
+THEN
+ItemHandleSetEvent(_ItemZapper, "PlayEffect");
+TimerLaunch(_EffectTimer, 2500);
+TimerLaunch(_ReplaceTimer, 1000);
+DB_BloodStoneEffectTimer(_EffectTimer,_PlayerZapped,_ItemZapper,_OverTimer);
+DB_BloodStoneReplaceTimer(_ReplaceTimer,_ItemZapper);
+
+IF
+TimerFinished(_Timer)
+AND
+DB_BloodStoneReplaceTimer(_Timer,_ItemZapper)
+AND
+ItemHandleGetPosition(_ItemZapper,_X,_Y,_Z)
+AND
+CreateItemTemplateAtPosition("Quest_Stone_Star_A_a83f4680-aaa6-4d05-bd7b-3f96b4413c56", _X, _Y, _Z, _ItemAfterZapping)
+THEN
+ItemHandleSetOnStage(_ItemZapper, 0);
+NOT DB_BloodStoneReplaceTimer(_Timer,_ItemZapper);
+
+IF
+TimerFinished(_EffectTimer)
+AND
+DB_BloodStoneEffectTimer(_EffectTimer,_Player,_ItemZapper,_OverTimer)
+THEN
+CharacterPlayEffect(_Player, "FX_GP_StarStone_Down_A");
+TimerLaunch(_OverTimer, 2000);
+
+IF
+TimerFinished(_OverTimer)
+AND
+DB_BloodStoneEffectTimer(_EffectTimer,_Player,_ItemZapper,_OverTimer)
+THEN
+CharacterPlayEffect(_Player, "FX_GP_Regenerate");
+Proc_RemoveHarmfullStatuses(_Player);
+CharacterSetVarInteger(_Player,"GLO_HasRot", 0);
+CharacterSetHitpointsPercentage(_Player, 100);
+NOT DB_BloodStoneEffectTimer(_EffectTimer,_Player,_ItemZapper,_OverTimer);
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION

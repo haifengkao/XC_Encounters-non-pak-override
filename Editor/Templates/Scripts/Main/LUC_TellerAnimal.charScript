@@ -1,0 +1,22 @@
+INIT
+	CHARACTER:__Me
+	
+BEHAVIOUR
+	
+REACTION BeAmazed, 1100
+	USAGE PEACE
+	VARS
+		FIXEDSTRING:_Line
+		CHARACTER:_Char
+		FLOAT:_Wait
+	ACTIONS
+		CharacterLookAt(CHARACTER:LUC_FortuneTellerHusband_23865917-d270-4c05-9196-a592ecebcc1f)
+		GetRandomBetween(_Wait, 30, 360)
+		Sleep(_Wait)
+		IF "c1&c2"
+			CharacterGet(_Char, __Me, 10, Random, Armor)
+			CharacterHasTalent(_Char, AnimalEmpathy)
+		THEN
+			GetRandom(_Line, "LUC_TellerAnimal1", "LUC_TellerAnimal2","LUC_TellerAnimal3","LUC_TellerAnimal4","LUC_TellerAnimal5","LUC_TellerAnimal6","LUC_TellerAnimal7")
+			DisplayText(__Me, _Line)
+		ENDIF

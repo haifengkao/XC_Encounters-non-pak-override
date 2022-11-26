@@ -1,0 +1,18 @@
+INIT
+
+	CHARACTER:__Me
+	
+BEHAVIOUR
+
+REACTION KnockedOut, 1100
+	USAGE PEACE
+	ACTIONS
+		CharacterPlayAnimation("knockdown_loop",0,1)
+		
+EVENTS
+
+EVENT Free
+	ON
+		OnCharacterEvent(__Me, "EvelynGangDead")
+	ACTIONS
+		SetPriority("KnockedOut", 0)

@@ -1,0 +1,56 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_SilverglenGuardsIntro(TRIGGER_LUC_Silverglen_Intro1,CHARACTER_LUC_ImmaculateGateGuard7);
+DB_SilverglenGuardsIntro(TRIGGER_LUC_Silverglen_Intro2,CHARACTER_LUC_ImmaculateGateGuard1);
+DB_SilverglenGuardsIntro(TRIGGER_LUC_Silverglen_Intro3,CHARACTER_LUC_ImmaculateGateGuard2);
+DB_SilverglenGuardsIntro(TRIGGER_LUC_Silverglen_Intro4,CHARACTER_LUC_ImmaculateGateGuard3);
+DB_SilverglenGuardsIntro(TRIGGER_LUC_Silverglen_Intro4,CHARACTER_LUC_ImmaculateGateGuard4);
+DB_SilverglenGuardsIntro(TRIGGER_LUC_Silverglen_Intro5,CHARACTER_LUC_ImmaculateGateGuard5);
+DB_SilverglenGuardsIntro(TRIGGER_LUC_Silverglen_Intro5,CHARACTER_LUC_ImmaculateGateGuard6);
+
+DB_PlayerComments("LUC_SilverglenGuardsComment","LUC_SilverglenGuardsComment_1_1",1,1);
+DB_PlayerComments("LUC_SilverglenGuardsComment","LUC_SilverglenGuardsComment_2_1",2,1);
+DB_PlayerComments("LUC_SilverglenGuardsComment","LUC_SilverglenGuardsComment_2_2",2,2);
+
+SneakTriggerSpotter(TRIGGER_LUC_Silverglen_Intro2, CHARACTER_LUC_ImmaculateGateGuard1);
+SneakTriggerSpotter(TRIGGER_LUC_Silverglen_Intro1, CHARACTER_LUC_ImmaculateGateGuard7);
+SneakTriggerSpotter(TRIGGER_LUC_Silverglen_Intro5, CHARACTER_LUC_ImmaculateGateGuard5);
+SneakTriggerSpotter(TRIGGER_LUC_Silverglen_Intro5, CHARACTER_LUC_ImmaculateGateGuard6);
+SneakTriggerSpotter(TRIGGER_LUC_Silverglen_Intro4, CHARACTER_LUC_ImmaculateGateGuard3);
+SneakTriggerSpotter(TRIGGER_LUC_Silverglen_Intro4, CHARACTER_LUC_ImmaculateGateGuard4);
+SneakTriggerSpotter(TRIGGER_LUC_Silverglen_Intro3, CHARACTER_LUC_ImmaculateGateGuard2);
+KBSECTION
+PROC
+ProcCharInTriggerSpottedByChar((CHARACTER)_Player,(TRIGGER)_Trigger,(CHARACTER)_Guard)
+AND
+NOT DB_DefinedCompanion(_Player)
+AND
+DB_SilverglenGuardsIntro(_Trigger,_Guard)
+THEN
+ProcRemoveAllSilverGlenGuardTriggers();
+ProcDoTwoSpeakerDialog("LUC_Guards_Intro",_Guard,_Player);
+
+IF
+DialogEnded("LUC_Guards_Intro",_ID)
+AND
+DB_DialogPlayers(_ID,_Player,1)
+THEN
+CharTimer(_Player,"LUC_SilverglenGuardsComment",3000);
+
+IF
+CharTimerFinished(_Player,"LUC_SilverglenGuardsComment")
+THEN
+Launch_PlayerComment(_Player,"LUC_SilverglenGuardsComment");
+
+PROC
+ProcRemoveAllSilverGlenGuardTriggers()
+AND
+DB_SilverglenGuardsIntro(_Trigger,_Guard)
+THEN
+NOT DB_SilverglenGuardsIntro(_Trigger,_Guard);
+ProcTriggerUnregisterForPlayers(_Trigger);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

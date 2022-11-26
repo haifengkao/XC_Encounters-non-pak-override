@@ -1,0 +1,202 @@
+INIT	CHARACTER:__Me
+	CHARACTERTEMPLATE:%DemonFormRT="Demons_Chaos_Anguish_48d4b775-1d64-4290-82cb-72ea672bc236"	TRIGGER:%Point1="DAF_AnguishDemon_Desk_a086d382-bbfb-4066-831c-19b3b97fccdf"	TRIGGER:%Point2="DAF_AnguishDemon_Cyclops_939fff68-6e84-4256-af70-b5f2861f1ec5"	TRIGGER:%Point3="DAF_AnguishDemon_Prison_8d1d3c8f-356e-4022-a4a4-ba65037403ad"
+	CHARACTER:%AnguishSlave01="DAF_AnguishDemon_Slave_01_1e95eea4-b563-4d03-a37d-02cc8fea5b76"
+	CHARACTER:%AnguishSlave02="DAF_AnguishDemon_Slave_02_c81aa888-c8d4-469c-a63b-3704be6f6a5e"
+	CHARACTER:%AnguishSlave03="DAF_AnguishDemon_Slave_03_bfd79d47-a672-45b0-8273-e6884909fb1e"
+	CHARACTER:%AnguishSlave04="DAF_AnguishDemon_Slave_04_60c8de69-26ca-4052-88d2-87df0cb2f016"
+	CHARACTER:%CyclopsWizard="DAF_AnguishDemon_Cyclops_Mage_221a5806-35ce-4da1-a641-e649f7a68702"
+	CHARACTER:%CyclopsMage="DAF_AnguishDemon_Cyclops_Warrior_900ba6a0-93e0-4350-957d-18ddf6b37796"
+	CHARACTER:%CyclopsFemale="DAF_AnguishDemon_Cyclops_FemaleCaster_dd3cb1a2-ac68-4e21-bb83-ebd40bf6bce4"
+	CHARACTER:%CyclopsFighter="DAF_AnguishDemon_Cyclops_Fighter_955fe985-b9c9-4810-9a0b-326b9f538c40"
+	INT:%Active=0
+	INT:%CyclopsSummonCounter=0
+	INT:%AnguishSlavesCharge=4
+	INT:%LoopFXHandle
+	EXTERN INT:%IAmASlave=1
+	EXTERN INT:%Healing_Current= 0 
+	EXTERN INT:%Healing_Desired=2
+	EXTERN INT:%HealingPriority=1000
+
+//------------------------------
+BEHAVIOURREACTION Main,500USAGE PEACECHECK "c1"	IsEqual(%Active,1)ACTIONS	CharacterMoveTo(%Point1,0,1,0,0.0)	CharacterLookFrom(%Point1,1)	CharacterPlayAnimation("Fidget_Forward_02")	Sleep(5)	CharacterMoveTo(%Point2,0,1,0,0.0)	CharacterLookFrom(%Point2,1)	CharacterPlayAnimation("Fidget_Low_01")	CharacterPlayAnimation("Throw_Away_01")	Sleep(2)	CharacterMoveTo(%Point3,0,1,0,0.0)	CharacterLookFrom(%Point3,1)	CharacterPlayAnimation("Intimidate_02")	Sleep(2)
+INTERRUPT
+	Reset()
+	
+REACTION AnguishDemon_SummonsHisFriends,0
+USAGE COMBAT
+CHECK "c1"
+	IsEqual(%IAmASlave,0)
+ACTIONS
+	IF "c1"
+		IsEqual(%CyclopsSummonCounter,2)
+	THEN	
+		CharacterPlayEffect(__Me,"FX_Skills_WitchCraft_Blind_Prepare_A")
+		DisplayText(__Me,"CMB_DAF_AnguishDemon_SummonsFriend",3)
+		CharacterPlayAnimation("cast_shout_cast")	
+		CharacterEvent(__Me,"DAF_AnguishDemon_CyclopsAppears_Female_Event")	
+		CombatLogText(__Me,"CMB_DAF_AnguishDemon_SummonCyclopsFemale",1,1)	
+		SetPriority("AnguishDemon_SummonsHisFriends",0)
+	ELIF "c1"
+		IsEqual(%CyclopsSummonCounter,4)
+	THEN
+		CharacterPlayEffect(__Me,"FX_Skills_WitchCraft_Blind_Prepare_A")
+		DisplayText(__Me,"CMB_DAF_AnguishDemon_SummonsFriend",3)
+		CharacterPlayAnimation("cast_shout_cast")
+		CharacterEvent(__Me,"DAF_AnguishDemon_CyclopsAppears_Fighter_Event")		
+		CombatLogText(__Me,"CMB_DAF_AnguishDemon_SummonCyclopsFighter",1,1)		
+		SetPriority("AnguishDemon_SummonsHisFriends",0)		
+	ELIF "c1"
+		IsEqual(%CyclopsSummonCounter,6)
+	THEN		
+		CharacterPlayEffect(__Me,"FX_Skills_WitchCraft_Blind_Prepare_A")
+		DisplayText(__Me,"CMB_DAF_AnguishDemon_SummonsFriend",3)
+		CharacterPlayAnimation("cast_shout_cast")
+		CharacterEvent(__Me,"DAF_AnguishDemon_CyclopsAppears_Wizard_Event")
+		CombatLogText(__Me,"CMB_DAF_AnguishDemon_SummonCyclopsWizard",1,1)		
+		SetPriority("AnguishDemon_SummonsHisFriends",0)	
+	ENDIF
+		
+REACTION AnguishDemon_GetsHealed,0
+USAGE COMBAT
+CHECK "c1&!c2"
+	IsEqual(%IAmASlave,0)
+	CharacterHasStatus(__Me,DYING)
+ACTIONS
+	IF "c1"
+		IsEqual(%AnguishSlavesCharge,4)
+	THEN
+		CharacterEvent(__Me,"DAF_AnguishDemon_SlaveHealFX_Event")
+		Sleep(1.5)
+		CharacterHeal(__Me,1.0)
+		DisplayText(__Me,"CMB_DAF_AnguishDemon_GetsHealed_01",3)		
+		CharacterPlayAnimation("cast_shout_cast")
+	ELIF "c1"
+		IsEqual(%AnguishSlavesCharge,3)
+	THEN
+		CharacterEvent(__Me,"DAF_AnguishDemon_SlaveHealFX_Event")
+		Sleep(1.5)		
+		CharacterHeal(__Me,0.75)
+		DisplayText(__Me,"CMB_DAF_AnguishDemon_GetsHealed_02",3)
+		CharacterPlayAnimation("cast_shout_cast")
+	ELIF "c1"
+		IsEqual(%AnguishSlavesCharge,2)
+	THEN
+		CharacterEvent(__Me,"DAF_AnguishDemon_SlaveHealFX_Event")
+		Sleep(1.5)		
+		CharacterHeal(__Me,0.5)
+		DisplayText(__Me,"CMB_DAF_AnguishDemon_GetsHealed_03",3)			
+		CharacterPlayAnimation("cast_shout_cast")			
+	ELIF "c1"
+		IsEqual(%AnguishSlavesCharge,1)
+	THEN
+		CharacterEvent(__Me,"DAF_AnguishDemon_SlaveHealFX_Event")
+		Sleep(1.5)
+		CharacterHeal(__Me,0.25)
+		DisplayText(__Me,"CMB_DAF_AnguishDemon_GetsHealed_04",3)			
+		CharacterPlayAnimation("cast_shout_cast")
+	ELIF "c1"
+		IsEqual(%AnguishSlavesCharge,0)
+	THEN
+		SetPriority("AnguishDemon_GetsHealed",0)
+	ENDIF
+	StopLoopEffect(%LoopFXHandle)
+	SetPriority("AnguishDemon_GetsHealed",0)
+INTERRUPT
+	Reset()
+	
+REACTION AnguishDemon_Slave_EndTurn,1000
+USAGE COMBAT
+CHECK "c1"
+	IsEqual(%IAmASlave,1)
+ACTIONS
+	CharacterEndTurn()	
+INTERRUPT
+	Reset()
+	
+REACTION AnguishDemon_Slave_Cower,1500
+USAGE WAITING
+CHECK "c1"
+	IsEqual(%IAmASlave,1)
+ACTIONS
+	CharacterPlayAnimation("cower",0)INTERRUPT
+	Reset()
+	
+REACTION AnguishDemon_Prisoners,100000
+USAGE COMBAT
+CHECK "c1&c2"
+	CharacterIsInTrigger(__Me, DAF_BalberithPrison_27bc28de-f709-49e6-a7e4-22db4447d635)
+	ItemIsLocked(DAF_ForestSpirit_Prisondoor_f8ad2809-3855-4fe8-bbb1-15f7d4717174)
+ACTIONS
+	CharacterAttack(ITEM:DAF_ForestSpirit_Prisondoor_f8ad2809-3855-4fe8-bbb1-15f7d4717174, 1)
+	SetPriority("InsidePrison", 0)
+
+//------------------------------
+EVENTS
+EVENT OnInit_Slave_ApplyFear
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		IsEqual(%IAmASlave,1)
+	THEN
+		PlayEffectAt(__Me,"FX_GP_TeleportSmoke_A")
+		CharacterApplyStatus(__Me,"FEAR",-1,1)	
+	ENDIF
+	
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	Add(%CyclopsSummonCounter,1)
+	IF "c1|c2|c3"
+		IsEqual(%CyclopsSummonCounter,2)
+		IsEqual(%CyclopsSummonCounter,4)
+		IsEqual(%CyclopsSummonCounter,6)
+	THEN
+		SetPriority("AnguishDemon_SummonsHisFriends",1200)		
+	ENDIF
+	IF "c1"
+		IsLessThen(%Healing_Current,%Healing_Desired)
+	THEN		
+		Add(%Healing_Current,1)
+	ELSE
+		SetPriority("AnguishDemon_GetsHealed",%HealingPriority)
+	ENDIF
+	
+EVENT OnCharacterEvent_PlayFXForWhenDemonHeals
+ON
+	OnCharacterEvent(_,"DAF_AnguishDemon_SlaveHealFX_Event")
+ACTIONS
+	IF "c1&!c2"
+		IsEqual(%IAmASlave,1)
+		CharacterHasStatus(__Me,DYING)
+	THEN
+		CharacterPlayEffect(__Me,"FX_Skills_Water_Regenerate_Cast_A")
+	ENDIF
+	
+EVENT OnDie_Slave_DemonDrinksPotion	
+VARS
+	CHARACTER:_Char
+ON
+	OnDie(_Char,_,_,_)	
+ACTIONS
+	IF "(c1|c2|c3|c4)&c5&!c6"
+		IsEqual(_Char,%AnguishSlave01)
+		IsEqual(_Char,%AnguishSlave02)
+		IsEqual(_Char,%AnguishSlave03)
+		IsEqual(_Char,%AnguishSlave04)
+		IsEqual(%IAmASlave,0)
+		CharacterIsDead(__Me)
+	THEN
+		DisplayText(__Me,"CMB_DAF_AnguishDemon_SlaveHasDied",3)
+		Subtract(%AnguishSlavesCharge,1)	
+		CharacterPlayEffect(__Me,"FX_Creatures_Darkminions_Death_A_Purple")
+		CharacterConsume(__Me,"DAF_AnguishDemon_DebuffPotion")
+	ENDIF		
+	
+EVENT OnCombatEnded_StopLoopFX
+ON
+	OnCombatEnded()
+	OnDeactivate()
+ACTIONS
+	StopLoopEffect(%LoopFXHandle)

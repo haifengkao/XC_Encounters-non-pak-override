@@ -1,0 +1,387 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%Ghost01
+	CHARACTER:%Ghost02
+	CHARACTER:%Ghost03
+	CHARACTER:%Ghost04
+	CHARACTER:%Ghost05
+	CHARACTER:%Follower01="LUC_MaradinosFollower_01_ea787328-cda6-4069-ad4b-e72740472018" 				//Melee
+	CHARACTER:%Follower02="LUC_MaradinosFollower_02_fdf5d758-89c5-4fd4-9504-9977a7b58f4f" 				//Mage 01
+	CHARACTER:%Follower03="LUC_MaradinosFollower_03_27175430-890b-4380-9a58-fbb7114286a2" 				//Hybrid
+	CHARACTER:%Follower04="LUC_MaradinosFollower_04_20c3488b-e8b3-4bbe-ac6a-14dfc04def6f" 				//Mage 02
+	CHARACTER:%Follower05="LUC_MaradinosFollower_05_e13c070b-f37c-4b0f-936a-004ad6960523" 				//Ranger
+	CHARACTERTEMPLATE:%Ghost_Melee_RT="LUC_Maradino_Melee_a398427d-a0a5-4db4-b79d-1f9eefcda03e"
+	CHARACTERTEMPLATE:%Ghost_Mage_RT="LUC_Maradino_Mage_A_28e8c3b0-7e6f-4b63-b51f-f00358b5e358"
+	CHARACTERTEMPLATE:%Ghost_Hybrid_RT="LUC_Maradino_Hybrid_33e91003-48c9-46b1-b3bc-bd1ba2454719"
+	CHARACTERTEMPLATE:%Ghost_MageB_RT="LUC_Maradino_Mage_B_28981e78-7f4b-4f8b-bfa6-02356906e756"
+	CHARACTERTEMPLATE:%Ghost_Archer_RT="LUC_Maradino_Ranger_5512a4be-3d4b-4ca2-93d2-0bb52a71705e"
+	ITEM:%studyGate="1m_Cellar_A_DoorMetalGrate_3_A_Item_000_58effd1f-3e8f-460e-b818-0386304ba2e9"
+	INT:%FXHandle_01=0
+	INT:%FXHandle_02=0
+	INT:%FXHandle_03=0
+	INT:%FXHandle_04=0
+	INT:%FXHandle_05=0
+	INT:%Bool_FXRestore_01=0
+	INT:%Bool_FXRestore_02=0
+	INT:%Bool_FXRestore_03=0
+	INT:%Bool_FXRestore_04=0
+	INT:%Bool_FXRestore_05=0
+	
+	//first Maradino resurrects his friends as usual: this increases a variable to 5
+	//once this var = 5 Maradino checks, every turn, to see if all ghosts are here
+	//if not, he creates a new instance of the missing one (by reusing the same reaction)
+
+//------------------------
+BEHAVIOUR
+REACTION Maradino_SayCoolText, 1500
+USAGE COMBAT
+CHECK "!(c1|c2|c3|c4|c5|c6)"
+	CharacterHasStatus(__Me,"CHARMED")
+	CharacterHasStatus(__Me,"FEAR")
+	CharacterHasStatus(__Me,"FROZEN")
+	CharacterHasStatus(__Me,"STUNNED")
+	CharacterHasStatus(__Me,"PETRIFIED")
+	CharacterHasStatus(__Me,"KNOCKED_DOWN")
+ACTIONS
+	DisplayText(__Me,"LUC_MaradinoBoss_10",4.0)
+	Sleep(4)
+	SetPriority("Maradino_SayCoolText",0)
+
+REACTION Maradino_Revive_Follower01, 1000
+USAGE COMBAT
+VARS
+	FLOAT:_MyAP
+CHECK "c1&c2&!c3&!(c4|c5|c6|c7|c8|c9)"
+	CharacterIsDead(%Follower01)
+	CharacterGetStat(_MyAP,__Me,ActionPoints)
+	IsLessThen(_MyAP,7)
+	CharacterHasStatus(__Me,"MUTED")
+	CharacterHasStatus(__Me,"FEAR")
+	CharacterHasStatus(__Me,"CHARMED")
+	CharacterHasStatus(__Me,"FROZEN")
+	CharacterHasStatus(__Me,"PETRIFIED")
+	CharacterHasStatus(__Me,"KNOCKED_DOWN")
+ACTIONS
+	CharacterLookAt(%Follower01)
+	DisplayText(__Me,"LUC_Maradino_SummonsHelp01",3)
+	CharacterPlayEffect(__Me,"FX_Skills_Ranger_Resurrect_Cast_A")	
+	Set(%Bool_FXRestore_01,1)
+	CharacterPlayLoopEffect(%FXHandle_01,%Follower01,"FX_GP_LightPillarBlue_A")
+	CharacterPlayAnimation("cast_shout_cast",1,1)
+	SpawnCharacter(_,%Ghost_Melee_RT,%Follower01,1)
+	CharacterUseActionPoints(__Me,7)
+	Sleep(2)
+	StopLoopEffect(%FXHandle_01)	
+	Set(%Bool_FXRestore_01,0)
+	SetPriority("Maradino_Revive_Follower01",0)
+	
+REACTION Maradino_Revive_Follower02, 1000
+USAGE COMBAT
+VARS
+	FLOAT:_MyAP
+CHECK "c1&c2&!c3&!(c4|c5|c6|c7|c8|c9)"
+	CharacterIsDead(%Follower02)
+	CharacterGetStat(_MyAP,__Me,ActionPoints)
+	IsLessThen(_MyAP,7)
+	CharacterHasStatus(__Me,"MUTED")
+	CharacterHasStatus(__Me,"FEAR")
+	CharacterHasStatus(__Me,"CHARMED")
+	CharacterHasStatus(__Me,"FROZEN")
+	CharacterHasStatus(__Me,"PETRIFIED")
+	CharacterHasStatus(__Me,"KNOCKED_DOWN")
+ACTIONS
+	CharacterLookAt(%Follower02)
+	DisplayText(__Me,"LUC_Maradino_SummonsHelp02",3)
+	CharacterPlayEffect(__Me,"FX_Skills_Ranger_Resurrect_Cast_A")
+	Set(%Bool_FXRestore_02,1)
+	CharacterPlayLoopEffect(%FXHandle_02,%Follower02,"FX_GP_LightPillarBlue_A")	
+	CharacterPlayAnimation("cast_shout_cast",1,1)
+	SpawnCharacter(_,%Ghost_Mage_RT,%Follower02,1)
+	CharacterUseActionPoints(__Me,7)
+	Sleep(2)
+	StopLoopEffect(%FXHandle_02)
+	Set(%Bool_FXRestore_02,0)	
+	SetPriority("Maradino_Revive_Follower02",0)
+
+REACTION Maradino_Revive_Follower03, 1000
+USAGE COMBAT
+VARS
+	FLOAT:_MyAP
+CHECK "c1&c2&!c3&!(c4|c5|c6|c7|c8|c9)"
+	CharacterIsDead(%Follower03)
+	CharacterGetStat(_MyAP,__Me,ActionPoints)
+	IsLessThen(_MyAP,7)
+	CharacterHasStatus(__Me,"MUTED")
+	CharacterHasStatus(__Me,"FEAR")
+	CharacterHasStatus(__Me,"CHARMED")
+	CharacterHasStatus(__Me,"FROZEN")
+	CharacterHasStatus(__Me,"PETRIFIED")
+	CharacterHasStatus(__Me,"KNOCKED_DOWN")
+ACTIONS
+	CharacterLookAt(%Follower03)
+	DisplayText(__Me,"LUC_Maradino_SummonsHelp03",3)
+	CharacterPlayEffect(__Me,"FX_Skills_Ranger_Resurrect_Cast_A")
+	Set(%Bool_FXRestore_03,1)
+	CharacterPlayLoopEffect(%FXHandle_03,%Follower03,"FX_GP_LightPillarBlue_A")
+	CharacterPlayAnimation("cast_shout_cast",1,1)
+	SpawnCharacter(_,%Ghost_Hybrid_RT,%Follower03,1)
+	CharacterUseActionPoints(__Me,7)
+	Sleep(2)
+	StopLoopEffect(%FXHandle_03)	
+	Set(%Bool_FXRestore_03,0)		
+	SetPriority("Maradino_Revive_Follower03",0)
+
+REACTION Maradino_Revive_Follower04, 1000
+USAGE COMBAT
+VARS
+	FLOAT:_MyAP
+CHECK "c1&c2&!c3&!(c4|c5|c6|c7|c8|c9)"
+	CharacterIsDead(%Follower04)
+	CharacterGetStat(_MyAP,__Me,ActionPoints)
+	IsLessThen(_MyAP,7)
+	CharacterHasStatus(__Me,"MUTED")
+	CharacterHasStatus(__Me,"FEAR")
+	CharacterHasStatus(__Me,"CHARMED")
+	CharacterHasStatus(__Me,"FROZEN")
+	CharacterHasStatus(__Me,"PETRIFIED")
+	CharacterHasStatus(__Me,"KNOCKED_DOWN")
+ACTIONS
+	CharacterLookAt(%Follower04)
+	DisplayText(__Me,"LUC_Maradino_SummonsHelp04",3)
+	CharacterPlayEffect(__Me,"FX_Skills_Ranger_Resurrect_Cast_A")
+	Set(%Bool_FXRestore_04,1)
+	CharacterPlayLoopEffect(%FXHandle_04,%Follower04,"FX_GP_LightPillarBlue_A")
+	CharacterPlayAnimation("cast_shout_cast",1,1)
+	SpawnCharacter(_,%Ghost_MageB_RT,%Follower04,1)
+	CharacterUseActionPoints(__Me,7)
+	Sleep(2)
+	StopLoopEffect(%FXHandle_04)	
+	Set(%Bool_FXRestore_04,0)	
+	SetPriority("Maradino_Revive_Follower04",0)
+
+REACTION Maradino_Revive_Follower05, 1000
+USAGE COMBAT
+VARS
+	FLOAT:_MyAP
+CHECK "c1&c2&!c3&!(c4|c5|c6|c7|c8|c9)"
+	CharacterIsDead(%Follower05)
+	CharacterGetStat(_MyAP,__Me,ActionPoints)
+	IsLessThen(_MyAP,7)
+	CharacterHasStatus(__Me,"MUTED")
+	CharacterHasStatus(__Me,"FEAR")
+	CharacterHasStatus(__Me,"CHARMED")
+	CharacterHasStatus(__Me,"FROZEN")
+	CharacterHasStatus(__Me,"PETRIFIED")
+	CharacterHasStatus(__Me,"KNOCKED_DOWN")
+ACTIONS
+	CharacterLookAt(%Follower01)
+	DisplayText(__Me,"LUC_Maradino_SummonsHelp05",3)
+	CharacterPlayEffect(__Me,"FX_Skills_Ranger_Resurrect_Cast_A")
+	Set(%Bool_FXRestore_05,1)
+	CharacterPlayLoopEffect(%FXHandle_05,%Follower05,"FX_GP_LightPillarBlue_A")
+	CharacterPlayAnimation("cast_shout_cast",1,1)
+	SpawnCharacter(_,%Ghost_Archer_RT,%Follower05,1)
+	CharacterUseActionPoints(__Me,7)
+	Sleep(2)
+	StopLoopEffect(%FXHandle_05)	
+	Set(%Bool_FXRestore_05,0)	
+	SetPriority("Maradino_Revive_Follower05",0)	
+
+REACTION Maradino_Waiting_Showoff, 10
+USAGE WAITING
+VARS 
+	FIXEDSTRING:_Animation
+	FLOAT:_SleepTime
+ACTIONS
+	GetWeightedRandom(_Animation,"still",INT:30,"Flex_01",INT:20,"Laugh_01",INT:5)
+	CharacterPlayAnimation(_Animation)
+	GetRandomBetween(_SleepTime,2,8)
+	Sleep(_SleepTime)
+	
+REACTION Maradino_StaffOfMagus, 200
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+	FIXEDSTRING:_MaradinoText
+CHECK "c1&c2"
+	CharacterGet(_Enemy,__Me,null,Lowest,Distance,Enemy)
+	CharacterCanCast(__Me,"Projectile_EnemyStaffOfMagusAir")
+ACTIONS 
+	GetWeightedRandom(_MaradinoText,"LUC_MaradinoBoss_13",INT:1,"LUC_MaradinoBoss_14",INT:1,"LUC_MaradinoBoss_15",INT:1,"LUC_MaradinoBoss_16",INT:1,"LUC_MaradinoBoss_17",INT:1,"LUC_MaradinoBoss_18",INT:1,"LUC_MaradinoBoss_19",INT:1,"",INT:3)
+	DisplayText(__Me,_MaradinoText,3)
+	CharacterUseSkill(Projectile_EnemyStaffOfMagusAir,_Enemy)
+
+//------------------------
+EVENTS
+EVENT OnInit_GiveSpells_FXRestore
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill("Projectile_EnemyStaffOfMagusAir")
+	IF "c1"
+		IsEqual(%Bool_FXRestore_01,1)
+	THEN
+		CharacterPlayLoopEffect(%FXHandle_01,%Follower01,"FX_GP_LightPillarBlue_A")
+	ENDIF
+	IF "c1"
+		IsEqual(%Bool_FXRestore_02,1)
+	THEN
+		CharacterPlayLoopEffect(%FXHandle_02,%Follower02,"FX_GP_LightPillarBlue_A")	
+	ENDIF
+	IF "c1"
+		IsEqual(%Bool_FXRestore_03,1)
+	THEN
+		CharacterPlayLoopEffect(%FXHandle_03,%Follower03,"FX_GP_LightPillarBlue_A")
+	ENDIF
+	IF "c1"
+		IsEqual(%Bool_FXRestore_04,1)
+	THEN
+		CharacterPlayLoopEffect(%FXHandle_04,%Follower04,"FX_GP_LightPillarBlue_A")
+	ENDIF	
+	IF "c1"
+		IsEqual(%Bool_FXRestore_05,1)
+	THEN
+		CharacterPlayLoopEffect(%FXHandle_05,%Follower05,"FX_GP_LightPillarBlue_A")
+	ENDIF	
+	
+EVENT OnCombatStarted_DisplayText
+VARS
+	CHARACTER:_ChosenOne
+ON
+	OnCombatStarted()
+ACTIONS
+	GetRandom(_ChosenOne,%Follower01,%Follower02,%Follower03,%Follower04,%Follower05)
+	IF "!c1"
+		CharacterIsDead(_ChosenOne)
+	THEN
+		DisplayText(_ChosenOne,"LUC_MaradinoBoss_01")
+	ENDIF
+	ItemClose(%studyGate)
+	ItemLock(%studyGate,"")
+	
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	IF "c1"
+		IsHardcore()
+	THEN
+		Set(%Ghost01,null)
+		Set(%Ghost02,null)
+		Set(%Ghost03,null)
+		Set(%Ghost04,null)
+		Set(%Ghost05,null)
+		IterateCharacters("CMBHC_Maradino_ScanForGhosts",Lowest,Distance)
+	ENDIF
+	IF "c1&c2&c3"
+		IsHardcore()
+		IsEqual(%Ghost01,null)
+		CharacterIsDead(%Follower01)		
+	THEN
+		SetPriority("Maradino_Revive_Follower01",1000)
+	ENDIF
+	IF "c1&c2&c3"
+		IsHardcore()
+		IsEqual(%Ghost02,null)
+		CharacterIsDead(%Follower02)	
+	THEN
+		SetPriority("Maradino_Revive_Follower02",1000)
+	ENDIF	
+	IF "c1&c2&c3"
+		IsHardcore()
+		IsEqual(%Ghost03,null)
+		CharacterIsDead(%Follower03)	
+	THEN
+		SetPriority("Maradino_Revive_Follower03",1000)
+	ENDIF
+	IF "c1&c2&c3"
+		IsHardcore()
+		IsEqual(%Ghost04,null)
+		CharacterIsDead(%Follower04)	
+	THEN
+		SetPriority("Maradino_Revive_Follower04",1000)
+	ENDIF	
+	IF "c1&c2&c3"
+		IsHardcore()
+		IsEqual(%Ghost05,null)
+		CharacterIsDead(%Follower05)
+	THEN
+		SetPriority("Maradino_Revive_Follower05",1000)
+	ENDIF
+
+EVENT OnDamage_IfSpider_MayApplyFear
+VARS
+	CHARACTER:_Attacker
+	CHARACTERTEMPLATE:_Attacker_RT
+	CHARACTERTEMPLATE:_SpiderSummon_RT="Summons_Earth_Spider_6d16a931-5609-4555-9eea-b936ca16c563"
+ON
+	OnDamage(_,_,_Attacker,_)
+ACTIONS
+	IF "c1&c2&c3"
+		CharacterGetTemplate(_Attacker,_Attacker_RT)
+		IsEqual(_Attacker_RT,_SpiderSummon_RT)
+		IsRandom(0.5)
+	THEN
+		CharacterApplyStatus(__Me,"FEAR",2)
+		CombatLogText(__Me,"CMB_LUC_Maradino_AfraidOfSpiders_BL",0,1)	//0 = combat, 1 = whole party
+	ENDIF	
+	
+EVENT OnIterateCharacter_ScanForGhosts
+VARS
+	CHARACTER:_Ghost
+	CHARACTERTEMPLATE:_GhostsTemplate
+ON
+	OnIterateCharacter(_Ghost,"CMBHC_Maradino_ScanForGhosts")
+ACTIONS
+	IF "!c1&c2&c3"
+		CharacterIsDead(_Ghost)							//c1
+		CharacterGetTemplate(_Ghost,_GhostsTemplate)	//c2
+		IsEqual(_GhostsTemplate,%Ghost_Melee_RT)		//c3
+	THEN
+		//DebugText(__Me,"Found Ghost 1!")
+		Set(%Ghost01,_Ghost)
+	ENDIF
+	IF "!c1&c2&c3"
+		CharacterIsDead(_Ghost)							//c1
+		CharacterGetTemplate(_Ghost,_GhostsTemplate)	//c2
+		IsEqual(_GhostsTemplate,%Ghost_Mage_RT)			//c3
+	THEN
+		//DebugText(__Me,"Found Ghost 2!")
+		Set(%Ghost02,_Ghost)
+	ENDIF
+	IF "!c1&c2&c3"
+		CharacterIsDead(_Ghost)							//c1
+		CharacterGetTemplate(_Ghost,_GhostsTemplate)	//c2
+		IsEqual(_GhostsTemplate,%Ghost_Hybrid_RT)		//c3
+	THEN
+		//DebugText(__Me,"Found Ghost 3!")
+		Set(%Ghost03,_Ghost)
+	ENDIF
+	IF "!c1&c2&c3"
+		CharacterIsDead(_Ghost)							//c1
+		CharacterGetTemplate(_Ghost,_GhostsTemplate)	//c2
+		IsEqual(_GhostsTemplate,%Ghost_MageB_RT)		//c3
+	THEN
+		//DebugText(__Me,"Found Ghost 4!")
+		Set(%Ghost04,_Ghost)
+	ENDIF
+	IF "!c1&c2&c3"
+		CharacterIsDead(_Ghost)							//c1
+		CharacterGetTemplate(_Ghost,_GhostsTemplate)	//c2
+		IsEqual(_GhostsTemplate,%Ghost_Archer_RT)		//c3
+	THEN
+		//DebugText(__Me,"Found Ghost 5!")
+		Set(%Ghost05,_Ghost)
+	ENDIF
+	
+EVENT OnCombatEnded_OnDie_CleanUp
+ON
+	OnDie(__Me,_,_,_)
+	OnCombatEnded()
+	OnDeactivate()
+ACTIONS
+	StopLoopEffect(%FXHandle_01)
+	StopLoopEffect(%FXHandle_02)
+	StopLoopEffect(%FXHandle_03)
+	StopLoopEffect(%FXHandle_04)
+	StopLoopEffect(%FXHandle_05)

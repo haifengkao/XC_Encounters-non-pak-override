@@ -1,0 +1,61 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter
+CHARACTER:__Me
+CHARACTER:%Friend = LUC_MineGoblinPatrol1_2_dd0f0392-32ce-4fcc-b31d-4963f6596e6c
+TRIGGER:%Trigger1 = LUC_PointMineGoblinPatrol1_1_dfba5fa8-8128-4ef3-b0df-610ffeb70ff1
+TRIGGER:%Trigger2 = LUC_PointMineGoblinPatrol1_2_cac02d90-c8bf-456b-878c-738e7b49ddcd
+
+FIXEDSTRING:%PreviousAction = ""
+FIXEDSTRING:%CurrentAction = "ChooseAction"
+
+BEHAVIOUR
+REACTION ChooseAction,1000
+USAGE PEACE
+ACTIONS
+	GetRandom(%CurrentAction,"GoToPoint1","GoToPoint2","GoToTalk")
+	GotoIfEqual(%PreviousAction, %CurrentAction, "Start")
+	Set(%PreviousAction, %CurrentAction)
+	SetPriority(%CurrentAction, 1070)
+	
+REACTION GoToPoint1,0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Trigger1,1)
+	CharacterLookFrom(%Trigger1)
+	DisplayText(__Me,"LUC_MineGoblinPatrol1_Script_0",3) // This is quite the view. I could stand here for ever.
+	Sleep(6)
+	DisplayText(__Me,"LUC_MineGoblinPatrol1_Script_1",3) // Ah well, duty calls!
+	Sleep(2)
+	SetPriority(%CurrentAction,0)
+INTERRUPT
+	SetPriority(%CurrentAction,0)
+	
+REACTION GoToPoint2,0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Trigger2,1)
+	CharacterLookFrom(%Trigger2)
+	DisplayText(__Me,"LUC_MineGoblinPatrol1_Script_2",3) // Why are these crates still standing here in the mines?
+	Sleep(3)
+	SetPriority(%CurrentAction,0)
+INTERRUPT
+	SetPriority(%CurrentAction,0)
+
+REACTION GoToTalk,0
+USAGE PEACE
+CHECK "!c1"
+	CharacterIsDead(%Friend)
+ACTIONS
+	CharacterMoveTo(%Friend,1)
+	IF "!c1"
+		CharacterIsDead(%Friend)
+	THEN
+	CharacterLookAt(%Friend)
+	DialogStart("LUC_AD_MineGoblinPatrol1",__Me,%Friend)
+	SetPriority(%CurrentAction,0)
+	ENDIF
+INTERRUPT
+	SetPriority(%CurrentAction,0)
+	

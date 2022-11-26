@@ -1,0 +1,14 @@
+INIT
+ITEM:__Me
+EXTERN SKILL:%ExplosionProjectile=Projectile_Fireball
+EXTERN INT:%CasterLevel=-1
+
+EVENTS 
+
+EVENT ReceiveFireDamage
+VARS
+	CHARACTER:_Target
+ON
+	OnDamage(Fire, _, _Target, _)
+ACTIONS
+	ExplodeAt(__Me,%ExplosionProjectile,%CasterLevel,_Target)

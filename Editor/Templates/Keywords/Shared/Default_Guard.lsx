@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<save>
+    <header version="2" time="1421405270" />
+    <version major="1" minor="3" revision="0" build="0" />
+    <region id="keywordDialog">
+        <node id="root">
+            <attribute id="KeywordVoiced" value="0" type="19" />
+            <attribute id="PlayGreeting" value="0" type="19" />
+            <attribute id="keywordAutoImport" value="0" type="19" />
+            <children>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="9762bcea-4585-4556-8014-c1f52aacdf66" type="22" />
+                    <attribute id="keywordContentMapValue" value="Greeting" handle="h7f890f24g8572g4902g90b4gd362b7e9bdf2" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="c7a99c72-f188-4047-93ad-faa817b67a98" type="22" />
+                    <attribute id="keywordContentMapValue" value="I don&apos;t know which lawless backwoods you slunk out of, but the Legion doesn&apos;t honour five-finger discounts! I&apos;ve got my eye on you, &apos;friend&apos;." handle="h1df16274g8192g4ee9gb691gcc6941b9fff5" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="cb2f692c-ae00-4c46-8878-c90d597ab6d6" type="22" />
+                    <attribute id="keywordContentMapValue" value="You ought to be ashamed, filling your pockets when you think our backs are turned! Well I&apos;ll warn you now: The Legion&apos;s got eyes in the back of its head, and those never blink!" handle="h6a4edd61g0c08g4139ga626g8e0035ecbbc4" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="d51ce59e-24b6-4ee5-a736-7766061f5085" type="22" />
+                    <attribute id="keywordContentMapValue" value="Don&apos;t think I can&apos;t see you skulking about over there! A legionnaire&apos;s got a sixth sense when it comes to thieving blackguards like you, and I can smell your ill intent from a mile away!" handle="h490acf01g4084g4ec4gbeb0g05863e2708fe" type="28" />
+                </node>
+                <node id="keywordNode">
+                    <attribute id="keywordActions" value="" type="23" />
+                    <attribute id="keywordConditions" value="" type="23" />
+                    <attribute id="keywordDisplayedText" value="9762bcea-4585-4556-8014-c1f52aacdf66" type="22" />
+                    <attribute id="keywordDisplayedTextVoiced" value="0" type="19" />
+                    <attribute id="keywordId" value="Greeting" type="22" />
+                    <attribute id="keywordLast" value="0" type="19" />
+                    <attribute id="keywordOwner" value="-1" type="4" />
+                    <attribute id="keywordShow" value="0" type="19" />
+                    <attribute id="keywordSource" value="0" type="5" />
+                    <children>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value="" type="23" />
+                            <attribute id="keywordEmotion" value="13" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="c7a99c72-f188-4047-93ad-faa817b67a98" type="22" />
+                                </node>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="cb2f692c-ae00-4c46-8878-c90d597ab6d6" type="22" />
+                                </node>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="d51ce59e-24b6-4ee5-a736-7766061f5085" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="keywordSpeakerNames">
+                    <children>
+                        <node id="keywordSpeakerName">
+                            <attribute id="Name" value="CYS_Human_Legionnaire_M;CYS_Human_TownGuard_Legionnaire_F_1;CYS_Human_TownGuard_Legionnaire_F_2;CYS_Human_TownGuard_Legionnaire_M_1;CYS_Human_TownGuard_Legionnaire_M_2;CYS_Human_TownGuard_Legionnaire_M_3" type="23" />
+                        </node>
+                        <node id="keywordSpeakerName">
+                            <attribute id="Name" value="" type="23" />
+                        </node>
+                        <node id="keywordSpeakerName">
+                            <attribute id="Name" value="" type="23" />
+                        </node>
+                        <node id="keywordSpeakerName">
+                            <attribute id="Name" value="" type="23" />
+                        </node>
+                    </children>
+                </node>
+            </children>
+        </node>
+    </region>
+</save>

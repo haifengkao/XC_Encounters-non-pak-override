@@ -1,0 +1,46 @@
+#INCLUDE Base
+INIT
+USING Base
+CHARACTER:__Me
+CHARACTER:%Astarte2=HOM_Astarte_SecondFight_bd1ae42b-e714-49e7-9103-cd6d0379e760
+EXTERN SKILL:%SkillInQuestion="Projectile_EnemyVoidShard"
+FLOAT:%SkillMaxRange										
+FLOAT:%SkillMinRange	
+									
+//------------------------
+BEHAVIOUR
+REACTION UseRangedAttackOnAstarte,300
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+	CHARACTER:_Target
+CHECK "c1&c2&c3"
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,%SkillInQuestion)
+	CharacterGet(_Target,__Me,50,Lowest,Distance,Enemy)
+	CharacterCanCast(__Me,%SkillInQuestion)
+ACTIONS
+	IF "c1"
+		IsRandom(0.7)
+	THEN
+		CharacterMoveInRange(%Astarte2,_MinRange,_MaxRange,1)
+		CharacterUseSkill(%SkillInQuestion,%Astarte2)
+	ELSE
+		CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+		CharacterUseSkill(%SkillInQuestion,_Target)	
+	ENDIF
+	
+REACTION UseDefaultAttackOnAstarte,100
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+	CHARACTER:_Target
+CHECK "c1"
+	CharacterGet(_Target,__Me,50,Lowest,Distance,Enemy)
+ACTIONS
+	IF "c1"
+		IsRandom(0.7)
+	THEN
+		CharacterAttack(%Astarte2)
+	ELSE
+		CharacterAttack(_Target)
+	ENDIF		

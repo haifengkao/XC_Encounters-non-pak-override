@@ -1,0 +1,67 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Event2DisplayText("HiddenPerceptionReveal","GEN_HiddenPerceptionReveal");
+DB_Event2DisplayText("HiddenPerceptionReveal2","GEN_HiddenPerceptionReveal2");
+DB_Event2DisplayText("HiddenPerceptionReveal3","GEN_HiddenPerceptionReveal3");
+DB_Event2DisplayText("HiddenPerceptionReveal4","GEN_HiddenPerceptionReveal4");
+DB_Event2DisplayText("HiddenTrapReveal","GEN_HiddenTrapReveal");
+DB_Event2DisplayText("HiddenTrapReveal2","GEN_HiddenTrapReveal2");
+DB_Event2DisplayText("HiddenTrapReveal3","GEN_HiddenTrapReveal3");
+DB_Event2DisplayText("HiddenTrapReveal4","GEN_HiddenTrapReveal4");
+DB_Event2DisplayText("FakePerceptionReveal","GEN_FakePerceptionReveal");
+DB_Event2DisplayText("FakePerceptionReveal2","GEN_FakePerceptionReveal2");
+DB_Event2DisplayText("FakePerceptionReveal3","GEN_FakePerceptionReveal3");
+DB_Event2DisplayText("FakePerceptionReveal4","GEN_FakePerceptionReveal4");
+DB_Event2DisplayText("AmbushReveal","GLO_AmbushDetected");
+DB_Event2DisplayText("AmbushReveal2","GLO_AmbushDetected2");
+DB_Event2DisplayText("AmbushReveal3","GLO_AmbushDetected3");
+DB_Event2DisplayText("AmbushReveal4","GLO_AmbushDetected4");
+KBSECTION
+IF
+CharacterEvent(_Player,_Event)
+AND
+NOT DB_BlockTextSpam(_Player)
+AND
+NOT _Player.DB_IsInDialog()
+AND
+NOT DB_Dead(_Player)
+AND
+DB_CustomEvent2DisplayText((CHARACTER)_Player,(STRING)_Event,(STRING)_Text)
+AND
+_Player.DB_IsPlayer()
+AND
+CharacterIsDead(_Player,0)
+THEN
+CharacterDisplayText(_Player,_Text);
+DB_BlockTextSpam(_Player);
+CharTimer(_Player,"BlockTextSpam",5000);
+
+IF
+CharacterEvent(_Player,_Event)
+AND
+NOT DB_BlockTextSpam(_Player)
+AND
+NOT _Player.DB_IsInDialog()
+AND
+NOT DB_Dead(_Player)
+AND
+DB_Event2DisplayText(_Event,_Text)
+AND
+_Player.DB_IsPlayer()
+AND
+CharacterIsDead(_Player,0)
+THEN
+CharacterDisplayText(_Player,_Text);
+DB_BlockTextSpam(_Player);
+CharTimer(_Player,"BlockTextSpam",5000);
+
+IF
+CharTimerFinished(_Player,"BlockTextSpam")
+THEN
+NOT DB_BlockTextSpam(_Player);
+
+
+EXITSECTION
+
+ENDEXITSECTION

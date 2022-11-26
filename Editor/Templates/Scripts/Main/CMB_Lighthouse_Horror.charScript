@@ -1,0 +1,218 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%persTarget
+	FLOAT3:%startPos
+	INT:%teleportBack = 0	INT:%teleportAttack = 0
+	INT:%gaveLHReaction = 0
+	EXTERN CHARACTER:%ally1=CYS_LighthouseWolf1_716ce56e-9e22-4faa-ad59-909da50d89c0
+	EXTERN CHARACTER:%ally2=CYS_LighthouseWolf2_db6994e1-d78a-4aed-8d1b-45ef8b26f30d
+	EXTERN CHARACTER:%ally3=CYS_LighthouseWolf3_707a9876-7fc8-43e4-9701-a0d368d9260e
+
+BEHAVIOUR
+REACTION BuffAlly,500
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_SkillMinRange=0
+	FLOAT:_SkillMaxRange=0
+CHECK "c1&c2&c3"
+	CharacterCanCast(__Me,Shout_EnemyInspire,1)
+	CharacterGet(_Target,__Me,null,Lowest,Distance,Ally,null,null) 
+	CharacterGetSkillRange(_SkillMinRange,_SkillMaxRange,__Me,Shout_EnemyInspire)
+ACTIONS
+	IF "c1"
+		CharacterCanCast(__Me,Shout_EnemyInspire,0)
+	THEN
+		CharacterMoveInRange(_Target,_SkillMinRange,_SkillMaxRange)
+		DisplayText(__Me,"CMB_LHHorror_Buff",4)
+		Sleep(1)
+		CharacterUseSkill(Shout_EnemyInspire,_Target)
+		SetPriority("BuffAlly",0)
+	ENDIF
+	CharacterEndTurn()
+	
+REACTION SpawnWolfOne,450
+USAGE COMBAT
+CHECK "c1"
+	CharacterIsDead(%ally1)
+ACTIONS
+	CharacterLookAt(%ally1)
+	DisplayText(__Me,"CMB_LHHorror_Resurrect",4)
+	CharacterPlayEffect(__Me,"FX_Skills_WitchCraft_Generic_A_Prepare")
+	Sleep(3)
+	CharacterEvent(__Me,"GotDeadOne")
+INTERRUPT
+	Reset()
+	
+REACTION SpawnWolfTwo,450
+USAGE COMBAT
+CHECK "c1"
+	CharacterIsDead(%ally2)
+ACTIONS
+	CharacterLookAt(%ally2)
+	DisplayText(__Me,"CMB_LHHorror_Resurrect",4)
+	CharacterPlayEffect(__Me,"FX_Skills_WitchCraft_Generic_A_Prepare")	
+	Sleep(3)
+	CharacterEvent(__Me,"GotDeadTwo")
+INTERRUPT
+	Reset()
+
+REACTION SpawnWolfThree,450
+USAGE COMBAT
+CHECK "c1"
+	CharacterIsDead(%ally3)
+ACTIONS
+	CharacterLookAt(%ally3)
+	DisplayText(__Me,"CMB_LHHorror_Resurrect",4)
+	CharacterPlayEffect(__Me,"FX_Skills_WitchCraft_Generic_A_Prepare")	
+	Sleep(3)
+	CharacterEvent(__Me,"GotDeadThree")
+INTERRUPT
+	Reset()
+
+// attack but only if anyone comes too close
+
+REACTION AttackNearest,400
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+CHECK "c1"
+	CharacterGet(_Target,__Me,4,Lowest,Vitality,Enemy,null,null,null,__Me)				
+ACTIONS
+	CharacterAttack(_Target)	
+REACTION AttackTeleport,399
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+CHECK "c1&c2"
+	IsEqual(%teleportAttack,1)
+	CharacterGet(_Target,__Me,null,Lowest,Distance,Enemy,null,null,null,__Me)				
+ACTIONS
+	CharacterAttack(_Target)	
+	Set(%teleportAttack,0)
+
+REACTION AttackWhenDying,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_hp
+	FLOAT:_minRange
+	FLOAT:_maxRange
+CHECK "((c1&c2)|(c3&c4&c5))&(c6&c7&c8)"
+	CharacterGetStat(_hp,__Me,Vitality)
+	IsLessThen(_hp,0.4)
+	CharacterIsDead(%ally1)
+	CharacterIsDead(%ally2)
+	CharacterIsDead(%ally3)
+	CharacterCanCast(__Me,Projectile_EnemyPoisonball,1)
+	CharacterGet(_Target,__Me,50,Lowest,Vitality,Enemy,null,null,null,__Me)
+	CharacterGetSkillRange(_minRange,_maxRange,_Target,Projectile_EnemyPoisonball)
+ACTIONS
+	IF "c1|c2"
+		IsEqual(%persTarget,null)
+		CharacterIsDead(%persTarget)
+	THEN
+		Set(%persTarget,_Target)
+	ENDIF
+	IF "c1"
+		CharacterCanCast(__Me,Projectile_EnemyPoisonball,0)
+	THEN
+		CharacterMoveInRange(%persTarget,0,_maxRange)
+		CharacterUseSkill(Projectile_EnemyPoisonball,%persTarget)
+	ENDIF
+	CharacterEndTurn()
+INTERRUPT
+	Reset()	
+REACTION SlapAroundSomeGuys,200
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT3:_MyPosition
+	FLOAT:_apAmount
+	FLOAT:_apCostAttack = 4
+	FLOAT3:_TargetPosition
+CHECK "!(c1|c2|c3|c4)&c5&!c6&c7&c8&!c9&c10&c11&c12"
+	CharacterHasStatus(__Me,FROZEN)
+	CharacterHasStatus(__Me,KNOCKED_DOWN)	CharacterHasStatus(__Me,FEAR)	CharacterHasStatus(__Me,CHARMED)	CharacterGetStat(_apAmount,__Me,ActionPoints)
+	IsLessThen(_apAmount,_apCostAttack)		CharacterGet(_Target,__Me,15,Lowest,Vitality,Enemy,null,null,null,__Me)
+	CharacterIsInParty(_Target)	CharacterHasStatus(_Target,INVISIBLE)
+	GetPosition(__Me,_MyPosition)
+	GetPosition(_Target,_TargetPosition)	FindValidPosition(_TargetPosition,4,__Me)
+ACTIONS		
+	GetPosition(__Me,%startPos)
+	Set(%teleportBack,1)
+	CharacterPlayEffect(_Target,"FX_GP_CameraShake_B")
+	PlayEffectAt(_MyPosition,"FX_GP_TeleportSmoke_A")
+	CombatLogText(__Me,"CMB_LHHorror_CanTeleport",0,1)
+	CharacterTeleportTo(_TargetPosition)	
+	Set(%teleportAttack,1)
+INTERRUPT
+	SetPriority("SlapAroundSomeGuys",0)
+	
+REACTION TeleportBack,100
+USAGE ALL
+VARS
+	FLOAT3:_position
+CHECK "c1&c2"
+	IsEqual(%teleportBack,1)
+	GetPosition(__Me,_position)
+ACTIONS
+	PlayEffectAt(_position,"FX_GP_TeleportSmoke_A")
+	CharacterTeleportTo(%startPos)
+	Set(%teleportBack,0)
+INTERRUPT
+	Reset()
+	
+EVENTS
+EVENT LighthouseHorrorAddSkill
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill(Shout_EnemyInspire)
+	CharacterAddSkill(Projectile_EnemyPoisonball)
+	CharacterAddSkill(Jump_LightHousePhoenixDive)
+	
+EVENT GotDeadOne
+VARS
+	FLOAT3:_position
+ON
+	OnCharacterEvent(__Me,"GotDeadOne")
+ACTIONS
+	GetPosition(%ally1, _position)
+	PlayEffectAt(_position,"FX_Skills_WitchCraft_Generic_A_Cast_A")
+	CharacterDestroy(%ally1)	
+	SpawnCharacter(%ally1,Animals_Wolf_A_Zombie_A_998d5aef-df3c-4937-a46a-95108d521214,_position,1)
+	SetPriority("SpawnWolfOne",0)
+	CharacterEndTurn()
+	
+EVENT GotDeadTwo
+VARS
+	FLOAT3:_position
+ON
+	OnCharacterEvent(__Me,"GotDeadTwo")
+ACTIONS
+	GetPosition(%ally2, _position)
+	PlayEffectAt(_position,"FX_Skills_WitchCraft_Generic_A_Cast_A")
+	CharacterDestroy(%ally2)	
+	SpawnCharacter(%ally2,Animals_Wolf_A_Zombie_A_998d5aef-df3c-4937-a46a-95108d521214,_position,1)
+	SetPriority("SpawnWolfTwo",0)
+	CharacterEndTurn()
+	
+EVENT GotDeadThree
+VARS
+	FLOAT3:_position
+ON
+	OnCharacterEvent(__Me,"GotDeadThree")
+ACTIONS
+	GetPosition(%ally3, _position)
+	PlayEffectAt(_position,"FX_Skills_WitchCraft_Generic_A_Cast_A")
+	CharacterDestroy(%ally3)	
+	SpawnCharacter(%ally3,Animals_Wolf_A_Zombie_A_998d5aef-df3c-4937-a46a-95108d521214,_position,1)
+	SetPriority("SpawnWolfThree",0)
+	CharacterEndTurn()
+	
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("SlapAroundSomeGuys",200)

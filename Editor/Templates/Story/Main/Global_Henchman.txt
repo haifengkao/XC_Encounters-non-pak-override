@@ -1,0 +1,23 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_HenchmanPool(CHARACTER_Henchman1);
+DB_HenchmanPool(CHARACTER_Henchman2);
+DB_HenchmanPool(CHARACTER_Henchman3);
+DB_HenchmanPool(CHARACTER_Henchman4);
+DB_HenchmanPool(CHARACTER_Henchman5);
+DB_HenchmanPool(CHARACTER_Henchman6);
+DB_HenchmanPool(CHARACTER_Henchman7);
+DB_HenchmanPool(CHARACTER_Henchman8);
+DB_HenchmanPool(CHARACTER_Henchman9);
+DB_HenchmanPool(CHARACTER_Henchman10);
+
+DB_HenchmanTrader(CHARACTER_HOM_HenchmenTrader,TRIGGER_HOM_HenchManEditDest);
+DB_HenchmanDismissTrigger(TRIGGER_HOM_HenchmenDismiss);
+KBSECTION
+
+
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

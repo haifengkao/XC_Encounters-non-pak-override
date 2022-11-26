@@ -1,0 +1,222 @@
+INIT
+	CHARACTER:__Me
+	INT:%IsActive=1
+	INT:%NumPlayersInDialog=0
+	INT:%StartedSave=0
+	INT:%StartedLoad=0
+	CHARACTER:%EndCombatTarget
+	EXTERN FLOAT:%TimeBetweenLoads=315
+	
+BEHAVIOUR
+
+REACTION MoveToRandomCharacter, 20000
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%IsActive, 1)
+VARS
+	CHARACTER:_MoveToCharacter
+ACTIONS
+	IF "c1"
+		GetRandomCharacter(_MoveToCharacter)
+	THEN
+		CharacterMoveTo(_MoveToCharacter, 1, 1, 1)
+	ENDIF
+INTERRUPT
+ACTIONS
+	Reset()
+ON
+	OnMovementFailed(_)
+ACTIONS
+	CharacterTeleportTo(_MoveToCharacter)
+	
+EVENTS
+
+EVENT Init
+ON
+	OnInit()
+ACTIONS
+	//Set(%TimeBetweenLoads, 315)
+
+EVENT OnStartTest
+ON
+	OnFunction("StartTest")
+ACTIONS
+	Set(%IsActive, 1)
+	Set(%NumPlayersInDialog, 0)
+	Set(%StartedSave, 0)
+	Set(%StartedLoad, 0)
+	
+	IF "c1"
+		IsGreaterThen(%TimeBetweenLoads, 0)
+	THEN
+		IF "c1"
+			IsRandom(0.5)
+		THEN
+			StartTimer("LoadLevel", %TimeBetweenLoads, -1)
+		ELSE
+			StartTimer("LoadGame", %TimeBetweenLoads, -1)
+		ENDIF
+	ENDIF
+	
+	StartTimer("Update", 0.5, -1)
+	StartTimer("SaveGame", 60, -1)
+
+EVENT OnUpdateTimeBetweenLoads
+ON
+	OnFunction("UpdateTimeBetweenLoadsFunc")
+ACTIONS
+	IF "c1"
+		IsGreaterThen(%TimeBetweenLoads, 0)
+	THEN
+		IF "c1"
+			IsRandom(0.5)
+		THEN
+			StartTimer("LoadLevel", %TimeBetweenLoads, -1)
+		ELSE
+			StartTimer("LoadGame", %TimeBetweenLoads, -1)
+		ENDIF
+	ELSE
+		StopTimer("Loadlevel")
+		StopTimer("LoadGame")
+	ENDIF
+
+EVENT PartyMemberIteratorDialog
+VARS
+	CHARACTER:_Player
+ON
+	OnIterateCharacter(_Player, "IteratePlayersDialog")
+ACTIONS
+	// Count players in dialog
+	IF "c1&c2"
+		CharacterIsPlayer(_Player)
+		IsInDialog(_Player)
+	THEN
+		Add(%NumPlayersInDialog, 1)
+	ENDIF
+	
+EVENT PartyMemberIteratorEndCombat
+VARS
+	CHARACTER:_Player
+ON
+	OnIterateCharacter(_Player, "IteratePlayersEndCombat")
+ACTIONS
+	TeleportTo(_Player, %EndCombatTarget)
+
+EVENT Update
+ON
+	OnTimer("Update")
+ACTIONS
+	IterateCharacters("IteratePlayersDialog")
+	
+	// Interrupt movement if any player is in dialog
+	IF "c1"
+		IsGreaterThen(%NumPlayersInDialog, 0)
+	THEN
+		Interrupt("MoveToRandomCharacter")
+		Set(%IsActive, 0)
+		SetPriority("MoveToRandomCharacter", 0)
+	ELSE
+		Set(%IsActive, 1)
+		SetPriority("MoveToRandomCharacter", 20000)
+	ENDIF
+	Set(%NumPlayersInDialog, 0)
+
+	IF "c1"
+		CharacterIsDead(__Me)
+	THEN
+		CharacterResurrect(__Me, 100)
+	ENDIF
+	
+	Set(%StartedSave, 0)
+	Set(%StartedLoad, 0)
+
+EVENT OnSaveGame
+ON
+	OnTimer("SaveGame")
+	OnFunction("SaveGameFunc")
+ACTIONS
+	IF "!c1&c2&!c3&c4"
+		GameIsSaving()
+		IsEqual(%StartedSave, 0)
+		GameIsLoading()
+		IsEqual(%StartedLoad, 0)
+	THEN
+		StartTimer("SaveGame", %TimeBetweenLoads, -1)
+		CallFunction("DoSaveGameFunc")
+	ELSE
+		StartTimer("SaveGame", 1, -1)
+	ENDIF
+	
+EVENT DoSaveGame
+ON
+	OnTimer("DoSaveGame")
+	OnFunction("DoSaveGameFunc")
+ACTIONS
+	SaveGame("AITEST")
+	// Avoid save and load in the same frame
+	Set(%StartedSave, 1)
+	
+EVENT OnLoadGame
+ON
+	OnTimer("LoadGame")
+	OnFunction("LoadGameFunc")
+ACTIONS
+	IF "!c1&c2&!c3&c4"
+		GameIsSaving()
+		IsEqual(%StartedSave, 0)
+		GameIsLoading()
+		IsEqual(%StartedLoad, 0)
+	THEN
+		StartTimer("LoadGame", %TimeBetweenLoads, -1)
+		CallFunction("DoLoadGameFunc")
+	ELSE
+		StartTimer("LoadGame", 1, -1)
+	ENDIF
+	
+EVENT DoLoadGame
+ON
+	OnTimer("DoLoadGame")
+	OnFunction("DoLoadGameFunc")
+ACTIONS
+	LoadGame("AITEST")
+	// Avoid save and load in the same frame
+	Set(%StartedLoad, 1)
+	
+EVENT OnLoadLevel
+ON
+	OnTimer("LoadLevel")
+	OnFunction("LoadLevelFunc")
+ACTIONS
+	IF "!c1&c2&!c3&c4"
+		GameIsSaving()
+		IsEqual(%StartedSave, 0)
+		GameIsLoading()
+		IsEqual(%StartedLoad, 0)
+	THEN
+		StartTimer("LoadLevel", %TimeBetweenLoads, -1)
+		CallFunction("DoLoadLevelFunc")
+	ELSE
+		StartTimer("LoadLevel", 1, -1)
+	ENDIF
+	
+EVENT DoLoadLevel
+ON
+	OnTimer("DoLoadLevel")
+	OnFunction("DoLoadLevelFunc")
+VARS
+	FIXEDSTRING:_LevelName
+ACTIONS
+	GetRandom(	_LevelName, "CYS_BlackCove", "Cyseal", "DAF_Druid_Dungeon", "DAF_King_Tomb", "DarkForest", "END_Endgame_Main", "LUC_BloodCave", "LUC_Mines", "LucullaForest", "ThePrisonGardenOfStoneKing")
+	LoadLevel(_LevelName)
+	
+EVENT ForceEndCombat
+ON
+	OnTimer("ForceEndCombat")
+	OnFunction("ForceEndCombatFunc")
+ACTIONS
+	IF "c1"
+		IsInCombat(__Me)
+	THEN
+		KillCombat(__Me)
+	ENDIF
+	

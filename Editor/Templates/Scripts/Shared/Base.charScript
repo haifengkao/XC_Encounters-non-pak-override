@@ -1,0 +1,399 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%LookAtChar
+	CHARACTER:%AttackOfOpportunity
+	ITEM:%LookAtItem
+	INT:%FearFlee
+	INT:%Following = 0
+	FIXEDSTRING:%PrevIdleAnim = ""
+	FIXEDSTRING:%CrawInfest_Faction = ""
+	EXTERN INT:%SayBlindedText = 1
+
+BEHAVIOUR
+
+REACTION TurnToChar, 100
+USAGE ALL
+CHECK "!c1"
+	IsEqual(%LookAtChar,null)
+ACTIONS	
+	CharacterLookAt(%LookAtChar,1)
+	Set(%LookAtChar,null)
+
+REACTION TurnToItem, 100
+USAGE ALL
+CHECK "!c1"
+	IsEqual(%LookAtItem,null)
+ACTIONS	
+	CharacterLookAt(%LookAtItem,1)
+	Set(%LookAtItem,null)
+	
+REACTION AttackOfOpportunity, 20000
+USAGE WAITING
+CHECK "!c1"
+	IsEqual(%AttackOfOpportunity,null)
+ACTIONS
+	CharacterAttackWithoutMove(%AttackOfOpportunity)
+	Set(%AttackOfOpportunity,null)
+
+REACTION BlindReaction, 100000
+USAGE COMBAT
+VARS	
+	CHARACTER:_Target
+	FIXEDSTRING:_BlindText
+	FLOAT:_TouchRange
+	FLOAT3:_MyPosition
+	FLOAT3:_PosOffset={2;2;2}
+	FLOAT:_Angle
+	FLOAT:_Dist=2.0
+CHECK "c1"
+	CharacterHasStatus(__Me,BLIND)
+ACTIONS
+	IF "c1"
+		IsEqual(%SayBlindedText,1)
+	THEN
+		GetRandom(_BlindText,"GEN_Blinded_1","GEN_Blinded_2","GEN_Blinded_3")
+		DisplayText(__Me,_BlindText,3)
+	ENDIF
+	IF "c1&c2"
+		CharacterGetTouchRange(_TouchRange,__Me)
+		CharacterGet(_Target,__Me,_TouchRange,Lowest,Distance,Enemy)
+	THEN
+		CharacterAttack(_Target)
+	ELSE
+		GetPosition(__Me,_MyPosition)
+		GetRandomBetween(_Angle,0,360)
+		RotateY(_PosOffset,_Angle)
+		Multiply(_PosOffset,_Dist)		
+		Add(_MyPosition,_PosOffset)
+		CharacterLookAt(_MyPosition)		
+		CharacterPlayEffect(__Me,"FX_GP_QuestionMark_A")
+		Sleep(1)
+	ENDIF
+	CharacterEndTurn()	
+	
+REACTION FearFlee, 100001
+USAGE COMBAT
+CHECK "c1&!c2"
+	CharacterHasStatus(__Me,FEAR)
+	IsEqual(%FearFlee,0)
+ACTIONS
+	CharacterFleeFrom(Enemy,10)
+	Set(%FearFlee,0)
+
+REACTION FearCower, 100000
+USAGE ALL
+CHECK "c1"
+	CharacterHasStatus(__Me,FEAR)
+ACTIONS	
+	CharacterPlayAnimation("cower",0,0)
+	CharacterEndTurn()
+	
+REACTION MoveAwayFromSurface,5
+USAGE PEACE
+CHECK "c1"
+	IsInDangerousSurface(__Me)
+ACTIONS
+	CharacterFleeFromDangerousSurface()
+
+REACTION MoveAwayFromOilSurface,4
+USAGE PEACE
+CHECK "c1"
+	IsInSurface(__Me,Oil)
+ACTIONS
+	CharacterFleeFromSurface(Oil)
+
+REACTION StartFollow, 10
+USAGE PEACE
+VARS 
+	CHARACTER:_Owner
+	FLOAT:_Dist
+CHECK "((c1|c2)&c3&c4)&((!c5)|c6)&!c7&!c8"
+	CharacterGetFollow(_Owner,__Me)
+	CharacterGetOwner(_Owner,__Me)
+	GetDistance(_Dist,__Me,_Owner)
+	IsLessThen(_Dist,70)
+	CharacterHasStatus(_Owner, SNEAKING)
+	CharacterHasStatus(__Me, SNEAKING)
+	CharacterInCreation(_Owner)
+	CharacterHasStatus(_Owner, DYING)
+ACTIONS
+	Set(%Following,1)
+	CharacterFollowOwnerOrLeader(-1,-1)
+INTERRUPT
+	Set(%Following,0)
+	Reset()
+	
+//REACTION ShouldFollow, 10
+//USAGE PEACE
+//VARS 
+//	CHARACTER:_Owner
+//	FLOAT:_Dist
+//CHECK "((c1|c2)&c3&c4)&(!(c5|c6))&!c7&!c8"
+//	CharacterGetFollow(_Owner,__Me)
+//	CharacterGetOwner(_Owner,__Me)
+//	GetDistance(_Dist,__Me,_Owner)
+//	IsGreaterThen(_Dist,70)
+//	CharacterHasStatus(_Owner, SNEAKING)
+//	CharacterHasStatus(__Me, SNEAKING)
+//	CharacterInCreation(_Owner)
+//	CharacterHasStatus(_Owner, DYING)
+//ACTIONS
+//	CharacterAppearOnTrailOutOfSightTo(_Owner,0,0)
+//INTERRUPT
+//	Reset()
+	
+REACTION StopFollow, 11
+USAGE PEACE
+VARS 
+	CHARACTER:_Owner
+	FLOAT:_Dist
+CHECK "c1&(!(((c2|c3)&c4&c5)&((!c6)|c7))|c8)"
+	IsEqual(%Following,1)
+	CharacterGetFollow(_Owner,__Me)
+	CharacterGetOwner(_Owner,__Me)
+	GetDistance(_Dist,__Me,_Owner)
+	IsLessThen(_Dist,70)
+	CharacterHasStatus(_Owner, SNEAKING)
+	CharacterHasStatus(__Me, SNEAKING)
+	CharacterInCreation(_Owner)
+ACTIONS
+	Set(%Following,0)
+
+REACTION Idle_Combat, 4
+USAGE WAITING
+VARS 
+	FIXEDSTRING:_Animation
+	FLOAT:_SleepTime
+ACTIONS
+	IF "!c1"
+		CharacterHasStatus(__Me, SNEAKING)
+	THEN
+		GetWeightedRandom(_Animation,"still",INT:50,"idle1",INT:10,"idle2",INT:10,"idle3",INT:10)
+		IF "c1"
+			IsEqual(_Animation,%PrevIdleAnim)
+		THEN
+			Goto("Start")
+		ENDIF
+		Set(%PrevIdleAnim,_Animation)
+		CharacterPlayAnimation(_Animation)
+		GetRandom(_SleepTime,0,2,3.5,6.8,9.3,11)
+		Sleep(_SleepTime)
+	ENDIF
+INTERRUPT
+	Reset()
+
+REACTION Idle_Peace, 4
+USAGE PEACE
+VARS 
+	FIXEDSTRING:_Animation
+	FLOAT:_SleepTime
+ACTIONS
+	IF "!c1"
+		CharacterHasStatus(__Me, SNEAKING)
+	THEN
+		GetWeightedRandom(_Animation,"still",INT:50,"idle1",INT:30,"idle2",INT:30,"idle3",INT:30)
+		IF "c1"
+			IsEqual(_Animation,%PrevIdleAnim)
+		THEN
+			Goto("Start")
+		ENDIF
+		Set(%PrevIdleAnim,_Animation)
+		CharacterPlayAnimation(_Animation)
+		GetRandom(_SleepTime,0,2,3.5,6.8,9.3,11)
+		Sleep(_SleepTime)
+	ENDIF
+INTERRUPT
+	Reset()
+	
+
+REACTION CombatFallback, 1
+USAGE COMBAT 
+ACTIONS
+	CharacterEndTurn()
+
+EVENTS
+
+EVENT AttackOfOpportunity
+VARS
+	CHARACTER:_Enemy
+ON
+	OnAttackOfOpportunity(_Enemy)
+ACTIONS
+	IF "c1"
+		CharacterCanSee(__Me, _Enemy)
+	THEN
+		Set(%AttackOfOpportunity,_Enemy)
+	ENDIF
+
+EVENT OnTurn_SetPrio_BlindReaction
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("BlindReaction",10000)
+
+
+EVENT TurnToInteraction
+VARS
+	CHARACTER:_Char
+	ITEM:_Item
+ON
+	OnMiss(_Char,_Item, __Me, _)
+	OnBlock(_Char,_Item, __Me, _)
+ACTIONS
+	Set(%LookAtChar,_Char)
+	Set(%LookAtItem,_Item)
+	
+EVENT StatusFearChanged
+ON
+	OnCharacterStatus(__Me,FEAR)
+ACTIONS
+	Set(%FearFlee,1)
+	
+EVENT BlizzardEnter
+ON 
+	OnTriggerEnter(__Me,"BlizzardEnter")
+VARS
+	CHARACTERTEMPLATE:_Temp	
+ACTIONS
+	IF "c1&!c2"
+		CharacterGetTemplate(__Me, _Temp)
+		IsEqual(_Temp, Animals_Deer_A_White_4b4fbce3-a979-4a86-a836-af860ca898bf)
+	THEN
+		AddStatusInfluence(__Me,CHILLED,20)
+	ENDIF
+	
+EVENT BlizzardLeave
+ON 
+	OnTriggerLeave(__Me,"BlizzardLeave")
+ACTIONS
+	RemoveStatusInfluence(__Me,CHILLED,20)	
+	
+EVENT RainEnter
+ON 
+	OnTriggerEnter(__Me,"RainEventOn")
+ACTIONS
+	AddStatusInfluence(__Me, WET, 20)
+	
+EVENT RainLeave
+ON 
+	OnTriggerLeave(__Me,"RainEventOff")
+ACTIONS
+	RemoveStatusInfluence(__Me, WET, 20)	
+	
+EVENT NoRainEnter
+ON 
+	OnTriggerEnter(__Me,"NoRainEventOn")
+ACTIONS
+	AddStatusInfluence(__Me, WARM, 20)
+	
+EVENT NoRainLeave
+ON 
+	OnTriggerLeave(__Me,"NoRainEventOff")
+ACTIONS
+	RemoveStatusInfluence(__Me, WARM, 20)
+		
+EVENT WarmEnter
+ON 
+	OnTriggerEnter(__Me,"EventWarmOn")
+ACTIONS
+	AddStatusInfluence(__Me, WARM, 20)
+	
+EVENT WarmLeave
+ON 
+	OnTriggerLeave(__Me,"EventWarmOff")
+ACTIONS
+	RemoveStatusInfluence(__Me, WARM, 20)
+	
+EVENT SandstormOn
+ON 
+	OnTriggerEnter(__Me,"SandstormOn")
+VARS
+	CHARACTERTEMPLATE:_Temp
+ACTIONS
+	IF "c1&!(c13|c2|c3|c4|c5|c6|c7|c8|c9|c10|c11|c12|c14)"
+		CharacterGetTemplate(__Me, _Temp)
+		IsEqual(_Temp, Env_Spider_Egg_A_75d66015-3a85-4e38-ad4e-af91bb80a1f1)
+		IsEqual(_Temp, Animals_Spider_A_20af6dd6-957b-4e5f-86f5-535bb04ca90e)
+		IsEqual(_Temp, Animals_Spider_Boss_B_a2840a4f-f72e-4fe8-b3b0-7224c6409b3e)
+		IsEqual(_Temp, Animals_Spider_A_Hatched_e3f1f82c-8266-4fc4-9a42-2564e9c9d996)
+		IsEqual(_Temp, Animals_Spider_A_Hatched_Green_dcb213f0-db60-474f-bf12-0c3e923b5a5a)
+		IsEqual(_Temp, LUC_SpiderBoss_EggChar_Blue_1b2355bb-8567-4bb3-8b45-0ab6e64b5daa)
+		IsEqual(_Temp, LUC_SpiderBoss_EggChar_Green_7d6be2c0-9099-4355-ad67-a4e283fcf9d7)
+		IsEqual(_Temp, LUC_SpiderBoss_EggChar_Red_90e8e41b-1df3-4eed-8863-f9e384489966)
+		IsEqual(_Temp, LUC_SpiderBoss_EggChar_Regular_3e005355-5820-4b3e-b7c2-d6dd7f8a4cc5)
+		IsEqual(_Temp, LUC_SpiderBoss_Spiderling_Blue_c0a25d63-7044-4c8c-b8b5-8324332544bf)
+		IsEqual(_Temp, LUC_SpiderBoss_Spiderling_d4c7abfb-1cd9-4f34-b156-a0919ecfa992)
+		IsEqual(_Temp, LUC_SpiderBoss_Spiderling_Green_b4a231d7-c16e-4033-9141-77158021b1e7)
+		IsEqual(_Temp, LUC_SpiderBoss_Spiderling_Red_02f66eaf-9f40-4a38-9dd3-6772b030b48c)
+	THEN
+		AddStatusInfluence(__Me,SLOWED,20)
+	ENDIF
+	
+EVENT SandstormOff
+ON 
+	OnTriggerLeave(__Me,"SandstormOff")
+VARS
+	CHARACTERTEMPLATE:_Temp
+ACTIONS
+	IF "c1&!(c13|c2|c3|c4|c5|c6|c7|c8|c9|c10|c11|c12|c14)"
+		CharacterGetTemplate(__Me, _Temp)
+		IsEqual(_Temp, Env_Spider_Egg_A_75d66015-3a85-4e38-ad4e-af91bb80a1f1)
+		IsEqual(_Temp, Animals_Spider_A_20af6dd6-957b-4e5f-86f5-535bb04ca90e)
+		IsEqual(_Temp, Animals_Spider_Boss_B_a2840a4f-f72e-4fe8-b3b0-7224c6409b3e)
+		IsEqual(_Temp, Animals_Spider_A_Hatched_e3f1f82c-8266-4fc4-9a42-2564e9c9d996)
+		IsEqual(_Temp, Animals_Spider_A_Hatched_Green_dcb213f0-db60-474f-bf12-0c3e923b5a5a)		
+		IsEqual(_Temp, LUC_SpiderBoss_EggChar_Blue_1b2355bb-8567-4bb3-8b45-0ab6e64b5daa)
+		IsEqual(_Temp, LUC_SpiderBoss_EggChar_Green_7d6be2c0-9099-4355-ad67-a4e283fcf9d7)
+		IsEqual(_Temp, LUC_SpiderBoss_EggChar_Red_90e8e41b-1df3-4eed-8863-f9e384489966)
+		IsEqual(_Temp, LUC_SpiderBoss_EggChar_Regular_3e005355-5820-4b3e-b7c2-d6dd7f8a4cc5)
+		IsEqual(_Temp, LUC_SpiderBoss_Spiderling_Blue_c0a25d63-7044-4c8c-b8b5-8324332544bf)
+		IsEqual(_Temp, LUC_SpiderBoss_Spiderling_d4c7abfb-1cd9-4f34-b156-a0919ecfa992)
+		IsEqual(_Temp, LUC_SpiderBoss_Spiderling_Green_b4a231d7-c16e-4033-9141-77158021b1e7)
+		IsEqual(_Temp, LUC_SpiderBoss_Spiderling_Red_02f66eaf-9f40-4a38-9dd3-6772b030b48c)
+	THEN
+		RemoveStatusInfluence(__Me,SLOWED, 20)
+	ENDIF
+
+EVENT CrawlingInfestation_Applied
+ON
+	OnCharacterStatus(__Me,CRAWLING_INFESTATION)
+VARS
+	CHARACTER:_StatusSource
+ACTIONS	
+	IF "c1&c2"
+		CharacterGetStatusSourceCharacter(__Me,"CRAWLING_INFESTATION",_StatusSource)
+		CharacterGetFaction(%CrawInfest_Faction,_StatusSource)	
+	THEN
+	ENDIF	
+	
+EVENT CrawlingInfestation_Removed
+ON
+	OnCharacterStatusRemoved(__Me,CRAWLING_INFESTATION)
+VARS
+	FLOAT:_level
+	INT:_spiderLevel
+	CHARACTER:_char1
+	CHARACTER:_char2
+	CHARACTER:_char3
+ACTIONS
+	IF "c1&c2"
+		CharacterHasStatus(__Me,DYING)
+		CharacterGetStat(_level,__Me,Level)
+	THEN
+		Cast(_spiderLevel, _level)
+		IF "c1"
+			IsLessThen(_spiderLevel,7)
+		THEN
+			SpawnCharacter(_char1,Animals_CrawlingInfestation_Small_bd199826-f818-49c7-91ae-29327b4c8cb7,__Me,0,0,null,_spiderLevel)
+			SpawnCharacter(_char2,Animals_CrawlingInfestation_Small_bd199826-f818-49c7-91ae-29327b4c8cb7,__Me,0,0,null,_spiderLevel)
+			CharacterSetFaction(_char1,%CrawInfest_Faction)
+			CharacterSetFaction(_char2,%CrawInfest_Faction)
+		ELSE
+			SpawnCharacter(_char1,Animals_CrawlingInfestation_Small_bd199826-f818-49c7-91ae-29327b4c8cb7,__Me,0,0,null,_spiderLevel)
+			SpawnCharacter(_char2,Animals_CrawlingInfestation_Big_6f8e29f8-706f-46eb-8f1d-af3bdf2c5d26,__Me,0,0,null,_spiderLevel)
+			SpawnCharacter(_char3,Animals_CrawlingInfestation_Big_6f8e29f8-706f-46eb-8f1d-af3bdf2c5d26,__Me,0,0,null,_spiderLevel)
+			CharacterSetFaction(_char1,%CrawInfest_Faction)
+			CharacterSetFaction(_char2,%CrawInfest_Faction)			
+			CharacterSetFaction(_char3,%CrawInfest_Faction)			
+		ENDIF
+	ENDIF	

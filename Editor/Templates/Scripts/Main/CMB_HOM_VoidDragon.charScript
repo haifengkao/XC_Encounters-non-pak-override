@@ -1,0 +1,980 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%Astarte2="HOM_Astarte_SecondFight_bd1ae42b-e714-49e7-9103-cd6d0379e760"
+	CHARACTER:%Zandalor="Zandalor_2535a516-8e0f-4c00-abe6-285e545fdc9b"
+	CHARACTER:%Icandra="END_Icandra_99e3ff72-410f-489f-bd28-8cc0ed3d947c"
+	ITEM:%GodBox="HOM_GodBox_8ecaea45-ae64-412e-a538-d892d2389c93"
+	INT:%CurrentPhase=1
+	INT:%Bool_Summon1_OK=0
+	INT:%Bool_Summon2_OK=0
+	TRIGGER:%P1_Grunt_Spawn01="HOM_EndFight_ShadowGrunt_Spawn01_dc932a28-fedc-472b-8a25-e8b8f955ab55"	
+	TRIGGER:%P1_Grunt_Spawn02="HOM_EndFight_ShadowGrunt_Spawn02_53049bb0-fa65-468e-83b2-c200ed6f52bf"	
+	TRIGGER:%P1_Grunt_Spawn03="HOM_EndFight_ShadowGrunt_Spawn03_c79b7c6c-6a7a-447b-9fd8-d47a96aad267"	
+	TRIGGER:%P1_Caster_Spawn01="HOM_EndFight_ShadowCaster_Spawn01_24cffa59-1b8e-4a9f-98e1-8e3b71ba9e3b"
+	TRIGGER:%P1_Caster_Spawn02="HOM_EndFight_ShadowCaster_Spawn02_9a82d51f-138c-4e21-a44e-9b0eab35301e"
+	TRIGGER:%P1_Mage_Spawn01="HOM_EndFight_ShadowMage_Spawn01_29e19a90-9abd-49b3-b1b9-7540a6764ecd"
+	TRIGGER:%P2_Spider_Spawn01="HOM_EndFight_SpiderSpawn01_efb95197-adba-4c10-b8a6-bd5078a3dbf4"
+	TRIGGER:%P2_Spider_Spawn02="HOM_EndFight_SpiderSpawn02_6f6f3671-f4ac-4c56-bc80-4de5eea87223"
+	TRIGGER:%P2_Spider_Spawn03="HOM_EndFight_SpiderSpawn03_c5218edd-1081-4720-82f2-12213edf5b97"
+	INT:%ReusableHandle_01
+	INT:%ReusableHandle_02
+	INT:%ReusableHandle_03
+	INT:%ReusableHandle_04
+	INT:%ReusableHandle_05
+	INT:%ReusableHandle_06
+	INT:%SummoningFX_Handle
+	INT:%DetectedCharacters=0
+	TRIGGER:%P3_Teleport_Spot00="HOM_EndFight_Dragon_347c5ff3-bb25-4211-bbf1-c68d9a59e586"
+	TRIGGER:%P3_Teleport_Spot01="HOM_EndFight_Teleport_Spot01_526f6d59-5fa4-4de9-8157-0116a8bc0231"
+	TRIGGER:%P3_Teleport_Spot02="HOM_EndFight_Teleport_Spot02_83617326-5e2a-4a50-86fc-3088b4992d32"
+	TRIGGER:%P3_Teleport_Spot03="HOM_EndFight_Teleport_Spot03_cc66271f-8596-40fc-bd0f-167f53481bac"
+	INT:%Bool_P3_TPSpotClear_00=0
+	INT:%Bool_P3_TPSpotClear_01=0
+	INT:%Bool_P3_TPSpotClear_02=0
+	INT:%Bool_P3_TPSpotClear_03=0
+	INT:%P3_CurrentTPSpot=0	
+	INT:%SpawnExploder_Current=0
+	INT:%SpawnExploder_Desired=2
+
+	//phase 1 - elementless ranged attack, summon grunt, mage, caster (once); if melee range, elementless close range breath, melee
+	//phase 2 - elemental ranged attacks, summon spiders (once); if melee range, rage, close range breaths
+	//phase 3 - identical to p2 but teleport across the arena every 2 turns - when dies, goes back to where it stood
+	//hardcore - every 2 turns, slow walkers spawning to get astarte
+	
+//------------------------	
+BEHAVIOUR 
+REACTION VoidDragon_Phase1_OpenFight,2000
+USAGE COMBAT
+CHECK "c1&c2&c3"
+	IsEqual(%CurrentPhase,1)										//c1
+	CharacterCanCast(__Me,"Projectile_EnemyDragonProjectile")		//c2
+	CharacterCanSee(__Me,%Astarte2)									//c3
+ACTIONS
+	CharacterApplyStatus(__Me,"ETHEREAL_SOLES",-1,1)
+	//DebugText(__Me,"P1: Opening!")
+	//DebugText(%Astarte2,"P1: Opening!")
+	CharacterUseSkill("Projectile_EnemyDragonProjectile",%Astarte2)	
+	SetPriority("VoidDragon_Phase1_OpenFight",0)
+
+REACTION VoidDragon_Phase1_Summon,1000
+USAGE COMBAT
+VARS
+	FLOAT:_MyAP
+CHECK "c1&c2&!(c3|c4|c5|c6|c7|c8|c9)"
+	IsEqual(%CurrentPhase,1)										//c1
+	CharacterGetStat(_MyAP,__Me,ActionPoints)						//c2
+	IsLessThen(_MyAP,4)												//!c3
+	CharacterHasStatus(__Me,"CHARMED")								//!c4
+	CharacterHasStatus(__Me,"STUNNED")								//!c5
+	CharacterHasStatus(__Me,"FROZEN")								//!c6
+	CharacterHasStatus(__Me,"PETRIFIED")							//!c7
+	CharacterHasStatus(__Me,"FEAR")									//!c8
+	CharacterHasStatus(__Me,"KNOCKED_DOWN")							//!c9
+ACTIONS
+	//DebugText(__Me,"P1 Summoning")
+	//DebugText(%Astarte2,"P1 Summoning")
+	CharacterPlayLoopEffect(%SummoningFX_Handle,__Me,"FX_Skills_WitchCraft_Summon_Prepare_A")
+	PlayLoopEffectAt(%ReusableHandle_01,%P1_Grunt_Spawn01,"FX_Skills_WitchCraft_Summon_Prepare_A")
+	PlayLoopEffectAt(%ReusableHandle_02,%P1_Grunt_Spawn02,"FX_Skills_WitchCraft_Summon_Prepare_A")
+	PlayLoopEffectAt(%ReusableHandle_03,%P1_Grunt_Spawn03,"FX_Skills_WitchCraft_Summon_Prepare_A")
+	PlayLoopEffectAt(%ReusableHandle_04,%P1_Caster_Spawn01,"FX_Skills_WitchCraft_Summon_Prepare_A")
+	PlayLoopEffectAt(%ReusableHandle_05,%P1_Caster_Spawn02,"FX_Skills_WitchCraft_Summon_Prepare_A")
+	PlayLoopEffectAt(%ReusableHandle_06,%P1_Mage_Spawn01,"FX_Skills_WitchCraft_Summon_Prepare_A")
+	CharacterPlayAnimation("cast_self_start",1,1)
+	CharacterPlayAnimation("cast_self_loop",1,1)
+	CharacterPlayAnimation("cast_self_cast",1,0)
+	SpawnCharacter(_,"Shadows_Grunt_B_35d1a441-11a9-414f-aa2d-4253c51c18bf",%P1_Grunt_Spawn01,1,1,__Me)
+	StopLoopEffect(%ReusableHandle_01)
+	PlayEffectAt(%P1_Grunt_Spawn01,"FX_Skills_WitchCraft_Summon_Summon_A")
+	Sleep(0.2)
+	SpawnCharacter(_,"Shadows_Grunt_B_35d1a441-11a9-414f-aa2d-4253c51c18bf",%P1_Grunt_Spawn02,1,1,__Me)
+	StopLoopEffect(%ReusableHandle_02)
+	PlayEffectAt(%P1_Grunt_Spawn02,"FX_Skills_WitchCraft_Summon_Summon_A")
+	Sleep(0.4)
+	SpawnCharacter(_,"Shadows_Grunt_B_35d1a441-11a9-414f-aa2d-4253c51c18bf",%P1_Grunt_Spawn03,1,1,__Me)
+	StopLoopEffect(%ReusableHandle_03)
+	PlayEffectAt(%P1_Grunt_Spawn03,"FX_Skills_WitchCraft_Summon_Summon_A")
+	Sleep(0.6)	
+	SpawnCharacter(_,"Shadows_Caster_B_f20f481c-d832-4204-ad6a-3eebc3455663",%P1_Caster_Spawn01,1,1,__Me)
+	StopLoopEffect(%ReusableHandle_04)
+	PlayEffectAt(%P1_Caster_Spawn01,"FX_Skills_WitchCraft_Summon_Summon_A")
+	Sleep(0.1)	
+	SpawnCharacter(_,"Shadows_Caster_B_f20f481c-d832-4204-ad6a-3eebc3455663",%P1_Caster_Spawn02,1,1,__Me)
+	StopLoopEffect(%ReusableHandle_05)	
+	PlayEffectAt(%P1_Caster_Spawn02,"FX_Skills_WitchCraft_Summon_Summon_A")	
+	Sleep(0.2)	
+	SpawnCharacter(_,"Shadows_Mage_B_b63de0c5-8e4d-4052-bc50-1c59092065f3",%P1_Mage_Spawn01,1,1,__Me)
+	StopLoopEffect(%ReusableHandle_06)
+	PlayEffectAt(%P1_Mage_Spawn01,"FX_Skills_WitchCraft_Summon_Summon_A")	
+	Sleep(0.9)
+	CharacterUseActionPoints(__Me,4)
+	StopLoopEffect(%SummoningFX_Handle)	
+	Set(%Bool_Summon1_OK,1)
+	SetPriority("VoidDragon_Phase1_Summon",0)
+INTERRUPT
+	Reset()
+
+REACTION VoidDragon_Phase1_CloseRange,400
+USAGE COMBAT
+VARS
+	CHARACTER:_Character
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&c4&!c5"
+	IsEqual(%CurrentPhase,1)																//c1
+	CharacterCanCast(__Me,"Cone_EnemyDragonConeVoid")										//c2
+	CharacterGetSkillRange(_,_MaxRange,__Me,"Cone_EnemyDragonConeVoid")						//c3
+	CharacterGet(_Character,__Me,_MaxRange,Lowest,Distance,Enemy)							//c4
+	IsEqual(_Character,%Zandalor)															//!c5
+ACTIONS
+	//DebugText(__Me,"P1: Close Range!")
+	//DebugText(%Astarte2,"P1: Close Range!")
+	CharacterUseSkill("Cone_EnemyDragonConeVoid",_Character)
+	IF "c1"
+		IsRandom(0.7)
+	THEN
+		CharacterUseSkill("Cone_EnemyDragonConeVoid",_Character)
+	ELSE
+		SetPriority("VoidDragon_Phase1_CloseRange",0)
+	ENDIF
+	
+REACTION VoidDragon_Phase1_LongRange,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Character
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&c4"
+	IsEqual(%CurrentPhase,1)																	//c1
+	CharacterGetSkillRange(_,_MaxRange,__Me,"Projectile_EnemyDragonProjectile")					//c2
+	CharacterCanCast(__Me,"Projectile_EnemyDragonProjectile")									//c3
+	CharacterGet(_Character,__Me,_MaxRange,Lowest,Distance,PlayerNoSummon)						//c4
+ACTIONS
+	//DebugText(__Me,"P1: Long Range!")
+	//DebugText(%Astarte2,"P1: Long Range!")
+	IF "c1"
+		IsRandom(0.6)
+	THEN
+		CharacterUseSkill("Projectile_EnemyDragonProjectile",%Astarte2)
+	ELSE
+		CharacterUseSkill("Projectile_EnemyDragonProjectile",_Character)
+	ENDIF	
+	
+REACTION VoidDragon_Phase1_MassSlow,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Character
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&c4"
+	IsEqual(%CurrentPhase,1)																	//c1
+	CharacterGetSkillRange(_,_MaxRange,__Me,"Shout_EnemySlowMass")						//c2
+	CharacterCanCast(__Me,"Shout_EnemySlowMass")												//c3
+	CharacterGet(_Character,__Me,_MaxRange,Lowest,Distance,Enemy)								//c4
+ACTIONS
+	//DebugText(__Me,"P1: Slow Mass!")
+	CharacterUseSkill("Shout_EnemySlowMass",__Me)
+	
+REACTION VoidDragon_Phase2_Summon,1000
+USAGE COMBAT
+VARS
+	FLOAT:_MyAP
+CHECK "c1&c2&!(c3|c4|c5|c6|c7|c8|c9)"
+	IsEqual(%CurrentPhase,2)										//c1
+	CharacterGetStat(_MyAP,__Me,ActionPoints)						//c2
+	IsLessThen(_MyAP,4)												//!c3
+	CharacterHasStatus(__Me,"CHARMED")								//!c4
+	CharacterHasStatus(__Me,"STUNNED")								//!c5
+	CharacterHasStatus(__Me,"FROZEN")								//!c6
+	CharacterHasStatus(__Me,"PETRIFIED")							//!c7
+	CharacterHasStatus(__Me,"FEAR")									//!c8
+	CharacterHasStatus(__Me,"KNOCKED_DOWN")							//!c9
+ACTIONS
+	//DebugText(__Me,"P2 Summoning")
+	//DebugText(%Astarte2,"P2 Summoning")
+	CharacterPlayLoopEffect(%SummoningFX_Handle,__Me,"FX_Skills_WitchCraft_Summon_Prepare_A")
+	PlayLoopEffectAt(%ReusableHandle_01,%P2_Spider_Spawn01,"FX_Skills_WitchCraft_Summon_Prepare_A")
+	PlayLoopEffectAt(%ReusableHandle_02,%P2_Spider_Spawn02,"FX_Skills_WitchCraft_Summon_Prepare_A")
+	PlayLoopEffectAt(%ReusableHandle_03,%P2_Spider_Spawn03,"FX_Skills_WitchCraft_Summon_Prepare_A")
+	CharacterPlayAnimation("cast_self_start",1,1)
+	CharacterPlayAnimation("cast_self_loop",1,1)
+	CharacterPlayAnimation("cast_self_cast",1,0)
+	SpawnCharacter(_,"Shadows_Spider_A_25c1e827-dd1e-4f7b-ad26-fd7c599f4f28",%P2_Spider_Spawn01,1,1,__Me)
+	StopLoopEffect(%ReusableHandle_01)
+	PlayEffectAt(%P2_Spider_Spawn01,"FX_Skills_WitchCraft_Summon_Summon_A")
+	Sleep(0.2)	
+	SpawnCharacter(_,"Shadows_Spider_A_25c1e827-dd1e-4f7b-ad26-fd7c599f4f28",%P2_Spider_Spawn02,1,1,__Me)
+	StopLoopEffect(%ReusableHandle_02)
+	PlayEffectAt(%P2_Spider_Spawn02,"FX_Skills_WitchCraft_Summon_Summon_A")
+	Sleep(0.4)	
+	SpawnCharacter(_,"Shadows_Spider_A_25c1e827-dd1e-4f7b-ad26-fd7c599f4f28",%P2_Spider_Spawn03,1,1,__Me)
+	StopLoopEffect(%ReusableHandle_03)
+	PlayEffectAt(%P2_Spider_Spawn03,"FX_Skills_WitchCraft_Summon_Summon_A")
+	Sleep(0.6)
+	CharacterUseActionPoints(__Me,4)
+	StopLoopEffect(%SummoningFX_Handle)
+	Set(%Bool_Summon2_OK,1)
+	SetPriority("VoidDragon_Phase2_Summon",0)
+INTERRUPT
+	Reset()
+	
+REACTION VoidDragon_Phase2_UseFear,500
+USAGE COMBAT
+VARS
+	CHARACTER:_Character
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&c4"
+	IsGreaterThen(%CurrentPhase,1)
+	CharacterCanCast(__Me,"Shout_EnemyFear")
+	CharacterGetSkillRange(_,_MaxRange,__Me,"Shout_EnemyFear")
+	CharacterGet(_Character,__Me,_MaxRange,Lowest,Distance,Enemy)
+ACTIONS
+	CharacterUseSkill("Shout_EnemyFear",__Me)
+	SetPriority("VoidDragon_Phase2_UseNullifyResistance",0)		//cast the one or the other, not both
+	
+REACTION VoidDragon_Phase2_UseNullifyResistance,500
+USAGE COMBAT
+VARS
+	CHARACTER:_Character
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&c4"
+	IsGreaterThen(%CurrentPhase,1)
+	CharacterCanCast(__Me,"Shout_EnemyNullResistance")
+	CharacterGetSkillRange(_,_MaxRange,__Me,"Shout_EnemyNullResistance")
+	CharacterGet(_Character,__Me,_MaxRange,Lowest,Distance,Enemy)	
+ACTIONS
+	CharacterUseSkill("Shout_EnemyNullResistance",__Me)
+	SetPriority("VoidDragon_Phase2_UseFear",0)					//cast the one or the other, not both
+	
+REACTION VoidDragon_Phase2_CloseRange,400
+USAGE COMBAT
+VARS
+	CHARACTER:_Character
+	FLOAT:_MaxRange
+	FLOAT:_Rand
+	FLOAT:_FireRes
+	FLOAT:_WaterRes
+	FLOAT:_AirRes
+	FLOAT:_EarthRes
+CHECK "c1&(c2|c3|c4|c5|c6)&c7&c8&c9&c10&c11&c12&!c13"
+	IsGreaterThen(%CurrentPhase,1)															//c1
+	CharacterCanCast(__Me,"Cone_EnemyDragonConeFire")										//c2
+	CharacterCanCast(__Me,"Cone_EnemyDragonConeWater")										//c3
+	CharacterCanCast(__Me,"Cone_EnemyDragonConeAir")										//c4
+	CharacterCanCast(__Me,"Cone_EnemyDragonConeEarth")										//c5
+	CharacterCanCast(__Me,"Cone_EnemyDragonConeVoid")										//c6
+	CharacterGetSkillRange(_,_MaxRange,__Me,"Cone_EnemyDragonConeFire")						//c7
+	CharacterGet(_Character,__Me,_MaxRange,Lowest,Distance,Enemy)							//c8
+	CharacterGetStat(_FireRes,_Character,FireResistance)									//c9
+	CharacterGetStat(_WaterRes,_Character,WaterResistance)									//c10
+	CharacterGetStat(_AirRes,_Character,AirResistance)										//c11
+	CharacterGetStat(_EarthRes,_Character,EarthResistance)									//c12
+	IsEqual(_Character,%Zandalor)															//!c13
+ACTIONS
+	//DebugText(__Me,"P2: Close Range!")
+	//DebugText(%Astarte2,"P2: Close Range!")
+	IF "c1&c2"
+		CharacterCanCast(__Me,"Cone_EnemyDragonConeFire")
+		IsLessThen(_FireRes,100)
+	THEN
+		CharacterUseSkill("Cone_EnemyDragonConeFire",_Character)
+	ELIF "c1&c2"
+		CharacterCanCast(__Me,"Cone_EnemyDragonConeWater")
+		IsLessThen(_WaterRes,100)
+	THEN
+		CharacterUseSkill("Cone_EnemyDragonConeWater",_Character)
+	ELIF "c1&c2"
+		CharacterCanCast(__Me,"Cone_EnemyDragonConeAir")
+		IsLessThen(_AirRes,100)
+	THEN
+		CharacterUseSkill("Cone_EnemyDragonConeAir",_Character)
+	ELIF "c1&c2"
+		CharacterCanCast(__Me,"Cone_EnemyDragonConeEarth")
+		IsLessThen(_EarthRes,100)
+	THEN
+		CharacterUseSkill("Cone_EnemyDragonConeEarth",_Character)
+	ELIF "c1"
+		CharacterCanCast(__Me,"Cone_EnemyDragonConeVoid")
+	THEN
+		CharacterUseSkill("Cone_EnemyDragonConeVoid",_Character)
+	ELIF "c1"
+		CharacterInWeaponRange(__Me,_Character)
+	THEN
+		CharacterAttackWithoutMove(_Character)
+	ELSE
+		SetPriority("VoidDragon_Phase2_CloseRange",0)
+	ENDIF
+
+REACTION VoidDragon_Phase2_LongRange,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Character
+	FLOAT:_Rand
+	FLOAT:_MaxRange
+	FLOAT:_FireRes
+	FLOAT:_WaterRes
+	FLOAT:_AirRes
+	FLOAT:_EarthRes
+CHECK "c1&(c2|c3|c4|c5|c6)&c7&c8&c9&c10&c11&c12"
+	IsGreaterThen(%CurrentPhase,1)															//c1
+	CharacterCanCast(__Me,"Projectile_EnemyDragonProjectileFire")							//c2
+	CharacterCanCast(__Me,"Projectile_EnemyDragonProjectileIce")							//c3
+	CharacterCanCast(__Me,"Projectile_EnemyDragonProjectileAir")							//c4
+	CharacterCanCast(__Me,"Projectile_EnemyDragonProjectileEarth")							//c5
+	CharacterCanCast(__Me,"Projectile_EnemyDragonProjectile")								//c6
+	CharacterGetSkillRange(_,_MaxRange,__Me,"Projectile_EnemyDragonProjectile")				//c7
+	CharacterGet(_Character,__Me,_MaxRange,Lowest,Distance,PlayerNoSummon)					//c8
+	CharacterGetStat(_FireRes,_Character,FireResistance)									//c9
+	CharacterGetStat(_WaterRes,_Character,WaterResistance)									//c10
+	CharacterGetStat(_AirRes,_Character,AirResistance)										//c11
+	CharacterGetStat(_EarthRes,_Character,EarthResistance)									//c12
+ACTIONS
+	//DebugText(__Me,"P2: Long Range!")
+	//DebugText(%Astarte2,"P2: Long Range!")
+	IF "c1"
+		CharacterCanCast(__Me,"Projectile_EnemyDragonProjectileFire")
+	THEN
+		IF "c1|c2"
+			IsRandom(0.6)
+			IsGreaterThen(_FireRes,100)
+		THEN
+			CharacterUseSkill("Projectile_EnemyDragonProjectileFire",%Astarte2)
+		ELSE
+			CharacterUseSkill("Projectile_EnemyDragonProjectileFire",_Character)
+		ENDIF
+	ELIF "c1"
+		CharacterCanCast(__Me,"Projectile_EnemyDragonProjectileIce")
+	THEN
+		IF "c1|c2"
+			IsRandom(0.6)
+			IsGreaterThen(_WaterRes,100)
+		THEN
+			CharacterUseSkill("Projectile_EnemyDragonProjectileIce",%Astarte2)
+		ELSE
+			CharacterUseSkill("Projectile_EnemyDragonProjectileIce",_Character)
+		ENDIF
+	ELIF "c1"
+		CharacterCanCast(__Me,"Projectile_EnemyDragonProjectileAir")
+	THEN
+		IF "c1|c2"
+			IsRandom(0.6)
+			IsGreaterThen(_AirRes,100)
+		THEN
+			CharacterUseSkill("Projectile_EnemyDragonProjectileAir",%Astarte2)
+		ELSE
+			CharacterUseSkill("Projectile_EnemyDragonProjectileAir",_Character)
+		ENDIF
+	ELIF "c1"
+		CharacterCanCast(__Me,"Projectile_EnemyDragonProjectileEarth")
+	THEN
+		IF "c1|c2"
+			IsRandom(0.6)
+			IsGreaterThen(_EarthRes,100)
+		THEN
+			CharacterUseSkill("Projectile_EnemyDragonProjectileEarth",%Astarte2)
+		ELSE
+			CharacterUseSkill("Projectile_EnemyDragonProjectileEarth",_Character)
+		ENDIF
+	ELIF "c1"
+		CharacterCanCast(__Me,"Projectile_EnemyDragonProjectileEarth")
+	THEN
+		IF "c1"
+			IsRandom(0.6)
+		THEN
+			CharacterUseSkill("Projectile_EnemyDragonProjectile",%Astarte2)
+		ELSE
+			CharacterUseSkill("Projectile_EnemyDragonProjectile",_Character)
+		ENDIF
+	ELSE
+		SetPriority("VoidDragon_Phase2_LongRange",0)
+	ENDIF
+	IF "c1"
+		IsRandom(0.3)
+	THEN
+		SetPriority("VoidDragon_Phase2_LongRange",0)
+		//DebugText(__Me,"P2 Long Range disabled!")
+		//DebugText(%Astarte2,"P2 Long Range disabled!")
+	ENDIF
+INTERRUPT
+	Reset()
+	
+REACTION VoidDragon_Phase3_Teleport,1000
+USAGE COMBAT
+VARS
+	FLOAT:_MyAP
+CHECK "c1&c2&!(c3|c4|c5|c6|c7|c8)"
+	IsEqual(%CurrentPhase,3)							//c1
+	CharacterGetStat(_MyAP,__Me,ActionPoints)			//c2
+	CharacterHasStatus(__Me,"CHARMED")					//!c3
+	CharacterHasStatus(__Me,"FROZEN")					//!c4
+	CharacterHasStatus(__Me,"STUNNED")					//!c5
+	CharacterHasStatus(__Me,"PETRIFIED")				//!c6
+	CharacterHasStatus(__Me,"KNOCKED_DOWN")				//!c7
+	IsLessThen(_MyAP,3)									//!c8
+ACTIONS
+	Set(%Bool_P3_TPSpotClear_00,0)
+	Set(%Bool_P3_TPSpotClear_01,0)
+	Set(%Bool_P3_TPSpotClear_02,0)
+	Set(%Bool_P3_TPSpotClear_03,0)
+	CharacterPlayEffect(__Me,"FX_Skills_Air_Teleport_Prepare_A")
+	Sleep(0.5)
+	IterateCharacters("CMB_HOM_VoidDragon_CheckTPSpots",Lowest,Distance)
+	IF "c1"
+		IsEqual(%P3_CurrentTPSpot,0)			//spots 2 & 3 are more interesting, he should check those first
+	THEN
+		IF "c1"
+			IsEqual(%Bool_P3_TPSpotClear_02,1)
+		THEN
+			//DebugText(__Me,"0 -> 2")
+			//DebugText(%Astarte2,"0 -> 2")	
+			CharacterPlayAnimation("Fly_01",1,1)
+			CharacterTeleportTo(%P3_Teleport_Spot02)
+			CharacterPlayAnimation("Dive_01",1,1)
+			IterateCharactersNear(__Me,4,"CMB_HOM_VoidDragon_ApplyKD",Lowest,Distance)
+			Set(%P3_CurrentTPSpot,2)			
+		ELIF "c1"
+			IsEqual(%Bool_P3_TPSpotClear_03,1)
+		THEN
+			//DebugText(__Me,"0 -> 3")			
+			//DebugText(%Astarte2,"0 -> 3")
+			CharacterPlayAnimation("Fly_01",1,1)
+			CharacterTeleportTo(%P3_Teleport_Spot03)			
+			CharacterPlayAnimation("Dive_01",1,1)	
+			IterateCharactersNear(__Me,4,"CMB_HOM_VoidDragon_ApplyKD",Lowest,Distance)		
+			Set(%P3_CurrentTPSpot,3)
+		ELIF "c1"
+			IsEqual(%Bool_P3_TPSpotClear_01,1)
+		THEN
+			//DebugText(__Me,"0 -> 1")			
+			//DebugText(%Astarte2,"0 -> 1")
+			CharacterPlayAnimation("Fly_01",1,1)
+			CharacterTeleportTo(%P3_Teleport_Spot01)				
+			CharacterPlayAnimation("Dive_01",1,1)	
+			IterateCharactersNear(__Me,4,"CMB_HOM_VoidDragon_ApplyKD",Lowest,Distance)				
+			Set(%P3_CurrentTPSpot,1)
+		ELSE
+			//DebugText(__Me,"ERROR: 231 occupied!")
+			//DebugText(%Astarte2,"ERROR: 231 occupied!")
+			SetPriority("VoidDragon_Phase3_Teleport",0)			
+		ENDIF
+	ELIF "c1"
+		IsEqual(%P3_CurrentTPSpot,1)
+	THEN
+		IF "c1"
+			IsEqual(%Bool_P3_TPSpotClear_02,1)
+		THEN
+			//DebugText(__Me,"1 -> 2")
+			//DebugText(%Astarte2,"1 -> 2")	
+			CharacterPlayAnimation("Fly_01",1,1)
+			CharacterTeleportTo(%P3_Teleport_Spot02)	
+			CharacterPlayAnimation("Dive_01",1,1)
+			IterateCharactersNear(__Me,4,"CMB_HOM_VoidDragon_ApplyKD",Lowest,Distance)									
+			Set(%P3_CurrentTPSpot,2)
+		ELIF "c1"
+			IsEqual(%Bool_P3_TPSpotClear_03,1)
+		THEN
+			//DebugText(__Me,"1 -> 3")
+			//DebugText(%Astarte2,"1 -> 3")	
+			CharacterPlayAnimation("Fly_01",1,1)
+			CharacterTeleportTo(%P3_Teleport_Spot03)	
+			CharacterPlayAnimation("Dive_01",1,1)	
+			IterateCharactersNear(__Me,4,"CMB_HOM_VoidDragon_ApplyKD",Lowest,Distance)					
+			Set(%P3_CurrentTPSpot,3)
+		ELIF "c1"
+			IsEqual(%Bool_P3_TPSpotClear_00,1)
+		THEN		
+			//DebugText(__Me,"1 -> 0")
+			//DebugText(%Astarte2,"1 -> 0")
+			CharacterPlayAnimation("Fly_01",1,1)			
+			CharacterTeleportTo(%P3_Teleport_Spot00)	
+			CharacterPlayAnimation("Dive_01",1,1)	
+			IterateCharactersNear(__Me,4,"CMB_HOM_VoidDragon_ApplyKD",Lowest,Distance)					
+			Set(%P3_CurrentTPSpot,0)
+		ELSE
+			//DebugText(__Me,"ERROR: 230 occupied!")
+			//DebugText(%Astarte2,"ERROR: 230 occupied!")
+			SetPriority("VoidDragon_Phase3_Teleport",0)			
+		ENDIF
+	ELIF "c1"
+		IsEqual(%P3_CurrentTPSpot,2)
+	THEN
+		IF "c1"
+			IsEqual(%Bool_P3_TPSpotClear_03,1)
+		THEN
+			//DebugText(__Me,"2 -> 3")
+			//DebugText(%Astarte2,"2 -> 3")	
+			CharacterPlayAnimation("Fly_01",1,1)
+			CharacterTeleportTo(%P3_Teleport_Spot03)
+			CharacterPlayAnimation("Dive_01",1,1)	
+			IterateCharactersNear(__Me,4,"CMB_HOM_VoidDragon_ApplyKD",Lowest,Distance)							
+			Set(%P3_CurrentTPSpot,3)
+		ELIF "c1"
+			IsEqual(%Bool_P3_TPSpotClear_01,1)
+		THEN
+			//DebugText(__Me,"2 -> 1")
+			//DebugText(%Astarte2,"2 -> 1")	
+			CharacterPlayAnimation("Fly_01",1,1)
+			CharacterTeleportTo(%P3_Teleport_Spot01)		
+			CharacterPlayAnimation("Dive_01",1,1)	
+			IterateCharactersNear(__Me,4,"CMB_HOM_VoidDragon_ApplyKD",Lowest,Distance)							
+			Set(%P3_CurrentTPSpot,1)
+		ELIF "c1"
+			IsEqual(%Bool_P3_TPSpotClear_00,1)
+		THEN
+			//DebugText(__Me,"2 -> 0")
+			//DebugText(%Astarte2,"2 -> 0")	
+			CharacterPlayAnimation("Fly_01",1,1)
+			CharacterTeleportTo(%P3_Teleport_Spot00)		
+			CharacterPlayAnimation("Dive_01",1,1)	
+			IterateCharactersNear(__Me,4,"CMB_HOM_VoidDragon_ApplyKD",Lowest,Distance)							
+			Set(%P3_CurrentTPSpot,0)
+		ELSE
+			//DebugText(__Me,"ERROR: 310 occupied!")
+			//DebugText(%Astarte2,"ERROR: 310 occupied!")
+			SetPriority("VoidDragon_Phase3_Teleport",0)
+		ENDIF
+	ELIF "c1"
+		IsEqual(%P3_CurrentTPSpot,3)
+	THEN
+		IF "c1"
+			IsEqual(%Bool_P3_TPSpotClear_02,1)
+		THEN
+			//DebugText(__Me,"3 -> 2")
+			//DebugText(%Astarte2,"3 -> 2")	
+			CharacterPlayAnimation("Fly_01",1,1)			
+			CharacterTeleportTo(%P3_Teleport_Spot02)	
+			CharacterPlayAnimation("Dive_01",1,1)
+			IterateCharactersNear(__Me,4,"CMB_HOM_VoidDragon_ApplyKD",Lowest,Distance)							
+			Set(%P3_CurrentTPSpot,2)
+		ELIF "c1"
+			IsEqual(%Bool_P3_TPSpotClear_01,1)
+		THEN
+			//DebugText(__Me,"3 -> 1")
+			//DebugText(%Astarte2,"3 -> 1")
+			CharacterPlayAnimation("Fly_01",1,1)
+			CharacterTeleportTo(%P3_Teleport_Spot01)						
+			CharacterPlayAnimation("Dive_01",1,1)
+			IterateCharactersNear(__Me,4,"CMB_HOM_VoidDragon_ApplyKD",Lowest,Distance)							
+			Set(%P3_CurrentTPSpot,1)
+		ELIF "c1"
+			IsEqual(%Bool_P3_TPSpotClear_00,1)
+		THEN
+			//DebugText(__Me,"3 -> 0")
+			//DebugText(%Astarte2,"3 -> 0")
+			CharacterPlayAnimation("Fly_01",1,1)
+			CharacterTeleportTo(%P3_Teleport_Spot00)						
+			CharacterPlayAnimation("Dive_01",1,1)	
+			IterateCharactersNear(__Me,4,"CMB_HOM_VoidDragon_ApplyKD",Lowest,Distance)							
+			Set(%P3_CurrentTPSpot,0)
+		ELSE
+			//DebugText(__Me,"ERROR: 210 occupied!")
+			//DebugText(%Astarte2,"ERROR: 210 occupied!")
+			SetPriority("VoidDragon_Phase3_Teleport",0)
+		ENDIF
+	ENDIF
+	CharacterUseActionPoints(__Me,3)
+	//DebugText(__Me,"TP complete!")
+	//DebugText(%Astarte2,"TP complete!")
+	CharacterResetCombatTimeout(__Me)
+	SetPriority("VoidDragon_Phase3_Teleport",0)
+INTERRUPT
+	Reset()
+
+REACTION VoidDragon_Phase4_Evacuate,1000
+USAGE COMBAT
+VARS
+	FLOAT:_MyAP
+CHECK "c1&c2&!c3"
+	IsEqual(%CurrentPhase,4)
+	CharacterGetStat(_MyAP,__Me,ActionPoints)
+	IsLessThen(_MyAP,4)
+ACTIONS
+	//DebugText(__Me,"HP critical: evacuating!")
+	//DebugText(%Astarte2,"HP critical: evacuating!")
+	Set(%Bool_P3_TPSpotClear_00,0)
+	CharacterPlayEffect(__Me,"FX_Skills_Air_Teleport_Prepare_A")
+	Sleep(0.5)
+	IterateCharacters("CMB_HOM_VoidDragon_CheckTPSpots",Lowest,Distance)
+	IF "!c1"
+		IsEqual(%P3_CurrentTPSpot,0)
+	THEN
+		CharacterPlayAnimation("Fly_01",1,1)
+		CharacterTeleportTo(%P3_Teleport_Spot00)								
+		StartTimer("HOM_VoidDragon_ApplyKnockdown_Timer",0.9,0)
+		CharacterPlayAnimation("Dive_01",1,1)		
+		Set(%P3_CurrentTPSpot,0)
+		CharacterLookAt(%Astarte2)
+		//DebugText(__Me,"Evacuated OK!")
+		//DebugText(%Astarte2,"Evacuated OK!")
+	ELSE
+		//DebugText(__Me,"Already at Evac!")
+		//DebugText(%Astarte2,"Already at Evac!")
+	ENDIF
+	SetPriority("VoidDragon_Phase4_Evacuate",0)
+			
+REACTION VoidDragon_AnyPhase_Physical,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Character
+CHECK "c1&c2"
+	CharacterGet(_Character,__Me,5,Lowest,Distance,Enemy)
+	CharacterInWeaponRange(__Me,_Character)
+ACTIONS
+	//DebugText(__Me,"AnyP: Physical")
+	//DebugText(%Astarte2,"AnyP: Physical")
+	/*IF "c1"
+		CharacterCanCast(__Me,"Shout_EnemyRage")
+	THEN
+		CharacterUseSkill("Shout_EnemyRage",__Me)
+	ENDIF*/
+	CharacterAttackWithoutMove(_Character)
+	IF "c1"
+		IsRandom(0.7)
+	THEN
+		CharacterAttackWithoutMove(_Character)
+	ELSE
+		SetPriority("VoidDragon_AnyPhase_Physical",0)
+	ENDIF
+	
+REACTION VoidDragon_AnyPhase_Animation,1000
+USAGE WAITING
+ACTIONS
+	//CharacterLookAt(%Astarte2)
+	//CharacterPlayAnimation("loop_cast_loop")
+	Sleep(1)
+		
+REACTION VoidDragon_PhaseManager,900
+USAGE COMBAT
+VARS
+	FLOAT:_MyVitality
+ACTIONS
+	Set(%DetectedCharacters,0)
+	IterateCharacters("CMB_HOM_VoidDragon_ScanForAllies",Lowest,Distance)
+	IF "c1"
+		IsEqual(%CurrentPhase,1)
+	THEN
+		IF "c1&(c2|(c3&c4))"
+			IsEqual(%Bool_Summon1_OK,1)
+			IsEqual(%DetectedCharacters,0)
+			CharacterGetStat(_MyVitality,__Me,Vitality)
+			IsLessThen(_MyVitality,0.7)
+		THEN
+			//DebugText(__Me,"Dragon: Phase 2")
+			//DebugText(%Astarte2,"Dragon: Phase 2")
+			Set(%CurrentPhase,2)
+			SetPriority("VoidDragon_PhaseManager",0)
+		ENDIF
+		SetPriority("VoidDragon_PhaseManager",0)
+	ELIF "c1"
+		IsEqual(%CurrentPhase,2)
+	THEN
+		IF "c1&(c2|(c3&c4))"
+			IsEqual(%Bool_Summon2_OK,1)
+			IsEqual(%DetectedCharacters,0)
+			CharacterGetStat(_MyVitality,__Me,Vitality)
+			IsLessThen(_MyVitality,0.4)
+		THEN
+			//DebugText(__Me,"Dragon: Phase 3")
+			//DebugText(%Astarte2,"Dragon: Phase 3")
+			Set(%CurrentPhase,3)			
+			SetPriority("VoidDragon_PhaseManager",0)
+		ENDIF
+		SetPriority("VoidDragon_PhaseManager",0)
+	ELIF "c1|c2"
+		IsEqual(%CurrentPhase,3)
+		IsEqual(%CurrentPhase,4)	//phase 4 is handled elsewhere
+	THEN
+		SetPriority("VoidDragon_PhaseManager",0)
+	ENDIF
+INTERRUPT
+	Reset()
+
+//-- TEXTS
+REACTION VoidDragon_AnyPhase_AstarteWounded_01,2200
+USAGE COMBAT
+VARS
+	FLOAT:_AstartesVitality
+CHECK "c1&c2&c3"
+	CharacterGetStat(_AstartesVitality,%Astarte2,Vitality)
+	IsLessThen(_AstartesVitality,0.7)
+	IsGreaterThen(_AstartesVitality,0.5)
+ACTIONS
+	DisplayText(__Me,"HOM_End_Void1",3)
+	Sleep(3)
+	SetPriority("VoidDragon_AnyPhase_AstarteWounded_01",0)
+		
+REACTION VoidDragon_AnyPhase_AstarteWounded_02,2100
+USAGE COMBAT
+VARS
+	FLOAT:_AstartesVitality
+CHECK "c1&c2&c3"
+	CharacterGetStat(_AstartesVitality,%Astarte2,Vitality)
+	IsLessThen(_AstartesVitality,0.5)
+	IsGreaterThen(_AstartesVitality,0.3)
+ACTIONS
+	DisplayText(__Me,"HOM_End_Void2",3)
+	Sleep(3)	
+	SetPriority("VoidDragon_AnyPhase_AstarteWounded_01",0)	
+	SetPriority("VoidDragon_AnyPhase_AstarteWounded_02",0)
+		
+REACTION VoidDragon_AnyPhase_AstarteWounded_03,2000
+USAGE COMBAT
+VARS
+	FLOAT:_AstartesVitality
+CHECK "c1&c2&c3"
+	CharacterGetStat(_AstartesVitality,%Astarte2,Vitality)
+	IsLessThen(_AstartesVitality,0.3)
+	IsGreaterThen(_AstartesVitality,0.1)
+ACTIONS
+	DisplayText(__Me,"HOM_End_Void3",3)
+	Sleep(3)	
+	SetPriority("VoidDragon_AnyPhase_AstarteWounded_01",0)
+	SetPriority("VoidDragon_AnyPhase_AstarteWounded_02",0)
+	SetPriority("VoidDragon_AnyPhase_AstarteWounded_03",0)
+		
+REACTION VoidDragon_AnyPhase_Fallback,10
+USAGE COMBAT
+ACTIONS
+	//DebugText(__Me,"Falling back!")
+	//DebugText(%Astarte2,"Falling back!")
+	CharacterEndTurn()
+	
+//------------------------
+EVENTS
+EVENT OnInit_AddSkill
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill("Cone_EnemyDragonConeAir")
+	CharacterAddSkill("Cone_EnemyDragonConeVoid")
+	CharacterAddSkill("Cone_EnemyDragonConeEarth")
+	CharacterAddSkill("Cone_EnemyDragonConeWater")
+	CharacterAddSkill("Cone_EnemyDragonConeFire")
+	CharacterAddSkill("Projectile_EnemyDragonProjectile")	
+	CharacterAddSkill("Projectile_EnemyDragonProjectileAir")	
+	CharacterAddSkill("Projectile_EnemyDragonProjectileEarth")	
+	CharacterAddSkill("Projectile_EnemyDragonProjectileIce")	
+	CharacterAddSkill("Projectile_EnemyDragonProjectileFire")	
+	//CharacterAddSkill("Shout_EnemyFear")
+	CharacterAddSkill("Shout_EnemySlowMass")
+	//CharacterAddSkill("Shout_EnemyNullResistance")
+	//CharacterAddSkill("Shout_EnemyRage")
+
+EVENT OnCombatStarted_ApplyKnockdownOnSpawningPoint
+ON
+	OnCombatStarted()
+ACTIONS
+	IterateCharactersNear(__Me,4,"CMB_HOM_VoidDragon_ApplyKD",Lowest,Distance)
+
+EVENT OnTurn_GeneralControl	
+VARS
+	TRIGGER:_ChosenTrigger
+	TRIGGER:_Trigger1="HOM_EndFight_ShadowExploder_Spawn01_c771ee36-bfa2-4a45-b245-bf13c50728c6"
+	TRIGGER:_Trigger2="HOM_EndFight_ShadowExploder_Spawn02_bbefd086-d43f-4225-9647-4f26215671f2"
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("VoidDragon_PhaseManager",1200)
+	IF "c1"
+		IsEqual(%CurrentPhase,1)
+	THEN
+		SetPriority("VoidDragon_Phase1_CloseRange",400)
+	ELIF "c1"
+		IsEqual(%CurrentPhase,2)
+	THEN
+		SetPriority("VoidDragon_Phase2_CloseRange",400)
+		SetPriority("VoidDragon_Phase2_LongRange",400)
+		SetPriority("VoidDragon_Phase2_UseFear",500)
+		SetPriority("VoidDragon_Phase2_UseNullifyResistance",500)
+	ENDIF
+	IF "c1"
+		IsEqual(%CurrentPhase,3)
+	THEN
+		Set(%DetectedCharacters,0)
+		IterateCharactersNear(__Me,10,"CMB_HOM_VoidDragon_ScanForEnemies",Lowest,Distance)			
+		IF "c1"
+			IsGreaterThen(%DetectedCharacters,1)
+		THEN
+			SetPriority("VoidDragon_Phase3_Teleport",1000)
+			//DebugText(__Me,"Leaving! ([1])",%DetectedCharacters)		
+			//DebugText(%Astarte2,"Leaving! ([1])",%DetectedCharacters)	
+		ELSE
+			//DebugText(__Me,"Staying! ([1])",%DetectedCharacters)		
+			//DebugText(%Astarte2,"Staying! ([1])",%DetectedCharacters)	
+		ENDIF
+	ENDIF
+	IF "c1&c2"
+		IsHardcore()
+		IsLessThen(%SpawnExploder_Current,%SpawnExploder_Desired)
+	THEN
+		Add(%SpawnExploder_Current,1)
+	ELIF "c1&c2"
+		IsHardcore()
+		IsEqual(%SpawnExploder_Current,%SpawnExploder_Desired)
+	THEN
+		//DebugText(__Me,"HC: Spawning Exploder!")
+		//DebugText(%Astarte2,"HC: Spawning Exploder!")
+		GetRandom(_ChosenTrigger,_Trigger1,_Trigger2)
+		PlayEffectAt(_ChosenTrigger,"FX_Skills_WitchCraft_Summon_Summon_A")
+		SpawnCharacter(_,"Shadows_Ghoul_B_1f7ba45b-8fc0-4265-a292-9766b7610b3e",_ChosenTrigger,1,1,__Me)
+		Set(%SpawnExploder_Current,0)
+	ENDIF
+	
+EVENT OnIterateCharacter_ScanForAllies
+VARS
+	CHARACTER:_Character
+	CHARACTERTEMPLATE:_CharacterTemplate
+ON
+	OnIterateCharacter(_Character,"CMB_HOM_VoidDragon_ScanForAllies")
+ACTIONS
+	IF "c1&!c2&c3&(c4|c5|c6)"
+		IsEqual(%CurrentPhase,1)
+		CharacterIsDead(_Character)
+		CharacterGetTemplate(_Character,_CharacterTemplate)
+		IsEqual(_CharacterTemplate,"Shadows_Grunt_B_35d1a441-11a9-414f-aa2d-4253c51c18bf")
+		IsEqual(_CharacterTemplate,"Shadows_Caster_B_f20f481c-d832-4204-ad6a-3eebc3455663")
+		IsEqual(_CharacterTemplate,"Shadows_Mage_B_b63de0c5-8e4d-4052-bc50-1c59092065f3")
+	THEN
+		//DebugText(__Me,"P1 Char Found! ([1])",%DetectedCharacters)
+		//DebugText(%Astarte2,"P1 Char Found! ([1])",%DetectedCharacters)
+		Add(%DetectedCharacters,1)
+	ENDIF
+	IF "c1&!c2&c3&c4"
+		IsEqual(%CurrentPhase,2)
+		CharacterIsDead(_Character)
+		CharacterGetTemplate(_Character,_CharacterTemplate)
+		IsEqual(_CharacterTemplate,"Shadows_Spider_A_25c1e827-dd1e-4f7b-ad26-fd7c599f4f28")
+	THEN
+		//DebugText(__Me,"P2 Char Found! ([1])",%DetectedCharacters)
+		//DebugText(%Astarte2,"P2 Char Found! ([1])",%DetectedCharacters)
+		Add(%DetectedCharacters,1)
+	ENDIF
+	
+EVENT OnIterateCharacter_ScanForEnemies
+VARS
+	CHARACTER:_Character
+ON
+	OnIterateCharacter(_Character,"CMB_HOM_VoidDragon_ScanForEnemies")
+ACTIONS
+	IF "c1&c2&!(c3|c4|c5|c6|c7|c8|c9|c10|c11|c12|c13)"
+		IsEqual(%CurrentPhase,3)							//c1
+		CharacterIsEnemy(__Me,_Character)					//c2
+		IsEqual(_Character,%Astarte2)						//!c3
+		IsEqual(_Character,%Icandra)						//!c4
+		IsEqual(_Character,%Zandalor)						//!c5
+		CharacterIsSummon(_Character)						//!c6
+		CharacterIsDead(_Character)							//!c7
+		CharacterHasStatus(_Character,"STUNNED")			//!c8
+		CharacterHasStatus(_Character,"PETRIFIED")			//!c9
+		CharacterHasStatus(_Character,"FROZEN")				//!c10
+		CharacterHasStatus(_Character,"CHARMED")			//!c11
+		CharacterHasStatus(_Character,"FEAR")				//!c12
+		CharacterHasStatus(_Character,"KNOCKED_DOWN")		//!c13
+	THEN
+		Add(%DetectedCharacters,1)
+		//DebugText(_Character,"Detected! ([1])",%DetectedCharacters)	
+	ENDIF
+	
+EVENT OnIterateCharacter_CheckTeleportationSpots
+VARS
+	CHARACTER:_Character
+ON
+	OnIterateCharacter(_Character,"CMB_HOM_VoidDragon_CheckTPSpots")
+ACTIONS
+	IF "!c1"
+		CharacterGet(_Character,%P3_Teleport_Spot00,5,Lowest,Distance)
+	THEN
+		Set(%Bool_P3_TPSpotClear_00,1)
+	ENDIF
+	IF "!c1"
+		CharacterGet(_Character,%P3_Teleport_Spot01,5,Lowest,Distance)
+	THEN
+		Set(%Bool_P3_TPSpotClear_01,1)	
+	ENDIF
+	IF "!c1"
+		CharacterGet(_Character,%P3_Teleport_Spot02,5,Lowest,Distance)
+	THEN
+		Set(%Bool_P3_TPSpotClear_02,1)		
+	ENDIF
+	IF "!c1"
+		CharacterGet(_Character,%P3_Teleport_Spot03,5,Lowest,Distance)
+	THEN
+		Set(%Bool_P3_TPSpotClear_03,1)		
+	ENDIF
+
+EVENT OnTimer_ApplyKnockdownOnLandingPoint
+ON
+	OnTimer("HOM_VoidDragon_ApplyKnockdown_Timer")
+ACTIONS
+	IterateCharactersNear(__Me,4,"CMB_HOM_VoidDragon_ApplyKD",Lowest,Distance)
+		
+EVENT OnIterateCharacter_CheckForCharactersInLandingZone
+VARS
+	CHARACTER:_Character
+ON
+	OnIterateCharacter(_Character,"CMB_HOM_VoidDragon_ApplyKD")
+ACTIONS
+	IF "c1&!(c2|c3)"
+		CharacterIsEnemy(__Me,_Character)
+		IsEqual(_Character,__Me)		
+		IsEqual(_Character,%Astarte2)		
+	THEN
+		CharacterConsume(_Character,"CMB_HOM_Dragon_CrushingAttack")
+		//DebugText(_Character,"Crushed!")
+	ENDIF
+	
+EVENT OnDie_Astarte_EndCombat
+ON
+	OnDie(%Astarte2,_,_,_)
+ACTIONS
+	CharacterSetCanFight(__Me,0)
+	IterateCharactersNear(__Me,40,"CMB_HOM_VoidDragon_CleanUp")
+
+EVENT OnVitalityChanged_SetPhaseTo4
+ON
+	OnVitalityChanged(_)
+VARS
+	FLOAT:_HPPercentage
+ACTIONS
+	IF "c1&c2"
+		CharacterGetStat(_HPPercentage, __Me, Vitality)
+		IsLessThen(_HPPercentage, 0.15)
+	THEN
+		//DebugText(__Me,"HP=[1]%, entering Phase 4!",_HPPercentage)
+		Set(%CurrentPhase,4)
+	ENDIF
+	
+EVENT OnDie_Dragon_CleanUp
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	IterateCharactersNear(__Me,40,"CMB_HOM_VoidDragon_CleanUp")
+	StopLoopEffect(%ReusableHandle_01)
+	StopLoopEffect(%ReusableHandle_02)
+	StopLoopEffect(%ReusableHandle_03)
+	StopLoopEffect(%ReusableHandle_04)
+	StopLoopEffect(%ReusableHandle_05)
+	StopLoopEffect(%ReusableHandle_06)
+
+EVENT OnIterateCharacter_CleanUp
+VARS
+	CHARACTER:_Character
+ON
+	OnIterateCharacter(_Character,"CMB_HOM_VoidDragon_CleanUp")
+ACTIONS
+	IF "c1&!c2"
+		CharacterIsAlly(__Me,_Character)
+		IsEqual(_Character,__Me)
+	THEN
+		CharacterDie(_Character)
+	ENDIF
+	
+EVENT OnCombatEnded_StopLoopFX
+ON
+	OnCombatEnded()
+	OnDeactivate()
+ACTIONS
+	StopLoopEffect(%ReusableHandle_01)
+	StopLoopEffect(%ReusableHandle_02)
+	StopLoopEffect(%ReusableHandle_03)
+	StopLoopEffect(%ReusableHandle_04)
+	StopLoopEffect(%ReusableHandle_05)
+	StopLoopEffect(%ReusableHandle_06)
+	

@@ -1,0 +1,14 @@
+INIT
+	CHARACTER:__Me
+	EXTERN STATUS:%DesiredStatus=STUNNED
+	EXTERN INT:%Int_StatusDuration=3
+	EXTERN INT:%Bool_ForceStatus=0	
+	
+EVENTS
+EVENT OnDamage_ApplyStatus
+VARS
+	CHARACTER:_Player
+ON
+	OnDamage(_,_,_Player,_)
+ACTIONS
+	CharacterApplyStatus(_Player,%DesiredStatus,%Int_StatusDuration,%Bool_ForceStatus)

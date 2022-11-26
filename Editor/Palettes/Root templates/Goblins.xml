@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<palette xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <palettes />
+  <objectids>
+    <guid>2429a605-e7a0-4fc2-bf5b-67f985c08a25</guid>
+    <guid>cb225653-2d14-47c3-be29-6654067a6b23</guid>
+    <guid>a330c7fc-ded7-4bbd-9d4b-d3449d609a27</guid>
+    <guid>09a7fdd6-fff3-47a3-a81a-03e24df0b224</guid>
+    <guid>cc4f39ee-3219-4a50-9056-7a2065c2499c</guid>
+    <guid>308d8102-e7f7-4176-b853-cb18c2cbdbb0</guid>
+    <guid>f3aa2ebf-ca35-4279-b0f7-68ed2736351f</guid>
+    <guid>4305a14f-c8de-4cb5-b69c-0301109c6a97</guid>
+    <guid>a2cc856f-6b43-4fea-88d4-265019aa90f5</guid>
+    <guid>1fe3ff41-d8b4-454f-b03e-a6c2e8d3255a</guid>
+  </objectids>
+  <name>Goblins</name>
+</palette>

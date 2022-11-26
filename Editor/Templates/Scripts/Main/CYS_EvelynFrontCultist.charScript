@@ -1,0 +1,41 @@
+INIT
+
+	CHARACTER:__Me 
+	CHARACTER:%OrcFriend = CYS_EvelynsOrc_75f80824-5228-426e-b059-ef8e181309cb
+	INT:%Counter = 0
+EVENTS
+
+EVENT atTheOrcs
+	ON
+		OnCharacterEvent(%OrcFriend, "RunToOrcs")
+	ACTIONS
+		SetPriority("RunToOrcs", 0)
+
+EVENT startFight
+	ON	
+		OnCombatStarted()
+	ACTIONS
+		IF "c1"
+			IsEqual(%Counter, 0)
+		THEN
+			DisplayText(__Me, "CYS_EvelynFirstCultist", 5)
+			Add(%Counter, 1)
+		ENDIF
+		CharacterConsume(__Me, Quest_GoblinPerceptionBoost)
+
+EVENT endFight
+	ON
+		OnCombatEnded()
+	ACTIONS
+		CharacterConsume(__Me, Quest_GoblinPerceptionLow)
+
+BEHAVIOUR
+
+REACTION RunToOrcs, 5000
+	USAGE COMBAT
+	CHECK "!c1"
+		CharacterHasStatus(__Me, CHARMED)
+	ACTIONS
+		CharacterMoveTo(%OrcFriend,1)
+		CharacterEvent(__Me, "caughtUpOrcs")
+		SetPriority(RunToOrcs, 0)

@@ -1,0 +1,69 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	TRIGGER:%Slab = LUC_IV_TeacherAtSlab_34d61fbe-44ef-4f49-8ae2-e2a4739f8684
+	TRIGGER:%LeftSpot = LUC_IV_TeacherLeftSpot_5f957b1d-1399-4f77-8494-d0f48e081fda
+	TRIGGER:%RightSpot = LUC_IV_TeacherRightSpot_c8a3605a-11f8-4355-b380-21ebbf236d0c
+	CHARACTER:%Student = LUC_IV_AnnoyingStudent_035d0e37-fca8-4f3c-b89f-7edf7ee6e013
+	INT:%Reset = 0
+	
+BEHAVIOUR
+
+REACTION State_TeachingClass, 0
+	USAGE PEACE
+	ACTIONS
+		GetRandom(%currentAction, "Action_UsingSlab", "Action_WalkingFrontDesk", "Action_Discoursing")
+		SetPriority(%currentAction, 1100)
+		
+REACTION Action_UsingSlab, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterMoveTo(%Slab, 0)
+		CharacterLookFrom(%Slab)
+		Set(%Reset, 1)
+		DialogStart("LUC_IV_AD_TeacherAtSlab",__Me)
+		Set(%Reset, 0)
+		CharacterPlayAnimation("Fidget_Forward_01")
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		IF "c1"
+			IsEqual(%Reset, 0)
+		THEN
+			SetPriority(%currentAction, 0)
+		ENDIF
+		
+REACTION Action_Discoursing, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterMoveTo(%Slab, 0) //Need to change to blackboard when we get one.
+		CharacterLookFrom(%Slab)  //id.
+		Sleep(5)
+		DialogStart("LUC_IV_AD_TeacherDiscoursing", __Me)
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)
+		
+REACTION Action_WalkingFrontDesk, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterMoveTo(%LeftSpot)
+		CharacterLookFrom(%LeftSpot)
+		Set(%Reset, 1)
+		Sleep(5)
+		DialogStart("LUC_IV_AD_TeacherDiscoursing", __Me)
+		Set(%Reset, 0)
+		CharacterMoveTo(%RightSpot)
+		CharacterLookFrom(%RightSpot)
+		CharacterPlayAnimation("Sigh_01")
+		CharacterLookAt(%Student)
+		CharacterPlayAnimation("Point_01")
+		DialogStart("LUC_IV_AD_TeacherYellStudent", __Me, %Student)
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		IF "c1"
+			IsEqual(%Reset, 0)
+		THEN
+			SetPriority(%currentAction, 0)
+		ENDIF

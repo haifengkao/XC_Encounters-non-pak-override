@@ -1,0 +1,59 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+CHARACTER:%Friend = CYS_WarehouseGuard2_df946569-d857-449e-b3bc-6304f73fa0f2
+CHARACTER:%Friend2 = CYS_WarehouseSergeant_bee43f0f-3e25-44e6-a266-0fe1958f1bef
+TRIGGER:%Point1 = CYS_PointWarehouseGuard1_1_f38da14d-8dd6-44c1-99d8-e53de5ceb2ad
+TRIGGER:%Point2 = CYS_PointWarehouseGuard1_2_f9ad72b3-ff55-4eaf-a982-0bbf2ba50069
+TRIGGER:%Point3 = CYS_Forbidden_WarehouseNormalRoom_Exit_e831ab42-0b47-4751-b5fe-72d26fa19321
+ITEM:%NormalDoor = CYS_PortWarehouseDoorNormal_63ecdb2c-79e8-4375-a12e-3f4e59c8d633
+CHARACTER:%PrevTalkTarget = null
+
+BEHAVIOUR
+
+REACTION State_Patrolling, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, "Action_GoToPoints","Action_TalkToFriends")
+	SetPriority(%currentAction, 1100)
+
+REACTION Action_GoToPoints,0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	CharacterMoveTo(%Point1)
+	CharacterLookFrom(%Point1)
+	Sleep(2)
+	GetRandom(_Animation,"Look_Down_Short_01","Look_Down_Long_01","Bored_01","Bored_02")
+	CharacterPlayAnimation(_Animation)
+	Sleep(2)
+	CharacterMoveTo(%Point2)
+	CharacterLookFrom(%Point2)
+	Sleep(2)	
+	GetRandom(_Animation,"Look_Down_Short_01","Look_Down_Long_01","Bored_01","Bored_02")
+	CharacterPlayAnimation(_Animation)
+	Sleep(2)
+	CharacterLookAt(%Point3)
+	Sleep(2)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)
+
+REACTION Action_TalkToFriends,0
+USAGE PEACE
+VARS
+	CHARACTER:_Friend
+ACTIONS
+	GetRandom(_Friend,%Friend,%Friend2)
+	GotoIfEqual(%PrevTalkTarget,_Friend,"Start")
+	Set(%PrevTalkTarget,_Friend)
+	CharacterMoveTo(_Friend,0)
+	CharacterEvent(_Friend,"DialogRequest")
+	CharacterLookAt(_Friend)
+	Sleep(2)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)

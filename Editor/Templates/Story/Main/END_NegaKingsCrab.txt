@@ -1,0 +1,1032 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+ProcDisablePlayerTrade(CHARACTER_END_NegaShrike);
+ProcDisablePlayerTrade(CHARACTER_END_NegaSam);
+ProcDisablePlayerTrade(CHARACTER_END_NegaPincer);
+ProcDisablePlayerTrade(CHARACTER_END_ThirdGuardian);
+
+NOT DB_IsNotMessingAround(CHARACTER_END_NegaSam);
+NOT DB_IsNotMessingAround(CHARACTER_END_NegaKingsCrab_Deer1);
+NOT DB_IsNotMessingAround(CHARACTER_END_NegaKingsCrab_Deer2);
+NOT DB_IsNotMessingAround(CHARACTER_END_NegaPincer);
+CharacterSetOnStage(CHARACTER_END_NegaIcara,0);
+CharacterSetOnStage(CHARACTER_END_NegaKingsCrab_Deer1,0);
+CharacterSetOnStage(CHARACTER_END_NegaKingsCrab_Deer2,0);
+DB_NoDefaultBehavior(CHARACTER_END_ThirdGuardian);
+
+DB_END_NegaKingsCrabNPC(CHARACTER_END_NegaIcara,0);
+DB_END_NegaKingsCrabNPC(CHARACTER_END_NegaPincer,0);
+DB_END_NegaKingsCrabNPC(CHARACTER_END_NegaDukeOfFerol,20);
+DB_END_NegaKingsCrabNPC(CHARACTER_END_NegaEsmeralda,20);
+DB_END_NegaKingsCrabNPC(CHARACTER_END_NegaSam,0);
+DB_END_NegaKingsCrabNPC(CHARACTER_END_NegaShrike,0);
+DB_END_NegaKingsCrabNPC(CHARACTER_END_NegaZixZax,0);
+DB_END_NegaKingsCrabNPC(CHARACTER_END_NegaWeaverOfTime,0);
+DB_END_NegaKingsCrabNPC(CHARACTER_END_NegaJake,0);
+DB_END_NegaKingsCrabNPC(CHARACTER_END_AstarteMourner1,15);
+DB_END_NegaKingsCrabNPC(CHARACTER_END_AstarteMourner2,15);
+DB_END_NegaKingsCrabNPC(CHARACTER_END_AstarteMourner3,15);
+DB_END_NegaKingsCrabNPC(CHARACTER_END_AstarteMourner4,15);
+DB_END_NegaKingsCrabNPC(CHARACTER_END_AstarteMourner5,15);
+DB_END_NegaKingsCrabNPC(CHARACTER_END_AstarteMournerSkel1,15);
+DB_END_NegaKingsCrabNPC(CHARACTER_END_AstarteMournerSkel2,15);
+DB_END_NegaKingsCrabNPC(CHARACTER_END_AstarteMournerSkel3,15);
+DB_END_NegaKingsCrabNPC(CHARACTER_END_AstarteMournerSkel4,15);
+DB_END_NegaKingsCrabNPC(CHARACTER_END_AstarteMournerSkel5,15);
+DB_END_NegaKingsCrabNPC(CHARACTER_END_NegaKingsCrab_Deer2,15);
+DB_END_NegaKingsCrabNPC(CHARACTER_END_NegaKingsCrab_Deer1,15);
+DB_END_NegaKingsCrabNPC(CHARACTER_END_NegaThelyron,0);
+DB_END_NegaKingsCrabNPC(CHARACTER_END_NegaEvelyn,0);
+DB_END_NegaKingsCrabNPC(CHARACTER_END_NegaSteven,0);
+DB_END_NegaKingsCrabNPC(CHARACTER_END_NegaBoris,0);
+DB_END_NegaKingsCrabNPC(CHARACTER_END_NegaFishThief,15);
+DB_END_NegaKingsCrabNPC(CHARACTER_END_NegaLeandraCrime,0);
+DB_END_NegaKingsCrabNPC(CHARACTER_END_NegaZandalorCrime,0);
+
+Proc_END_SetupNegaKingsCrabNPCs();
+
+DB_AD_Dialog(CHARACTER_END_NegaEsmeralda,"END_AD_NegaEsmeralda");
+DB_AD_Dialog(CHARACTER_END_NegaDukeOfFerol,"END_AD_NegaDukeOfFerol");
+DB_AD_Dialog(CHARACTER_END_NegaJake,"END_AD_NegaJake");
+DB_AD_Dialog(CHARACTER_END_NegaZixZax,"END_AD_NegaKingsCrab_ZixZax");
+DB_AD_Dialog(CHARACTER_END_NegaWeaverOfTime,"END_AD_NegaKingsCrab_WeaverOfTime");
+DB_AD_Dialog(CHARACTER_END_NegaIcara,"END_AD_NegaIcara");
+DB_AD_Dialog(CHARACTER_END_NegaFishThief,"END_AD_NegaKingsCrab_ThiefRobin");
+DB_AD_Dialog(CHARACTER_END_NegaThelyron,"END_AD_NegaKingsCrab_NegaThelyron");
+DB_AD_Dialog(CHARACTER_END_NegaEvelyn,"END_AD_NegaKingsCrab_NegaEvelyn");
+DB_AD_Dialog(CHARACTER_END_NegaBoris,"END_AD_NegaKingsCrab_NegaBoris");
+DB_AD_Dialog(CHARACTER_END_NegaSteven,"END_AD_NegaKingsCrab_NegaSteven");
+
+DB_Dialogs(CHARACTER_END_NegaShrike,"END_NegaKingsCrab_NegaShrike");
+DB_Dialogs(CHARACTER_END_NegaSam,"END_NegaSam");
+DB_Dialogs(CHARACTER_END_NegaPincer,"END_NegaPincer");
+
+DB_END_NegaFish(ITEM_END_NegaFish1);
+DB_END_NegaFish(ITEM_END_NegaFish2);
+DB_END_NegaFish(ITEM_END_NegaFish3);
+DB_END_NegaFish(ITEM_END_NegaFish4);
+DB_END_NegaFish(ITEM_END_NegaFish5);
+DB_END_NegaFish(ITEM_END_NegaFish6);
+DB_END_NegaFish(ITEM_END_NegaFish7);
+DB_END_NegaFish(ITEM_END_NegaFish9);
+
+// ITEMS
+ItemToContainer(ITEM_END_Key_NegaKingsCrab_Room1,ITEM_END_BookOfImmaculates,1);
+ItemToContainer(ITEM_END_Key_NegaKingsCrab_Room2,ITEM_END_NegaAstarteCorpseContainer,1);
+ItemSetOnstage(ITEM_END_NegaAstarteCorpseContainer,0);
+ItemSetOnstage(ITEM_END_NegaBigFishTub,0);
+ItemSetOnstage(ITEM_END_LeandraPanties,0);
+ItemSetOnstage(ITEM_END_Nega_ThiefBarrierButton,0);
+
+DB_ItemDialogs(ITEM_END_NegaAstarteCorpse,"END_NegaKingsCrab_AstartePayRespects");
+
+// ASTARTE MOURNERS
+DB_END_NegaKingsCrabAstarteMouners(CHARACTER_END_AstarteMourner1,CHARACTER_END_AstarteMournerSkel1);
+DB_END_NegaKingsCrabAstarteMouners(CHARACTER_END_AstarteMourner2,CHARACTER_END_AstarteMournerSkel2);
+DB_END_NegaKingsCrabAstarteMouners(CHARACTER_END_AstarteMourner3,CHARACTER_END_AstarteMournerSkel3);
+DB_END_NegaKingsCrabAstarteMouners(CHARACTER_END_AstarteMourner4,CHARACTER_END_AstarteMournerSkel4);
+DB_END_NegaKingsCrabAstarteMouners(CHARACTER_END_AstarteMourner5,CHARACTER_END_AstarteMournerSkel5);
+Proc_END_NegaKingsCrab_SetupAstarteMouners();
+
+// TRIFE COMBAT
+DB_OneShotPlayerTrigger(TRIGGER_END_Box_NegaKingsCrabBattleSceneStart);
+
+// LEANDRA
+DB_OneShotPlayerTrigger(TRIGGER_END_Box_Nega_LeandraTauntImmaculateRoom);
+DB_OneShotPlayerTrigger(TRIGGER_END_Box_Nega_LeandraTauntCellar);
+
+DB_END_LeandraVoice("END_AD_NegaKingsCrab_Leandra_TauntCellar",TRIGGER_END_Point_LeandraVoiceCellar,1);
+DB_END_LeandraVoice("END_AD_NegaKingsCrab_Leandra_TauntJake",TRIGGER_END_Point_LeandraVoiceJake,2);
+DB_END_LeandraVoice("END_AD_NegaKingsCrab_Leandra_TauntBookOfImmaculates",TRIGGER_END_Point_LeandraVoiceBook,3);
+DB_END_LeandraVoice("END_AD_NegaKingsCrab_Leandra_TauntImmaculates",TRIGGER_END_Point_LeandraVoiceImmaculates,4);
+DB_END_LeandraVoice("END_AD_NegaKingsCrab_Leandra_TauntPanties",TRIGGER_END_Point_LeandraVoicePanties,5);
+
+// SHOVEL
+DB_ShovelArea(TRIGGER_END_NegaCrabRewardSpawn,"END_Crab",ITEM_END_Nega_CrabShovel);
+DB_ShovelRewardItemAppear("END_Crab",ITEM_END_NegaCrabReward, TRIGGER_END_NegaCrabRewardSpawn);
+
+DB_ShovelArea(TRIGGER_END_NegaChapelRewardSpawn,"END_Chapel",ITEM_END_Nega_ChapelShovel);
+DB_ShovelRewardItemAppear("END_Chapel",ITEM_END_NegaChapelReward, TRIGGER_END_NegaChapelRewardSpawn);
+
+// TELEPORTS
+DB_END_NegaCloset(ITEM_END_NegaCloset1,TRIGGER_END_Point_NegaCloset2);
+DB_END_NegaCloset(ITEM_END_NegaCloset2,TRIGGER_END_Point_NegaCloset3);
+DB_END_NegaCloset(ITEM_END_NegaCloset3,TRIGGER_END_Point_NegaCloset5);
+DB_END_NegaCloset(ITEM_END_NegaCloset5,TRIGGER_END_Point_NegaCloset1);
+ItemApplyStatus(ITEM_END_NegaCloset1,"VOID_AURA",-1.0,1);
+ItemApplyStatus(ITEM_END_NegaCloset2,"VOID_AURA",-1.0,1);
+ItemApplyStatus(ITEM_END_NegaCloset3,"VOID_AURA",-1.0,1);
+ItemApplyStatus(ITEM_END_NegaCloset5,"VOID_AURA",-1.0,1);
+
+// GRAVES
+
+DB_END_NegaChapelShovel(ITEM_END_ShovelDirt_Nega1,ITEM_END_Shovel_Flower1);
+DB_END_NegaChapelShovel(ITEM_END_ShovelDirt_Nega2,ITEM_END_Shovel_Flower2);
+DB_END_NegaChapelShovel(ITEM_END_ShovelDirt_Nega3,ITEM_END_Shovel_Flower3);
+DB_END_NegaChapelShovel(ITEM_END_ShovelDirt_Nega4,ITEM_END_Shovel_Flower4);
+DB_END_NegaChapelShovel(ITEM_END_ShovelDirt_Nega5,ITEM_END_Shovel_Flower5);
+
+// EFFECTS
+PROC_LoopEffectAtCharacter("FX_GP_Status_Drunk_A_Effect1",CHARACTER_END_NegaZixZax,"END_ZixZaxDrunkEffect","END_Endgame_Main","Dummy_StatusFX");
+PROC_LoopEffectAtCharacter("FX_GP_Status_Drunk_A_Effect1",CHARACTER_END_NegaWeaverOfTime,"END_WeaverDrunkEffect","END_Endgame_Main","Dummy_StatusFX");
+KBSECTION
+//REGION Debug section
+
+IF
+CharacterEvent(_,"END_NegaKingsCrab_Enter")
+AND
+NOT DB_OnlyOnce("StartNegaIcara")
+THEN
+DB_OnlyOnce("StartNegaIcara");
+GlobalSetEvent("End_NegaStart");
+
+IF
+TextEventSet("nega")
+THEN
+CharacterTeleportPartyToTrigger(TRIGGER_END_Nega_Entrance,"END_NegaKingsCrab_Enter");
+
+IF
+TextEventSet("fisht")
+THEN
+CharacterTeleportPartyToTrigger(TRIGGER_CYS_FishTheftTrigger,"");
+
+//END_REGION
+
+//REGION Setup Tavern
+
+IF
+RegionStarted("END_Endgame_Main")
+AND
+GlobalGetEvent("END_Nega_Init",0)
+THEN
+GlobalSetEvent("END_Nega_Init");
+
+PROC
+Proc_END_SetupNegaKingsCrabNPCs()
+AND
+DB_END_NegaKingsCrabNPC(_Char,_)
+THEN
+DB_NoDefaultBehavior(_Char);
+NeverThreatenedDialog(_Char);
+DB_NoCharacterCompanionReplace(_Char);
+CharacterApplyStatus(_Char,"VOID_AURA",-1.0,1);
+DB_DisableAttackReaction(_Char);
+CharacterSetInvulnerable(_Char,1);
+
+//END_REGION
+
+//REGION Poof
+
+PROC
+Proc_VoidPoof((CHARACTER)_Character)
+AND
+CharacterGetRegion(_Character,_Region)
+AND
+DB_CurrentLevel(_Region)
+AND
+CharacterGetPosition(_Character,_X,_Y,_Z)
+THEN
+PlayScaledEffectAtPosition("FX_GP_VoidPoof_A",1.3,_X,_Y,_Z);
+
+PROC
+Proc_VoidPoof((CHARACTER)_Character)
+THEN
+CharacterSetOnStage(_Character,0);
+
+PROC
+Proc_VoidFoop((CHARACTER)_Character)
+AND
+CharacterGetRegion(_Character,_Region)
+AND
+DB_CurrentLevel(_Region)
+AND
+CharacterGetPosition(_Character,_X,_Y,_Z)
+THEN
+PlayScaledEffectAtPosition("FX_GP_VoidPoof_A",1.3,_X,_Y,_Z);
+
+PROC
+Proc_VoidFoop((CHARACTER)_Character)
+THEN
+CharacterSetOnStage(_Character,1);
+
+IF
+CharacterAttackedByCharacter(_Npc,_Player)
+AND
+DB_END_NegaKingsCrabNPC(_Npc,0)
+AND
+NOT DB_END_PoofedNpc(_Npc)
+THEN
+DB_END_PoofedNpc(_Npc);
+Proc_VoidPoof(_Npc);
+CharTimer(_Npc,"END_NegaKingsCrab_Poof",45000);
+
+IF
+CharacterAttackedByCharacter(_Npc,_Player)
+AND
+DB_END_NegaKingsCrabNPC(_Npc,_Time)
+AND
+NOT DB_END_PoofedNpc(_Npc)
+AND
+_Time != 0
+AND
+IntegerProduct(_Time,1000,_Timer)
+THEN
+DB_END_PoofedNpc(_Npc);
+Proc_VoidPoof(_Npc);
+CharTimer(_Npc,"END_NegaKingsCrab_Poof",_Timer);
+
+IF
+CharTimerFinished(_Char,"END_NegaKingsCrab_Poof")
+AND
+NOT DB_End_NegaKingsCrabNoPoofNpc(_Char)
+THEN
+NOT DB_END_PoofedNpc(_Char);
+Proc_VoidFoop(_Char);
+
+//END_REGION 
+
+//REGION Shrike drink
+
+IF
+DialogEnded("END_NegaKingsCrab_NegaShrike",_)
+AND
+GlobalGetEvent("END_NegaShrike_BringADrink",1)
+THEN
+CharacterSetHasDialog(CHARACTER_END_NegaShrike,0);
+CharacterSetScriptframe(CHARACTER_END_NegaShrike,"END_ShrikeBringDrink");
+
+IF
+CharacterAttackedByCharacter(CHARACTER_END_NegaShrike,_)
+AND
+GlobalGetEvent("END_NegaShrike_BringADrink",1)
+THEN
+CharacterSetHasDialog(CHARACTER_END_NegaShrike,1);
+CharacterClearScriptframe(CHARACTER_END_NegaShrike);
+
+IF
+CharacterEvent(CHARACTER_END_NegaShrike,"END_Nega_SpawnDrinks")
+AND
+TriggerGetPosition(TRIGGER_END_Nega_SpawnDrinks1,_X1,_Y1,_Z1)
+AND
+TriggerGetPosition(TRIGGER_END_Nega_SpawnDrinks2,_X2,_Y2,_Z2)
+AND
+CreateItemTemplateAtPosition("5ae163f5-3078-4bc6-8060-3da4bae3c6d7",_X1,_Y1,_Z1,_Handler1)
+AND
+CreateItemTemplateAtPosition("5ae163f5-3078-4bc6-8060-3da4bae3c6d7",_X2,_Y2,_Z2,_Handler2)
+THEN
+GlobalSetEvent("END_NegaShrike_Drink");
+DB_End_NegaShrikeDrinks(_Handler1);
+DB_End_NegaShrikeDrinks(_Handler2);
+
+IF
+CharacterScriptFrameFinished(CHARACTER_END_NegaShrike,"END_ShrikeBringDrink")
+THEN
+GlobalClearEvent("END_NegaShrike_BringADrink");
+CharacterSetHasDialog(CHARACTER_END_NegaShrike,1);
+
+IF
+CharacterUsedItemTemplate(_Character,_,_Handle)
+AND
+DB_End_NegaShrikeDrinks(_Handle)
+AND
+NOT DB_IsInDialog(CHARACTER_END_NegaShrike)
+AND
+CharacterGetDistanceToCharacter(CHARACTER_END_NegaShrike,_Character,_Distance)
+AND
+_Distance < 10.0
+AND
+NOT DB_OnlyOnce("END_NegaShrikeDrinks")
+THEN
+DB_OnlyOnce("END_NegaShrikeDrinks");
+CharacterLookAtCharacter(CHARACTER_END_NegaShrike,_Character,0);
+DialogStartOneSpeakerDialog("END_AD_NegaKingsCrab_Shrike_Mocks",CHARACTER_END_NegaShrike);
+
+IF
+CharacterUsedItemTemplate(_Character,_,_Handle)
+AND
+DB_End_NegaShrikeDrinks(_Handle)
+THEN
+NOT DB_End_NegaShrikeDrinks(_Handle);
+
+IF
+AutomatedDialogEnded("END_AD_NegaKingsCrab_Shrike_Mocks",_)
+AND
+DB_IsPlayer(_Player)
+AND
+CharacterGetDistanceToCharacter(CHARACTER_END_NegaShrike,_Player,_Distance)
+AND
+_Distance < 7.0
+AND
+NOT DB_InDialog(_Player)
+AND
+NOT DB_END_NegaKingsCrab_States("DrinkComment")
+THEN
+Launch_PlayerComment(_Player,"END_Comment_NegaKingsCrabDrinks");
+DB_END_NegaKingsCrab_States("DrinkComment");
+
+//END_REGION
+
+//REGION Astarte
+
+PROC
+Proc_END_NegaKingsCrab_SetupAstarteMouners()
+AND
+DB_END_NegaKingsCrabAstarteMouners(_Char,_Skel)
+THEN
+DB_AD_Dialog(_Char,"END_AD_NegakingsCrab_AstarteMourner");
+DB_AD_Dialog(_Skel,"END_AD_NegakingsCrab_AstarteMourner");
+CharacterSetOnStage(_Skel,0);
+
+IF
+GlobalEventSet("END_NegaAstarte_Burn")
+AND
+DB_END_NegaKingsCrabAstarteMouners(_Char,_)
+THEN
+CharacterSetScriptframe(_Char,"Burn");
+DB_End_NegaKingsCrabNoPoofNpc(_Char);
+
+IF
+CharacterDied(_Char)
+AND
+DB_END_NegaKingsCrabAstarteMouners(_Char,_Skel)
+THEN
+CharacterAppearAtCharacter(_Skel,_Char,1);
+DialogRequestStopForCharacter(_Char);
+CharacterSetOnStage(_Char,0);
+
+IF
+ItemEvent(ITEM_END_NegaAstarteCorpse,"MakeDemonAppear")
+THEN
+ItemApplyStatus(ITEM_END_NegaAstarteCorpse,"BURNING",7.0,1);
+ItemTimer(ITEM_END_NegaAstarteCorpse,"END_NegaAstarteCorpseBurnEffect",3000);
+
+IF
+ItemTimerFinished(ITEM_END_NegaAstarteCorpse,"END_NegaAstarteCorpseBurnEffect")
+AND
+ItemPlayLoopEffect(ITEM_END_NegaAstarteCorpseContainer,"FX_GP_Status_Burning_A_Effect1",_Handle)
+THEN
+PlayEffectAtItem("FX_Skills_Fire_Immolate_Impact_A",ITEM_END_NegaAstarteCorpse);
+ItemTimer(ITEM_END_NegaAstarteCorpse,"END_NegaAstarteCorpseBurned",4000);
+DB_END_NegaKingsCrab_Handlers("CorpseContainer",_Handle);
+GlobalSetEvent("END_NegaAstarte_Burn");
+
+IF
+ItemTimerFinished(ITEM_END_NegaAstarteCorpse,"END_NegaAstarteCorpseBurned")
+THEN
+ItemSetOnstage(ITEM_END_NegaAstarteCorpse,0);
+ItemSetOnstage(ITEM_END_NegaAstarteCorpseContainer,1);
+NotifyGameProgress(98.0);
+
+//END_REGION
+
+//REGION Journal
+
+PROC
+PROC_CleanUpPlayerComments("END_Comment_EnteredNegaKingCrab")
+THEN
+QuestUpdate("END_NegaKingsCrab","NegaKingsCrab");
+
+IF
+ItemAddedToCharacter(ITEM_END_Key_NegaKingsCrab_Room1,_Player)
+AND
+DB_IsPlayer(_Player)
+AND
+NOT DB_END_NegaKingsCrab_States("GotRoom1Key")
+THEN
+DB_END_NegaKingsCrab_States("GotRoom1Key");
+QuestUpdate("END_NegaKingsCrab","Book");
+
+IF
+ItemAddedToCharacter(ITEM_END_Key_NegaKingsCrab_Room2,_Player)
+AND
+DB_IsPlayer(_Player)
+AND
+NOT DB_END_NegaKingsCrab_States("GotRoom2Key")
+THEN
+DB_END_NegaKingsCrab_States("GotRoom2Key");
+QuestUpdate("END_NegaKingsCrab","Astarte");
+
+IF
+ItemDestroyed(ITEM_END_AfterShrikeTeleporter_Inactive)
+THEN
+QuestUpdate("END_NegaKingsCrab","End");
+QuestUpdate("HOM_Starstones", "ExitedNKCI"); 
+QuestClose("END_NegaKingsCrab");
+
+//END_REGION
+
+//REGION Leandra voice
+
+IF
+CharacterAttackedByCharacter(CHARACTER_END_NegaLeandra,_)
+THEN
+DialogRequestStopForCharacter(CHARACTER_END_NegaLeandra);
+//Proc_VoidPoof(CHARACTER_END_NegaLeandra);
+
+PROC
+Proc_END_LeandraVoice(_)
+THEN
+DialogRequestStopForCharacter(CHARACTER_END_NegaLeandra);
+TimerCancel("END_LeandraTauntTimer");
+
+IF
+AutomatedDialogEnded(_Dialog,_)
+AND
+DB_END_LeandraVoice(_Dialog,_,_)
+AND
+NOT DB_END_LeandraVoiceNoPoof(_Dialog)
+THEN
+Proc_VoidPoof(CHARACTER_END_NegaLeandra);
+NOT DB_END_LeandraTauntDialog(_Dialog);
+Proc_END_LeandraClearKnockPlayers();
+
+PROC
+Proc_END_LeandraVoice((INTEGER)_Label)
+AND
+DB_END_LeandraVoice(_Dialog,_Trigger,_Label)
+THEN
+CharacterTeleportToTrigger(CHARACTER_END_NegaLeandra,_Trigger,"END_NegaLeandra_Poof");
+Proc_VoidFoop(CHARACTER_END_NegaLeandra);
+CharacterMoveToTrigger(CHARACTER_END_NegaLeandra,_Trigger,1,"");
+Proc_END_LeandraKnockPlayers(_Trigger);
+DB_END_LeandraTauntDialog(_Dialog);
+TimerLaunch("END_LeandraTauntTimer",200);
+
+PROC
+Proc_END_LeandraClearKnockPlayers()
+AND
+DB_END_LeandraTauntKnokedPlayer(_Player)
+THEN
+CharacterRemoveStatus(_Player,"KNOCKED_DOWN");
+
+PROC
+Proc_END_LeandraKnockPlayers((TRIGGER)_Knock)
+AND
+DB_IsPlayer(_Player)
+AND
+CharacterGetDistanceToCharacter(_Player,CHARACTER_END_NegaLeandra,_Dist)
+AND
+_Dist < 7.0
+THEN
+DB_END_LeandraTauntKnokedPlayer(_Player);
+CharacterApplyStatus(_Player,"KNOCKED_DOWN",-1.0,1);
+
+PROC
+Proc_END_LeandraKnockPlayers((TRIGGER)_Knock)
+THEN
+ProcTriggerUnregisterForPlayers(_Knock);
+
+IF
+TimerFinished("END_LeandraTauntTimer")
+AND
+DB_END_LeandraTauntDialog(_Dialog)
+THEN
+NOT DB_END_LeandraTauntDialog(_Dialog);
+DialogStartOneSpeakerDialog(_Dialog,CHARACTER_END_NegaLeandra);
+
+IF
+AutomatedDialogEnded("END_AD_NegaJake",_)
+AND
+NOT DB_END_NegaKingsCrab_States("LeandraTauntJake")
+THEN
+Proc_END_LeandraVoice(2);
+DB_END_NegaKingsCrab_States("LeandraTauntJake");
+
+IF
+ItemRemovedFromContainer(ITEM_END_Key_NegaKingsCrab_Room1,ITEM_END_BookOfImmaculates)
+AND
+NOT DB_END_NegaKingsCrab_States("LeandraBookImmaculates_Book")
+THEN
+DB_END_NegaKingsCrab_States("LeandraBookImmaculates_Book");
+Proc_END_LeandraVoice(3);
+
+
+PROC
+ProcOneShotTriggerEntered(_Player,TRIGGER_END_Box_Nega_LeandraTauntImmaculateRoom)
+AND
+NOT DB_END_NegaKingsCrab_States("LeandraTauntImmaculatesRoom")
+THEN
+CharTimer(_Player,"LeandraLookAt",100);
+DB_END_NegaKingsCrab_States("LeandraTauntImmaculatesRoom");
+Proc_END_LeandraVoice(4);
+
+PROC
+ProcOneShotTriggerEntered(_Player,TRIGGER_END_Box_Nega_LeandraTauntCellar)
+AND
+NOT DB_END_NegaKingsCrab_States("LeandraTauntCellar")
+THEN
+CharTimer(_Player,"LeandraLookAt",100);
+DB_END_NegaKingsCrab_States("LeandraTauntCellar");
+Proc_END_LeandraVoice(1);
+
+IF
+CharacterUsedItem(_,ITEM_END_LeandraPanties)
+AND
+NOT DB_END_NegaKingsCrab_States("LeandraPanties_Comment")
+THEN
+Proc_END_LeandraVoice(5);
+DB_END_NegaKingsCrab_States("LeandraPanties_Comment");
+
+//END_REGION
+
+//REGION Battle
+
+IF
+CharacterAttackedByCharacter(CHARACTER_END_ThirdGuardian,_Player)
+AND
+NOT DB_END_ThirdGuardianShrikeDone(1)
+THEN
+NOT DB_OneShotPlayerTrigger(TRIGGER_END_Box_NegaKingsCrabBattleSceneStart);
+CharacterLookAtCharacter(CHARACTER_END_ThirdGuardian,_Player,0);
+DB_END_ThirdGuardianShrikeDone(1);
+Proc_END_SpawnShrike();
+
+PROC
+ProcOneShotTriggerEntered(_Player,TRIGGER_END_Box_NegaKingsCrabBattleSceneStart)
+AND
+NOT DB_END_ThirdGuardianShrikeDone(1)
+THEN
+CharacterLookAtCharacter(CHARACTER_END_ThirdGuardian,_Player,0);
+PROC_MendatoryDialog("END_NegaKingsCrab_ThirdGuardianShrike_TwoPlayer",CHARACTER_END_ThirdGuardian, _Player);
+DB_END_ThirdGuardianShrikeDone(1);
+
+IF
+DialogEnded("END_NegaKingsCrab_ThirdGuardianShrike_TwoPlayer", _)
+THEN
+Proc_END_SpawnShrike();
+
+PROC
+Proc_END_SpawnShrike()
+AND
+CharacterGetPosition(CHARACTER_END_ThirdGuardian,_X,_Y,_Z)
+THEN
+TriggerSetAtmosphere("fa8ccf70-ad34-4c60-b6d4-8ab7fc82b589","Eden_Endfight");
+PlayScaledEffectAtPosition("FX_GP_VoidPoof_A",3.0,_X,_Y,_Z);
+TimerLaunch("END_Shrike_Spawn",1200);
+
+IF
+TimerFinished("END_Shrike_Spawn")
+AND
+CharacterGetPosition(CHARACTER_END_ThirdGuardian,_X,_Y,_Z)
+THEN
+CharacterPlayAnimation(CHARACTER_END_ThirdGuardian, "die_acid", "spawnShrike");
+CharacterTeleportToTrigger(CHARACTER_HOM_Shrike,TRIGGER_END_Point_NKCI_ShrikeSpawn,"");
+
+IF
+CharacterEvent(CHARACTER_END_ThirdGuardian, "spawnShrike")
+THEN
+CharacterSetOnStage(CHARACTER_END_ThirdGuardian, 0);
+CharacterMakeStoryNpc(CHARACTER_HOM_Shrike,0);
+NOT IsStoryNpc(CHARACTER_HOM_Shrike);
+CharacterSetFaction(CHARACTER_HOM_Shrike, "Evil NPC");
+CharacterAppear(CHARACTER_HOM_Shrike, 1);
+
+IF
+ItemDestroyed(ITEM_END_AfterShrikeTeleporter_Inactive)
+AND
+Random(5000, _Sleep1)
+AND
+Random(5000, _Sleep2)
+THEN
+DB_TeleportOutOfNKCI(CHARACTER_Player1, TRIGGER_END_RoomB_Start_Player1, _Sleep1);
+DB_TeleportOutOfNKCI(CHARACTER_Player2, TRIGGER_END_RoomB_Start_Player2, _Sleep2);
+
+IF
+ItemDestroyed(ITEM_END_AfterShrikeTeleporter_Inactive)
+AND
+NOT DB_OnlyOnce("END_DoTheCompanionsInDB")
+AND
+DB_Companion(_Comp)
+AND
+DB_Companion(_OtherComp)
+AND
+_Comp != _OtherComp
+AND
+Random(5000, _Sleep1)
+AND
+Random(5000, _Sleep2)
+THEN
+DB_TeleportOutOfNKCI(_Comp, TRIGGER_END_RoomB_Start_Comp1, _Sleep1);
+DB_TeleportOutOfNKCI(_OtherComp, TRIGGER_END_RoomB_Start_Comp2, _Sleep2);
+DB_OnlyOnce("END_DoTheCompanionsInDB");
+
+IF
+ItemDestroyed(ITEM_END_AfterShrikeTeleporter_Inactive)
+AND
+DB_Companion(_Comp)
+AND
+NOT DB_OnlyOnce("END_DoTheCompanionsInDB")
+AND
+Random(5000, _Sleep1)
+THEN
+DB_TeleportOutOfNKCI(_Comp, TRIGGER_END_RoomB_Start_Comp1, _Sleep1);
+
+IF 
+ItemDestroyed(ITEM_END_AfterShrikeTeleporter_Inactive)
+AND
+DB_TeleportOutOfNKCI(_Dude, _Trigger, _Sleep)
+AND
+NOT DB_Dead(_Dude)
+THEN
+DialogRequestStopForCharacter(_Dude);
+CharacterApplyStatus(_Dude, "KNOCKED_DOWN", -1.0, 1);
+
+IF 
+ItemDestroyed(ITEM_END_AfterShrikeTeleporter_Inactive)
+THEN
+GlobalSetEvent("End_NegaEnd");
+TimerLaunch("END_PortToRoomB", 1500);
+
+IF
+TimerFinished("END_PortToRoomB")
+AND
+DB_TeleportOutOfNKCI(_Dude, _Trigger, _Sleep)
+AND
+NOT DB_Dead(_Dude)
+THEN
+CharacterTeleportToTrigger(_Dude, _Trigger, "");
+CharTimer(_Dude, "wakeupFromHorrorSleep", _Sleep);
+
+IF
+CharTimerFinished(_Dude, "wakeupFromHorrorSleep")
+THEN
+CharacterRemoveStatus(_Dude, "KNOCKED_DOWN");
+
+IF 
+TimerFinished("END_PortToRoomB")
+AND
+DB_TeleportOutOfNKCI(_Dude, _Trigger, _Sleep)
+AND
+DB_Dead(_Dude)
+THEN
+DialogRequestStopForCharacter(_Dude);
+CharacterTeleportToTrigger(_Dude, _Trigger, "");
+
+//END_REGION
+
+//REGION InnBehaviors
+
+IF
+CharacterUsedItem(_Player,_Closet)
+AND
+DB_END_NegaCloset(_Closet,_Trigger)
+AND
+NOT DB_NegaClosetActive(_Closet)
+THEN
+ItemTimer(_Closet,"END_NegaClosetTP",200);
+DB_NegaClosetActive(_Closet);
+
+IF
+ItemTimerFinished(_Closet,"END_NegaClosetTP")
+AND
+DB_END_NegaCloset(_Closet,_Trigger)
+AND
+TriggerGetPosition(_Trigger,_X,_Y,_Z)
+THEN
+NOT DB_NegaClosetActive(_Closet);
+CharacterTeleportPartyToTrigger(_Trigger,"END_ClosetTeleported");
+PlayScaledEffectAtPosition("FX_GP_TeleportSmoke_A",2.0,_X,_Y,_Z);
+
+IF
+CharacterEvent(_Player,"END_ClosetTeleported")
+THEN
+CharacterApplyStatus(_Player,"KNOCKED_DOWN",0.0,1);
+
+IF
+ItemRemovedFromContainer(ITEM_END_Key_NegaKingsCrab_Room1,ITEM_END_BookOfImmaculates)
+AND
+NOT DB_OnlyOnce("NegaKC_BookComments")
+THEN
+DB_OnlyOnce("NegaKC_BookComments");
+ItemSetEvent(ITEM_END_BookOfImmaculates,"END_Nega_BookOfImmaculatesGrab");
+TriggerSetAtmosphere("98cfcfbe-500b-4311-b348-62e6e5add850","NegaCelalrAfter");
+ItemPlaySound(ITEM_END_BookOfImmaculates, "Scripted_Endgame_Basement_Book");
+
+IF
+AutomatedDialogEnded("END_AD_NegaKingsCrab_Leandra_TauntBookOfImmaculates",_)
+THEN
+DB_PlayerComment_Trigger(TRIGGER_END_Comment_NegaCellarBlood,"END_Comment_NegaCellarBlood");
+
+PROC
+PROC_CleanUpPlayerComments("END_Comment_NegaCellarBlood")
+THEN
+TriggerResetAtmosphere("98cfcfbe-500b-4311-b348-62e6e5add850");
+
+IF
+CharacterUsedItem(_,ITEM_END_Behavior_NegaKingsCrab_Deer1)
+AND
+NOT DB_END_NegaKingsCrab_States("Deer1")
+THEN
+DB_END_NegaKingsCrab_States("Deer1");
+CharacterTeleportToTrigger(CHARACTER_END_NegaKingsCrab_Deer1,TRIGGER_END_Point_Behavior_NegaKingsCrab_DeerSculpture1_1,"");
+Proc_VoidFoop(CHARACTER_END_NegaKingsCrab_Deer1);
+CharacterMoveToTrigger(CHARACTER_END_NegaKingsCrab_Deer1,TRIGGER_END_Point_Behavior_NegaKingsCrab_DeerSculpture1_2,1,"END_NegaKingsCrab_Deer1End");
+DialogStartOneSpeakerItemDialog("END_AD_NegaKingsCrab_LeandraTaunt_Deer1",ITEM_END_NegaKingsCrab_Deer1LeandraVoice);
+
+IF
+CharacterEvent(CHARACTER_END_NegaKingsCrab_Deer1,"END_NegaKingsCrab_Deer1End")
+THEN
+Proc_VoidPoof(CHARACTER_END_NegaKingsCrab_Deer1);
+
+IF
+CharacterUsedItem(_,ITEM_END_Behavior_NegaKingsCrab_Deer2)
+AND
+NOT DB_END_NegaKingsCrab_States("Deer2")
+THEN
+DB_END_NegaKingsCrab_States("Deer2");
+CharacterTeleportToTrigger(CHARACTER_END_NegaKingsCrab_Deer2,TRIGGER_END_Point_Behavior_NegaKingsCrab_DeerSculpture2_1,"");
+Proc_VoidFoop(CHARACTER_END_NegaKingsCrab_Deer2);
+CharacterMoveToTrigger(CHARACTER_END_NegaKingsCrab_Deer2,TRIGGER_END_Point_Behavior_NegaKingsCrab_DeerSculpture2_2,1,"END_NegaKingsCrab_Deer1End");
+DialogStartOneSpeakerItemDialog("END_AD_NegaKingsCrab_LeandraTaunt_Deer2",ITEM_END_NegaKingsCrab_Deer2LeandraVoice);
+
+IF
+CharacterEvent(CHARACTER_END_NegaKingsCrab_Deer2,"END_NegaKingsCrab_Deer1End")
+THEN
+Proc_VoidPoof(CHARACTER_END_NegaKingsCrab_Deer2);
+
+IF
+CharacterEvent(_Player,"END_NegaNaugtyChairUse")
+AND
+DB_IsPlayer(_Player)
+THEN
+CharacterApplyStatus(_Player, "KNOCKED_DOWN",1.0,-1);
+
+//END_REGION
+
+//REGION Thief
+
+IF
+CharacterUsedItem(_,_Item)
+AND
+DB_END_NegaFish(_Item)
+AND
+NOT DB_END_NegaFishStates("IsSavingFish")
+THEN
+CharacterLookAtItem(CHARACTER_END_NegaFishThief,_Item,0);
+DialogStartOneSpeakerAutomatedDialog("END_AD_NegaKingsCrab_NegaThief_Fish1",CHARACTER_END_NegaFishThief);
+
+PROC
+Proc_VoidPoof(CHARACTER_END_NegaFishThief)
+AND
+NOT DB_END_FishThiefStates("SavedFish")
+THEN
+NOT DB_END_NegaFishStates("IsSavingFish");
+CharacterClearScriptframe(CHARACTER_END_NegaFishThief);
+PlayEffectAtItem("FX_GP_VoidPoof_A",ITEM_END_NegaBigFish);
+ItemSetOnstage(ITEM_END_NegaBigFish,0);
+
+PROC
+Proc_VoidFoop(CHARACTER_END_NegaFishThief)
+AND
+NOT DB_END_FishThiefStates("SavedFish")
+THEN
+CharacterSetHasDialog(CHARACTER_END_NegaFishThief,1);
+PlayEffectAtItem("FX_GP_VoidPoof_A",ITEM_END_NegaBigFish);
+ItemSetOnstage(ITEM_END_NegaBigFish,1);
+
+IF
+CharacterUsedItem(_,ITEM_END_NegaBigFish)
+AND
+NOT DB_END_NegaFishStates("IsSavingFish")
+THEN
+DialogRequestStopForCharacter(CHARACTER_END_NegaFishThief);
+CharacterSetHasDialog(CHARACTER_END_NegaFishThief,0);
+CharacterSetScriptframe(CHARACTER_END_NegaFishThief,"Poof");
+DB_END_NegaFishStates("IsSavingFish");
+
+IF
+CharacterScriptFrameFinished(CHARACTER_END_NegaFishThief, "Poof")
+AND
+CharacterGetPosition(CHARACTER_END_NegaFishThief,_X,_Y,_Z)
+THEN
+PlayEffectAtPosition("FX_GP_TeleportSmoke_A",_X,_Y,_Z);
+CharacterSetOnStage(CHARACTER_END_NegaFishThief,0);
+ItemSetEvent(ITEM_END_NegaMagicWall,"shutDown");
+
+IF
+ItemEvent(ITEM_END_NegaBigFish,"END_NegaThief_PoofFish")
+AND
+NOT DB_END_FishThiefStates("SavedFish")
+AND
+ItemGetPosition(ITEM_END_NegaBigFish,_X,_Y,_Z)
+THEN
+PlayEffectAtPosition("FX_GP_TeleportSmoke_A",_X,_Y,_Z);
+ItemSetOnstage(ITEM_END_NegaBigFish,0);
+ItemSetOnstage(ITEM_END_NegaBigFishTub,1);
+DB_END_FishThiefStates("SavedFish");
+
+IF
+CharacterUsedItem(_Player,ITEM_END_Nega_ThiefBarrierButton)
+AND
+NOT DB_END_Nega_Barrier(1)
+THEN
+DB_END_Nega_Barrier(1);
+CharacterDisplayText(_Player,"GEN_Wonder");
+ItemSetEvent(ITEM_END_NegaMagicWall,"shutDown");
+
+IF
+CharacterUsedItem(_Player,ITEM_END_NegaFish8)
+AND
+NOT DB_END_NegaKingsCrab_States("ThiefButton")
+THEN
+DB_END_NegaKingsCrab_States("ThiefButton");
+ItemPlayEffect(ITEM_END_Nega_ThiefBarrierButton,"FX_GP_TeleportSmoke_A");
+ItemSetOnstage(ITEM_END_Nega_ThiefButtonFish,0);
+ItemMoveToTrigger(ITEM_END_NegaFish8,TRIGGER_END_Point_NegaThiefPaint,1.0,1.0,0);
+ItemSetOnstage(ITEM_END_Nega_ThiefBarrierButton,1);
+
+//END_REGION
+
+//REGION Shovel
+
+IF
+RegionStarted("END_Endgame_Main")
+AND
+GlobalGetEvent("END_Nega_FlowersInit",0)
+AND
+DB_END_NegaChapelShovel(_,_Flower)
+THEN
+GlobalSetEvent("END_Nega_FlowersInit");
+ItemSetOnstage(_Flower,0);
+
+IF
+CharacterUsedItem(_Player,_DirtPile)
+AND
+DB_END_NegaChapelShovel(_DirtPile,_)
+AND
+NOT DB_END_Nega_Shovelling_Mound(_,_DirtPile)
+AND
+ItemTemplateIsInPartyInventory(_Player,"TOOL_Shovel_A_41486dd2-3fd5-464e-870e-844120cf0517",1,_Count)
+AND
+_Count > 0
+AND
+GetItemhandleForItemTemplateInInventory(_Player,"TOOL_Shovel_A_41486dd2-3fd5-464e-870e-844120cf0517",_ShovelHandle)
+THEN
+DB_END_Nega_Shovelling_Mound(_Player,_DirtPile);
+DB_END_Nega_Shovelling_Mound_Last(_DirtPile);
+CharacterSetFightMode(_Player,0,1);
+CharacterFreeze(_Player);
+CharacterPlayAnimation(_Player,"use_dig","dignegashovel");
+
+IF
+CharacterUsedItem(_Player,_DirtPile)
+AND
+DB_END_NegaChapelShovel(_DirtPile,_)
+AND
+NOT DB_END_Nega_Shovelling_Mound(_,_DirtPile)
+AND
+ItemTemplateIsInPartyInventory(_Player,"TOOL_Shovel_A_41486dd2-3fd5-464e-870e-844120cf0517",0,0)
+THEN
+CharacterDisplayText(_Player,"GLO_ShovelRequired");
+
+IF
+CharacterEvent(_Player,"dignegashovel")
+AND
+DB_END_Nega_Shovelling_Mound_Last(_DirtPile)
+AND
+DB_END_NegaChapelShovel(_DirtPile,_Flower)
+THEN
+NOT DB_END_Nega_Shovelling_Mound_Last(_DirtPile);
+ItemSetOnstage(_DirtPile,0);
+ItemSetOnstage(_Flower,1);
+ItemPlayEffect(_Flower,"FX_GP_Hit_Ooze_A_Large");
+
+IF
+CharacterEvent(_Player,"dignegashovel")
+AND
+NOT DB_Combat(_Player,_)
+THEN
+CharacterUnfreeze(_Player);
+CharacterSetFightMode(_Player,1,1);
+
+//END_REGION
+
+//REGION Crime scene
+
+IF
+AutomatedDialogEnded("END_AD_NegaKingsCrab_ZandalorLeandra_CrimeScene",_)
+THEN
+ItemSetVarInteger(ITEM_END_NegaKingsCrab_CrimeSceneDoor,"DialogEnded",1);
+ProcFaceEachother(CHARACTER_END_NegaZandalorCrime,CHARACTER_END_NegaLeandraCrime);
+
+IF
+AutomatedDialogEnded("END_AD_NegaKingsCrab_Leandra_CrimeSceneGoAway",_)
+THEN
+ProcFaceEachother(CHARACTER_END_NegaZandalorCrime,CHARACTER_END_NegaLeandraCrime);
+
+IF
+CharacterEvent(_,"END_CrimePoof")
+AND
+NOT DB_OnlyOnce("LeandraPanties")
+THEN
+DB_OnlyOnce("LeandraPanties");
+ItemPlayEffect(ITEM_END_LeandraPanties,"FX_Env_Crystal_Void_Impact_A");
+ItemSetOnstage(ITEM_END_LeandraPanties,1);
+
+IF
+CharacterEvent(_Char,"END_CrimePoof")
+AND
+NOT DB_End_NegaKingsCrabNoPoofNpc(_Char)
+AND
+NOT DB_END_PoofedNpc(_Char)
+THEN
+DialogRequestStopForCharacter(_Char);
+Proc_VoidPoof(_Char);
+
+IF
+CharacterEvent(_Char,"END_CrimePoof")
+THEN
+DB_End_NegaKingsCrabNoPoofNpc(_Char);
+
+IF
+CharacterEvent(_,"END_NegaKingsCrab_Enter")
+AND
+GlobalGetEvent("END_EndGame_IcaraBehavior",0)
+THEN
+GlobalSetEvent("END_EndGame_IcaraBehavior");
+
+IF
+CharacterEvent(CHARACTER_END_NegaIcara,"END_Nega_IcaraBehavior")
+THEN
+TimerLaunch("END_NegaIcarabehavior",5000);
+
+IF
+TimerFinished("END_NegaIcaraBehavior")
+THEN
+CharacterSetEvent(CHARACTER_END_NegaIcara,"END_Nega_NegaIcaraBehavior");
+
+//END_REGION
+
+//REGION Markers
+
+IF
+CharacterUsedItem(_,ITEM_END_NegaCloset5)
+THEN
+ProcShowMarker("NEGA_ToSecondFloor");
+
+IF
+CharacterUsedItem(_,ITEM_END_Door_NegaKingsCrab_Room1)
+THEN
+ProcShowMarker("NEGA_DoorToSecondFloor");
+
+IF
+ItemOpened(ITEM_END_Door_NegaKingsCrab_Room1)
+THEN
+ProcHideMarker("NEGA_DoorToSecondFloor");
+
+IF
+ItemDestroyed(ITEM_END_Door_NegaKingsCrab_Room1)
+THEN
+ProcHideMarker("NEGA_DoorToSecondFloor");
+
+IF
+CharacterUsedItem(_,ITEM_END_TP_NegaKingsCrab_1_Down)
+THEN
+ProcShowMarker("NEGA_ToCellar");
+
+IF
+CharacterUsedItem(_,ITEM_END_Door_NegaKingsCrab_Room2)
+THEN
+ProcShowMarker("NEGA_BattleDoor");
+
+IF
+CharacterUsedItem(_,ITEM_END_NegaCloset3)
+THEN
+ProcShowMarker("NEGA_ToGroundFloor");
+
+IF
+CharacterEnteredTrigger(_,TRIGGER_END_REGION_NegaKingsCrab_Chapel)
+THEN
+ProcShowMarker("NEGA_Chapel");
+
+//END_REGION
+
+//REGION Clean nega items
+
+IF
+ItemDestroyed(ITEM_END_AfterShrikeTeleporter_Inactive)
+AND
+DB_IsPlayer(_Player)
+THEN
+CharacterRemoveTaggedLocalItems(_Player,"Nega",-1);
+
+IF
+ItemDestroyed(ITEM_END_AfterShrikeTeleporter_Inactive)
+THEN
+ItemRemove(ITEM_END_Key_NegaKingsCrab_Room1);
+ItemRemove(ITEM_END_Key_NegaKingsCrab_Room2);
+ItemRemove(ITEM_END_Key_NegaKingsCrab_CrimeSceneRoom);
+
+IF
+ItemDestroyed(ITEM_END_AfterShrikeTeleporter_Inactive)
+AND
+DB_End_NegaShrikeDrinks(_Handle)
+THEN
+ItemHandleDelete(_Handle);
+
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

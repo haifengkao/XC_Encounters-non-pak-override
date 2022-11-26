@@ -1,0 +1,307 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+ItemToCharacter(ITEM_HIB_BloodStoneGuardOrders,CHARACTER_HIB_BloodStoneDemon1);
+DB_NoDefaultBehavior(CHARACTER_HIB_Leandra);
+DB_Dialogs(CHARACTER_HIB_ImpCrafter,"HIB_ImpCrafter");
+NeverThreatenedDialog(CHARACTER_HIB_ImpCrafter);
+CharacterSetAnimationSetOverride(CHARACTER_HIB_ImpCrafter,"Lying_Wounded");
+DB_DyingNpcOnBed(CHARACTER_HIB_ImpCrafter, ITEM_HIB_Impcrafter_Invisibed);
+DB_EvilDude(CHARACTER_HIB_Leandra);
+NoStealingReaction(CHARACTER_HIB_Leandra);
+
+DB_OneShot_DialogTrigger_NewSystem(TRIGGER_HIB_Area_BloodStone,"HIB_Leandra",CHARACTER_HIB_Leandra);
+SneakTriggerSpotter(TRIGGER_HIB_Area_BloodStone,CHARACTER_HIB_Leandra);
+CharacterSetImmortal(CHARACTER_HIB_Leandra,1);
+
+DB_HIB_BloodStoneGuards(CHARACTER_HIB_BloodStoneGuard1,TRIGGER_HIB_Point_BloodStoneGuard1,CHARACTER_HIB_BloodStoneDemon1);
+DB_HIB_BloodStoneGuards(CHARACTER_HIB_BloodStoneGuard2,TRIGGER_HIB_Point_BloodStoneGuard2,CHARACTER_HIB_BloodStoneDemon2);
+DB_HIB_BloodStoneGuards(CHARACTER_HIB_BloodStoneGuard3,TRIGGER_HIB_Point_BloodStoneGuard3,CHARACTER_HIB_BloodStoneDemon3);
+DB_HIB_BloodStoneGuards(CHARACTER_HIB_BloodStoneGuard4,TRIGGER_HIB_Point_BloodStoneGuard4,CHARACTER_HIB_BloodStoneDemon4);
+PROC_HIB_BloodStoneGuardsInit();
+
+KillCounter("HIB_BloodStoneGuards",4);
+
+KillCounterDB(CHARACTER_HIB_BloodStoneDemon1,"HIB_BloodStoneGuards");
+KillCounterDB(CHARACTER_HIB_BloodStoneDemon2,"HIB_BloodStoneGuards");
+KillCounterDB(CHARACTER_HIB_BloodStoneDemon3,"HIB_BloodStoneGuards");
+KillCounterDB(CHARACTER_HIB_BloodStoneDemon4,"HIB_BloodStoneGuards");
+
+DB_PlayerComments("HIB_CommentSlaughter","HIB_CommentSlaughter_1_1",1,1);
+DB_PlayerComments("HIB_CommentSlaughter","HIB_CommentSlaughter_2_1",2,1);
+DB_PlayerComments("HIB_CommentSlaughter","HIB_CommentSlaughter_2_2",2,2);
+DB_PlayerComment_Trigger(TRIGGER_HIB_CommentSlaughter,"HIB_CommentSlaughter");
+DB_PlayerComments("HIB_CommentOnCastlePassword","HIB_CommentOnCastlePassword_1_1",1,1);
+DB_PlayerComments("HIB_CommentOnCastlePassword","HIB_CommentOnCastlePassword_2_1",2,1);
+DB_PlayerComments("HIB_CommentOnCastlePassword","HIB_CommentOnCastlePassword_2_2",2,2);
+
+CharacterSetHitpointsPercentage(CHARACTER_HIB_ImpCrafter, 1);
+CharacterApplyStatus(CHARACTER_HIB_ImpCrafter, "UNHEALABLE", -1.0, 1);
+DB_NoDefaultBehavior(CHARACTER_HIB_ImpCrafter);
+KBSECTION
+PROC
+PROC_HIB_BloodStoneGuardsInit()
+AND
+DB_HIB_BloodStoneGuards(_Character,_,_Demon)
+THEN
+CharacterSetVarInteger(_Character,"IgnoreDialogChecks",0);
+SneakTriggerSpotter(TRIGGER_HIB_Area_BloodStone,_Character);
+CharacterSetOnStage(_Demon,0);
+DB_NoDefaultBehavior(_Character);
+CharacterSetImmortal(_Character,1);
+
+IF
+CharacterReceivedDamage(CHARACTER_HIB_Leandra)
+AND
+NOT CHARACTER_HIB_Leandra.HIB_StartedBloodStoneFight()
+AND
+NOT CHARACTER_HIB_Leandra.hadDialog()
+THEN
+PROC_HIB_BloodStoneFightStarts();
+ItemSetCanInteract(ITEM_HIB_BloodStone, 0);
+NOT DB_OneShot_DialogTrigger_NewSystem(TRIGGER_HIB_Area_BloodStone,"HIB_Leandra",CHARACTER_HIB_Leandra);
+NOT SneakTriggerSpotter(TRIGGER_HIB_Area_BloodStone,CHARACTER_HIB_Leandra);
+CHARACTER_HIB_Leandra.hadDialog();
+
+IF
+CharacterAttackedByCharacter(CHARACTER_HIB_Leandra, _)
+AND
+NOT CHARACTER_HIB_Leandra.HIB_StartedBloodStoneFight()
+AND
+NOT CHARACTER_HIB_Leandra.hadDialog()
+THEN
+PROC_HIB_BloodStoneFightStarts();
+ItemSetCanInteract(ITEM_HIB_BloodStone, 0);
+NOT DB_OneShot_DialogTrigger_NewSystem(TRIGGER_HIB_Area_BloodStone,"HIB_Leandra",CHARACTER_HIB_Leandra);
+NOT SneakTriggerSpotter(TRIGGER_HIB_Area_BloodStone,CHARACTER_HIB_Leandra);
+CHARACTER_HIB_Leandra.hadDialog();
+
+IF
+CharacterReceivedDamage(_Character)
+AND
+DB_HIB_BloodStoneGuards(_Character,_,_)
+AND
+NOT CHARACTER_HIB_Leandra.HIB_StartedBloodStoneFight()
+THEN
+PROC_HIB_BloodStoneFightStarts();
+NOT DB_OneShot_DialogTrigger_NewSystem(TRIGGER_HIB_Area_BloodStone,"HIB_Leandra",CHARACTER_HIB_Leandra);
+NOT SneakTriggerSpotter(TRIGGER_HIB_Area_BloodStone,CHARACTER_HIB_Leandra);
+
+IF
+DialogEnded("HIB_Leandra",_)
+AND
+NOT CHARACTER_HIB_Leandra.HIB_StartedBloodStoneFight()
+THEN
+PROC_HIB_BloodStoneFightStarts();
+
+PROC
+PROC_HIB_BloodStoneFightStarts()
+AND
+NOT CHARACTER_HIB_Leandra.HIB_StartedBloodStoneFight()
+THEN
+CHARACTER_HIB_Leandra.HIB_StartedBloodStoneFight();
+DialogRequestStopForCharacter(CHARACTER_HIB_Leandra);
+CharacterSetVarFixedString(CHARACTER_HIB_Leandra,"currentState","");
+ProcTriggerUnregisterForPlayers(TRIGGER_HIB_Area_BloodStone);
+CharacterDisplayText(CHARACTER_HIB_Leandra,"HIB_Leandra_1");
+PROC_HIB_BloodStoneGuardsAttack();
+
+PROC
+PROC_HIB_BloodStoneGuardsAttack()
+AND
+DB_HIB_BloodStoneGuards(_Character,_Trigger,_)
+THEN
+NOT DB_HIB_BloodStoneGuards(_Character,_Trigger);
+CharacterSetVarFixedString(_Character,"currentState","");
+CharacterMoveToTrigger(_Character,_Trigger,1,"HIB_BloodStoneGuardTurnsToDemon");
+
+IF
+CharacterEvent(_Character,"HIB_BloodStoneGuardTurnsToDemon")
+AND
+ItemPlayLoopBeamEffect(ITEM_HIB_BloodStone,_Character,"FX_GP_Beam_Blood_A","","",_Effect)
+THEN
+DB_HIB_BloodStoneGuardEffects(_Character,_Effect);
+CharTimer(_Character,"HIB_BloodStoneGuardTurns",3000);
+
+IF
+CharacterEvent(CHARACTER_HIB_BloodStoneGuard1,"HIB_BloodStoneGuardTurnsToDemon")
+THEN
+CharacterPlayAnimation(CHARACTER_HIB_BloodStoneGuard1,"Revolt_02","");
+
+IF
+CharacterEvent(CHARACTER_HIB_BloodStoneGuard2,"HIB_BloodStoneGuardTurnsToDemon")
+THEN
+CharacterPlayAnimation(CHARACTER_HIB_BloodStoneGuard2,"Kneel_02","");
+
+IF
+CharacterEvent(CHARACTER_HIB_BloodStoneGuard3,"HIB_BloodStoneGuardTurnsToDemon")
+THEN
+CharacterPlayAnimation(CHARACTER_HIB_BloodStoneGuard3,"Intimidate_01","");
+
+IF
+CharacterEvent(CHARACTER_HIB_BloodStoneGuard4,"HIB_BloodStoneGuardTurnsToDemon")
+THEN
+CharacterPlayAnimation(CHARACTER_HIB_BloodStoneGuard4,"Worship_01","");
+
+IF
+CharTimerFinished(_Character,"HIB_BloodStoneGuardTurns")
+AND
+DB_HIB_BloodStoneGuardEffects(_Character,_Effect)
+AND
+DB_HIB_BloodStoneGuards(_Character,_Trigger,_Demon)
+THEN
+NOT DB_HIB_BloodStoneGuardEffects(_Character,_Effect);
+StopLoopEffect(_Effect);
+PlayEffectAtCharacter("FX_GP_DeathStroke_A",_Character);
+CharacterSetOnStage(_Character,0);
+CharacterAppearAtTrigger(_Demon,_Trigger,1);
+NOT DB_HIB_BloodStoneGuards(_Character,_Trigger,_Demon);
+PROC_HIB_CheckBloodStoneDemons();
+
+PROC
+PROC_HIB_CheckBloodStoneDemons()
+AND
+NOT DB_HIB_BloodStoneGuards(_,_,_)
+THEN
+CharacterPickupItem(CHARACTER_HIB_Leandra,ITEM_HIB_BloodStone,"HIB_LeandraPickUpStone");
+
+IF
+CharacterDisplayTextEnded(CHARACTER_HIB_Leandra,"HIB_Leandra_1")
+THEN
+DB_HibFirstLineDone(1);
+
+IF
+CharacterEvent(CHARACTER_HIB_Leandra,"HIB_LeandraPickUpStone")
+THEN
+DB_StonePickedup(1);
+
+IF
+DB_HibFirstLineDone(1)
+AND
+DB_StonePickedup(1)
+THEN
+CharacterDisplayText(CHARACTER_HIB_Leandra,"HIB_Leandra_2");
+
+IF
+CharacterDisplayTextEnded(CHARACTER_HIB_Leandra,"HIB_Leandra_2")
+THEN
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A",CHARACTER_HIB_Leandra);
+CharacterSetOnStage(CHARACTER_HIB_Leandra,0);
+
+PROC
+ReactOnKillCounter("HIB_BloodStoneGuards")
+THEN
+GlobalSetEvent("HIB_KilledStoneImmaculates");
+QuestAdd("HIB_Immaculates");
+QuestUpdate("HIB_Immaculates","MetLeandra");
+QuestClose("HIB_Immaculates");
+
+PROC
+ReactOnKillCounter("HIB_BloodStoneGuards")
+AND
+CharacterGetDistanceToCharacter(CHARACTER_HIB_Leandra,CHARACTER_Player1,_Dist1)
+AND
+CharacterGetDistanceToCharacter(CHARACTER_HIB_Leandra,CHARACTER_Player2,_Dist2)
+AND
+_Dist1 < 20.0
+AND
+_Dist2 < 20.0
+THEN
+ProcDoTwoSpeakerDialog("HIB_DD_AfterLeandra",CHARACTER_Player1,CHARACTER_Player2);
+DB_OnlyOnce("HIB_DD_AfterLeandra");
+
+PROC
+ReactOnKillCounter("HIB_BloodStoneGuards")
+AND
+NOT DB_OnlyOnce("HIB_DD_AfterLeandra")
+THEN
+ProcDefinePartyDialog("HIB_DD_AfterLeandra");
+
+IF
+DialogEnded("HIB_ImpCrafter",_)
+THEN
+CharacterDie(CHARACTER_HIB_ImpCrafter,0);
+
+IF
+GlobalEventSet("HIB_ShowMarkerCastle")
+THEN
+ProcShowMarker("HIB_CastleGate");
+
+IF
+ItemAddedToCharacter(ITEM_HIB_BloodStone,_Player)
+AND
+_Player.DB_IsPlayer()
+AND NOT 
+DB_OnlyOnce("HIB_LeandraAngry")
+THEN
+DB_OnlyOnce("HIB_LeandraAngry");
+PROC_TeleportingRegionBlockOn();
+ProcTriggerRegisterForPlayers(TRIGGER_HIB_LeandraStun);
+CharacterPlayEffect(CHARACTER_HIB_Leandra, "FX_GP_LeandraShockwave_A");
+TimerLaunch("HIB_StunCharacters", 100);
+NOT DB_OneShot_DialogTrigger_NewSystem(TRIGGER_HIB_Area_BloodStone,"HIB_Leandra",CHARACTER_HIB_Leandra);
+NOT SneakTriggerSpotter(TRIGGER_HIB_Area_BloodStone,CHARACTER_HIB_Leandra);
+
+IF
+CharacterMovedItem(_Player, ITEM_HIB_BloodStone)
+AND
+_Player.DB_IsPlayer()
+AND NOT 
+DB_OnlyOnce("HIB_LeandraAngry")
+THEN
+DB_OnlyOnce("HIB_LeandraAngry");
+PROC_TeleportingRegionBlockOn();
+ProcTriggerRegisterForPlayers(TRIGGER_HIB_LeandraStun);
+CharacterPlayEffect(CHARACTER_HIB_Leandra, "FX_GP_LeandraShockwave_A");
+TimerLaunch("HIB_StunCharacters", 100);
+NOT DB_OneShot_DialogTrigger_NewSystem(TRIGGER_HIB_Area_BloodStone,"HIB_Leandra",CHARACTER_HIB_Leandra);
+NOT SneakTriggerSpotter(TRIGGER_HIB_Area_BloodStone,CHARACTER_HIB_Leandra);
+
+IF
+TimerFinished("HIB_StunCharacters")
+THEN
+ProcTriggerRegisterForPlayers(TRIGGER_HIB_LeandraStun);
+
+IF
+CharacterEnteredTrigger(_Player, TRIGGER_HIB_LeandraStun)
+THEN
+PlayEffectAtCharacter("FX_Skills_Air_Storm_Impact_A",_Player);
+CharacterFreeze(_Player);
+CharacterApplyStatus(_Player,"STUNNED",-1.0,1);
+CharacterRemoveStatus(_Player, "INVISIBLE");
+CharacterRemoveStatus(_Player, "SNEAKING");
+
+IF
+TimerFinished("HIB_StunCharacters")
+AND
+_Player.DB_IsPlayer()
+AND
+ItemIsInCharacterInventory(ITEM_HIB_BloodStone, _Player, 1)
+THEN
+ItemDrop(ITEM_HIB_BloodStone);
+
+IF
+TimerFinished("HIB_StunCharacters")
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_HIB_Leandra, _Player)
+AND
+NOT 	CHARACTER_HIB_Leandra.hadDialog()
+THEN
+PROC_MendatoryDialog("HIB_Leandra",CHARACTER_HIB_Leandra,_Player);
+
+IF
+DialogStarted("HIB_Leandra", _)
+THEN
+CHARACTER_HIB_Leandra.hadDialog();
+
+IF
+DialogEnded("HIB_Leandra", _)
+THEN
+ProcTriggerUnregisterForPlayers(TRIGGER_HIB_LeandraStun);
+ItemSetCanInteract(ITEM_HIB_BloodStone, 0);
+PROC_TeleportingRegionBlockOff();
+Proc_UnfreezeAll();
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

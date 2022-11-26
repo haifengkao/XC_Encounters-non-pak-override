@@ -1,0 +1,90 @@
+INIT
+	ITEM:__Me
+	ITEM:%Door = LUC_IC_MagicalWall_ae79e563-bb05-4a50-88c2-1a281b4c8e57
+	ITEM:%Brasero1 = LUC_IC_Brasero1_f53aa924-072c-4a08-b921-d6c88a2c5617
+	ITEM:%Brasero2 = LUC_IC_Brasero2_ae53b2d5-37cf-48f9-9a3b-c46a576f9066
+	ITEM:%Brasero3 = LUC_IC_Brasero3_e6592ab3-7006-4ce6-9360-c8bd9ad38562
+	ITEM:%Brasero4 = LUC_IC_Brasero4_917ae7f0-fb05-4ee1-9ab3-7450c4660b17
+	INT:%Brasero1Lit = 0
+	INT:%Brasero2Lit = 0
+	INT:%Brasero3Lit = 0
+	INT:%Brasero4Lit = 0
+	INT:%Open = 0
+EVENTS
+
+EVENT Brasero1Lit
+	ON
+		OnItemStatus(%Brasero1, BURNING)
+	ACTIONS
+		Set(%Brasero1Lit, 1)
+		ItemEvent(__Me, "CheckBraserosState")
+
+EVENT Brasero2Lit
+	ON
+		OnItemStatus(%Brasero2, BURNING)
+	ACTIONS
+		Set(%Brasero2Lit, 1)
+		ItemEvent(__Me, "CheckBraserosState")
+
+EVENT Brasero3Lit
+	ON
+		OnItemStatus(%Brasero3, BURNING)
+	ACTIONS
+		Set(%Brasero3Lit, 1)
+		ItemEvent(__Me, "CheckBraserosState")
+
+EVENT Brasero4Lit
+	ON
+		OnItemStatus(%Brasero4, BURNING)
+	ACTIONS
+		Set(%Brasero4Lit, 1)
+		ItemEvent(__Me, "CheckBraserosState")
+		
+EVENT Brasero1Unlit
+	ON
+		OnItemStatusRemoved(%Brasero1, BURNING)
+	ACTIONS
+		Set(%Brasero1Lit, 0)
+		ItemEvent(__Me, "CheckBraserosState")
+		
+EVENT Brasero2Unlit
+	ON
+		OnItemStatusRemoved(%Brasero2, BURNING)
+	ACTIONS
+		Set(%Brasero2Lit, 0)
+		ItemEvent(__Me, "CheckBraserosState")
+		
+EVENT Brasero3Unlit
+	ON
+		OnItemStatusRemoved(%Brasero3, BURNING)
+	ACTIONS
+		Set(%Brasero3Lit, 0)
+		ItemEvent(__Me, "CheckBraserosState")
+		
+EVENT Brasero4Unlit
+	ON
+		OnItemStatusRemoved(%Brasero4, BURNING)
+	ACTIONS
+		Set(%Brasero4Lit, 0)
+		ItemEvent(__Me, "CheckBraserosState")
+
+EVENT CheckBraseros
+	ON
+		OnItemEvent(__Me, "CheckBraserosState")
+	ACTIONS
+		IF "c1&c2&c3&c4"
+			IsEqual(%Brasero1Lit, 1)
+			IsEqual(%Brasero2Lit, 1)
+			IsEqual(%Brasero3Lit, 1)
+			IsEqual(%Brasero4Lit, 1)
+		THEN
+			PlayEffectAt(%Door, "FX_GP_TeleportSmoke_A")
+			ItemSetOnStage(%Door, 0)
+			Set(%Open, 1)
+		ELIF "c1"
+			IsEqual(%Open, 1)
+		THEN
+			Set(%Open, 0)
+			PlayEffectAt(%Door, "FX_GP_TeleportSmoke_A")
+			ItemSetOnStage(%Door, 1)
+		ENDIF

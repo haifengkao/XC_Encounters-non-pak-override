@@ -1,0 +1,30 @@
+INIT
+
+CHARACTER:__Me
+INT:%State = 0
+
+BEHAVIOUR
+
+REACTION Wandering,1050
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%State,1)
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	Sleep(3)
+	GetRandom(_Animation,"idle1","idle2","idle3")
+	CharacterPlayAnimation(_Animation)
+	CharacterWander(TRIGGER:DAF_AreaTrollBridge_Fight_8819473e-b505-425a-89b6-648df05dd8c1,5)
+INTERRUPT
+	Reset()
+			
+STORY
+
+SCRIPTFRAME Wander
+ACTIONS
+	Set(%State, 1)
+		
+	
+	
+	

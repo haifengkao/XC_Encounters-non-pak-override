@@ -1,0 +1,123 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%CurrentTarget_Boost
+	CHARACTER:%CurrentTarget_Haste
+	CHARACTERTEMPLATE:%Spider_RT="Animals_Spider_A_20af6dd6-957b-4e5f-86f5-535bb04ca90e"
+	CHARACTERTEMPLATE:%Spider_Hatched_RT="Animals_Spider_A_Hatched_e3f1f82c-8266-4fc4-9a42-2564e9c9d996"
+	CHARACTERTEMPLATE:%Spider_Hatched_G_RT="Animals_Spider_A_Hatched_Green_dcb213f0-db60-474f-bf12-0c3e923b5a5a"
+	EXTERN INT:%Bool_CanCastBoost=0
+	EXTERN INT:%Bool_CanCastHaste=0
+
+//-----------
+BEHAVIOUR
+REACTION SpiderWorshipper_DamageBoost,500
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2"
+	CharacterCanCast(__Me,"Target_EnemyTargetedDamageBoost")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyTargetedDamageBoost")
+ACTIONS
+	//DebugText(__Me,"Iterating (Boost)!")
+	Set(%CurrentTarget_Boost,null)
+	IterateCharactersInCombat(__Me,"CMB_SpiderWorshippers_Iterate_Boost",Lowest,Distance)
+	IF "!c1"
+		IsEqual(%CurrentTarget_Boost,null)
+	THEN
+		CharacterMoveInRange(%CurrentTarget_Boost,_MinRange,_MaxRange,1)
+		CharacterUseSkill("Target_EnemyTargetedDamageBoost",%CurrentTarget_Boost)
+	ELSE
+		SetPriority("SpiderWorshipper_DamageBoost",0)
+	ENDIF
+INTERRUPT
+	Reset()
+
+REACTION SpiderWorshipper_Haste,500
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2"
+	CharacterCanCast(__Me,"Target_EnemyHaste")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyHaste")
+ACTIONS
+	//DebugText(__Me,"Iterating (Haste)!")
+	Set(%CurrentTarget_Haste,null)
+	IterateCharactersInCombat(__Me,"CMB_SpiderWorshippers_Iterate_Haste",Lowest,Distance)
+	IF "!c1"
+		IsEqual(%CurrentTarget_Haste,null)
+	THEN
+		CharacterMoveInRange(%CurrentTarget_Haste,_MinRange,_MaxRange,1)
+		CharacterUseSkill("Target_EnemyHaste",%CurrentTarget_Haste)
+	ELSE
+		SetPriority("SpiderWorshipper_Haste",0)
+	ENDIF
+INTERRUPT
+	Reset()
+
+//-----------
+EVENTS
+EVENT OnInit_GiveSpells
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		IsEqual(%Bool_CanCastBoost,1)
+	THEN
+		CharacterAddSkill("Target_EnemyTargetedDamageBoost")
+	ENDIF
+	IF "c1"
+		IsEqual(%Bool_CanCastHaste,1)
+	THEN
+		CharacterAddSkill("Target_EnemyHaste")
+	ENDIF	
+	
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("SpiderWorshipper_DamageBoost",500)
+	SetPriority("SpiderWorshipper_Haste",500)
+	
+EVENT OnIterateCharacter_ScanForSpiders_Boost
+VARS
+	CHARACTER:_Spider
+	CHARACTERTEMPLATE:_TargetsTemplate
+ON
+	OnIterateCharacter(_Spider,"CMB_SpiderWorshippers_Iterate_Boost")
+ACTIONS
+	IF "!c1&c2&(c3|c4|c5)&!(c6|c7|c8)"
+		CharacterIsDead(_Spider)								//!c1
+		CharacterGetTemplate(_Spider,_TargetsTemplate)			//c2
+		IsEqual(_TargetsTemplate,%Spider_RT)					//c3
+		IsEqual(_TargetsTemplate,%Spider_Hatched_RT)			//c4
+		IsEqual(_TargetsTemplate,%Spider_Hatched_G_RT)			//c5
+		CharacterHasStatus(_Spider,"BOOST")						//c6
+		CharacterHasStatus(_Spider,"KNOCKED_DOWN")				//c7
+		CharacterHasStatus(_Spider,"STUNNED")					//c8
+	THEN
+		//DebugText(_Spider,"Boost?")
+		Set(%CurrentTarget_Boost,_Spider)
+	ENDIF
+
+EVENT OnIterateCharacter_ScanForSpiders_Haste
+VARS
+	CHARACTER:_Spider
+	CHARACTERTEMPLATE:_TargetsTemplate
+ON
+	OnIterateCharacter(_Spider,"CMB_SpiderWorshippers_Iterate_Haste")
+ACTIONS
+	IF "!c1&c2&(c3|c4|c5)&!(c6|c7|c8)"
+		CharacterIsDead(_Spider)								//!c1
+		CharacterGetTemplate(_Spider,_TargetsTemplate)			//c2
+		IsEqual(_TargetsTemplate,%Spider_RT)					//c3
+		IsEqual(_TargetsTemplate,%Spider_Hatched_RT)			//c4
+		IsEqual(_TargetsTemplate,%Spider_Hatched_G_RT)			//c5
+		CharacterHasStatus(_Spider,"HASTED")					//c6
+		CharacterHasStatus(_Spider,"KNOCKED_DOWN")				//c7
+		CharacterHasStatus(_Spider,"STUNNED")					//c8
+	THEN
+		//DebugText(_Spider,"Haste?")
+		Set(%CurrentTarget_Haste,_Spider)
+	ENDIF

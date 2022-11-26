@@ -1,0 +1,78 @@
+INIT
+
+CHARACTER:__Me
+EXTERN SKILL:%chooseHealingSpell=Heal_EnemyRegenerate
+EXTERN INT:%UseHealingSpellStartAt=0
+EXTERN INT:%UseHealingSpellFrequency=3
+EXTERN INT:%UseSelfHealingStartAt=0
+EXTERN INT:%UseSelfHealingFrequency=3
+EXTERN FLOAT:%TargetsHealth=0.6
+EXTERN FLOAT:%MyOwnHealth=0.5
+FLOAT:%HealersSightRange
+
+//-----------------------
+BEHAVIOUR
+	
+REACTION HealFriendly,0
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_hp
+	FLOAT:_Min
+	FLOAT:_Max
+CHECK "c1&c2&c3&c4&c5"
+	CharacterCanCast(__Me,%chooseHealingSpell)
+	CharacterGetSkillRange(_Min,_Max,__Me,%chooseHealingSpell)
+	CharacterGet(_Target,__Me,%HealersSightRange,Lowest,Vitality,Ally)
+	CharacterGetStat(_hp,_Target,Vitality)
+	IsLessThen(_hp,%TargetsHealth)		
+ACTIONS
+	CharacterMoveInRange(_Target,_Min,_Max,1)
+	CharacterUseSkill(%chooseHealingSpell,_Target)
+	Set(%UseHealingSpellStartAt,0)
+	SetPriority("HealFriendly",0)
+	
+REACTION HealSelf,0
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_hp
+CHECK "c1&c2&c3"
+	CharacterCanCast(__Me,%chooseHealingSpell)
+	CharacterGetStat(_hp,__Me,Vitality)
+	IsLessThen(_hp,%MyOwnHealth)		
+ACTIONS
+	CharacterUseSkill(%chooseHealingSpell,__Me)
+	Set(%UseSelfHealingStartAt,0)
+	SetPriority("HealSelf",0)
+	
+//-----------------------	
+EVENTS
+EVENT AddSkillGetSightRange
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetSightRange(%HealersSightRange,__Me)
+	THEN
+		CharacterAddSkill(%chooseHealingSpell)
+	ENDIF
+	
+EVENT SetFrequencies
+ON
+	OnTurn()
+ACTIONS
+	IF "c1"
+		IsLessThen(%UseHealingSpellStartAt,%UseHealingSpellFrequency)
+	THEN		
+		Add(%UseHealingSpellStartAt,1)
+	ELSE
+		SetPriority("HealFriendly",600)
+	ENDIF
+	IF "c1"
+		IsLessThen(%UseSelfHealingStartAt,%UseSelfHealingFrequency)
+	THEN		
+		Add(%UseSelfHealingStartAt,1)
+	ELSE
+		SetPriority("HealSelf",500)
+	ENDIF		

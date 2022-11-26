@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<palette xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <palettes />
+  <objectids>
+    <guid>835c266c-2619-41a6-9591-50fc937bf97d</guid>
+    <guid>484e77bc-cff3-4ca0-b24c-d4d648124153</guid>
+    <guid>80837d4d-29b8-4bbf-be64-de22be936655</guid>
+    <guid>c8daa28c-901b-4d16-8a80-97edd7e99a9b</guid>
+  </objectids>
+  <name>Helpers</name>
+</palette>

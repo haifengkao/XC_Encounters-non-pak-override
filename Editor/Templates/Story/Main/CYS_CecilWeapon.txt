@@ -1,0 +1,104 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Dialogs(CHARACTER_CYS_Cecil,"CYS_Cecil");
+DB_Dialogs(CHARACTER_CYS_Conrad,"CYS_Conrad");
+DB_Dialogs(CHARACTER_CYS_SailorMerchant1,"CYS_Sailors");
+DB_Dialogs(CHARACTER_CYS_SailorMerchant2,"CYS_Sailors");
+DB_Dialogs(CHARACTER_CYS_SailorMerchant3,"CYS_Sailors");
+DB_Dialogs(CHARACTER_CYS_Dietmar,CHARACTER_CYS_DietmarThug1,CHARACTER_CYS_DietmarThug2,"CYS_Dietmar");
+
+DB_IsNotMessingAround(CHARACTER_CYS_Dietmar);
+DB_IsNotMessingAround(CHARACTER_CYS_DietmarThug1);
+DB_IsNotMessingAround(CHARACTER_CYS_DietmarThug2);
+DB_IsNotMessingAround(CHARACTER_CYS_DietmarThug3);
+DB_IsNotMessingAround(CHARACTER_CYS_DietmarThug4);
+DB_IsNotMessingAround(CHARACTER_CYS_DietmarThug5);
+DB_IsNotMessingAround(CHARACTER_CYS_DietmarThug6);
+
+ItemToCharacter(ITEM_CYS_StaffOfPergamon,CHARACTER_CYS_Dietmar);
+KBSECTION
+//REGION STAFF AND REACTIONS
+
+IF
+GlobalEventSet("CYS_StaffOfPergamon")
+THEN
+CHARACTER_CYS_Cecil.GaveYouPergamonGoal();
+
+IF
+ItemAddedToCharacter(ITEM_CYS_StaffOfPergamon,_Player)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT CHARACTER_CYS_Cecil.GaveYouPergamonGoal()
+AND
+NOT ITEM_CYS_StaffOfPergamon.IsAlreadyInPlayerPossession()
+THEN
+ITEM_CYS_StaffOfPergamon.IsAlreadyInPlayerPossession();
+GlobalSetEvent("CYS_PergamonDietmarDied");
+QuestAdd("CYS_Pergamon");
+QuestUpdate("CYS_Pergamon","Update5");
+
+IF
+ItemAddedToCharacter(ITEM_CYS_StaffOfPergamon,_Player)
+AND
+_Player.DB_IsPlayer()
+AND
+CHARACTER_CYS_Cecil.GaveYouPergamonGoal()
+AND
+NOT ITEM_CYS_StaffOfPergamon.IsAlreadyInPlayerPossession()
+THEN
+ITEM_CYS_StaffOfPergamon.IsAlreadyInPlayerPossession();
+GlobalSetEvent("CYS_PergamonDietmarDied");
+QuestUpdate("CYS_Pergamon","Update6");
+
+IF
+ItemRemovedFromCharacter(ITEM_CYS_StaffOfPergamon, _Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+GlobalClearEvent("CYS_HasStaffPergamon");
+
+IF
+ItemAddedToCharacter(ITEM_CYS_StaffOfPergamon, _Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+GlobalSetEvent("CYS_HasStaffPergamon");
+
+IF
+GlobalEventSet("CYS_GivesStaffPergamon")
+THEN
+ItemToCharacter(ITEM_CYS_StaffOfPergamon,CHARACTER_CYS_Cecil);
+
+IF  
+DialogCharacterEventSet("CYS_TakeStaffPergamon",_Player,_)
+AND
+ItemIsInPartyInventory(ITEM_CYS_StaffOfPergamon,_Player,1,1)
+THEN
+NOOP(1);
+
+IF
+CharacterDied(CHARACTER_CYS_Conrad)
+THEN
+GlobalSetEvent("CYS_ConradIsDead");
+
+IF
+DialogEnded("CYS_Cecil",_)
+AND
+DB_GlobalEvent("CYS_GivePergamonStaff")
+THEN
+Proc_CompanionComment(CHARACTER_Jahan,"JAH_CC_WastingTimeStaff",CHARACTER_CYS_Cecil);
+
+IF
+DialogEnded("CYS_Cecil",_)
+AND
+DB_GlobalEvent("CYS_KeepPergamonStaff")
+THEN
+Proc_CompanionComment(CHARACTER_Jahan,"JAH_CC_WastingTimeStaff",CHARACTER_CYS_Cecil);
+
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

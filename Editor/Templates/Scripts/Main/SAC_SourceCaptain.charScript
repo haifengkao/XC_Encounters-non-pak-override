@@ -1,0 +1,22 @@
+INIT
+
+CHARACTER:__Me
+
+	CHARACTER:%Player
+
+/*
+BEHAVIOUR
+
+REACTION Patrol, 1000
+USAGE PEACE
+ACTIONS
+	CharacterWander(TRIGGER:SAC_Box_SourceCaptain_e51df565-6525-4eb0-adae-7bcfe5fd8b96, 3)
+	Sleep(2)
+*/
+
+STORY
+
+SCRIPTFRAME StartDialog
+ACTIONS
+	CharacterMoveTo(%Player)
+	CharacterEvent(__Me, "SAC_SourceCaptainDialog")

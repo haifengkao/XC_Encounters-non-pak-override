@@ -1,0 +1,67 @@
+INIT
+ITEM:__Me
+CHARACTER:%UsedBy = null
+CHARACTER:%Target = null
+EXTERN FLOAT:%DistanceCheck=20.0
+FLOAT:%CLOSEST
+EVENTS
+
+EVENT BallistaShoot
+VARS
+CHARACTER:_Char
+ON
+	OnUseItem(_Char,__Me)
+ACTIONS
+	Set(%UsedBy,_Char)
+	Set(%CLOSEST, %DistanceCheck)
+	Set(%Target,null)
+	IterateCharactersNear(__Me,%DistanceCheck,"BallistaCheck")
+	IF "c1"
+		IsEqual(%Target,null)
+	THEN
+		DisplayText(__Me,"CYS_BallistaNotInRange",3)
+	ELIF "!c1"
+		CharacterHasStatus(%UsedBy,COMBAT)
+	THEN
+		DisplayText(__Me,"CYS_BallistaNotInCombat",3)
+	ELSE
+		SetPriority("ShootBallista",100)
+	ENDIF
+	
+EVENT Iterator
+VARS 
+	CHARACTER:_Char
+	FLOAT:_Distance
+ON
+	OnIterateCharacter(_Char,"BallistaCheck")
+ACTIONS
+	IF "!c1&c2&c3&c4"
+		CharacterIsDead(_Char)
+		CharacterIsEnemy(%UsedBy, _Char)
+		GetDistance(_Distance, _Char, %UsedBy)
+		IsLessThen(_Distance, %CLOSEST)
+	THEN
+		Set(%CLOSEST, _Distance)
+		Set(%Target,_Char)
+	ENDIF
+	
+EVENT ShootAnimation
+VARS
+	FLOAT3:_Offset={0;2;-2}
+ON
+	OnTimer("BallistaShooting")
+ACTIONS
+	ShootLocalProjectileAt("Projectile_EnemyFireball",__Me,_Offset,%Target,3)
+	StopTimer("BallistaShooting")
+	
+BEHAVIOUR
+
+REACTION ShootBallista,0
+USAGE ALL
+ACTIONS	
+	ItemLookAt(%Target,30)
+	StartTimer("BallistaShooting",2.2,0)
+	ItemPlayAnimation("Shoot")
+	Set(%UsedBy,null)
+	ItemPlayAnimation("idle")
+	SetPriority("ShootBallista",0)

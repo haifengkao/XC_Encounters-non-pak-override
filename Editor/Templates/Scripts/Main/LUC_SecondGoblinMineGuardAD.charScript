@@ -1,0 +1,38 @@
+#INCLUDE DefaultCharacter
+#INCLUDE SpottingGuard
+
+INIT
+USING DefaultCharacter
+USING SpottingGuard
+INT:%StateVar1 = 0
+CHARACTER:__Me
+CHARACTER:%Goblin2 = LUC_GoblinGuard4_9847f815-2dbc-43c6-8a82-f29de8983694
+
+EVENTS
+	EVENT StartAD
+		ON
+			OnCharacterEvent(__Me,"LUC_StartGoblinGuardAD")
+		ACTIONS
+			Set(%StateVar1,1)
+			
+BEHAVIOUR
+REACTION StartAD,1000
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%StateVar1,1)
+ACTIONS
+	DisplayText(__Me,"LUC_SecondGoblinMineGuard_Script_0",5) // I'm getting tired standing here.
+	Sleep(5)
+	DisplayText(%Goblin2,"LUC_SecondGoblinMineGuard_Script_1",5) //Why is that? It is an easy, nonlethal job. We could have been assigned much worse.
+	Sleep(5)
+	DisplayText(__Me,"LUC_SecondGoblinMineGuard_Script_2",5) // I know. But those miners that keep passing by, it's like an endless line of sheep.
+	Sleep(5)
+	DisplayText(__Me,"LUC_SecondGoblinMineGuard_Script_3",5) // I started counting a while ago and now I can't keep my eyes open. I could really take a little .... ZzZzzzZz.
+	Sleep(5)
+	DisplayText(%Goblin2,"LUC_SecondGoblinMineGuard_Script_4",5) // Wake up before the boss comes, idiot. And stop counting the miners, you child!
+	Sleep(10)
+	Set(%StateVar1,0)
+INTERRUPT
+	Set(%StateVar1,0)
+	Reset()
+	

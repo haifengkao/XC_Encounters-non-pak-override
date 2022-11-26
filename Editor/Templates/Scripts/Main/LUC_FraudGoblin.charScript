@@ -1,0 +1,80 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter
+CHARACTER:__Me
+CHARACTER:%FraudOrc = LUC_FraudingOrc2_df6d4da4-4bc2-4fff-9795-344016828511
+
+INT:%StateVar1 = 0
+INT:%StateVar2 = 0
+INT:%StateVar3 = 0
+
+EVENTS
+EVENT Reply1
+ON
+	OnCharacterEvent(__Me,"Reply1")
+ACTIONS
+	Set(%StateVar1,1)
+
+EVENT Reply2
+ON
+	OnCharacterEvent(__Me,"Reply2")
+ACTIONS
+	Set(%StateVar2,1)
+
+EVENT DontDoThat
+ON
+	OnCharacterEvent(__Me,"DontDoThat")
+ACTIONS
+	Set(%StateVar3,1)
+	
+EVENT Reset1
+ON
+	OnCharacterEvent(__Me,"Reset")
+ACTIONS
+	Set(%StateVar1,0)
+	Set(%StateVar2,0)
+	Set(%StateVar3,0)
+
+BEHAVIOUR
+REACTION SayNo, 1000
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%StateVar1,1)
+ACTIONS
+	Set(%StateVar1,0)
+	DisplayText(__Me,"LUC_FraudGoblin_Script_0") // I am a Goblin! And no!
+	//CharacterPlayAnimation("Fidget_Forward_01")
+	Sleep(15)
+	CharacterEvent(%FraudOrc,"AskAgain")
+INTERRUPT
+	CharacterEvent(%FraudOrc,"Reset")
+	Reset()
+
+REACTION SayNoAgain, 1000
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%StateVar2,1)
+ACTIONS
+	Set(%StateVar2,0)
+	DisplayText(__Me,"LUC_FraudGoblin_Script_1") // I said ... NO!
+	//CharacterPlayAnimation("Fidget_Forward_01")
+	Sleep(15)
+	CharacterEvent(%FraudOrc,"AttackGoblin")
+INTERRUPT
+	CharacterEvent(%FraudOrc,"Reset")
+	Reset()
+	
+REACTION DontDoThat, 1000
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%StateVar3,1)
+ACTIONS
+	Set(%StateVar3,0)
+	DisplayText(__Me,"LUC_FraudGoblin_Script_2") // Leave me alone, you big fat bully!
+	Sleep(15)
+	CharacterEvent(%FraudOrc,"StartFighting")
+INTERRUPT
+	CharacterEvent(%FraudOrc,"Reset")
+	Reset()
+	

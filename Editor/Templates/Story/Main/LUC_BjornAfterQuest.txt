@@ -1,0 +1,88 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+IF
+CharacterScriptFrameFinished(_Char,"MoveToSafeSpot")
+AND
+DB_LUCBjornAfterScripts(_Char)
+THEN
+NOT DB_LUCBjornAfterScripts(_Char);
+ProcLUCSetTraderInfo(_Char);
+ProcLUCSetAfterEscortDialogs(_Char);
+ProcCheckAfterQuestGoalComplete();
+
+IF
+CharacterDying(_Char)
+AND
+DB_LUCBjornAfterScripts(_Char)
+THEN
+NOT DB_LUCBjornAfterScripts(_Char);
+ProcCheckAfterQuestGoalComplete();
+
+PROC
+ProcLUCSetTraderInfo(CHARACTER_LUC_Bjorn)
+THEN
+DB_BigTrader(CHARACTER_LUC_Bjorn);
+DB_ShopRegion("LucullaForest",TRIGGER_LUC_Ownership_Silverglen_Blacksmith,CHARACTER_LUC_Bjorn,"Gero");
+ProcLUCEscortSetTradeTreasure(CHARACTER_LUC_Bjorn,"LUC_Blacksmith_Bjorn","LUC_Blacksmith_Bjorn_Mount");
+
+PROC
+ProcLUCSetTraderInfo(CHARACTER_LUC_Mara)
+AND
+CHARACTER_LUC_Mara.IsBlackSmith()
+THEN
+DB_BigTrader(CHARACTER_LUC_Mara);
+DB_ShopRegion("LucullaForest",TRIGGER_LUC_Ownership_Silverglen_Blacksmith,CHARACTER_LUC_Mara,"Gero");
+CharacterSetVarFixedString(CHARACTER_LUC_Mara, "currentState", "State_Blacksmith");
+ProcLUCEscortSetTradeTreasure(CHARACTER_LUC_Mara,"LUC_Blacksmith_Mara","LUC_Blacksmith_Mara_Mount");
+
+PROC
+ProcLUCSetTraderInfo(CHARACTER_LUC_BjornMount)
+THEN
+GenerateItems(CHARACTER_Player1,CHARACTER_LUC_BjornMount);	//HACK to clear his inventory of the old stuff
+CharacterClearTradeGeneratedItems(CHARACTER_LUC_BjornMount);
+DB_CustomTradeTreasure(CHARACTER_LUC_BjornMount,"LUC_BjornMount_SmithTreasure");
+CharacterSetVarInteger(CHARACTER_LUC_Bjorn,"HasMount",1);
+
+PROC
+ProcLUCSetAfterEscortDialogs((CHARACTER)_Char)
+AND
+DB_ProcBjornAfterDialogs(_Char,(STRING)_Dialog)
+THEN
+ProcRemoveAllDialogEntriesForSpeaker(_Char);
+DB_Dialogs(_Char,_Dialog);
+
+PROC
+ProcLUCSetAfterEscortDialogs((CHARACTER)_Char)
+AND
+DB_AD_Dialog(_Char,_AD)
+THEN
+NOT DB_AD_Dialog(_Char,_AD);
+
+PROC
+ProcCheckAfterQuestGoalComplete()
+AND
+NOT DB_LUCBjornAfterScripts(_)
+THEN
+GoalCompleted;
+
+PROC
+ProcLUCEscortSetTradeTreasure((CHARACTER)_Char,(STRING)_NormalTreasuer,(STRING)_MountTreasure)
+AND
+CHARACTER_LUC_BjornMount.NeedsEscorting()
+THEN
+DB_CustomTradeTreasure(_Char,_MountTreasure);
+
+PROC
+ProcLUCEscortSetTradeTreasure((CHARACTER)_Char,(STRING)_NormalTreasuer,(STRING)_MountTreasure)
+AND
+NOT CHARACTER_LUC_BjornMount.NeedsEscorting()
+THEN
+DB_CustomTradeTreasure(_Char,_NormalTreasuer);
+
+EXITSECTION
+NOT CHARACTER_LUC_BjornMount.NeedsEscorting();
+ENDEXITSECTION
+ParentTargetEdge "LUC_BrokenWagon"

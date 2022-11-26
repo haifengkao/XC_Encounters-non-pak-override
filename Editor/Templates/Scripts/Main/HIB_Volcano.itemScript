@@ -1,0 +1,64 @@
+INIT
+
+ITEM:__Me
+EXTERN FLOAT:%Timer = 5
+EXTERN SKILL:%ProjectileSkill = null
+EXTERN INT:%CasterLevel = -1
+EXTERN FLOAT3:%Offset = {0;0;0}
+EXTERN ITEM:%Target1 = null
+EXTERN ITEM:%Target2 = null
+EXTERN ITEM:%Target3 = null
+
+BEHAVIOUR
+REACTION Shooting, 0
+USAGE ALL
+VARS 
+	FLOAT3:_Dir
+	INT:_Amount
+	FLOAT:_SleepTime
+ACTIONS
+	GetRandomBetween(_Amount,INT:2,INT:5)
+	GetForwardDirection(__Me,_Dir)
+	Label("Loop_Shooting")
+	IF "!c1"
+		IsEqual(_Amount,0)
+	THEN
+		ShootLocalProjectile(%ProjectileSkill,__Me,%Offset,_Dir,%CasterLevel)
+		GetRandomBetween(_SleepTime,FLOAT:0.5,FLOAT:2.0)
+		StartTimer("VolcanoLand",_SleepTime,0)
+		Add(_SleepTime,0.5)
+		Sleep(_SleepTime)
+		Subtract(_Amount,1)
+		Goto("Loop_Shooting")
+	ENDIF
+	StartTimer("UpdateShooting",%Timer,0)
+	SetPriority("Shooting",0)
+
+EVENTS
+
+EVENT Initialize
+ON
+	OnInit()
+ACTIONS
+	StartTimer("UpdateShooting",%Timer,0)
+
+EVENT Shutdown
+ON
+	OnShutdown()
+ACTIONS
+	StopTimer("UpdateShooting")
+
+EVENT UpdateShooting
+ON
+	OnTimer("UpdateShooting")
+ACTIONS
+	SetPriority("Shooting",1000)
+
+EVENT VolcanoLand
+ON
+	OnTimer("VolcanoLand")
+VARS 
+	ITEM:_Target
+ACTIONS
+	GetRandom(_Target,%Target1,%Target2,%Target3)
+	ItemEvent(_Target,"HIB_VolcanoShoot")

@@ -1,0 +1,31 @@
+INIT
+CHARACTER:__Me
+TRIGGER:%Point1 = DAF_Prison_Armory_ce55ffbe-2737-4fa0-b063-e29546cf4cc9
+TRIGGER:%Point2 = DAF_Prison_Torture_105620be-1ee5-414c-ade5-6932575775cd
+TRIGGER:%Point3 = DAF_Prison_Barrel_f9bc7c48-fc3d-430c-af6f-ab4a494b9b1c
+ITEM:%Chair = FUR_Citz_Chair_A_020_12e19c54-3f9f-4de9-b109-e095b54fdf6f
+ITEM:%Bench = FUR_Poor_Bench_A_027_4d5f157f-1da3-4160-859f-7e4d775f563f
+
+BEHAVIOUR
+REACTION Main, 500
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Point1)
+	CharacterLookFrom(%Point1)
+	DisplayText(__Me,"DAF_PrisonGuard_Armory",3)
+	CharacterPlayAnimation("Think_02")
+	
+	CharacterMoveTo(%Point2)
+	CharacterLookFrom(%Point2)
+	DisplayText(__Me,"DAF_PrisonGuard_Torture",3)
+	CharacterPlayAnimation("Sigh_01")
+	
+	CharacterUseItem(%Bench)
+	Sleep(10)
+	
+	CharacterMoveTo(%Point3,0,1,0,0.0)
+	CharacterLookFrom(%Point3,1)
+	CharacterPlayAnimation("Fidget_Forward_02")
+	
+	CharacterUseItem(%Chair)
+	Sleep(7)

@@ -1,0 +1,1968 @@
+<?xml version="1.0" ?>
+<save>
+    <header version="1" time="1352295985" />
+    <region id="AlignmentManager">
+        <node id="root">
+            <children>
+                <node id="Alignments">
+                    <children>
+                        <node id="Alignment">
+                            <attribute id="Object" value="Hero" type="22" />
+                        </node>
+                        <node id="Alignment">
+                            <attribute id="Object" value="Story" type="22" />
+                        </node>
+                        <node id="Alignment">
+                            <attribute id="Object" value="Good" type="22" />
+                        </node>
+                        <node id="Alignment">
+                            <attribute id="Object" value="Neutral" type="22" />
+                        </node>
+                        <node id="Alignment">
+                            <attribute id="Object" value="Evil" type="22" />
+                        </node>
+                        <node id="Alignment">
+                            <attribute id="Object" value="AnimalBase" type="22" />
+                        </node>
+						 <node id="Alignment">
+                            <attribute id="Object" value="Companion" type="22" />
+                        </node>
+	                </children>
+                </node>
+                <node id="Entities">
+                    <children>
+						<!-- this is a hack for having different groups of neutral NPCs ending up being hostile to each other/players when they join combat together when there's a hostile relation between 2 of the groups -->
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="NeutralGoodNPC" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Hero" type="22" />
+                            <attribute id="Name" value="Hero Player1" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Hero" type="22" />
+                            <attribute id="Name" value="Hero Player2" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Companion" type="22" />
+                            <attribute id="Name" value="Companion1" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Companion" type="22" />
+                            <attribute id="Name" value="Companion2" type="22" />
+                        </node>
+						<node id="Entity">
+							<attribute id="Alignment" value="Companion" type="22" />
+							<attribute id="Name" value="Companion3" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Companion" type="22" />
+                            <attribute id="Name" value="Companion4" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Companion" type="22" />
+                            <attribute id="Name" value="Companion5" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Companion" type="22" />
+                            <attribute id="Name" value="Companion6" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Companion" type="22" />
+                            <attribute id="Name" value="Companion7" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Companion" type="22" />
+                            <attribute id="Name" value="Companion8" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Companion" type="22" />
+                            <attribute id="Name" value="Companion9" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Companion" type="22" />
+                            <attribute id="Name" value="Companion10" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Companion" type="22" />
+                            <attribute id="Name" value="Companion11" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Companion" type="22" />
+                            <attribute id="Name" value="Companion12" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Companion" type="22" />
+                            <attribute id="Name" value="Companion13" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Companion" type="22" />
+                            <attribute id="Name" value="Companion14" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Story" type="22" />
+                            <attribute id="Name" value="Story NPC" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Neutral" type="22" />
+                            <attribute id="Name" value="DAF_Troll_Immaculate" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Neutral" type="22" />
+                            <attribute id="Name" value="DAF_AnguishDemonSlave" type="22" />
+                        </node>						
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="Good NPC" type="22" />
+                        </node>
+						<node id="Entity">
+							<attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="Pets" type="22" />
+						</node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="Snorri" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="CYS_Harbour" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="CYS_HarbourWarehouse" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="CYS_Village" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="CYS_Church" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="CYS_BridgeGuards" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="CYS_LighthouseGuards" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="Bellegar" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="CYS_ArcheologistBren" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="CYS_Dietmar" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Neutral" type="22" />
+                            <attribute id="Name" value="CYS_Pincer" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="CYS_Jake" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="CYS_JakeDog" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="CYS_Eglandaer" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="CYS_SamsonGhost" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="CYS_Zixzax" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_IV_OrcOutside" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Neutral" type="22" />
+                            <attribute id="Name" value="LUC_M_Prisoners" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="CYS_Nozgoth" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Neutral" type="22" />
+                            <attribute id="Name" value="LUC_M_Skeletons" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_Albert" type="22" />
+                        </node>						
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_Assassin" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_MinersCamp" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Neutral" type="22" />
+                            <attribute id="Name" value="LUC_Troll" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Neutral" type="22" />
+                            <attribute id="Name" value="LUC_TrollBaby" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Neutral" type="22" />
+                            <attribute id="Name" value="LUC_TrollDaddy" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_Ruby" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_BrokenCart" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_Roy" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Neutral" type="22" />
+                            <attribute id="Name" value="LUC_RoyAnimals" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_GoblinVillage" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_MinesGoblins" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="LUC_CanyonGoblins" type="22" />
+                        </node>
+						 <node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="LUC_CanyonGoblinsGuard1" type="22" />
+                        </node>
+						 <node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="LUC_CanyonGoblinsGuard2" type="22" />
+                        </node>
+						 <node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="LUC_CanyonGoblinsGuard3" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="LUC_CanyonGoblins2" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="LUC_FirstMineGuardGoblins" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="LUC_SecondMineGuardGoblins" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_ThirdMineGuardGoblinsWarning" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="LUC_ThirdMineGuardGoblins" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_SpiderWorshippers" type="22" />
+                        </node>						
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_MineFuseGoblins" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_Rejects" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_OrcAmbush" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_OrcAmbushSlave" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_Icara" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Neutral" type="22" />
+                            <attribute id="Name" value="LUC_GoblinBridges" type="22" />
+                        </node>						
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Neutral" type="22" />
+                            <attribute id="Name" value="LUC_Bicky" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_HumanTNTRoom" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="CYS_SkeletonKing" type="22" />
+                        </node>
+		                <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_Rapuk" type="22" />
+                        </node>
+		                <node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="LUC_SpiderMatriarch" type="22" />
+                        </node>						
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Neutral" type="22" />
+                            <attribute id="Name" value="Neutral NPC" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="Evil NPC" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="CYS_ArhuOrc" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="AnimalBase" type="22" />
+                            <attribute id="Name" value="Animal" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="RoyalGuard" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Neutral" type="22" />
+                            <attribute id="Name" value="BlackCove" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="CYS_Guard" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="CYS_CeciliaGuard" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="CYS_PrisonGuard" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="CYS_OrcLibrarian" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="CYS_Thelyron" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_GoblinLostFound" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_GoblinHostageTaker" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="LUC_GoblinBoss" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_GoblinPatrol" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="CYS_ArcheologistSkeletons" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="DAF_BOReinforcements" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Neutral" type="22" />
+                            <attribute id="Name" value="DAF_VillageBO_Orc" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Neutral" type="22" />
+                            <attribute id="Name" value="DAF_VillageBO_Human" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Neutral" type="22" />
+                            <attribute id="Name" value="DAF_VillageBO_GateGuard" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Neutral" type="22" />
+                            <attribute id="Name" value="DAF_VillageBO_Torturers" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Neutral" type="22" />
+                            <attribute id="Name" value="DAF_VillageBO_Prisoners" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="TES_Cecil" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="TES_Craig" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="TES_Animals" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="Ronald" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="Stefan" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="DAF_Adventurers" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="DAF_AdventurersFloaters" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="DAF_Wollocks" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="DAF_ArcanaMother" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="DAF_Druid" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="DAF_AdventurerCyclops" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="DAF_DarkForestWoman" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="DAF_Hershel" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="DAF_VillageRats" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="CYS_ArhuGuards" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="DAF_RaceGhosts" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="DAF_OpheliaVincent" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="DAF_HiddenFamily" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="DAF_SC_ImpWorkerGroup1" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="DAF_SC_ImpWorkerGroup2" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Neutral" type="22" />
+                            <attribute id="Name" value="DAF_Regin" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="DAF_CyclopsGroup" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="DAF_Golem" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="DAF_MotherBrain" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="DFD_ZombieBoss" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="CYS_BC_Pirates" type="22" />
+                        </node>
+
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="DAF_ReginsDead" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="DFD_ZombieLabGroup1" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="DFD_ZombieLabGroup2" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="DFD_ZombieLabPrison1" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="DFD_ZombieLabPrison2" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="DFD_ZombieLabPrisonMain" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="CYS_HiddenBandits" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="DFD_ReginSkeletons" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="DFD_ReginBodyGuards" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="DAF_OpheliaFamily" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="DAF_TristanFamily" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="DAF_NeutralFamily" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="CYS_LonelyBandit" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_GoblinSeparatist" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Neutral" type="22" />
+                            <attribute id="Name" value="WER_LordCrash" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Neutral" type="22" />
+                            <attribute id="Name" value="CYS_GreavingOrc" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="CYS_Attila" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Neutral" type="22" />
+                            <attribute id="Name" value="WER_OriginalWeresheep" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Neutral" type="22" />
+                            <attribute id="Name" value="WER_LadyFromTheSky" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="CYS_Evelyn_BlackCult" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="GLO_FabFive" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="CYS_Arhu" type="22" />
+                        </node> 
+						<node id="Entity">
+                            <attribute id="Alignment" value="Hero" type="22" />
+                            <attribute id="Name" value="Cat_Arhu" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Neutral" type="22" />
+                            <attribute id="Name" value="LUC_TrollKing" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_Lawrence" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Neutral" type="22" />
+                            <attribute id="Name" value="LUC_DrunkGoblins" type="22" />
+                        </node>						
+						<node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="LUC_WitchCabin_Cultist" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Neutral" type="22" />
+                            <attribute id="Name" value="LUC_Maradino" type="22" />
+                        </node>						
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_ImmaculateVillage" type="22" />
+                        </node>
+                        <node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_Jareth" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_ImmaculateVillageSchool" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_ImmaculateVillageGeomancer" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_ImmaculateVillageBlacksmith" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_SummonedGuard" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_PrisonGuard" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_Prisoner" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_EscapedPrisoner" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_M_ControllingCultists" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_IV_Prisoners" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="CYS_BC_Orc" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="CYS_BC_Denizen" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="Bellegar_Demon1" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="Bellegar_Demon2" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="Bellegar_Demon3" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="Bellegar_Demon4" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="HIB_Elemental_Fire" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="HIB_Elemental_Ice" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="HIB_Elemental_Earth" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="HIB_Elemental_Wind" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="HIB_ShamblingMoundHostile" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="HIB_Immaculates" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Neutral" type="22" />
+                            <attribute id="Name" value="HIB_ImmaculatesGood" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="LUC_Spider" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_Kadraskaz" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="LUC_SpiderBoss" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Neutral" type="22" />
+                            <attribute id="Name" value="HIB_Hopper" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Neutral" type="22" />
+                            <attribute id="Name" value="HIB_HopperSnowman" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="LUC_SpiderEgg" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Neutral" type="22" />
+                            <attribute id="Name" value="LUC_IC_Immaculate" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Neutral" type="22" />
+                            <attribute id="Name" value="LUC_IC_Prisoner" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="LUC_IC_Slaver" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="LUC_IC_Sacrificed" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="LUC_IC_Mangoth" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="LUC_IC_InnerGuard" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Neutral" type="22" />
+                            <attribute id="Name" value="LUC_BG_Immaculate" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Neutral" type="22" />
+                            <attribute id="Name" value="DAF_Imal" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="CYS_SourceTrader" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Good" type="22" />
+                            <attribute id="Name" value="Thuringer" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="LUC_WC_Immaculate" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="Evil" type="22" />
+                            <attribute id="Name" value="CYS_EvelynsOrc" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="AnimalBase" type="22" />
+                            <attribute id="Name" value="GLO_StrayCat" type="22" />
+                        </node>
+						<node id="Entity">
+                            <attribute id="Alignment" value="AnimalBase" type="22" />
+                            <attribute id="Name" value="GLO_StrayDog" type="22" />
+                        </node>
+                    </children>
+                </node>
+                <node id="Relations">
+                    <children>
+						
+						<node id="Relation">
+                            <attribute id="Source" value="Cat_Arhu" type="22" />
+                            <attribute id="Target" value="Good" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="Good" type="22" />
+                            <attribute id="Target" value="Cat_Arhu" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="Story" type="22" />
+                            <attribute id="Target" value="Companion" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="Companion" type="22" />
+                            <attribute id="Target" value="Story" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="AnimalBase" type="22" />
+                            <attribute id="Target" value="Companion" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Companion" type="22" />
+                            <attribute id="Target" value="AnimalBase" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Companion" type="22" />
+                            <attribute id="Target" value="Good" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Good" type="22" />
+                            <attribute id="Target" value="Companion" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Companion" type="22" />
+                            <attribute id="Target" value="Neutral" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Neutral" type="22" />
+                            <attribute id="Target" value="Companion" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Companion" type="22" />
+                            <attribute id="Target" value="Evil" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Evil" type="22" />
+                            <attribute id="Target" value="Companion" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+									
+						<node id="Relation">
+                            <attribute id="Source" value="Story" type="22" />
+                            <attribute id="Target" value="Hero" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="Hero" type="22" />
+                            <attribute id="Target" value="Story" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="AnimalBase" type="22" />
+                            <attribute id="Target" value="Hero" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Hero" type="22" />
+                            <attribute id="Target" value="AnimalBase" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Hero" type="22" />
+                            <attribute id="Target" value="Good" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Good" type="22" />
+                            <attribute id="Target" value="Hero" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Hero" type="22" />
+                            <attribute id="Target" value="Neutral" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Neutral" type="22" />
+                            <attribute id="Target" value="Hero" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Hero" type="22" />
+                            <attribute id="Target" value="Evil" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Evil" type="22" />
+                            <attribute id="Target" value="Hero" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Good" type="22" />
+                            <attribute id="Target" value="Neutral" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Neutral" type="22" />
+                            <attribute id="Target" value="Good" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Good" type="22" />
+                            <attribute id="Target" value="Evil" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Evil" type="22" />
+                            <attribute id="Target" value="Good" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Evil" type="22" />
+                            <attribute id="Target" value="Neutral" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Neutral" type="22" />
+                            <attribute id="Target" value="Evil" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="AnimalBase" type="22" />
+                            <attribute id="Target" value="Good" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Good" type="22" />
+                            <attribute id="Target" value="AnimalBase" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="AnimalBase" type="22" />
+                            <attribute id="Target" value="Neutral" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Neutral" type="22" />
+                            <attribute id="Target" value="AnimalBase" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="AnimalBase" type="22" />
+                            <attribute id="Target" value="Evil" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Evil" type="22" />
+                            <attribute id="Target" value="AnimalBase" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="Story" type="22" />
+                            <attribute id="Target" value="Good" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="Good" type="22" />
+                            <attribute id="Target" value="Story" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="Story" type="22" />
+                            <attribute id="Target" value="Neutral" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="Neutral" type="22" />
+                            <attribute id="Target" value="Story" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="Story" type="22" />
+                            <attribute id="Target" value="Evil" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="Evil" type="22" />
+                            <attribute id="Target" value="Story" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+    					<node id="Relation">
+                            <attribute id="Source" value="Story" type="22" />
+                            <attribute id="Target" value="AnimalBase" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="AnimalBase" type="22" />
+                            <attribute id="Target" value="Story" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_MineFuseGoblins" type="22" />
+                            <attribute id="Target" value="Hero" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="Hero" type="22" />
+                            <attribute id="Target" value="LUC_MineFuseGoblins" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_MinesGoblins" type="22" />
+                            <attribute id="Target" value="Hero" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="Hero" type="22" />
+                            <attribute id="Target" value="LUC_MinesGoblins" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="DAF_AdventurersFloaters" type="22" />
+                            <attribute id="Target" value="DAF_Adventurers" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="DAF_Adventurers" type="22" />
+                            <attribute id="Target" value="DAF_AdventurersFloaters" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="DAF_VillageBO_Human" type="22" />
+                            <attribute id="Target" value="DAF_HiddenFamily" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="DAF_HiddenFamily" type="22" />
+                            <attribute id="Target" value="DAF_VillageBO_Human" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="DAF_VillageBO_Orc" type="22" />
+                            <attribute id="Target" value="DAF_HiddenFamily" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="DAF_HiddenFamily" type="22" />
+                            <attribute id="Target" value="DAF_VillageBO_Orc" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="DAF_VillageBO_Torturers" type="22" />
+                            <attribute id="Target" value="DAF_VillageRats" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="DAF_VillageRats" type="22" />
+                            <attribute id="Target" value="DAF_VillageBO_Torturers" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="DAF_VillageBO_Human" type="22" />
+                            <attribute id="Target" value="DAF_VillageRats" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="DAF_VillageRats" type="22" />
+                            <attribute id="Target" value="DAF_VillageBO_Human" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="DAF_VillageRats" type="22" />
+                            <attribute id="Target" value="DAF_VillageBO_GateGuard" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="DAF_VillageBO_GateGuard" type="22" />
+                            <attribute id="Target" value="DAF_VillageRats" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="DAF_VillageBO_Orc" type="22" />
+                            <attribute id="Target" value="DAF_VillageRats" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="DAF_VillageRats" type="22" />
+                            <attribute id="Target" value="DAF_VillageBO_Orc" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="DAF_VillageBO_Orc" type="22" />
+                            <attribute id="Target" value="DAF_VillageBO_GateGuard" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="DAF_VillageBO_GateGuard" type="22" />
+                            <attribute id="Target" value="DAF_VillageBO_Orc" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Hero" type="22" />
+                            <attribute id="Target" value="DAF_Golem" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="DAF_Golem" type="22" />
+                            <attribute id="Target" value="Hero" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="DFD_ZombieLabPrisonMain" type="22" />
+                            <attribute id="Target" value="DFD_ZombieLabPrison1" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="DFD_ZombieLabPrisonMain" type="22" />
+                            <attribute id="Target" value="DFD_ZombieLabPrison2" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="DFD_ZombieLabPrison1" type="22" />
+                            <attribute id="Target" value="DFD_ZombieLabPrisonMain" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="DFD_ZombieLabPrison2" type="22" />
+                            <attribute id="Target" value="DFD_ZombieLabPrisonMain" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="DFD_ReginBodyGuards" type="22" />
+                            <attribute id="Target" value="DFD_ReginSkeletons" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="DAF_VillageBO_Torturers" type="22" />
+                            <attribute id="Target" value="DAF_VillageBO_Prisoners" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="LUC_M_Prisoners" type="22" />
+                            <attribute id="Target" value="LUC_M_Skeletons" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="LUC_M_Skeletons" type="22" />
+                            <attribute id="Target" value="LUC_M_Prisoners" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>						
+                        <node id="Relation">
+                            <attribute id="Source" value="DAF_VillageBO_Prisoners" type="22" />
+                            <attribute id="Target" value="DAF_VillageBO_Torturers" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="DFD_ReginSkeletons" type="22" />
+                            <attribute id="Target" value="DFD_ReginBodyGuards" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+						</node>
+						<node id="Relation">
+                            <attribute id="Source" value="WER_LordCrash" type="22" />
+                            <attribute id="Target" value="Hero" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="Hero" type="22" />
+                            <attribute id="Target" value="WER_LordCrash" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="CYS_Attila" type="22" />
+                            <attribute id="Target" value="Evil" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="Evil" type="22" />
+                            <attribute id="Target" value="CYS_Attila" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>						
+						<node id="Relation">
+                            <attribute id="Source" value="CYS_Evelyn_BlackCult" type="22" />
+                            <attribute id="Target" value="Hero" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>												
+						<node id="Relation">
+                            <attribute id="Source" value="Hero" type="22" />
+                            <attribute id="Target" value="CYS_Evelyn_BlackCult" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_RoyAnimals" type="22" />
+                            <attribute id="Target" value="LUC_TrollKing" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>												
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_TrollKing" type="22" />
+                            <attribute id="Target" value="LUC_RoyAnimals" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_IV_Prisoners" type="22" />
+                            <attribute id="Target" value="LUC_ImmaculateVillageSchool" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_ImmaculateVillageSchool" type="22" />
+                            <attribute id="Target" value="LUC_IV_Prisoners" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_IV_Prisoners" type="22" />
+                            <attribute id="Target" value="LUC_ImmaculateVillageGeomancer" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_ImmaculateVillageGeomancer" type="22" />
+                            <attribute id="Target" value="LUC_IV_Prisoners" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_IV_Prisoners" type="22" />
+                            <attribute id="Target" value="LUC_ImmaculateVillageBlacksmith" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_ImmaculateVillageBlacksmith" type="22" />
+                            <attribute id="Target" value="LUC_IV_Prisoners" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="Evil NPC" type="22" />
+                            <attribute id="Target" value="LUC_ImmaculateVillage" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>	
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_ImmaculateVillage" type="22" />
+                            <attribute id="Target" value="Evil NPC" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Evil NPC" type="22" />
+                            <attribute id="Target" value="LUC_Jareth" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node> 
+                        <node id="Relation">
+                            <attribute id="Source" value="LUC_Jareth" type="22" />
+                            <attribute id="Target" value="Evil NPC" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node> 
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_IV_Prisoners" type="22" />
+                            <attribute id="Target" value="LUC_ImmaculateVillage" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>	
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_EscapedPrisoner" type="22" />
+                            <attribute id="Target" value="LUC_PrisonGuard" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_PrisonGuard" type="22" />
+                            <attribute id="Target" value="LUC_EscapedPrisoner" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_Prisoner" type="22" />
+                            <attribute id="Target" value="LUC_PrisonGuard" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_PrisonGuard" type="22" />
+                            <attribute id="Target" value="LUC_Prisoner" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_Prisoner" type="22" />
+                            <attribute id="Target" value="Hero" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="Hero" type="22" />
+                            <attribute id="Target" value="LUC_Prisoner" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_EscapedPrisoner" type="22" />
+                            <attribute id="Target" value="Hero" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="Hero" type="22" />
+                            <attribute id="Target" value="LUC_EscapedPrisoner" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_EscapedPrisoner" type="22" />
+                            <attribute id="Target" value="Companion" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="Companion" type="22" />
+                            <attribute id="Target" value="LUC_EscapedPrisoner" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_Prisoner" type="22" />
+                            <attribute id="Target" value="Companion" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="Companion" type="22" />
+                            <attribute id="Target" value="LUC_Prisoner" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_Prisoner" type="22" />
+                            <attribute id="Target" value="LUC_EscapedPrisoner" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_EscapedPrisoner" type="22" />
+                            <attribute id="Target" value="LUC_Prisoner" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_ImmaculateVillage" type="22" />
+                            <attribute id="Target" value="LUC_IV_Prisoners" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_IV_Prisoners" type="22" />
+                            <attribute id="Target" value="LUC_PrisonGuard" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_PrisonGuard" type="22" />
+                            <attribute id="Target" value="LUC_IV_Prisoners" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="CYS_BC_Orc" type="22" />
+                            <attribute id="Target" value="CYS_BC_Denizen" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="CYS_BC_Denizen" type="22" />
+                            <attribute id="Target" value="CYS_BC_Orc" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_TrollBaby" type="22" />
+                            <attribute id="Target" value="LUC_TrollDaddy" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_TrollDaddy" type="22" />
+                            <attribute id="Target" value="LUC_TrollBaby" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_Ruby" type="22" />
+                            <attribute id="Target" value="LUC_Troll" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_Troll" type="22" />
+                            <attribute id="Target" value="LUC_Ruby" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="BlackCove" type="22" />
+                            <attribute id="Target" value="CYS_BC_Denizen" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="CYS_BC_Denizen" type="22" />
+                            <attribute id="Target" value="BlackCove" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="BlackCove" type="22" />
+                            <attribute id="Target" value="CYS_BC_Orc" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="CYS_BC_Orc" type="22" />
+                            <attribute id="Target" value="BlackCove" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="Bellegar_Demon1" type="22" />
+                            <attribute id="Target" value="Bellegar_Demon2" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="Bellegar_Demon1" type="22" />
+                            <attribute id="Target" value="Bellegar_Demon3" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="Bellegar_Demon1" type="22" />
+                            <attribute id="Target" value="Bellegar_Demon4" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="Bellegar_Demon2" type="22" />
+                            <attribute id="Target" value="Bellegar_Demon3" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="Bellegar_Demon2" type="22" />
+                            <attribute id="Target" value="Bellegar_Demon4" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="Bellegar_Demon3" type="22" />
+                            <attribute id="Target" value="Bellegar_Demon4" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="Bellegar_Demon1" type="22" />
+                            <attribute id="Target" value="Hero" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="Bellegar_Demon2" type="22" />
+                            <attribute id="Target" value="Hero" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="Bellegar_Demon3" type="22" />
+                            <attribute id="Target" value="Hero" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="Bellegar_Demon4" type="22" />
+                            <attribute id="Target" value="Hero" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="Evil" type="22" />
+                            <attribute id="Target" value="CYS_GreavingOrc" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+						</node>
+						<node id="Relation">
+                            <attribute id="Source" value="HIB_Elemental_Fire" type="22" />
+                            <attribute id="Target" value="HIB_Elemental_Ice" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="HIB_Elemental_Ice" type="22" />
+                            <attribute id="Target" value="HIB_Elemental_Fire" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="HIB_Elemental_Fire" type="22" />
+                            <attribute id="Target" value="HIB_Elemental_Wind" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="HIB_Elemental_Wind" type="22" />
+                            <attribute id="Target" value="HIB_Elemental_Fire" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="HIB_Elemental_Fire" type="22" />
+                            <attribute id="Target" value="HIB_Elemental_Earth" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="HIB_Elemental_Earth" type="22" />
+                            <attribute id="Target" value="HIB_Elemental_Fire" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="HIB_Elemental_Ice" type="22" />
+                            <attribute id="Target" value="HIB_Elemental_Wind" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="HIB_Elemental_Wind" type="22" />
+                            <attribute id="Target" value="HIB_Elemental_Ice" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="HIB_Elemental_Ice" type="22" />
+                            <attribute id="Target" value="HIB_Elemental_Earth" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="HIB_Elemental_Earth" type="22" />
+                            <attribute id="Target" value="HIB_Elemental_Ice" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="HIB_Elemental_Wind" type="22" />
+                            <attribute id="Target" value="HIB_Elemental_Earth" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="HIB_Elemental_Earth" type="22" />
+                            <attribute id="Target" value="HIB_Elemental_Wind" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="HIB_ImmaculatesGood" type="22" />
+                            <attribute id="Target" value="HIB_Immaculates" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="HIB_Immaculates" type="22" />
+                            <attribute id="Target" value="HIB_ImmaculatesGood" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="LUC_Roy" type="22" />
+                            <attribute id="Target" value="LUC_RoyAnimals" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="HIB_ShamblingMoundHostile" type="22" />
+                            <attribute id="Target" value="HIB_Immaculates" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="HIB_Immaculates" type="22" />
+                            <attribute id="Target" value="HIB_ShamblingMoundHostile" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="HIB_ShamblingMoundHostile" type="22" />
+                            <attribute id="Target" value="HIB_ImmaculatesGood" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="HIB_ImmaculatesGood" type="22" />
+                            <attribute id="Target" value="HIB_ShamblingMoundHostile" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="LUC_Spider" type="22" />
+                            <attribute id="Target" value="LUC_Kadraskaz" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="LUC_Kadraskaz" type="22" />
+                            <attribute id="Target" value="LUC_Spider" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>			
+                        <node id="Relation">
+                            <attribute id="Source" value="LUC_SpiderBoss" type="22" />
+                            <attribute id="Target" value="LUC_Kadraskaz" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="LUC_Kadraskaz" type="22" />
+                            <attribute id="Target" value="LUC_SpiderBoss" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>				
+                        <node id="Relation">
+							<attribute id="Source" value="LUC_SpiderBoss" type="22" />
+                            <attribute id="Target" value="Good" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Good" type="22" />
+							<attribute id="Target" value="LUC_SpiderBoss" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>				
+                        <node id="Relation">
+							<attribute id="Source" value="LUC_SpiderBoss" type="22" />
+                            <attribute id="Target" value="Hero" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Hero" type="22" />
+							<attribute id="Target" value="LUC_SpiderBoss" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>					
+                        <node id="Relation">
+							<attribute id="Source" value="CYS_SkeletonKing" type="22" />
+                            <attribute id="Target" value="Good" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Good" type="22" />
+							<attribute id="Target" value="CYS_SkeletonKing" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>				
+                        <node id="Relation">
+							<attribute id="Source" value="CYS_SkeletonKing" type="22" />
+                            <attribute id="Target" value="Hero" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Hero" type="22" />
+							<attribute id="Target" value="CYS_SkeletonKing" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>	
+						<node id="Relation">
+							<attribute id="Source" value="CYS_SkeletonKing" type="22" />
+                            <attribute id="Target" value="Companion" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Companion" type="22" />
+							<attribute id="Target" value="CYS_SkeletonKing" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>									
+                        <node id="Relation">
+							<attribute id="Source" value="LUC_SpiderWorshippers" type="22" />
+                            <attribute id="Target" value="LUC_SpiderEgg" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="LUC_SpiderEgg" type="22" />
+							<attribute id="Target" value="LUC_SpiderWorshippers" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+                        <node id="Relation">
+							<attribute id="Source" value="LUC_SpiderWorshippers" type="22" />
+                            <attribute id="Target" value="Hero" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Hero" type="22" />
+							<attribute id="Target" value="LUC_SpiderWorshippers" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>	
+                        <node id="Relation">
+							<attribute id="Source" value="LUC_SpiderWorshippers" type="22" />
+                            <attribute id="Target" value="Companion" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Companion" type="22" />
+							<attribute id="Target" value="LUC_SpiderWorshippers" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>		
+						<node id="Relation">
+                            <attribute id="Source" value="Companion" type="22" />
+                            <attribute id="Target" value="Good" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Good" type="22" />
+                            <attribute id="Target" value="Companion" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Companion" type="22" />
+                            <attribute id="Target" value="Neutral" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Neutral" type="22" />
+                            <attribute id="Target" value="Companion" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Companion" type="22" />
+                            <attribute id="Target" value="Evil" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Evil" type="22" />
+                            <attribute id="Target" value="Companion" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="Companion" type="22" />
+                            <attribute id="Target" value="Hero" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Hero" type="22" />
+                            <attribute id="Target" value="Companion" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_IC_Slaver" type="22" />
+                            <attribute id="Target" value="LUC_IC_Immaculate" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="LUC_IC_Immaculate" type="22" />
+                            <attribute id="Target" value="LUC_IC_Slaver" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_IC_Slaver" type="22" />
+                            <attribute id="Target" value="LUC_IC_Prisoner" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="LUC_IC_Prisoner" type="22" />
+                            <attribute id="Target" value="LUC_IC_Slaver" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_IC_Sacrificed" type="22" />
+                            <attribute id="Target" value="LUC_IC_InnerGuard" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="LUC_IC_InnerGuard" type="22" />
+                            <attribute id="Target" value="LUC_IC_Sacrificed" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_IC_Sacrificed" type="22" />
+                            <attribute id="Target" value="LUC_IC_Mangoth" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="LUC_IC_Mangoth" type="22" />
+                            <attribute id="Target" value="LUC_IC_Sacrificed" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_WC_Immaculate" type="22" />
+                            <attribute id="Target" value="Thuringer" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Thuringer" type="22" />
+                            <attribute id="Target" value="LUC_WC_Immaculate" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="CYS_EvelynsOrc" type="22" />
+                            <attribute id="Target" value="Hero" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Hero" type="22" />
+                            <attribute id="Target" value="CYS_EvelynsOrc" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="CYS_EvelynsOrc" type="22" />
+                            <attribute id="Target" value="Companion" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="Companion" type="22" />
+                            <attribute id="Target" value="CYS_EvelynsOrc" type="22" />
+                            <attribute id="Value" value="50" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="GLO_StrayCat" type="22" />
+                            <attribute id="Target" value="GLO_StrayDog" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+                        <node id="Relation">
+                            <attribute id="Source" value="GLO_StrayDog" type="22" />
+                            <attribute id="Target" value="GLO_StrayCat" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_IV_OrcOutside" type="22" />
+                            <attribute id="Target" value="LUC_ImmaculateVillageSchool" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_ImmaculateVillageSchool" type="22" />
+                            <attribute id="Target" value="LUC_IV_OrcOutside" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_IV_OrcOutside" type="22" />
+                            <attribute id="Target" value="LUC_ImmaculateVillageBlacksmith" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_ImmaculateVillageBlacksmith" type="22" />
+                            <attribute id="Target" value="LUC_IV_OrcOutside" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_IV_OrcOutside" type="22" />
+                            <attribute id="Target" value="LUC_ImmaculateVillageBlacksmith" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_ImmaculateVillageBlacksmith" type="22" />
+                            <attribute id="Target" value="LUC_IV_OrcOutside" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_IV_OrcOutside" type="22" />
+                            <attribute id="Target" value="LUC_ImmaculateVillageGeomancer" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_ImmaculateVillageGeomancer" type="22" />
+                            <attribute id="Target" value="LUC_IV_OrcOutside" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_IV_OrcOutside" type="22" />
+                            <attribute id="Target" value="LUC_ImmaculateVillage" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_ImmaculateVillage" type="22" />
+                            <attribute id="Target" value="LUC_IV_OrcOutside" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_IV_OrcOutside" type="22" />
+                            <attribute id="Target" value="LUC_BG_Immaculate" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_BG_Immaculate" type="22" />
+                            <attribute id="Target" value="LUC_IV_OrcOutside" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_IV_OrcOutside" type="22" />
+                            <attribute id="Target" value="LUC_IC_Immaculate" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_IC_Immaculate" type="22" />
+                            <attribute id="Target" value="LUC_IV_OrcOutside" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_IV_OrcOutside" type="22" />
+                            <attribute id="Target" value="LUC_PrisonGuard" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="LUC_PrisonGuard" type="22" />
+                            <attribute id="Target" value="LUC_IV_OrcOutside" type="22" />
+                            <attribute id="Value" value="0" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="DAF_Imal" type="22" />
+                            <attribute id="Target" value="Evil" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="Evil" type="22" />
+                            <attribute id="Target" value="DAF_Imal" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="DAF_Imal" type="22" />
+                            <attribute id="Target" value="WER_OriginalWeresheep" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="WER_OriginalWeresheep" type="22" />
+                            <attribute id="Target" value="DAF_Imal" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="Evil" type="22" />
+                            <attribute id="Target" value="WER_OriginalWeresheep" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+						<node id="Relation">
+                            <attribute id="Source" value="WER_OriginalWeresheep" type="22" />
+                            <attribute id="Target" value="Evil" type="22" />
+                            <attribute id="Value" value="100" type="4" />
+                        </node>
+						<!-------------------------------------------------------------------------------------------->
+						<node id="Relation">
+							<attribute id="Source" value="Companion" type="22" />
+							<attribute id="Target" value="NeutralGoodNPC" type="22" />
+							<attribute id="Value" value="50" type="4" />
+						</node>
+						<node id="Relation">
+								<attribute id="Source" value="NeutralGoodNPC" type="22" />
+								<attribute id="Target" value="Companion" type="22" />
+								<attribute id="Value" value="50" type="4" />
+						</node>
+						<node id="Relation">
+							<attribute id="Source" value="Hero" type="22" />
+							<attribute id="Target" value="NeutralGoodNPC" type="22" />
+							<attribute id="Value" value="50" type="4" />
+						</node>
+						<node id="Relation">
+							<attribute id="Source" value="NeutralGoodNPC" type="22" />
+							<attribute id="Target" value="Hero" type="22" />
+							<attribute id="Value" value="50" type="4" />
+						</node>
+						 <node id="Relation">
+							<attribute id="Source" value="Good" type="22" />
+							<attribute id="Target" value="NeutralGoodNPC" type="22" />
+							<attribute id="Value" value="50" type="4" />
+						</node>
+						<node id="Relation">
+							<attribute id="Source" value="NeutralGoodNPC" type="22" />
+							<attribute id="Target" value="Good" type="22" />
+							<attribute id="Value" value="50" type="4" />
+						</node>
+						<node id="Relation">
+							<attribute id="Source" value="Evil" type="22" />
+							<attribute id="Target" value="NeutralGoodNPC" type="22" />
+							<attribute id="Value" value="50" type="4" />
+						</node>
+						<node id="Relation">
+							<attribute id="Source" value="NeutralGoodNPC" type="22" />
+							<attribute id="Target" value="Evil" type="22" />
+							<attribute id="Value" value="50" type="4" />
+						</node>
+						 <node id="Relation">
+							<attribute id="Source" value="AnimalBase" type="22" />
+							<attribute id="Target" value="NeutralGoodNPC" type="22" />
+							<attribute id="Value" value="50" type="4" />
+						</node>
+						<node id="Relation">
+							<attribute id="Source" value="NeutralGoodNPC" type="22" />
+							<attribute id="Target" value="AnimalBase" type="22" />
+							<attribute id="Value" value="50" type="4" />
+						</node>
+						<node id="Relation">
+							<attribute id="Source" value="Story" type="22" />
+							<attribute id="Target" value="NeutralGoodNPC" type="22" />
+							<attribute id="Value" value="50" type="4" />
+						</node>
+						<node id="Relation">
+							<attribute id="Source" value="NeutralGoodNPC" type="22" />
+							<attribute id="Target" value="Story" type="22" />
+							<attribute id="Value" value="50" type="4" />
+						</node>
+					</children>
+                </node>
+            </children>
+        </node>
+    </region>
+</save>

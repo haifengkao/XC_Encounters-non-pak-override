@@ -1,0 +1,45 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+
+BEHAVIOUR
+	
+REACTION State_Worried, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, "Action_Catatonic")
+	SetPriority(%currentAction, 1100)
+
+REACTION State_Idle,0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	IF "c1"
+		IsRandom(0.2)
+	THEN
+		Sleep(15)
+		DialogStart("LUC_AD_ImpSlave",__Me)
+	ENDIF
+	GetRandom(_Animation,"idle1","idle2","idle3")
+	CharacterPlayAnimation(_Animation)
+	Sleep(4)
+
+REACTION State_Nothing,0
+USAGE PEACE
+ACTIONS
+	CharacterPlayAnimation("idle1")
+	Sleep(4)
+
+REACTION Action_Catatonic,0
+USAGE PEACE
+ACTIONS
+	Sleep(15)
+	DialogStart("LUC_AD_ImpSlave",__Me)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)
+	
+	

@@ -1,0 +1,110 @@
+#INCLUDE Base
+
+INIT
+USING Base
+CHARACTER:__Me
+CHARACTER:%secondSkillTargetNC=null
+EXTERN SKILL:%chooseSecondSkillNC=null
+EXTERN INT:%rangeAdjustmentBoolSSNC=0
+EXTERN INT:%frequencySSNC=0
+EXTERN INT:%frequencySSNCStartAt=0
+EXTERN INT:%prioritySSNC=300
+EXTERN INT:%storeTargetSSNC=1
+EXTERN SURFACE:%targetOnSurfaceSSNC=null
+EXTERN RELATION:%targetRelationSSNC=Ally
+EXTERN FLOAT:%targetHealthEqOrLowerSSNC=1
+EXTERN STATUS:%targetStatusSSNC=null
+EXTERN FIXEDSTRING:%saveAPTextSecondNC="CMB_MageSkipsTurnToPrepare"
+EXTERN INT:%displaySaveAPTextSecondNC=1
+
+BEHAVIOUR
+REACTION CastSkillSecondNC,0
+VARS
+	CHARACTER:_char
+	FLOAT:_minRange
+	FLOAT:_maxRange
+	FLOAT:_hp
+USAGE COMBAT
+CHECK "c1&c2&c3&c4&!c5"
+	CharacterCanCast(__Me,%chooseSecondSkillNC,1)
+	CharacterGetSkillRange(_minRange,_maxRange,__Me,%chooseSecondSkillNC)
+	CharacterGet(_char,__Me,30,Random,null,%targetRelationSSNC,%targetOnSurfaceSSNC,%targetStatusSSNC)
+	CharacterGetStat(_hp,_char,Vitality)
+	IsGreaterThen(_hp,%targetHealthEqOrLowerSSNC)
+ACTIONS
+	IF "c1|c2|c3|c4|c5"
+		IsEqual(%storeTargetSSNC,0)
+		IsEqual(%secondSkillTargetNC,null)
+		CharacterIsDead(%secondSkillTargetNC)
+		CharacterHasStatus(%secondSkillTargetNC,CHARMED)
+		CharacterIsAlly(__Me,%secondSkillTargetNC)
+	THEN
+		Set(%secondSkillTargetNC,_char)
+	ENDIF
+	IF "c1"
+		CharacterCanCast(__Me,%chooseSecondSkillNC,0)
+	THEN
+		IF "c1"
+			IsEqual(%rangeAdjustmentBoolSSNC,1)
+		THEN
+			Subtract(_maxRange,3.0)
+		ENDIF	
+		CharacterMoveInRange(%secondSkillTargetNC,_minRange,_maxRange,1)
+		CharacterUseSkill(%chooseSecondSkillNC,%secondSkillTargetNC)
+		Set(%frequencySSNCStartAt,0)
+		SetPriority("CastSkillSecondNC",0)
+	ELSE
+		Sleep(1)
+		CharacterLookAt(%secondSkillTargetNC)
+		IF "c1"
+			IsEqual(%displaySaveAPTextSecondNC,1)
+		THEN
+			DisplayCombatInfoText(__Me,%saveAPTextSecondNC,2)
+		ELSE
+			Sleep(1)
+		ENDIF
+		CharacterPlayEffect(__Me, "FX_GP_Status_SkipTurn_A_Icon", "Dummy_OverheadFX")
+		CharacterEndTurn()
+	ENDIF
+
+EVENTS
+EVENT AddSkillSecondNC
+ON
+	OnInit()
+ACTIONS
+	IF "!c1"
+		IsEqual(%chooseSecondSkillNC,null)
+	THEN
+		CharacterAddSkill(%chooseSecondSkillNC)
+	ENDIF
+	
+EVENT SetFrequenceSecondNC
+ON
+	OnTurn()
+ACTIONS
+	IF "!c1&!c2"
+		IsEqual(%storeTargetSSNC,1)
+		IsEqual(%storeTargetSSNC,0)
+	THEN
+		DebugText(__Me,"Storetarget must be 1 or 0 (on or off)")
+		Set(%storeTargetSSNC,1)
+	ENDIF
+	IF "!c1&!c2"
+		IsEqual(%rangeAdjustmentBoolSSNC,1)
+		IsEqual(%rangeAdjustmentBoolSSNC,0)
+	THEN
+		DebugText(__Me,"Range Adjustment must be 1 or 0 (on or off)")
+		Set(%rangeAdjustmentBoolSSNC,1)
+	ENDIF		
+	IF "c1"
+		IsEqual(%chooseSecondSkillNC,null)
+	THEN
+		DebugText(__Me,"Skill script assigned but no skill selected")
+	ENDIF
+	IF "c1"
+		IsLessThen(%frequencySSNCStartAt,%frequencySSNC)
+	THEN		
+		Add(%frequencySSNCStartAt,1)
+	ELSE
+		SetPriority("CastSkillSecondNC",%prioritySSNC)
+	ENDIF

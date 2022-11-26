@@ -1,0 +1,199 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_ItemDialogs(ITEM_LUC_DP_Pavillon, "LUC_DP_Pavillon");
+DB_ItemDialogs(ITEM_LUC_LP_Pavillon, "LUC_LP_Pavillon");
+
+ItemSetOnstage(ITEM_LUC_DP_FastButton,0);
+ItemSetOnstage(ITEM_LUC_DP_FastChest,0);
+ItemSetOnstage(ITEM_LUC_DP_SlowButton,0);
+ItemSetOnstage(ITEM_LUC_DP_SlowChest,0);
+
+
+DB_SlowTraps(ITEM_Pav_SlowTrap_01);
+DB_SlowTraps(ITEM_Pav_SlowTrap_02);
+DB_SlowTraps(ITEM_Pav_SlowTrap_03);
+DB_SlowTraps(ITEM_Pav_SlowTrap_04);
+DB_SlowTraps(ITEM_Pav_SlowTrap_05);
+DB_SlowTraps(ITEM_Pav_SlowTrap_06);
+DB_SlowTraps(ITEM_Pav_SlowTrap_07);
+DB_SlowTraps(ITEM_Pav_SlowTrap_08);
+DB_SlowTraps(ITEM_Pav_SlowTrap_09);
+DB_SlowTraps(ITEM_Pav_SlowTrap_10);
+DB_SlowTraps(ITEM_Pav_SlowTrap_11);
+DB_SlowTraps(ITEM_Pav_SlowTrap_12);
+DB_SlowTraps(ITEM_Pav_SlowTrapPit_01);
+DB_SlowTraps(ITEM_Pav_SlowTrapPit_02);
+DB_SlowTraps(ITEM_Pav_SlowTrapPit_03);
+DB_SlowTraps(ITEM_Pav_SlowTrapPit_04);
+DB_SlowTraps(ITEM_Pav_SlowTrapPit_05);
+DB_SlowTraps(ITEM_Pav_SlowTrapPit_06);
+DB_SlowTraps(ITEM_Pav_SlowTrapPit_07);
+DB_SlowTraps(ITEM_Pav_SlowTrapPit_08);
+DB_SlowTraps(ITEM_Pav_SlowTrapPit_09);
+DB_SlowTraps(ITEM_Pav_SlowTrapPit_10);
+DB_SlowTraps(ITEM_Pav_SlowTrapPit_11);
+
+DB_FastTraps(ITEM_Pav_Trap_01);
+DB_FastTraps(ITEM_Pav_Trap_02);
+DB_FastTraps(ITEM_Pav_Trap_03);
+DB_FastTraps(ITEM_Pav_Trap_04);
+DB_FastTraps(ITEM_Pav_Trap_05);
+DB_FastTraps(ITEM_Pav_Trap_06);
+DB_FastTraps(ITEM_Pav_Trap_07);
+DB_FastTraps(ITEM_Pav_Trap_08);
+DB_FastTraps(ITEM_Pav_Trap_09);
+DB_FastTraps(ITEM_Pav_Trap_10);
+DB_FastTraps(ITEM_Pav_Trap_11);
+DB_FastTraps(ITEM_Pav_Trap_12);
+DB_FastTraps(ITEM_Pav_Trap_13);
+DB_FastTraps(ITEM_Pav_Trap_14);
+DB_FastTraps(ITEM_Pav_Trap_15);
+DB_FastTraps(ITEM_Pav_Trap_16);
+DB_FastTraps(ITEM_Pav_Trap_17);
+DB_FastTraps(ITEM_Pav_Trap_18);
+DB_FastTraps(ITEM_Pav_Trap_19);
+DB_FastTraps(ITEM_Pav_Mine_03);
+DB_FastTraps(ITEM_Pav_TrapGaspit_01);
+
+Proc_LUC_DP_HideSlowTraps();
+Proc_LUC_DP_HideFastTraps();
+KBSECTION
+IF
+GlobalEventSet("LUC_DP_SlowDeath")
+THEN
+ITEM_LUC_DP_Pavillon.SlowDeath();
+
+IF
+DialogEnded("LUC_DP_Pavillon", _)
+AND
+ITEM_LUC_DP_Pavillon.SlowDeath()
+THEN
+NOT ITEM_LUC_DP_Pavillon.SlowDeath();
+ItemSetOnstage(ITEM_LUC_DP_SlowButton, 1);	
+ItemSetCanInteract(ITEM_LUC_DP_Pavillon, 0);
+ProcTriggerRegisterForPlayers(TRIGGER_LUC_DP_AreaPuzzle);
+Proc_LUC_DP_ShowSlowTraps();
+
+PROC
+Proc_LUC_DP_HideSlowTraps()
+AND
+DB_SlowTraps(_Trap)
+THEN
+ItemSetOnstage(_Trap, 0);
+
+PROC
+Proc_LUC_DP_HideFastTraps()
+AND
+DB_FastTraps(_Trap)
+THEN
+ItemSetOnstage(_Trap, 0);
+
+PROC
+Proc_LUC_DP_ShowSlowTraps()
+AND
+DB_SlowTraps(_Trap)
+THEN
+ItemSetOnstage(_Trap, 1);
+
+PROC
+Proc_LUC_DP_ShowFastTraps()
+AND
+DB_FastTraps(_Trap)
+THEN
+ItemSetOnstage(_Trap, 1);
+
+IF
+GlobalEventSet("LUC_DP_QuickDeath")
+THEN
+ITEM_LUC_DP_Pavillon.QuickDeath();
+
+IF
+DialogEnded("LUC_DP_Pavillon", _)
+AND
+ITEM_LUC_DP_Pavillon.QuickDeath()
+THEN
+NOT ITEM_LUC_DP_Pavillon.QuickDeath();
+ItemSetOnstage(ITEM_LUC_DP_FastButton, 1);	
+ItemSetCanInteract(ITEM_LUC_DP_Pavillon, 0);
+ProcTriggerRegisterForPlayers(TRIGGER_LUC_DP_AreaPuzzle);
+Proc_LUC_DP_ShowFastTraps();
+
+IF
+CharacterLeftTrigger(_Player, TRIGGER_LUC_DP_AreaPuzzle)
+AND
+NOT ITEM_LUC_DP_Pavillon.done()
+AND
+_OtherPlayer.DB_IsPlayer()
+AND
+NOT DB_InRegion(_OtherPlayer, TRIGGER_LUC_DP_AreaPuzzle)
+THEN
+ItemSetOnstage(ITEM_LUC_DP_FastButton,0);
+ItemSetOnstage(ITEM_LUC_DP_FastChest,0);
+ItemSetOnstage(ITEM_LUC_DP_SlowButton,0);
+ItemSetOnstage(ITEM_LUC_DP_SlowChest,0);
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_DP_AreaPuzzle);
+ItemSetCanInteract(ITEM_LUC_DP_Pavillon, 1);
+GlobalClearEvent("LUC_DP_SlowDeath");
+GlobalClearEvent("LUC_DP_QuickDeath");
+Proc_LUC_DP_HideSlowTraps();
+Proc_LUC_DP_HideFastTraps();
+
+IF
+CharacterUsedItem(_Player, ITEM_LUC_DP_SlowButton)
+THEN
+ItemSetOnstage(ITEM_LUC_DP_SlowChest, 1);
+ItemPlayEffect(ITEM_LUC_DP_SlowChest, "FX_GP_TeleportSmoke_A");
+ITEM_LUC_DP_Pavillon.done();
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_DP_AreaPuzzle);
+Proc_LUC_DP_HideSlowTraps();
+ItemSetCanInteract(ITEM_LUC_DP_SlowButton,0);
+
+IF
+CharacterUsedItem(_Player, ITEM_LUC_DP_FastButton)
+THEN
+ItemSetOnstage(ITEM_LUC_DP_FastChest, 1);
+ItemPlayEffect(ITEM_LUC_DP_FastChest, "FX_GP_TeleportSmoke_A");
+ITEM_LUC_DP_Pavillon.done();
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_DP_AreaPuzzle);
+Proc_LUC_DP_HideFastTraps();
+ItemSetCanInteract(ITEM_LUC_DP_FastButton,0);
+
+
+IF
+DialogEnded("LUC_LP_Pavillon", _ID)
+AND
+DB_DialogPlayers(_ID,_Player,1)
+AND
+CharacterGetVarInteger(_Player, "LifePuzzleDie", 1)
+THEN
+CharacterSetVarInteger(_Player, "LifePuzzleDie", 0);
+CharacterDie(_Player,0);
+
+IF
+DialogEnded("LUC_LP_Pavillon", _ID)
+AND
+DB_DialogPlayers(_ID,_Player,1)
+AND
+CharacterGetVarInteger(_Player, "LifePuzzleSlow", 1)
+THEN
+CharacterSetVarInteger(_Player, "LifePuzzleSlow", 0);
+ItemTemplateAddToCharacter("BOOK_Skill_Earth_OilSurface_b29f86dd-6b67-4060-9d54-dfa508364b9c", _Player, 1);
+ItemSetCanInteract(ITEM_LUC_LP_Pavillon, 0);
+CharacterPlayHUDSound(_Player,"UI_LuckyFind");
+
+IF
+DialogEnded("LUC_LP_Pavillon", _ID)
+AND
+DB_DialogPlayers(_ID,_Player,1)
+AND
+CharacterGetVarInteger(_Player, "LifePuzzleFast", 1)
+THEN
+CharacterSetVarInteger(_Player, "LifePuzzleFast", 0);
+ItemTemplateAddToCharacter("BOOK_Skill_Fire_Haste_a02ecabc-7a5b-4590-b66b-c7569e9fd5a8", _Player, 1);
+ItemSetCanInteract(ITEM_LUC_LP_Pavillon, 0);
+CharacterPlayHUDSound(_Player,"UI_LuckyFind");
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

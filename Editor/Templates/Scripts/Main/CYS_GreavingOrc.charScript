@@ -1,0 +1,28 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+
+BEHAVIOUR
+
+REACTION State_Sobbing, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, "Action_Sob")
+	SetPriority(%currentAction, 1100)
+
+REACTION Action_Sob, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterLookAt(ITEM:Goblins_Totem_A_000_62ff686c-b6ec-4ee2-87a9-e0aabcfcc5b8)
+		CharacterPlayAnimation("Crying_01",0,1)
+		IF "c1"
+			IsRandom(0.5)
+		THEN
+			DialogStart("CYS_AD_GreavingOrc",__Me)
+		ENDIF
+		Sleep(2.0)
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)

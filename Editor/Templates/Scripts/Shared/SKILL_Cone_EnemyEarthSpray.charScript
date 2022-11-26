@@ -1,0 +1,118 @@
+#TEMPLATE "_SKILL_Base" : Cone_EnemyEarthSpray
+
+INIT
+CHARACTER:__Me
+FLOAT:%SkillTargetScore_Cone_EnemyEarthSpray=-1000000
+// [GLOBAL_VARS]
+INT:%ClassScore_Cone_EnemyEarthSpray
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_Cone_EnemyEarthSpray
+VARS
+	// [CALC_VARS]
+	FLOAT:_SkillRangeMin
+	FLOAT:_SkillRangeMax
+	FLOAT:_SkillImpactRange
+	FLOAT3:_TargetPos
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_Cone_EnemyEarthSpray")
+ACTIONS
+	Set(%SkillTargetScore_Cone_EnemyEarthSpray, -1000000)
+
+	// [CALC_ACTIONS_PRE]
+	Set(%ClassScore_Cone_EnemyEarthSpray, 0)
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	IF "(c1)&(c2)&(c3)"
+	    CharacterGetSkillRange(_SkillRangeMin, _SkillRangeMax, __Me, Cone_EnemyEarthSpray) // c1
+	    CharacterGetSkillImpactRange(_SkillImpactRange, __Me, Cone_EnemyEarthSpray) // c2
+	    FindPosition(_TargetPos, __Me, _SkillRangeMax, _SkillImpactRange, __Me, -1, 0, 2, -1) // c3
+	THEN
+	    Set(%SkillTargetPos_Cone_EnemyEarthSpray, _TargetPos)
+	    Add(%ActionScore_Cone_EnemyEarthSpray, 20.0)
+	ELSE 
+	    IterateCharactersInCombat(__Me, "CalculateTarget_Cone_EnemyEarthSpray", Random, Vitality)
+	    IF "!c1"
+	    	IsEqual(%SkillTargetChar_Cone_EnemyEarthSpray, null)
+	    THEN
+	    	Add(%ActionScore_Cone_EnemyEarthSpray, %SkillTargetScore_Cone_EnemyEarthSpray)
+	    ENDIF
+	ENDIF
+	// [~CALC_ACTIONS]
+
+	
+
+	
+// Calculate the character we should attack
+EVENT CalculateTarget_Cone_EnemyEarthSpray
+VARS	
+	CHARACTER:_Char
+	// [CALC_TARGET_VARS]
+	INT:_ClassScore_Cone_EnemyEarthSpray
+	FLOAT:_Score
+	INT:_EnemiesInRange
+	// [~CALC_TARGET_VARS]
+ON
+	OnIterateCharacter(_Char, "CalculateTarget_Cone_EnemyEarthSpray")	
+ACTIONS
+	// [CALC_CHAR_TARGET_ACTIONS_PRE]
+	Set(_ClassScore_Cone_EnemyEarthSpray, %ClassScore_Cone_EnemyEarthSpray)
+	Set(_Score, 0.0)
+	// [~CALC_CHAR_TARGET_ACTIONS_PRE]
+	// [CALC_CHAR_TARGET_ACTIONS]
+	IF "(!c1&!c2&!c3)&((c4)|c5)&(!(c6))&(c7)&(c8)"
+	    CharacterIsDead(_Char) // c1
+	    CharacterHasStatus(_Char, INVISIBLE) // c2
+	    CharacterHasStatus(_Char, SNEAKING) // c3
+	    CharacterHasStatus(_Char, AGGRO_MARKED) // c4
+	    CharacterIsBetterOrEqualClass(_Char, %ClassScore_Cone_EnemyEarthSpray, _ClassScore_Cone_EnemyEarthSpray, 5, 4, 3, 2, 1) // c5
+	    CharacterHasStatus(_Char, PETRIFIED) // c6
+	    CharacterIsEnemy(__Me, _Char) // c7
+	    CharacterCount(_EnemiesInRange, _Char, 5, Enemy, null) // c8
+	THEN
+	    Set(%ClassScore_Cone_EnemyEarthSpray, _ClassScore_Cone_EnemyEarthSpray)
+	    IF "(c1)"
+	        CharacterHasStatus(_Char, AGGRO_MARKED) // c1
+	    THEN
+	        Add(_Score, 5.0)
+	    ENDIF
+	    // Hostile count score calculation
+	    Add(_Score, 10.0) // HostileWeight
+	    
+	    // SeveralEnemiesInRange score calculation
+	    IF "(!c1)"
+	        IsLessThen(_EnemiesInRange, 2) // c1
+	    THEN
+	        Add(_Score, 5.0)
+	    ENDIF
+	    
+	    // Can see score calculation
+	    IF "!c1"
+	    	CharacterCanSee(__Me, _Char)
+	    THEN
+	    	Add(_Score, -10.0)
+	    ENDIF
+	    
+	    IF "c1"
+	    	IsGreaterThen(_Score, %SkillTargetScore_Cone_EnemyEarthSpray)
+	    THEN
+	    	Set(%SkillTargetChar_Cone_EnemyEarthSpray, _Char)
+	    	Set(%SkillTargetScore_Cone_EnemyEarthSpray, _Score)
+	    ENDIF	
+	ENDIF
+	// [~CALC_CHAR_TARGET_ACTIONS]
+	
+	
+	
+	
+	
+	
+	
+	

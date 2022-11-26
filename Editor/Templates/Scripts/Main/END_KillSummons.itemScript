@@ -1,0 +1,25 @@
+INIT
+
+ITEM:__Me
+
+	EXTERN STRING:%Event = ""
+
+EVENTS
+
+EVENT Kill
+ON
+	OnGlobalEventSet(%Event)
+ACTIONS
+	IterateCharactersNear(__Me, 30.0, "SAC_IterateParty")
+	
+EVENT Iterate
+VARS
+	CHARACTER:_Char
+ON
+	OnIterateCharacter(_Char, "SAC_IterateParty")
+ACTIONS
+	IF "c1"
+		CharacterIsSummon(_Char)
+	THEN
+		CharacterDie(_Char)
+	ENDIF

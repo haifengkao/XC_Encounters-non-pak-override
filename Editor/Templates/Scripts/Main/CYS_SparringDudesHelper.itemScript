@@ -1,0 +1,24 @@
+INIT
+
+ITEM:__Me
+INT:%Counter = 0
+EVENTS
+
+EVENT load
+	ON
+		OnItemEvent(__Me, "back")
+	ACTIONS
+		Add(%Counter, 1)
+		IF "c1"
+			IsEqual(%Counter, 2)
+		THEN
+			StartTimer("CYS_FightingDudes", 1.0, 0)
+			Set(%Counter, 0)
+		ENDIF
+		
+EVENT Timer
+	ON
+		OnTimer("CYS_FightingDudes")
+	ACTIONS
+		ItemEvent(__Me, "ResumeSparring")
+		ItemEvent(__Me, "ResumeSparring")

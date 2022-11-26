@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<palette xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <palettes />
+  <objectids>
+    <guid>ef6e1597-83f0-48e9-9635-122bce888a43</guid>
+    <guid>ed43a4f6-2e66-470c-bb3b-e79568e331ad</guid>
+    <guid>50b97033-ccb5-49fa-a311-d3ce6a3ec389</guid>
+    <guid>381ea5a3-258d-4eb4-bf51-c1fb2433f50a</guid>
+    <guid>82cedd71-3a8b-4156-9de9-8911fe0f3fb5</guid>
+    <guid>93a83993-9ca3-4692-9bc4-99fc92eea865</guid>
+    <guid>281189e9-b0e2-4809-99eb-9c31ba8de478</guid>
+    <guid>414289f1-ef4c-4c9a-b446-55fd49b19fc3</guid>
+    <guid>361cf425-dcc2-49d2-9cb5-b688e958f502</guid>
+    <guid>32d50a1a-d473-40c6-8cfe-d115e1e0ac16</guid>
+    <guid>ff56a598-664d-43a7-b5dd-85761f554f76</guid>
+    <guid>85ec836f-fe7d-4b70-b938-856be6d65e25</guid>
+  </objectids>
+  <name>Wollocks</name>
+</palette>

@@ -1,0 +1,24 @@
+INIT
+CHARACTER:__Me
+INT:%IsCrying = 1
+TRIGGER:%Point1 = DAF_Point_LonelyFloater1_8c015ec6-8e29-4d75-a83b-f1f76ef28cc4
+TRIGGER:%Point2 = DAF_Point_LonelyFloater2_da62b65b-359b-47b5-8348-9f7e7cdf2c7a
+TRIGGER:%Point3 = DAF_Point_LonelyFloater3_71e46e2b-80c3-4ee7-a410-c9f160748632
+
+BEHAVIOUR
+REACTION ChooseAction, 1060
+USAGE PEACE
+VARS
+	TRIGGER:_Trigger = ""
+	FIXEDSTRING:_RandomWalkLine = ""
+CHECK "c1"
+	IsEqual(%IsCrying, 1)
+ACTIONS
+	Check()
+	GetRandom(_RandomWalkLine, "DAF_LonelyFloater_Script_0", "DAF_LonelyFloater_Script_1", "DAF_LonelyFloater_Script_2","DAF_LonelyFloater_Script_3")
+	DisplayText(__Me,_RandomWalkLine)
+	GetRandom(_Trigger,%Point1,%Point2,%Point3)
+	CharacterMoveTo(_Trigger,0)
+	CharacterWander(FLOAT:10,5,0,_Trigger)
+INTERRUPT
+	Reset()

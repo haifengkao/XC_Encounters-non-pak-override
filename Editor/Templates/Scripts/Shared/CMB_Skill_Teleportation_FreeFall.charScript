@@ -1,0 +1,124 @@
+INIT
+CHARACTER:__Me
+EXTERN INT:%TeleportStartAt=0
+EXTERN INT:%TeleportFrequency=0
+EXTERN INT:%bool_TryToTelepIntoHarmfulSurface=1
+EXTERN INT:%bool_TryToTelepNearStrongestAlly=1
+EXTERN COMPARE:%TeleportStatCompareHow=Highest
+EXTERN COMPAREFUNC:%TeleportStatCompareWhat=Distance
+
+//----------------
+BEHAVIOUR 
+REACTION TeleportTargetIntoSurface,0
+USAGE COMBAT
+VARS
+	CHARACTER:_Player
+	FLOAT3:_HarmfulSurface
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&c4&!c5&(c6|c7|c8|c9|c10|c11|c12|c13|c14)&c15"
+	IsEqual(%bool_TryToTelepIntoHarmfulSurface,1)						//c1
+	CharacterCanCast(__Me,Teleportation_EnemyFreeFall)					//c2	
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,Teleportation_EnemyFreeFall)							//c3
+	CharacterGet(_Player,__Me,_MaxRange,%TeleportStatCompareHow,%TeleportStatCompareWhat,Enemy,None)	//c4
+	CharacterIsDead(_Player)											//c5
+	FindSurface(_HarmfulSurface,__Me,0,_MaxRange,Lava)				//c6
+	FindSurface(_HarmfulSurface,__Me,0,_MaxRange,Electrified)		//c7
+	FindSurface(_HarmfulSurface,__Me,0,_MaxRange,BloodElectrified)	//c8
+	FindSurface(_HarmfulSurface,__Me,0,_MaxRange,Ice)				//c9
+	FindSurface(_HarmfulSurface,__Me,0,_MaxRange,BloodFrozen)		//c10
+	FindSurface(_HarmfulSurface,__Me,0,_MaxRange,Fire)				//c11
+	FindSurface(_HarmfulSurface,__Me,0,_MaxRange,CloudPoison)		//c12
+	FindSurface(_HarmfulSurface,__Me,0,_MaxRange,CloudSteam)		//c13
+	FindSurface(_HarmfulSurface,__Me,0,_MaxRange,Ooze)				//c14
+	FindValidPosition(_HarmfulSurface,4,_Player)						//c15		
+ACTIONS 
+	CharacterMoveInRange(_Player,_MinRange,_MaxRange,1)
+	CharacterUseSkill(Teleportation_EnemyFreeFall,_Player,_HarmfulSurface)
+	Sleep(1)
+	Set(%TeleportStartAt,0)
+	SetPriority("TeleportTargetIntoSurface",0)
+	SetPriority("TeleportTargetNearStrongestAlly",0)
+	SetPriority("TeleportTargetNearMe",0)
+INTERRUPT
+	Reset()
+	
+REACTION TeleportTargetNearStrongestAlly,0
+USAGE COMBAT
+VARS
+	CHARACTER:_Player
+	CHARACTER:_StrongestAlly
+	FLOAT3:_StrongestAllysPosition
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&c4&!c5&c6&c7&c8"
+	IsEqual(%bool_TryToTelepNearStrongestAlly,1)															//c1
+	CharacterCanCast(__Me,Teleportation_EnemyFreeFall)														//c2
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,Teleportation_EnemyFreeFall)							//c3
+	CharacterGet(_Player,__Me,_MaxRange,%TeleportStatCompareHow,%TeleportStatCompareWhat,Enemy,None)		//c4
+	CharacterIsDead(_Player)																				//c5
+	CharacterGet(_StrongestAlly,__Me,_MaxRange,Highest,Strength,Ally)										//c6
+	GetPosition(_StrongestAlly,_StrongestAllysPosition)														//c7
+	FindValidPosition(_StrongestAllysPosition,4,_Player)	 												//c8
+ACTIONS 
+	CharacterMoveInRange(_Player,_MinRange,_MaxRange,1)
+	CharacterUseSkill(Teleportation_EnemyFreeFall,_Player,_StrongestAllysPosition)
+	Sleep(1)
+	Set(%TeleportStartAt,0)
+	SetPriority("TeleportTargetIntoSurface",0)
+	SetPriority("TeleportTargetNearStrongestAlly",0)
+	SetPriority("TeleportTargetNearMe",0)
+INTERRUPT
+	Reset()
+		
+REACTION TeleportTargetNearMe,0
+USAGE COMBAT
+VARS
+	CHARACTER:_Player
+	FLOAT3:_MyPosition	
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&c4&!c5"
+	IsEqual(%bool_TryToTelepIntoHarmfulSurface,0)															//c1
+	CharacterGet(_Player,__Me,_MaxRange,%TeleportStatCompareHow,%TeleportStatCompareWhat,Enemy,None)		//c2
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,Teleportation_EnemyFreeFall)							//c3
+	CharacterCanCast(__Me,Teleportation_EnemyFreeFall)														//c4
+	CharacterIsDead(_Player)																				//c5
+ACTIONS 
+	IF "c1&c2" 
+		GetPosition(__Me,_MyPosition)
+		FindValidPosition(_MyPosition,4,_Player)
+	THEN	
+		CharacterMoveInRange(_Player,_MinRange,_MaxRange,1)
+		CharacterUseSkill(Teleportation_EnemyFreeFall,_Player,_MyPosition)
+	ENDIF
+		Sleep(1)
+		Set(%TeleportStartAt,0)
+		SetPriority("TeleportTargetIntoSurface",0)
+		SetPriority("TeleportTargetNearStrongestAlly",0)
+		SetPriority("TeleportTargetNearMe",0)	
+INTERRUPT
+	Reset()
+	
+//----------------
+EVENTS
+EVENT GiveTeleportSpell
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill(Teleportation_EnemyFreeFall)
+	
+EVENT SetTeleportFrequency
+ON
+	OnTurn()
+ACTIONS
+	IF "c1"
+		IsLessThen(%TeleportStartAt,%TeleportFrequency)
+	THEN		
+		Add(%TeleportStartAt,1)
+	ELSE
+		SetPriority("TeleportTargetIntoSurface",450)
+		SetPriority("TeleportTargetNearStrongestAlly",400)
+		SetPriority("TeleportTargetNearMe",350)
+	ENDIF
+	

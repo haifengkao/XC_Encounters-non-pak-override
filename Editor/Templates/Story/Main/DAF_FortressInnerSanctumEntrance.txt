@@ -1,0 +1,242 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+//REGION Mirror Puzzle
+ItemSetOnstage(ITEM_DAF_Fort_Statues_Mirror_1,0);
+ItemSetCanInteract(ITEM_DAF_Fort_Statues_Mirror_1,0);
+TriggerRegisterForItems(TRIGGER_DAF_Fort_MirrorPuz_TrStat1);
+TriggerRegisterForItems(TRIGGER_DAF_Fort_MirrorPuz_TrStat2);
+TriggerRegisterForItems(TRIGGER_DAF_Fort_MirrorPuz_TrStat3);
+
+DB_MirrorPuz_Statues(ITEM_DAF_Fort_MirrorPuz_Statue_Knight);
+DB_MirrorPuz_Statues(ITEM_DAF_Fort_MirrorPuz_Statue_Worshipper);
+DB_MirrorPuz_Statues(ITEM_DAF_Fort_MirrorPuz_Statue_Fish);
+
+DB_MirrorPuz_Triggers(TRIGGER_DAF_Fort_MirrorPuz_TrStat1, ITEM_DAF_Fort_MirrorPuz_Statue_Knight, "Statue1Placed");
+DB_MirrorPuz_Triggers(TRIGGER_DAF_Fort_MirrorPuz_TrStat2, ITEM_DAF_Fort_MirrorPuz_Statue_Worshipper, "Statue2Placed");
+DB_MirrorPuz_Triggers(TRIGGER_DAF_Fort_MirrorPuz_TrStat3, ITEM_DAF_Fort_MirrorPuz_Statue_Fish, "Statue3Placed");
+//END_REGION
+
+//REGION Demon Ambush Chars DB
+DB_DAF_Fort_ETIS_AmbushRoom(CHARACTER_DAF_FortAmbush_AmbushDemon_01);
+//END_REGION
+
+PROC_DAF_Fort_ETIS_AmbushInit();
+AmbushTrigger(TRIGGER_DAF_Fort_ETIS_AmbushRoomTrigger_01,ITEM_DAF_Fort_ETIS_AmbushRoom_AmbushInvisHelper);
+KBSECTION
+//REGION DoorPuzzle
+IF
+CharacterItemEvent(_Player,ITEM_DAF_Fortress_ChoiceLever,"DAF_Fort_State0")
+THEN
+GlobalSetEvent("DAF_Fort_State0");
+GlobalClearEvent("DAF_Fort_State1");
+GlobalClearEvent("DAF_Fort_State2");
+ItemDisplayText(ITEM_DAF_Fortress_ChoiceLever,"DAF_Fort_Choicelever1");
+
+IF
+CharacterItemEvent(_Player,ITEM_DAF_Fortress_ChoiceLever,"DAF_Fort_State1")
+THEN
+GlobalSetEvent("DAF_Fort_State1");
+GlobalClearEvent("DAF_Fort_State0");
+GlobalClearEvent("DAF_Fort_State2");
+ItemDisplayText(ITEM_DAF_Fortress_ChoiceLever,"DAF_Fort_Choicelever2");
+
+IF
+CharacterItemEvent(_Player,ITEM_DAF_Fortress_ChoiceLever,"DAF_Fort_State2")
+THEN
+GlobalSetEvent("DAF_Fort_State2");
+GlobalClearEvent("DAF_Fort_State0");
+GlobalClearEvent("DAF_Fort_State1");
+ItemDisplayText(ITEM_DAF_Fortress_ChoiceLever,"DAF_Fort_Choicelever3");
+
+IF
+CharacterItemEvent(_Player,ITEM_DAF_Fortress_ActivateLever,"DAF_Fort_LeverActivate")
+AND
+GlobalGetEvent("DAF_Fort_State0",1)
+THEN
+ItemOpen(ITEM_DAF_FortressTrap_Door1);
+ItemClose(ITEM_DAF_FortressTrap_Door2);
+ItemOpen(ITEM_DAF_FortressTrap_Door3);
+ItemClose(ITEM_DAF_FortressTrap_Door4);
+CharacterItemSetEvent(_Player,ITEM_DAF_FortressTrap_Lava4_1,"DAF_ETIS_Room4_Lava_On");
+ItemClose(ITEM_DAF_FortressTrap_Door5);
+ItemOpen(ITEM_DAF_FortressTrap_Door6);
+CharacterItemSetEvent(CHARACTER_DAF_Fort_ETIS_Room3_Sent,ITEM_DAF_Fortress_ActivateLever,"DAF_ETIS_SentRoom3_turnMeOff");
+CharacterItemSetEvent(_Player,ITEM_DAF_Fortress_ActivateLever,"DAF_ETIS_Room3_Lava_Off");
+CharacterItemSetEvent(_Player,ITEM_DAF_Fortress_ActivateLever,"DAF_ETIS_Room5_Lava_Off");
+
+IF
+CharacterItemEvent(_Player,ITEM_DAF_Fortress_ActivateLever,"DAF_Fort_LeverActivate")
+AND
+GlobalGetEvent("DAF_Fort_State1",1)
+THEN
+ItemClose(ITEM_DAF_FortressTrap_Door1);
+ItemOpen(ITEM_DAF_FortressTrap_Door2);
+ItemOpen(ITEM_DAF_FortressTrap_Door3);
+ItemClose(ITEM_DAF_FortressTrap_Door4);
+CharacterItemSetEvent(_Player,ITEM_DAF_FortressTrap_Lava4_1,"DAF_ETIS_Room4_Lava_Off");
+ItemClose(ITEM_DAF_FortressTrap_Door5);
+ItemClose(ITEM_DAF_FortressTrap_Door6);
+CharacterItemSetEvent(CHARACTER_DAF_Fort_ETIS_Room3_Sent,ITEM_DAF_Fortress_ActivateLever,"DAF_ETIS_SentRoom3_turnMeOn");
+
+IF
+CharacterItemEvent(_Player,ITEM_DAF_Fortress_ActivateLever,"DAF_Fort_LeverActivate")
+AND
+GlobalGetEvent("DAF_Fort_State2",1)
+THEN
+ItemClose(ITEM_DAF_FortressTrap_Door1);
+ItemClose(ITEM_DAF_FortressTrap_Door2);
+ItemClose(ITEM_DAF_FortressTrap_Door3);
+ItemOpen(ITEM_DAF_FortressTrap_Door4);
+CharacterItemSetEvent(_Player,ITEM_DAF_FortressTrap_Lava4_1,"DAF_ETIS_Room4_Lava_On");
+ItemOpen(ITEM_DAF_FortressTrap_Door5);
+ItemClose(ITEM_DAF_FortressTrap_Door6);
+CharacterItemSetEvent(CHARACTER_DAF_Fort_ETIS_Room3_Sent,ITEM_DAF_Fortress_ActivateLever,"DAF_ETIS_SentRoom3_turnMeOn");
+
+//END_REGION
+
+//REGION FinalDoorPuzzle
+IF
+CharacterItemEvent(_Player,ITEM_DAF_Fort_ETIS_Door_ButtonFire,"DAF_Fort_Light1_On")
+THEN
+GlobalSetEvent("DAF_Fort_Light1_On2");
+
+IF
+CharacterItemEvent(_Player,ITEM_DAF_Fort_ETIS_Door_ButtonAir,"DAF_Fort_Light2_On")
+THEN
+GlobalSetEvent("DAF_Fort_Light2_On2");
+
+IF
+CharacterItemEvent(_Player,ITEM_DAF_Fort_ETIS_Door_ButtonEarth,"DAF_Fort_Light3_On")
+THEN
+GlobalSetEvent("DAF_Fort_Light3_On2");
+
+IF
+CharacterItemEvent(_Player,ITEM_DAF_Fort_ETIS_Door_ButtonIce,"DAF_Fort_Light4_On")
+THEN
+GlobalSetEvent("DAF_Fort_Light4_On2");
+
+
+IF
+CharacterItemEvent(_Player,ITEM_DAF_Fort_ETIS_DoorLever2,"DAF_ETIS_OpenRoundDoor")
+AND
+GlobalGetEvent("DAF_Fort_Light1_On2",1)
+AND
+GlobalGetEvent("DAF_Fort_Light2_On2",1)
+AND
+GlobalGetEvent("DAF_Fort_Light3_On2",1)
+AND
+GlobalGetEvent("DAF_Fort_Light4_On2",1)
+THEN
+ItemOpen(ITEM_DAF_Fort_ETIS_RoundStoneDoor_1);
+ItemOpen(ITEM_DAF_Fort_ETIS_RoundStoneDoor_2);
+DB_DAF_ETIS_Lever2Handled(1);
+
+IF
+CharacterItemEvent(_Player,ITEM_DAF_Fort_ETIS_DoorLever2,"DAF_ETIS_OpenRoundDoor")
+AND
+NOT DB_DAF_ETIS_Lever2Handled(1)
+THEN
+CharacterDisplayText(_Player, "GLO_FailedUse");
+
+IF
+CharacterItemEvent(_Player,ITEM_DAF_Fort_ETIS_DoorLever2,"DAF_ETIS_OpenRoundDoor")
+THEN
+NOT DB_DAF_ETIS_Lever2Handled(1);
+
+IF
+CharacterItemEvent(_Player,ITEM_DAF_Fort_ETIS_DoorLever,"DAF_ETIS_OpenRoundDoor")
+AND
+GlobalGetEvent("DAF_Fort_Light1_On2",1)
+AND
+GlobalGetEvent("DAF_Fort_Light2_On2",1)
+AND
+GlobalGetEvent("DAF_Fort_Light3_On2",1)
+AND
+GlobalGetEvent("DAF_Fort_Light4_On2",1)
+THEN
+ItemOpen(ITEM_DAF_Fort_ETIS_RoundStoneDoor_1);
+ItemOpen(ITEM_DAF_Fort_ETIS_RoundStoneDoor_2);
+DB_DAF_ETIS_LeverHandled(1);
+
+IF
+CharacterItemEvent(_Player,ITEM_DAF_Fort_ETIS_DoorLever,"DAF_ETIS_OpenRoundDoor")
+AND
+NOT DB_DAF_ETIS_LeverHandled(1)
+THEN
+CharacterDisplayText(_Player, "GLO_FailedUse");
+
+IF
+CharacterItemEvent(_Player,ITEM_DAF_Fort_ETIS_DoorLever,"DAF_ETIS_OpenRoundDoor")
+THEN
+NOT DB_DAF_ETIS_LeverHandled(1);
+
+//END_REGION
+
+//REGION Statue Puzzle
+IF
+ItemEnteredTrigger(_Statue,_Trigger,_)
+AND
+DB_MirrorPuz_Triggers(_Trigger, _Statue, _Event)
+THEN
+GlobalSetEvent(_Event);
+
+IF
+ItemLeftTrigger(_Statue,_Trigger,_)
+AND
+DB_MirrorPuz_Triggers(_Trigger, _Statue, _Event)
+THEN
+GlobalClearEvent(_Event);
+
+IF
+CharacterItemEvent(_Player,ITEM_DAF_Fort_PuzPortal_Lever,"PortalLeverPulled")
+AND
+GlobalGetEvent("Statue1Placed",1)
+AND
+GlobalGetEvent("Statue2Placed",1)
+AND
+GlobalGetEvent("Statue3Placed",1)
+THEN
+ItemSetOnstage(ITEM_DAF_Fort_Statues_Mirror_1,1);
+PlayEffectAtItem("FX_GP_TeleportSmoke_A",ITEM_DAF_Fort_Statues_Mirror_1);
+ItemSetCanInteract(ITEM_DAF_Fort_Statues_Mirror_1,1);
+DB_DAF_MirrorPuzLeverHandled(1);
+
+IF
+CharacterItemEvent(_Player,ITEM_DAF_Fort_PuzPortal_Lever,"PortalLeverPulled")
+AND
+NOT DB_DAF_MirrorPuzLeverHandled(1)
+THEN
+CharacterDisplayText(_Player, "GLO_FailedUse");
+
+IF
+CharacterItemEvent(_Player,ITEM_DAF_Fort_PuzPortal_Lever,"PortalLeverPulled")
+THEN
+NOT DB_DAF_MirrorPuzLeverHandled(1);
+
+
+//END_REGION
+
+
+//REGION INIT - AmbushDemonInit - Set demon off stage
+PROC
+PROC_DAF_Fort_ETIS_AmbushInit()
+AND
+DB_DAF_Fort_ETIS_AmbushRoom(_Demon)					
+THEN
+CharacterSetOnStage(_Demon,0);
+//END_REGION
+
+//REGION Ambush Room (Fortress Entrance Inner Sanctum)
+PROC
+ProcLaunchAmbush(TRIGGER_DAF_Fort_ETIS_AmbushRoomTrigger_01, _Player)
+AND
+DB_DAF_Fort_ETIS_AmbushRoom(_Demon)	
+THEN
+CharacterAppear(_Demon,1);
+	NOT DB_DAF_Fort_ETIS_AmbushRoom(_Demon);
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

@@ -1,0 +1,1054 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_FreezeLines(0,"GEN_ArrestFreeze_1");
+DB_FreezeLines(1,"GEN_ArrestFreeze_2");
+DB_FreezeLines(2,"GEN_ArrestFreeze_3");
+DB_FreezeLines(3,"__LAST__");
+
+DB_Compcount(0);
+DB_CompMax(2);
+KBSECTION
+IF
+TextEventSet(_Text)
+AND
+DB_Text2GlobalEvent((STRING)_Text,(STRING)_Global)
+THEN
+GlobalSetEvent(_Global);
+
+
+///////////////////////////////////////////////////////////////////////
+// Story call to forward the clock to _NewHour.
+// The clock will be advanced with max 24 hours. This happens when you call SetGameClock(_H) AND Time(_,_H,_).
+//
+// DO NOT USE THE ENGINE CALL SetTime DIRECTLY!
+//
+PROC	
+SetGameClock((INTEGER)_NewHour) 
+AND
+Time(_Day,_H,_)
+AND 
+_NewHour > _H
+// day stays today
+THEN
+UpdateTime(_Day,_NewHour);
+
+PROC
+SetGameClock((INTEGER)_NewHour) 
+AND
+Time(_Day,_H,_) 
+AND
+_NewHour <= _H 
+AND
+// day forwards +1
+IntegerSum(_Day,1,_DayP1)
+THEN	
+UpdateTime(_DayP1,_NewHour);
+
+///////////////////////////////////////////////////////////////////////
+PROC
+Hold((CHARACTER)_Npc,1)
+THEN
+CharacterFreeze(_Npc);
+//CharacterSetStill(_Npc);
+ProcDisplayFreezeMessage(_Npc);
+
+PROC
+ProcDisplayFreezeMessage((CHARACTER)_Npc)
+AND
+DB_FreezeLines(_Nr,"__LAST__")
+AND
+Random(_Nr,_Index)
+AND
+DB_FreezeLines(_Index,_Text)
+THEN
+CharacterDisplayText(_Npc,_Text);
+
+PROC	
+Hold(_Npc,0)
+THEN
+CharacterUnfreeze(_Npc);
+
+// Short forms
+PROC
+Hold((CHARACTER)_Npc)
+THEN	
+Hold(_Npc,1);
+
+///////////////////////////////////////////////////////////////////////
+// ControlToNpc readies the game engine to show things _Npc will do
+// (in a script frame for instance). If _Npc != NPC_Hero, it will prevent
+// the player from doing things.
+// This function does not do anything with the camera: no LockOnNpc, nor
+// FrameGrab.
+//
+PROC
+ReturnControlToPlayer((CHARACTER)_Player,(INTEGER)_)
+THEN
+//InterfaceDisabled(ENGINE_GAME,0); //TODO
+ShroudRender(1);
+//SetLineOfSightClipping(ENGINE_GAME,1); //TODO
+Hold(_Player,0);
+StartScriptFrame(_Player,"Hero idle");		// to abort things like "look at" scripts
+
+PROC
+ControlToNpc((CHARACTER)_Player,(CHARACTER)_Npc)
+THEN
+//InterfaceDisabled(ENGINE_GAME,1); //YODO
+ShroudRender(0);
+//SetLineOfSightClipping(ENGINE_GAME,0); //TODO
+SetStill(_Player);
+
+///////////////////////////////////////////////////////////////////////
+// ShiftToNpc/1 not only transfers control to the _Npc but as well
+// locks the camera on the _Npc and preforms a FrameGrab.
+// In ShiftToNpc/2, the second argument is used to say whether or not
+// a FrameGrab is needed.
+//
+//TODO commented block here: We need a playerp aram for this? Can't just take control away
+//from both players?'
+/*
+PROC	
+ShiftToNpc((CHARACTER)_Npc,1) 
+AND
+ NOT _Npc.DB_IsPlayer()
+THEN	
+ControlToNpc(_Npc);
+LockOnNpc(ENGINE_GAME,_Npc);
+FrameGrab(ENGINE_GAME);
+
+PROC	ShiftToNpc((NPC)_Npc,0) AND _Npc != NPC_Hero
+THEN	ControlToNpc(_Npc);
+	LockOnNpc(ENGINE_GAME,_Npc);
+*/
+
+PROC
+ShiftToNpc((CHARACTER)_Player,1)
+AND
+_Player.DB_IsPlayer()
+THEN	
+ReturnControlToPlayer(_Player,1);
+CameraLockOnNpc(_Player);
+//FrameGrab(ENGINE_GAME); TODO
+
+PROC
+ShiftToNpc((CHARACTER)_Player,0)
+AND
+_Player.DB_IsPlayer()
+THEN
+ReturnControlToPlayer(_Player,1);
+CameraLockOnNpc(_Player);
+
+///////////////////////////////////////////////////////////////////////
+//TODO commented block
+/*
+PROC
+ShiftToNpc((NPC)_Npc)
+THEN	
+ShiftToNpc(_Npc,0);
+// No framegrab for standard ShiftToNpc
+// ShiftToNpc(_Npc,1);
+
+
+///////////////////////////////////////////////////////////////////////
+// Like ShiftToNpc, but now by moving the camera
+// When camera motion ends, CameraEvent(ENGINE_GAME,_CameraID) is generated.
+//
+PROC	
+MoveCameraToNpc((CHARACTER)_Npc,(STRING)_CameraID,(INTEGER)_Speed) 
+AND
+_Npc != NPC_Hero
+THEN	
+ControlToNpc(_Npc);
+
+PROC	MoveCameraToNpc((NPC)_Npc,(STRING)_CameraID,(INTEGER)_Speed)
+THEN	CameraToNpc(ENGINE_GAME,_Npc,_CameraID,_Speed);
+	FinishMoveCameraToNpc(_CameraID,_Npc);				// Remember to do things when camera movement stops.
+
+IF		CameraEvent(ENGINE_GAME,_CameraID) AND
+	FinishMoveCameraToNpc(_CameraID,_Npc)
+THEN	NOT FinishMoveCameraToNpc(_CameraID,_Npc);		// cleanup
+	ShiftToNpc(_Npc,0);
+	MoveCameraToNpcFinished(_CameraID);		// let caller know that camera move has finished
+*/
+///////////////////////////////////////////////////////////////////////
+// this proc gives back the interface to the hero if after _Timeout gameframes
+// True(_Condition) is still valid.
+// Max 3 timers at the time can run: _ID = 1, 2 or 3
+// If the _ID is still in use, nothing will be executed the second time.
+//
+PROC
+DeadlockBreak((INTEGER)_ID,(INTEGER)_Timeout,(STRING)_Condition) 
+AND 
+NOT DeadlockCondition(_ID,(STRING)_)				// fail if _ID is in use
+AND 
+DeadlockTimer(_ID,(STRING)_Timer)		// get timer name
+THEN
+DeadlockCondition(_ID,_Condition);			// remember _Condition
+TimerLaunch(_Timer,_Timeout);
+
+// StopDeadlock must not be called.
+// It should only be triggered if the timer ends. If not, it would be possible
+// to start a new deadlock timer while the previous is still counting.
+//TODO: commented block
+/*
+PROC	
+StopDeadlock((INTEGER)_ID,(STRING)_Condition)
+AND
+True(_Condition)
+THEN
+LockOnNpc(ENGINE_GAME,NPC_Hero);
+InterfaceDisabled(ENGINE_GAME,0);
+StartScriptFrame(NPC_Hero,"Hero idle");
+ShroudRender(1);
+SetLineOfSightClipping(ENGINE_GAME,1);
+*/
+
+// always cleanup deadlock condition memory such that _ID can be used again
+PROC
+StopDeadlock((INTEGER)_ID,(STRING)_Condition)
+THEN
+NOT DeadlockCondition(_ID,_Condition);
+
+IF
+TimerFinished(_Timer)
+AND
+DeadlockTimer(_ID,_Timer) 
+AND					// get ID
+DeadlockCondition(_ID,_Condition)			// get condition
+THEN
+StopDeadlock(_ID,_Condition);
+
+///////////////////////////////////////////////////////////////////////
+PROC
+StartScriptFrameWhenPlayerOutsideRegion((CHARACTER)_Player,(CHARACTER)_Npc,(STRING)_ScriptFrame,(TRIGGER)_Region) 
+AND
+NOT DB_InRegion(_Player,_Region)
+THEN
+StartScriptFrame(_Npc,_ScriptFrame);
+
+PROC	
+StartScriptFrameWhenPlayerOutsideRegion((CHARACTER)_Player,(CHARACTER)_Npc,(STRING)_ScriptFrame,(TRIGGER)_Region)
+AND
+DB_InRegion(_Player,_Region)
+THEN
+StartScriptFrameIfPlayerLeavesRegion(_Player,_Npc,_ScriptFrame,_Region);	// remember script to start
+
+IF	
+CharacterLeftTrigger(_Player,_Region)
+AND
+_Player.DB_IsPlayer()
+AND
+StartScriptFrameIfPlayerLeavesRegion(_Player,_Npc,_ScriptFrame,_Region)
+THEN
+StartScriptFrame(_Npc,_ScriptFrame);
+NOT StartScriptFrameIfPlayerLeavesRegion(_Player,_Npc,_ScriptFrame,_Region);
+
+///////////////////////////////////////////////////////////////////////
+PROC
+BeginFight((CHARACTER)_Npc1,(CHARACTER)_Npc2)
+AND
+CharacterGetRelationToCharacter(_Npc1,_Npc2,_Value12)
+AND
+CharacterGetRelationToCharacter(_Npc2,_Npc1,_Value21)
+THEN	
+Fighting(_Npc1,_Npc2);
+Fighting(_Npc2,_Npc1);
+OldAlignmentRelation(_Npc1,_Npc2,_Value12);
+OldAlignmentRelation(_Npc2,_Npc1,_Value21);
+EnableDefaultBehavior(_Npc1,0);
+EnableDefaultBehavior(_Npc2,0);
+Attack(_Npc1,_Npc2);
+Attack(_Npc2,_Npc1);
+
+///////////////////////////////////////////////////////////////////////
+// Asserting DB_RemoveNpc((NPC)_Npc) will remove the npc as soon as the player
+// does not see _Npc anymore, by teleporting him to the unreachable location.
+// When this is done, the proc NpcRemoved/1 is called.
+// As a side effect, _Npc is set StoryNpc to prevent him to start fighting
+// with other npcs at location unreachable.
+//
+IF
+DB_RemoveNpc(_Npc) 
+AND
+DB_StoryStarted(1)		// Dante: added this to make sure that npcs which are removed by asserting the fact
+		// DB_RemoveNpc in an INIT section, will be removed only AFTER the NpcIterator has run.
+		// (The npc iterator calls SetStoryNpcStatus which resets.)
+		// The call SetStoryNpcStatus on a removed npc is always dangerous: there are many
+		// npcs set at unreachable which could start fighting if the player comes nearby.
+THEN
+ProcCheckIfNPCSeenByPlayers(_Npc);
+ProcRemoveIfUnseen(_Npc);
+
+PROC
+ProcCheckIfNPCSeenByPlayers(_)
+AND
+DB_NPCSeenByPlayers(_Npc)
+THEN
+NOT DB_NPCSeenByPlayers(_Npc);
+
+PROC
+ProcCheckIfNPCSeenByPlayers((CHARACTER)_Npc)
+AND
+_Player.DB_IsPlayer()
+AND
+CharacterCanSeeCharacter(_Player,_Npc,1)
+THEN
+DB_NPCSeenByPlayers(_Npc);
+
+PROC
+ProcRemoveIfUnseen((CHARACTER)_Npc)
+AND
+NOT DB_NPCSeenByPlayers(_Npc)
+THEN	
+DoRemoveNpc(_Npc);
+
+PROC
+DoRemoveNpc((CHARACTER)_Npc)
+THEN
+CharacterMakeStoryNpc(_Npc,1);// prevent this npc to attack others
+CharacterSetOnStage(_Npc,0);	
+//SetLocation(_Npc,LOCATION_unreachable);
+NOT DB_RemoveNpc(_Npc);
+NpcRemoved(_Npc);
+
+// Remove an npc upon leaving a certain region
+// This is handy when the _Npc is dead, no seeing events get generated!
+IF
+DB_RemoveNpc((CHARACTER)_Player,(CHARACTER)_Npc,(TRIGGER)_Region)
+AND
+NOT DB_InRegion(_Player,_Region)
+THEN
+DoRemoveNpc(_Npc);
+
+PROC	
+DoRemoveNpc(_Npc) 
+AND
+DB_RemoveNpc(_Player,_Npc,(TRIGGER)_Region)
+THEN
+CharacterMakeStoryNpc(_Npc,1);		// prevent this npc to attack others
+CharacterSetOnStage(_Npc,0);	
+//SetLocation(_Npc,LOCATION_unreachable);
+NOT DB_RemoveNpc(_Player,_Npc,_Region);
+NpcRemoved(_Npc);
+
+// dummy function for the declaration
+PROC	
+NpcRemoved((CHARACTER)_Npc)
+THEN
+NOP(1);
+
+// The same now, but with a nice disappearing animation if 2nd argument == 1:
+PROC
+DoRemoveNpc((CHARACTER)_Npc,0)
+THEN	
+DoRemoveNpc(_Npc);
+
+PROC	
+DoRemoveNpc((CHARACTER)_Npc,1)
+THEN
+CharacterMakeStoryNpc(_Npc,1);		// prevent this npc to attack others
+CharacterPlayAnimation(_Npc,"Teleport Away","NPC_TeleportedAway");
+//TeleportToLocation(ENGINE_GAME,_Npc,LOCATION_unreachable);
+NOT DB_RemoveNpc(_Npc);
+
+IF
+CharacterEvent(_Npc,"NPC_TeleportedAway")
+THEN
+CharacterSetOnStage(_Npc,0);
+
+//
+// SetNpcAtLocation
+// Brings _Npc to the location given.
+// As side effect, it restores the StoryNpc status as it should be:
+//
+PROC	
+SetNpcAtLocation((CHARACTER)_Npc,(TRIGGER)_Location)
+AND
+TriggerGetPosition(_Location,_X,_Y,_Z)
+THEN	
+CharacterTeleportToPosition(_Npc,_X,_Y,_Z,"");
+CharacterSetOnStage(_Npc,1);	//TODO this needed dawg?
+//SetLocation(_Npc,_Location);
+SetStoryNpcStatus(_Npc);
+
+///////////////////////////////////////////////////////////////////////
+// RemoveNpcGroup works like DB_RemoveNpc, but only removes the npcs if the complete group
+// goes out of sight.
+// USE: 1) assert RemoveNpcGroup(_Npc,(INTEGER)_GroupID)) for every _Npc in the group
+//	     2) call RemoveNpcGroupComplete((INTEGER)_GroupID)) to state that the group is defined completely
+//
+
+// Dante fix: 12-2-2002: if run for the second time, we need to unassert the
+//						UnseenNpcsInGroup fact because else, the previously asserted fact
+//						will be combined with the NpcsInGroup result of CountNpcsInGroup (1)
+PROC	
+RemoveNpcGroupComplete((CHARACTER)_Player,(INTEGER)_GroupID) 
+AND
+UnseenNpcsInGroup(_Player,_GroupID,_N)
+THEN	
+NOT UnseenNpcsInGroup(_Player,_GroupID,_N);
+
+PROC	
+RemoveNpcGroupComplete((CHARACTER)_Player,(INTEGER)_GroupID)
+THEN
+CountNpcsInGroup(_Player,_GroupID);		// (1)
+CountUnseenNpcsInGroup(_Player,_GroupID);
+
+//
+PROC	
+CountNpcsInGroup((CHARACTER)_Player,(INTEGER)_GroupID)
+AND
+NpcsInGroup(_Player,_GroupID,_N)
+THEN	
+NOT NpcsInGroup(_Player,_GroupID,_N);
+
+PROC
+CountNpcsInGroup((CHARACTER)_Player,(INTEGER)_GroupID)
+THEN	
+NpcsInGroup(_Player,_GroupID,0);
+
+PROC	
+CountNpcsInGroup((CHARACTER)_Player,(INTEGER)_GroupID) 
+AND
+RemoveNpcGroup(_Player,_Npc,_SummonID) 
+AND
+NpcsInGroup(_Player,_SummonID,_N) 
+AND
+IntegerSum(_N,1,_NP1)
+THEN
+NOT NpcsInGroup(_Player,_SummonID,_N);
+NpcsInGroup(_Player,_SummonID,_NP1);
+
+//
+PROC	
+CountUnseenNpcsInGroup((CHARACTER)_Player,(INTEGER)_GroupID)
+AND
+UnseenNpcsInGroup(_Player,_GroupID,_N)
+THEN
+NOT UnseenNpcsInGroup(_Player,_GroupID,_N);
+
+PROC
+CountUnseenNpcsInGroup((CHARACTER)_Player,(INTEGER)_GroupID)
+THEN
+UnseenNpcsInGroup(_Player,_GroupID,0);
+
+PROC
+CountUnseenNpcsInGroup((CHARACTER)_Player,(INTEGER)_GroupID)
+AND
+RemoveNpcGroup(_Player,_Npc,_GroupID) 
+AND
+NOT Sees(_,_Npc)
+AND
+UnseenNpcsInGroup(_player,_GroupID,_N) 
+AND
+IntegerSum(_N,1,_NP1)
+AND
+NOT DB_Combat(_Npc,_)
+THEN	
+NOT UnseenNpcsInGroup(_player,_GroupID,_N);
+UnseenNpcsInGroup(_player,_GroupID,_NP1);
+
+//
+
+IF
+CharacterLeftCombat(_Npc,_)
+AND
+NOT Sees(_,_Npc)
+AND
+RemoveNpcGroup(_CheckPlayer,_Npc,_GroupID) 
+AND
+UnseenNpcsInGroup(_CheckPlayer,_GroupID,_N) 
+AND
+IntegerSum(_N,1,_NP1)
+THEN	
+NOT UnseenNpcsInGroup(_CheckPlayer,_GroupID,_N);
+UnseenNpcsInGroup(_CheckPlayer,_GroupID,_NP1);
+
+IF	
+CharacterLostSightOfCharacter((CHARACTER)_player,(CHARACTER)_Npc) 
+AND
+_player.DB_IsPlayer()
+AND
+NOT Sees(_,_Npc)
+AND
+RemoveNpcGroup(_CheckPlayer,_Npc,_GroupID) 
+AND
+UnseenNpcsInGroup(_CheckPlayer,_GroupID,_N) 
+AND
+IntegerSum(_N,1,_NP1)
+AND
+NOT DB_Combat(_Npc,_)
+THEN	
+NOT UnseenNpcsInGroup(_CheckPlayer,_GroupID,_N);
+UnseenNpcsInGroup(_CheckPlayer,_GroupID,_NP1);
+
+IF		
+CharacterSawCharacter((CHARACTER)_player,(CHARACTER)_Npc) 
+AND
+_player.DB_IsPlayer()
+AND 
+RemoveNpcGroup(_,_Npc,_) 
+THEN
+ProcCheckIfOtherPlayersCanSeeNPC(_player,_Npc);
+ProcCheckUnseenNPC(_player,_Npc);
+
+PROC
+ProcCheckUnseenNPC((CHARACTER)_player,(CHARACTER)_Npc)
+AND
+NOT DB_OtherPlayersSee(_Npc)
+AND 
+RemoveNpcGroup(_CheckPlayer,_Npc,_GroupID) 
+AND
+UnseenNpcsInGroup(_CheckPlayer,_GroupID,_N) 
+AND
+IntegerSubtract(_N,1,_NM1)
+THEN
+NOT UnseenNpcsInGroup(_CheckPlayer,_GroupID,_N);
+UnseenNpcsInGroup(_CheckPlayer,_GroupID,_NM1);
+
+//
+IF	
+UnseenNpcsInGroup(_player,_GroupID,_N) 
+AND
+NpcsInGroup(_player,_GroupID,_N)
+THEN
+DoRemoveNpcsInGroup(_player,_GroupID);
+
+//
+PROC
+DoRemoveNpcsInGroup((CHARACTER)_Player,(INTEGER)_GroupID)
+AND 
+RemoveNpcGroup(_player,_Npc,_GroupID)
+THEN	
+DoRemoveNpc(_Npc);
+NOT RemoveNpcGroup(_player,_Npc,_GroupID);
+
+PROC	
+DoRemoveNpcsInGroup((CHARACTER)_Player,_GroupID)
+THEN
+NpcGroupRemoved(_Player,_GroupID);
+
+// dummy function for the declaration
+PROC
+NpcGroupRemoved((CHARACTER)_Player,(INTEGER)_GroupID)
+THEN
+NOP(1);
+
+///////////////////////////////////////////////////////////////////////
+PROC	
+EnableEngineCalls(1)
+THEN	
+NOT EngineCallsAreDisabled(1);
+//EnableEngineCalls(ENGINE_GAME,1); //TODO
+
+PROC
+EnableEngineCalls(0)
+THEN
+EngineCallsAreDisabled(1);
+//EnableEngineCalls(ENGINE_GAME,0); //TODO
+
+///////////////////////////////////////////////////////////////////////
+// Somewhat far fetched, but it works:
+// Note that the active map must contain the object and the location.
+//
+// We use NPC_Verdistis_Dummy to carry away the objects.
+// (This npc is not used for anything else.)
+PROC	
+MoveObjectToLocation((ITEM)_Object,(TRIGGER)_Location)
+THEN
+ItemTeleportToTrigger(_Object,_Location);
+
+///////////////////////////////////////////////////////////////////////
+// Safer: prevents that default behavior thwarts our plans when the story demands npcs to attack.
+// FRED - 3/3/02 - DB_AlignmentChangedByStory(_Npc) is nowhere used. Added MakeAttackable(_Npc)
+PROC
+Attack((CHARACTER)_Npc,(CHARACTER)_Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+MakeAttackable(_Player,_Npc);
+
+// FRED - 11/3/02 - Also when the Hero attacks an Npc
+PROC	
+Attack(_Player,(CHARACTER)_Npc) 
+AND
+_Player.DB_IsPlayer()
+AND
+NOT IsStoryNpc(_Npc)
+THEN	
+MakeAttackable(_Player,_Npc);
+
+// Especially useful for the guards. If this is disturbing for other scenes, 
+// move the SetRunning call to the guards' code
+PROC	
+Attack((CHARACTER)_Npc,(CHARACTER)_Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+SetRunning(_Npc,1);		// is set off when they are resurrected or become friendly again	//TODO: do we care about this running behaviour?
+
+PROC
+Attack((CHARACTER)_Npc1,(CHARACTER)_Npc2)
+THEN
+EnableDefaultBehavior(_Npc1,0);
+EnableDefaultBehavior(_Npc2,0);
+//CharacterAttackCharacter(_Npc1,_Npc2);
+
+//TODO: commented block probably not needed, code will handle this
+/*
+///////////////////////////////////////////////////////////////////////
+// Similarly, when doors are closed, we set the strength to 100 such that they cannot be lockpicked.
+// (When the story closes a door, it should stay closed. Exceptions confirm the rule :)
+PROC	Lock((OBJECT)_Object) AND ObjectStrenght(_Object,_Strength)
+THEN	NOT ObjectStrenght(_Object,_Strength);
+
+PROC	Lock((OBJECT)_Object) AND
+	ObjectProperty(_Object,O_PROP_strength,_Strength)
+THEN	ObjectStrenght(_Object,_Strength);
+
+PROC	Lock((OBJECT)_Object)
+THEN	SetObjectProperty(_Object,O_PROP_strength,100);
+	Close(_Object);
+	Lock_Direct(_Object);
+
+//
+PROC	Unlock((OBJECT)_Object)
+THEN	Unlock_Direct(_Object);
+
+PROC	Unlock((OBJECT)_Object) AND ObjectStrenght(_Object,_Strength)
+THEN	SetObjectProperty(_Object,O_PROP_strength,_Strength);
+	NOT ObjectStrenght(_Object,_Strength);
+
+//
+PROC	Close((OBJECT)_Object)
+THEN	Close_Direct(_Object);
+
+PROC	Open((OBJECT)_Object)
+THEN	Unlock(_Object);
+	Open_Direct(_Object);
+*/
+
+
+//TODO commented block. Bleh?
+/*
+////////////////////////////////////////////
+// Normally an npc has a unique alignment, just to prevent that when you kill a npc with alignment
+// "good npc" causes all other good npcs in the world to attack you (how could they possibly know)??
+// SwitchNpcClass copies the alignment of the class, (OVERWRITES THE UNIQUE ALIGNMENT OF THE NPC)
+// such that the npc gets exactly the same alignment of all eggs of this class. Reason: if you
+// polymorph an orc into a frog, the orcs should attack the orc (which does not happen if the npc
+// orc keeps his unique alignment, since there is no enemy relation defined between the different
+// orc relations).
+//
+// The following function enables you to keep the unique npc alignment
+PROC	SwitchNpcClass_KeepUniqueNpcAlignment((NPC)_Npc,(NPC_CLASS)_Class,(INTEGER)_CopyStats) AND
+	Alignment(_Npc,_Alignment)
+THEN	SwitchNpcClass(_Npc,_Class,_CopyStats);		// this call makes _Npc belong to the alignment as defined in classlist
+																			// which is NOT a unique alignment
+	SetAlignment(_Npc,_Alignment);
+
+
+///////////////////////////////////////////
+// When you die and the interface is disabled you cannot access the menu to load a previous savegame
+IF		DB_Dead(NPC_Hero)
+THEN	InterfaceDisabled(ENGINE_GAME,0);
+*/
+
+QRY
+QryGetValidDialogSpeaker((CHARACTER)_)
+AND
+DB_DialogSpeaker(_Player)
+THEN
+NOT DB_DialogSpeaker(_Player);
+
+QRY
+QryGetValidDialogSpeaker((CHARACTER)_)
+AND
+DB_ReplacedCompanionSpeaker(_Player)
+THEN
+NOT DB_ReplacedCompanionSpeaker(_Player);
+
+QRY
+QryGetValidDialogSpeaker((CHARACTER)_Companion)
+AND
+DB_Companion(_Companion)
+AND
+GetMultiplayerCharacter(_Companion,_OwnerPlayer)
+THEN
+DB_ReplacedCompanionSpeaker(_Companion);
+DB_DialogSpeaker(_OwnerPlayer);
+CharacterPurgeQueue(_Companion);
+CharacterPlayAnimation(_Companion,"still","");
+
+QRY
+QryGetValidDialogSpeaker((CHARACTER)_Companion)
+AND
+DB_Companion(_Companion)
+AND
+DB_ReplacedCompanionSpeaker(_Companion)
+AND
+DB_DialogSpeaker(_OwnerPlayer)
+AND
+DB_Dead(_OwnerPlayer)
+AND
+_OtherPlayer.DB_IsPlayer()
+AND
+_OtherPlayer!=_OwnerPlayer
+AND
+NOT DB_Dead(_OtherPlayer)
+AND
+NOT DB_Companion(_OtherPlayer)
+THEN
+NOT DB_DialogSpeaker(_OwnerPlayer);
+DB_DialogSpeaker(_OtherPlayer);
+
+QRY
+QryGetValidDialogSpeaker((CHARACTER)_Player)
+AND
+NOT DB_Companion(_Player)
+THEN
+DB_DialogSpeaker(_Player);
+
+PROC
+ProcHandleBlockedCompanionDialog((CHARACTER)_Owner)
+AND
+DB_ReplacedCompanionSpeaker(_Companion)
+THEN
+CharacterFreeze(_Companion);
+CharacterSetHasDialog(_Companion,0);	//make sure other players can't talk to him and disrupt the flow
+CharacterDisplayText(_Companion,"GEN_CompleteLeaderDialog");
+DB_BlockedCompanion(_Companion,_Owner);
+
+PROC
+ProcUnblockBlockedCompanion((CHARACTER)_Owner)
+AND
+DB_BlockedCompanion(_Companion,_Owner)
+THEN
+CharacterUnfreeze(_Companion);
+NOT DB_BlockedCompanion(_Companion,_Owner);
+CharacterSetHasDialog(_Companion,1);
+
+PROC
+ProcCheckBlockedDialog((CHARACTER)_Player)
+AND
+DB_BlockedOneshotDialog(_Player,_Trigger)
+THEN
+DB_OneShotPlayerTrigger(_Trigger);
+ProcUnblockBlockedCompanion(_Player);
+DB_BlockChecked(1);
+
+PROC
+ProcCheckBlockedDialog((CHARACTER)_Player)
+AND
+NOT DB_BlockChecked(1)
+AND
+DB_BlockedCompanion(_Companion,_Player)
+AND
+DB_BlockedCompanionDialog(_Dialog,2,_Npc,_Companion)
+THEN
+NOT DB_BlockedCompanionDialog(_Dialog,2,_Npc,_Companion);
+ProcUnblockBlockedCompanion(_Player);
+ProcDoTwoSpeakerDialog(_Dialog,_Npc,_Player);
+DB_BlockChecked(1);
+
+PROC
+ProcCheckBlockedDialog((CHARACTER)_Player)
+AND
+NOT DB_BlockChecked(1)
+AND
+DB_BlockedCompanion(_Companion,_Player)
+AND
+DB_BlockedCompanionDialog(_Dialog,3,_Npc,_Npc2,_Companion)
+THEN
+NOT DB_BlockedCompanionDialog(_Dialog,3,_Npc,_Npc2,_Companion);
+ProcUnblockBlockedCompanion(_Player);
+ProcDoThreeSpeakerDialog(_Dialog,_Npc,_Npc2,_Player);
+DB_BlockChecked(1);
+
+PROC
+ProcCheckBlockedDialog((CHARACTER)_Player)
+AND
+NOT DB_BlockChecked(1)
+AND
+DB_BlockedCompanion(_Companion,_Player)
+AND
+DB_BlockedCompanionDialog(_Dialog,4,_Npc,_Npc2,_Npc3,_Companion)
+THEN
+NOT DB_BlockedCompanionDialog(_Dialog,4,_Npc,_Npc2,_Npc3,_Companion);
+ProcUnblockBlockedCompanion(_Player);
+ProcDoFourSpeakerDialog(_Dialog,_Npc,_Npc2,_Npc3,_Player);
+DB_BlockChecked(1);
+
+PROC
+ProcCheckBlockedDialog((CHARACTER)_Player)
+AND
+NOT DB_BlockChecked(1)
+AND
+DB_BlockedCompanion(_Companion,_Player)
+AND
+DB_BlockedCompanionDialog(_Dialog,5,_Npc,_Npc2,_Npc3,_Npc4,_Companion)
+THEN
+NOT DB_BlockedCompanionDialog(_Dialog,5,_Npc,_Npc2,_Npc3,_Npc4,_Companion);
+ProcUnblockBlockedCompanion(_Player);
+ProcDoFiveSpeakerDialog(_Dialog,_Npc,_Npc2,_Npc3,_Npc4,_Player);
+DB_BlockChecked(1);
+
+PROC
+ProcCheckBlockedDialog((CHARACTER)_Player)
+AND
+NOT DB_BlockChecked(1)
+AND
+DB_BlockedCompanion(_Companion,_Player)
+AND
+DB_BlockedCompanionItemDialog(_Dialog,2,_Item,_Companion)
+THEN
+NOT DB_BlockedCompanionItemDialog(_Dialog,2,_Item,_Companion);
+ProcUnblockBlockedCompanion(_Player);
+ProcDoTwoSpeakerItemDialog(_Dialog,_Companion,_Item);
+DB_BlockChecked(1);
+
+PROC
+ProcCheckBlockedDialog((CHARACTER)_Player)
+AND
+NOT DB_BlockChecked(1)
+AND
+DB_BlockedCompanion(_Companion,_Player)
+AND
+DB_BlockedCompanionItemDialog(_Dialog,3,_Item,_Npc,_Companion)
+THEN
+NOT DB_BlockedCompanionItemDialog(_Dialog,3,_Item,_Npc,_Companion);
+ProcUnblockBlockedCompanion(_Player);
+ProcDoThreeSpeakerItemDialog(_Dialog,_Companion,_Npc,_Item);
+DB_BlockChecked(1);
+
+PROC
+ProcCheckBlockedDialog(_)
+THEN
+NOT DB_BlockChecked(1);
+
+PROC
+ProcDisableFollow((CHARACTER)_Char)
+THEN
+CharacterDetachFromGroup(_Char);
+CharacterLockGroup(_Char,1);
+
+
+IF
+CharacterUsedItemFailed(_Player,_Item)
+AND
+_Player.DB_IsPlayer()
+THEN
+ProcShowForbiddenItemText(_Player,_Item);
+
+PROC
+ProcShowForbiddenItemText((CHARACTER)_Player,(ITEM)_Item)
+AND
+NOT DB_ForbiddenDoors(_,_Item)
+AND
+NOT DB_NoForbiddenText(_Item)
+THEN
+CharacterStatusText(_Player,"GLO_ForbiddenItem");
+
+IF
+TextEventSet("_EnableDualDialogs_")
+THEN
+NOT DB_DualDialogsDisabled(1);
+
+IF
+TextEventSet("_DisableDualDialogs_")
+THEN
+DB_DualDialogsDisabled(1);
+
+IF
+DB_DualDialogsDisabled(1)
+AND
+DB_PartyDialogs(_Player,_DualDialog)
+THEN
+TimerCancel(_DualDialog);
+PROC_StopEffectAtCharacter(_Player,"ExclamationMark");
+NOT DB_PartyDialogs(_Player,_DualDialog);
+CharacterSetHasDialog(_Player,0);
+
+IF
+DB_DualDialogsDisabled(1)
+AND
+DB_AffectionDialog(_DualDialog,_SrcChar,_Player)
+THEN
+PROC_StopEffectAtCharacter(_SrcChar,"AffectionExclamationMark");
+PROC_StopEffectAtCharacter(_Player,"AffectionExclamationMark");
+NOT DB_AffectionDialog(_DualDialog,_SrcChar,_Player);
+CharacterSetHasDialog(_Player,0);
+CharacterSetHasDialog(_SrcChar,0);
+
+PROC
+ProcShowMarker((STRING)_Marker)
+THEN
+ShowMapMarker(_Marker,1);
+
+PROC
+ProcHideMarker((STRING)_Marker)
+THEN
+ShowMapMarker(_Marker,0);
+
+PROC
+ProcFreezePlayers()
+AND
+_Player.DB_IsPlayer()
+THEN
+CharacterFreeze(_Player);
+
+PROC
+ProcUnfreezePlayers()
+AND
+_Player.DB_IsPlayer()
+THEN
+CharacterUnfreeze(_Player);
+
+IF
+CharacterUnlockedTalent(_Player,"LoneWolf")
+AND
+DB_CompMax(_Count)
+AND
+IntegerSubtract(_Count,1,_NewMax)
+THEN
+NOT DB_CompMax(_Count);
+DB_CompMax(_NewMax);
+_Player.DB_HasLoneWolf();
+ProcDismissAllCompanions();
+ProcCheckPartyState();
+
+PROC
+ProcSetPartyFullIfLoneWolf()
+AND
+DB_Compcount(_Old)
+AND
+IntegerSum(_Old,1,_New)
+THEN
+NOT DB_Compcount(_Old);
+DB_Compcount(_New);
+ProcCheckPartyState();
+
+PROC
+ProcCheckPartyState()
+AND
+DB_CompMax(_Max)
+AND
+DB_Compcount(_Count)
+AND
+_Count>=_Max
+THEN
+GlobalSetEvent("GEN_PartyFull");
+
+PROC
+ProcCheckPartyState()
+AND
+DB_CompMax(_Max)
+AND
+DB_Compcount(_Count)
+AND
+_Count<_Max
+THEN
+GlobalClearEvent("GEN_PartyFull");
+
+PROC
+ProcIncreaseCompMaxIfLonewolf((CHARACTER)_Char)
+AND
+CharacterHasTalent(_Char,"LoneWolf",1)
+AND
+DB_CompMax(_Max)
+AND
+IntegerSum(_Max,1,_New)
+THEN
+NOT DB_CompMax(_Max);
+DB_CompMax(_New);
+ProcCheckPartyState();
+
+PROC
+ProcDecreaseCompMaxIfLonewolf((CHARACTER)_Char)
+AND
+CharacterHasTalent(_Char,"LoneWolf",1)
+AND
+DB_CompMax(_Max)
+AND
+IntegerSubtract(_Max,1,_New)
+THEN
+NOT DB_CompMax(_Max);
+DB_CompMax(_New);
+ProcCheckPartyState();
+
+PROC
+ProcDismissMadoc()
+AND
+DB_Compcount(_Count)
+AND
+IntegerSubtract(_Count,1,_New)
+THEN
+NOT DB_Compcount(_Count);
+DB_Compcount(_New);
+ProcCheckPartyState();
+
+PROC
+ProcDismissJahan()
+AND
+DB_Compcount(_Count)
+AND
+IntegerSubtract(_Count,1,_New)
+THEN
+NOT DB_Compcount(_Count);
+DB_Compcount(_New);
+ProcCheckPartyState();
+
+PROC
+ProcDismissBairdotr()
+AND
+DB_Compcount(_Count)
+AND
+IntegerSubtract(_Count,1,_New)
+THEN
+NOT DB_Compcount(_Count);
+DB_Compcount(_New);
+ProcCheckPartyState();
+
+PROC
+ProcDismissWolgraff()
+AND
+DB_Compcount(_Count)
+AND
+IntegerSubtract(_Count,1,_New)
+THEN
+NOT DB_Compcount(_Count);
+DB_Compcount(_New);
+ProcCheckPartyState();
+
+
+//REGION moving items default functions 
+
+PROC
+CharacterMoveAllItemsToCharacter((CHARACTER)_Char,(CHARACTER)_DestChar)
+THEN
+CharacterMoveAllItemsToCharacter(_Char,_DestChar,0);
+
+PROC
+CharacterMoveAllItemsToContainer((CHARACTER)_Char,(ITEM)_Dest)
+THEN
+CharacterMoveAllItemsToContainer(_Char,_Dest,0);
+
+PROC
+ContainerMoveAllItemsToCharacter((ITEM)_Cont,(CHARACTER)_DestChar)
+THEN
+ContainerMoveAllItemsToCharacter(_Cont,_DestChar,0);
+
+//END_REGION
+
+//Region
+PROC
+ProcStopCompanionDialogs()
+AND
+DB_Companion(_Comp)
+THEN
+DialogRequestStopForCharacter(_Comp);
+
+EXITSECTION
+
+ENDEXITSECTION

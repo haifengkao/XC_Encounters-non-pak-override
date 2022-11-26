@@ -1,0 +1,93 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+
+CHARACTER:__Me
+TRIGGER:%Point1 = CYS_BurialMountDogPatrol1_c741f08a-3039-493a-81dc-a5e032940972
+TRIGGER:%Point2 = CYS_BurialMountDogPatrol2_0da91268-7766-43e0-b592-71f9714b1c52
+TRIGGER:%Point3 = CYS_BurialMountDogPatrol3_f26e1240-e2ae-4cd5-b255-544f5a2e6b18
+TRIGGER:%Point4 = CYS_BurialMountDogPatrol4_824e4530-a745-44b1-b6f7-0f2458068170
+INT:%FreakOut = 0
+INT:%CurrentPoint = 0
+
+BEHAVIOUR
+
+REACTION State_Patrol, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction,"Action_Patrol")
+	SetPriority(%currentAction,1100)
+	
+REACTION Action_Patrol, 0
+USAGE PEACE
+VARS 
+	CHARACTER:_Player
+	TRIGGER:_Dest
+	FLOAT:_Dist
+ACTIONS
+	IF "(c1&c2)|c3"
+		CharacterGet(_Player,__Me,null,Lowest,Distance,Player)
+		CharacterCanSee(__Me,_Player)
+		IsEqual(%FreakOut,1)
+	THEN
+		IF "(c1&c2)&(!c3)"
+			GetDistance(_Dist,__Me,_Player)
+			IsGreaterThen(_Dist,FLOAT:6.0)
+			IsEqual(%FreakOut,1)
+		THEN
+			CharacterLookAt(_Player)
+			IF "c1"
+				IsRandom(0.7)
+			THEN
+				DisplayText(__Me,"CYS_BurialDogWarn1")
+				Sleep(3.5)
+			ENDIF
+		ELSE
+			//start barking
+			CharacterEvent(__Me,"SpottedPlayer")
+		ENDIF
+	ELSE
+		IF "!c1"
+			IsLessThen(%CurrentPoint,4)
+		THEN
+			Set(%CurrentPoint,0)
+		ENDIF
+		GetElement(_Dest,%CurrentPoint,%Point1,%Point2,%Point3,%Point4)
+		Add(%CurrentPoint,1)
+		CharacterMoveTo(_Dest,1)
+		Sleep(1.0)
+	ENDIF
+	SetPriority(%currentAction,0)
+
+EVENTS
+
+EVENT GetAngry
+ON
+	OnDamage(_,_,_,_)
+ACTIONS
+	Set(%FreakOut,1)
+	
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+STORY
+
+SCRIPTFRAME WakeSkeletons
+VARS	
+	FIXEDSTRING:_Text
+ACTIONS
+	CharacterLookAt(CHARACTER:CYS_ArcheologistSkeleton01_4f84d4aa-ff6d-46e2-aaa3-9f10fd7f41c5)
+	GetRandom(_Text,"CYS_BurialDogBark1","CYS_BurialDogBark2","CYS_BurialDogBark3")
+	DisplayText(__Me,_Text)
+	CharacterEvent(CHARACTER:CYS_ArcheologistSkeleton01_4f84d4aa-ff6d-46e2-aaa3-9f10fd7f41c5,"Wake")
+	CharacterEvent(CHARACTER:Cyseal_AdventurerKilledSkeleton_01_06ddfdd2-e926-40e6-a4cd-8dd6f3a73139,"Wake")
+	Sleep(1.0)
+	CharacterLookAt(CHARACTER:CYS_ArcheologistSkeleton02_fe807769-050a-43ed-ac78-85a54ab8c62a)
+	GetRandom(_Text,"CYS_BurialDogBark1","CYS_BurialDogBark2","CYS_BurialDogBark3")
+	DisplayText(__Me,_Text)
+	CharacterEvent(CHARACTER:CYS_ArcheologistSkeleton02_fe807769-050a-43ed-ac78-85a54ab8c62a,"Wake")
+	CharacterEvent(CHARACTER:Cyseal_AdventurerKilledSkeleton_02_947cbf48-aaea-40c0-a084-f95d81481fd3,"Wake")
+	
+	
+	
+

@@ -1,0 +1,124 @@
+#INCLUDE State_Manager
+INIT 
+	USING State_Manager
+	CHARACTER:__Me
+	FLOAT3:%AdjustPosition
+	INT:%WaypointValue = 0
+	EXTERN CHARACTER:%MyFirstFriend = null
+	EXTERN CHARACTER:%MySecondFriend = null
+	EXTERN CHARACTER:%Leader = null
+	EXTERN CHARACTER:%MyColleague = null
+	EXTERN INT:%AmTheLeader=1
+	EXTERN TRIGGER:%Waypoint1 = null
+	EXTERN TRIGGER:%Waypoint2 = null
+	EXTERN TRIGGER:%Waypoint3 = null
+	EXTERN TRIGGER:%Waypoint4 = null
+	EXTERN TRIGGER:%Extra1 = null
+	EXTERN TRIGGER:%Extra2 = null
+	EXTERN FLOAT:%Sleep1 = null
+	EXTERN FLOAT:%Sleep2 = null
+	EXTERN FIXEDSTRING:%Action = null
+	EXTERN STRING:%UniqueName_LetsGoEvent = "DAF_DeathKnights_Group1"
+	
+//------------------------
+BEHAVIOUR
+REACTION State_Patrolling, 0
+	USAGE PEACE
+	ACTIONS
+	GetRandom(%currentAction, %Action)
+	SetPriority(%currentAction, 1100)
+
+REACTION Action_Patrol1, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Waypoint2)
+	CharacterMoveTo(%Waypoint3)
+	CharacterLookAt(%Extra1)
+	Sleep(%Sleep2)
+	CharacterMoveTo(%Waypoint2)
+	CharacterMoveTo(%Waypoint1)
+	CharacterLookAt(%Extra2)
+	Sleep(%Sleep1)		
+	SetPriority(%currentAction,0)
+
+REACTION Action_Patrol2, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Waypoint2)		
+	SetPriority("WaitForYourFellows",2000)
+	CharacterMoveTo(%Waypoint3)		
+	SetPriority("WaitForYourFellows",2000)		
+	CharacterMoveTo(%Waypoint4)				
+	SetPriority("WaitForYourFellows",2000)		
+	CharacterMoveTo(%Waypoint3)		
+	SetPriority("WaitForYourFellows",2000)		
+	CharacterMoveTo(%Waypoint2)	
+	SetPriority("WaitForYourFellows",2000)		
+	CharacterMoveTo(%Waypoint1)			
+	SetPriority("WaitForYourFellows",2000)	
+	SetPriority(%currentAction,0)
+		
+REACTION Action_LookAtTarget, 0
+USAGE PEACE
+ACTIONS
+	Sleep(%Sleep1)	
+	CharacterLookAt(%Extra1)
+	Sleep(%Sleep2)	
+	CharacterLookAt(%Extra2)			
+	SetPriority(%currentAction,0)
+		
+REACTION WaitForYourFellows, 0
+USAGE PEACE
+VARS
+	FLOAT:_CurrentDistanceFriend1
+	FLOAT:_CurrentDistanceFriend2
+	FLOAT:_CurrentDistanceServant
+	FLOAT:_CurrentDistanceLeader
+	FLOAT:_MaxAllowedDistance = 3.5
+	FLOAT:_MinDistanceWithLeader = 2.5
+ACTIONS
+	IF "c1&((!c2&c3&c4)|(!c5&c6&c7))"	//am the leader - if 1 of my guys isn't with me i stop & wait
+		IsEqual(%AmTheLeader,1)																		//c1
+		CharacterIsDead(%MyFirstFriend)																//!c2
+		GetDistance(_CurrentDistanceFriend1,__Me,%MyFirstFriend)									//c3
+		IsGreaterThen(_CurrentDistanceFriend1,_MaxAllowedDistance)									//c4
+		CharacterIsDead(%MySecondFriend)															//!c5
+		GetDistance(_CurrentDistanceFriend2,__Me,%MySecondFriend)									//c6
+		IsGreaterThen(_CurrentDistanceFriend2,_MaxAllowedDistance)									//c7
+	THEN
+		//DebugText(__Me,"Where are my guys?")
+		Sleep(0.1)
+	ELIF "c1&!c2&c3&c4&c5&c6"       //am a follower - if i'm with the leader but my other friend isn't with us i wait
+		IsEqual(%AmTheLeader,0)																		//c1
+		CharacterIsDead(%Leader)																	//!c2
+		GetDistance(_CurrentDistanceLeader,__Me,%Leader)											//c3
+		IsLessThen(_CurrentDistanceLeader,_MinDistanceWithLeader)									//c4
+		GetDistance(_CurrentDistanceServant,__Me,%MyColleague)										//c5
+		IsGreaterThen(_CurrentDistanceServant,_MaxAllowedDistance)									//c6
+	THEN
+		//DebugText(__Me,"I'm with leader but friend is away!")	
+		Sleep(0.1)
+	ELSE
+		IF "c1"
+			IsEqual(%AmTheLeader,1)
+		THEN
+			CharacterEvent(__Me,%UniqueName_LetsGoEvent)
+			//DebugText(__Me,"Okay, let's go!")
+			SetPriority("WaitForYourFellows",0)	
+		ELSE
+			SetPriority("WaitForYourFellows",0)
+		ENDIF
+	ENDIF
+		
+//------------------------
+EVENTS
+EVENT LetsGoEventReceived
+ON
+	OnCharacterEvent(%Leader,%UniqueName_LetsGoEvent)
+ACTIONS
+	IF "c1"
+		IsEqual(%AmTheLeader,0)
+	THEN
+		SetPriority("WaitForYourFellows",0)
+		//DebugText(__Me,"Yes M'lord!")		
+	ENDIF

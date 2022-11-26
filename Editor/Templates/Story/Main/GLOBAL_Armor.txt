@@ -1,0 +1,43 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+IF
+ItemTemplateEquipped(_Item, _Player)
+AND
+_Player.DB_IsPlayer()
+AND
+EquippedArmorDB((STRING)_Item, (STRING)_Flag)
+THEN
+DialogSetCharacterEvent(_Flag, _Player, 0);
+PROC_CheckBothPlayersOnFlag(_Flag);
+
+IF
+ItemTemplateUnEquipped(_Item, _Player)
+AND
+_Player.DB_IsPlayer()
+AND
+EquippedArmorDB(_Item, _Flag)
+THEN
+DialogClearCharacterEvent(_Flag, _Player, 0);
+GlobalClearEvent(_Flag);
+
+PROC
+PROC_CheckBothPlayersOnFlag((STRING)_Flag)
+AND
+CharacterGetVarInteger(CHARACTER_Player1, _Flag, _ValuePlayer1)
+AND
+_ValuePlayer1 == 1
+AND
+CharacterGetVarInteger(CHARACTER_Player2, _Flag, _ValuePlayer2)
+AND
+_ValuePlayer2 == 1
+THEN
+GlobalSetEvent(_Flag);
+
+
+
+EXITSECTION
+
+ENDEXITSECTION

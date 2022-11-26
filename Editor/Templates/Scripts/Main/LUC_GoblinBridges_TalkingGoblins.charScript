@@ -1,0 +1,48 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%LeftGoblin=LUC_GoblinBridges_Guard_16_333a6b97-2feb-447f-bd4a-d82aa8d3e9d3
+	ITEM:%Barrel1=CONT_Barrel_Oil_A_009_46db2900-ab12-4821-ba3a-31836280b02a
+	ITEM:%Barrel2=CONT_Barrel_Oil_A_001_4cc43be7-2520-4097-b8a6-734dac6da237
+	ITEM:%Barrel3=CONT_Barrel_Oil_A_013_330b9f7c-49bc-4303-bc14-e301534bf31e
+	
+//---------------------------------
+BEHAVIOUR
+REACTION TalkAboutBarrels, 500
+USAGE PEACE
+CHECK "!c1&!c2&!c3&!c4&!c5&!c6&!c7"
+	IsInDialog(__Me)
+	IsInDialog(%LeftGoblin)
+	CharacterIsDead(%LeftGoblin)
+	CharacterIsDead(__Me)
+	ItemHasStatus(%Barrel1,DYING)
+	ItemHasStatus(%Barrel2,DYING)
+	ItemHasStatus(%Barrel3,DYING)
+ACTIONS
+	DialogStart("LUC_AD_GoblinBridges_BarrelTalk",%LeftGoblin,__Me)
+	StartTimer("LUC_GoblinBridges_BarrelTalk_Timer",80.0,0)
+	SetPriority("TalkAboutBarrels",0)
+		
+//---------------------------------		
+EVENTS
+EVENT TalkAgainTimer
+ON
+	OnTimer("LUC_GoblinBridges_BarrelTalk_Timer")
+ACTIONS
+	SetPriority("TalkAboutBarrels",500)
+	
+EVENT TakingDamageInterruptDialogue
+ON
+	OnDamage(_,_,_,_)
+	OnCombatStarted()
+ACTIONS
+	DialogRequestStop("LUC_AD_GoblinBridges_BarrelTalk")
+	
+EVENT BarrelDamagedInterruptEvent
+ON
+	OnCharacterEvent(__Me,"LUC_GoblinBridges_Barrels")
+ACTIONS
+	DialogRequestStop("LUC_AD_GoblinBridges_BarrelTalk")
+	SetPriority("TalkAboutBarrels",0)
+	StopTimer("LUC_GoblinBridges_BarrelTalk_Timer")
+	DisplayText(%LeftGoblin,"LUC_GoblinBridges_BarrelDestroyed_01",4)
+	DisplayText(__Me,"LUC_GoblinBridges_BarrelDestroyed_02",4)

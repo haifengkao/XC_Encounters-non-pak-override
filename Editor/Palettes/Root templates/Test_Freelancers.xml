@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<palette xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <palettes />
+  <objectids>
+    <guid>45c4a3b8-e44c-4f9d-b7c3-192eb4a0a112</guid>
+    <guid>895d6590-7827-4ba8-bff2-29b4daa5364f</guid>
+    <guid>9d60a8f4-acd9-4256-855d-eff18a4de3dc</guid>
+    <guid>f0588241-33b3-461d-880d-4b0e69e76c5b</guid>
+    <guid>b33719ad-c608-4724-a1cb-88642f89d483</guid>
+    <guid>0e2c9426-e651-47ee-8d86-3bda1140b088</guid>
+    <guid>88aee677-4c70-4c60-b44e-063837816756</guid>
+    <guid>a2c87659-c13a-48fb-8eba-6327d5885ce3</guid>
+    <guid>abe908fc-4fb5-4c6d-a28b-1d69c195813c</guid>
+    <guid>f84ea2d6-75f5-412a-acaf-59d3157e1e3d</guid>
+    <guid>e5b87a4b-1080-4e0d-97ec-3638e85c0a7e</guid>
+    <guid>f9bd4a30-25b9-46ee-bca7-4d280f9b3e72</guid>
+    <guid>04249c56-fd58-42f2-886d-7422cd118846</guid>
+    <guid>34260fbb-00ff-4cba-88a4-a76c84708700</guid>
+    <guid>af0950a1-04a9-4a13-92fb-48e693589510</guid>
+    <guid>febf2c37-2291-4fd1-9d7d-745a7713a1ea</guid>
+    <guid>0c66f580-b10b-4843-bbda-110865a6a54c</guid>
+    <guid>35df29a2-35a8-4927-a074-dfce02bb7db5</guid>
+    <guid>1949f641-2bba-49c5-8371-f864d1961d71</guid>
+    <guid>fc5ba08b-136e-4a4c-8b61-3ed550738465</guid>
+    <guid>613a61b7-915a-401f-9412-3b65f7466529</guid>
+    <guid>668713ad-a2ed-4941-858d-9baba10b02cc</guid>
+    <guid>84506672-d0fc-411e-889f-d238d9d40789</guid>
+    <guid>245b2adb-2c11-40a0-a978-2814b6de78fd</guid>
+  </objectids>
+  <name>Test_Freelancers</name>
+</palette>

@@ -1,0 +1,14 @@
+INIT
+	CHARACTER:__Me
+
+//-----------------------
+EVENTS 	
+EVENT ExplodeOnDeath
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	IF "c1"
+		IsInCombat(__Me)
+	THEN
+		ExplodeAt(__Me,Projectile_SuicideBomberExplosion,-1,__Me)
+	ENDIF

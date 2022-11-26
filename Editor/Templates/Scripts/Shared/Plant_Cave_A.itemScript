@@ -1,0 +1,24 @@
+INIT
+ITEM:__Me
+INT:%State = 1
+EXTERN FLOAT:%Distance = 3.0
+
+BEHAVIOUR
+
+REACTION Open, 1000
+USAGE ALL
+CHECK "c1"
+	IsEqual(%State, 0)
+ACTIONS
+	ItemOpen(__Me)
+	Set(%State, 1)
+
+REACTION ReactOnPlayer, 2000
+USAGE ALL
+VARS
+	CHARACTER:_player
+CHECK "c1"
+	CharacterGet(_player, __Me, %Distance, Lowest, Distance, Player)
+ACTIONS 
+	ItemClose(__Me)
+	Set(%State, 0)

@@ -1,0 +1,31 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter
+CHARACTER:__Me
+
+BEHAVIOUR
+REACTION NoSkillsAnymore,79
+USAGE COMBAT
+VARS
+	CHARACTER:_char
+	FLOAT:_hisInt
+	FLOAT:_myInt
+CHECK "c1&c2&c3&c4"
+	CharacterGet(_char,__Me,10,Lowest,Intelligence,Ally)
+	CharacterGetStat(_hisInt,_char,Intelligence)
+	CharacterGetStat(_myInt,__Me,Intelligence)
+	IsGreaterThen(_myInt,_hisInt)
+ACTIONS
+	CharacterFleeFrom(Enemy,6)
+	CharacterEndTurn()
+
+REACTION DoMelee,70
+USAGE COMBAT
+VARS
+	CHARACTER:_char
+CHECK "c1"
+	CharacterGet(_char,__Me,25,Lowest,Vitality,Enemy,null,null,null,__Me)
+ACTIONS
+	CharacterMoveTo(_char,1)
+	CharacterAttack(_char)

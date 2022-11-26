@@ -1,0 +1,7 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter
+
+BEHAVIOUR
+//Sitting on chairs, drinking, chatting, etc etc

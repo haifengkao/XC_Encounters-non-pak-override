@@ -1,0 +1,27 @@
+INIT
+ITEM:__Me
+EXTERN STRING:%OnStatusEvent=null
+EXTERN INT:%Repeat=1
+EXTERN STATUS:%StatusApplied=WET
+INT:%StatusCounter=0
+
+EVENTS
+
+EVENT ItemOnStatusApplied
+	ON
+		OnItemStatus(__Me,%StatusApplied)
+	ACTIONS
+		IF "c1&c2"  //if first time and no repeat
+			IsEqual(%StatusCounter,0)
+			IsEqual(%Repeat,0)
+		THEN
+			CharacterItemEvent(null,__Me,%OnStatusEvent)
+			Add(%StatusCounter,1)
+		ENDIF
+		
+		IF "c1&!c2" //if first time and repeat
+			IsEqual(%StatusCounter,0)
+			IsEqual(%Repeat,0)
+		THEN
+			CharacterItemEvent(null,__Me,%OnStatusEvent)
+		ENDIF

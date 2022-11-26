@@ -1,0 +1,43 @@
+INIT
+CHARACTER:__Me
+CHARACTER:%Love = DAF_Vincent_de9e3874-45dd-41c2-96f1-2c911bf505e0
+INT:%State = 0
+
+BEHAVIOUR
+
+REACTION ReactOnPlayerCloseToOphelia, 2000
+USAGE PEACE
+VARS
+	CHARACTER:_player
+CHECK "c1&c2"
+	IsEqual(%State,0)
+	CharacterGet(_player, __Me, 6, COMPARE:Lowest, Distance, Player)
+ACTIONS
+	CharacterLookAt(_player)
+	Sleep(5)
+INTERRUPT
+	Reset()
+
+
+REACTION OpheliaIdle,1050
+USAGE PEACE
+VARS
+FIXEDSTRING:_Text
+FIXEDSTRING:_Animation
+CHECK "c1"
+	IsEqual(%State,0)
+ACTIONS
+	IF "c1"
+		IsRandom(0.5)
+	THEN
+		DisplayText(__Me,"DAF_Ophelia_01",5)
+		GetRandom(_Animation,"Tired_01","idle1")
+		CharacterPlayAnimation(_Animation)
+		Sleep(12)	
+	ELSE
+		CharacterLookAt(%Love)
+		CharacterEvent(%Love,"OpheliaDialogRequest")
+		Sleep(40)
+	ENDIF
+INTERRUPT
+		Reset()

@@ -1,0 +1,58 @@
+INIT
+	CHARACTER:__Me
+	INT:%AuraThreshold=0
+
+//--------------	
+BEHAVIOUR
+REACTION NetherJester_SelectNextAura,500
+USAGE COMBAT
+ACTIONS
+	CharacterRemoveStatus(__Me,FIRE_IMMUNITY_AURA)
+	CharacterRemoveStatus(__Me,WATER_IMMUNITY_AURA)
+	CharacterRemoveStatus(__Me,AIR_IMMUNITY_AURA)
+	CharacterRemoveStatus(__Me,EARTH_IMMUNITY_AURA)
+	IF "c1"
+		IsEqual(%AuraThreshold,0)
+	THEN
+		CharacterPlayEffect(__Me,"FX_Skills_Fire_Summon_Prepare_A")
+		CharacterApplyStatus(__Me,"FIRE_IMMUNITY_AURA",-1,1)
+		Add(%AuraThreshold,1)
+	ELIF "c1"
+		IsEqual(%AuraThreshold,1)
+	THEN
+		CharacterPlayEffect(__Me,"FX_Skills_Water_Summon_Prepare_A")
+		CharacterApplyStatus(__Me,"WATER_IMMUNITY_AURA",-1,1)
+		Add(%AuraThreshold,1)
+	ELIF "c1"
+		IsEqual(%AuraThreshold,2)
+	THEN
+		CharacterPlayEffect(__Me,"FX_Skills_Air_Summon_Prepare_A")
+		CharacterApplyStatus(__Me,"AIR_IMMUNITY_AURA",-1,1)
+		Add(%AuraThreshold,1)
+	ELIF "c1"
+		IsEqual(%AuraThreshold,3)
+	THEN
+		CharacterPlayEffect(__Me,"FX_Skills_Earth_Summon_Prepare_A")
+		CharacterApplyStatus(__Me,"EARTH_IMMUNITY_AURA",-1,1)
+		Set(%AuraThreshold,0)
+	ELSE
+		Set(%AuraThreshold,0)
+	ENDIF
+	CharacterPlayAnimation("cast_shout_cast")
+	Sleep(1)
+	SetPriority("NetherJester_SelectNextAura",0)	
+
+//--------------
+EVENTS
+EVENT OnInit_ApplyFireAura
+ON
+	OnInit()
+ACTIONS
+	CharacterApplyStatus(__Me,"FIRE_IMMUNITY_AURA",-1,1)
+	Add(%AuraThreshold,1)
+	
+EVENT OnTurn_RestorePriority
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("NetherJester_SelectNextAura",500)

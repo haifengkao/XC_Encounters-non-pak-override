@@ -1,0 +1,56 @@
+INIT 
+CHARACTER:__Me	
+EXTERN INT:%AmTheSheperd=0
+CHARACTER:%VoidShepherd=LUC_BG_Barricade02_Imma10_b95f1c6a-043c-4bad-8513-91a381f93815
+ITEM:%Seat2=LUC_BG_Sit6_dc07ab20-62ab-427d-b7f3-41557ec7f6cf
+INT:%Sitting2 = 0	
+
+//------------------------
+EVENTS
+EVENT InitApplyAura
+	ON
+		OnInit()
+	ACTIONS
+		IF "c1"
+			IsEqual(%AmTheSheperd,0)
+		THEN
+			CharacterApplyStatus(__Me,VOID_AURA,-1)
+		ENDIF
+		
+EVENT Leavecombat
+	ON
+		OnCombatEnded()
+	ACTIONS
+		CharacterConsume(__Me, Quest_GoblinPerceptionLow)
+		
+EVENT EnterCombatTellGoats
+	ON
+		OnCombatStarted()
+		//OnCharacterEvent(__Me,"LUC_DemonPlains_GoatUnderAttack")
+	ACTIONS
+		CharacterConsume(__Me, Quest_GoblinPerceptionBoost)
+		CharacterEvent(__Me,"LUC_DemonPlains_GoatTurnAggroEvent")
+		DisplayText(%VoidShepherd,"LUC_DemonPlains_ShepherdEntersCombat")				
+	
+EVENT GoatEnableCanFight
+	ON
+		OnCharacterEvent(%VoidShepherd,"LUC_DemonPlains_GoatTurnAggroEvent")
+		OnCharacterEvent(__Me,"LUC_DemonPlains_GoatTurnAggroEvent")
+	ACTIONS
+		IF "c1"
+			IsEqual(%AmTheSheperd,0)
+		THEN
+			CharacterSetCanFight(__Me,1,1)
+		ENDIF
+		
+EVENT GoatDisableCanFight
+	ON
+		//OnCombatEnded()
+		OnDie(%VoidShepherd,_,_,_)
+	ACTIONS
+		IF "c1"
+			IsEqual(%AmTheSheperd,0)
+		THEN
+			//CharacterSetCanFight(__Me,0)
+			CharacterSetFaction(__Me,"Neutral")
+		ENDIF

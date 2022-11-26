@@ -1,0 +1,25 @@
+#INCLUDE PressurePlate
+
+INIT
+USING PressurePlate
+ITEM:__Me
+EXTERN ITEM:%ScaleIndicator = null
+
+EVENTS
+
+EVENT PlateChange
+ON
+	OnItemEvent(__Me,"PressurePlateChange")
+ACTIONS
+	ItemEvent(%ScaleIndicator,"ScaleWeightChange")
+	Interrupt(PercentageChance)
+	SetPriority(PercentageChance,100)
+
+BEHAVIOUR
+
+REACTION PercentageChance,0
+ACTIONS
+	ItemPlayAnimationTo("PressurePlate",%CurrentPercentage,3)	
+	SetPriority(PercentageChance,0)
+INTERRUPT
+	Reset()

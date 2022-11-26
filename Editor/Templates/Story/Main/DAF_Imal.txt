@@ -1,0 +1,207 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+ItemToCharacter(ITEM_DAF_ImalRecipe, CHARACTER_DAF_Imal);
+ItemToCharacter(ITEM_DAF_VoxWood, CHARACTER_DAF_Imal);
+DB_IsNotMessingAround(CHARACTER_DAF_Imal);
+SneakTriggerSpotter(TRIGGER_DAF_ImalSpotting, CHARACTER_DAF_Imal);
+DB_EvilDude(CHARACTER_DAF_Imal);
+DB_ImalDialog("DAF_Imal_Wolgraff");
+DB_ImalDialog("DAF_Imal_NoWolgraff");
+KBSECTION
+//REGION Journal
+IF
+DialogEnded("WOL_CD_MuteRabbit", _)
+THEN
+QuestAdd("WOL_Imal");
+QuestUpdate("WOL_Imal", "MuteRabbit");
+
+IF
+DialogEnded("WOL_CD_MuteDog", _)
+THEN
+QuestAdd("WOL_Imal");
+QuestUpdate("WOL_Imal", "MuteDog");
+
+IF
+DialogEnded("WOL_CD_MuteDeer", _)
+THEN
+QuestAdd("WOL_Imal");
+QuestUpdate("WOL_Imal", "MuteDeer");
+
+IF
+DialogEnded("WOL_CD_MuteBoar", _)
+THEN
+QuestAdd("WOL_Imal");
+QuestUpdate("WOL_Imal", "MuteBoar");
+
+IF
+GameBookInterfaceClosed(ITEM_DAF_ImalRecipe, _)
+AND 
+NOT DB_OnlyOnce("WolgraffRecipe")
+AND
+CHARACTER_Wolgraff.hasBeenRecruited()
+THEN
+QuestAdd("WOL_Imal");
+QuestUpdate("WOL_Imal", "GetRecipeKnowWol");
+DB_OnlyOnce("WolgraffRecipe");
+
+IF
+GameBookInterfaceClosed(ITEM_DAF_ImalRecipe, _)
+AND 
+NOT DB_OnlyOnce("WolgraffRecipe")
+AND 
+NOT CHARACTER_Wolgraff.hasBeenRecruited()
+THEN
+QuestAdd("WOL_Imal");
+QuestUpdate("WOL_Imal", "GetRecipeNoWol");
+DB_OnlyOnce("WolgraffRecipe");
+
+IF
+ItemTemplateAddedToCharacter("Quest_VoicePotion_eeb48095-6b00-4c71-b004-3bdaaa666030", _, _Char)
+AND
+DB_IsPlayer(_Char)
+AND 
+NOT DB_OnlyOnce("WolgraffVoiceDialg")
+THEN	
+DB_OnlyOnce("WolgraffVoiceDialg");
+QuestAdd("WOL_Imal");
+QuestUpdate("WOL_Imal", "GetPotion");
+Proc_CompanionDialog(CHARACTER_Wolgraff,"WOL_Default",_Char);
+//END_REGION
+
+//REGION Imal Dialog
+PROC
+ProcCharInTriggerSpotted(_Player,TRIGGER_DAF_ImalSpotting)
+AND
+DB_Companion(_Player)
+AND
+NOT _Player == CHARACTER_Wolgraff
+THEN
+CharacterSetFaction(CHARACTER_DAF_Imal, "Evil NPC");
+CharacterSetEvent(CHARACTER_DAF_Imal, "stopEvent");
+
+PROC
+ProcCharInTriggerSpotted(CHARACTER_Wolgraff,TRIGGER_DAF_ImalSpotting)
+THEN
+CharacterSetEvent(CHARACTER_DAF_Imal, "stopEvent");
+PROC_DoCompanionNemesisDialog("DAF_Imal_Wolgraff",CHARACTER_DAF_Imal,CHARACTER_Wolgraff);
+
+PROC
+ProcCharInTriggerSpotted(_Player,TRIGGER_DAF_ImalSpotting)
+AND 
+NOT DB_Companion(_Player)
+AND
+CharacterGetDistanceToCharacter(_Player,CHARACTER_Wolgraff,_Dist)
+AND
+_Dist < 10.0
+THEN
+CharacterSetEvent(CHARACTER_DAF_Imal, "stopEvent");
+DialogStartThreeSpeakerDialog("DAF_Imal_Wolgraff",CHARACTER_DAF_Imal,_Player,CHARACTER_Wolgraff);
+
+PROC
+ProcCharInTriggerSpotted(_Player,TRIGGER_DAF_ImalSpotting)
+AND 
+NOT DB_Companion(_Player)
+AND
+CharacterGetDistanceToCharacter(_Player,CHARACTER_Wolgraff,_Dist)
+AND
+_Dist >= 10.0
+THEN
+CharacterSetEvent(CHARACTER_DAF_Imal, "stopEvent");
+DialogStartTwoSpeakerDialog("DAF_Imal_NoWolgraff",CHARACTER_DAF_Imal,_Player);
+
+IF
+CharacterEnteredCombat(CHARACTER_DAF_Imal, _)
+THEN
+ProcCleanUpSneakTrigger(TRIGGER_DAF_ImalSpotting);
+
+IF
+DialogEnded(_Dial, _)
+AND
+DB_ImalDialog(_Dial)
+THEN
+CharacterSetFaction(CHARACTER_DAF_Imal, "Evil NPC");
+NOT DB_QueuedDialogNemesis("DAF_Imal_Wolgraff", CHARACTER_DAF_Imal, CHARACTER_Wolgraff);
+
+IF
+CharacterAttackedByCharacter(CHARACTER_DAF_Imal, _)
+AND
+CharacterGetFaction(CHARACTER_DAF_Imal, _Faction)
+AND
+_Faction != "Evil NPC"
+THEN
+DialogRequestStopForCharacter(CHARACTER_DAF_Imal);
+CharacterSetEvent(CHARACTER_DAF_Imal, "stopEvent");
+CharacterSetFaction(CHARACTER_DAF_Imal, "Evil NPC");
+NOT DB_QueuedDialogNemesis("DAF_Imal_Wolgraff", CHARACTER_DAF_Imal, CHARACTER_Wolgraff);
+//END_REGION
+
+IF
+ItemTemplateAddedToCharacter("Quest_VoicePotion_eeb48095-6b00-4c71-b004-3bdaaa666030", _, _Char)
+AND
+_Char.DB_IsPlayer()
+THEN
+GlobalSetEvent("WOL_CureInParty");
+
+IF
+ItemTemplateRemovedFromCharacter("Quest_VoicePotion_eeb48095-6b00-4c71-b004-3bdaaa666030", _, _Char)
+AND
+_Char.DB_IsPlayer()
+THEN
+GlobalClearEvent("WOL_CureInParty");
+
+IF
+DialogCharacterEventSet("WOL_GotCure",_Player,_)
+AND
+ItemTemplateIsInPartyInventory(_Player, "Quest_VoicePotion_eeb48095-6b00-4c71-b004-3bdaaa666030", 1, 1)
+THEN
+ItemTemplateRemoveFromCharacter("Quest_VoicePotion_eeb48095-6b00-4c71-b004-3bdaaa666030",_Player, 1);
+QuestUpdate("WOL_Imal", "CureWolfram");
+QuestClose("WOL_Imal");
+CharacterPlayEffect(CHARACTER_Wolgraff, "FX_GP_Regenerate");
+DB_WolgraffDrankPotion(1);
+
+IF
+DialogEnded("WOL_Default", _ID)
+AND
+DB_DialogPlayers(_ID, _Player, 1)
+AND
+DB_WolgraffDrankPotion(1)
+THEN
+ProcDoTwoSpeakerDialog("WOL_CD_Potion", CHARACTER_Wolgraff, _Player);
+
+IF
+DialogEnded("WOL_CD_Potion", _)
+THEN
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_Wolgraff);
+DB_Dialogs(CHARACTER_Wolgraff,"WOL_DefaultVoice");
+CharacterSetHasDialog(CHARACTER_Wolgraff, 1);
+NOT DB_Companion_Default_Dialog(CHARACTER_Wolgraff,"WOL_Default");
+DB_Companion_Default_Dialog(CHARACTER_Wolgraff,"WOL_DefaultVoice");
+CharacterSetVarInteger(CHARACTER_Wolgraff, "CanSpeak", 1);
+GlobalSetEvent("WolgraffVoiceBack");
+
+IF
+CharacterDied(CHARACTER_DAF_Imal)
+THEN
+CharacterSetOnStage(CHARACTER_DAF_MuteBoar, 0);
+CharacterSetOnStage(CHARACTER_DAF_MuteDog, 0);
+CharacterSetOnStage(CHARACTER_LUC_MuteDeer, 0);
+CharacterSetOnStage(CHARACTER_CYS_CoweringRabbit, 0);
+
+IF
+GlobalEventSet("WOL_RefuseSH")
+THEN
+CHARACTER_Wolgraff.isLeaving();
+
+IF
+DialogEnded("WOL_CD_ConclusionSourceHunter", _)
+AND
+CHARACTER_Wolgraff.isLeaving()
+THEN
+ProcDismissWolgraff();
+CharacterSetOnStage(CHARACTER_Wolgraff,0);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

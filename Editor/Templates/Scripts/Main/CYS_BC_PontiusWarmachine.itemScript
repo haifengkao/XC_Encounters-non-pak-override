@@ -1,0 +1,325 @@
+INIT
+	ITEM:__Me
+	CHARACTER:%Warmachine_User
+	CHARACTER:%Warmachine_Target=null
+	STRING:%WarmachineState="Ready"	
+	INT:%SmokeFXHandle
+	INT:%PrepareFXHandle
+	INT:%SelectedTargetFXHandle
+	INT:%Bool_WM_StandingBy=1
+	INT:%Bool_WMUsersPartyMember_InCombat=0
+	INT:%TargetAmount=0
+	EXTERN FLOAT:%Warmachine_Range=20
+	
+	//Using the warmachine while friends are in combat: target enemies
+	//Using the warmachine while friends aren't in combat: targets anyone
+
+//-----------
+BEHAVIOUR
+REACTION PontiusWM_ShootProjectiles,0
+USAGE ALL
+VARS
+	INT:_LoopStatus=0
+	CHARACTER:_FakeTarget
+	FIXEDSTRING:_Faction
+CHECK "c1"
+	IsEqual(%Bool_WM_StandingBy,1)
+ACTIONS
+	Set(%Bool_WM_StandingBy,0)
+	Set(%Bool_WMUsersPartyMember_InCombat,0)
+	IterateCharactersNear(__Me,50,"CMB_CYS_BC_Pontius_Warmachine_ScanForFighting_UsersParty_Members",Lowest,Distance)
+	ItemPlayLoopEffect(%PrepareFXHandle,__Me,"FX_Skills_WitchCraft_Generic_A_Prepare")	
+	IF "c1"
+		IsEqual(%Bool_WMUsersPartyMember_InCombat,1)
+	THEN
+		IterateCharactersNear(__Me,%Warmachine_Range,"CMB_CYS_BC_Pontius_Warmachine_ScanForHostilesOnly",Lowest,Distance)
+		//DebugText(__Me,"User's party in combat! Targeting user's enemy!")
+		WHILE "c1"
+			IsLessThen(_LoopStatus,%TargetAmount)
+		DO
+			IF "c1&c2&c3"
+				CharacterGet(_FakeTarget,%Warmachine_Target,30,Random,Distance)
+				CharacterGetFaction(_Faction,_FakeTarget)
+				IsEqual(_Faction,"CYS_BC_Denizen")
+			THEN
+				ItemLookAt(_FakeTarget,280)
+				CharacterPlayEffect(_FakeTarget,"FX_Skills_Warrior_IronCommand_RouletteMark_A")
+				Sleep(0.5)	
+				Add(_LoopStatus,1)		
+			ENDIF
+		ENDWHILE		
+	ELSE
+		IterateCharactersNear(__Me,%Warmachine_Range,"CMB_CYS_BC_Pontius_Warmachine_ScanForAnyone",Lowest,Distance)
+		//DebugText(__Me,"User's party NOT in combat! Targeting anyone!")
+		WHILE "c1"
+			IsLessThen(_LoopStatus,%TargetAmount)
+		DO
+			IF "c1"
+				CharacterGet(_FakeTarget,%Warmachine_Target,30,Random,Distance)
+			THEN
+				ItemLookAt(_FakeTarget,280)
+				CharacterPlayEffect(_FakeTarget,"FX_Skills_Warrior_IronCommand_RouletteMark_A")
+				Sleep(0.5)	
+				Add(_LoopStatus,1)		
+			ENDIF
+		ENDWHILE		
+	ENDIF
+	CharacterPlayLoopEffect(%SelectedTargetFXHandle,%Warmachine_Target,"FX_Skills_Warrior_IronCommand_Status_A")
+	Sleep(1)
+	StopLoopEffect(%SelectedTargetFXHandle)
+	IF "c1"
+		IsEqual(%Warmachine_Target,null)
+	THEN
+		DisplayText(__Me,"CYS_BallistaNotInRange",3)
+	ELSE
+		//DebugText(__Me,"Shooting target: [1]",%Warmachine_Target)
+		GetRandom(%WarmachineState,"Fire","Water","Air","Earth","Poison")
+		ItemLookAt(%Warmachine_Target,280)
+		StartTimer("CMB_CYS_BC_PontiusWarmachine_Shoot_Timer",2.2,0)
+		IF "c1"
+			IsEqual(%WarmachineState,"Fire")
+		THEN
+			ItemPlayEffect(__Me,"FX_Skills_Fire_Flare_Impact_A")
+			ItemPlayEffect(__Me,"FX_Skills_Fire_Summon_Prepare_A")	
+		ELIF "c1"
+			IsEqual(%WarmachineState,"Water")
+		THEN
+			ItemPlayEffect(__Me,"FX_Skills_Water_IceWall_Impact_A")
+			ItemPlayEffect(__Me,"FX_Skills_Water_Summon_Prepare_A")
+		ELIF "c1"
+			IsEqual(%WarmachineState,"Air")
+		THEN
+			ItemPlayEffect(__Me,"FX_Skills_Air_Summon_Cast_A")
+			ItemPlayEffect(__Me,"FX_Skills_Air_BlitzBolt_Target_A")
+		ELIF "c1"
+			IsEqual(%WarmachineState,"Earth")
+		THEN
+			ItemPlayEffect(__Me,"FX_Skills_Earth_EnemyEarthProjectile_Cast_A")
+			ItemPlayEffect(__Me,"FX_Skills_Earth_Summon_Prepare_A")	
+		ELIF "c1"
+			IsEqual(%WarmachineState,"Poison")
+		THEN
+			ItemPlayEffect(__Me,"FX_Skills_Earth_PoisonDart_Cast_A")	
+			ItemPlayEffect(__Me,"FX_Skills_Earth_PoisonDart_Prepare_A")
+		ENDIF
+		ItemPlayAnimation("Shoot")
+		ItemPlayAnimation("idle")
+	ENDIF
+	Set(_LoopStatus,0)
+	Set(%Bool_WM_StandingBy,1)
+	//DebugText(__Me,"Shutting down!")
+	SetPriority("PontiusWM_ShootProjectiles",0)
+INTERRUPT
+	Reset()
+	
+//-----------
+EVENTS
+EVENT OnUse_ActivateWM
+VARS
+	CHARACTER:_User
+ON
+	OnUseItem(_User,__Me)
+ACTIONS
+	Set(%TargetAmount,0)
+	Set(%Warmachine_Target,null)
+	//DebugText(__Me,"Used! Target is [1]!",%Warmachine_Target)
+	IF "c1"
+		IsEqual(%Bool_WM_StandingBy,1)
+	THEN
+		Set(%Warmachine_User,_User)
+		SetPriority("PontiusWM_ShootProjectiles",1000)
+	ENDIF
+
+EVENT OnTimer_ShootFirstBolt
+ON
+	OnTimer("CMB_CYS_BC_PontiusWarmachine_Shoot_Timer")
+ACTIONS
+	IF "c1"
+		IsEqual(%WarmachineState,"Fire")
+	THEN
+		ShootLocalProjectileAt(Projectile_EnemyFireball,__Me,{0;2;-2},%Warmachine_Target,20)
+	ENDIF
+	IF "c1"
+		IsEqual(%WarmachineState,"Water")
+	THEN	
+		ShootLocalProjectileAt(Projectile_EnemyIceShard,__Me,{0;2;-2},%Warmachine_Target,20)
+	ENDIF	
+	IF "c1"
+		IsEqual(%WarmachineState,"Air")
+	THEN
+		ShootLocalProjectileAt(Projectile_EnemyBlitzBolt,__Me,{0;2;-2},%Warmachine_Target,20)	
+	ENDIF		
+	IF "c1"
+		IsEqual(%WarmachineState,"Earth")
+	THEN
+		ShootLocalProjectileAt(Projectile_EnemyEarthShard,__Me,{0;2;-2},%Warmachine_Target,20)
+	ENDIF	
+	IF "c1"
+		IsEqual(%WarmachineState,"Poison")
+	THEN
+		ShootLocalProjectileAt(Projectile_EnemyPoisonball,__Me,{0;2;-2},%Warmachine_Target,20)
+	ENDIF	
+	StartTimer("CYS_BC_PontiusWarmachine_Bolt02_Timer",0.02,0)
+	
+EVENT OnTimer_ShootSecondBolt
+ON
+	OnTimer("CYS_BC_PontiusWarmachine_Bolt02_Timer")
+ACTIONS
+	IF "c1"
+		IsEqual(%WarmachineState,"Fire")
+	THEN
+		ShootLocalProjectileAt(Projectile_EnemyFireball,__Me,{0;2;-2},%Warmachine_Target,20)
+	ENDIF
+	IF "c1"
+		IsEqual(%WarmachineState,"Water")
+	THEN	
+		ShootLocalProjectileAt(Projectile_EnemyIceShard,__Me,{0;2;-2},%Warmachine_Target,20)
+	ENDIF	
+	IF "c1"
+		IsEqual(%WarmachineState,"Air")
+	THEN
+		ShootLocalProjectileAt(Projectile_EnemyBlitzBolt,__Me,{0;2;-2},%Warmachine_Target,20)	
+	ENDIF		
+	IF "c1"
+		IsEqual(%WarmachineState,"Earth")
+	THEN
+		ShootLocalProjectileAt(Projectile_EnemyEarthShard,__Me,{0;2;-2},%Warmachine_Target,20)
+	ENDIF	
+	IF "c1"
+		IsEqual(%WarmachineState,"Poison")
+	THEN
+		ShootLocalProjectileAt(Projectile_EnemyPoisonball,__Me,{0;2;-2},%Warmachine_Target,20)
+	ENDIF	
+	StartTimer("CYS_BC_PontiusWarmachine_Bolt03_Timer",0.2,0)
+	
+EVENT OnTimer_ShootThirdBolt
+ON
+	OnTimer("CYS_BC_PontiusWarmachine_Bolt03_Timer")
+ACTIONS
+	IF "c1"
+		IsEqual(%WarmachineState,"Fire")
+	THEN
+		ShootLocalProjectileAt(Projectile_EnemyFireball,__Me,{0;2;-2},%Warmachine_Target,20)
+	ENDIF
+	IF "c1"
+		IsEqual(%WarmachineState,"Water")
+	THEN	
+		ShootLocalProjectileAt(Projectile_EnemyIceShard,__Me,{0;2;-2},%Warmachine_Target,20)
+	ENDIF	
+	IF "c1"
+		IsEqual(%WarmachineState,"Air")
+	THEN
+		ShootLocalProjectileAt(Projectile_EnemyBlitzBolt,__Me,{0;2;-2},%Warmachine_Target,20)	
+	ENDIF		
+	IF "c1"
+		IsEqual(%WarmachineState,"Earth")
+	THEN
+		ShootLocalProjectileAt(Projectile_EnemyEarthShard,__Me,{0;2;-2},%Warmachine_Target,20)
+	ENDIF	
+	IF "c1"
+		IsEqual(%WarmachineState,"Poison")
+	THEN
+		ShootLocalProjectileAt(Projectile_EnemyPoisonball,__Me,{0;2;-2},%Warmachine_Target,20)
+	ENDIF	
+	StartTimer("CYS_BC_PontiusWarmachine_Bolt04_Timer",0.2,0)
+	
+EVENT OnTimer_ShootFourthBolt
+ON
+	OnTimer("CYS_BC_PontiusWarmachine_Bolt04_Timer")
+ACTIONS
+	IF "c1"
+		IsEqual(%WarmachineState,"Fire")
+	THEN
+		ShootLocalProjectileAt(Projectile_EnemyFireball,__Me,{0;3;-3},%Warmachine_Target,20)
+	ENDIF
+	IF "c1"
+		IsEqual(%WarmachineState,"Water")
+	THEN	
+		ShootLocalProjectileAt(Projectile_EnemyIceShard,__Me,{0;3;-3},%Warmachine_Target,20)
+	ENDIF	
+	IF "c1"
+		IsEqual(%WarmachineState,"Air")
+	THEN
+		ShootLocalProjectileAt(Projectile_EnemyBlitzBolt,__Me,{0;3;-3},%Warmachine_Target,20)	
+	ENDIF		
+	IF "c1"
+		IsEqual(%WarmachineState,"Earth")
+	THEN
+		ShootLocalProjectileAt(Projectile_EnemyEarthShard,__Me,{0;3;-3},%Warmachine_Target,20)
+	ENDIF	
+	IF "c1"
+		IsEqual(%WarmachineState,"Poison")
+	THEN
+		ShootLocalProjectileAt(Projectile_EnemyPoisonball,__Me,{0;3;-3},%Warmachine_Target,20)
+	ENDIF	
+	StartTimer("CYS_BC_PontiusWarmachine_StartSmoke_Timer",0.8,0)
+	Set(%WarmachineState,"Ready")	
+
+EVENT OnTimer_StartSmoke
+ON
+	OnTimer("CYS_BC_PontiusWarmachine_StartSmoke_Timer")
+ACTIONS
+	StopLoopEffect(%PrepareFXHandle)
+	ItemPlayLoopEffect(%SmokeFXHandle,__Me,"FX_Env_Smoke_Fire_A")
+	StartTimer("CYS_BC_PontiusWarmachine_KillSmoke_Timer",3,0)
+	
+EVENT OnTimer_KillSmoke
+ON
+	OnTimer("CYS_BC_PontiusWarmachine_KillSmoke_Timer")
+ACTIONS
+	StopLoopEffect(%SmokeFXHandle)
+		
+EVENT OnItemDestroyed_KillAllHandles
+ON
+	OnItemDestroyed(__Me)
+	OnDeactivate()
+ACTIONS
+	StopLoopEffect(%SmokeFXHandle)
+	StopLoopEffect(%PrepareFXHandle)
+	StopLoopEffect(%SelectedTargetFXHandle)
+	
+EVENT OnIterateCharacter_ScanForFriendsInCombat
+VARS
+	CHARACTER:_UsersPartyMember
+ON
+	OnIterateCharacter(_UsersPartyMember,"CMB_CYS_BC_Pontius_Warmachine_ScanForFighting_UsersParty_Members")
+ACTIONS
+	//DebugText(__Me,"Scanning for user's party members that are in combat!")
+	IF "!c1&c2&c3"
+		CharacterIsDead(_UsersPartyMember)
+		CharacterIsAlly(%Warmachine_User,_UsersPartyMember)
+		IsInCombat(_UsersPartyMember)
+	THEN
+		Set(%Bool_WMUsersPartyMember_InCombat,1)
+	ENDIF
+	
+EVENT OnIterateCharacter_ScanForHostiles
+VARS
+	CHARACTER:_Hostile
+	FIXEDSTRING:_HostilesFaction
+ON
+	OnIterateCharacter(_Hostile,"CMB_CYS_BC_Pontius_Warmachine_ScanForHostilesOnly")
+ACTIONS
+	//DebugText(__Me,"Scanning for hostiles!")
+	IF "!c1&c2&c3"
+		CharacterIsDead(_Hostile)
+		CharacterGetFaction(_HostilesFaction,_Hostile)
+		IsEqual(_HostilesFaction,"CYS_BC_Denizen")
+	THEN
+		Add(%TargetAmount,1)			//counting hostiles; this value is used to create a threshold in the loop above
+		Set(%Warmachine_Target,_Hostile)
+	ENDIF
+
+EVENT OnIterateCharacter_ScanForAnyone
+VARS
+	CHARACTER:_Target
+ON
+	OnIterateCharacter(_Target,"CMB_CYS_BC_Pontius_Warmachine_ScanForAnyone")
+ACTIONS
+	//DebugText(__Me,"Scanning for anyone!")
+	IF "!c1"
+		CharacterIsDead(_Target)
+	THEN
+		Add(%TargetAmount,1)			//counting targets; this value is used to create a threshold in the loop above
+		Set(%Warmachine_Target,_Target)
+	ENDIF

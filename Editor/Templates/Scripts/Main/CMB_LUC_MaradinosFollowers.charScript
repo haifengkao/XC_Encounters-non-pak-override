@@ -1,0 +1,46 @@
+INIT
+CHARACTER:__Me
+CHARACTER:%Follower01 = LUC_MaradinosFollower_01_ea787328-cda6-4069-ad4b-e72740472018
+CHARACTER:%Follower02 = LUC_MaradinosFollower_02_fdf5d758-89c5-4fd4-9504-9977a7b58f4f
+CHARACTER:%Follower03 = LUC_MaradinosFollower_03_27175430-890b-4380-9a58-fbb7114286a2
+CHARACTER:%Follower04 = LUC_MaradinosFollower_04_20c3488b-e8b3-4bbe-ac6a-14dfc04def6f
+CHARACTER:%Follower05 = LUC_MaradinosFollower_05_e13c070b-f37c-4b0f-936a-004ad6960523
+CHARACTER:%Maradino = LUC_MaradinoBoss_01_0de02cfe-996e-46ac-8198-1857bf38d0ab
+INT:%hasPlayedText = 0
+	
+//------------------------	
+EVENTS
+EVENT MasterEnteredCombat
+ON
+	OnCharacterEvent(%Maradino,"LUC_MaradinosFollowersWakeUp")
+ACTIONS
+	IF "!c1"
+	CharacterHasStatus(__Me,DYING)
+	THEN
+	CharacterSetCanFight(__Me,1,1)
+	Set(%hasPlayedText,1)
+	ENDIF
+	
+EVENT PlayerAttackedMe
+VARS
+CHARACTER:_Player
+FIXEDSTRING:_faction
+ON
+	OnDamage(_,_,_Player,_)
+	OnMiss(_Player,_, __Me, _)
+ACTIONS
+	IF "c1&c2"
+	CharacterIsPlayer(_Player)
+	IsEqual(%hasPlayedText,0)
+	THEN
+	CharacterSetCanFight(__Me,1,1)
+	DisplayText(__Me,"LUC_MaradinoBoss_02",4)
+	Set(%hasPlayedText,1)
+	ENDIF
+	
+//------------------------
+BEHAVIOUR
+REACTION PlayingDead, 1500
+USAGE PEACE
+ACTIONS
+	CharacterPlayAnimation("knockdown_loop",0,1)

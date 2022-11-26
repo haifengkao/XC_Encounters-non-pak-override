@@ -1,0 +1,83 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+ItemSetOnstage(ITEM_CYS_WilliamWell,0);
+DB_ItemDialogs(ITEM_CYS_WalterWell,"CYS_Walter");
+
+DB_CYS_WishingWellTreasure(CHARACTER_CYS_WishingWell,1);
+DB_CYS_WishingWellTreasure(CHARACTER_CYS_WishingWellBad,2);
+DB_CYS_WishingWellTreasure(CHARACTER_CYS_WishingWellMeh,3);
+DB_CYS_WishingWellTreasure(CHARACTER_CYS_WishingWellGood,4);
+
+CharacterSetVisible(CHARACTER_CYS_WilliamWell_DialogHack,0);
+CharacterSetCanFight(CHARACTER_CYS_WilliamWell_DialogHack,0);
+CharacterSetImmortal(CHARACTER_CYS_WilliamWell_DialogHack,1);
+DB_NoDefaultBehavior(CHARACTER_CYS_WilliamWell_DialogHack);
+CharacterMakeStoryNpc(CHARACTER_CYS_WilliamWell_DialogHack,1);
+CharacterFreeze(CHARACTER_CYS_WilliamWell_DialogHack);
+KBSECTION
+//REGION Retrieve quest
+IF
+DialogEnded("CYS_Walter",_ID)
+AND
+DB_DialogPlayers(_ID, _Player, 1)
+AND
+NOT QuerCheckIfPlayerFarFrom(_Player)
+AND
+ItemGetVarInteger(ITEM_CYS_WalterWell,"sendParty",1)
+THEN
+ItemSetVarInteger(ITEM_CYS_WalterWell,"sendParty",0);
+CharacterTeleportPartyToTrigger(TRIGGER_HIB_WellArrival,"");
+
+IF
+DialogEnded("CYS_Walter",_ID)
+AND
+DB_DialogPlayers(_ID, _Player, 1)
+AND
+QuerCheckIfPlayerFarFrom(_Player)
+AND
+ItemGetVarInteger(ITEM_CYS_WalterWell,"sendParty",1)
+THEN
+ItemSetVarInteger(ITEM_CYS_WalterWell,"sendParty",0);
+ProcDoTwoSpeakerItemDialog("CYS_WalterFailTP", _Player, ITEM_CYS_WalterWell);
+//END_REGION
+
+//REGION CYSEAL WISH
+IF
+DialogEnded("CYS_Walter",_ID)
+AND
+DB_DialogPlayers(_ID,_Player,1)
+AND
+CharacterGetVarInteger(_Player,"CYS_GaveWalterGold",_Reward)
+AND
+DB_CYS_WishingWellTreasure(_Character,_Reward)
+THEN
+CharacterSetVarInteger(_Player,"CYS_GaveWalterGold",0);
+CharacterMoveAllItemsToCharacter(_Character,CHARACTER_CYS_WishingWellDepot);
+GenerateItems(_Player,_Character);
+CharacterMoveAllItemsToCharacter(_Character,_Player);
+//END_REGION
+
+IF
+CharacterUsedItem(_Player,ITEM_CYS_WilliamWell)
+AND
+_Player.DB_IsPlayer()
+THEN
+ProcDoTwoSpeakerDialog("HIB_WilliamWell",CHARACTER_CYS_WilliamWell_DialogHack,_Player);
+
+QRY
+QuerCheckIfPlayerFarFrom((CHARACTER) _Player)
+AND
+DB_IsPlayer(_OtherPlayer)
+AND
+_Player != _OtherPlayer
+AND
+CharacterGetDistanceToCharacter(_Player, _OtherPlayer, _Dist)
+AND
+_Dist > 10
+THEN
+DB_NOP(1);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

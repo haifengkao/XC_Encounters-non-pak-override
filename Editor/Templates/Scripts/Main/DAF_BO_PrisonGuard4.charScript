@@ -1,0 +1,22 @@
+INIT
+CHARACTER:__Me
+TRIGGER:%Point1 = DAF_Prison_Armory_ce55ffbe-2737-4fa0-b063-e29546cf4cc9
+TRIGGER:%Point2 = DAF_Prison_Barrel_f9bc7c48-fc3d-430c-af6f-ab4a494b9b1c
+ITEM:%Bed = FUR_Citz_Bed_A_Mattress_A_LightBrown_000_48163005-ceba-4d49-aca7-9a6b06f91839
+ITEM:%Chair = FUR_Citz_Chair_A_029_98a9f59c-07c7-4bf5-9829-dbfc540334dc
+
+BEHAVIOUR
+
+REACTION Main, 500
+USAGE PEACE
+ACTIONS
+	CharacterUseItem(%Bed)
+	Sleep(20)
+	CharacterWander(FLOAT:5.0,20.0,0,%Point1)
+	
+	CharacterMoveTo(%Point2,0,1,0,0.0)
+	CharacterLookFrom(%Point2,1)
+	CharacterPlayAnimation("Fidget_Forward_02")
+	
+	CharacterUseItem(%Chair)
+	Sleep(7)

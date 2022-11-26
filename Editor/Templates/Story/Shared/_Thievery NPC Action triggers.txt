@@ -1,0 +1,1250 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+// Shop regions are regions where it is allowed to take goods having an owner != hero.
+// ProcessTheftEvent will in that case start a dialog for the shop keeper where he asks to pay for the
+// objects.
+// DB_ShopRegion(_Level,_Region,_Owner,_Dialog):
+//		_Region: the region
+//		_Owner: the shop keeper
+//		_Dialog: the dialog that will be started. This dialog must:
+//				- react on DIALOG_EVENT_thievery_player_stole_one_item/many_items. If one of them are set,
+//				  the dialog needs to ask whether the player wants to buy the item(s). If yes, set the event
+//					DIALOG_EVENT_npc_start_trade.
+//				- react on DIALOG_EVENT_npc_does_not_want_to_trade if set in combination with one of the events above.
+//				  If set, it should be a "Get OUT!, I don't sell goods to you!" dialog.
+// Note that goods are ALWAYS taken back from the player such that the owner can trade. So, if the player
+// decides not to buy the goods, then he has not stolen them either.
+
+DB_ThiefCrimeDialog("Npc_accepts_theft_of_own_objects");
+DB_ThiefCrimeDialog("Dont_steal_from_me_Please_Leave");
+DB_ThiefCrimeDialog("Thievery_is_unwise");
+DB_ThiefCrimeDialog("You_are_a_thief_Please_leave");
+KBSECTION
+//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+//
+// This goal triggers:
+//		ActNegatively
+//		ActPositively
+//
+// This goal defines:
+//		DisapproveTheft(_Spotter,_Owner,_Involvment)
+//		ApproveTheft(_Spotter,_Owner,_Involvment)
+//
+//		ProcessTheftEvent((NPC)_Spotter,(NPC)_Owner)
+//		ProcessTheft((NPC)_Spotter,(NPC)_Owner)
+//
+// Influencing facts:
+//		PersonalValue((NPC)_Spotter,_Object): it is bad if _spotter has a personal bond with _object
+//		DB_FamousObject((OBJECT)_Object,(INTEGER)_Fame): it is important if the object is famous
+//		Relation(_Spotter,_Owner,_Relation): it is bad if _spotter and _owner have a good relation
+//		DB_CharacterStats(_Spotter,_,_ValueCheap,_): stealing expensive items is bad
+//		DB_CharacterStats(_Spotter,_ToleranceThievery,_,_): negative tolerance is bad
+//		PlayerHasThievesRelationWith(_Spotter): is good (_spotter will not rat in many cases)
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+//
+// PROC DisapproveTheft(_Player,_Spotter,_Owner,_Involvment)
+//
+
+// DANTE 22-4-2002: extra code for guards, such that they:
+// 1) ALWAYS react
+// 2) do not drop their attitude (unless it goes via the reputation
+PROC
+DisapproveTheft((CHARACTER)_Player,(CHARACTER)_Spotter,(CHARACTER)_Owner,(INTEGER)_Involvment)
+AND
+DB_IsGuard(_Spotter)
+THEN
+DoRevenge(_Player,_Spotter,2);	//TODO: DEFINE ACTION_THEFT_NOT_FROM_ME	// skip ActNegatively
+
+PROC
+DisapproveTheft((CHARACTER)_Player,(CHARACTER)_Spotter,(CHARACTER)_Owner,(INTEGER)_Involvment)
+AND
+NOT DB_IsGuard(_Spotter)
+THEN
+DisapproveTheft_NoGuard(_Player,(CHARACTER)_Spotter,(CHARACTER)_Owner,(INTEGER)_Involvment);
+
+
+// Apply _Spotter's tolerance for thievery
+// If it concerns my own items, apply tolerance only if it is negative:
+// (E.g. a rich guy who gets upset over a spoon.)
+
+PROC	
+DisapproveTheft_NoGuard((CHARACTER)_Player,(CHARACTER)_Owner,(CHARACTER)_Owner,(INTEGER)_Involvment)
+AND
+DB_CharacterStats(_Owner,(INTEGER)_ToleranceThievery,(INTEGER)_,(INTEGER)_)
+AND
+_ToleranceThievery < 0
+AND
+IntegerSubtract(_Involvment,_ToleranceThievery,_R)
+AND
+IntegerDivide(_R,2,_AttDrop)
+THEN
+DecreaseAttitude(_Player,_Owner,_AttDrop);
+ProcCheckIfHostile(_Player,_Owner);
+ActNegatively(_Player,_Owner,_R,1); //TODO DEFINE ACTION_THEFT_FROM_ME
+
+PROC
+ProcCheckIfHostile((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+CharacterGetRepAttitudeTowardsPlayer(_Npc,_Player,_RepAtt)
+AND
+_RepAtt <= -75 
+AND
+NOT DB_IsHostile(_Player,_Npc)
+THEN	
+ShouldBecomeHostile(_Player,_Npc);
+
+PROC
+DisapproveTheft_NoGuard((CHARACTER)_Player,(CHARACTER)_Owner,(CHARACTER)_Owner,(INTEGER)_Involvment)
+AND
+DB_CharacterStats(_Owner,_ToleranceThievery,_,_)
+AND
+_ToleranceThievery >= 0
+AND
+IntegerDivide(_Involvment,2,_AttDrop)
+THEN
+DecreaseAttitude(_Player,_Owner,_AttDrop);
+ProcCheckIfHostile(_Player,_Owner);
+ActNegatively(_Player,_Owner,_Involvment,1); //TODO DEFINE ACTION_THEFT_FROM_ME
+
+// _Spotter != _Owner
+PROC
+DisapproveTheft_NoGuard((CHARACTER)_Player,(CHARACTER)_Spotter,(CHARACTER)_Owner,(INTEGER)_Involvment)
+AND
+_Spotter != _Owner 
+AND
+DB_CharacterStats(_Spotter,_ToleranceThievery,_,_)
+AND
+IntegerSubtract(_Involvment,_ToleranceThievery,_R)
+AND
+_R > 0
+// don't do anything if tolerance is bigger than involvment
+AND
+IntegerDivide(_R,2,_AttDrop)
+THEN
+DecreaseAttitude(_Player,_Spotter,_AttDrop);
+ProcCheckIfHostile(_Player,_Spotter);
+ActNegatively(_Player,_Spotter,_R,2);	//TODO DEFINE ACTION_THEFT_NOT_FROM_ME
+
+// In all cases: every disapproved theft makes the _Spotter less tolerant for next thieveries:
+// (You could steal the entire houses in glenborus (cheap objects) before the dwarves got aggressive.)
+PROC
+DisapproveTheft_NoGuard((CHARACTER)_Player,(CHARACTER)_Spotter,(CHARACTER)_,(INTEGER)_)
+THEN
+DecreaseToleranceThievery(_Spotter,25);
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+//
+// PROC ApproveTheft(_Player,_Spotter,_Owner,_Involvment)
+//
+
+PROC	
+ApproveTheft((CHARACTER)_Player,(CHARACTER)_Spotter,(CHARACTER)_,(INTEGER)_Involvment)
+THEN
+IncreaseAttitude(_Player,_Spotter,_Involvment);
+
+PROC
+ApproveTheft((CHARACTER)_Player,(CHARACTER)_Spotter,(CHARACTER)_Spotter,(INTEGER)_Involvment)
+THEN
+ActPositively(_Player,_Spotter,_Involvment,1); //TODO DEFINE ACTION_THEFT_FROM_ME
+
+PROC
+ApproveTheft((CHARACTER)_Player,(CHARACTER)_Spotter,(CHARACTER)_Owner,(INTEGER)_Involvment)
+AND
+_Spotter != _Owner
+THEN
+ActPositively(_Player,_Spotter,_Involvment,2);	//TODO DEFINE ACTION_THEFT_NOT_FROM_ME
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
+//
+// This following part triggers
+//
+//		DisapproveTheft(_Spotter,_Owner,_Intensity)
+//		ApproveTheft(_Spotter,_Owner,_Intensity)
+//
+//
+// Facts used: (cleaned up by DeleteThieveryFacts/1)
+//
+//		DB_ObjectTheft_ByEvidence(1):
+//				asserted if the detection happened while trading
+//
+//		DB_ValueStolen((INTEGER)_Value):
+//				the value of the good(s) stolen
+//
+//		DB_ObjectStolen((OBJECT)_Object):
+//		ObjectClassStolen((OBJECT_CLASS)_ObjectClass,(INTEGER)_Amount):
+//				one of the two above, depending on what is stolen
+//
+//		DB_BonusFame((INTEGER)_Fame):
+//				only asserted if an osiris object was stolen, and if it was a famous one (see DB_FamousObject/2)
+//
+//		OwnerStolenGoods((NPC)_Owner)
+//
+//		InvolvmentTheft((INTEGER)_Involvment)
+//				= 100 for own objects
+//				= relation / 2 between spotter and owner if Relation/3 defined (can be negative)
+//				= (default) 0 if the alignment relation value returned by the engine < 25
+//									alignment relation value returned by the engine / 2 otherwise:
+//										50 for goods
+//										25 for neutrals
+//										values in between for others
+//
+//				If PlayerHasThievesRelationWith(_Spotter):
+//						=> Involvment -= 26. This means that
+//								_Spotter will still be angry for stealing from his own (TemperedInvolvment = 75)
+//										or from his best friends (Relation or AlignmentRelation > 50)
+//								_Spotter will approve stealing from other people
+//
+//		  A negative involvment (only possible via Relation/3 or PlayerHasThievesRelationWith/1)
+//			means that _Spotter approves the theft.
+//
+//		TemperedInvolvmentTheft((INTEGER)_Involvment)
+//			Involvment is reduced:
+//						to 100% if stealing from spotter's best friend
+//						to 100% if the object has a personal value or is considered "not cheap" to _Spotter
+//						to 10% if the object has no personal value and is considered "cheap" to _Spotter
+//								(for definition of cheap, see DB_CharacterStats/4)
+//
+//			If a famous object is stolen (even a cheap one) its fame strenghtens the tempered involvment
+//		 (negative or positive) with its FameBonus (=fame/4 (max +25 or -25)).
+//
+// !!!!!ONE BIG OVERRULE EXISTS!!!!!!!
+//			If it is the first time the player steals, the TemperedInvolvmentTheft will always be reduced
+//			to max 10, such that the player will get a warning not to steal in this game!
+//
+// PS: be careful: if an object needs to be stolen by the player (because of a quest)
+//		 set its owner to be 0 (= the player itself). If not, everybody could start
+//		 disliking the npc.
+//
+// Examples for values of tempered involvment:
+//		100:		somebody detects stealing one of his expensive objects
+//		 10:		somebody detects stealing one of his inexpensive objects
+//		 35:		somebody detects stealing one of his inexpensive but famous objects
+//		 50:		somebody sees you stealing ANY object from one of his best friends
+//		 75:		somebody sees you stealing a famous object from one of his best friends
+//		 25:		somebody sees you stealing an expensive object from a guy he does not know
+//		  2:		somebody sees you stealing a cheap object from a guy he does not know
+//		 -1:		a fellow thief sees you stealing ANY object from a guy he does not know
+//		-26:		a fellow thief sees you stealing a famous object from a guy he does not know
+//		 24:		a fellow thief sees you stealing ANY object from one of his best friends
+//		  2:		a fellow thief sees you stealing an inexpensive object from one of his best friends
+//
+// To declare a famous object X, assert:
+//				DB_FamousObject(X,Fame);		// Fame between 0 and 100
+//
+// To declare a relation, assert:
+//				Relation(A,B,Strength);		// Strenght between 0 and 100
+//
+
+//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+// ProcessTheftEvent/2
+// ProcessTheft/2
+//
+
+// 0) remember the owner of the stolen object or goods
+PROC
+ProcessTheftEvent((CHARACTER)_Offender,(CHARACTER)_,(CHARACTER)_Owner)
+THEN
+OwnerStolenGoods(_Offender,_Owner);
+
+// ProcessTheftEvent is the function that is called every time the player takes up some good(s)
+// that do not belong to him, and some npc (_Spotter) spots this.
+// The following rules check whether the player is in a shop (where it is allowed to take objects
+// if one pays) or not. If not allowed, ProcessTheft is called, which determines how _Spotter will react.
+PROC
+ProcessTheftEvent((CHARACTER)_Offender,(CHARACTER)_Spotter,(CHARACTER)_Owner)
+AND
+NOT DB_ObjectTheft_ByEvidence(_Offender,1) 
+AND		
+// this rule fails when player wants to sell stolen items
+DB_InRegion(_Offender,(TRIGGER)_Region)
+AND
+DB_ShopRegion(_,_Region,_,_)
+THEN
+TheftInsideShop(_Offender,1);
+
+PROC
+ProcessTheftEvent((CHARACTER)_Offender,_Spotter,_Owner)
+AND 
+NOT TheftInsideShop(_Offender,1)
+THEN	
+ProcTheftCheckCrime(_Offender,_Spotter,_Owner);
+
+PROC
+ProcTheftCheckCrime((CHARACTER)_Player,(CHARACTER)_Npc,(CHARACTER)_)
+AND
+DB_CrimeInProgress(_OtherPlayer,_Npc,_)
+AND
+_Player!=_OtherPlayer
+THEN
+DB_DoTheftCrimeInterrupt(1);
+
+PROC
+ProcTheftCheckCrime((CHARACTER)_Player,(CHARACTER)_Npc,(CHARACTER)_)
+AND
+DB_CrimeInProgress(_OtherPlayer,_CheckNpc,_)
+AND
+_Player!=_OtherPlayer
+AND
+CharacterCanSeeCharacter(_CheckNpc,_Npc,1)
+THEN
+DB_DoTheftCrimeInterrupt(1);
+
+PROC
+ProcTheftCheckCrime((CHARACTER)_Player,(CHARACTER)_Npc,(CHARACTER)_)
+AND
+DB_CrimeInProgress(_,_Npc,_Reason)
+AND
+_Reason!="Stealing"
+THEN
+DB_DoTheftCrimeInterrupt(1);
+
+PROC
+ProcTheftCheckCrime((CHARACTER)_Player,(CHARACTER)_Npc,(CHARACTER)_)
+AND
+DB_DoTheftCrimeInterrupt(1)
+THEN
+ProcHandleCrimeInterrupt(_Player,_Npc);
+
+PROC
+ProcTheftCheckCrime((CHARACTER)_Player,(CHARACTER)_Npc,(CHARACTER)_Owner)
+AND
+NOT DB_DoTheftCrimeInterrupt(1)
+AND
+DB_CrimeInProgress(_,_Npc,_)
+THEN
+//we're busy handling a thievery request. But refuse the player to steal anyway!
+GiveBackStolenStuff(_Player,1);
+//decrease their attitude for every additional item stolen
+DecreaseAttitude(_Player,_Npc,5);
+
+PROC
+ProcTheftCheckCrime((CHARACTER)_Player,(CHARACTER)_Npc,(CHARACTER)_Owner)
+AND
+NOT DB_DoTheftCrimeInterrupt(1)
+AND
+NOT DB_CrimeInProgress(_,_Npc,_)
+THEN
+ProcessTheft(_Player,_Npc,_Owner);
+
+PROC
+ProcTheftCheckCrime((CHARACTER)_Player,(CHARACTER)_Npc,(CHARACTER)_Owner)
+THEN
+NOT DB_DoTheftCrimeInterrupt(1);
+
+PROC
+ProcessTheftEvent((CHARACTER)_Offender,_Npc,_Owner)
+AND
+TheftInsideShop(_Offender,1)
+AND
+_Npc!=_Owner
+THEN
+ProcTheftCheckCrime(_Offender,_Npc,_Owner);
+
+PROC
+ProcessTheftEvent((CHARACTER)_Offender,_Owner,_Owner)
+AND
+TheftInsideShop(_Offender,1)
+THEN
+// Give back "stolen" stuff (such that _Owner can sell them to the player)
+// but regenerate _Owner's inventory first:
+GenTradeItems(_Owner);
+GiveBackStolenStuff(_Offender,1);
+// Init the dialog events:
+Thievery_ClearGeneralDialogEvents(_Offender,1);
+Thievery_SetGeneralDialogEvents(_Offender,1);
+
+PROC
+ProcessTheftEvent((CHARACTER)_Offender,_Owner,_Owner)
+AND
+TheftInsideShop(_Offender,1)
+AND
+_Owner.DoesNotWantToTrade(_Offender)
+THEN
+// If _Owner.DoesNotWantToTrade() then GenTradeItems(_Owner) clears the inventory,
+// except for the osiris objects, so move them to a dummy:
+MoveObjectsToDummy(_Owner);		// move the osiris objects to a dummy
+ProcLaunchOverheadDialogReplacement(_Owner);
+SetAndStartDialog(_Offender,_Owner,"Default_Out");
+			
+PROC	
+ProcessTheftEvent((CHARACTER)_Offender,_Owner,_Owner)
+AND 
+TheftInsideShop(_Offender,1)
+AND
+NOT _Owner.DoesNotWantToTrade(_Offender)
+AND
+DB_ShopRegion(_,_,_Owner,_Dialog)
+THEN	
+// Start the dialog asking whether player wants to buy:
+SetAndStartDialog(_Offender,_Owner,_Dialog);
+
+PROC
+ProcessTheftEvent((CHARACTER)_Offender,_,_)
+THEN
+NOT TheftInsideShop(_Offender,1);		// cleanup
+
+// For in case _Dialog is used as the default dialog of the shop keeper, the thievery events need to be
+// cleared:
+IF
+DialogEnded(_Dialog,_Instance)
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+AND
+DB_DialogNPCs(_Instance,_Owner,1)
+AND
+DB_ShopRegion(_,_,_Owner,_Dialog)
+THEN
+Thievery_ClearGeneralDialogEvents(_Player,1);
+
+//////////////////////////////////////////////////////////////////////////////////////
+PROC
+Thievery_ClearGeneralDialogEvents((CHARACTER)_Character,1)
+THEN
+SetAndRememberDialogEvent(_Character,"EVENT_thievery_player_stole_one_item",0);
+SetAndRememberDialogEvent(_Character,"EVENT_thievery_player_stole_many_items",0);
+
+// SetAndRememberDialogEvent(DIALOG_EVENT_thievery_player_stole_one_item,...);
+// SetAndRememberDialogEvent(DIALOG_EVENT_thievery_player_stole_many_items,...);
+PROC
+Thievery_SetGeneralDialogEvents((CHARACTER)_Character,1)
+AND
+DB_ObjectStolen(_Character,_,_,_)
+THEN
+SetAndRememberDialogEvent(_Character,"EVENT_thievery_player_stole_one_item",1);
+
+PROC
+Thievery_SetGeneralDialogEvents((CHARACTER)_Character,1)
+AND
+GeneratedObjectStolen(_Character,_)
+THEN
+SetAndRememberDialogEvent(_Character,"EVENT_thievery_player_stole_one_item",1);
+
+PROC	
+Thievery_SetGeneralDialogEvents((CHARACTER)_Character,1)
+AND
+ObjectClassStolen(_Character,_,1,_,_)
+THEN
+SetAndRememberDialogEvent(_Character,"EVENT_thievery_player_stole_one_item",1);
+
+PROC
+Thievery_SetGeneralDialogEvents((CHARACTER)_Character,1)
+AND
+ObjectClassStolen(_Character,_,_Amount,_,_)
+AND
+_Amount != 1
+THEN
+SetAndRememberDialogEvent(_Character,"EVENT_thievery_player_stole_many_items",1);
+
+//////////////////////////////////////////////////////////////////////////////////////
+// ProcessTheft/2
+
+// 1) decide how to react:
+
+// 1.1) assert involvment
+// if own object stolen: max involvment
+
+PROC
+ProcessTheft((CHARACTER)_Character,(CHARACTER)_Spotter,(CHARACTER)_Owner)
+THEN
+DB_CrimeInProgress(_Character,_Spotter,"Stealing");
+
+IF
+DialogEnded(_Dialog,_Inst)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+AND
+ArrestThiefDialog(_Npc,_Dialog)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_CrimeInProgress(_Player,_SpotNpc,"Stealing")
+THEN
+NOT DB_CrimeInProgress(_Player,_SpotNpc,"Stealing");
+
+PROC
+DoDisgustedAction((CHARACTER)_Player,(CHARACTER)_Npc,(INTEGER)_) 
+AND
+DB_CrimeInProgress(_Player,_Npc,"Stealing")
+THEN
+NOT DB_CrimeInProgress(_Player,_Npc,"Stealing");
+
+IF
+DialogEnded(_Dialog,_Inst)
+AND
+DB_ThiefCrimeDialog(_Dialog)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_CrimeInProgress(_Player,_Npc,"Stealing")
+THEN
+NOT DB_CrimeInProgress(_Player,_Npc,"Stealing");
+
+
+PROC
+ProcessTheft((CHARACTER)_Character,(CHARACTER)_Owner,(CHARACTER)_Owner)
+THEN
+InvolvmentTheft(_Character,100);
+InvolvmentAsserted(_Character,1);
+
+// if somebody else's object stolen: Relation/3 defines involvment
+PROC
+ProcessTheft((CHARACTER)_Character,_Spotter,_Owner)
+AND
+NOT InvolvmentAsserted(_Character,1)
+AND
+Relation(_Spotter,_Owner,(INTEGER)_R)
+AND
+_R >= 90	//TODO DEFINE ATTITUDE_BEST_FRIEND
+THEN
+StealingFromSpottersBestFriend(_Character,1);
+ 
+PROC
+ProcessTheft((CHARACTER)_Character,_Spotter,_Owner)
+AND 
+NOT InvolvmentAsserted(_Character,1)
+AND
+Relation(_Spotter,_Owner,(INTEGER)_R)
+AND
+IntegerDivide(_R,2,_I)		// cfr. AccordingAlignmentValue
+THEN	
+InvolvmentTheft(_Character,_I);
+InvolvmentAsserted(_Character,1);
+
+// if not own object and not a relation with owner: check alignment relation:
+PROC
+ProcessTheft((CHARACTER)_Character,_Spotter,_Owner)
+AND
+NOT InvolvmentAsserted(_Character,1)
+AND
+CharacterGetRelationToCharacter(_Spotter,_Owner,_Alignment)
+THEN
+ReactOnTheft_AccordingAlignmentValue(_Character,_Alignment);
+
+// Helper function
+//PROC	ReactOnTheft_AccordingAlignmentValue(100)
+//THEN	StealingFromSpottersBestFriend(1);		// this is too strong
+PROC
+ReactOnTheft_AccordingAlignmentValue((CHARACTER)_Character,(INTEGER)_Alignment)
+AND
+_Alignment > 25
+AND
+IntegerDivide(_Alignment,2,_I)		// cfr. Relation
+THEN
+InvolvmentTheft(_Character,_I);
+InvolvmentAsserted(_Character,1);
+
+PROC
+ReactOnTheft_AccordingAlignmentValue((CHARACTER)_Character,_Alignment) 
+AND
+NOT InvolvmentAsserted(_Character,1)
+THEN
+InvolvmentTheft(_Character,0);
+InvolvmentAsserted(_Character,1);
+
+// at this moment, InvolvmentTheft/1 is always asserted and between -50 and +100
+// add thievery relation bonus:
+PROC
+ProcessTheft((CHARACTER)_Character,_Spotter,_)
+AND
+PlayerHasThievesRelationWith(_Character,_Spotter)
+AND
+InvolvmentTheft(_Character,_I) 
+AND
+IntegerSubtract(_I,26,_NewI)
+THEN
+NOT InvolvmentTheft(_Character,_I);
+InvolvmentTheft(_Character,_NewI);
+
+// at this moment, InvolvmentTheft/1 is always asserted and between -75 and +100
+// calculate tempered involvment:
+PROC
+ProcessTheft((CHARACTER)_Character,_Spotter,_)
+THEN
+TemperInvolvmentAccordingValue(_Character,_Spotter);
+
+// 1.2) react:
+
+PROC
+RegisterTheft((CHARACTER)_Player)
+THEN
+DB_Noop(1);
+
+PROC
+ProcessTheft((CHARACTER)_Character,_Spotter,_Owner)
+AND
+TemperedInvolvmentTheft(_Character,(INTEGER)_TI)
+AND
+_TI >= 0
+THEN
+DisapproveTheft(_Character,_Spotter,_Owner,_TI);
+RegisterTheft(_Character);
+
+PROC
+ProcessTheft((CHARACTER)_Character,_Spotter,_Owner)
+AND
+TemperedInvolvmentTheft(_Character,_TI)
+AND
+_TI < 0
+AND
+IntegerProduct(_TI,-1,_MTI)
+THEN
+ApproveTheft(_Character,_Spotter,_Owner,_MTI);
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+//
+// PROC TemperInvolvmentAccordingValue(_Spotter)
+//
+// Temper the involvment and assert the result as TemperedInvolvmentTheft
+//
+
+// OVERRULING: firing one time per game:
+PROC
+TemperInvolvmentAccordingValue((CHARACTER)_Character,(CHARACTER)_Spotter)
+AND
+NOT PlayerAlreadyStoleInThisGame(_Character,1)
+THEN
+PlayerAlreadyStoleInThisGame(_Character,1);
+TemperedInvolvmentTheft(_Character,10);
+TemperedInvolvmentAsserted(_Character,1);
+
+// if approving theft: do not temper reaction
+PROC
+TemperInvolvmentAccordingValue((CHARACTER)_Character,(CHARACTER)_Spotter)
+AND
+NOT TemperedInvolvmentAsserted(_Character,1)
+AND
+InvolvmentTheft(_Character,_Involvment)
+AND
+_Involvment < 0
+THEN
+TemperedInvolvmentTheft(_Character,_Involvment);
+TemperedInvolvmentAsserted(_Character,1);
+
+// do not temper reaction if stealing of one of my best friends:
+PROC
+TemperInvolvmentAccordingValue((CHARACTER)_Character,(CHARACTER)_Spotter)
+AND
+NOT TemperedInvolvmentAsserted(_Character,1)
+AND
+StealingFromSpottersBestFriend(_Character,1)
+AND
+InvolvmentTheft(_Character,_Involvment)
+THEN
+TemperedInvolvmentTheft(_Character,_Involvment);
+TemperedInvolvmentAsserted(_Character,1);
+
+// If the item has personal value: react with full involvment.
+// (So, not applicable for an objectclass being stolen.)
+PROC
+TemperInvolvmentAccordingValue((CHARACTER)_Character,(CHARACTER)_Spotter)
+AND
+NOT TemperedInvolvmentAsserted(_Character,1)
+AND
+DB_ObjectStolen(_Character,_Object,_,_) 
+AND
+PersonalValue(_Spotter,_Object) 
+AND
+InvolvmentTheft(_Character,_Involvment)
+THEN
+TemperedInvolvmentTheft(_Character,_Involvment);
+TemperedInvolvmentAsserted(_Character,1);
+
+// Else, if the item(s) stolen are considered expensive: react with full involvment
+PROC	
+TemperInvolvmentAccordingValue((CHARACTER)_Character,(CHARACTER)_Spotter)
+AND
+NOT TemperedInvolvmentAsserted(_Character,1)
+AND
+DB_ValueStolen(_Character,_Value)
+AND
+DB_CharacterStats(_Spotter,_,_,_ValueExpensive)
+AND
+_Value >= _ValueExpensive 
+AND
+InvolvmentTheft(_Character,_Involvment)
+THEN
+TemperedInvolvmentTheft(_Character,_Involvment);
+TemperedInvolvmentAsserted(_Character,1);
+
+// Else, if the item(s) stolen are considered not cheap: react with 1/3rd of the involvment
+PROC
+TemperInvolvmentAccordingValue((CHARACTER)_Character,(CHARACTER)_Spotter)
+AND
+NOT TemperedInvolvmentAsserted(_Character,1)
+AND
+DB_ValueStolen(_Character,_Value)
+AND
+DB_CharacterStats(_Spotter,_,_ValueCheap,_) 
+AND
+_Value > _ValueCheap 
+AND
+InvolvmentTheft(_Character,_Involvment) 
+AND
+IntegerDivide(_Involvment,3,_TI)
+THEN
+TemperedInvolvmentTheft(_Character,_TI);
+TemperedInvolvmentAsserted(_Character,1);
+
+// Else: react with 1/10th of the involvment
+// (i.e. when cheap item, not with personal value, and not from best friend
+PROC
+TemperInvolvmentAccordingValue((CHARACTER)_Character,(CHARACTER)_Spotter)
+AND
+NOT TemperedInvolvmentAsserted(_Character,1)
+AND
+InvolvmentTheft(_Character,_Involvment)
+AND
+IntegerDivide(_Involvment,10,_TI)
+THEN	
+TemperedInvolvmentTheft(_Character,_TI);
+
+// here, TemperedInvolvmentTheft is always asserted. Strenghten reaction for famous objects:
+PROC
+TemperInvolvmentAccordingValue((CHARACTER)_Character,(CHARACTER)_Spotter)
+AND
+DB_BonusFame(_Character,_Bonus) 
+AND
+TemperedInvolvmentTheft(_Character,_TI)
+AND
+_TI > 0
+AND
+IntegerSum(_TI,_Bonus,_NewTI)
+THEN
+NOT TemperedInvolvmentTheft(_Character,_TI);
+TemperedInvolvmentTheft(_Character,_NewTI);
+
+PROC
+TemperInvolvmentAccordingValue((CHARACTER)_Character,(CHARACTER)_Spotter)
+AND 
+DB_BonusFame(_Character,_Bonus)
+AND
+TemperedInvolvmentTheft(_Character,_TI) 
+AND 
+_TI < 0 
+AND
+IntegerSubtract(_TI,_Bonus,_NewTI)
+THEN
+NOT TemperedInvolvmentTheft(_Character,_TI);
+TemperedInvolvmentTheft(_Character,_NewTI);
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
+//
+// Delete all facts that are one-time used by this goal to assert reaction on 1 theft:
+
+PROC 
+DeleteThieveryFacts((CHARACTER)_Character,1)
+AND 
+DB_ValueStolen(_Character,(INTEGER)_Value)
+THEN
+NOT DB_ValueStolen(_Character,_Value);
+
+PROC 
+DeleteThieveryFacts((CHARACTER)_Character,1)
+AND
+DB_ObjectStolen(_Character,(ITEM)_Object,(INTEGER)_Handle,(INTEGER)_ContainerHandle)
+THEN
+NOT DB_ObjectStolen(_Character,_Object,_Handle,_ContainerHandle);
+
+PROC 
+DeleteThieveryFacts((CHARACTER)_Character,1)
+AND 
+GeneratedObjectStolen(_Character,(INTEGER)_ObjectID)
+THEN
+NOT GeneratedObjectStolen(_Character,_ObjectID);
+
+/*PROC
+DeleteThieveryFacts((CHARACTER)_Player,1)
+AND
+DB_StoleFrom(_Player,_Spotter,_Owner,_Val)
+THEN
+DB_StoleFrom(_Player,_Spotter,_Owner,_Val);
+*/
+
+PROC 
+DeleteThieveryFacts((CHARACTER)_Character,1)
+AND
+ObjectClassStolen(_Character,(STRING)_ObjectClass,(INTEGER)_Amount,(INTEGER)_Handle,(INTEGER)_Container)
+THEN
+NOT ObjectClassStolen(_Character,_ObjectClass,_Amount,_Handle,_Container);
+
+PROC 
+DeleteThieveryFacts((CHARACTER)_Character,1)
+AND
+DB_BonusFame(_Character,(INTEGER)_Fame)
+THEN 
+NOT DB_BonusFame(_Character,_Fame);
+
+PROC
+DeleteThieveryFacts((CHARACTER)_Character,1)
+AND
+OwnerStolenGoods(_Character,(CHARACTER)_Npc)
+THEN
+NOT OwnerStolenGoods(_Character,_Npc);
+
+PROC 
+DeleteThieveryFacts((CHARACTER)_Character,1) 
+AND
+InvolvmentTheft(_Character,(INTEGER)_Involvment)
+THEN 
+NOT InvolvmentTheft(_Character,(INTEGER)_Involvment);
+
+PROC
+DeleteThieveryFacts((CHARACTER)_Character,1)
+AND
+TemperedInvolvmentTheft(_Character,(INTEGER)_Involvment)
+THEN 
+NOT TemperedInvolvmentTheft(_Character,(INTEGER)_Involvment);
+
+PROC 
+DeleteThieveryFacts((CHARACTER)_Character,1)
+THEN
+NOT InvolvmentAsserted(_Character,1);
+NOT TemperedInvolvmentAsserted(_Character,1);
+NOT DB_ObjectTheft_ByEvidence(_Character,1);
+NOT StealingFromSpottersBestFriend(_Character,1);
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
+// Some special rules to prevent that the player steals many items by dragging them outside the shop
+//
+
+IF
+CharacterSpottedItemTemplateMoved_Redhanded(_Dropper,_,_Owner,_,_CrimeID)
+AND
+NOT NoStealingReaction(_Owner)
+AND
+DB_Combat(_Owner,_ID)
+AND
+CharacterIsTagged(_Owner,"Animal",0)
+AND
+NOT DB_Combat(_Dropper,_ID)
+AND
+CharacterCanSeeCharacter(_Owner,_Dropper,1)
+AND
+NOT DB_CrimeHandled(_Dropper,_CrimeID)
+THEN
+DB_CrimeHandled(_Dropper,_CrimeID);
+ProcMakeNPCHostile(_Dropper,_Owner);
+
+IF
+CharacterSpottedItemTemplateMoved_Redhanded(_Dropper,_,_Owner,_,_CrimeID)
+AND
+NOT NoStealingReaction(_Owner)
+AND
+NOT DB_Combat(_Owner,_)
+AND
+NOT DB_NoDefaultBehavior(_Owner)
+AND
+CharacterIsTagged(_Owner,"Animal",0)
+AND
+NOT _Owner.DB_IsPlayer()
+AND
+NOT DB_ShopRegion(_,_,_Owner,_)
+AND
+CharacterCanSeeCharacter(_Owner,_Dropper,1)
+AND
+NOT DB_NoDefaultBehavior(_Owner)
+AND
+NOT DB_CrimeHandled(_Dropper,_CrimeID)
+THEN
+DB_CrimeHandled(_Dropper,_CrimeID);
+DeleteThieveryFacts(_Dropper,1);			
+ProcMoveCheckCrime(_Dropper,_Owner);
+
+PROC
+ProcMoveCheckCrime((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_CrimeInProgress(_OtherPlayer,_Npc,_)
+AND
+_Player!=_OtherPlayer
+THEN
+DB_DoMoveCrimeInterrupt(1);
+
+PROC
+ProcMoveCheckCrime((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_CrimeInProgress(_,_Npc,_Reason)
+AND
+_Reason!="Moving"
+THEN
+DB_DoMoveCrimeInterrupt(1);
+
+PROC
+ProcMoveCheckCrime((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_DoMoveCrimeInterrupt(1)
+THEN
+ProcHandleCrimeInterrupt(_Player,_Npc);
+
+PROC
+ProcMoveCheckCrime((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT DB_DoMoveCrimeInterrupt(1)
+THEN
+ProcWarnPlayerOfMovingStuff(_Player,_Npc);
+
+PROC
+ProcWarnPlayerOfMovingStuff((CHARACTER)_Player,(CHARACTER)_Npc)
+THEN
+DB_CrimeInProgress(_Player,_Npc,"Moving");
+
+PROC
+ProcWarnPlayerOfMovingStuff((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT DB_MoveWarnings(_Player,_Npc,_)
+THEN
+DB_MoveWarnings(_Player,_Npc,0);
+
+PROC
+ProcWarnPlayerOfMovingStuff((CHARACTER)_Player,(CHARACTER)_Npc)
+THEN
+DecreaseAttitude(_Player,_Npc,10);
+
+PROC
+ProcWarnPlayerOfMovingStuff((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_MoveWarnings(_Player,_Npc,_Warns)
+AND
+IntegerSum(_Warns,1,_New)
+THEN
+NOT DB_MoveWarnings(_Player,_Npc,_Warns);
+DB_MoveWarnings(_Player,_Npc,_New);
+
+PROC
+PreStartDialog((CHARACTER)_Player,(CHARACTER)_Npc,"Default_DontMoveMyStuff")
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_MovingWasWarnedBefore",0);
+SetAndRememberDialogEvent(_Player,"EVENT_MovingCallingGuards",0);
+
+
+PROC
+PreStartDialog((CHARACTER)_Player,(CHARACTER)_Npc,"Default_DontMoveMyStuff")
+AND
+DB_MoveWarnings(_Player,_Npc,_Warns)
+AND
+_Warns>1
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_MovingWasWarnedBefore",1);
+
+PROC
+PreStartDialog((CHARACTER)_Player,(CHARACTER)_Npc,"Default_DontMoveMyStuff")
+AND
+DB_MoveWarnings(_Player,_Npc,_Warns)
+AND
+_Warns>2
+AND
+DB_InRegion(_Player,_Region)
+AND
+GuardedRegion(_Region,_,_,_) 
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_MovingCallingGuards",1);
+
+IF
+DialogEnded("Default_DontMoveMyStuff",_Inst)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+THEN
+NOT DB_CrimeInProgress(_Player,_Npc,"Moving");
+
+PROC
+ProcWarnPlayerOfMovingStuff((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_MoveWarnings(_Player,_Npc,_Warns)	
+AND
+_Warns<=2
+THEN
+ProcLaunchOverheadDialogReplacement(_Npc);
+SetAndStartDialog(_Player,_Npc,"Default_DontMoveMyStuff");
+
+PROC
+ProcWarnPlayerOfMovingStuff((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_MoveWarnings(_Player,_Npc,_Warns)	
+AND
+_Warns>2
+THEN	
+DialogRequestStopForCharacter(_Npc);
+NOT _Npc.DB_IsInDialog();
+NOT DB_NpcGotHelp(_Npc);
+ProcCheckIfHostile(_Player,_Npc);
+ProcCallGuardsIfNotHostile(_Player,_Npc);
+
+PROC
+ProcWarnPlayerOfMovingStuff((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_MoveWarnings(_Player,_Npc,_Warns)	
+AND
+_Warns>2
+AND
+DB_NpcGotHelp(_Npc)
+THEN
+ProcLaunchOverheadDialogReplacement(_Npc);
+SetAndStartDialog(_Player,_Npc,"Default_DontMoveMyStuff");
+
+IF		
+DialogEnded("Default_DontMoveMyStuff",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+AND
+DB_MoveWarnings(_Player,_Npc,_Warns)	
+AND
+_Warns>2
+AND
+DB_NpcGotHelp(_Npc)
+THEN	
+ProcCheckGuardsShowedUp(_Player,_Npc);
+NOT DB_NpcGotHelp(_Npc);
+
+
+//failed to call guards, so go hostile
+PROC
+ProcWarnPlayerOfMovingStuff((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_MoveWarnings(_Player,_Npc,_Warns)	
+AND
+_Warns>2
+AND
+NOT DB_NpcGotHelp(_Npc)
+THEN
+NOT OverrideGuardDialog(_Player,"Called_Guard_Disturb_peace");	
+ProcLaunchOverheadDialogReplacement(_Npc);
+ProcStartAttackDialog(_Player,_Npc,"I_attack_you");
+
+IF
+CharacterSpottedItemTemplateMoved_Redhanded(_Dropper,_,_ShopOwner,_,_CrimeID)
+AND
+NOT NoStealingReaction(_ShopOwner)
+AND
+NOT _ShopOwner.DB_IsPlayer()
+AND
+NOT DB_NoDefaultBehavior(_ShopOwner)
+AND
+CharacterIsTagged(_ShopOwner,"Animal",0)
+AND
+DB_Combat(_ShopOwner,_ID)
+AND
+NOT DB_Combat(_Dropper,_ID)
+AND
+DB_ShopRegion(_,_,_ShopOwner,_)
+AND
+CharacterCanSeeCharacter(_ShopOwner,_Dropper,1)
+AND
+NOT DB_CrimeHandled(_Dropper,_CrimeID)
+THEN
+DB_CrimeHandled(_Dropper,_CrimeID);
+ProcMakeNPCHostile(_Dropper,_ShopOwner);
+
+IF
+CharacterSpottedItemTemplateMoved_Redhanded(_Dropper,_,_ShopOwner,_,_CrimeID)
+AND
+NOT NoStealingReaction(_ShopOwner)
+AND
+NOT _ShopOwner.DB_IsPlayer()
+AND
+NOT DB_NoDefaultBehavior(_ShopOwner)
+AND
+NOT DB_Combat(_ShopOwner,_)
+AND
+DB_ShopRegion(_,_,_ShopOwner,_)
+AND
+CharacterCanSeeCharacter(_ShopOwner,_Dropper,1)
+AND
+NOT DB_CrimeHandled(_Dropper,_CrimeID)
+THEN
+DB_CrimeHandled(_Dropper,_CrimeID);
+DeleteThieveryFacts(_Dropper,1);						
+// Since MOVING an object is not really a theft (the player will
+// not end up with any object in his back pack), we have to reset
+// the thievery facts from a previous theft
+// (all this for in case DIALOG_ShopOwner_DontMoveMyStuff causes the guards to come)
+ProcLaunchOverheadDialogReplacement(_ShopOwner);
+SetAndStartDialog(_Dropper,_ShopOwner,"ShopOwner_DontMoveMyStuff");
+
+
+//
+PROC
+PreStartDialog((CHARACTER)_Player,(CHARACTER)_ShopOwner,"ShopOwner_DontMoveMyStuff")
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_shop_moved_stuff_warn_friendly_1",0);
+SetAndRememberDialogEvent(_Player,"EVENT_shop_moved_stuff_warn_friendly_2",0);
+SetAndRememberDialogEvent(_Player,"EVENT_shop_moved_stuff_warn_friendly_3",0);
+SetAndRememberDialogEvent(_Player,"EVENT_shop_moved_stuff_warn_unfriendly_1",0);
+SetAndRememberDialogEvent(_Player,"EVENT_shop_moved_stuff_warn_unfriendly_2",0);
+SetAndRememberDialogEvent(_Player,"EVENT_shop_moved_stuff_warn_no_guards_1",0);
+SetAndRememberDialogEvent(_Player,"EVENT_shop_moved_stuff_warn_no_guards_2",0);
+
+
+PROC
+PreStartDialog((CHARACTER)_Player,(CHARACTER)_ShopOwner,"ShopOwner_DontMoveMyStuff")
+THEN
+NOT ShopOwnerInGuardedRegion(_Player,1);
+
+PROC
+PreStartDialog((CHARACTER)_Player,(CHARACTER)_ShopOwner,"ShopOwner_DontMoveMyStuff")
+AND
+DB_InRegion(_Player,(TRIGGER)_Region)
+AND
+GuardedRegion(_Region,(TRIGGER)_,(STRING)_,(STRING)_)
+THEN
+ShopOwnerInGuardedRegion(_Player,1);
+
+PROC
+PreStartDialog((CHARACTER)_Player,(CHARACTER)_ShopOwner,"ShopOwner_DontMoveMyStuff")
+AND
+NOT ShopOwnerWarnedNotToMoveItems(_Player,_ShopOwner,_)
+THEN
+ShopOwnerWarnedNotToMoveItems(_Player,_ShopOwner,0);
+
+PROC
+PreStartDialog((CHARACTER)_Player,(CHARACTER)_ShopOwner,"ShopOwner_DontMoveMyStuff")
+AND
+ShopOwnerWarnedNotToMoveItems(_Player,_ShopOwner,_NTimes)
+THEN
+ShopOwnerWarnsNotToMoveItems(_Player,_ShopOwner,_NTimes);
+
+PROC
+ShopOwnerWarnsNotToMoveItems((CHARACTER)_Player,(CHARACTER)_ShopOwner,(INTEGER)_NTimes)
+AND
+ShopOwnerInGuardedRegion(_Player,1) 
+AND
+NOT _ShopOwner.DoesNotWantToTrade(_Player)
+THEN	
+ShopOwnerWarnsNotToMoveItems_Friendly_Guarded(_Player,_ShopOwner,_NTimes);
+
+PROC
+ShopOwnerWarnsNotToMoveItems_Friendly_Guarded((CHARACTER)_Player,(CHARACTER)_ShopOwner,0)
+THEN	
+SetAndRememberDialogEvent(_Player,"EVENT_shop_moved_stuff_warn_friendly_1",1);
+
+PROC
+ShopOwnerWarnsNotToMoveItems_Friendly_Guarded((CHARACTER)_Player,(CHARACTER)_ShopOwner,1)
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_shop_moved_stuff_warn_friendly_2",1);
+
+PROC	
+ShopOwnerWarnsNotToMoveItems_Friendly_Guarded((CHARACTER)_Player,(CHARACTER)_ShopOwner,_I)
+AND
+_I >= 2
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_shop_moved_stuff_warn_friendly_3",1);
+
+PROC
+ShopOwnerWarnsNotToMoveItems((CHARACTER)_Player,(CHARACTER)_ShopOwner,(INTEGER)_NTimes)
+AND
+ShopOwnerInGuardedRegion(_Player,1) 
+AND
+_ShopOwner.DoesNotWantToTrade(_Player)
+THEN
+ShopOwnerWarnsNotToMoveItems_Unfriendly_Guarded(_Player,_ShopOwner,_NTimes);
+
+PROC
+ShopOwnerWarnsNotToMoveItems_Unfriendly_Guarded((CHARACTER)_Player,(CHARACTER)_ShopOwner,0)
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_shop_moved_stuff_warn_unfriendly_1",1);
+
+PROC
+ShopOwnerWarnsNotToMoveItems_Unfriendly_Guarded((CHARACTER)_Player,(CHARACTER)_ShopOwner,_I)
+AND
+_I >= 1
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_shop_moved_stuff_warn_unfriendly_2",1);
+	
+PROC
+ShopOwnerWarnsNotToMoveItems((CHARACTER)_Player,(CHARACTER)_ShopOwner,(INTEGER)_NTimes)
+AND
+NOT ShopOwnerInGuardedRegion(_Player,1)
+THEN
+ShopOwnerWarnsNotToMoveItems_NoGuards(_Player,_ShopOwner,_NTimes);
+
+PROC
+ShopOwnerWarnsNotToMoveItems_NoGuards((CHARACTER)_Player,(CHARACTER)_ShopOwner,0)
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_shop_moved_stuff_warn_no_guards_1",1);
+
+PROC
+ShopOwnerWarnsNotToMoveItems_NoGuards((CHARACTER)_Player,(CHARACTER)_ShopOwner,_I) 
+AND
+_I >= 1
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_shop_moved_stuff_warn_no_guards_2",1);
+
+// decrease attitude if warned more than once:
+PROC
+ShopOwnerWarnsNotToMoveItems((CHARACTER)_Player,(CHARACTER)_ShopOwner,(INTEGER)_NTimes)
+AND
+_NTimes > 0
+AND
+DB_CharacterStats(_ShopOwner,_ToleranceThievery,_,_) 
+AND
+_ToleranceThievery < 0
+THEN
+IncreaseAttitude(_Player,_ShopOwner,_ToleranceThievery);
+DecreaseToleranceThievery(_ShopOwner,10);
+
+// increment counter:
+PROC
+ShopOwnerWarnsNotToMoveItems((CHARACTER)_Player,(CHARACTER)_ShopOwner,(INTEGER)_NTimes)
+AND
+IntegerSum(_NTimes,1,_NTimesP1)
+THEN
+NOT ShopOwnerWarnedNotToMoveItems(_Player,_ShopOwner,_NTimes);
+ShopOwnerWarnedNotToMoveItems(_Player,_ShopOwner,_NTimesP1);
+
+// Keep track of cooled down per npc:
+IF
+DialogEnded(_,_Instance)
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+AND
+DB_DialogNPCs(_Instance,_Npc,1)
+AND
+DialogConditionTrue(_Player,"EVENT_shop_keeper_cooled_down")
+THEN
+ShopkeeperCooledDown(_Player,_Npc);
+
+IF
+DialogEnded(_,_Instance)
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+AND
+DB_DialogNPCs(_Instance,_Npc,1)
+AND
+NOT DialogConditionTrue(_Player,"EVENT_shop_keeper_cooled_down")
+THEN
+NOT ShopkeeperCooledDown(_Player,_Npc);
+
+IF
+DialogEnded(_,_Instance)
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_shop_keeper_cooled_down",0);
+
+PROC
+PreStartDialog((CHARACTER)_Player,_Npc,_) 
+AND
+ShopkeeperCooledDown(_Player,_Npc)
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_shop_keeper_cooled_down",1);
+EXITSECTION
+
+ENDEXITSECTION

@@ -1,0 +1,154 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Dialogs(CHARACTER_CYS_GreavingOrc,"CYS_GreavingOrc");
+
+//REGION SHOVEL LOGIC
+DB_ShovelRewardItemAppear("CYS_ShovelGrievingOrcBrother",ITEM_CYS_GreavingOrcDeadBrother,TRIGGER_CYS_ShovelGrievingOrcBrotherPoint);
+DB_ShovelRewardItemAppear("CYS_ShovelGrievingOrc1",ITEM_CYS_GreavingOrcShovel1,TRIGGER_CYS_ShovelGrievingOrc1Point);
+DB_ShovelRewardItemAppear("CYS_ShovelGrievingOrc2",ITEM_CYS_GreavingOrcShovel2,TRIGGER_CYS_ShovelGrievingOrc2Point);
+DB_ShovelRewardItemAppear("CYS_ShovelGrievingOrc3",ITEM_CYS_GreavingOrcShovel3,TRIGGER_CYS_ShovelGrievingOrc3Point);
+
+db_GreavingOrcGraves(TRIGGER_CYS_ShovelGrievingOrcBrother,"CYS_ShovelGrievingOrcBrother",ITEM_CYS_ShovelGrievingOrcBrotherDirt);
+db_GreavingOrcGraves(TRIGGER_CYS_ShovelGrievingOrc1,"CYS_ShovelGrievingOrc1",ITEM_CYS_ShovelGrievingOrc1Dirt);
+db_GreavingOrcGraves(TRIGGER_CYS_ShovelGrievingOrc2,"CYS_ShovelGrievingOrc2",ITEM_CYS_ShovelGrievingOrc2Dirt);
+db_GreavingOrcGraves(TRIGGER_CYS_ShovelGrievingOrc3,"CYS_ShovelGrievingOrc3",ITEM_CYS_ShovelGrievingOrc3Dirt);
+
+
+//END_REGION
+
+//REGION PLAYER COMMENTS
+
+DB_PlayerComment_Trigger(TRIGGER_CYS_Area_CommentBeachFight,"CYS_CommentBeachFight");
+
+DB_PlayerComments("CYS_CommentBeachFight", "CYS_CommentBeachFight_1_1",1,1);
+DB_PlayerComments("CYS_CommentBeachFight", "CYS_CommentBeachFight_2_1",2,1);
+DB_PlayerComments("CYS_CommentBeachFight", "CYS_CommentBeachFight_2_2",2,2);
+
+DB_PlayerComment_Trigger(TRIGGER_CYS_CommentOrcCamp,"CYS_CommentOrcCamp");
+
+DB_PlayerComments("CYS_CommentOrcCamp", "CYS_CommentOrcCamp_1_1",1,1);
+DB_PlayerComments("CYS_CommentOrcCamp", "CYS_CommentOrcCamp_2_1",2,1);
+DB_PlayerComments("CYS_CommentOrcCamp", "CYS_CommentOrcCamp_2_2",2,2);
+
+DB_PlayerComments("CYS_CommentOrcDiggingHint", "CYS_CommentOrcDiggingHint_1_1",1,1);
+DB_PlayerComments("CYS_CommentOrcDiggingHint", "CYS_CommentOrcDiggingHint_2_1",2,1);
+DB_PlayerComments("CYS_CommentOrcDiggingHint", "CYS_CommentOrcDiggingHint_2_2",2,2);
+
+DB_PlayerComments("CYS_CommentOrcDiggingHint_Peace", "CYS_CommentOrcDiggingHint_Peace_1_1",1,1);
+DB_PlayerComments("CYS_CommentOrcDiggingHint_Peace", "CYS_CommentOrcDiggingHint_Peace_2_1",2,1);
+DB_PlayerComments("CYS_CommentOrcDiggingHint_Peace", "CYS_CommentOrcDiggingHint_Peace_2_2",2,2);
+
+
+DB_IsNotMessingAround(CHARACTER_CYS_GreavingOrc);
+//END_REGION
+
+KBSECTION
+//REGION Go To Grave Brother
+IF
+GlobalEventSet("CYS_GreavingOrcToldAboutGraves")
+THEN
+CHARACTER_CYS_GreavingOrc.hadGraveExplanation();
+
+IF
+DialogEnded("CYS_GreavingOrc",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+CHARACTER_CYS_GreavingOrc.hadGraveExplanation()
+AND
+NOT DB_GlobalEvent("CYS_GreavingOrcLeftAlone") 
+THEN
+NOT CHARACTER_CYS_GreavingOrc.hadGraveExplanation();
+Launch_PlayerComment(_Player,"CYS_CommentOrcDiggingHint");
+
+IF
+DialogEnded("CYS_GreavingOrc",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+CHARACTER_CYS_GreavingOrc.hadGraveExplanation()
+AND
+DB_GlobalEvent("CYS_GreavingOrcLeftAlone") 
+THEN
+NOT CHARACTER_CYS_GreavingOrc.hadGraveExplanation();
+Launch_PlayerComment(_Player,"CYS_CommentOrcDiggingHint_Peace");
+
+IF
+DialogEnded("CYS_GreavingOrc",_)
+AND
+NOT CHARACTER_CYS_GreavingOrc.HasShownGrave()
+AND
+CharacterGetVarInteger(CHARACTER_CYS_GreavingOrc,"CYS_GreavingOrcShowsLocation",1)
+THEN
+CHARACTER_CYS_GreavingOrc.HasShownGrave();
+CharacterDisplayText(CHARACTER_CYS_GreavingOrc,"CYS_GreavingOrc_Story_01"); // Ok, I'll show you. Follow me.
+ProcCharacterMoveToTrigger(CHARACTER_CYS_GreavingOrc,TRIGGER_CYS_Point_GreavingOrcBrother,1,"CYS_GreavingOrcShowingGrave");
+CharacterSetHasDialog(CHARACTER_CYS_GreavingOrc,0);
+
+IF
+CharacterEvent(CHARACTER_CYS_GreavingOrc,"CYS_GreavingOrcShowingGrave")
+THEN
+CharacterDisplayText(CHARACTER_CYS_GreavingOrc,"CYS_GreavingOrc_Story_00"); // Here it is, at my feet. Don't step on it.
+CharacterSetHasDialog(CHARACTER_CYS_GreavingOrc,1);
+QuestUpdate("CYS_Grieving","Update2");
+QuestClose("CYS_Grieving");
+
+IF
+GlobalEventSet("CYS_FailedToConvinceGrievingOrc")
+THEN
+DecreaseAttitude(CHARACTER_Player1,CHARACTER_CYS_GreavingOrc,30);
+DecreaseAttitude(CHARACTER_Player2,CHARACTER_CYS_GreavingOrc,30);
+
+//END_REGION
+
+//REGION Shovel With Orc Still Alive
+IF
+CharacterEnteredCombat(CHARACTER_CYS_GreavingOrc,_)
+THEN
+ProcTriggerUnregisterForPlayers(TRIGGER_CYS_Area_GrievingTalk);
+
+IF
+db_GreavingOrcGraves(_Trigger,_Event,_Dirt)
+THEN
+DB_ShovelArea(_Trigger,_Event,_Dirt);
+
+IF
+CharacterUsedItemTemplate(_Player,"TOOL_Shovel_A_41486dd2-3fd5-464e-870e-844120cf0517",_)
+AND
+CharacterCanSeeCharacter(CHARACTER_CYS_GreavingOrc, _Player, 1)
+AND
+DB_InRegion(_Player,_Trigger)
+AND
+db_GreavingOrcGraves(_Trigger,_Event,_Dirt)
+AND
+NOT DB_Dead(CHARACTER_CYS_GreavingOrc)
+THEN
+NOT db_GreavingOrcGraves(_Trigger,_Event,_Dirt);
+CharacterDisplayText(CHARACTER_CYS_GreavingOrc,"CYS_GreavingOrc_Story_02"); //What do you think you are doing? You pay for this!
+ProcMakeNPCHostile(_Player,CHARACTER_CYS_GreavingOrc);
+
+IF
+CharacterUsedItem(_Player,_Dirt)
+AND
+db_GreavingOrcGraves(_Trigger,_Event,_Dirt)
+AND
+CharacterCanSeeCharacter(CHARACTER_CYS_GreavingOrc, _Player, 1)
+AND
+NOT DB_Dead(CHARACTER_CYS_GreavingOrc)
+THEN
+NOT db_GreavingOrcGraves(_Trigger,_Event,_Dirt);
+CharacterDisplayText(CHARACTER_CYS_GreavingOrc,"CYS_GreavingOrc_Story_02"); //What do you think you are doing? You pay for this!
+ProcMakeNPCHostile(_Player,CHARACTER_CYS_GreavingOrc);
+
+PROC
+ProcShovelRewards(_Player,"CYS_ShovelGrievingOrcBrother")
+THEN
+QuestUpdate("CYS_Greaving", "EndFallback");
+QuestClose("CYS_Grieving");
+//END_REGION
+
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

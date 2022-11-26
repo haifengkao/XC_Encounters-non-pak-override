@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<palette xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <palettes />
+  <objectids>
+    <guid>9a240004-c5da-409c-8357-914b4a586512</guid>
+    <guid>5b5c4201-9a7f-487b-aaaa-5ec15e325abf</guid>
+    <guid>9f8d96f7-cd0c-4f42-96be-70090684511c</guid>
+  </objectids>
+  <name>Gameplay</name>
+</palette>

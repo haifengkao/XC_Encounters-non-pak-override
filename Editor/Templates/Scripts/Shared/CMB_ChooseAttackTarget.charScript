@@ -1,0 +1,91 @@
+#INCLUDE Base
+
+INIT
+USING Base
+CHARACTER:__Me
+EXTERN INT:%meleePriorityTargetOne=100
+EXTERN COMPARE:%meleeFindHowTargetOne=Highest
+EXTERN COMPAREFUNC:%meleeFindWhatTargetOne=Vitality
+EXTERN SURFACE:%meleeSurfaceTargetOne=null
+EXTERN RELATION:%meleeRelationTargetOne=Enemy
+EXTERN FLOAT:%meleeHealthTargetOne=1
+EXTERN STATUS:%meleeStatusTargetOne=null
+
+EVENTS
+EVENT ChooseTargetTurnStart
+ON
+	OnTurn()
+ACTIONS
+	CharacterSetEnemy(__Me,null)
+
+EVENT ChooseTargetSetPriorities // because priority is an external var
+VARS
+	INT:_meleeTargetMovePriority=1
+ON
+    OnInit()
+ACTIONS
+	Subtract(%meleePriorityTargetOne,_meleeTargetMovePriority)
+    SetPriority("GetMoveToMeleeTargetOne",%meleePriorityTargetOne)
+	Add(%meleePriorityTargetOne,_meleeTargetMovePriority)
+    SetPriority("GetMeleeTargetOne",%meleePriorityTargetOne)
+	Add(%meleePriorityTargetOne,_meleeTargetMovePriority)
+    SetPriority("MoveToMeleeTargetOne",%meleePriorityTargetOne)
+	Add(%meleePriorityTargetOne,_meleeTargetMovePriority)
+    SetPriority("AttackMeleeTargetOne",%meleePriorityTargetOne)
+
+BEHAVIOUR
+REACTION AttackMeleeTargetOne,0 // if you already have a target set, and you can see it, attack it
+VARS
+    CHARACTER:_char
+    FLOAT:_hp
+USAGE COMBAT
+CHECK "c1&c2"
+	CharacterGetEnemy(_char,__Me)
+	CharacterCanSee(__Me,_char)
+ACTIONS
+	CharacterAttack(_char)
+	
+BEHAVIOUR
+REACTION MoveToMeleeTargetOne,0 // if you already have a target set, and you did not see it, move to it
+VARS
+    CHARACTER:_char
+    FLOAT:_hp
+USAGE COMBAT
+CHECK "c1"
+	CharacterGetEnemy(_char,__Me)
+ACTIONS
+	CharacterMoveTo(_char,1)
+
+REACTION GetMeleeTargetOne,0 // no target set, look for a target you can see, store it and attack
+VARS
+    CHARACTER:_char
+    FLOAT:_hp
+USAGE COMBAT
+CHECK "(c1|c2|c3|c4)&c5&!c6&!c7"
+    CharacterGet(_char,__Me,30,%meleeFindHowTargetOne,%meleeFindWhatTargetOne,%meleeRelationTargetOne,%meleeSurfaceTargetOne,%meleeStatusTargetOne,null,__Me)
+    CharacterGet(_char,__Me,30,%meleeFindHowTargetOne,%meleeFindWhatTargetOne,%meleeRelationTargetOne,null,%meleeStatusTargetOne,null,__Me)
+    CharacterGet(_char,__Me,30,%meleeFindHowTargetOne,%meleeFindWhatTargetOne,%meleeRelationTargetOne,%meleeSurfaceTargetOne,null,null,__Me)
+    CharacterGet(_char,__Me,30,%meleeFindHowTargetOne,%meleeFindWhatTargetOne,%meleeRelationTargetOne,null,null,null,__Me)
+    CharacterGetStat(_hp,_char,Vitality)
+    IsGreaterThen(_hp,%meleeHealthTargetOne)
+	CharacterHasTalent(_char,Stench)
+ACTIONS
+	CharacterSetEnemy(__Me,_char)
+	CharacterAttack(_char)
+
+REACTION GetMoveToMeleeTargetOne,0 // no target set, look for a target, store it and move to
+VARS
+    CHARACTER:_char
+    FLOAT:_hp
+USAGE COMBAT
+CHECK "(c1|c2|c3|c4)&c5&!c6&!c7"
+    CharacterGet(_char,__Me,30,%meleeFindHowTargetOne,%meleeFindWhatTargetOne,%meleeRelationTargetOne,%meleeSurfaceTargetOne,%meleeStatusTargetOne)
+    CharacterGet(_char,__Me,30,%meleeFindHowTargetOne,%meleeFindWhatTargetOne,%meleeRelationTargetOne,null,%meleeStatusTargetOne)
+    CharacterGet(_char,__Me,30,%meleeFindHowTargetOne,%meleeFindWhatTargetOne,%meleeRelationTargetOne,%meleeSurfaceTargetOne,null)
+    CharacterGet(_char,__Me,30,%meleeFindHowTargetOne,%meleeFindWhatTargetOne,%meleeRelationTargetOne,null,null)
+    CharacterGetStat(_hp,_char,Vitality)
+    IsGreaterThen(_hp,%meleeHealthTargetOne)
+	CharacterHasTalent(_char,Stench)
+ACTIONS
+	CharacterSetEnemy(__Me,_char)
+    CharacterMoveTo(_char,1)

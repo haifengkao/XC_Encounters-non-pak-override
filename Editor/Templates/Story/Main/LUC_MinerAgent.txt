@@ -1,0 +1,411 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Dialogs(CHARACTER_LUC_Nadia,"LUC_Nadia");
+DB_Dialogs(CHARACTER_LUC_Brian,"LUC_Brian");
+DB_Dialogs(CHARACTER_LUC_Lawrence,"LUC_Lawrence");
+DB_Dialogs(CHARACTER_LUC_Overseer,"LUC_Brandon");
+
+ItemOpen(ITEM_LUC_DoorMinerAgent);
+DB_OneShotPlayerTrigger(TRIGGER_LUC_Area_AD_LawrenceBrandon);
+
+DB_LUC_NadiaMiners(CHARACTER_LUC_Miner1,TRIGGER_LUC_PointMiner1,TRIGGER_LUC_PointMiner1_2);
+DB_LUC_NadiaMiners(CHARACTER_LUC_Miner2,TRIGGER_LUC_PointMiner2,TRIGGER_LUC_PointMiner2_2);
+DB_LUC_NadiaMiners(CHARACTER_LUC_Miner6,TRIGGER_LUC_PointMiner6,TRIGGER_LUC_PointMiner6_2);
+DB_LUC_NadiaMiners(CHARACTER_LUC_Miner7,TRIGGER_LUC_PointMiner7,TRIGGER_LUC_PointMiner7_2);
+
+ItemToContainer(ITEM_CYS_LawrenceGold,ITEM_CYS_LawrenceCorpse,-1);
+ItemToContainer(ITEM_CYS_LawrenceBook,ITEM_CYS_LawrenceCorpse,-1);
+ItemToContainer(ITEM_CYS_LawrenceNote,ITEM_CYS_LawrenceCorpse,-1);
+ItemToContainer(ITEM_CYS_LawrenceOre,ITEM_CYS_LawrenceCorpse,-1);
+ItemSetOnstage(ITEM_CYS_LawrenceCorpse,0);
+
+ItemToCharacter(ITEM_LUC_MiningOfficeLetter, CHARACTER_LUC_Overseer);
+
+DB_LUC_NadiaEndQuest("LUC_NadiaPartEnd");
+DB_LUC_NadiaEndQuest("LUC_LawrencePartEnd");
+DB_LUC_NadiaEndDone(0);
+
+DB_PlayerComments("LUC_CommentLawrenceDiedWilderness","LUC_CommentLawrenceDiedWilderness_1_1",1,1);
+DB_PlayerComments("LUC_CommentLawrenceDiedWilderness","LUC_CommentLawrenceDiedWilderness_2_1",2,1);
+DB_PlayerComments("LUC_CommentLawrenceDiedWilderness","LUC_CommentLawrenceDiedWilderness_2_2",2,2);
+
+DB_PlayerComments("LUC_CommentLawrenceDiedFromMob","LUC_CommentLawrenceDiedFromMob_1_1",1,1);
+DB_PlayerComments("LUC_CommentLawrenceDiedFromMob","LUC_CommentLawrenceDiedFromMob_2_1",2,1);
+DB_PlayerComments("LUC_CommentLawrenceDiedFromMob","LUC_CommentLawrenceDiedFromMob_2_2",2,2);
+KBSECTION
+//REGION INTRO
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,TRIGGER_LUC_Area_AD_LawrenceBrandon)
+THEN
+DialogStartTwoSpeakerDialog("LUC_AD_LawrenceBrandon",CHARACTER_LUC_Lawrence,CHARACTER_LUC_Overseer);
+
+IF
+AutomatedDialogEnded("LUC_AD_LawrenceBrandon",_)
+THEN
+CharacterSetVarFixedString(CHARACTER_LUC_Lawrence,"currentState","State_ActionManager");
+CharacterSetVarFixedString(CHARACTER_LUC_Overseer,"currentState","State_ActionManager");
+
+IF
+DialogEnded("LUC_Brandon", _)
+AND
+DB_GlobalEvent("LUC_KeepBlackRock")
+THEN
+ProcRemoveDialogEntryForSpeaker(CHARACTER_LUC_Overseer, "LUC_Brandon");
+CharacterDisappearOutOfSight(CHARACTER_LUC_Overseer,0,1,"",1);
+
+//END_REGION
+
+//REGION NADIA
+IF
+GlobalEventSet("LUC_PlayersKnowTruthAboutLawrence")
+AND
+CharacterGetVarInteger(CHARACTER_LUC_Nadia, "hasStartedQuest", 1)
+THEN
+QuestUpdate("LUC_LawrenceNadia", "LearnBrandonTruth");
+
+IF
+GlobalEventSet("LUC_PlayersKnowTruthAboutLawrence")
+AND
+CharacterGetVarInteger(CHARACTER_LUC_Nadia, "hasStartedQuest", 0)
+THEN
+QuestAdd("LUC_LawrenceNadia");
+QuestUpdate("LUC_LawrenceNadia", "StartBrandon");
+
+
+IF
+DialogEnded("LUC_Brandon", _Handle)
+AND
+DB_DialogPlayers(_Handle,_Player,1)
+AND
+CharacterGetVarInteger(_Player,"getMiningLetter",1)
+THEN
+ItemToCharacter(ITEM_LUC_MiningOfficeLetter, _Player);
+
+IF
+ItemAddedToCharacter(ITEM_LUC_MiningOfficeLetter, _Player)
+AND
+DB_IsPlayer(_Player)
+THEN
+GlobalSetEvent("LUC_HasMiningOfficeLetter");
+
+IF
+ItemRemovedFromCharacter(ITEM_LUC_MiningOfficeLetter, _Player)
+AND
+DB_IsPlayer(_Player)
+THEN
+GlobalClearEvent("LUC_HasMiningOfficeLetter");
+
+IF
+DialogCharacterEventSet("LUC_TakeMiningLetter",_Player,_)
+AND
+ItemIsInPartyInventory(ITEM_LUC_MiningOfficeLetter,_Player,1,1)
+THEN
+NOOP(1);
+
+IF
+DialogEnded("LUC_Nadia", _)
+AND
+CharacterGetVarInteger(CHARACTER_LUC_Nadia,"GoesToLawrence",1)
+THEN
+CharacterSetVarInteger(CHARACTER_LUC_Nadia,"GoesToLawrence",0);
+CharacterDisplayText(CHARACTER_LUC_Nadia,"LUC_Nadia_04");
+CharacterSetVarFixedString(CHARACTER_LUC_Nadia,"currentState","");
+CharacterSetHasDialog(CHARACTER_LUC_Nadia,0);
+CharacterMoveToCharacter(CHARACTER_LUC_Nadia,CHARACTER_LUC_Lawrence,1,"ArrivedAtLawrence",0);
+
+IF
+CharacterEvent(CHARACTER_LUC_Nadia,"ArrivedAtLawrence")
+AND
+DB_Dead(CHARACTER_LUC_Lawrence)
+THEN
+CharacterDisplayText(CHARACTER_LUC_Nadia, "LUC_NadiaSawLawrenceDead");
+
+IF
+CharacterDisplayTextEnded(CHARACTER_LUC_Nadia, "LUC_NadiaSawLawrenceDead")
+THEN
+ProcCharacterMoveToTrigger(CHARACTER_LUC_Nadia,TRIGGER_LUC_Ownership_Silverglen_Nadia_Shop,1,"backToShop");
+CharacterSetVarFixedString(CHARACTER_LUC_Nadia,"currentState","State_ActionManager");
+
+IF
+CharacterEvent(CHARACTER_LUC_Nadia,"ArrivedAtLawrence")
+AND
+NOT DB_Dead(CHARACTER_LUC_Lawrence)
+THEN
+ProcTriggerRegisterForPlayers(TRIGGER_LUC_AreaLawrence);
+CharacterSetHasDialog(CHARACTER_LUC_Lawrence,0);
+
+IF
+DB_InRegion(_Player,TRIGGER_LUC_AreaLawrence)
+AND
+NOT _Player.DB_IsInDialog()
+AND
+NOT CHARACTER_LUC_Nadia.DidLawrenceDialog()
+THEN
+CHARACTER_LUC_Nadia.DidLawrenceDialog();
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_AreaLawrence);
+PROC_MendatoryDialogThreeSpeaker("LUC_NadiaLawrence",CHARACTER_LUC_Nadia,CHARACTER_LUC_Lawrence,_Player);
+DB_IsNotMessingAround(CHARACTER_LUC_Nadia);
+DB_IsNotMessingAround(CHARACTER_LUC_Lawrence);
+
+IF
+DialogEnded("LUC_Lawrence", _ID)
+AND
+CharacterGetVarInteger(CHARACTER_LUC_Lawrence, "willFight", 1)
+AND
+DB_DialogPlayers(_ID,_Player,1)
+THEN
+DecreaseAttitude(CHARACTER_Player1, CHARACTER_LUC_Lawrence, 20);
+DecreaseAttitude(CHARACTER_Player2, CHARACTER_LUC_Lawrence, 20);
+
+IF
+CharacterDied(CHARACTER_LUC_Lawrence)
+THEN
+GlobalSetEvent("LUC_LawrenceIsDead");
+
+//END_REGION
+
+//REGION NADIA SHOUTS TRUTH
+IF
+DialogEnded("LUC_NadiaLawrence",_)
+THEN
+NOT DB_IsNotMessingAround(CHARACTER_LUC_Nadia);
+NOT DB_IsNotMessingAround(CHARACTER_LUC_Lawrence);
+
+IF
+DialogEnded("LUC_NadiaLawrence",_)
+AND
+CharacterGetVarInteger(CHARACTER_LUC_Lawrence, "getLynched", 1)
+THEN
+ProcCharacterMoveToTrigger(CHARACTER_LUC_Nadia,TRIGGER_LUC_PointNadiaStartShouting,1,"arrivedAtShoutingPoint");
+NOT DB_NPCHadDialog(CHARACTER_LUC_Nadia,1);
+
+IF
+DialogEnded("LUC_NadiaLawrence",_)
+AND
+CharacterGetVarInteger(CHARACTER_LUC_Lawrence, "StaysAlive", 1)
+THEN
+ProcCharacterMoveToTrigger(CHARACTER_LUC_Nadia,TRIGGER_LUC_Ownership_Silverglen_Nadia_Shop,1,"backToShop");
+CharacterSetHasDialog(CHARACTER_LUC_Lawrence, 1);
+
+IF
+CharacterEvent(CHARACTER_LUC_Nadia,"arrivedAtShoutingPoint")
+THEN
+CharacterSetVarFixedString(CHARACTER_LUC_Lawrence,"currentState","State_DuringNadiaSpeech");
+DialogStartOneSpeakerDialog("LUC_AD_NadiaShoutsTruth",CHARACTER_LUC_Nadia);
+
+IF
+AutomatedDialogStarted("LUC_AD_NadiaShoutsTruth",_) 
+AND
+DB_LUC_NadiaMiners(_Miner,_Point,_)
+THEN
+DialogRequestStopForCharacter(_Miner);
+CharacterSetHasDefaultDialog(_Miner,0);
+ProcCharacterMoveToTrigger(_Miner,_Point,1,"");
+CharacterSetVarFixedString(_Miner,"currentState","State_ListeningToNadia");
+
+IF
+CharacterAttackedByCharacter(CHARACTER_LUC_Nadia, _Player)
+AND
+CharacterGetVarFixedString(CHARACTER_LUC_Lawrence,"currentState","State_DuringNadiaSpeech")
+AND
+DB_LUC_NadiaMiners(_Miner,_,_)
+THEN
+DialogRequestStopForCharacter(_Miner);
+DialogRequestStopForCharacter(CHARACTER_LUC_Nadia);
+DialogRequestStopForCharacter(CHARACTER_LUC_Lawrence);
+GlobalSetEvent("LUC_NadiaSceneTurnedToMassacre");
+SetAttitudeToAtMax(_Player, CHARACTER_LUC_Nadia, -100);
+SetAttitudeToAtMax(_Player, CHARACTER_LUC_Lawrence, -100);
+
+IF
+CharacterAttackedByCharacter(CHARACTER_LUC_Lawrence, _Player)
+AND
+CharacterGetVarFixedString(CHARACTER_LUC_Lawrence,"currentState","State_DuringNadiaSpeech")
+AND
+DB_IsPlayer(_Player)
+AND
+DB_LUC_NadiaMiners(_Miner,_,_)
+THEN
+DialogRequestStopForCharacter(_Miner);
+DialogRequestStopForCharacter(CHARACTER_LUC_Nadia);
+DialogRequestStopForCharacter(CHARACTER_LUC_Lawrence);
+GlobalSetEvent("LUC_NadiaSceneTurnedToMassacre");
+SetAttitudeToAtMax(_Player, CHARACTER_LUC_Nadia, -100);
+SetAttitudeToAtMax(_Player, CHARACTER_LUC_Lawrence, -100);
+
+IF
+CharacterAttackedByCharacter(_Miner, _Player)
+AND
+CharacterGetVarFixedString(CHARACTER_LUC_Lawrence,"currentState","State_DuringNadiaSpeech")
+AND
+DB_LUC_NadiaMiners(_Miner,_,_)
+THEN
+DialogRequestStopForCharacter(_Miner);
+DialogRequestStopForCharacter(CHARACTER_LUC_Nadia);
+DialogRequestStopForCharacter(CHARACTER_LUC_Lawrence);
+GlobalSetEvent("LUC_NadiaSceneTurnedToMassacre");
+SetAttitudeToAtMax(_Player, CHARACTER_LUC_Nadia, -100);
+SetAttitudeToAtMax(_Player, CHARACTER_LUC_Lawrence, -100);
+
+
+//END_REGION
+
+//REGION MINERS KILL LAWRENCE
+IF
+AutomatedDialogEnded("LUC_AD_NadiaShoutsTruth",_)
+AND
+NOT DB_GlobalEvent("LUC_NadiaSceneTurnedToMassacre")
+THEN
+CharacterSetVarFixedString(CHARACTER_LUC_Nadia,"currentState","State_AfterLawrenceSpeech");
+CharacterDisplayText(CHARACTER_LUC_Miner6,"LUC_NadiaMiner_01");
+
+IF
+CharacterDisplayTextEnded(CHARACTER_LUC_Miner6,"LUC_NadiaMiner_01")
+AND
+NOT DB_GlobalEvent("LUC_NadiaSceneTurnedToMassacre")
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_LUC_Lawrence, _Player)
+AND
+CharacterGetDistanceToCharacter(CHARACTER_LUC_Lawrence, _Player, _Dist)
+AND
+_Dist <= 10
+THEN
+PROC_MendatoryDialogThreeSpeaker("LUC_LawrenceBegs", CHARACTER_LUC_Lawrence, CHARACTER_LUC_Miner6, _Player);
+
+IF
+CharacterDisplayTextEnded(CHARACTER_LUC_Miner6,"LUC_NadiaMiner_01")
+AND
+NOT DB_GlobalEvent("LUC_NadiaSceneTurnedToMassacre")
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_LUC_Lawrence, _Player)
+AND
+CharacterGetDistanceToCharacter(CHARACTER_LUC_Lawrence, _Player, _Dist)
+AND
+_Dist > 10
+THEN
+CHARACTER_LUC_Miner7.KillsLawrence();
+CharacterSetScriptframe(CHARACTER_LUC_Miner7,"KillLawrence");
+
+IF
+DialogEnded("LUC_LawrenceBegs",_)
+AND
+NOT DB_GlobalEvent("LUC_NadiaSceneTurnedToMassacre")
+AND
+CharacterGetVarInteger(CHARACTER_LUC_Lawrence, "willGoAway", 1)
+THEN
+CharacterDisappearOutOfSight(CHARACTER_LUC_Lawrence, 0, 1, "isGone", 1);
+ProcCharacterMoveToTrigger(CHARACTER_LUC_Nadia,TRIGGER_LUC_Ownership_Silverglen_Nadia_Shop,1,"backToShop");
+CharacterSetVarFixedString(CHARACTER_LUC_Nadia,"currentState","State_ActionManager");
+PROC_LUC_AfterLawrenceDeath();
+
+
+IF
+DialogEnded("LUC_LawrenceBegs",_)
+AND
+NOT DB_GlobalEvent("LUC_NadiaSceneTurnedToMassacre")
+AND
+CharacterGetVarInteger(CHARACTER_LUC_Lawrence, "willDieSoon", 1)
+THEN
+CHARACTER_LUC_Miner7.KillsLawrence();
+CharacterSetScriptframe(CHARACTER_LUC_Miner7,"KillLawrence");
+
+IF
+CharacterDied(CHARACTER_LUC_Lawrence)
+AND
+CharacterGetVarInteger(CHARACTER_LUC_Lawrence, "willDieSoon", 1)
+AND
+CharacterGetClosestPlayer(CHARACTER_LUC_Lawrence, _Player)
+THEN
+Launch_PlayerComment(_Player, "LUC_CommentLawrenceDiedFromMob");
+
+//END_REGION
+
+//REGION END QUEST
+IF
+CharacterDied(CHARACTER_LUC_Lawrence)
+AND
+CHARACTER_LUC_Miner7.KillsLawrence()
+THEN
+NOT CHARACTER_LUC_Miner7.KillsLawrence();
+CharacterDisplayText(CHARACTER_LUC_Miner7,"LUC_NadiaMiner_02");
+GlobalSetEvent("LUC_LawrenceDead");
+QuestClose("LUC_LawrenceNadia");
+
+IF
+CharacterDisplayTextEnded(CHARACTER_LUC_Miner7,"LUC_NadiaMiner_02")
+THEN
+ProcCharacterMoveToTrigger(CHARACTER_LUC_Nadia,TRIGGER_LUC_Ownership_Silverglen_Nadia_Shop,1,"backToShop");
+CharacterSetVarFixedString(CHARACTER_LUC_Nadia,"currentState","State_ActionManager");
+PROC_LUC_AfterLawrenceDeath();
+
+IF
+CharacterEvent(CHARACTER_LUC_Nadia,"backToShop")
+THEN
+CharacterSetHasDialog(CHARACTER_LUC_Nadia,1);
+
+PROC
+PROC_LUC_AfterLawrenceDeath()
+AND
+DB_LUC_NadiaMiners(_Miner,_,_Point)
+THEN
+ProcCharacterMoveToTrigger(_Miner,_Point,0,"LUC_NadiaMinerBack");
+
+IF
+CharacterEvent(_Miner,"LUC_NadiaMinerBack")
+AND
+DB_LUC_NadiaMiners(_Miner,_Point,_Point2)
+THEN
+NOT DB_LUC_NadiaMiners(_Miner,_Point,_Point2);
+CharacterSetVarFixedString(_Miner,"currentState","State_Waiting");
+CharacterSetHasDefaultDialog(_Miner,1);
+
+IF
+DialogEnded("LUC_Brandon", _)
+AND
+CharacterGetVarInteger(CHARACTER_LUC_Overseer,"leavesSilverglen",1)
+THEN
+CharacterSetHasDialog(CHARACTER_LUC_Overseer, 0);
+CharacterDisappearOutOfSight(CHARACTER_LUC_Overseer,0,1,"",1);
+
+IF
+CharacterEvent(CHARACTER_LUC_Lawrence, "isGone")
+THEN
+ItemSetOnstage(ITEM_CYS_LawrenceCorpse,1);
+QuestClose("LUC_LawrenceNadia");
+
+IF
+GlobalEventSet("LUC_NadiaHeardLies")
+THEN
+CHARACTER_LUC_Nadia.isNotHappy();
+
+IF
+ItemClosed(ITEM_CYS_LawrenceCorpse)
+AND
+ItemGetClosestPlayer(ITEM_CYS_LawrenceCorpse, _Player)
+THEN
+Launch_PlayerComment(_Player, "LUC_CommentLawrenceDiedWilderness");
+
+IF
+GlobalEventSet("LUC_NadiaPartEnd")
+AND
+NOT CHARACTER_LUC_Nadia.isNotHappy()
+THEN
+TriggerSetItemOwner(TRIGGER_LUC_Ownership_Silverglen_Nadia_Shop, CHARACTER_NULL);
+TriggerSetItemOwner(TRIGGER_LUC_Ownership_Silverglen_Nadia_GF_Exit, CHARACTER_NULL);
+TriggerSetItemOwner(TRIGGER_LUC_Ownership_Silverglen_Nadia_GF, CHARACTER_NULL);
+ProcClearForbiddenArea("LUC_Nadia");
+
+
+
+//END_REGION
+IF
+TextEventSet("nadia")
+THEN
+GlobalSetEvent("LUC_PlayersKnowTruthAboutLawrence");
+ItemToCharacter(ITEM_LUC_MiningOfficeLetter, CHARACTER_Player2);
+
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

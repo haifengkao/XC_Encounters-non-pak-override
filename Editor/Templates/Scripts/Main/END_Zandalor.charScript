@@ -1,0 +1,51 @@
+#INCLUDE State_Manager
+
+INIT
+
+USING State_Manager
+CHARACTER:__Me
+
+BEHAVIOUR
+
+REACTION State_WanderBehind, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, "Action_Wander")
+	SetPriority(%currentAction, 1100)
+		
+REACTION Action_Wander, 0
+USAGE PEACE
+ACTIONS
+	CharacterFollow(END_Icandra_99e3ff72-410f-489f-bd28-8cc0ed3d947c, 10, 0)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)
+	
+REACTION Throw_Water, 0
+USAGE PEACE
+ACTIONS
+	CharacterPlayAnimation("Throw_Water_01")
+	
+EVENTS
+
+EVENT ThrowWater
+ON
+	OnCharacterEvent(__Me, "ThrowWater")
+ACTIONS
+	SetPriority(Throw_Water, 5000)
+	
+EVENT StopThrowWater
+ON
+	OnCharacterEvent(__Me, "StopThrowWater")
+ACTIONS
+	SetPriority(Throw_Water, 0)
+
+EVENT Timeoutturn
+ON
+	OnGlobalEventSet("END_PortalEnding")
+ACTIONS
+	IF "c1"
+		IsInCombat(__Me)
+	THEN
+		CharacterSetCombatTimeout(__Me, 120.0)
+	ENDIF

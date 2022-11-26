@@ -1,0 +1,64 @@
+INIT
+ITEM:__Me
+INT:%DeadCyclopsCounter=0
+CHARACTERTEMPLATE:%CyclopsTank=Cyclops_Warrior_A_Strong_dd9d4bbd-d6c1-447b-b61a-35c0d3a024a4
+CHARACTERTEMPLATE:%CyclopsMage=Cyclops_Wizard_A_Strong_62ce589b-3e57-420c-bf3e-0e31e9f8da93
+CHARACTERTEMPLATE:%CyclopsWitch=Cyclops_BoneCaster_Fem_A_Strong_90487563-4719-4a86-ae23-590dd1e4fecf
+CHARACTERTEMPLATE:%CyclopsFighter=Cyclops_BoneFighter_A_Strong_96adbc95-7fb6-48ae-97a3-88a63dc80f5f
+CHARACTERTEMPLATE:%CyclopsGhoul=Cyclops_BoneCasterSkeleton_A_Strong_2c146695-4bff-40b8-a3ec-ce4799187850
+TRIGGER:%TankPosition=DAF_DarkMarsh_CyclopsSpawn_Warrior_a6d7d6f0-2b8a-4ea0-988b-1c57eeaa3f6c
+TRIGGER:%MagePosition=DAF_DarkMarsh_CyclopsSpawn_Mage_88c76619-698a-4d47-bb26-6f9801dc062b
+TRIGGER:%WitchPosition=DAF_DarkMarsh_CyclopsSpawn_Witch_0d038bc5-0dd4-401d-a698-3a3317463b8b
+TRIGGER:%FighterPosition=DAF_DarkMarsh_CyclopsSpawn_Fighter_b7ba09b7-7439-49fb-8edf-f47ca6a0c7a9
+TRIGGER:%GhoulPosition=DAF_DarkMarsh_CyclopsSpawn_Ghoul_99fa089a-70f9-4c61-81db-372297c41a3c
+CHARACTER:%Player1=a0af7520-57ac-4f1c-b9d7-197bceebeade
+CHARACTER:%Player2=dac1443f-a866-4ab3-b240-e705c0b20ec5
+
+//--------------
+BEHAVIOUR
+REACTION CounterOKAppearAsGhost,1500
+USAGE ALL
+VARS
+	CHARACTER:_SpawnedCyclops
+ACTIONS
+	IF "c1"
+		IsEqual(%DeadCyclopsCounter,5)
+	THEN
+		SpawnCharacter(_SpawnedCyclops,%CyclopsTank,%TankPosition,1)
+		SetMaterial(_SpawnedCyclops,3c7f47ad-4fc2-4e9d-a3c2-b5f9c10b0d4a,-1,1,1,1)
+		Add(%DeadCyclopsCounter,1)	//If counter stays the same then the script continuously spawn creatures ^^'
+	ELIF "c1"
+		IsEqual(%DeadCyclopsCounter,11)
+	THEN
+		SpawnCharacter(_SpawnedCyclops,%CyclopsMage,%MagePosition,1)
+		SetMaterial(_SpawnedCyclops,3c7f47ad-4fc2-4e9d-a3c2-b5f9c10b0d4a,-1,1,1,1)	
+		Add(%DeadCyclopsCounter,1)	
+	ELIF "c1"
+		IsEqual(%DeadCyclopsCounter,17)
+	THEN
+		SpawnCharacter(_SpawnedCyclops,%CyclopsWitch,%WitchPosition,1)
+		SetMaterial(_SpawnedCyclops,3c7f47ad-4fc2-4e9d-a3c2-b5f9c10b0d4a,-1,1,1,1)
+		Add(%DeadCyclopsCounter,1)		
+	ELIF "c1"
+		IsEqual(%DeadCyclopsCounter,23)
+	THEN
+		SpawnCharacter(_SpawnedCyclops,%CyclopsFighter,%FighterPosition,1)
+		SetMaterial(_SpawnedCyclops,3c7f47ad-4fc2-4e9d-a3c2-b5f9c10b0d4a,-1,1,1,1)	
+		Add(%DeadCyclopsCounter,1)			
+	ELIF "c1"
+		IsEqual(%DeadCyclopsCounter,29)
+	THEN
+		SpawnCharacter(_SpawnedCyclops,%CyclopsGhoul,%GhoulPosition,1)
+		SetMaterial(_SpawnedCyclops,3c7f47ad-4fc2-4e9d-a3c2-b5f9c10b0d4a,-1,1,1,1)
+		Set(%DeadCyclopsCounter,99)			
+	ENDIF
+	
+//--------------
+EVENTS
+EVENT ReceiveEventIncrementCounter
+ON
+	OnCharacterEvent(_,"DAF_DarkMarsh_CyclopsDied_Event")
+ACTIONS
+	Add(%DeadCyclopsCounter,1)
+	DebugText(%Player1,"Death registered!")
+	DebugText(%Player2,"Death registered!")

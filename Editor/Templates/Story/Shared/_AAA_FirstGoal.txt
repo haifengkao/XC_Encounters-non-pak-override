@@ -1,0 +1,596 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+// Time(_Day,_Hour,_TotalHours)
+// Current time (updated last time event NewHour was generated)
+//		_TotalHours = (_Day - 1)*24 + _Hour
+//		_TotalHours is suitable for calculating time differences
+//SetTime(ENGINE_GAME,10);  TODO
+Time(1,10,10);
+// CurrentHalfHour and total HalfHours
+HalfHour(20,20);
+
+//TODO: for now we use these timers to simulate time passing. This should come from the game engine if we're going to support different time of day settings
+GameHour(300000);
+StartTimeOfDayTimerLoop();
+KBSECTION
+IF
+CharacterIsPlayer(_Char)
+THEN
+_Char.DB_IsPlayer();
+
+//REGION Dialog book keeping 
+
+IF
+DialogStarted(_,_Inst)
+THEN
+ProcGetInvolvedPlayers(_Inst);
+ProcGetInvolvedNPCs(_Inst);
+ProcSaveNumActors(_Inst);
+
+IF
+AutomatedDialogStarted(_,_Inst)
+THEN
+ProcGetInvolvedPlayers(_Inst);
+ProcGetInvolvedNPCs(_Inst);
+ProcSaveNumActors(_Inst);
+DB_AutomatedDialog(_Inst);
+
+PROC
+ProcSaveNumActors((INTEGER)_Inst)
+AND
+DialogGetNumberOfInvolvedNPCs(_Inst,_NumNPCs)
+AND
+DialogGetNumberOfInvolvedPlayers(_Inst,_NumPlayers)
+THEN
+DB_DialogNumPlayers(_Inst,_NumPlayers);
+DB_DialogNumNPCs(_Inst,_NumNPCs);
+
+PROC
+ProcGetInvolvedNPCs((INTEGER)_Inst)
+THEN
+ProcGetInvolveNPC(_Inst,1);
+
+PROC
+ProcGetInvolveNPC((INTEGER)_Inst,(INTEGER)_Index)
+AND
+DialogGetInvolvedNPC(_Inst,_Index,_NPC)
+AND
+IntegerSum(_Index,1,_New)
+THEN
+DB_DialogNPCs(_Inst,_NPC,_Index);
+ProcGetInvolveNPC(_Inst,_New);
+
+PROC
+ProcGetInvolvedPlayers((INTEGER)_Inst)
+THEN
+ProcGetInvolvePlayer(_Inst,1);
+
+PROC
+ProcGetInvolvePlayer((INTEGER)_Inst,(INTEGER)_Index)
+AND
+DialogGetInvolvedPlayer(_Inst,_Index,_Player)
+AND
+IntegerSum(_Index,1,_New)
+THEN
+DB_DialogPlayers(_Inst,_Player,_Index);
+ProcGetInvolvePlayer(_Inst,_New);
+
+//END_REGION
+
+//REGION Player NPC seeing
+
+PROC
+ProcCheckIfOtherPlayersCanSeeNPC((CHARACTER)_,(CHARACTER)_)
+AND
+DB_OtherPlayersSee(_Npc)
+THEN
+NOT DB_OtherPlayersSee(_Npc);
+
+PROC
+ProcCheckIfOtherPlayersCanSeeNPC((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+_Other.DB_IsPlayer()
+AND
+_Other!=_Player 
+AND
+Sees(_OtherPlayer,_Npc)
+THEN
+DB_OtherPlayersSee(_Npc);
+
+
+//END_REGION
+
+//REGION Player trigger checking
+PROC
+ProcCheckOtherPlayersInTrigger((CHARACTER)_,(TRIGGER)_)
+AND
+DB_OtherPlayersInRegion(_Trigger,1)
+THEN
+NOT DB_OtherPlayersInRegion(_Trigger,1);
+
+PROC
+ProcCheckOtherPlayersInTrigger((CHARACTER)_Player,(TRIGGER)_CheckTrigger)
+AND
+_Other.DB_IsPlayer()
+AND
+_Other!=_Player 
+AND
+DB_InRegion(_Other, _CheckTrigger)
+THEN
+DB_OtherPlayersInRegion(_CheckTrigger,1);
+
+
+//END_REGION
+
+//REGION Player triggers
+PROC
+ProcTriggerRegisterForPlayers((TRIGGER)_Trig)
+THEN
+DB_PlayerTriggers(_Trig);
+
+PROC
+ProcTriggerUnregisterForPlayers((TRIGGER)_Trig)
+THEN
+NOT DB_PlayerTriggers(_Trig);
+TriggerUnregisterForPlayers(_Trig);
+ProcUnRegisterForCompanions(_Trig);
+
+IF
+DB_PlayerTriggers((TRIGGER)_Trig)
+THEN
+TriggerRegisterForPlayers(_Trig);
+ProcRegisterForCompanions(_Trig);
+
+PROC
+ProcUnRegisterForCompanions((TRIGGER)_Trig)
+AND
+DB_Companion(_Char)
+THEN
+TriggerUnregisterForCharacter(_Trig,_Char);
+
+PROC
+ProcRegisterForCompanions((TRIGGER)_Trig)
+AND
+DB_Companion(_Char)
+THEN
+TriggerRegisterForCharacter(_Trig,_Char);
+
+PROC
+ProcRegisterPlayerTriggers((CHARACTER)_Char)
+AND
+DB_PlayerTriggers(_Trig)
+THEN
+TriggerRegisterForCharacter(_Trig,_Char);
+
+PROC
+ProcUnRegisterPlayerTriggers((CHARACTER)_Char)
+AND
+DB_PlayerTriggers(_Trig)
+THEN
+TriggerUnregisterForCharacter(_Trig,_Char);
+
+IF
+DB_Companion(_Char)
+THEN
+_Char.DB_IsPlayer();
+DB_PlayerCheck(_Char);
+ProcRegisterPlayerTriggers(_Char);
+ProcSetupCompanionPrisonEscapeTimers(_Char);
+ProcSetupGenericTimers(_Char);
+
+PROC
+ProcSetupGenericTimers((CHARACTER)_Char)
+AND
+CharacterGetUUID(_Char,_UUID)
+AND
+StringConcatenate(_UUID,"_genTim",_Timer)
+THEN
+GenericDialogTimers(_Char,_Timer);
+
+PROC
+ProcSetupCompanionPrisonEscapeTimers((CHARACTER)_Char)
+AND
+CharacterGetUUID(_Char,_UUID)
+AND
+StringConcatenate(_UUID,"_pris",_Timer)
+AND
+StringConcatenate(_UUID,"2",_Timer2)
+THEN
+PrisonEscapeTimers(_Char,_Timer,0);
+PrisonEscapeTimers(_Char,_Timer2,1);
+
+IF
+DB_PlayerCheck(_Char)
+AND
+NOT DB_Companion(_Char)
+THEN
+NOT _Char.DB_IsPlayer();
+NOT DB_PlayerCheck(_Char);
+NOT DB_NoDefaultBehavior(_Char);
+ProcUnRegisterPlayerTriggers(_Char);
+ProcRemoveCompanionPrisonTimers(_Char);
+ProcClearCompanionPrisonChest(_Char);
+ProcRemoveGenericTimer(_Char);
+
+PROC
+ProcRemoveGenericTimer((CHARACTER)_Char)
+AND
+GenericDialogTimers(_Char,_Timer)
+THEN
+NOT GenericDialogTimers(_Char,_Timer);
+
+PROC
+ProcClearCompanionPrisonChest((CHARACTER)_Char)
+AND
+DB_CompanionChest((STRING)_Prison,(ITEM)_Chest,(CHARACTER)_Char)
+THEN
+NOT DB_CompanionChest(_Prison,_Chest,_Char);
+DB_CompanionChest(_Prison,_Chest,CHARACTER_NULL);
+
+PROC
+ProcRemoveCompanionPrisonTimers((CHARACTER)_Char)
+AND
+PrisonEscapeTimers(_Char,_Tim,_Escape)
+THEN
+NOT PrisonEscapeTimers(_Char,_Tim,_Escape);
+
+
+//END_REGION
+
+// Since storyeditor orders goals alphabetically, this is the only way to make sure this goal comes first in story.div
+// This is important because Osiris uses rule order to execute alternatives.
+
+///////////////////////////////////////////////////////////////////////
+// buffer time
+
+PROC
+StartTimeOfDayTimerLoop()
+AND
+GameHour(_Msec)
+THEN
+TimerLaunch("TimeOfDay",_Msec);
+
+IF
+TimerFinished("TimeOfDay")
+AND
+GameHour(_Msec)
+AND
+Time(_,_Hour,_)
+AND
+IntegerSum(_Hour,1,_NewHour)
+AND
+IntegerModulo(_NewHour,24,_Mod)
+THEN
+TimerLaunch("TimeOfDay",_Msec);
+NewHour(_Mod);
+
+PROC
+NewHour(0) 
+AND		// Day shifts to tomorrow
+Time((INTEGER)_Day,(INTEGER)_,(INTEGER)_) 
+AND
+IntegerSum(_Day,1,_DayP1)
+THEN
+UpdateTime(_DayP1,0);
+
+PROC
+NewHour((INTEGER)_Hour) 
+AND
+_Hour != 0
+AND							// Day stays today
+Time(_Day,_,_)
+THEN
+UpdateTime(_Day,_Hour);
+
+// Asserts Time(_Day,_Hour,...) with ... = the corresponding total hours = 24*(_Day - 1) + _Hour
+PROC
+UpdateTime((INTEGER)_Day,(INTEGER)_Hour) 
+AND
+Time(_D,_H,_TH) 
+AND
+// calc new total hours:
+IntegerSubtract(_Day,1,_DM1) 
+AND
+IntegerProduct(_DM1,24,_T1) 
+AND
+IntegerSum(_T1,_Hour,_NewTH)
+THEN
+NOT Time(_D,_H,_TH);
+Time(_Day,_Hour,_NewTH);
+
+//TODO: commented stuff
+/*
+//
+IF		NewHalfHour(ENGINE_GAME,0)
+THEN	SetNewHalfHour(24);
+IF		NewHalfHour(ENGINE_GAME,_HH) AND _HH != 0
+THEN	SetNewHalfHour(_HH);
+
+PROC	SetNewHalfHour((INTEGER)_HH) AND
+	HalfHour((INTEGER)_CurrentHH,(INTEGER)_TotalHH) AND
+	IntegerSubtract(FUNCTION_Math,_HH,_CurrentHH,_Delta) AND
+	// Normally, Delta == 1
+	IntegerSum(FUNCTION_Math,_CurrentHH,_Delta,_CurrentHHPDelta) AND
+	IntegerSum(FUNCTION_Math,_TotalHH,_Delta,_TotalHHPDelta)
+THEN	NOT HalfHour(_CurrentHH,_TotalHH);
+	HalfHour(_CurrentHHPDelta,_TotalHHPDelta);
+
+
+///////////////////////////////////////////////////////////////////////
+// Buffer player invisibility
+IF		PlayerTurnsInvisible(NPC_Hero,1)
+THEN	PlayerIsInvisible(1);
+
+IF		PlayerTurnsInvisible(NPC_Hero,0)
+THEN	NOT PlayerIsInvisible(1);
+*/ 
+///////////////////////////////////////////////////////////////////////
+// Buffer seeing events
+// Note: "Sees" is asserted as soon as the "NpcSees" is generated. So you can use
+// "Sees" as event as well. Major difference: NpcSees ignores player invisibility.
+
+// Buffer effects of player movement:
+// (NpcSees actually means: "player starts seeing", NpcDoesNotSee means "players ends seeing")
+IF		
+CharacterSawCharacter(_Player,_Npc)
+AND
+_Player.DB_IsPlayer()
+THEN
+Sees(_Player, _Npc);
+
+//DB_Dead NPCs are blind
+IF
+CharacterDying(_Npc)
+AND
+Sees(_Npc,_Player)
+THEN
+NOT Sees(_Npc,_Player);
+
+IF		
+CharacterLostSightOfCharacter(_Player,_Npc)
+AND
+_Player.DB_IsPlayer()
+THEN	
+NOT Sees(_Player, _Npc);
+NOT Sees(_Npc, _Player);
+
+// Bring player invisibility into account (neglect for story npcs):
+IF		
+Sees(_Npc, _Player) 
+AND
+_Player.DB_IsPlayer()
+AND 
+PlayerIsInvisible(_Player,1) 
+AND 
+NOT IsStoryNpc(_Npc)
+THEN
+NOT Sees(_Npc, _Player);
+
+IF		
+Sees(_Player, _Npc)
+AND
+_Player.DB_IsPlayer()
+AND 
+NOT PlayerIsInvisible(_Player,1)
+THEN	
+Sees(_Npc, _Player);
+
+IF		
+Sees(_Player, _Npc)
+AND
+_Player.DB_IsPlayer()
+AND 
+IsStoryNpc(_Npc)
+THEN
+Sees(_Npc, _Player);
+
+/*
+///////////////////////////////////////////////////////////////////////
+// Buffer dialog distance (analogous to seeing events)
+
+// Buffer effects of player movement:
+IF		NpcEntersDialogDistance(NPC_Hero, _Npc)
+THEN	InDialogDistance(NPC_Hero, _Npc);
+
+IF		NpcLeavesDialogDistance(NPC_Hero, _Npc)
+THEN	NOT InDialogDistance(NPC_Hero, _Npc);
+	NOT InDialogDistance(_Npc, NPC_Hero);
+
+// Bring player invisibility into account (neglect for story npcs):
+IF		InDialogDistance(_Npc, NPC_Hero) AND PlayerIsInvisible(1) AND NOT IsStoryNpc(_Npc)
+THEN	NOT InDialogDistance(_Npc, NPC_Hero);
+
+IF		InDialogDistance(NPC_Hero, _Npc) AND NOT PlayerIsInvisible(1)
+THEN	InDialogDistance(_Npc, NPC_Hero);
+
+IF		InDialogDistance(NPC_Hero, _Npc) AND IsStoryNpc(_Npc)
+THEN	InDialogDistance(_Npc, NPC_Hero);
+*/
+
+///////////////////////////////////////////////////////////////////////
+// Buffer region events
+IF	
+CharacterEnteredTrigger(_Npc,_Region)
+THEN
+DB_InRegion(_Npc, _Region);
+
+IF
+CharacterLeftTrigger(_Npc,_Region)
+THEN
+NOT DB_InRegion(_Npc, _Region);
+WasInRegion(_Npc,_Region);
+
+///////////////////////////////////////////////////////////////////////
+// Buffer killed
+IF
+CharacterDying(_Npc)
+THEN
+DB_Dead(_Npc);
+
+IF
+CharacterDied(_Npc)
+AND
+NOT DB_Dead(_Npc)
+THEN
+DB_Dead(_Npc);
+
+IF
+CharacterResurrected(_Npc)
+THEN
+NOT DB_Dead(_Npc);
+
+//TODO: comments
+/*
+// Engine does not generate NpcDoesNotSee for dead npcs anymore, so we have to clean up ourself:
+IF		NpcKilled(_Npc) AND Sees(_Npc,_OtherNpc)
+THEN	NOT Sees(_Npc,_OtherNpc);
+IF		NpcKilled(_Npc) AND Sees(_OtherNpc,_Npc)
+THEN	NOT Sees(_OtherNpc,_Npc);
+// Cleanup InDialogDistance
+IF		NpcKilled(_Npc) AND InDialogDistance(_Npc,_OtherNpc)
+THEN	NOT InDialogDistance(_Npc,_OtherNpc);
+IF		NpcKilled(_Npc) AND InDialogDistance(_OtherNpc,_Npc)
+THEN	NOT InDialogDistance(_OtherNpc,_Npc);
+*/
+
+IF
+CharacterDied(_Npc)
+AND
+DB_InRegion(_Npc,_Region)
+THEN
+NOT DB_InRegion(_Npc,_Region);
+
+//TODO: comments
+/*
+IF		NpcResurrected((NPC)_Npc)
+THEN	NOT DB_Dead(_Npc);
+
+IF		NpcKilledBy(_Npc,NPC_Hero)
+THEN	HeroKilled(_Npc);
+*/
+///////////////////////////////////////////////////////////////////////
+// Cleanup DB_InRegion of npc (not the hero) if they are killed
+// test for _Npc != NPC_Hero explicitely added because debug cheat key "F1" does not
+// resurrect NPC_Hero, hence he remains "dead" although he can play on, enter regions, etc...
+IF
+DB_Dead(_Npc) 
+AND
+NOT _Npc.DB_IsPlayer()
+AND 
+DB_InRegion(_Npc,_Region)
+THEN
+NOT DB_InRegion(_Npc,_Region);
+
+IF
+RegionStarted((STRING)_NewRegion) 
+THEN
+DB_CurrentLevel(_NewRegion);
+
+IF
+RegionEnded((STRING)_Region)
+THEN
+NOT DB_CurrentLevel(_Region);
+
+//TODO: comments
+/*
+///////////////////////////////////////////////////////////////////////
+// Buffer identified
+IF		ObjectIdentified(_Object)
+THEN	Identified(_Object);
+*/
+
+////////////////////////////////////////////
+// Bookkeeping of object state:
+//	 Possibilities:
+//			ObjectState(_Object,_State): not asserted (unknown), else
+//					_State = "in the world": ObjectCoordinates(_Object,_X,_Y,_Map) says where it is lying
+//					_State = "unreachable": object is in a container or being dragged by the player
+//					_State = "in npc backpack": NpcHasObject(_Npc,_Object) says who is carrying the object
+//
+
+IF
+ItemDropped(_Object)
+THEN
+SetObjectState(_Object,"in the world");
+
+IF
+ItemAddedToContainer(_Object,_)
+THEN
+SetObjectState(_Object,"unreachable");
+
+IF
+ItemAddedToCharacter(_Object,_)
+THEN
+SetObjectState(_Object,"in npc backpack");
+
+PROC
+SetObjectState((ITEM)_Object,(STRING)_)
+AND
+ObjectState(_Object,(STRING)_State)
+THEN
+NOT ObjectState(_Object,_State);
+
+PROC
+SetObjectState((ITEM)_Object,(STRING)_State)
+THEN
+ObjectState(_Object,_State);
+
+//TODO comments
+/*
+////////////////////////////////////////////
+// bookkeeping of object location:
+
+// Remember object coordinates when dropped
+IF		ObjectDropped(_Object) AND GetObjectCoordinates(_Object,_X,_Y,_Map)
+THEN	ObjectCoordinates(_Object,_X,_Y,_Map);	
+
+// Forget object coordinates when taken "out of the world" and put in an inventory:
+IF		ObjectDroppedInNonNpcInventory(_Object) AND ObjectCoordinates(_Object,_X,_Y,_Map)
+THEN	NOT ObjectCoordinates(_Object,_X,_Y,_Map);	
+IF		NpcGetsObject(_,_Object) AND ObjectCoordinates(_Object,_X,_Y,_Map)
+THEN	NOT ObjectCoordinates(_Object,_X,_Y,_Map);
+*/
+////////////////////////////////////////////
+// bookkeeping of object "carrier": see NpcHasObject
+// (for ownership, use div query: Owner([in]_Object,[out]_Npc))
+////////////////////////////////////////////
+
+IF
+DB_OneShotPlayerTrigger(_Trigger)
+THEN
+ProcTriggerRegisterForPlayers(_Trigger);
+
+IF
+DB_OneShotPlayerOnlyTrigger(_Trigger)
+THEN
+TriggerRegisterForPlayers(_Trigger);
+
+IF
+CharacterEnteredTrigger(_Player,_Trigger)
+AND
+DB_OneShotPlayerOnlyTrigger(_Trigger)
+THEN
+TriggerUnregisterForPlayers(_Trigger);
+NOT DB_OneShotPlayerOnlyTrigger(_Trigger);
+ProcOneShotTriggerEntered(_Player,_Trigger);
+
+IF
+CharacterEnteredTrigger(_Player,_Trigger)
+AND
+DB_OneShotPlayerTrigger(_Trigger)
+AND
+_Player.DB_IsPlayer()
+THEN
+ProcTriggerUnregisterForPlayers(_Trigger);
+NOT DB_OneShotPlayerTrigger(_Trigger);
+ProcOneShotTriggerEntered(_Player,_Trigger);
+
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,(TRIGGER)_Trigger)
+THEN
+NOP(1);
+
+EXITSECTION
+
+ENDEXITSECTION

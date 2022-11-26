@@ -1,0 +1,28 @@
+INIT
+	CHARACTER:__Me
+	ITEM:%Door=CYS_NorthGateLeft_83e68323-0c3a-4e0c-a935-ac0e3b5a5212
+	FLOAT:%DoorBreakerSightRange
+	TRIGGER:%TriggerBoxAroundBallista=BoxTrigger_000_0e88e1e4-3ac4-42fc-b4b7-7cc38915c552
+
+BEHAVIOUR
+REACTION IfCantGetAnyEnemy_ThenAttackDoor,100
+USAGE COMBAT
+VARS
+	CHARACTER:_Player
+CHECK "c1&c2&!c3"
+	CharacterGet(_Player,__Me,%DoorBreakerSightRange,Lowest,Distance,Enemy)
+	CharacterIsInTrigger(_Player,%TriggerBoxAroundBallista)
+	ItemIsDestroyed(%Door)
+ACTIONS
+	//DebugText(__Me,"Can't get a target! Attacking door!")
+	CharacterAttack(%Door)
+	
+EVENTS
+EVENT OnInitGetSightRange
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%DoorBreakerSightRange,__Me,Sight)
+	THEN
+	ENDIF

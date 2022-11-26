@@ -1,0 +1,25 @@
+INIT
+ITEM:__Me
+INT:%Seen = 0
+	
+BEHAVIOUR
+
+REACTION CallForHelp,1050
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%Seen,0)
+ACTIONS
+	DisplayText(__Me,"LUC_MiningCampHatch_1",5)
+	Sleep(10)
+	DisplayText(__Me,"LUC_MiningCampHatch_2",5)
+	Sleep(10)
+INTERRUPT
+	Reset()
+
+EVENTS
+
+EVENT SeenGoblin
+ON
+	OnItemEvent(__Me,"SawGoblin")
+ACTIONS
+	Set(%Seen,1)

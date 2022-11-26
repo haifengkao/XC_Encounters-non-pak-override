@@ -1,0 +1,18 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+QRY
+QRY_CharacterIsAvailable((CHARACTER)_Char)
+AND
+CharacterIsDead(_Char,0)
+AND
+CharacterIsInCombat(_Char,0)
+AND
+NOT DB_InDialog(_Char)
+THEN
+QROOP(1);
+EXITSECTION
+
+ENDEXITSECTION

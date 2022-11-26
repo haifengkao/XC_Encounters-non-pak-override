@@ -1,0 +1,48 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	FIXEDSTRING:%Anim
+	FIXEDSTRING:%Text
+	FLOAT:%Sleep
+
+BEHAVIOUR
+
+REACTION State_Wander, 0
+	USAGE PEACE
+	ACTIONS
+		GetRandomBetween(%Sleep, 1, 5)
+		Sleep(%Sleep)
+		GetRandom(%Anim, "Pst_02", "No_03", "emotion_sad", "Crying_01", "Beg_01")
+		CharacterPlayAnimation(%Anim, 1, 0)
+		GetRandom(%Text, "LUC_HumanPrisoner1", "LUC_HumanPrisoner4", "LUC_HumanPrisoner3", "LUC_HumanPrisoner5", "LUC_HumanPrisoner2")
+		DisplayText(__Me, %Text, 3)
+		
+REACTION State_Idle, 0
+	USAGE PEACE
+	ACTIONS
+		GetRandom(%currentAction, "Action_Pray", "Action_ReadBook")
+		SetPriority(%currentAction, 1100)
+	
+REACTION Action_Pray, 0
+	USAGE PEACE
+	ACTIONS 
+		CharacterMoveTo(TRIGGER:CYS_MarcusPrayingPoint_a3e409ae-7657-4aa3-8d29-9119de007d2a, 0)
+		CharacterLookFrom(TRIGGER:CYS_MarcusPrayingPoint_a3e409ae-7657-4aa3-8d29-9119de007d2a)
+		CharacterPlayAnimation("Worship_01")
+		CharacterPlayAnimation("Worship_01")
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)
+	
+REACTION Action_ReadBook, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterMoveTo(TRIGGER:CYS_MarcusBookShelfPoint_fbf20550-aed5-401d-916b-c9f7d9657361, 0)
+		CharacterLookFrom(TRIGGER:CYS_MarcusBookShelfPoint_fbf20550-aed5-401d-916b-c9f7d9657361)
+		CharacterPlayAnimation("Fidget_High_01")
+		CharacterPlayAnimation("Stand_Read_01")
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)

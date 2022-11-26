@@ -1,0 +1,121 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%ZombieTroll="CYS_Bridge_Troll_Zombie_0a40fc21-c2e9-4d3a-9dd9-ef39e64218d3"
+
+//--------
+BEHAVIOUR
+REACTION Slug_HealZombieTroll_Projectile,700
+USAGE COMBAT
+VARS
+	FLOAT:_ZombieTrollsHealth
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+	FLOAT:_DistanceBetwMeAndTroll	
+CHECK "!c1&c2&c3&c4&c5&c6&c7"
+	CharacterIsDead(%ZombieTroll)													//c1
+	CharacterGetStat(_ZombieTrollsHealth,%ZombieTroll,Vitality)						//c2
+	IsLessThen(_ZombieTrollsHealth,0.9)												//c3
+	CharacterCanCast(__Me,"Projectile_EnemyPoisonball")								//c4
+	CharacterCanSee(__Me,%ZombieTroll)												//c5
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyPoisonball")	//c6
+	GetDistance(_DistanceBetwMeAndTroll,__Me,%ZombieTroll)							//c7
+ACTIONS
+	CharacterUseSkill("Projectile_EnemyPoisonball",%ZombieTroll)
+
+REACTION Slug_HealZombieTroll_Target,600
+USAGE COMBAT
+VARS
+	FLOAT:_ZombieTrollsHealth
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "!c1&c2&c3&c4&c5&c6"
+	CharacterIsDead(%ZombieTroll)
+	CharacterGetStat(_ZombieTrollsHealth,%ZombieTroll,Vitality)
+	IsLessThen(_ZombieTrollsHealth,0.9)
+	CharacterCanCast(__Me,"Target_EnemyPoison")
+	CharacterCanSee(__Me,%ZombieTroll)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyPoison")
+ACTIONS
+	CharacterUseSkill("Target_EnemyPoison",%ZombieTroll)
+
+REACTION Slug_BuffZombieTroll,500
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "!c1&c2&c3&c4"
+	CharacterIsDead(%ZombieTroll)
+	CharacterCanCast(__Me,"Target_EnemyTargetedDamageBoost")
+	CharacterCanSee(__Me,%ZombieTroll)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyTargetedDamageBoost")
+ACTIONS
+	CharacterUseSkill("Target_EnemyTargetedDamageBoost",%ZombieTroll)
+
+REACTION Slug_FriendIsDead_GoToCorpse,0
+USAGE PEACE
+CHECK "c1"
+	CharacterIsDead(%ZombieTroll)
+ACTIONS
+	CharacterMoveTo(%ZombieTroll,1)
+	CharacterLookAt(%ZombieTroll)
+	CharacterPlayEffect(__Me,"FX_GP_ExclamationMark_A")
+	SetPriority("Slug_FriendIsDead_GoToCorpse",0)
+
+REACTION Slug_FriendIsDead_DisplayBL,0
+USAGE PEACE
+ACTIONS
+	CombatLogText(__Me,"CMBHC_CYS_SlugWeeps_BL",0,1)	
+	//StartTimer("CMBHC_CYS_SlugIsGoingToDie_Timer",20,0)		
+	SetPriority("Slug_FriendIsDead_DisplayBL",0)
+
+REACTION Slug_FriendIsDead_Weep,0
+USAGE PEACE
+VARS
+	FLOAT:_SleepValue
+ACTIONS
+	CharacterPlayAnimation("stillblind",1,1)
+	GetRandomBetween(_SleepValue,0.3,0.9)
+	Sleep(_SleepValue)
+
+//--------
+EVENTS
+EVENT OnInit_GiveTheSlugSomeSpells
+ON
+	OnInit()
+ACTIONS
+	SetPriority("Combat_AttackSetEnemy",0)						
+	SetPriority("Combat_MoveToSetEnemy",0)
+	CharacterAddSkill("Projectile_EnemyPoisonball")
+	CharacterAddSkill("Target_EnemyPoison")
+	CharacterAddSkill("Target_EnemyTargetedDamageBoost")
+
+EVENT OnDie_ZombieTroll_IncreasePeacePrio
+VARS
+	CHARACTER:_Attacker
+ON
+	OnDie(%ZombieTroll,_,_Attacker,_)
+ACTIONS
+	CharacterSetFaction(__Me,"Animal")
+	CharacterSetCanFight(__Me,0,1)
+	SetPriority("Slug_HealZombieTroll_Projectile",0)
+	SetPriority("Slug_HealZombieTroll_Target",0)
+	SetPriority("Slug_BuffZombieTroll",0)
+	SetPriority("Slug_FriendIsDead_GoToCorpse",1500)
+	SetPriority("Slug_FriendIsDead_DisplayBL",1400)
+	SetPriority("Slug_FriendIsDead_Weep",1300)
+
+/*EVENT OnTimer_KillSlug
+ON
+	OnTimer("CMBHC_CYS_SlugIsGoingToDie_Timer")
+ACTIONS
+	CharacterDie(__Me)*/
+	
+EVENT OnDeactivate_SetOffStage
+ON
+	OnDeactivate()
+ACTIONS
+	IF "c1"
+		CharacterIsDead(%ZombieTroll)
+	THEN
+		CharacterSetOffStage()
+	ENDIF

@@ -1,0 +1,157 @@
+INIT
+	CHARACTER:__Me
+	FLOAT:%MySightRange
+	CHARACTER:%SourcererBoss="CYS_Nozgoth_daf6e85e-4da4-400c-80f3-4cde4ba7b275"
+	CHARACTERTEMPLATE:%Summon_Golem_Ranged="CYS_Sourcerer_UndeadArcher_Summon_cb9723e5-142d-4c0d-b904-b6069f4332e5"
+	CHARACTERTEMPLATE:%Summon_Golem_Mage="CYS_Sourcerer_UndeadMage_Summon_6c04b1e4-5a32-478b-b873-9e7cb1d90785"
+	INT:%FXHandle
+
+//------------------------
+BEHAVIOUR
+REACTION SourcererSummon_CastInvisibilityOnBoss,500
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "!c1&!c2&c3&c4"
+	CharacterIsDead(%SourcererBoss)
+	CharacterHasStatus(%SourcererBoss,INVISIBLE)
+	CharacterCanCast(__Me,"Target_EnemyInvisibilityTarget")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyInvisibilityTarget")	
+ACTIONS
+	CharacterMoveInRange(%SourcererBoss,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Target_EnemyInvisibilityTarget",%SourcererBoss)
+	
+REACTION SourcererSummon_CastRicochet,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&c4"
+	CharacterGet(_Target,__Me,%MySightRange,Lowest,Distance,Enemy)
+	CharacterCanCast(__Me,"Projectile_EnemyRicochet")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyRicochet")
+	IsRandom(0.4)
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_EnemyRicochet",_Target)	
+	
+REACTION SourcererSummon_UseKOArrow,350
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "!c1&c2&!c3&c4&c5"
+	IsCasual()																			//!c1
+	CharacterGet(_Target,__Me,%MySightRange,Highest,Distance,Enemy)						//c2
+	CharacterHasStatus(_Target,KNOCKED_DOWN)											//!c3
+	CharacterCanCast(__Me,"Projectile_EnemyKnockedOutArrow")							//c4
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyKnockedOutArrow")	//c5
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_EnemyKnockedOutArrow",_Target)	
+	SetPriority("SourcererSummon_UseKOArrow",0)
+	
+REACTION SourcererSummon_CastStun,340
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "!c1&c2&!c3&c4&c5"
+	IsCasual()																			//!c1
+	CharacterGet(_Target,__Me,%MySightRange,Highest,Intelligence,Enemy)					//c2
+	CharacterHasStatus(_Target,STUNNED)													//!c3
+	CharacterCanCast(__Me,"Projectile_EnemyStunningArrow")								//c4
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyStunningArrow")	//c5
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_EnemyStunningArrow",_Target)	
+	SetPriority("SourcererSummon_CastStun",0)
+	
+REACTION SourcererSummon_CastSlow,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "!c1&c2&!c3&c4&c5"
+	IsCasual()																			//!c1
+	CharacterGet(_Target,__Me,%MySightRange,Highest,Speed,Enemy)						//c2
+	CharacterHasStatus(_Target,SLOWED)													//!c3
+	CharacterCanCast(__Me,"Projectile_EnemySlowDownArrow")								//c4
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemySlowDownArrow")	//c5	
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_EnemySlowDownArrow",_Target)
+	SetPriority("SourcererSummon_CastSlow",0)
+
+//------------------------
+EVENTS
+EVENT OnInit_ApplySandMaterial
+VARS
+	CHARACTERTEMPLATE:_ArcherRootTemplate
+	CHARACTERTEMPLATE:_MageRootTemplate
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%MySightRange,__Me,Sight)
+	THEN
+		//SetMaterial(__Me,"d96fdcdd-5291-4466-96c0-1f9b9a0fd239",-1,1,1,1,1)
+	ENDIF
+	IF "c1&c2"
+		CharacterGetTemplate(__Me,_ArcherRootTemplate)
+		IsEqual(%Summon_Golem_Ranged,_ArcherRootTemplate)
+	THEN
+		CharacterAddSkill("Projectile_EnemyKnockedOutArrow")	
+		CharacterAddSkill("Projectile_EnemyStunningArrow")
+		CharacterAddSkill("Projectile_EnemyRicochet")
+		CharacterAddSkill("Projectile_EnemySlowDownArrow")
+	ENDIF
+	IF "c1&c2"
+		CharacterGetTemplate(__Me,_MageRootTemplate)
+		IsEqual(%Summon_Golem_Mage,_MageRootTemplate)
+	THEN
+		CharacterAddSkill("Target_EnemyInvisibilityTarget")
+	ENDIF	
+	
+EVENT OnCombatEnded_Die
+ON
+	OnCombatEnded()
+ACTIONS
+	CharacterDie(__Me)
+	
+EVENT OnDie_PlayCoolFX
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	PlayEffectAt(__Me,"FX_GP_DamageType_Earth_Impact_A")			
+	PlayEffectAt(__Me,"FX_GP_Footstep_A_Large_Sand")
+	//CharacterSetOffStage()
+	
+EVENT OnTurn_IncreaseCounterTowardsNaturalDeath
+VARS
+	INT:_CurrentCountdownToDeath=0
+	INT:_TargetedCountdownToDeath
+ON
+	OnTurn()
+ACTIONS
+	IF "c1"
+		IsHardcore()
+	THEN
+		GetRandomBetween(_TargetedCountdownToDeath,6,8)
+	ELSE
+		GetRandomBetween(_TargetedCountdownToDeath,3,4)
+	ENDIF
+	IF "c1"
+		IsLessThen(_CurrentCountdownToDeath,_TargetedCountdownToDeath)
+	THEN		
+		Add(_CurrentCountdownToDeath,1)
+	ELSE
+		Set(_CurrentCountdownToDeath,0)
+		CharacterDie(__Me)
+	ENDIF

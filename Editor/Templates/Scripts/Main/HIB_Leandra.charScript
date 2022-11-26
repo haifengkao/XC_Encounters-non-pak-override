@@ -1,0 +1,12 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+
+BEHAVIOUR
+
+REACTION State_Cheering, 0
+USAGE PEACE
+ACTIONS
+	DialogStart("HIB_AD_Leandra",__Me)

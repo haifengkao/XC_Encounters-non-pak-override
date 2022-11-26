@@ -1,0 +1,70 @@
+INIT
+CHARACTER:__Me
+EXTERN INT:%UsePhoenixDiveStartAt=0
+EXTERN INT:%UsePhoenixDiveFrequency=0
+EXTERN COMPARE:%PDCompareHow=Highest
+EXTERN COMPAREFUNC:%PDCompareWhat=Distance
+
+//----------------
+BEHAVIOUR 
+REACTION UsePhoenixDive,0
+USAGE COMBAT
+VARS
+	CHARACTER:_Player
+	CHARACTER:_NearbyAlly
+	FLOAT3:_PhoenixDiveDestination
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+	FLOAT:_DistanceBetwMeAndEnemy
+	FLOAT3:_PosOffset={1.3;0;0}
+	FLOAT:_Angle
+	FLOAT:_Dist	
+CHECK "c1&c2&!c3&c4&c5&!c6&c7&c8&!c9"
+	CharacterCanCast(__Me,Jump_EnemyPhoenixDive)														//c1	
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,Jump_EnemyPhoenixDive)								//c2
+	CharacterGet(_NearbyAlly,__Me,3,Lowest,Distance,Ally)												//!c3
+	CharacterGet(_Player,__Me,_MaxRange,%PDCompareHow,%PDCompareWhat,Enemy,None)						//c4
+	CharacterCanSee(__Me,_Player)																		//c5
+	IsInDangerousSurface(_Player)																		//!c6
+	GetPosition(_Player,_PhoenixDiveDestination)														//c7
+	GetDistance(_DistanceBetwMeAndEnemy,__Me,_PhoenixDiveDestination)									//c8
+	IsLessThen(_DistanceBetwMeAndEnemy,7)																//!c9
+ACTIONS 
+	GetRandomBetween(_Angle,0,360)
+	GetRandomBetween(_Dist,2,4)
+	RotateY(_PosOffset,_Angle)
+	Multiply(_PosOffset,_Dist)	
+	Add(_PhoenixDiveDestination,_PosOffset)
+	IF "c1"
+		FindValidPosition(_PhoenixDiveDestination,3,__Me)
+	THEN
+		CharacterMoveInRange(_Player,_MinRange,_MaxRange,1)
+		CharacterUseSkill(Jump_EnemyPhoenixDive,_PhoenixDiveDestination)
+		Sleep(1)
+		Set(%UsePhoenixDiveStartAt,0)
+		SetPriority("UsePhoenixDive",0)
+	ELSE
+		SetPriority("UsePhoenixDive",0)
+	ENDIF
+INTERRUPT
+	Reset()
+	
+//----------------
+EVENTS
+EVENT GivePhoenixDive
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill(Jump_EnemyPhoenixDive)
+	
+EVENT SetPhoenixDiveFrequency
+ON
+	OnTurn()
+ACTIONS
+	IF "c1"
+		IsLessThen(%UsePhoenixDiveStartAt,%UsePhoenixDiveFrequency)
+	THEN		
+		Add(%UsePhoenixDiveStartAt,1)
+	ELSE
+		SetPriority("UsePhoenixDive",400)
+	ENDIF

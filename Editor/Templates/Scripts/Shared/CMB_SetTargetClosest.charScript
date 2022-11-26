@@ -1,0 +1,68 @@
+#INCLUDE Base
+
+INIT
+USING Base
+CHARACTER:__Me
+CHARACTER:%currentSetTargetClosest=null
+INT:%targetClosestChange=0
+FLOAT:%targetClosestBestScore=10000
+EXTERN FLOAT:%maxTargetClosestDistance=30.0
+
+EVENTS
+/*
+EVENT SetTargetClosestDisableDefault
+ON
+	OnInit()
+ACTIONS
+	SetPriority("Combat_AttackClosest",0)
+	SetPriority("Combat_MoveToClosest",0)
+*/
+
+EVENT EvaluateSetTargetClosest
+ON
+	OnTurn()
+ACTIONS
+	IF "c1"
+		CharacterGetEnemy(%currentSetTargetClosest,__Me)
+	THEN
+		Set(%targetClosestChange,1)
+	ELSE
+		Set(%targetClosestChange,0)
+	ENDIF
+	Set(%targetClosestBestScore,10000)
+	IterateCharactersInCombat(__Me,"SetTargetClosestIterator")
+	
+EVENT IterateSetTargetClosest
+VARS 
+	CHARACTER:_Char
+	FLOAT:_targetDistance
+	INT:_alreadyTargetedBy
+	FLOAT:_targetClosestThisScore=0
+ON
+	OnIterateCharacter(_Char,"SetTargetClosestIterator")
+ACTIONS
+	IF "!c1&!c2&c3&c4&!c5&c6&!c7"
+		CharacterIsDead(_Char)
+		IsEqual(__Me,_Char)
+		CharacterIsEnemy(__Me,_Char)
+		GetDistance(_targetDistance,__Me,_Char)
+		IsGreaterThen(_targetDistance,%maxTargetClosestDistance)
+		CharacterGetHostileCount(_alreadyTargetedBy,_Char)
+		CharacterHasStatus(_Char,INVISIBLE)
+	THEN
+		IF "c1"
+			IsEqual(_alreadyTargetedBy,0)
+		THEN
+			Multiply(_targetDistance,0.8) // to be tweaked
+		ELSE
+			Multiply(_targetDistance,1.5) // to be tweaked
+			Multiply(_targetDistance,_alreadyTargetedBy)
+		ENDIF		
+		Set(_targetClosestThisScore,_targetDistance)
+		IF "!c1"
+			IsGreaterThen(_targetClosestThisScore,%targetClosestBestScore)
+		THEN
+			Set(%targetClosestBestScore,_targetClosestThisScore)
+			CharacterSetEnemy(__Me,_Char)
+		ENDIF
+	ENDIF

@@ -1,0 +1,105 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+TRIGGER:%Point1 = LUC_PointBruce1_c9761ee0-c934-45ba-bc3a-0595f4768dd9
+TRIGGER:%Point2 = LUC_PointBruce2_ee88194c-2ad8-4169-bd66-ad2d97a79cbd
+TRIGGER:%Point3 = LUC_PointBruce3_b4c7e0d0-1d1e-48c6-8faa-8ec12bcbc093
+CHARACTER:%Timfred = LUC_Timfred_e59f80b7-6de9-41e9-a4c2-f76e17f604fc
+CHARACTER:%Doreen = LUC_Doreen_456664e6-5fc8-4a05-8491-735a8235a203
+
+BEHAVIOUR
+
+REACTION State_RunningAround, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction,"Action_TalkToTimfred","Action_GoToCows")
+	SetPriority(%currentAction,1100)
+
+REACTION State_Panicking, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Text
+	CHARACTER:_Char
+ACTIONS
+	CharacterMoveTo(%Point3,1)
+	CharacterLookFrom(%Point3)
+	Sleep(5)
+	IF "c1"
+		CharacterGet(_Char, __Me, 10, Random, Distance, All, null, null, AnimalEmpathy)
+	THEN
+		GetRandom(_Text,"LUC_Bruce_3","LUC_Bruce_4")
+		DisplayText(__Me,_Text,5)
+	ENDIF
+	Sleep(15)
+
+REACTION State_WaitingForDecision, 0
+USAGE PEACE
+ACTIONS
+	Sleep(3)
+	CharacterWander(FLOAT:3,5,0,%Point1)
+
+REACTION State_AfterLuculla, 0
+USAGE PEACE
+ACTIONS
+	Sleep(2)
+	CharacterWander(FLOAT:3,6)
+
+REACTION Action_TalkToTimfred, 0
+USAGE PEACE
+ACTIONS
+	Sleep(2)
+	CharacterWander(FLOAT:2,3,0,%Point1)
+	Sleep(2)
+	CharacterMoveTo(%Point1)
+	CharacterLookFrom(%Point1)
+	Sleep(1)
+	CharacterEvent(%Timfred,"BruceTalks")
+	Sleep(10)
+	SetPriority(%currentAction,0)
+INTERRUPT
+	SetPriority(%currentAction,0)
+
+REACTION Action_GoToCows, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Text
+	CHARACTER:_Char
+ACTIONS
+	Sleep(2)
+	CharacterWander(FLOAT:2,3,0,%Point1)
+	Sleep(2)
+	CharacterMoveTo(%Point2)
+	CharacterLookFrom(%Point2)
+	Sleep(1)
+	IF "c1"
+		CharacterGet(_Char, __Me, 10, Random, Distance, All, null, null, AnimalEmpathy)
+	THEN
+		GetRandom(_Text,"LUC_Bruce_1","LUC_Bruce_2")
+		DisplayText(__Me,_Text,5)
+	ENDIF
+	Sleep(15)
+	SetPriority(%currentAction,0)
+INTERRUPT
+	SetPriority(%currentAction,0)
+
+EVENTS
+
+EVENT Panicking
+ON
+	OnGlobalEventSet("LUC_BruceKnowsSlaughter")
+ACTIONS
+	Set(%currentState,"State_Panicking")
+	
+EVENT WaitingForDecision
+ON
+	OnGlobalEventSet("LUC_AnimalsPurchased")
+ACTIONS
+	Set(%currentState,"State_WaitingForDecision")
+
+EVENT InCyseal
+ON
+	OnCharacterEvent(__Me,"LUC_AnimalBackToCyseal")
+ACTIONS
+	Set(%currentState,"State_InCyseal")

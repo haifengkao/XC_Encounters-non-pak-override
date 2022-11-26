@@ -1,0 +1,119 @@
+#TEMPLATE "_SKILL_Base" : Heal_EnemyRegenerate_HealingWolf
+
+INIT
+CHARACTER:__Me
+FLOAT:%SkillTargetScore_Heal_EnemyRegenerate_HealingWolf=-1000000
+// [GLOBAL_VARS]
+INT:%ClassScore_Heal_EnemyRegenerate_HealingWolf
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_Heal_EnemyRegenerate_HealingWolf
+VARS
+	// [CALC_VARS]
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_Heal_EnemyRegenerate_HealingWolf")
+ACTIONS
+	Set(%SkillTargetScore_Heal_EnemyRegenerate_HealingWolf, -1000000)
+
+	// [CALC_ACTIONS_PRE]
+	Set(%ClassScore_Heal_EnemyRegenerate_HealingWolf, 0)
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	IterateCharactersInCombat(__Me, "CalculateTarget_Heal_EnemyRegenerate_HealingWolf", Random, Vitality)
+	IF "!c1"
+		IsEqual(%SkillTargetChar_Heal_EnemyRegenerate_HealingWolf, null)
+	THEN
+		Add(%ActionScore_Heal_EnemyRegenerate_HealingWolf, %SkillTargetScore_Heal_EnemyRegenerate_HealingWolf)
+	ENDIF
+	// [~CALC_ACTIONS]
+
+	
+
+	
+// Calculate the character we should attack
+EVENT CalculateTarget_Heal_EnemyRegenerate_HealingWolf
+VARS	
+	CHARACTER:_Char
+	// [CALC_TARGET_VARS]
+	INT:_ClassScore_Heal_EnemyRegenerate_HealingWolf
+	FLOAT:_StatVitality
+	FLOAT:_Score
+	FLOAT:_SkillRangeMin
+	FLOAT:_SkillRangeMax
+	FLOAT:_DistanceToChar
+	FLOAT:_DistanceScore
+	// [~CALC_TARGET_VARS]
+ON
+	OnIterateCharacter(_Char, "CalculateTarget_Heal_EnemyRegenerate_HealingWolf")	
+ACTIONS
+	// [CALC_CHAR_TARGET_ACTIONS_PRE]
+	Set(_ClassScore_Heal_EnemyRegenerate_HealingWolf, %ClassScore_Heal_EnemyRegenerate_HealingWolf)
+	Set(_Score, 0.0)
+	// [~CALC_CHAR_TARGET_ACTIONS_PRE]
+	// [CALC_CHAR_TARGET_ACTIONS]
+	IF "(!c1&!c2&!c3)&(c4)&((c5&c6)|c7)&(!(((c8)|c9)|c10))&(c11)&(c12)&(c13)"
+	    CharacterIsDead(_Char) // c1
+	    CharacterHasStatus(_Char, INVISIBLE) // c2
+	    CharacterHasStatus(_Char, SNEAKING) // c3
+	    CharacterIsBetterOrEqualClass(_Char, %ClassScore_Heal_EnemyRegenerate_HealingWolf, _ClassScore_Heal_EnemyRegenerate_HealingWolf, 5, 1, 3, 4, 2) // c4
+	    CharacterGetStat(_StatVitality, _Char, Vitality) // c5
+	    IsLessThen(_StatVitality, 0.6) // c6
+	    IsLessThen(_StatVitality, 0.3) // c7
+	    IsGreaterThen(_StatVitality, 0.8) // c8
+	    CharacterHasStatus(_Char, HEALING) // c9
+	    CharacterHasStatus(_Char, CHARMED) // c10
+	    CharacterIsAlly(__Me, _Char) // c11
+	    CharacterGetSkillRange(_SkillRangeMin, _SkillRangeMax, __Me, Heal_EnemyRegenerate_HealingWolf) // c12
+	    GetDistance(_DistanceToChar, __Me, _Char) // c13
+	THEN
+	    Set(%ClassScore_Heal_EnemyRegenerate_HealingWolf, _ClassScore_Heal_EnemyRegenerate_HealingWolf)
+	    // Hostile count score calculation
+	    Add(_Score, 10.0) // HostileWeight
+	    
+	    // Range score calculation
+	    Set(_DistanceScore, _DistanceToChar)
+	    IF "(c1)"
+	        IsGreaterThen(_DistanceScore, _SkillRangeMax) // c1
+	    THEN
+	        Subtract(_DistanceScore, _SkillRangeMax)
+	        Multiply(_DistanceScore, -1.0)
+	    ELIF "(c1)"
+	        IsLessThen(_DistanceScore, _SkillRangeMin) // c1
+	    THEN
+	        Subtract(_DistanceScore, _SkillRangeMin)
+	        Multiply(_DistanceScore, 1.0)
+	    ELSE 
+	        Set(_DistanceScore, 0.0)
+	    ENDIF
+	    Add(_Score, _DistanceScore)
+	    
+	    // Can see score calculation
+	    IF "!c1"
+	    	CharacterCanSee(__Me, _Char)
+	    THEN
+	    	Add(_Score, -10.0)
+	    ENDIF
+	    
+	    IF "c1"
+	    	IsGreaterThen(_Score, %SkillTargetScore_Heal_EnemyRegenerate_HealingWolf)
+	    THEN
+	    	Set(%SkillTargetChar_Heal_EnemyRegenerate_HealingWolf, _Char)
+	    	Set(%SkillTargetScore_Heal_EnemyRegenerate_HealingWolf, _Score)
+	    ENDIF	
+	ENDIF
+	// [~CALC_CHAR_TARGET_ACTIONS]
+	
+	
+	
+	
+	
+	
+	
+	

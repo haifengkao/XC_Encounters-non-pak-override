@@ -1,0 +1,420 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+PROC
+Proc_LimitAbilitiesForCompanion((CHARACTER)_Companion)
+THEN
+CharacterLockAbility(_Companion,"Blackrock");
+CharacterLockAbility(_Companion,"Charisma");
+
+IF
+DB_Companion(_Character)
+THEN
+DB_NoDefaultBehavior(_Character);
+
+PROC
+Proc_CompanionDialog((CHARACTER)_Companion,(STRING)_Dialog,(CHARACTER)_Anchor)
+AND
+NOT DB_Dead(_Companion)
+AND
+NOT IgnoreCompanionDialogsAndComments(_Companion)
+AND
+NOT IgnoreOnlyCompanionDialogs(1)
+AND
+DB_Companion(_Companion)
+AND
+NOT DB_CompanionDialogsFinished(_Companion,_Dialog)
+AND
+NOT DB_HandlingCompanionDialog(_Companion,_Dialog)
+AND
+CharacterGetDistanceToCharacter(_Companion,_Anchor,_Dist)
+AND
+_Dist < 30.0
+THEN
+DB_CompanionDialog_Queue(_Companion,_Dialog);
+ProcLaunchTestCompanionQueueTimer();
+
+PROC
+ProcLaunchTestCompanionQueueTimer()
+AND
+NOT DB_TestingCompanionQueue(1)
+THEN
+DB_TestingCompanionQueue(1);
+TimerLaunch("Test_CompanionDialog_Queue",4000);
+
+IF
+TimerFinished("Test_CompanionDialog_Queue")
+THEN
+NOT DB_TestingCompanionQueue(1);
+Proc_Test_CompanionDialog_Queue();
+
+IF
+DialogEnded(_Dialog,_)
+AND
+DB_HandlingCompanionDialog(_Companion,_Dialog)
+AND
+DB_Companion_Default_Dialog((CHARACTER)_Companion,(STRING)_DefaultDialog)
+THEN
+PROC_StopEffectAtCharacter(_Companion,"ExclamationMark");
+NOT DB_HandlingCompanionDialog(_Companion,_Dialog);
+DB_CompanionDialogsFinished(_Companion,_Dialog);
+ProcRemoveDialogEntryForSpeaker(_Companion,_Dialog);
+DB_Dialogs(_Companion,_DefaultDialog);
+
+IF
+DialogEnded(_,_Instance)
+AND
+DB_DialogPlayers(_Instance,_Companion,1)
+AND
+DB_Companion(_Companion)
+THEN
+Proc_Test_CompanionDialog_Queue();
+
+IF
+CharacterDied(_Companion)
+AND
+DB_Companion(_Companion)
+THEN
+ProcCancelAllCompanionDialogs(_Companion);
+
+IF
+CharacterResurrected(_Companion)
+AND
+DB_Companion_Default_Dialog(_Companion,_Dialog)
+THEN
+DB_Dialogs(_Companion,_Dialog);
+
+PROC
+ProcCancelAllCompanionDialogs((CHARACTER)_Companion)
+AND
+DB_HandlingCompanionDialog(_Companion,_Dialog)
+AND
+DB_Companion_Default_Dialog(_Companion,_DefaultDialog)
+THEN
+PROC_StopEffectAtCharacter(_Companion,"ExclamationMark");
+NOT DB_HandlingCompanionDialog(_Companion,_Dialog);
+NOT DB_CompanionDialogs(_Companion,_Dialog);
+ProcRemoveDialogEntryForSpeaker(_Companion,_Dialog);
+DB_Dialogs(_Companion,_DefaultDialog);
+
+PROC
+ProcCancelAllCompanionDialogs((CHARACTER)_Companion)
+AND
+DB_CompanionDialog_Queue((CHARACTER)_Companion,(STRING)_Dialog)
+THEN
+NOT DB_CompanionDialog_Queue(_Companion,_Dialog);
+
+PROC
+ProcCancelOneCompanionDialog((CHARACTER)_Companion,(STRING)_Dialog)
+AND
+DB_HandlingCompanionDialog(_Companion,_Dialog)
+AND
+DB_Companion_Default_Dialog(_Companion,_DefaultDialog)
+THEN
+PROC_StopEffectAtCharacter(_Companion,"ExclamationMark");
+NOT DB_HandlingCompanionDialog(_Companion,_Dialog);
+NOT DB_CompanionDialogs(_Companion,_Dialog);
+ProcRemoveDialogEntryForSpeaker(_Companion,_Dialog);
+DB_Dialogs(_Companion,_DefaultDialog);
+
+PROC
+ProcCancelOneCompanionDialog((CHARACTER)_Companion,(STRING)_Dialog)
+AND
+DB_CompanionDialog_Queue((CHARACTER)_Companion,(STRING)_Dialog)
+THEN
+NOT DB_CompanionDialog_Queue(_Companion,_Dialog);
+
+PROC
+ProcCancelOneCompanionDialog((CHARACTER)_Companion,(STRING)_Dialog)
+THEN
+DB_CompanionDialogsFinished(_Companion,_Dialog);
+
+PROC
+Proc_Test_CompanionDialog_Queue()
+AND
+DB_CompanionDialog_Queue((CHARACTER)_Companion,(STRING)_Dialog)
+AND
+NOT DB_HandlingCompanionDialog(_Companion,_)
+THEN
+DB_HandlingCompanionDialog(_Companion,_Dialog);
+NOT DB_CompanionDialog_Queue(_Companion,_Dialog);
+PROC_LoopEffectAtCharacter("FX_GP_ExclamationMark_A",_Companion,"ExclamationMark","__ANY__");
+DB_CompanionDialogs(_Companion,_Dialog);
+
+IF
+DB_CompanionDialogs(_Companion,_)
+AND
+DB_Dialogs(_Companion,_Dialog)
+THEN
+ProcRemoveDialogEntryForSpeaker(_Companion,_Dialog);
+
+QRY
+QryGetCloseEnoughOtherPlayer((CHARACTER)_Player,(REAL)_MaxDist)
+AND
+_Player2.DB_IsPlayer()
+AND
+NOT DB_Companion(_Player2)
+AND
+_Player!=_Player2
+AND
+CharacterGetDistanceToCharacter(_Player,_Player2,_Dist)
+AND
+_Dist<=_MaxDist
+THEN
+DB_CloseEnoughPlayer(_Player,_Player2);
+
+//this will make sure that the condition never returns false (simplifies scripting since all we care about is the return value in the database)
+QRY
+QryGetCloseEnoughOtherPlayer((CHARACTER)_Player,(REAL)_MaxDist)
+THEN
+DB_Noop(1);
+
+IF
+DialogStartRequested(_Companion,_Player)
+AND
+NOT DB_Companion(_Player)
+AND
+DB_CompanionDialogs(_Companion,_Dialog)
+AND
+QryGetCloseEnoughOtherPlayer(_Player,10)
+THEN
+ProcSelectPlayersForCompanionDialog(_Companion,_Player);
+
+PROC
+ProcSelectPlayersForCompanionDialog((CHARACTER)_Companion,(CHARACTER)_Player)
+AND
+DB_CompanionDialogs(_Companion,_Dialog)
+AND
+DB_CloseEnoughPlayer(_Player,_Player2)
+THEN
+//even with multiple players the procedure will only go through once
+ProcCheckIfCompanionDialogCanGetThrough(_Player,_Player2,_Companion,_Dialog);
+
+//didn't find a dual dialog that could start, so fallback to the single player case
+PROC
+ProcSelectPlayersForCompanionDialog((CHARACTER)_Companion,(CHARACTER)_Player)
+AND
+DB_CompanionDialogs(_Companion,_Dialog)
+AND
+NOT _Player.DB_IsInDialog()
+AND
+NOT DB_Dead(_Player)
+THEN
+_Companion.DB_IsInDialog();
+_Player.DB_IsInDialog();
+CharacterMakeStoryNpc(_Companion,1);
+CharacterMakeStoryNpc(_Player,1);
+ProcFaceEachother(_Player,_Companion);
+DialogStartTwoSpeakerDialog(_Dialog,_Companion,_Player);
+NOT DB_CompanionDialogs(_Companion,_Dialog);
+
+PROC
+ProcSelectPlayersForCompanionDialog((CHARACTER)_Companion,(CHARACTER)_Player)
+AND
+DB_CloseEnoughPlayer(_Player,_Player2)
+THEN
+NOT DB_CloseEnoughPlayer(_Player,_Player2);
+
+PROC
+ProcCheckIfCompanionDialogCanGetThrough((CHARACTER)_Player,(CHARACTER)_Player2,(CHARACTER)_Companion,(STRING)_Dialog)
+AND
+NOT DB_Dead(_Player2)
+AND
+NOT DB_DualDialogsDisabled(1)
+AND
+NOT _Player2.DB_IsInDialog()
+AND
+NOT _Player.DB_IsInDialog()
+AND
+NOT DB_Dead(_Player)
+THEN
+_Companion.DB_IsInDialog();
+_Player.DB_IsInDialog();
+_Player2.DB_IsInDialog();
+CharacterMakeStoryNpc(_Companion,1);
+CharacterMakeStoryNpc(_Player,1);
+CharacterMakeStoryNpc(_Player2,1);
+ProcFaceEachother(_Player,_Companion);
+ProcFaceCharacter(_Player2,_Companion);
+DialogStartThreeSpeakerDialog(_Dialog,_Companion,_Player,_Player2);
+NOT DB_CompanionDialogs(_Companion,_Dialog);
+
+PROC
+Proc_CompanionComment((CHARACTER)_Companion,(STRING)_Comment,(CHARACTER)_Anchor)
+AND
+NOT IgnoreCompanionDialogsAndComments(_Companion)
+AND
+DB_Companion(_Companion)
+AND
+NOT DB_CompanionComment_Handling(_Companion,_Comment)
+AND
+NOT DB_CompanionCommentsFinished(_Companion,_Comment)
+AND
+CharacterGetDistanceToCharacter(_Companion,_Anchor,_Dist)
+AND
+_Dist < 30.0
+THEN
+DB_CompanionComment_Queue(_Companion,_Comment);
+TimerLaunch("Test_CompanionComment_Queue",3000);
+
+IF
+TimerFinished("Test_CompanionComment_Queue")
+AND
+ShutUpPlayers(1)
+THEN
+TimerLaunch("Test_CompanionComment_Queue",3000);
+
+IF
+TimerFinished("Test_CompanionComment_Queue")
+AND
+DB_CompanionComment_Queue(_Companion,_Comment)
+AND
+NOT ShutUpPlayers(1)
+AND
+NOT QRY_FindNearestCompanionToBanterWith(_Companion)
+THEN
+PROC_SetCompanionBanterReplyEvent(CHARACTER_NULL);
+DialogStartOneSpeakerAutomatedDialog(_Comment,_Companion);
+ShutUpPlayers(1);
+TimerLaunch("ShutUpPlayers",30000);
+NOT DB_CompanionComment_Queue(_Companion,_Comment);
+DB_CompanionComment_Handling(_Companion,_Comment);
+
+IF
+TimerFinished("Test_CompanionComment_Queue")
+AND
+DB_CompanionComment_Queue(_Companion,_Comment)
+AND
+NOT ShutUpPlayers(1)
+AND
+QRY_FindNearestCompanionToBanterWith(_Companion)
+AND
+DB_BanterCompanion((CHARACTER)_OtherCompanion)
+THEN
+PROC_SetCompanionBanterReplyEvent(_OtherCompanion);
+DialogStartTwoSpeakerAutomatedDialog(_Comment,_Companion,_OtherCompanion);
+ShutUpPlayers(1);
+TimerLaunch("ShutUpPlayers",30000);
+NOT DB_CompanionComment_Queue(_Companion,_Comment);
+DB_CompanionComment_Handling(_Companion,_Comment);
+
+PROC
+PROC_SetCompanionBanterReplyEvent((CHARACTER)_Companion)
+AND
+DB_CompanionBanter_Event(_,(STRING)_Event)
+THEN
+GlobalClearEvent(_Event);
+
+PROC
+PROC_SetCompanionBanterReplyEvent((CHARACTER)_Companion)
+AND
+DB_CompanionBanter_Event(_Companion,(STRING)_Event)
+THEN
+GlobalSetEvent(_Event);
+
+QRY
+QRY_FindNearestCompanionToBanterWith((CHARACTER)_Companion)
+AND
+QRY_LoopClosestCompanionSearch(_Companion)
+AND
+DB_IsClosestCompanion(_OtherCompanion)
+THEN
+DB_BanterCompanion(_OtherCompanion);
+Proc_CleanupFindClosestCompanion();
+
+QRY
+QRY_LoopClosestCompanionSearch((CHARACTER)_)
+AND
+DB_BanterCompanion(_Companion)
+THEN
+NOT DB_BanterCompanion(_Companion);
+
+QRY
+QRY_LoopClosestCompanionSearch((CHARACTER)_)
+THEN
+DB_ClosestCompanionDistance(10.0);
+DB_IsClosestCompanion(CHARACTER_NULL);
+
+QRY
+QRY_LoopClosestCompanionSearch((CHARACTER)_Companion)
+AND
+DB_Companion(_OtherCompanion)
+AND
+_Companion != _OtherCompanion
+AND
+NOT DB_IsInDialog(_OtherCompanion)
+AND
+CharacterGetDistanceToCharacter(_Companion,_OtherCompanion,_Dist)
+AND
+DB_ClosestCompanionDistance(_LowestDist)
+AND
+_Dist < _LowestDist
+AND
+DB_IsClosestCompanion(_CurrentClosestChar)
+THEN
+NOT DB_ClosestCompanionDistance(_LowestDist);
+DB_ClosestCompanionDistance(_Dist);
+NOT DB_IsClosestCompanion(_CurrentClosestChar);
+DB_IsClosestCompanion(_OtherCompanion);
+
+QRY
+QRY_LoopClosestCompanionSearch((CHARACTER)_)
+AND
+DB_IsClosestCompanion(CHARACTER_NULL)
+AND
+DB_ClosestCompanionDistance(_Dist)
+THEN
+NOT DB_IsClosestCompanion(CHARACTER_NULL);
+NOT DB_ClosestCompanionDistance(_Dist);
+
+PROC
+Proc_CleanupFindClosestCompanion()
+AND
+DB_ClosestCompanionDistance(_Dist)
+AND
+DB_IsClosestCompanion(_Char)
+THEN
+NOT DB_ClosestCompanionDistance(_Dist);
+NOT DB_IsClosestCompanion(_Char);
+
+IF
+AutomatedDialogEnded(_Comment,_)
+AND
+DB_CompanionComment_Handling(_Companion,_Comment)
+THEN
+NOT DB_CompanionComment_Handling(_Companion,_Comment);
+DB_CompanionCommentsFinished(_Companion,_Comment);
+TimerLaunch("Test_CompanionComment_Queue",4000);
+TimerCancel("ShutUpPlayers");
+NOT ShutUpPlayers(1);
+
+PROC
+ProcDismissAllCompanions()
+AND
+NOT DB_InCharacterCreation(1)
+AND
+_Player.DB_IsPlayer()
+THEN
+ProcShowCompanionDismissMessage(_Player);
+
+PROC
+ProcDismissAllCompanions()
+AND
+DB_Companion(_Comp)
+AND
+DB_DismissEvent(_Comp,_Event)
+THEN
+GlobalSetEvent(_Event);
+ProcDoDismissOfCompanion(_Comp);
+
+PROC
+ProcCancelAllCompanionDialogsForAllCompanions()
+AND
+DB_Companion(_Comp)
+THEN
+ProcCancelAllCompanionDialogs(_Comp);
+EXITSECTION
+
+ENDEXITSECTION

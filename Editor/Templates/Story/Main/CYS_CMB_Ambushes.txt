@@ -1,0 +1,135 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+//REGION Skeleton Ambush West Triggers
+DB_CYS_SkelAmbushWestTriggers(TRIGGER_CYS_Point_AmbushWest_Trigger1);
+DB_CYS_SkelAmbushWestTriggers(TRIGGER_CYS_Point_AmbushWest_Trigger2);
+DB_CYS_SkelAmbushWestTriggers(TRIGGER_CYS_Point_AmbushWest_Trigger3);
+//END_REGION
+
+//REGION Skeleton Ambush West Chars
+DB_CYS_SkelAmbushWest(TRIGGER_CYS_Point_AmbushWest_Trigger1,CHARACTER_CYS_AmbushWest_SkeletonArcher1,TRIGGER_CYS_Point_AmbushWest_Archer1_1);
+DB_CYS_SkelAmbushWest(TRIGGER_CYS_Point_AmbushWest_Trigger1,CHARACTER_CYS_AmbushWest_SkeletonArcher2,TRIGGER_CYS_Point_AmbushWest_Archer2_1);
+DB_CYS_SkelAmbushWest(TRIGGER_CYS_Point_AmbushWest_Trigger1,CHARACTER_CYS_AmbushWest_SkeletonArcher3,TRIGGER_CYS_Point_AmbushWest_Archer3_1);
+DB_CYS_SkelAmbushWest(TRIGGER_CYS_Point_AmbushWest_Trigger1,CHARACTER_CYS_AmbushWest_SkeletonAxe,TRIGGER_CYS_Point_AmbushWest_Axe_1);
+DB_CYS_SkelAmbushWest(TRIGGER_CYS_Point_AmbushWest_Trigger1,CHARACTER_CYS_AmbushWest_SkeletonClubber,TRIGGER_CYS_Point_AmbushWest_Club_1);
+DB_CYS_SkelAmbushWest(TRIGGER_CYS_Point_AmbushWest_Trigger1,CHARACTER_CYS_AmbushWest_SkeletonSwordShield,TRIGGER_CYS_Point_AmbushWest_Sword_1);
+DB_CYS_SkelAmbushWest(TRIGGER_CYS_Point_AmbushWest_Trigger1,CHARACTER_CYS_AmbushWest_SkeletonMage,TRIGGER_CYS_Point_AmbushWest_Mage_1);
+DB_CYS_SkelAmbushWest(TRIGGER_CYS_Point_AmbushWest_Trigger2,CHARACTER_CYS_AmbushWest_SkeletonArcher1,TRIGGER_CYS_Point_AmbushWest_Archer1_2);
+DB_CYS_SkelAmbushWest(TRIGGER_CYS_Point_AmbushWest_Trigger2,CHARACTER_CYS_AmbushWest_SkeletonArcher2,TRIGGER_CYS_Point_AmbushWest_Archer2_2);
+DB_CYS_SkelAmbushWest(TRIGGER_CYS_Point_AmbushWest_Trigger2,CHARACTER_CYS_AmbushWest_SkeletonArcher3,TRIGGER_CYS_Point_AmbushWest_Archer3_2);
+DB_CYS_SkelAmbushWest(TRIGGER_CYS_Point_AmbushWest_Trigger2,CHARACTER_CYS_AmbushWest_SkeletonAxe,TRIGGER_CYS_Point_AmbushWest_Axe_2);
+DB_CYS_SkelAmbushWest(TRIGGER_CYS_Point_AmbushWest_Trigger2,CHARACTER_CYS_AmbushWest_SkeletonClubber,TRIGGER_CYS_Point_AmbushWest_Club_2);
+DB_CYS_SkelAmbushWest(TRIGGER_CYS_Point_AmbushWest_Trigger2,CHARACTER_CYS_AmbushWest_SkeletonSwordShield,TRIGGER_CYS_Point_AmbushWest_Sword_2);
+DB_CYS_SkelAmbushWest(TRIGGER_CYS_Point_AmbushWest_Trigger2,CHARACTER_CYS_AmbushWest_SkeletonMage,TRIGGER_CYS_Point_AmbushWest_Mage_2);
+DB_CYS_SkelAmbushWest(TRIGGER_CYS_Point_AmbushWest_Trigger3,CHARACTER_CYS_AmbushWest_SkeletonArcher1,TRIGGER_CYS_Point_AmbushWest_Archer1_3);
+DB_CYS_SkelAmbushWest(TRIGGER_CYS_Point_AmbushWest_Trigger3,CHARACTER_CYS_AmbushWest_SkeletonArcher2,TRIGGER_CYS_Point_AmbushWest_Archer2_3);
+DB_CYS_SkelAmbushWest(TRIGGER_CYS_Point_AmbushWest_Trigger3,CHARACTER_CYS_AmbushWest_SkeletonArcher3,TRIGGER_CYS_Point_AmbushWest_Archer3_3);
+DB_CYS_SkelAmbushWest(TRIGGER_CYS_Point_AmbushWest_Trigger3,CHARACTER_CYS_AmbushWest_SkeletonAxe,TRIGGER_CYS_Point_AmbushWest_Axe_3);
+DB_CYS_SkelAmbushWest(TRIGGER_CYS_Point_AmbushWest_Trigger3,CHARACTER_CYS_AmbushWest_SkeletonClubber,TRIGGER_CYS_Point_AmbushWest_Club_3);
+DB_CYS_SkelAmbushWest(TRIGGER_CYS_Point_AmbushWest_Trigger3,CHARACTER_CYS_AmbushWest_SkeletonSwordShield,TRIGGER_CYS_Point_AmbushWest_Sword_3);
+DB_CYS_SkelAmbushWest(TRIGGER_CYS_Point_AmbushWest_Trigger3,CHARACTER_CYS_AmbushWest_SkeletonMage,TRIGGER_CYS_Point_AmbushWest_Mage_3);
+//END_REGION
+
+//REGION Skeleton Ambush Field
+DB_CYS_SkelAmbushField(CHARACTER_CYS_Ambush_Field_SkeletonSLS1);
+DB_CYS_SkelAmbushField(CHARACTER_CYS_Ambush_Field_SkeletonSLS2);
+//END_REGION
+
+PROC_CYS_SkeletonAmbushWestInit();
+PROC_CYS_SkeletonAmbushFieldInit();
+PROC_CYS_UndeadEncounter2Init();
+KBSECTION
+//REGION INIT - Set west ambush guys offstage
+PROC
+PROC_CYS_SkeletonAmbushWestInit()
+AND
+DB_CYS_SkelAmbushWest(TRIGGER_CYS_Point_AmbushWest_Trigger1,_Skellie,_)
+THEN
+CharacterSetOnStage(_Skellie,0);
+//END_REGION
+
+//REGION INIT - Reg triggers
+PROC
+PROC_CYS_SkeletonAmbushWestInit()
+AND
+DB_CYS_SkelAmbushWestTriggers(_Triggers)
+THEN
+TriggerRegisterForPlayers(_Triggers);
+//END_REGION
+
+//REGION INIT - Set field ambush guys offstage
+PROC
+PROC_CYS_SkeletonAmbushFieldInit()
+AND
+DB_CYS_SkelAmbushField(_Skellie)
+THEN
+CharacterSetOnStage(_Skellie,0);
+//END_REGION
+
+
+//REGION Spawn skel when combat starts
+IF
+DB_Combat(CHARACTER_CYS_Ambush_Field_SkeletonTriggers,_)
+AND
+DB_CYS_SkelAmbushField(_Skeleton)
+THEN
+CharacterAppear(_Skeleton,1);
+NOT DB_CYS_SkelAmbushField(_Skeleton);
+//END_REGION
+
+//REGION Spawn skels when you enter a trigger
+IF
+CharacterEnteredTrigger(_,_Trigger)
+AND
+DB_CYS_SkelAmbushWestTriggers(_Trigger)
+THEN
+PROC_CYS_SkeletonAmbushWestSpawn(_Trigger);
+PROC_CYS_SkeletonAmbushWestClearTriggers();
+PROC_CYS_SkeletonAmbushWestClearChars();
+
+PROC
+PROC_CYS_SkeletonAmbushWestSpawn((TRIGGER)_Trigger)
+AND
+DB_CYS_SkelAmbushWest(_Trigger,_Char,_Destination)
+THEN
+CharacterAppearAtTrigger(_Char,_Destination,1);
+
+PROC 
+PROC_CYS_SkeletonAmbushWestClearTriggers()
+AND
+DB_CYS_SkelAmbushWestTriggers(_Trigger)
+THEN
+NOT DB_CYS_SkelAmbushWestTriggers(_Trigger);
+TriggerUnregisterForPlayers(_Trigger);
+
+PROC 
+PROC_CYS_SkeletonAmbushWestClearChars()
+AND
+DB_CYS_SkelAmbushWest(_Trigger,_Char,_Destination)
+THEN
+NOT DB_CYS_SkelAmbushWest(_Trigger,_Char,_Destination);
+//END_REGION
+
+//REGION Undead Encounter 2
+PROC 
+PROC_CYS_UndeadEncounter2Init()
+THEN
+CharacterSetOnStage(CHARACTER_CYS_Ambush_Undead_Skeleton_Grunt_BMW_000,0);
+CharacterSetOnStage(CHARACTER_CYS_Ambush_Undead_Skeleton_Grunt_BMW_001,0);
+
+IF
+CharacterEvent(CHARACTER_CYS_Ambush_Undead_BoarWild_A_Zombie_A_Strong_003,"CMB_CYS_UndeadEncounter2_BoarIsDead_Event")
+THEN
+CharacterSetOnStage(CHARACTER_CYS_Ambush_Undead_Skeleton_Grunt_BMW_000,1);
+TimerLaunch("CMB_CYS_UndeadEncounter2_BoarIsDead_Timer1",400);
+
+IF
+TimerFinished("CMB_CYS_UndeadEncounter2_BoarIsDead_Timer1")
+THEN
+CharacterAppear(CHARACTER_CYS_Ambush_Undead_Skeleton_Grunt_BMW_001,1);
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

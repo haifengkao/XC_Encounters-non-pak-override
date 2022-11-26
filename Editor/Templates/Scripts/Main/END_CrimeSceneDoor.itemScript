@@ -1,0 +1,63 @@
+INIT
+
+ITEM:__Me
+
+	CHARACTER:%Leandra = END_NegaLeandraCrime_ba9fa52f-8d06-4146-a829-7aa2f67378be
+	CHARACTER:%Zandalor = END_NegaZandalorCrime_ed853add-52e9-4609-b1d1-ea3843a875af
+	INT:%DialogEnded = 0
+	INT:%Used = 0
+	INT:%Locked = 1
+	
+EVENTS
+
+EVENT UseDoor
+ON
+	OnUseItem(_, __Me)
+ACTIONS
+	IF "c1"
+		IsEqual(%Locked, 1)
+	THEN
+		IF "!c1&!c2"
+			IsEqual(%DialogEnded, 1)
+			IsEqual(%Used, 1)
+		THEN
+			CharacterEvent(%Zandalor, "END_NegaCrimeDoorDialog")
+			CharacterEvent(%Leandra, "END_NegaCrimeDoor")
+			Set(%Used, 1)
+		ENDIF
+		
+		IF "c1"
+			IsEqual(%DialogEnded, 1)
+		THEN
+			CharacterEvent(%Leandra, "END_NegaCrimeDoorDialog2")
+			CharacterEvent(%Zandalor, "END_NegaCrimeDoor")
+		ENDIF
+	ENDIF
+	
+EVENT Open
+ON
+	OnItemOpened(__Me)
+ACTIONS
+	IF "c1"
+		IsEqual(%Locked, 1)
+	THEN
+		CallFunction("FuncRoomActions")
+	ENDIF
+	
+EVENT Destroy
+ON
+	OnItemDestroyed(__Me)
+ACTIONS
+	IF "c1"
+		IsEqual(%Locked, 1)
+	THEN
+		CallFunction("FuncRoomActions")
+	ENDIF
+	
+EVENT FuncRoomOpened
+ON
+	OnFunction("FuncRoomActions")
+ACTIONS
+	Set(%Locked, 0)
+	CharacterEvent(%Zandalor, "END_CrimePoof")
+	CharacterEvent(%Leandra, "END_CrimePoof")

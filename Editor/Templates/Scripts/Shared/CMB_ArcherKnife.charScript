@@ -1,0 +1,315 @@
+#INCLUDE DefaultCharacter
+INIT
+	USING DefaultCharacter
+	EXTERN INT:%archerPriorityFlee=140
+	EXTERN FLOAT:%archerMoveIfEnemyInRange=6
+	EXTERN FLOAT:%archerSwitchIfEnemyClose=3
+	EXTERN FLOAT:%archerSwitchToRanged=6
+	EXTERN FLOAT:%archerDontFleeFurtherThan=20
+	CHARACTER:__Me
+	FLOAT3:%startPosition
+	CHARACTER:%currentSetTargetArcher=null
+	CHARACTER:%currentSetTargetArcherMove=null
+	FLOAT:%setTargetArcherBestScore=-1000
+	FLOAT:%setTargetArcherBestScoreMove=1000000
+	FLOAT:%setTargetArcherMaxDistance=70.0
+
+//--------------------
+EVENTS
+EVENT ArcherStartTurn
+ON
+	OnTurn()
+ACTIONS
+	Set(%currentSetTargetArcher,null)
+	Set(%setTargetArcherBestScore,-100)
+	Set(%currentSetTargetArcherMove,null)
+	Set(%setTargetArcherBestScoreMove,1000000)
+	//DebugText(__Me,"Scanning for target! (AK)")
+	IterateCharactersInCombat(__Me,"SetTargetArcherIterator")
+	
+EVENT TargetBecomesInvisible
+VARS
+	CHARACTER:_Char
+	CHARACTER:_CurrentTarget
+ON
+	OnCharacterStatus(_Char,INVISIBLE)
+ACTIONS
+	//DebugText(__Me,"[1]: went invisible! (AK)",_Char)
+	IF "c1&c2"
+		CharacterGetEnemy(_CurrentTarget,__Me)
+		IsEqual(_CurrentTarget,_Char)
+	THEN
+		Set(%currentSetTargetArcher,null)
+		Set(%setTargetArcherBestScore,-100)
+		Set(%currentSetTargetArcherMove,null)
+		Set(%setTargetArcherBestScoreMove,1000000)
+		//DebugText(__Me,"Scanning for new target! (AK)")
+		IterateCharactersInCombat(__Me,"SetTargetArcherIterator")
+	ENDIF
+	
+EVENT TargetDies
+VARS
+	CHARACTER:_Char
+	CHARACTER:_CurrentTarget
+ON
+	OnDie(_Char,_,_,_)
+ACTIONS
+	//DebugText(__Me,"[1]: dead! (AK)",_Char)
+	IF "c1&c2"
+		CharacterGetEnemy(_CurrentTarget,__Me)
+		IsEqual(_CurrentTarget,_Char)
+	THEN
+		Set(%currentSetTargetArcher,null)
+		Set(%setTargetArcherBestScore,-100)
+		Set(%currentSetTargetArcherMove,null)
+		Set(%setTargetArcherBestScoreMove,1000000)
+		//DebugText(__Me,"Scanning for new target! (AK)")
+		IterateCharactersInCombat(__Me,"SetTargetArcherIterator")
+	ENDIF
+	
+EVENT TargetIsNotVisibleAnymore	//added by Edouard on 29/05/2015
+VARS
+	CHARACTER:_Char
+	CHARACTER:_CurrentTarget
+ON
+	OnLostSight(_Char)
+ACTIONS
+	//DebugText(__Me,"[1]: lost sight! (AK)",_Char)
+	IF "c1&c2"
+		CharacterGetEnemy(_CurrentTarget,__Me)
+		IsEqual(_CurrentTarget,_Char)
+	THEN
+		Set(%currentSetTargetArcher,null)
+		Set(%setTargetArcherBestScore,-100)
+		Set(%currentSetTargetArcherMove,null)
+		Set(%setTargetArcherBestScoreMove,1000000)
+		//DebugText(__Me,"Scanning for new target! (AK)")
+		IterateCharactersInCombat(__Me,"SetTargetArcherIterator")
+	ENDIF
+	
+EVENT ArcherIterateSetTarget
+VARS 
+	CHARACTER:_Char
+	FLOAT:_targetDistance
+	FLOAT:_targetClosestThisScore=0
+	FLOAT:_maxRange
+	FLOAT:_charHealth
+	FLOAT:_targetPiercingRes
+	INT:_alreadyTargetedBy
+ON
+	OnIterateCharacter(_Char,"SetTargetArcherIterator")
+ACTIONS
+	IF "!c1&!c2&c3&c4&!c5&c6&c7&!c8&!c9&c10&c11"
+		CharacterIsDead(_Char)													//!c1
+		IsEqual(__Me,_Char)														//!c2
+		CharacterIsEnemy(__Me,_Char)											//c3
+		GetDistance(_targetDistance,__Me,_Char)									//c4
+		IsGreaterThen(_targetDistance,%setTargetArcherMaxDistance)				//!c5
+		CharacterGetWeaponRange(_,_maxRange,__Me)								//c6
+		CharacterGetStat(_charHealth,_Char,Vitality)							//c7
+		CharacterHasStatus(_Char,INVISIBLE)										//!8
+		CharacterHasStatus(_Char,SNEAKING)										//!c9
+		CharacterGetHostileCount(_alreadyTargetedBy,_Char)						//c10
+		CharacterGetStat(_targetPiercingRes,_Char,PiercingResistance)			//c11
+	THEN
+		//DebugText(_Char,"Detected! (AK)")
+		Add(_maxRange,3)
+		Subtract(_targetDistance,_maxRange)
+		IF "c1"
+			IsEqual(_alreadyTargetedBy,0)
+		THEN
+			Multiply(_targetDistance,0.2)
+		ENDIF
+		IF "c1"
+			IsGreaterThen(_alreadyTargetedBy,0)
+		THEN
+			Add(_alreadyTargetedBy,0.1)
+			Multiply(_targetDistance,_alreadyTargetedBy)
+		ENDIF
+		IF "c1"
+			IsLessThen(_charHealth,0.2)
+		THEN
+			Multiply(_targetDistance,0.8)
+		ENDIF
+		IF "c1"
+			IsGreaterThen(_targetPiercingRes,0.9)
+		THEN
+			Multiply(_targetDistance,5)
+		ENDIF
+		IF "c1"
+			CharacterIsSummon(_Char)
+		THEN
+			Multiply(_targetDistance,1.5)
+		ENDIF
+		IF "c1"
+			CharacterHasStatus(_Char,AGGRO_MARKED)
+		THEN
+			Divide(_targetDistance,2)
+		ENDIF
+		IF "!c1"
+			CharacterCanSee(__Me,_Char)
+		THEN
+			Multiply(_targetDistance,10) // to be tweaked
+		ENDIF
+		IF "c1&c2"
+			IsLessThen(_targetDistance,0)
+			IsGreaterThen(_targetDistance,%setTargetArcherBestScore)
+		THEN
+			Set(%setTargetArcherBestScore,_targetDistance)
+			Set(%currentSetTargetArcher,_Char)
+		ENDIF
+		IF "c1&c2"
+			IsGreaterThen(_targetDistance,0)
+			IsLessThen(_targetDistance,%setTargetArcherBestScoreMove)
+		THEN
+			Set(%setTargetArcherBestScoreMove,_targetDistance)
+			Set(%currentSetTargetArcherMove,_Char)
+		ENDIF
+		IF "!c1"
+			IsEqual(%currentSetTargetArcher,null)
+		THEN
+			CharacterSetEnemy(__Me,%currentSetTargetArcher)
+		ELSE
+			CharacterSetEnemy(__Me,%currentSetTargetArcherMove)
+		ENDIF
+	ENDIF
+
+EVENT GetStartPosition
+ON
+	OnInit()
+ACTIONS
+	GetPosition(__Me,%startPosition)
+	SetPriority("Combat_MoveToSetEnemy",0)
+
+EVENT CheckDistanceToStart
+VARS
+	FLOAT3:_CurrentPosition
+	FLOAT:_Difference
+ON
+	OnTurn()
+ACTIONS
+	IF "c1&c2&c3"
+		GetPosition(__Me,_CurrentPosition)
+		GetDistance(_Difference,_CurrentPosition,%startPosition)
+		IsGreaterThen(_Difference,%archerDontFleeFurtherThan)
+	THEN
+		SetPriority("FleeAndAttack",0)
+	ELSE
+		SetPriority("FleeAndAttack",%archerPriorityFlee)
+	ENDIF
+
+//--------------------
+BEHAVIOUR 
+REACTION FleeAndAttack,0 // if anyone comes within x meters, flee and target them
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+	FLOAT:_archerMoveRangeIfEnemyClose
+CHECK "(c1|c2)&c3&c4&c5"
+	CharacterHasWeaponType(__Me,Bow,1)
+	CharacterHasWeaponType(__Me,CrossBow,1)
+	CharacterGet(_Enemy,__Me,%archerMoveIfEnemyInRange,Lowest,Distance,Enemy,null,null,null,__Me)
+	GetDistance(_archerMoveRangeIfEnemyClose,__Me,_Enemy)
+	CharacterCanSee(__Me,_Enemy)
+ACTIONS
+	Add(_archerMoveRangeIfEnemyClose,%archerMoveIfEnemyInRange)
+	CharacterFleeFrom(RELATION:Enemy,_archerMoveRangeIfEnemyClose)
+	CharacterAttack(_Enemy)
+INTERRUPT
+ON
+	OnMovementFailed(_)
+ACTIONS
+	CharacterAttack(_Enemy)
+	
+REACTION SwitchToDagger,150 // switch to dagger if enemy close and you cannot flee
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+CHECK "(c1|c2)&c3&c4&!c5"
+	CharacterHasWeaponType(__Me,Bow,1)
+	CharacterHasWeaponType(__Me,CrossBow,1)
+	CharacterGet(_Enemy,__Me,%archerSwitchIfEnemyClose,Lowest,Distance,Enemy)
+	CharacterHasWeaponType(__Me,SmallWeapons)
+	CharacterHasStatus(_Enemy,INVISIBLE)
+ACTIONS
+	CharacterSwitchWeaponType(SmallWeapons)
+	CharacterSetEnemy(__Me,_Enemy)
+	CharacterAttack(_Enemy)
+INTERRUPT
+ON
+	OnMovementFailed(_)
+ACTIONS
+	CharacterEndTurn()
+
+REACTION SwitchToBow,150 // switch to bow if no one is close
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+CHECK "c1&!c2&c3"	
+	CharacterHasWeaponType(__Me,SmallWeapons,1)
+	CharacterGet(_Enemy,__Me,%archerSwitchToRanged,Lowest,Distance,Enemy)
+	CharacterHasWeaponType(__Me,Bow)
+ACTIONS
+	CharacterSwitchWeaponType(Bow)
+	Set(%currentSetTargetArcher,null)
+	Set(%setTargetArcherBestScore,-100)
+	Set(%currentSetTargetArcherMove,null)
+	Set(%setTargetArcherBestScoreMove,1000000)
+	IterateCharactersInCombat(__Me,"SetTargetArcherIterator")
+	
+REACTION SwitchToXBow,150 // switch to bow if no one is close
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+CHECK "c1&!c2&c3"	
+	CharacterHasWeaponType(__Me,SmallWeapons,1)
+	CharacterGet(_Enemy,__Me,%archerSwitchToRanged,Lowest,Distance,Enemy)
+	CharacterHasWeaponType(__Me,CrossBow)
+ACTIONS
+	CharacterSwitchWeaponType(CrossBow)
+	Set(%currentSetTargetArcher,null)
+	Set(%setTargetArcherBestScore,-100)
+	Set(%currentSetTargetArcherMove,null)
+	Set(%setTargetArcherBestScoreMove,1000000)
+	IterateCharactersInCombat(__Me,"SetTargetArcherIterator")
+
+REACTION ArcherKnifeClosestAttack,149
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+	FLOAT:_dist
+	FLOAT:_minRange
+	FLOAT:_maxRange
+CHECK "c1&c2&c3&(c4|(c5&c6))"
+	CharacterGetEnemy(_Enemy,__Me) // returns false if null
+	CharacterGetWeaponRange(_minRange,_maxRange,__Me)
+	GetInnerDistance(_dist,__Me,_Enemy)
+	CharacterCanSee(__Me,_Enemy)
+	IsLessThen(_dist,_maxRange)
+	CharacterHasWeaponType(__Me,SmallWeapons,1)
+ACTIONS
+	//DebugText(__Me,"Melee'ing [1]!",_SetEnemy)
+	CharacterAttack(_Enemy)
+INTERRUPT
+ON
+	OnMovementFailed(_)
+ACTIONS
+	CharacterEndTurn()
+	
+REACTION ArcherKnifeCannotSeeTarget,7
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+	FLOAT:_TouchRange
+CHECK "c1&!c2&c3&c4"
+	CharacterGetEnemy(_Enemy,__Me)
+	CharacterCanSee(__Me,_Enemy)
+	CharacterHasWeaponType(__Me,SmallWeapons)
+	CharacterGetTouchRange(_TouchRange, __Me)
+ACTIONS	
+	CharacterMoveTo(_Enemy,1,0,0,0,_TouchRange)
+INTERRUPT
+ON
+	OnMovementFailed(_)
+ACTIONS
+	DelayReaction("ArcherKnifeCannotSeeTarget",3)

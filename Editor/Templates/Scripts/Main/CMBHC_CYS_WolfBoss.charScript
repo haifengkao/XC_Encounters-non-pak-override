@@ -1,0 +1,67 @@
+INIT
+	CHARACTER:__Me
+	INT:%SickAllies_Count
+	CHARACTER:%SickAlly
+	
+//----------
+BEHAVIOUR
+REACTION WolfBoss_Cast_PurifShout,900
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3"
+	CharacterCanCast(__Me,"Shout_EnemyPurifyingShout")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Shout_EnemyPurifyingShout")	
+	IsHardcore()
+ACTIONS
+	DebugText(__Me,"Anyone sick?")
+	Set(%SickAllies_Count,0)	
+	Set(%SickAlly,null)	
+	IterateCharacters("Iterate_AlliesInNeedOfPurification",Lowest,Distance)
+	IF "c1"
+		IsGreaterThen(%SickAllies_Count,1)	//you need at least 2 allies in need of purification to use purifshout!
+	THEN
+		DebugText(__Me,"Sick wolves: [1]",%SickAllies_Count)
+		CharacterMoveInRange(%SickAlly,_MinRange,_MaxRange,1)		
+		CharacterUseSkill("Shout_EnemyPurifyingShout",__Me)
+	ENDIF
+	SetPriority("WolfBoss_Cast_PurifShout",0)
+INTERRUPT
+	Reset()	
+	
+//----------
+EVENTS
+EVENT OnInit_GivePurifShout
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill("Shout_EnemyPurifyingShout")
+
+EVENT OnIterate_ScanForAlliesWithStatuses
+VARS
+	CHARACTER:_Ally
+ON
+	OnIterateCharacter(_Ally,"Iterate_AlliesInNeedOfPurification")
+ACTIONS
+	IF "(c1&!c2&(c3|c4|c5|c6|c7))|(c8&c9)"
+		CharacterIsAlly(__Me,_Ally)										//c1
+		IsEqual(_Ally,__Me)												//!c2
+		CharacterHasStatus(_Ally,"BURNING")								//c3
+		CharacterHasStatus(_Ally,"FROZEN")								//c4
+		CharacterHasStatus(_Ally,"STUNNED")								//c5
+		CharacterHasStatus(_Ally,"MARK_OF_DEATH")						//c6
+		CharacterHasStatus(_Ally,"CRAWLING_INFESTATION")				//c7
+		CharacterIsEnemy(__Me,_Ally)									//c8
+		CharacterHasStatus(_Ally,"CHARMED")								//c9		
+	THEN
+		DebugText(_Ally,"Sick!")
+		Add(%SickAllies_Count,1)
+		Set(%SickAlly,_Ally)
+	ENDIF		
+	
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("WolfBoss_Cast_PurifShout",900)

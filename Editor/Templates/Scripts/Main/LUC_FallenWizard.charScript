@@ -1,0 +1,56 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter
+CHARACTER:__Me
+INT:%StateVar1 = 0
+INT:%StateVar2 = 0
+
+BEHAVIOUR
+REACTION ShoutOut,1100
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%StateVar1,1)
+ACTIONS
+	DisplayText(__Me,"LUC_FallenWizard_Script_0") // Hey you. Can you help me?
+	CharacterPlayAnimation("Fidget_Forward_01")
+	DisplayText(__Me,"LUC_FallenWizard_Script_1") // I think I broke my leg. Come over please.
+	CharacterPlayAnimation("Shrug_01")
+	Sleep(15)
+	Set(%StateVar1,0)
+
+REACTION Moan,1000
+USAGE PEACE
+VARS
+	FIXEDSTRING:%Text = ""
+	FIXEDSTRING:%Animation = ""
+ACTIONS
+	GetRandom(%Text,"LUC_FallenWizard_Script_2","LUC_FallenWizard_Script_3","LUC_FallenWizard_Script_4")
+	DisplayText(__Me,%Text) // Awwwwww. // Owwwwww. // That blasted orc!
+	GetRandom(%Animation,"Fidget_Forward_01","Shrug_01")
+	CharacterPlayAnimation(%Animation)
+	Sleep(15)
+INTERRUPT
+	Reset()
+
+REACTION GoAway,1200
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%StateVar2,1)	
+ACTIONS
+	Set(%StateVar2,0)
+	DisplayText(__Me,"LUC_FallenWizard_Script_5")
+	CharacterDisappear(180)
+
+	
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+STORY
+
+SCRIPTFRAME StartShouting
+	ACTIONS	
+	Set(%StateVar1,1)
+
+SCRIPTFRAME GoAway
+	ACTIONS	
+	Set(%StateVar2,1)
+	

@@ -1,0 +1,21 @@
+//Needs an ItemUseEvent catch in Behaviour script
+
+/*
+INIT
+ITEM:__Me
+EXTERN FIXEDSTRING:%Epitaph1 = ""
+EXTERN FIXEDSTRING:%Epitaph2 = ""
+EXTERN FIXEDSTRING:%Epitaph3 = ""
+EXTERN FIXEDSTRING:%Epitaph4 = ""
+EXTERN FIXEDSTRING:%Epitaph5 = ""
+
+EVENTS
+EVENT Epitaph
+ON
+	OnItemEvent
+ACTIONS
+	DisplayText(__Me,%Epitaph1,3)
+	DisplayText(__Me,%Epitaph2,3)
+	DisplayText(__Me,%Epitaph3,3)
+	DisplayText(__Me,%Epitaph4,3)
+	DisplayText(__Me,%Epitaph5,3)*/

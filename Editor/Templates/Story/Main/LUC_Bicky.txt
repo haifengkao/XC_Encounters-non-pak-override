@@ -1,0 +1,122 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+SneakTriggerSpotter(TRIGGER_LUC_AreaBicky, CHARACTER_LUC_Bicky);
+DB_NoDefaultBehavior(CHARACTER_LUC_Bicky);
+DB_NoDefaultBehavior(CHARACTER_LUC_Bonnie);
+DB_IsNotMessingAround(CHARACTER_LUC_Bicky);
+DB_IsNotMessingAround(CHARACTER_LUC_Bonnie);
+TriggerRegisterForCharacter(TRIGGER_LUC_AreaBicky, CHARACTER_LUC_Bonnie);
+DB_EvilDude(CHARACTER_LUC_Bicky);
+KBSECTION
+IF
+CharacterUsedItem(_Player, ITEM_LUC_DoorProstitute2)
+AND
+NOT CHARACTER_LUC_Bicky.talk()
+THEN
+CHARACTER_LUC_Bicky.talk();
+PROC_MendatoryDialogThreeSpeaker("LUC_Bicky", CHARACTER_LUC_Bicky, CHARACTER_LUC_Bonnie, _Player);
+
+IF
+DialogEnded("LUC_Bicky", _)
+AND
+CharacterGetVarInteger(CHARACTER_LUC_Bicky, "explode", 1)
+THEN
+Proc_LUC_KillBicky();
+
+IF
+CharacterEvent(CHARACTER_LUC_Bicky, "GLO_SpotterSneaker")
+THEN
+Proc_LUC_KillBicky();
+
+IF
+CharacterDied(CHARACTER_LUC_Bicky)
+AND
+DB_Dead(CHARACTER_LUC_Bonnie)
+THEN
+QuestUpdate("LUC_Bicky","KilledBonnie");
+QuestClose("LUC_Bicky");
+
+IF
+CharacterDied(CHARACTER_LUC_Bicky)
+AND
+NOT DB_Dead(CHARACTER_LUC_Bonnie)
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_LUC_Bonnie, _Player)
+THEN
+CharacterLeaveCombat(CHARACTER_LUC_Bonnie);
+GlobalSetEvent("LUC_BonnieSaved");
+CharacterSetVarFixedString(CHARACTER_LUC_Bonnie,"currentState","State_Saved");
+PROC_MendatoryDialog("LUC_Bonnie",CHARACTER_LUC_Bonnie,_Player);
+
+IF
+CharacterLeftTrigger(CHARACTER_LUC_Bonnie, TRIGGER_LUC_AreaBicky)
+AND
+NOT DB_Dead(CHARACTER_LUC_Bicky)
+THEN
+Proc_LUC_KillBicky();
+
+IF
+DialogEnded("LUC_Bonnie",_)
+AND
+NOT CHARACTER_LUC_Bonnie.isBackToCamp()
+THEN
+CHARACTER_LUC_Bonnie.isBackToCamp();
+ProcCharacterMoveToTrigger(CHARACTER_LUC_Bonnie,TRIGGER_LUC_Point_Inn_Up,1,"BonnieReachedStairsDown");
+QuestUpdate("LUC_Bicky","SavedBonnie");
+QuestClose("LUC_Bicky");
+
+IF
+CharacterEvent(CHARACTER_LUC_Bonnie,"BonnieReachedStairsDown")
+THEN
+CharacterTeleportToTrigger(CHARACTER_LUC_Bonnie,TRIGGER_LUC_Point_Inn_Down,"");
+CharacterUseItem(CHARACTER_LUC_Bonnie, ITEM_LUC_BonnieBench, "atBench");
+
+IF
+CharacterEvent(CHARACTER_LUC_Bonnie, "atBench")
+THEN
+DB_Dialogs(CHARACTER_LUC_Bonnie, "LUC_Bonnie");
+CharacterSetVarFixedString(CHARACTER_LUC_Bonnie, "currentState", "State_Waiting");
+
+IF
+CharacterEnteredCombat(CHARACTER_LUC_Bicky, _)
+THEN
+Proc_LUC_KillBicky();
+
+IF
+CharacterEnteredCombat(CHARACTER_LUC_Bonnie, _)
+AND
+NOT DB_Dead(CHARACTER_LUC_Bicky)
+THEN
+Proc_LUC_KillBicky();
+
+IF	
+DialogStarted("LUC_DD_Bicky", _ID)
+AND
+DialogGetInvolvedPlayer(_ID, 1, _Player)
+THEN
+DB_LUC_DDBicky(_Player);
+
+IF
+DialogEnded("LUC_DD_Bicky", _)
+AND
+DB_LUC_DDBicky(_Player)
+THEN
+NOT DB_LUC_DDBicky(_Player);
+
+PROC
+Proc_LUC_KillBicky()
+AND
+DB_LUC_DDBicky(_Player)
+THEN
+DialogRequestStopForCharacter(_Player);
+
+PROC
+Proc_LUC_KillBicky()
+THEN
+DialogRequestStopForCharacter(CHARACTER_LUC_Bicky);
+CharacterDie(CHARACTER_LUC_Bicky, 0);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

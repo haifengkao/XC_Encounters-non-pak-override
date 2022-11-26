@@ -1,0 +1,36 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+CHARACTER:%Alistair = CYS_Fab_Alistair_3f08a420-852d-4f99-b8cd-8d5fcd0596ab
+
+BEHAVIOUR
+
+REACTION State_Waiting, 0
+USAGE PEACE
+ACTIONS
+	Sleep(2)
+
+REACTION State_Dialog, 0
+USAGE PEACE
+CHECK "!c1&!c2"
+	IsInDialog(%Alistair)
+	IsInDialog(__Me)
+ACTIONS
+	IF "!c1"
+		CharacterIsDead(%Alistair)
+	THEN
+		DialogStart("CYS_AD_AnnaAlistair",__Me,%Alistair)
+	ENDIF
+	Set(%currentState,"State_Waiting")
+INTERRUPT
+	Set(%currentState,"State_Waiting")
+
+EVENTS
+
+EVENT StartDialog
+ON
+	OnCharacterEvent(__Me,"DialogRequest")
+ACTIONS
+	Set(%currentState,"State_Dialog")

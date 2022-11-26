@@ -1,0 +1,49 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter
+
+CHARACTER:__Me
+CHARACTER:%Friend = LUC_CookMiner_56bafd7a-bdaf-4477-8fea-1eb20f5d40af
+
+TRIGGER:%Trigger1 = LUC_PointHungryMiner_d6d435b7-a5f1-49d3-a377-da73ae2f3701
+TRIGGER:%Trigger2 = LUC_PointHungryMiner2_580f9679-4d9e-4e54-92d2-c01cde63f445
+INT:%NumberOfAnimations = 1
+FIXEDSTRING:%CurrentAnimation = ""
+
+BEHAVIOUR
+REACTION MinePoint,1000
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Trigger1,0)
+	CharacterLookFrom(%Trigger1)
+	GetRandom(%NumberOfAnimations, 1, 2)
+	Set(%CurrentAnimation, "Repairman_01")
+	SetPriority("LoopAnimation", 1070)
+INTERRUPT
+	Reset()
+
+REACTION LoopAnimation, 0
+VARS
+	INT:_Counter = 0
+USAGE PEACE
+ACTIONS
+	CharacterPlayAnimation(%CurrentAnimation)
+	Add(_Counter, 1)
+	IF "!c1"
+		IsGreaterThen(_Counter, %NumberOfAnimations)
+	THEN
+		Goto("Start")
+	ELSE
+		CharacterMoveTo(%Trigger2,0)
+		DisplayText(__Me,"LUC_HungryMiner_Script_0",3)
+		Sleep(3)
+		DisplayText(%Friend,"LUC_HungryMiner_Script_1",3)
+		Sleep(1)
+		CharacterPlayAnimation("Sigh_01")
+		Sleep(15)
+		Set(_Counter, 0)
+		SetPriority("LoopAnimation", 0)
+	ENDIF
+INTERRUPT
+	SetPriority("LoopAnimation", 0)

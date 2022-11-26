@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<palette xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <palettes />
+  <objectids>
+    <guid>facf820b-8ca3-4484-b4bb-9f17647ed7e5</guid>
+    <guid>b63d69b8-48d6-4606-b4ec-62f3bf42ca91</guid>
+    <guid>1eaf2529-913d-4800-8583-da3bf7db0331</guid>
+    <guid>d7f75472-846c-497d-ab91-8772da146cf4</guid>
+    <guid>ef3808aa-a31a-4b9b-9617-027d0fd197a5</guid>
+    <guid>bab23c49-7c2d-4c85-9978-e008bf1aea81</guid>
+    <guid>d9157d4c-4af8-477b-847b-f08c79b116af</guid>
+    <guid>d6189bab-2cc0-4b91-b163-aa6d6a1383a4</guid>
+    <guid>47651d1f-1c71-49f0-a52d-dbc8968e9fd7</guid>
+    <guid>957dea8c-1124-4e9e-a1e8-8e1f7d4fdf94</guid>
+    <guid>99bff464-f557-486f-8abb-5ebdcefe6eed</guid>
+    <guid>68da6b0a-427c-411d-99bd-d54f24c06f5e</guid>
+    <guid>6f1ba0a8-8bc1-4e8c-bf79-8bd2df1b1d78</guid>
+    <guid>9f3ed65e-37fb-4d8b-bf78-faf48001fc03</guid>
+    <guid>883c6c0b-0771-495b-b5ff-4ac591439af0</guid>
+    <guid>8ffad9ad-a302-4983-9b2b-4d6f5562c2f9</guid>
+    <guid>6145313a-da7f-498f-9066-713a54b8c89e</guid>
+    <guid>ca9070c7-de3d-4e82-9e0e-d9b50d6428a8</guid>
+    <guid>4b0e9209-fda0-4fec-a979-9a6c7b224d17</guid>
+    <guid>abef84ea-f819-4a2d-a04e-6c231ad031e4</guid>
+    <guid>057563f7-8fb8-4c6d-8ab2-746d6779183d</guid>
+    <guid>1e7fead7-2d2f-4478-b7d8-07536d1f62f7</guid>
+    <guid>c81cce4c-0c71-4822-8401-813493bd49ce</guid>
+    <guid>d88fb7fd-19cd-44b9-bb74-39687de5277a</guid>
+    <guid>2fa250c4-bc01-4b72-9050-a332d95dd35a</guid>
+    <guid>1b9a23c7-aa5c-43b8-839a-be4105bf5c46</guid>
+    <guid>95c06e4d-241d-449c-97d4-c05ade764746</guid>
+    <guid>1fe02ff4-ef67-44da-9637-b19512e98069</guid>
+    <guid>e1167f3b-37b9-4a89-ae50-f6dd52ae229f</guid>
+    <guid>e834444d-cdb9-42ad-8fd4-71bb22126f72</guid>
+  </objectids>
+  <name>Laboratory</name>
+</palette>

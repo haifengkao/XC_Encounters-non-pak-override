@@ -1,0 +1,629 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+
+EXTERN ITEM:%ReginaldBench = null
+EXTERN ITEM:%CedricBench = null
+EXTERN ITEM:%PlayerBench = null
+EXTERN TRIGGER:%PlayerFinal = null
+EXTERN STRING:%Dialog = null
+EXTERN INT:%GoToPlayer = 0 // 0 : Always, 1 : Follow Gallagher / Gallagher
+INT:%BenchUsed = 3 // 0 : Reginald; 1 : Cedric; 2 : Player
+INT:%PlayInPlay = 0
+INT:%CanGoToShow = 1
+TRIGGER:%ReginaldTrigger = CYS_ChairWanted_Reginald_13edeab8-8ab1-4599-b405-79b3477100f2
+TRIGGER:%CedricTrigger = CYS_ChairWanted_Cedric_575b94f5-2561-4883-9ca6-96684146142f
+TRIGGER:%PlayerTrigger = CYS_ChairWanted_Player_89634d70-93a7-458d-b7e6-b3bd08f918d8
+ITEM:%ChosenBench = null
+
+BEHAVIOUR
+
+REACTION State_WatchReginald, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, "Action_WatchReginald")
+	SetPriority(%currentAction, 1100)
+	
+REACTION State_WatchCedric, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, "Action_WatchCedric")
+	SetPriority(%currentAction, 1100)
+	
+REACTION Action_WatchReginald, 0
+USAGE PEACE
+VARS
+	FLOAT:_WaitTime
+	FIXEDSTRING:_Anim
+	ITEM:_Seat
+ACTIONS
+	IF "(!c1&!c2)|!c3"
+		CharacterHasStatus(__Me,"SITTING")
+		CharacterHasStatus(__Me,"LYING")
+		IsEqual(%BenchUsed, 0)
+	THEN
+		IF "c1&c2&c3"
+			ItemIsInTrigger(%ReginaldBench, %ReginaldTrigger)
+			CharacterCanSitOnItem(__Me, %ReginaldBench)
+			IsFacing(%ReginaldBench, TRIGGER:CYS_Point_Reginald2_55cf9617-3200-4f53-8f40-58e0a9fea03a, 90)
+		THEN
+			CharacterMoveTo(%ReginaldBench)
+			IF "c1&c2&c3"
+				ItemIsInTrigger(%ReginaldBench, %ReginaldTrigger)
+				CharacterCanSitOnItem(__Me, %ReginaldBench)
+				IsFacing(%ReginaldBench, TRIGGER:CYS_Point_Reginald2_55cf9617-3200-4f53-8f40-58e0a9fea03a, 90)
+			THEN
+				CharacterUseItem(%ReginaldBench)
+				Set(%BenchUsed, 0)
+			ENDIF
+		ELSE
+			CharacterMoveInRange(%ReginaldTrigger, 1, 5, 0)
+			CharacterLookAt(TRIGGER:CYS_Point_Reginald2_55cf9617-3200-4f53-8f40-58e0a9fea03a)
+			Set(%ChosenBench, null)
+			IterateItemsNear(__Me, 10, "canISitOnYouReginald")
+			IF "!c1"
+				IsEqual(%ChosenBench, null)
+			THEN
+				CharacterMoveTo(%ChosenBench)
+				IF "c1&c2&c3"
+					ItemIsInTrigger(%ChosenBench, %ReginaldTrigger)
+					CharacterCanSitOnItem(__Me, %ChosenBench)
+					IsFacing(%ChosenBench, TRIGGER:CYS_Point_Reginald2_55cf9617-3200-4f53-8f40-58e0a9fea03a, 90)
+				THEN
+					CharacterUseItem(%ChosenBench)
+					Set(%BenchUsed, 0)
+				ENDIF
+			ENDIF
+		ENDIF
+	ENDIF
+	GetRandomBetween(_WaitTime,1,6)
+	Sleep(_WaitTime)
+	IF "c1"
+		CharacterHasStatus(__Me,"SITTING")
+	THEN
+		GetRandom(_Anim, "Sit_Chuckle_01", "Sit_Laugh_01", "Sit_Praise_01", "Sit_Yes_01")
+		CharacterSetAnimationOverride(__Me, _Anim)
+		IF "c1"
+			IsRandom(0.25)
+		THEN
+			DialogStart(%Dialog,__Me)
+		ENDIF
+		CharacterSetAnimationOverride(__Me, "Sit_Idle_03")
+	ELSE
+		GetRandom(_Anim, "Chuckle_01", "Laugh_01", "Clap_02", "Yes_02")
+		CharacterPlayAnimation(_Anim)
+		IF "c1"
+			IsRandom(0.25)
+		THEN
+			DialogStart(%Dialog,__Me)
+		ENDIF
+	ENDIF
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	Reset()
+	SetPriority(%currentAction, 0)
+
+REACTION Action_WatchCedric, 0
+USAGE PEACE
+VARS
+	FLOAT:_WaitTime
+	FIXEDSTRING:_Anim
+ACTIONS
+	IF "(!c1&!c2)|!c3"
+		CharacterHasStatus(__Me,"SITTING")
+		CharacterHasStatus(__Me,"LYING")
+		IsEqual(%BenchUsed, 1)
+	THEN
+		IF "c1&c2&c3"
+			ItemIsInTrigger(%CedricBench, %CedricTrigger)
+			CharacterCanSitOnItem(__Me, %CedricBench)
+			IsFacing(%CedricBench, TRIGGER:CYS_Point_FairCedric_1_fe18ab92-7cda-4ebb-aea8-e08b05d88a20, 90)
+		THEN
+			CharacterMoveTo(%CedricBench)
+			IF "c1&c2&c3"
+				ItemIsInTrigger(%CedricBench, %CedricTrigger)
+				CharacterCanSitOnItem(__Me, %CedricBench)
+				IsFacing(%CedricBench, TRIGGER:CYS_Point_FairCedric_1_fe18ab92-7cda-4ebb-aea8-e08b05d88a20, 90)
+			THEN
+				CharacterUseItem(%CedricBench)
+				Set(%BenchUsed, 1)
+			ENDIF
+		ELSE
+			CharacterMoveInRange(%CedricTrigger, 1, 5, 0)
+			CharacterLookAt(TRIGGER:CYS_Point_FairCedric_1_fe18ab92-7cda-4ebb-aea8-e08b05d88a20)
+			Set(%ChosenBench, null)
+			IterateItemsNear(__Me, 10, "canISitOnYouCedric")
+			IF "!c1"
+				IsEqual(%ChosenBench, null)
+			THEN
+				CharacterMoveTo(%ChosenBench)
+				IF "c1&c2&c3"
+					ItemIsInTrigger(%ChosenBench, %CedricTrigger)
+					CharacterCanSitOnItem(__Me, %ChosenBench)
+					IsFacing(%ChosenBench, TRIGGER:CYS_Point_FairCedric_1_fe18ab92-7cda-4ebb-aea8-e08b05d88a20, 90)
+				THEN
+					CharacterUseItem(%ChosenBench)
+					Set(%BenchUsed, 1)
+				ENDIF
+			ENDIF
+		ENDIF
+	ENDIF
+	GetRandomBetween(_WaitTime,1,6)
+	Sleep(_WaitTime)
+	IF "c1"
+		CharacterHasStatus(__Me,"SITTING")
+	THEN
+		GetRandom(_Anim, "Sit_Chuckle_01", "Sit_Laugh_01", "Sit_Praise_01", "Sit_Yes_01")
+		CharacterSetAnimationOverride(__Me, _Anim)
+		IF "c1"
+			IsRandom(0.25)
+		THEN
+			DialogStart(%Dialog,__Me)
+		ENDIF
+		CharacterSetAnimationOverride(__Me, "Sit_Idle_03")
+	ELSE
+		GetRandom(_Anim, "Chuckle_01", "Laugh_01", "Clap_02", "Yes_02")
+		CharacterPlayAnimation(_Anim)
+		IF "c1"
+			IsRandom(0.25)
+		THEN
+			DialogStart(%Dialog,__Me)
+		ENDIF
+	ENDIF
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	Reset()
+	SetPriority(%currentAction, 0)
+	
+REACTION Action_BooPlayer, 0
+USAGE PEACE
+VARS
+	FLOAT:_WaitTime
+	FIXEDSTRING:_Anim
+ACTIONS
+	IF "(!c1&!c2)|!c3"
+		CharacterHasStatus(__Me,"SITTING")
+		CharacterHasStatus(__Me,"LYING")
+		IsEqual(%BenchUsed, 2)
+	THEN
+		IF "c1&c2&c3"
+			ItemIsInTrigger(%PlayerBench, %PlayerTrigger)
+			CharacterCanSitOnItem(__Me, %PlayerBench)
+			IsFacing(%PlayerBench, TRIGGER:CYS_Performance1Player_ab81168b-b254-42fc-9fc0-91746efd76b2, 90)
+		THEN
+			CharacterMoveTo(%PlayerBench)
+			IF "c1&c2&c3"
+				ItemIsInTrigger(%PlayerBench, %PlayerTrigger)
+				CharacterCanSitOnItem(__Me, %PlayerBench)
+				IsFacing(%PlayerBench, TRIGGER:CYS_Performance1Player_ab81168b-b254-42fc-9fc0-91746efd76b2, 90)
+			THEN
+				CharacterUseItem(%PlayerBench)
+				Set(%BenchUsed, 2)
+			ENDIF
+		ELSE
+			CharacterMoveInRange(%PlayerTrigger, 1, 5, 0)
+			CharacterLookAt(TRIGGER:CYS_Performance1Player_ab81168b-b254-42fc-9fc0-91746efd76b2)
+			Set(%ChosenBench, null)
+			IterateItemsNear(__Me, 10, "canISitOnYouPlayer")
+			IF "!c1"
+				IsEqual(%ChosenBench, null)
+			THEN
+				CharacterMoveTo(%ChosenBench)
+				IF "c1&c2&c3"
+					ItemIsInTrigger(%ChosenBench, %PlayerTrigger)
+					CharacterCanSitOnItem(__Me, %ChosenBench)
+					IsFacing(%ChosenBench, TRIGGER:CYS_Performance1Player_ab81168b-b254-42fc-9fc0-91746efd76b2, 90)
+				THEN
+					CharacterUseItem(%ChosenBench)
+					Set(%BenchUsed, 2)
+				ENDIF
+			ENDIF
+		ENDIF
+	ENDIF
+	GetRandomBetween(_WaitTime,1,3)
+	Sleep(_WaitTime)
+	IF "c1"
+		CharacterHasStatus(__Me,"SITTING")
+	THEN
+		GetRandom(_Anim, "Sit_Tired_01", "Sit_Sigh_01", "Sit_No_01", "Sit_Annoyed_01")
+		CharacterSetAnimationOverride(__Me, _Anim)
+		DialogStart("CYS_AD_BooPlayers",__Me)
+		CharacterSetAnimationOverride(__Me, "Sit_Idle_03")
+	ELSE
+		GetRandom(_Anim, "Tired_01", "Sigh_01", "No_01", "Annoyed_01")
+		CharacterPlayAnimation(_Anim)
+		DialogStart("CYS_AD_BooPlayers",__Me)
+	ENDIF
+INTERRUPT
+	Reset()
+	
+REACTION Action_WooPlayer, 0
+USAGE PEACE
+VARS
+	FLOAT:_WaitTime
+	FIXEDSTRING:_Anim
+ACTIONS
+	IF "(!c1&!c2)|!c3"
+		CharacterHasStatus(__Me,"SITTING")
+		CharacterHasStatus(__Me,"LYING")
+		IsEqual(%BenchUsed, 2)
+	THEN
+		IF "c1&c2&c3"
+			ItemIsInTrigger(%PlayerBench, %PlayerTrigger)
+			CharacterCanSitOnItem(__Me, %PlayerBench)
+			IsFacing(%PlayerBench, TRIGGER:CYS_Performance1Player_ab81168b-b254-42fc-9fc0-91746efd76b2, 90)
+		THEN
+			CharacterMoveTo(%PlayerBench)
+			IF "c1&c2&c3"
+				ItemIsInTrigger(%PlayerBench, %PlayerTrigger)
+				CharacterCanSitOnItem(__Me, %PlayerBench)
+				IsFacing(%PlayerBench, TRIGGER:CYS_Performance1Player_ab81168b-b254-42fc-9fc0-91746efd76b2, 90)
+			THEN
+				CharacterUseItem(%PlayerBench)
+				Set(%BenchUsed, 2)
+			ENDIF
+		ELSE
+			CharacterMoveInRange(%PlayerTrigger, 1, 5, 0)
+			CharacterLookAt(TRIGGER:CYS_Performance1Player_ab81168b-b254-42fc-9fc0-91746efd76b2)
+			Set(%ChosenBench, null)
+			IterateItemsNear(__Me, 10, "canISitOnYouPlayer")
+			IF "!c1"
+				IsEqual(%ChosenBench, null)
+			THEN
+				CharacterMoveTo(%ChosenBench)
+				IF "c1&c2&c3"
+					ItemIsInTrigger(%ChosenBench, %PlayerTrigger)
+					CharacterCanSitOnItem(__Me, %ChosenBench)
+					IsFacing(%ChosenBench, TRIGGER:CYS_Performance1Player_ab81168b-b254-42fc-9fc0-91746efd76b2, 90)
+				THEN
+					CharacterUseItem(%ChosenBench)
+					Set(%BenchUsed, 2)
+				ENDIF
+			ENDIF
+		ENDIF
+	ENDIF
+	GetRandomBetween(_WaitTime,1,3)
+	Sleep(_WaitTime)
+	IF "c1"
+		CharacterHasStatus(__Me,"SITTING")
+	THEN
+		GetRandom(_Anim, "Sit_Chuckle_01", "Sit_Laugh_01", "Sit_Praise_01", "Sit_Yes_01")
+		CharacterSetAnimationOverride(__Me, _Anim)
+		DialogStart("CYS_AD_WooPlayers",__Me)
+		CharacterSetAnimationOverride(__Me, "Sit_Idle_03")
+	ELSE
+		GetRandom(_Anim, "Chuckle_01", "Laugh_01", "Clap_02", "Yes_02")
+		CharacterPlayAnimation(_Anim)
+		DialogStart("CYS_AD_WooPlayers",__Me)
+	ENDIF
+INTERRUPT
+	Reset()	
+	
+REACTION Action_WaitAtPlayer, 0
+USAGE PEACE
+VARS
+	FLOAT:_WaitTime
+	INT:_CanReset 
+	FIXEDSTRING:_Anim
+ACTIONS
+	IF "(!c1&!c2)|!c3"
+		CharacterHasStatus(__Me,"SITTING")
+		CharacterHasStatus(__Me,"LYING")
+		IsEqual(%BenchUsed, 2)
+	THEN
+		IF "c1&c2&c3"
+			ItemIsInTrigger(%PlayerBench, %PlayerTrigger)
+			CharacterCanSitOnItem(__Me, %PlayerBench)
+			IsFacing(%PlayerBench, TRIGGER:CYS_Performance1Player_ab81168b-b254-42fc-9fc0-91746efd76b2, 90)
+		THEN
+			CharacterMoveTo(%PlayerBench)
+			IF "c1&c2&c3"
+				ItemIsInTrigger(%PlayerBench, %PlayerTrigger)
+				CharacterCanSitOnItem(__Me, %PlayerBench)
+				IsFacing(%PlayerBench, TRIGGER:CYS_Performance1Player_ab81168b-b254-42fc-9fc0-91746efd76b2, 90)
+			THEN
+				CharacterUseItem(%PlayerBench)
+				Set(%BenchUsed, 2)
+			ENDIF
+		ELSE
+			CharacterMoveInRange(%PlayerTrigger, 1, 5, 0)
+			CharacterLookAt(TRIGGER:CYS_Performance1Player_ab81168b-b254-42fc-9fc0-91746efd76b2)
+			Set(%ChosenBench, null)
+			IterateItemsNear(__Me, 10, "canISitOnYouPlayer")
+			IF "!c1"
+				IsEqual(%ChosenBench, null)
+			THEN
+				CharacterMoveTo(%ChosenBench)
+				IF "c1&c2&c3"
+					ItemIsInTrigger(%ChosenBench, %PlayerTrigger)
+					CharacterCanSitOnItem(__Me, %ChosenBench)
+					IsFacing(%ChosenBench, TRIGGER:CYS_Performance1Player_ab81168b-b254-42fc-9fc0-91746efd76b2, 90)
+				THEN
+					CharacterUseItem(%ChosenBench)
+					Set(%BenchUsed, 2)
+				ENDIF
+			ENDIF
+		ENDIF
+	ENDIF
+	GlobalSetEvent("CYS_HN_CrowdIsHere")
+	Sleep(10)
+	IF "c1"
+		CharacterHasStatus(__Me,"SITTING")
+	THEN
+		GetRandom(_Anim, "Sit_Surprise_01", "Sit_Look_Left_01", "Sit_Look_Right_01")
+		CharacterSetAnimationOverride(__Me, _Anim)
+		IF "c1"
+			IsRandom(0.25)
+		THEN
+			DialogStart("CYS_AD_HN_WaitAtPlayer",__Me)
+		ENDIF
+		CharacterSetAnimationOverride(__Me, "Sit_Idle_03")
+	ELSE
+		GetRandom(_Anim, "Surprise_02", "Look_Left_Short_01", "Look_Right_Short_01")
+		CharacterPlayAnimation(_Anim)
+		IF "c1"
+			IsRandom(0.25)
+		THEN
+			DialogStart("CYS_AD_HN_WaitAtPlayer",__Me)
+		ENDIF
+	ENDIF
+INTERRUPT
+	IF "c1"
+		IsEqual(_CanReset, 1)
+	THEN
+		Set(_CanReset,0)
+	ELSE
+		Reset()
+	ENDIF
+	
+REACTION Action_FinalBooPlayer, 0
+USAGE PEACE
+VARS
+	FLOAT:_WaitTime
+	FIXEDSTRING:_Anim
+ACTIONS
+	GetRandomBetween(_WaitTime,1,3)
+	Sleep(_WaitTime)
+	CharacterSetAnimationOverride(__Me, "")
+	CharacterMoveTo(%PlayerFinal, 1)
+	CharacterLookFrom(%PlayerFinal)
+	CharacterPlayAnimation("Crowd_Booing_01")
+	DialogStart("CYS_AD_FinalBooPlayers",__Me)
+	CharacterPlayAnimation("Crowd_Booing_01")
+	Set(%BenchUsed, 3)
+	CharacterEvent(__Me, "finishedPlay")
+	
+REACTION Action_FinalWooPlayer, 0
+USAGE PEACE
+VARS
+	FLOAT:_WaitTime
+	FIXEDSTRING:_Anim
+ACTIONS
+	GetRandomBetween(_WaitTime,1,3)
+	Sleep(_WaitTime)
+	CharacterSetAnimationOverride(__Me, "")
+	CharacterMoveTo(%PlayerFinal, 1)
+	CharacterLookFrom(%PlayerFinal)
+	CharacterPlayAnimation("Crowd_Cheering_01")
+	DialogStart("CYS_AD_FinalWooPlayers",__Me)
+	CharacterPlayAnimation("Crowd_Cheering_01")
+	Set(%BenchUsed, 3)
+	CharacterEvent(__Me, "finishedPlay")
+
+EVENTS 
+
+EVENT FightStart
+ON
+	OnCombatStarted()
+ACTIONS
+	IF "c1"
+		CharacterHasStatus(__Me, SITTING)
+	THEN
+		CharacterRemoveStatus(__Me, SITTING)
+	ENDIF
+	CharacterSetAnimationOverride(__Me, "")
+	
+EVENT WooPlayers
+ON
+	OnCharacterEvent(CYS_FairCrowdWarmer_d17187eb-7b20-4cba-9497-36d6ba8b1d68, "WooPlayer")
+VARS
+	INT:_Val
+ACTIONS
+	IF "(c1|(c2&c3))&c4"
+		IsEqual(%GoToPlayer, 0)
+		GetVar(_Val, CHARACTER:CYS_FairCrowdWarmer_d17187eb-7b20-4cba-9497-36d6ba8b1d68, "GallagherPaid")
+		IsEqual(_Val, 1)
+		IsEqual(%BenchUsed, 2)
+	THEN
+		CharacterEvent(__Me, "WatchingPlayer")
+		DialogRequestStop("CYS_AD_HN_WaitAtPlayer")
+		DialogRequestStop("CYS_AD_BooPlayers")
+		SetPriority("Action_BooPlayer", 0)
+		SetPriority("Action_WaitAtPlayer", 0)	
+		SetPriority("Action_WooPlayer", 3100)	
+	ENDIF
+	Set(%PlayInPlay, 1)
+		
+EVENT WaitAtPlayers
+ON
+	OnCharacterEvent(CYS_FairCrowdWarmer_d17187eb-7b20-4cba-9497-36d6ba8b1d68, "GoWaitAtPlayer")
+ACTIONS
+	IF "c1&c2"
+		IsEqual(%GoToPlayer, 1)
+		IsEqual(%PlayInPlay, 0)
+	THEN	
+		CharacterEvent(__Me, "WaitingPlayer")
+		SetPriority("Action_WaitAtPlayer", 3100)
+	ELIF "c1&c2"
+		IsEqual(%GoToPlayer, 1)
+		IsEqual(%PlayInPlay, 1)
+	THEN
+		CharacterEvent(__Me, "WatchingPlayer")
+		DialogRequestStop("CYS_AD_HN_WaitAtPlayer")
+		DialogRequestStop("CYS_AD_BooPlayers")
+		SetPriority("Action_BooPlayer", 0)
+		SetPriority("Action_WaitAtPlayer", 0)	
+		SetPriority("Action_WooPlayer", 3100)	
+	ENDIF
+	
+EVENT BooPlayers
+ON
+	OnCharacterEvent(CYS_FairCrowdWarmer_d17187eb-7b20-4cba-9497-36d6ba8b1d68, "BooPlayer")
+VARS
+	INT:_Val
+ACTIONS
+	IF "(c1|(c2&c3))&c4"
+		IsEqual(%GoToPlayer, 0)
+		GetVar(_Val, CHARACTER:CYS_FairCrowdWarmer_d17187eb-7b20-4cba-9497-36d6ba8b1d68, "GallagherPaid")
+		IsEqual(_Val, 1)
+		IsEqual(%BenchUsed, 2)
+	THEN
+		DialogRequestStop("CYS_AD_WooPlayers")
+		DialogRequestStop("CYS_AD_HN_WaitAtPlayer")
+		SetPriority("Action_BooPlayer", 3100)
+		SetPriority("Action_WooPlayer", 0)
+		SetPriority("Action_WaitAtPlayer", 0)
+	ENDIF
+	
+EVENT FinalWooPlayers
+ON
+	OnCharacterEvent(CYS_FairCrowdWarmer_d17187eb-7b20-4cba-9497-36d6ba8b1d68, "FinalWooPlayer")
+VARS
+	INT:_Val
+ACTIONS
+	IF "(c1|(c2&c3))&c4"
+		IsEqual(%GoToPlayer, 0)
+		GetVar(_Val, CHARACTER:CYS_FairCrowdWarmer_d17187eb-7b20-4cba-9497-36d6ba8b1d68, "GallagherPaid")
+		IsEqual(_Val, 1)
+		IsEqual(%BenchUsed, 2)
+	THEN
+		DialogRequestStop("CYS_AD_BooPlayers")
+		DialogRequestStop("CYS_AD_WooPlayers")
+		SetPriority("Action_FinalWooPlayer", 3100)
+		SetPriority("Action_BooPlayer", 0)
+		SetPriority("Action_WooPlayer", 0)
+	ELIF "(c1|(c2&c3))"
+		IsEqual(%GoToPlayer, 0)
+		GetVar(_Val, CHARACTER:CYS_FairCrowdWarmer_d17187eb-7b20-4cba-9497-36d6ba8b1d68, "GallagherPaid")
+		IsEqual(_Val, 1)
+	THEN
+		SetPriority("Action_BooPlayer", 0)
+		SetPriority("Action_WooPlayer", 0)
+		SetPriority("Action_WaitAtPlayer", 0)	
+		Set(%BenchUsed, 3)
+		CharacterEvent(__Me, "finishedPlay")
+	ENDIF
+	
+EVENT FinalBooPlayers
+ON
+	OnCharacterEvent(CYS_FairCrowdWarmer_d17187eb-7b20-4cba-9497-36d6ba8b1d68, "FinalBooPlayer")
+VARS
+	INT:_Val
+ACTIONS
+	IF "(c1|(c2&c3))&c4"
+		IsEqual(%GoToPlayer, 0)
+		GetVar(_Val, CHARACTER:CYS_FairCrowdWarmer_d17187eb-7b20-4cba-9497-36d6ba8b1d68, "GallagherPaid")
+		IsEqual(_Val, 1)
+		IsEqual(%BenchUsed, 2)
+	THEN
+		DialogRequestStop("CYS_AD_WooPlayers")
+		DialogRequestStop("CYS_AD_BooPlayers")
+		SetPriority("Action_FinalBooPlayer", 3100)
+		SetPriority("Action_BooPlayer", 0)
+		SetPriority("Action_WooPlayer", 0)
+	ELIF "(c1|(c2&c3))"
+		IsEqual(%GoToPlayer, 0)
+		GetVar(_Val, CHARACTER:CYS_FairCrowdWarmer_d17187eb-7b20-4cba-9497-36d6ba8b1d68, "GallagherPaid")
+		IsEqual(_Val, 1)
+	THEN
+		SetPriority("Action_BooPlayer", 0)
+		SetPriority("Action_WooPlayer", 0)
+		SetPriority("Action_WaitAtPlayer", 0)	
+		Set(%BenchUsed, 3)
+		CharacterEvent(__Me, "finishedPlay")
+	ENDIF
+		
+EVENT GoToPlayer
+ON
+	OnCharacterEvent(CYS_FairCrowdWarmer_d17187eb-7b20-4cba-9497-36d6ba8b1d68, "GoToPlayer")
+VARS
+	INT:_Val
+ACTIONS
+	IF "(c1|(c2&c3))&c4"
+		IsEqual(%GoToPlayer, 0)
+		GetVar(_Val, CHARACTER:CYS_FairCrowdWarmer_d17187eb-7b20-4cba-9497-36d6ba8b1d68, "GallagherPaid")
+		IsEqual(_Val, 1)
+		IsEqual(%CanGoToShow, 1)
+	THEN
+		DialogRequestStop(%Dialog)
+		CharacterSetAnimationOverride(__Me, "")
+		SetPriority("Action_WaitAtPlayer", 3100)
+	ENDIF
+	
+EVENT LeavePlayers
+VARS
+	INT:_Val
+ON
+	OnCharacterEvent(CYS_FairCrowdWarmer_d17187eb-7b20-4cba-9497-36d6ba8b1d68, "leavePlayer")
+ACTIONS
+	IF "(c1|(c2&c3))"
+		IsEqual(%GoToPlayer, 0)
+		GetVar(_Val, CHARACTER:CYS_FairCrowdWarmer_d17187eb-7b20-4cba-9497-36d6ba8b1d68, "GallagherPaid")
+		IsEqual(_Val, 1)
+	THEN
+		SetPriority(Action_BooPlayer, 0)
+		SetPriority(Action_FinalWooPlayer, 0)
+		SetPriority(Action_FinalBooPlayer, 0)
+		SetPriority(Action_WooPlayer, 0)
+		Set(%PlayInPlay, 0)
+	ENDIF
+	
+EVENT IteratorReginald
+VARS
+	ITEM:_Item
+ON
+	OnIterateItem(_Item, "canISitOnYouReginald")
+ACTIONS
+	IF "c1&c2&c3"
+		ItemIsInTrigger(_Item, %ReginaldTrigger)
+		CharacterCanSitOnItem(__Me, _Item)
+		IsFacing(_Item, TRIGGER:CYS_Point_Reginald2_55cf9617-3200-4f53-8f40-58e0a9fea03a, 90)
+	THEN
+		Set(%ChosenBench, _Item)
+	ENDIF
+		
+EVENT IteratorCedric
+VARS
+	ITEM:_Item
+ON
+	OnIterateItem(_Item, "canISitOnYouCedric")
+ACTIONS
+	IF "c1&c2&c3"
+		ItemIsInTrigger(_Item, %CedricTrigger)
+		CharacterCanSitOnItem(__Me, _Item)
+		IsFacing(_Item, TRIGGER:CYS_Point_FairCedric_1_fe18ab92-7cda-4ebb-aea8-e08b05d88a20, 90)
+	THEN
+		Set(%ChosenBench, _Item)
+	ENDIF
+		
+EVENT IteratorPlayer
+VARS
+	ITEM:_Item
+ON
+	OnIterateItem(_Item, "canISitOnYouPlayer")
+ACTIONS
+	IF "c1&c2&c3"
+		ItemIsInTrigger(_Item, %PlayerTrigger)
+		CharacterCanSitOnItem(__Me, _Item)
+		IsFacing(_Item, TRIGGER:CYS_Performance1Player_ab81168b-b254-42fc-9fc0-91746efd76b2, 90)
+	THEN
+		Set(%ChosenBench, _Item)
+	ENDIF
+
+EVENT Sittingremove
+ON
+	OnCharacterStatusRemoved(__Me, SITTING)
+ACTIONS
+	CharacterSetAnimationOverride(__Me, "")

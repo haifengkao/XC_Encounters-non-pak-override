@@ -1,0 +1,22 @@
+INIT
+CHARACTER:__Me
+INT:%AmountOfTurnsElapsed=0
+
+//-----------------------
+EVENTS
+EVENT OnTurn_IncreaseCounter
+ON
+	OnTurn()
+ACTIONS
+	IF "c1&c2"
+		IsHardcore()
+		IsEqual(%AmountOfTurnsElapsed,2)		
+	THEN
+		CharacterEvent(__Me,"CMBHC_Cyseal_RainLands_BoltStrickenZombie")
+		//DebugText(__Me,"Event sent!")		
+	ELIF "c1"
+		IsHardcore()
+	THEN
+		Add(%AmountOfTurnsElapsed,1)
+		//DebugText(__Me,"Turn +1")		
+	ENDIF	

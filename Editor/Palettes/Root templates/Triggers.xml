@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<palette xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <palettes />
+  <objectids>
+    <guid>d0c8d0d5-e2a0-4798-9ac6-67eaa606254c</guid>
+    <guid>14ec1f7b-dfb9-4001-af8f-469b06c1c70f</guid>
+    <guid>987b8a4d-2208-4bae-a92d-706db0e593e8</guid>
+    <guid>747866fd-3bc2-40f7-a304-8487aa613f3f</guid>
+    <guid>491000b4-548e-49ee-8ff2-27e3b63d8b7b</guid>
+    <guid>15111ce4-12fc-4757-bb81-7c2c212e141a</guid>
+    <guid>3b3f0c23-608d-49a6-830f-271e0ab7928b</guid>
+    <guid>3125dc53-89b1-45c9-ac62-db8cc885229b</guid>
+    <guid>3787cd7f-f111-4935-a250-c0fd5b72fc44</guid>
+    <guid>4eacd3b1-ade1-4a0c-80ec-e65593998f75</guid>
+    <guid>0ad1f15b-10d5-4a10-8936-299d82cafd59</guid>
+    <guid>e1dd1fce-eb20-4824-b232-5a78344351b1</guid>
+    <guid>7e5d2a30-15a3-4a0e-a951-0fc1686cb4bb</guid>
+  </objectids>
+  <name>Triggers</name>
+</palette>

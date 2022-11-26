@@ -1,0 +1,423 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%PurifyingFire_Target
+	INT:%AuraThreshold=0
+	EXTERN INT:%Gren_Poison_Current=3
+	EXTERN INT:%Gren_Poison_Desired=3	
+	EXTERN INT:%Gren_Molo_Current=3
+	EXTERN INT:%Gren_Molo_Desired=3	
+	
+//---------
+BEHAVIOUR
+REACTION Zigzax_CastPurifyingFire_OnEnemy,700
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2"
+	CharacterCanCast(__Me,"Target_EnemyPurifyingFire")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyPurifyingFire")
+ACTIONS
+	DebugText(__Me,"E-PF: scanning!")
+	Set(%PurifyingFire_Target,null)
+	IterateCharactersInCombat(__Me,"CMB_Zixzax_ScanForEnemiesWithPositiveStatuses",Lowest,Distance)
+	IF "!c1"
+		IsEqual(%PurifyingFire_Target,null)
+	THEN
+		CharacterMoveInRange(%PurifyingFire_Target,_MinRange,_MaxRange,1)
+		CharacterUseSkill("Target_EnemyPurifyingFire",%PurifyingFire_Target)
+	ELSE
+		SetPriority("Zigzax_CastPurifyingFire_OnEnemy",0)
+	ENDIF
+INTERRUPT
+	Reset()
+
+REACTION Zixzax_Grenade_Poison,0
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3"
+	CharacterCanCast(__Me,"Projectile_Grenade_PoisonFlask")
+	CharacterGet(_Target,__Me,20,Highest,Distance,Enemy)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_Grenade_PoisonFlask")
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_Grenade_PoisonFlask",_Target)
+	Set(%Gren_Poison_Current,0)
+	SetPriority("Zixzax_Grenade_Poison",0)
+
+REACTION Zixzax_Grenade_Molotov,0
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3"
+	CharacterCanCast(__Me,"Projectile_Grenade_Molotov")
+	CharacterGet(_Target,__Me,20,Highest,Distance,Enemy)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_Grenade_Molotov")
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_Grenade_Molotov",_Target)
+	Set(%Gren_Molo_Current,0)
+	SetPriority("Zixzax_Grenade_Molotov",0)
+			
+REACTION Zigzax_SelectNextAura,600
+USAGE COMBAT
+VARS
+	CHARACTER:_Player
+CHECK "c1"
+	CharacterGet(_Player,__Me,20,Random,Distance,Enemy)
+ACTIONS
+	DebugText(__Me,"Looking at [1]!",_Player)
+	CharacterLookAt(_Player)
+	CharacterRemoveStatus(__Me,"FIRE_IMMUNITY_AURA")
+	CharacterRemoveStatus(__Me,"WATER_IMMUNITY_AURA")
+	CharacterRemoveStatus(__Me,"AIR_IMMUNITY_AURA")
+	CharacterRemoveStatus(__Me,"EARTH_IMMUNITY_AURA")
+	DebugText(__Me,"Selecting Aura!")	
+	IF "c1"
+		IsEqual(%AuraThreshold,0)
+	THEN
+		CharacterPlayEffect(__Me,"FX_Skills_Fire_Summon_Prepare_A")
+		CharacterApplyStatus(__Me,"FIRE_IMMUNITY_AURA",-1,1)
+		Add(%AuraThreshold,1)
+	ELIF "c1"
+		IsEqual(%AuraThreshold,1)
+	THEN
+		CharacterPlayEffect(__Me,"FX_Skills_Water_Summon_Prepare_A")
+		CharacterApplyStatus(__Me,"WATER_IMMUNITY_AURA",-1,1)
+		Add(%AuraThreshold,1)
+	ELIF "c1"
+		IsEqual(%AuraThreshold,2)
+	THEN
+		CharacterPlayEffect(__Me,"FX_Skills_Air_Summon_Prepare_A")
+		CharacterApplyStatus(__Me,"AIR_IMMUNITY_AURA",-1,1)
+		Add(%AuraThreshold,1)
+	ELIF "c1"
+		IsEqual(%AuraThreshold,3)
+	THEN
+		CharacterPlayEffect(__Me,"FX_Skills_Earth_Summon_Prepare_A")
+		CharacterApplyStatus(__Me,"EARTH_IMMUNITY_AURA",-1,1)
+		Set(%AuraThreshold,0)
+	ELSE
+		Set(%AuraThreshold,0)
+	ENDIF
+	CharacterPlayAnimation("cast_shout_cast",1,1)
+	SetPriority("Zigzax_SelectNextAura",0)
+	
+REACTION Zigzax_CastHasteOnSelf,450
+USAGE COMBAT
+CHECK "c1&!c2"
+	CharacterCanCast(__Me,"Target_EnemyHaste")
+	CharacterHasStatus(__Me,"HASTED")
+ACTIONS
+	CharacterUseSkill("Target_EnemyHaste",__Me)
+
+REACTION Zigzax_CastSlow,400
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&!(c3|c4|c5)&c6&c7"
+	CharacterCanCast(__Me,"Target_EnemySlow")									//c1
+	CharacterGet(_Target,__Me,20,Highest,Dexterity,Enemy)						//c2
+	CharacterHasStatus(_Target,"SLOWED")										//!c3	
+	CharacterHasStatus(_Target,"KNOCKED_DOWN")									//!c4	
+	CharacterHasStatus(_Target,"STUNNED")										//!c5	
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemySlow")			//c6
+	IsRandom(0.25)																//c7
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Target_EnemySlow",_Target)	//Target_EnemyShacklesOfPain
+
+REACTION Zigzax_CastShacklesOfPain,400
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+	FLOAT:_MyVitality	
+CHECK "c1&c2&!(c3|c4|c5)&c6&c7&c8"
+	CharacterCanCast(__Me,"Target_EnemyShacklesOfPain")							//c1
+	CharacterGet(_Target,__Me,20,Lowest,Vitality,Enemy)							//c2
+	CharacterHasStatus(__Me,"SHACKLES_OF_PAIN_CASTER")							//!c3	
+	CharacterHasStatus(_Target,"SHACKLES_OF_PAIN")								//!c4	
+	CharacterHasStatus(_Target,"CHARMED")										//!c5	
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemySlow")			//c6
+	CharacterGetStat(_MyVitality,__Me,"Vitality")								//c7	
+	IsLessThen(_MyVitality,0.5)													//c8	
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Target_EnemyShacklesOfPain",_Target)
+
+REACTION Zigzax_CastCharm,400
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+	FLOAT:_MyVitality		
+CHECK "c1&c2&c3&!(c4|c5|c6|c7|c8|c9|c10)&c11&c12&c13"
+	CharacterCanCast(__Me,"Projectile_EnemyCharm")											//c1
+	CharacterGet(_Target,__Me,50,Highest,Strength,Enemy)									//c2
+	CharacterIsPlayer(_Target)																//c3
+	CharacterHasStatus(_Target,"CHARMED")													//!c4
+	CharacterHasStatus(_Target,"STUNNED")													//!c5
+	CharacterHasStatus(_Target,"FROZEN")													//!c6
+	CharacterHasStatus(_Target,"PETRIFIED")													//!c7
+	CharacterHasStatus(_Target,"KNOCKED_DOWN")												//!c8
+	CharacterHasStatus(_Target,"FEAR")														//!c9
+	CharacterHasStatus(_Target,"SHACKLES_OF_PAIN")											//!c10
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyCharm")				//c11
+	CharacterGetStat(_MyVitality,__Me,"Vitality")											//c12	
+	IsLessThen(_MyVitality,0.5)																//c13
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_EnemyCharm",_Target)	
+
+REACTION Zixzax_Grenade_NailBomb,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3"
+	CharacterCanCast(__Me,"Projectile_Grenade_Nailbomb")
+	CharacterGet(_Target,__Me,20,Random,Distance,Enemy)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_Grenade_Nailbomb")
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_Grenade_Nailbomb",_Target)
+	SetPriority("Zixzax_Grenade_NailBomb",0)
+	
+REACTION Zixzax_Grenade_MustardGas,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&c4"
+	CharacterCanCast(__Me,"Projectile_Grenade_MustardGas")
+	CharacterGet(_Target,__Me,20,Random,Distance,Enemy)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_Grenade_MustardGas")
+	IsRandom(0.25)
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_Grenade_MustardGas",_Target)
+	SetPriority("Zixzax_Grenade_MustardGas",0)
+	
+REACTION Zixzax_Grenade_Tremor,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&c4"
+	CharacterCanCast(__Me,"Projectile_Grenade_Tremor")
+	CharacterGet(_Target,__Me,20,Random,Distance,Enemy)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_Grenade_Tremor")
+	IsRandom(0.25)	
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_Grenade_Tremor",_Target)
+	SetPriority("Zixzax_Grenade_Tremor",0)
+
+REACTION Zixzax_Grenade_Taser,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&c4"
+	CharacterCanCast(__Me,"Projectile_Grenade_Taser")
+	CharacterGet(_Target,__Me,20,Random,Distance,Enemy)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_Grenade_Taser")
+	IsRandom(0.25)	
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_Grenade_Taser",_Target)
+	SetPriority("Zixzax_Grenade_Taser",0)
+
+REACTION Zixzax_Grenade_Terror,300
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&c4"
+	CharacterCanCast(__Me,"Projectile_Grenade_Terror")
+	CharacterGet(_Target,__Me,20,Random,Distance,Enemy)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_Grenade_Terror")
+	IsRandom(0.25)
+ACTIONS
+	CharacterMoveInRange(_Target,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_Grenade_Terror",_Target)
+	SetPriority("Zixzax_Grenade_Terror",0)
+	
+REACTION Zixzax_CastShield_Fire,0
+USAGE COMBAT
+CHECK "!c1"
+	CharacterHasStatus(__Me,"SHIELD")
+ACTIONS
+	IF "c1"
+		CharacterCanCast(__Me,"Shield_EnemyFire")
+	THEN
+		CharacterUseSkill("Shield_EnemyFire",__Me)
+	ENDIF
+	SetPriority("Zixzax_CastShield_Fire",0)
+		
+REACTION Zixzax_CastShield_Water,0
+USAGE COMBAT
+CHECK "!c1"
+	CharacterHasStatus(__Me,"SHIELD")
+ACTIONS
+	IF "c1"
+		CharacterCanCast(__Me,"Shield_EnemyWater")
+	THEN
+		CharacterUseSkill("Shield_EnemyWater",__Me)
+	ENDIF
+	SetPriority("Zixzax_CastShield_Water",0)
+		
+REACTION Zixzax_CastShield_Air,0
+USAGE COMBAT
+CHECK "!c1"
+	CharacterHasStatus(__Me,"SHIELD")
+ACTIONS
+	IF "c1"
+		CharacterCanCast(__Me,"Shield_EnemyAir")
+	THEN
+		CharacterUseSkill("Shield_EnemyAir",__Me)
+	ENDIF	
+	SetPriority("Zixzax_CastShield_Air",0)
+	
+REACTION Zixzax_CastShield_Earth,0
+USAGE COMBAT
+CHECK "!c1"
+	CharacterHasStatus(__Me,"SHIELD")
+ACTIONS
+	IF "c1"
+		CharacterCanCast(__Me,"Shield_EnemyEarth")
+	THEN
+		CharacterUseSkill("Shield_EnemyEarth",__Me)
+	ENDIF
+	SetPriority("Zixzax_CastShield_Earth",0)
+	
+REACTION Zigzax_CastWindWalker,0
+USAGE COMBAT
+CHECK "c1&!c2"
+	CharacterCanCast(__Me,"Target_EnemyWindWalker")
+	CharacterHasStatus(__Me,"WIND_WALKER")
+ACTIONS
+	CharacterUseSkill("Target_EnemyWindWalker",__Me)
+	SetPriority("Zigzax_CastWindWalker",0)
+		
+//---------
+EVENTS
+EVENT OnInit_GiveZiggieHisSpells
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(20,__Me,Sight)
+	THEN
+		CharacterAddSkill("Teleportation_EnemyArcaneVortex")
+		CharacterAddSkill("Target_EnemyHaste")
+		CharacterAddSkill("Target_EnemySlow")
+		CharacterAddSkill("Target_EnemyWindWalker")
+		CharacterAddSkill("Projectile_EnemyCharm")
+		CharacterAddSkill("Target_EnemyShacklesOfPain")
+		//--
+		CharacterAddSkill("Projectile_Grenade_PoisonFlask")
+		CharacterAddSkill("Projectile_Grenade_Molotov")
+		CharacterAddSkill("Projectile_Grenade_Nailbomb")		
+		CharacterAddSkill("Projectile_Grenade_MustardGas")
+		CharacterAddSkill("Projectile_Grenade_Tremor")
+		CharacterAddSkill("Projectile_Grenade_Taser")
+		CharacterAddSkill("Projectile_Grenade_Terror")		
+	ENDIF
+	
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("Zigzax_CastPurifyingFire_OnEnemy",600)
+	SetPriority("Zigzax_SelectNextAura",500)	
+	SetPriority("Zixzax_Grenade_NailBomb",300)
+	SetPriority("Zixzax_Grenade_MustardGas",300)
+	SetPriority("Zixzax_Grenade_Tremor",300)
+	SetPriority("Zixzax_Grenade_Taser",300)
+	SetPriority("Zixzax_Grenade_Terror",300)
+	IF "c1"
+		IsLessThen(%Gren_Poison_Current,%Gren_Poison_Desired)
+	THEN
+		Add(%Gren_Poison_Current,1)
+	ELSE
+		SetPriority("Zixzax_Grenade_Poison",650)
+	ENDIF
+	IF "c1"
+		IsLessThen(%Gren_Molo_Current,%Gren_Molo_Desired)
+	THEN
+		Add(%Gren_Molo_Current,1)
+	ELSE
+		SetPriority("Zixzax_Grenade_Molotov",640)
+	ENDIF
+	
+EVENT OnDamage_CheckDamageType_SetShieldPrio
+VARS
+	DAMAGE:_Damage
+ON
+	OnDamage(_Damage,_,_,_)
+ACTIONS
+	IF "c1"
+		IsEqual(_Damage,"Fire")
+	THEN
+		SetPriority("Zixzax_CastShield_Fire",800)
+	ELIF "c1"
+		IsEqual(_Damage,"Water")
+	THEN
+		SetPriority("Zixzax_CastShield_Water",800)
+	ELIF "c1"
+		IsEqual(_Damage,"Air")
+	THEN
+		SetPriority("Zixzax_CastShield_Air",800)
+	ELIF "c1"
+		IsEqual(_Damage,"Earth")
+	THEN
+		SetPriority("Zixzax_CastShield_Earth",800)
+	ELIF "c1|c2|c3"
+		IsEqual(_Damage,"Slashing")
+		IsEqual(_Damage,"Crushing")
+		IsEqual(_Damage,"Piercing")
+	THEN
+		SetPriority("Zigzax_CastWindWalker",800)		
+	ENDIF
+		
+EVENT OnIterateCharacter_ScanForEnemiesWithPositiveStatuses
+VARS
+	CHARACTER:_Enemy
+	FIXEDSTRING:_EnemysFaction
+ON
+	OnIterateCharacter(_Enemy,"CMB_Zixzax_ScanForEnemiesWithPositiveStatuses")
+ACTIONS
+	IF "!c1&c2&(c3|c4)"
+		CharacterIsDead(_Enemy)
+		CharacterIsEnemy(__Me,_Enemy)
+		CharacterHasStatus(_Enemy,"SHIELD")
+		CharacterHasStatus(_Enemy,"HEALING")
+	THEN
+		Set(%PurifyingFire_Target,_Enemy)
+	ENDIF
+		
+EVENT OnCombatEnded_RemoveAuras_ScanForItemsToCleanUp
+ON
+	OnCombatEnded()
+	OnDie(__Me,_,_,_)
+ACTIONS
+	CharacterRemoveStatus(__Me,"FIRE_IMMUNITY_AURA")
+	CharacterRemoveStatus(__Me,"WATER_IMMUNITY_AURA")
+	CharacterRemoveStatus(__Me,"AIR_IMMUNITY_AURA")
+	CharacterRemoveStatus(__Me,"EARTH_IMMUNITY_AURA")

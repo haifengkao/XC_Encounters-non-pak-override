@@ -1,0 +1,326 @@
+INIT
+	ITEM:__Me
+	CHARACTER:%SpawnedChar1
+	CHARACTER:%SpawnedChar2
+	CHARACTER:%SpawnedChar3
+	CHARACTER:%SpawnedChar4
+	CHARACTER:%SpawnedChar5
+	CHARACTER:%SpawnedChar6
+	INT:%CurrentCharsSpawned=0
+	EXTERN CHARACTER:%NearbyCharacter=null
+	EXTERN CHARACTERTEMPLATE:%CharacterTemplate1=null
+	EXTERN CHARACTERTEMPLATE:%CharacterTemplate2=null
+	EXTERN TRIGGER:%SpawnTrigger1=null
+	EXTERN TRIGGER:%SpawnTrigger2=null
+	EXTERN STRING:%EventSentByNearbyChar="CMBHC_GenericEvent_OnTurn"
+	EXTERN STRING:%EventSentByNearbyCharWhenCombatEnds="CMBHC_GenericEvent_WhenCombatEnds"
+	EXTERN STRING:%FXToPlayWhenSpawning="FX_GP_TeleportSmoke_A"
+	EXTERN FIXEDSTRING:%SpawnOutsideCombat_Timer="CMBHC_SpawnHole_SpawnOutsideCombat_Timer"
+
+		// /!\ THIS SCRIPT IS TO BE USED WITH CMB_GEN_CombatSendEvent, OTHERWISE IT WON'T WORK /!\ \\
+
+		//basically what happens here is that we've got a character (%NearbyCharacter)
+		//when this character enters combat / acts in combat he sends an event to this item (%EventSentByNearbyChar)
+		//when the item receives the event then it acts accordingly
+		//an event is also sent even when the combat ends (ie player fled) (%EventSentByNearbyCharWhenCombatEnds)
+		//char still sends events even if dead; the spawner only stops reacting to events when it, itself, is destroyed
+
+		//a creature spawns in its designated spot and gets an ID (%SpawnedChar1 - 6)
+		//killing the master & ending the fight stops the spawning (see CMB_GEN_CombatSendEvent - OnTurn_GeneralControl)
+	
+//------------------------
+BEHAVIOUR
+REACTION Spawner_StartSpawning,0
+USAGE ALL
+VARS
+	CHARACTER:_Player
+	CHARACTERTEMPLATE:_ChosenTemplate
+	TRIGGER:_ChosenTrigger
+	FLOAT:_SleepValue
+CHECK "!c1&!c2"
+	ItemIsDestroyed(__Me)										//!c1
+	IsGreaterThen(%CurrentCharsSpawned,6)						//!c2
+ACTIONS
+	//DebugText(__Me,"Entering reaction!")
+	GetRandomBetween(_SleepValue,4,10)
+	Sleep(_SleepValue)
+	IF "c1"
+		IsEqual(%CurrentCharsSpawned,0)
+	THEN
+		IF "!(c1|c2)"
+			IsEqual(%CharacterTemplate1,null)
+			IsEqual(%CharacterTemplate2,null)
+		THEN
+			GetRandom(_ChosenTemplate,%CharacterTemplate1,%CharacterTemplate2)
+			PlayEffectAt(__Me,%FXToPlayWhenSpawning)
+			SpawnCharacter(%SpawnedChar1,_ChosenTemplate,%SpawnTrigger1,0)
+			PlayEffectAt(%SpawnedChar1,"FX_GP_Footstep_A_Large_Dirt")				
+		ELIF "!c1&c2"
+			IsEqual(%CharacterTemplate1,null)
+			IsEqual(%CharacterTemplate2,null) 
+		THEN
+			PlayEffectAt(__Me,%FXToPlayWhenSpawning)		
+			SpawnCharacter(%SpawnedChar1,%CharacterTemplate1,%SpawnTrigger1,0)	
+			PlayEffectAt(%SpawnedChar1,"FX_GP_Footstep_A_Large_Dirt")				
+		ELIF "c1&!c2"
+			IsEqual(%CharacterTemplate1,null)
+			IsEqual(%CharacterTemplate2,null) 
+		THEN
+			PlayEffectAt(__Me,%FXToPlayWhenSpawning)		
+			SpawnCharacter(%SpawnedChar1,%CharacterTemplate2,%SpawnTrigger1,0)
+			PlayEffectAt(%SpawnedChar1,"FX_GP_Footstep_A_Large_Dirt")				
+		ENDIF
+		Add(%CurrentCharsSpawned,1)
+		SetPriority("Spawner_StartSpawning",0)
+	ELIF "c1"
+		IsEqual(%CurrentCharsSpawned,1)
+	THEN
+		IF "!(c1|c2)"
+			IsEqual(%CharacterTemplate1,null)
+			IsEqual(%CharacterTemplate2,null)
+		THEN
+			GetRandom(_ChosenTemplate,%CharacterTemplate1,%CharacterTemplate2)
+			PlayEffectAt(__Me,%FXToPlayWhenSpawning)			
+			SpawnCharacter(%SpawnedChar2,_ChosenTemplate,%SpawnTrigger2,0)
+			PlayEffectAt(%SpawnedChar2,"FX_GP_Footstep_A_Large_Dirt")				
+		ELIF "!c1&c2"
+			IsEqual(%CharacterTemplate1,null)
+			IsEqual(%CharacterTemplate2,null) 
+		THEN
+			PlayEffectAt(__Me,%FXToPlayWhenSpawning)
+			SpawnCharacter(%SpawnedChar2,%CharacterTemplate1,%SpawnTrigger2,0)	
+			PlayEffectAt(%SpawnedChar2,"FX_GP_Footstep_A_Large_Dirt")			
+		ELIF "c1&!c2"
+			IsEqual(%CharacterTemplate1,null)
+			IsEqual(%CharacterTemplate2,null) 
+		THEN
+			PlayEffectAt(__Me,%FXToPlayWhenSpawning)
+			SpawnCharacter(%SpawnedChar2,%CharacterTemplate2,%SpawnTrigger2,0)
+			PlayEffectAt(%SpawnedChar2,"FX_GP_Footstep_A_Large_Dirt")			
+		ENDIF
+		Add(%CurrentCharsSpawned,1)
+		SetPriority("Spawner_StartSpawning",0)		
+	ELIF "c1"
+		IsEqual(%CurrentCharsSpawned,2)
+	THEN
+		IF "!(c1|c2)"
+			IsEqual(%CharacterTemplate1,null)
+			IsEqual(%CharacterTemplate2,null)
+		THEN
+			GetRandom(_ChosenTemplate,%CharacterTemplate1,%CharacterTemplate2)
+			PlayEffectAt(__Me,%FXToPlayWhenSpawning)
+			SpawnCharacter(%SpawnedChar3,_ChosenTemplate,%SpawnTrigger1,0)
+			PlayEffectAt(%SpawnedChar3,"FX_GP_Footstep_A_Large_Dirt")			
+		ELIF "!c1&c2"
+			IsEqual(%CharacterTemplate1,null)
+			IsEqual(%CharacterTemplate2,null) 
+		THEN
+			PlayEffectAt(__Me,%FXToPlayWhenSpawning)
+			SpawnCharacter(%SpawnedChar3,%CharacterTemplate1,%SpawnTrigger1,0)	
+			PlayEffectAt(%SpawnedChar3,"FX_GP_Footstep_A_Large_Dirt")				
+		ELIF "c1&!c2"
+			IsEqual(%CharacterTemplate1,null)
+			IsEqual(%CharacterTemplate2,null) 
+		THEN
+			PlayEffectAt(__Me,%FXToPlayWhenSpawning)
+			SpawnCharacter(%SpawnedChar3,%CharacterTemplate2,%SpawnTrigger1,0)
+			PlayEffectAt(%SpawnedChar3,"FX_GP_Footstep_A_Large_Dirt")				
+		ENDIF
+		Add(%CurrentCharsSpawned,1)		
+		SetPriority("Spawner_StartSpawning",0)		
+	ELIF "c1"
+		IsEqual(%CurrentCharsSpawned,3)
+	THEN
+		IF "!(c1|c2)"
+			IsEqual(%CharacterTemplate1,null)
+			IsEqual(%CharacterTemplate2,null)
+		THEN
+			GetRandom(_ChosenTemplate,%CharacterTemplate1,%CharacterTemplate2)
+			PlayEffectAt(__Me,%FXToPlayWhenSpawning)
+			SpawnCharacter(%SpawnedChar4,_ChosenTemplate,%SpawnTrigger2,0)
+			PlayEffectAt(%SpawnedChar4,"FX_GP_Footstep_A_Large_Dirt")				
+		ELIF "!c1&c2"
+			IsEqual(%CharacterTemplate1,null)
+			IsEqual(%CharacterTemplate2,null) 
+		THEN
+			PlayEffectAt(__Me,%FXToPlayWhenSpawning)
+			PlayEffectAt(__Me,%FXToPlayWhenSpawning)
+			SpawnCharacter(%SpawnedChar4,%CharacterTemplate1,%SpawnTrigger2,0)	
+			PlayEffectAt(%SpawnedChar4,"FX_GP_Footstep_A_Large_Dirt")			
+		ELIF "c1&!c2"
+			IsEqual(%CharacterTemplate1,null)
+			IsEqual(%CharacterTemplate2,null) 
+		THEN
+			PlayEffectAt(__Me,%FXToPlayWhenSpawning)
+			SpawnCharacter(%SpawnedChar4,%CharacterTemplate2,%SpawnTrigger2,0)
+			PlayEffectAt(%SpawnedChar4,"FX_GP_Footstep_A_Large_Dirt")			
+		ENDIF
+		Add(%CurrentCharsSpawned,1)	
+		SetPriority("Spawner_StartSpawning",0)
+	ELIF "c1"
+		IsEqual(%CurrentCharsSpawned,4)
+	THEN
+		IF "!(c1|c2)"
+			IsEqual(%CharacterTemplate1,null)
+			IsEqual(%CharacterTemplate2,null)
+		THEN
+			GetRandom(_ChosenTemplate,%CharacterTemplate1,%CharacterTemplate2)
+			PlayEffectAt(__Me,%FXToPlayWhenSpawning)
+			SpawnCharacter(%SpawnedChar5,_ChosenTemplate,%SpawnTrigger1,0)
+			PlayEffectAt(%SpawnedChar5,"FX_GP_Footstep_A_Large_Dirt")			
+		ELIF "!c1&c2"
+			IsEqual(%CharacterTemplate1,null)
+			IsEqual(%CharacterTemplate2,null) 
+		THEN
+			PlayEffectAt(__Me,%FXToPlayWhenSpawning)
+			SpawnCharacter(%SpawnedChar5,%CharacterTemplate1,%SpawnTrigger1,0)	
+			PlayEffectAt(%SpawnedChar5,"FX_GP_Footstep_A_Large_Dirt")			
+		ELIF "c1&!c2"
+			IsEqual(%CharacterTemplate1,null)
+			IsEqual(%CharacterTemplate2,null) 
+		THEN
+			PlayEffectAt(__Me,%FXToPlayWhenSpawning)
+			SpawnCharacter(%SpawnedChar5,%CharacterTemplate2,%SpawnTrigger1,0)
+			PlayEffectAt(%SpawnedChar5,"FX_GP_Footstep_A_Large_Dirt")			
+		ENDIF
+		Add(%CurrentCharsSpawned,1)		
+		SetPriority("Spawner_StartSpawning",0)		
+	ELIF "c1"
+		IsEqual(%CurrentCharsSpawned,5)
+	THEN
+		IF "!(c1|c2)"
+			IsEqual(%CharacterTemplate1,null)
+			IsEqual(%CharacterTemplate2,null)
+		THEN
+			GetRandom(_ChosenTemplate,%CharacterTemplate1,%CharacterTemplate2)
+			PlayEffectAt(__Me,%FXToPlayWhenSpawning)
+			SpawnCharacter(%SpawnedChar6,_ChosenTemplate,%SpawnTrigger2,0)
+		ELIF "!c1&c2"
+			IsEqual(%CharacterTemplate1,null)
+			IsEqual(%CharacterTemplate2,null) 
+		THEN
+			PlayEffectAt(__Me,%FXToPlayWhenSpawning)
+			SpawnCharacter(%SpawnedChar6,%CharacterTemplate1,%SpawnTrigger2,0)	
+		ELIF "c1&!c2"
+			IsEqual(%CharacterTemplate1,null)
+			IsEqual(%CharacterTemplate2,null) 
+		THEN
+			PlayEffectAt(__Me,%FXToPlayWhenSpawning)
+			SpawnCharacter(%SpawnedChar6,%CharacterTemplate2,%SpawnTrigger2,0)
+		ENDIF
+		Add(%CurrentCharsSpawned,1)	
+		SetPriority("Spawner_StartSpawning",0)		
+	ELSE
+		//DebugText(__Me,"Maximum reached - [1]",%CurrentCharsSpawned)
+		SetPriority("Spawner_StartSpawning",0)		
+	ENDIF
+
+//------------------------
+EVENTS
+EVENT OnInit_CheckIfAllStatsAreFilled
+ON
+	OnInit()
+ACTIONS
+	Set(%CurrentCharsSpawned,0)
+	IF "c1&c2"
+		IsEqual(%CharacterTemplate1,null)
+		IsEqual(%CharacterTemplate2,null)
+	THEN
+		//DebugText(__Me,"No character to spawn!")
+	ENDIF
+	IF "c1&c2"
+		IsEqual(%SpawnTrigger1,null)
+		IsEqual(%SpawnTrigger2,null)
+	THEN
+		//DebugText(__Me,"No triggers designated!")
+	ENDIF	
+	IF "c1"
+		IsEqual(%NearbyCharacter,null)
+	THEN
+		//DebugText(__Me,"Spawner has no master!")
+	ENDIF
+		
+EVENT AttachedCharacterSendsEvent_SetSpawningPrio			//attached char sends event every turn
+ON
+	OnCharacterEvent(%NearbyCharacter,%EventSentByNearbyChar)
+ACTIONS
+	//DebugText(__Me,"Event received from [1]!",%NearbyCharacter)
+	SetPriority("Spawner_StartSpawning",100)
+	
+EVENT AttachedCharacterEndsCombat_KillSpawningPrio
+ON
+	OnCharacterEvent(%NearbyCharacter,%EventSentByNearbyCharWhenCombatEnds)
+ACTIONS
+	SetPriority("Spawner_StartSpawning",0)
+
+EVENT OnDie_SpawnedCharacter1_DecreaseCounter
+ON
+	OnDie(%SpawnedChar1,_,_,_)
+ACTIONS
+	IF "!c1"
+		IsEqual(%SpawnedChar1,null)
+	THEN	
+		Subtract(%CurrentCharsSpawned,1)
+		//DebugText(__Me,"C1 died!")
+	ENDIF
+	
+EVENT OnDie_SpawnedCharacter2_DecreaseCounter
+ON
+	OnDie(%SpawnedChar2,_,_,_)
+ACTIONS
+	IF "!c1"
+		IsEqual(%SpawnedChar2,null)
+	THEN	
+		Subtract(%CurrentCharsSpawned,1)
+		//DebugText(__Me,"C2 died!")
+	ENDIF
+		
+EVENT OnDie_SpawnedCharacter3_DecreaseCounter
+ON
+	OnDie(%SpawnedChar3,_,_,_)
+ACTIONS
+	IF "!c1"
+		IsEqual(%SpawnedChar3,null)
+	THEN	
+		Subtract(%CurrentCharsSpawned,1)
+		//DebugText(__Me,"C3 died!")
+	ENDIF
+	
+EVENT OnDie_SpawnedCharacter4_DecreaseCounter
+ON
+	OnDie(%SpawnedChar4,_,_,_)
+ACTIONS
+	IF "!c1"
+		IsEqual(%SpawnedChar4,null)
+	THEN	
+		Subtract(%CurrentCharsSpawned,1)
+		//DebugText(__Me,"C4 died!")
+	ENDIF
+		
+EVENT OnDie_SpawnedCharacter5_DecreaseCounter
+ON
+	OnDie(%SpawnedChar5,_,_,_)
+ACTIONS	
+	IF "!c1"
+		IsEqual(%SpawnedChar5,null)
+	THEN	
+		Subtract(%CurrentCharsSpawned,1)
+		//DebugText(__Me,"C5 died!")
+	ENDIF
+	
+EVENT OnDie_SpawnedCharacter6_DecreaseCounter
+ON
+	OnDie(%SpawnedChar6,_,_,_)
+ACTIONS
+	IF "!c1"
+		IsEqual(%SpawnedChar6,null)
+	THEN	
+		Subtract(%CurrentCharsSpawned,1)
+		//DebugText(__Me,"C6 died!")
+	ENDIF
+	
+EVENT OnItemDestroyed_PlayCoolFX
+ON
+	OnItemDestroyed(__Me)
+ACTIONS
+	PlayEffectAt(__Me,"FX_Creatures_SandyHole_Destruction_A")

@@ -1,0 +1,88 @@
+#TEMPLATE "_SKILL_Base" : Target_EnemyCrawlingInfestation
+
+INIT
+CHARACTER:__Me
+FLOAT:%SkillTargetScore_Target_EnemyCrawlingInfestation=-1000000
+// [GLOBAL_VARS]
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_Target_EnemyCrawlingInfestation
+VARS
+	// [CALC_VARS]
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_Target_EnemyCrawlingInfestation")
+ACTIONS
+	Set(%SkillTargetScore_Target_EnemyCrawlingInfestation, -1000000)
+
+	// [CALC_ACTIONS_PRE]
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	IterateCharactersInCombat(__Me, "CalculateTarget_Target_EnemyCrawlingInfestation", Random, Vitality)
+	IF "!c1"
+		IsEqual(%SkillTargetChar_Target_EnemyCrawlingInfestation, null)
+	THEN
+		Add(%ActionScore_Target_EnemyCrawlingInfestation, %SkillTargetScore_Target_EnemyCrawlingInfestation)
+	ENDIF
+	// [~CALC_ACTIONS]
+
+	
+
+	
+// Calculate the character we should attack
+EVENT CalculateTarget_Target_EnemyCrawlingInfestation
+VARS	
+	CHARACTER:_Char
+	// [CALC_TARGET_VARS]
+	FLOAT:_StatVitality
+	FLOAT:_Score
+	// [~CALC_TARGET_VARS]
+ON
+	OnIterateCharacter(_Char, "CalculateTarget_Target_EnemyCrawlingInfestation")	
+ACTIONS
+	// [CALC_CHAR_TARGET_ACTIONS_PRE]
+	Set(_Score, 0.0)
+	// [~CALC_CHAR_TARGET_ACTIONS_PRE]
+	// [CALC_CHAR_TARGET_ACTIONS]
+	IF "(!c1&!c2&!c3)&(!(((c4)|c5&c6)|c7))&(c8)"
+	    CharacterIsDead(_Char) // c1
+	    CharacterHasStatus(_Char, INVISIBLE) // c2
+	    CharacterHasStatus(_Char, SNEAKING) // c3
+	    CharacterHasStatus(_Char, CRAWLING_INFESTATION) // c4
+	    CharacterGetStat(_StatVitality, _Char, Vitality) // c5
+	    IsLessThen(_StatVitality, 0.3) // c6
+	    CharacterHasStatus(_Char, AGGRO_MARKED) // c7
+	    CharacterIsEnemy(__Me, _Char) // c8
+	THEN
+	    // Hostile count score calculation
+	    Add(_Score, 10.0) // HostileWeight
+	    
+	    // Can see score calculation
+	    IF "!c1"
+	    	CharacterCanSee(__Me, _Char)
+	    THEN
+	    	Add(_Score, -10.0)
+	    ENDIF
+	    
+	    IF "c1"
+	    	IsGreaterThen(_Score, %SkillTargetScore_Target_EnemyCrawlingInfestation)
+	    THEN
+	    	Set(%SkillTargetChar_Target_EnemyCrawlingInfestation, _Char)
+	    	Set(%SkillTargetScore_Target_EnemyCrawlingInfestation, _Score)
+	    ENDIF	
+	ENDIF
+	// [~CALC_CHAR_TARGET_ACTIONS]
+	
+	
+	
+	
+	
+	
+	
+	

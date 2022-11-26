@@ -1,0 +1,66 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+ItemSetOnstage(ITEM_DAF_Statue_Chest,0);
+
+DB_DAF_Offer_ForbiddenTemplate("UNI_Teleport_Pyramid_A_9e7a4ee9-4034-4496-8038-5cf517dd324e");
+DB_DAF_Offer_ForbiddenTemplate("UNI_Teleport_Pyramid_A_B_09cb89b1-e64e-488b-bcdc-c4de61a51184");
+DB_DAF_Offer_ForbiddenTemplate("PUZ_PhantomAmulet_A_862575bb-628d-42f8-937e-b9ad3c059653");
+DB_DAF_Offer_ForbiddenTemplate("Quest_Stone_Blood_B_b3f5e7ac-2bf5-4d89-9163-8e52f9a10ac5");
+DB_DAF_Offer_ForbiddenTemplate("Quest_Seal_Key_A_8eea82bf-82e9-4481-bdad-5150cac438c9");
+KBSECTION
+IF
+CharacterUsedItem(_,ITEM_DAF_Statue_Plaque)
+THEN
+ItemDisplayText(ITEM_DAF_Statue_Plaque,"DAF_Statue_Inscription");
+
+IF
+ItemAddedToContainer(_Item,ITEM_DAF_Statue_Bowl)
+AND
+ItemIsStoryItem(_Item,1)
+AND
+ItemGetHandle(_Item,_Handle)
+AND
+ItemGetClosestPlayer(ITEM_DAF_Statue_Bowl,_Player)
+THEN
+ItemToCharacter(_Item,_Player);
+DB_DAF_Offer_ForbiddenItemhandle(_Handle);
+
+IF
+ItemTemplateAddedToContainer(_Template,_Handle,ITEM_DAF_Statue_Bowl)
+AND
+DB_DAF_Offer_ForbiddenTemplate(_Template)
+AND
+NOT DB_DAF_Offer_ForbiddenItemhandle(_Handle)
+AND
+ItemGetClosestPlayer(ITEM_DAF_Statue_Bowl,_Player)
+THEN
+ItemHandleToCharacter(_Handle,_Player,1);
+
+IF
+ItemTemplateAddedToContainer(_Template,_Handle,ITEM_DAF_Statue_Bowl)
+AND
+NOT DB_DAF_Offer_ForbiddenTemplate(_Template)
+AND
+NOT DB_DAF_Offer_ForbiddenItemhandle(_Handle)
+AND
+NOT DB_OnlyOnce("DAF_Statue_Bowl")
+AND
+ContainerGetGoldValue(ITEM_DAF_Statue_Bowl,_Value)
+AND
+_Value > 1000
+THEN
+DB_OnlyOnce("DAF_Statue_Bowl");
+ContainerMoveAllItemsToCharacter(ITEM_DAF_Statue_Bowl,CHARACTER_LUC_PickAxeHolderHack);
+ItemSetOnstage(ITEM_DAF_Statue_Chest,1);
+ItemMoveToTrigger(ITEM_DAF_Statue_Chest,TRIGGER_DAF_Statue_Point,0.5,0.0,0);
+ItemDisplayText(ITEM_DAF_Statue_Bowl,"DAF_Statue_Thanks");
+
+IF
+ItemTemplateAddedToContainer(_,_Handle,ITEM_DAF_Statue_Bowl)
+THEN
+NOT DB_DAF_Offer_ForbiddenItemhandle(_Handle);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

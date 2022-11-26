@@ -1,0 +1,74 @@
+INIT
+	CHARACTER:__Me
+	INT:%DoWalkAbout = 0
+	INT:%WaitAtPortal = 0
+	INT:%AfterIntro = 0
+	CHARACTER:%FaceTarget = null
+	INT:%DialogRequested  = 0
+
+//---------
+BEHAVIOUR
+REACTION WaitAtPortal, 200
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%WaitAtPortal,1)
+VARS
+	CHARACTER:_Player
+	FLOAT:_Dist
+ACTIONS
+	IF "c1&c2&c3"
+		GetClosestPlayer(_Player)
+		GetDistance(_Dist,_Player,__Me)
+		IsLessThen(_Dist,6.0)
+	THEN
+		CharacterLookAt(_Player)
+		IF "c1"
+			IsRandom(0.2)
+		THEN
+			DialogStart("HOM_AD_ZixZax_PortalWait",__Me)
+		ENDIF
+	ENDIF
+	Sleep(1.0)
+
+REACTION AfterIntro, 300
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%AfterIntro,1)
+VARS
+	CHARACTER:_Player
+	FLOAT:_Dist
+ACTIONS
+	IF "c1&c2&c3"
+		GetClosestPlayer(_Player)
+		GetDistance(_Dist,_Player,__Me)
+		IsLessThen(_Dist,10.0)
+	THEN
+		CharacterLookAt(_Player)
+		DialogStart("HOM_AD_ZixzaxBeforeLeaveHomestead",__Me)
+	ENDIF
+	Sleep(5.0)
+
+REACTION FaceTarget, 0
+USAGE PEACE
+ACTIONS
+	IF "!c1"
+		IsEqual(%FaceTarget,null)
+	THEN
+		CharacterLookAt(%FaceTarget)
+	ENDIF
+	Set(%FaceTarget,null)
+	SetPriority("FaceTarget",0)
+
+//---------
+EVENTS
+EVENT OnFaceTarget
+ON
+	OnCharacterEvent(__Me,"FaceTarget")
+ACTIONS
+	IF "c1"
+		IsEqual(%DialogRequested,0)
+	THEN
+		Set(%DialogRequested,1)
+		SetPriority("FaceTarget",2000)
+	ENDIF
+	

@@ -1,0 +1,15 @@
+INIT
+
+ITEM:__Me
+EXTERN STRING:%Effect = "FX_Creatures_Animals_Spider_Unburrow_A"
+
+
+EVENTS
+
+EVENT Death
+ON
+	OnVitalityChanged(0.0)
+ACTIONS
+	PlayEffectAt(__Me, %Effect)
+	ItemSetOnStage(__Me, 0)
+		

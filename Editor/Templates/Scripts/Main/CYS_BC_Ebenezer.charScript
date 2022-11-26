@@ -1,0 +1,23 @@
+#INCLUDE CYS_BC_QuestGhost
+
+INIT
+	USING CYS_BC_QuestGhost
+	CHARACTER:__Me
+	
+BEHAVIOUR
+
+REACTION State_BeforeQuest, 0 OVERRIDE
+	USAGE PEACE
+	ACTIONS
+		GetRandom(%currentAction, "Action_Preach")
+		SetPriority(%currentAction, 1100)
+
+REACTION  Action_Preach, 0
+	USAGE PEACE
+	ACTIONS
+	// --- Should use CharacterPlayAnimation Speeching --- //
+		DialogStart("CYS_BC_AD_Ebenezer", __Me)
+		Sleep(3)
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)

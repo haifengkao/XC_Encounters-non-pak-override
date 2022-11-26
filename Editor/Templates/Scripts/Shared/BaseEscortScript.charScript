@@ -1,0 +1,183 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager 
+	INT:%CurrentWaypoint = 0
+	INT:%NumWaypoints = 7
+	INT:%ForcedUpdate = 0
+	EXTERN TRIGGER:%Trigger01 = null
+	EXTERN TRIGGER:%Trigger02 = null
+	EXTERN TRIGGER:%Trigger03 = null
+	EXTERN TRIGGER:%Trigger04 = null
+	EXTERN TRIGGER:%Trigger05 = null
+	EXTERN TRIGGER:%Trigger06 = null
+	EXTERN TRIGGER:%Trigger07 = null
+	EXTERN INT:%Running = 1
+	EXTERN FLOAT:%NearDist = 4.0
+	CHARACTER:__Me
+	
+	EXTERN INT:%WaitForParty = 0
+	EXTERN CHARACTER:%PartyMember1 = null
+	EXTERN CHARACTER:%PartyMember2 = null
+	EXTERN FLOAT:%MaxPartyDist = 10.0
+	EXTERN FLOAT:%MinPartyDist = 20.0
+	INT:%Waited = 0
+	INT:%WaitLock = 0
+	
+	TRIGGER:%CurrentTrigger = null
+BEHAVIOUR
+
+REACTION State_DoEscort, 0
+USAGE PEACE
+ACTIONS
+	Set(%currentAction,"Action_FollowWaypoints")
+	SetPriority(%currentAction, 1100)
+	
+REACTION Action_WaitForParty,1102
+USAGE PEACE
+VARS
+	FLOAT:_Dist=-666
+	FLOAT:_Dist2=-666
+	FLOAT:_MeDist
+	FLOAT:_DestDist1
+	FLOAT:_DestDist2
+	INT:_Param1
+	INT:_Param2
+CHECK "c29&c1&c2&c3&((!c4)|(!c5))&(((!c4)&(!c6))|((!c5)&(!c10)))&(((c4|c6)|((!c6)&c7&c8))&((c5|c10)|((!c10)&c11&c12)))&((c9|c13)&(((c4|c14)|((!c14)&c15&(!c16)))&((c5|c17)|((!c17)&c18&(!c19)))))&(c20&(((c4|c14|c27)|(c21&c23&c25))&((c5|c17|c28)|(c22&c24&c26))))"
+	IsGreaterThen(%CurrentWaypoint,0)
+	IsEqual(%WaitForParty,1)
+	IsEqual(%currentState,"State_DoEscort")
+	
+	IsEqual(%PartyMember1,null)
+	IsEqual(%PartyMember2,null)
+	
+	CharacterIsDead(%PartyMember1)
+	GetDistance(_Dist,__Me,%PartyMember1)
+	IsGreaterThen(_Dist,%MaxPartyDist)
+	IsLessThen(_Dist,%MinPartyDist)
+	
+	CharacterIsDead(%PartyMember2)
+	GetDistance(_Dist2,__Me,%PartyMember2)
+	IsGreaterThen(_Dist2,%MaxPartyDist)
+	IsLessThen(_Dist2,%MinPartyDist)
+	
+	CharacterIsPlayer(%PartyMember1)
+	GetVar(_Param1,%PartyMember1,"CurrentWaypoint")
+	IsLessThen(%CurrentWaypoint,_Param1)
+	
+	CharacterIsPlayer(%PartyMember2)
+	GetVar(_Param2,%PartyMember2,"CurrentWaypoint")
+	IsLessThen(%CurrentWaypoint,_Param2)
+	
+	GetDistance(_MeDist,__Me,%CurrentTrigger)
+	
+	IsEqual(_Param1,%CurrentWaypoint)
+	IsEqual(_Param2,%CurrentWaypoint)
+	GetDistance(_DestDist1,%PartyMember1,%CurrentTrigger)
+	GetDistance(_DestDist2,%PartyMember2,%CurrentTrigger)
+	IsLessThen(_MeDist,_DestDist1)
+	IsLessThen(_MeDist,_DestDist2)
+	
+	IsGreaterThen(%CurrentWaypoint,_Param1)
+	IsGreaterThen(%CurrentWaypoint,_Param2)
+	
+	IsEqual(%Waited,0)
+ACTIONS
+	Sleep(2.0)
+	Set(%Waited,1)
+	Set(%WaitLock,1)
+INTERRUPT
+	Reset()
+	
+REACTION Action_WaitForPartyEanble,1101
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%WaitLock,1)
+ACTIONS
+	Set(%WaitLock,0)
+	StartTimer("ClearWait",1.5,0)
+	
+
+REACTION Action_FollowWaypoints, 0
+USAGE PEACE
+VARS
+	STRING:_WaypointEvent = null
+	FLOAT:_Dist=0.0
+	INT:_NumTries=0
+ACTIONS
+	Set(%ForcedUpdate, 1)
+	CharacterForceUpdate(1)
+	WHILE "c1"
+		IsLessThen(%CurrentWaypoint,%NumWaypoints)
+	DO
+		GetElement(%CurrentTrigger,%CurrentWaypoint,%Trigger01,%Trigger02,%Trigger03,%Trigger04,%Trigger05,%Trigger06,%Trigger07)
+		IF "!c1"
+			IsEqual(%CurrentTrigger, null)
+		THEN
+			CharacterMoveInRange(%CurrentTrigger,1.0,2.0,%Running)
+			IF "c1&c2"
+				GetDistance(_Dist,__Me,%CurrentTrigger)
+				IsGreaterThen(_Dist,%NearDist)
+			THEN
+				IF "c1"
+					IsGreaterThen(_NumTries,2)
+				THEN
+					DebugText(__Me,"Can't find path! Teleporting!")
+					CharacterTeleportTo(%CurrentTrigger)
+				ELSE
+					Add(_NumTries,1)
+					Sleep(1.0)
+				ENDIF
+			ELSE
+				Set(_NumTries,0)
+				GetElement(_WaypointEvent,%CurrentWaypoint,"ReachedWaypoint1","ReachedWaypoint2","ReachedWaypoint3","ReachedWaypoint4","ReachedWaypoint5","ReachedWaypoint6","ReachedWaypoint7")
+				CharacterEvent(__Me,_WaypointEvent)
+				CallFunction("UpdateWaypoint")
+			ENDIF
+		ELSE
+			Goto("Loop_Exit")
+		ENDIF
+	ENDWHILE
+	Label("Loop_Exit")
+	SetPriority("Action_WaitForParty", 0)
+	Set(%currentState,"State_EscortDone")
+	Set(%ForcedUpdate, 0)
+	CharacterForceUpdate(0)
+
+EVENTS
+
+EVENT DoWaypointUpdate
+ON
+	OnFunction("UpdateWaypoint")
+ACTIONS
+	Add(%CurrentWaypoint, 1)
+	GetElement(%CurrentTrigger,%CurrentWaypoint,%Trigger01,%Trigger02,%Trigger03,%Trigger04,%Trigger05,%Trigger06,%Trigger07)
+	
+EVENT Shutdown
+ON
+	OnShutdown()
+ACTIONS
+	StopTimer("ClearWait")
+	
+EVENT Init
+ON
+	OnInit()
+ACTIONS
+	Set(%Waited,0)
+	Set(%WaitLock,0)
+
+EVENT UpdateFoodCheck
+ON
+	OnTimer("ClearWait")
+ACTIONS
+	Set(%Waited,0)
+
+EVENT Died
+ON
+	OnDie(__Me, _,_,_)
+ACTIONS
+	IF "c1"
+		IsEqual(%ForcedUpdate, 1)
+	THEN
+		CharacterForceUpdate(0)
+	ENDIF

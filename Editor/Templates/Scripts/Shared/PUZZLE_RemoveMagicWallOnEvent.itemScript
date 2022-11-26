@@ -1,0 +1,12 @@
+INIT
+
+	ITEM:__Me
+	EXTERN STRING:%Event=null
+	
+EVENTS
+
+EVENT DestroyOnEvent
+	ON
+		OnCharacterItemEvent(_,_,%Event)
+	ACTIONS
+		ItemEvent(__Me, "shutDown")

@@ -1,0 +1,35 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+CHARACTER:%Partner1 = LUC_WitchCave_Cultist6_cf5f576e-91f2-4716-8102-a028bdfaddb8
+CHARACTER:%Partner2 = LUC_WitchCave_Cultist7_48d9f60b-9d48-4e7b-8211-e02512919bd6
+CHARACTER:%Partner3 = LUC_WitchCave_Cultist8_468a704e-a4b1-4f03-ad57-a972269d4554
+
+BEHAVIOUR
+
+REACTION State_CommandingTroops, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+	CHARACTER:_Partner
+ACTIONS
+	GetRandom(_Partner,%Partner1,%Partner2,%Partner3)
+	GetRandom(_Animation,"Attention_01","Attention_02","Attention_03","Listen_01")
+	CharacterWander(FLOAT:1,3,0)
+	CharacterMoveTo(_Partner)
+	CharacterLookAt(_Partner)
+	CharacterPlayAnimation(_Animation)
+	Sleep(10)
+
+EVENTS
+
+EVENT SpottedPlayer
+ON
+	OnCombatStarted()
+VARS
+	FIXEDSTRING:_Text
+ACTIONS
+	GetRandom(_Text,"LUC_WitchCave_CultistSpotsPlayer_1","LUC_WitchCave_CultistSpotsPlayer_2","LUC_WitchCave_CultistSpotsPlayer_3","LUC_WitchCave_CultistSpotsPlayer_4")
+	DisplayText(__Me,_Text,5)

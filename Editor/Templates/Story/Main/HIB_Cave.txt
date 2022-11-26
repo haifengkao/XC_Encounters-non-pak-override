@@ -1,0 +1,366 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+//REGION ARRIVAL
+DB_PlayerComments("HIB_CommentOnArrival","HIB_CommentOnArrival_1_1",1,1);
+DB_PlayerComments("HIB_CommentOnArrival","HIB_CommentOnArrival_2_1",2,1);
+DB_PlayerComments("HIB_CommentOnArrival","HIB_CommentOnArrival_2_2",2,2);
+DB_PlayerComment_Trigger(TRIGGER_HIB_CommentOnArrival,"HIB_CommentOnArrival");
+//END_REGION
+
+//REGION APPRENTICE
+DB_Dialogs(CHARACTER_HIB_Apprentice,"HIB_Apprentice");
+CharacterSetHitpointsPercentage(CHARACTER_HIB_Apprentice,1);
+CharacterApplyStatus(CHARACTER_HIB_Apprentice, "UNHEALABLE", -1.0, 1);
+CharacterSetAnimationSetOverride(CHARACTER_HIB_Apprentice,"Lying_Wounded");
+DB_NoDefaultBehavior(CHARACTER_HIB_Apprentice);
+
+DB_HIB_AlminaSentinels(CHARACTER_HIB_SentinelAlmina1);
+DB_HIB_AlminaSentinels(CHARACTER_HIB_SentinelAlmina2);
+DB_HIB_AlminaSentinels(CHARACTER_HIB_SentinelAlmina3);
+DB_HIB_AlminaSentinels(CHARACTER_HIB_SentinelAlmina4);
+DB_HIB_AlminaSentinels(CHARACTER_HIB_SentinelAlmina5);
+DB_HIB_AlminaSentinels(CHARACTER_HIB_SentinelAlmina6);
+
+DB_PlayerComments("HIB_CommentAfterFirstFlame","HIB_CommentAfterFirstFlame_1_1",1,1);
+DB_PlayerComments("HIB_CommentAfterFirstFlame","HIB_CommentAfterFirstFlame_2_1",2,1);
+DB_PlayerComments("HIB_CommentAfterFirstFlame","HIB_CommentAfterFirstFlame_2_2",2,2);
+//END_REGION
+
+//REGION GATES
+DB_PlayerComments("HIB_CommentOnFirstTrap","HIB_CommentOnFirstTrap_1_1",1,1);
+DB_PlayerComments("HIB_CommentOnFirstTrap","HIB_CommentOnFirstTrap_1_1",2,1);
+DB_PlayerComments("HIB_CommentOnFirstTrap","HIB_CommentOnFirstTrap_1_1",2,2);
+DB_PlayerComments("HIB_CommentBuildersCamp","HIB_CommentBuildersCamp_1_1",1,1);
+DB_PlayerComments("HIB_CommentBuildersCamp","HIB_CommentBuildersCamp_2_1",2,1);
+DB_PlayerComment_Trigger(TRIGGER_HIB_CommentBuildersCamp,"HIB_CommentBuildersCamp");
+DB_PlayerComment_Trigger(TRIGGER_HIB_CommentBuildersCamp2,"HIB_CommentBuildersCamp");
+DB_PlayerComments("HIB_CommentGardenGate4","HIB_CommentGardenGate4_1_1",1,1);
+DB_PlayerComments("HIB_CommentGardenGate4","HIB_CommentGardenGate4_2_1",2,1);
+
+ITEM_HIB_GardenGate2.IsLocked();
+ITEM_HIB_GardenGate3.IsLocked();
+ITEM_HIB_GardenGate4.IsLocked();
+ItemSetCanInteract(ITEM_HIB_GardenGate1,0);
+ItemSetCanInteract(ITEM_HIB_GardenGate2,0);
+ItemSetCanInteract(ITEM_HIB_GardenGate3,0);
+ItemSetCanInteract(ITEM_HIB_GardenGate4,0);
+
+CharacterSetOnStage(CHARACTER_HIB_GardenGate3_AmbushRooster1,0);
+CharacterSetOnStage(CHARACTER_HIB_GardenGate3_AmbushRooster2,0);
+CharacterSetOnStage(CHARACTER_HIB_GardenGate3_Hardcore_Rat01,0);
+CharacterSetOnStage(CHARACTER_HIB_GardenGate3_Hardcore_Rat02,0);
+CharacterSetOnStage(CHARACTER_HIB_GardenGate3_Hardcore_Rat03,0);
+KillCounterDB(CHARACTER_HIB_GardenGate3_AmbushRooster1,"HIB_CaveElementals");
+KillCounterDB(CHARACTER_HIB_GardenGate3_AmbushRooster2,"HIB_CaveElementals");
+KillCounter("HIB_CaveElementals",2);
+DB_PlayerComments("HIB_CommentCaveElementals","HIB_CommentCaveElementals_1_1",1,1);
+DB_PlayerComments("HIB_CommentCaveElementals","HIB_CommentCaveElementals_2_1",2,1);
+DB_PlayerComments("HIB_CommentCaveElementals","HIB_CommentCaveElementals_2_2",2,2);
+
+DB_ShovelArea(TRIGGER_HIB_ShovelGardenGateLever3,"HIB_ShovelGardenGateLever3",ITEM_HIB_ShovelGardenGateLever3Dirt);
+DB_ShovelRewardItemAppear("HIB_ShovelGardenGateLever3",ITEM_HIB_GardenGate3_Lever_Key,TRIGGER_HIB_ShovelGardenGateLever3Point);
+//END_REGION
+
+//REGION RAT INTRO
+DB_RatIntro(CHARACTER_HIB_RatIntro_Rat01);
+DB_RatIntro(CHARACTER_HIB_RatIntro_Rat02);
+DB_RatIntro(CHARACTER_HIB_RatIntro_Rat03);
+DB_RatIntro(CHARACTER_HIB_RatIntro_Rat04);
+DB_RatIntro(CHARACTER_HIB_RatIntro_Rat05);
+DB_RatIntro(CHARACTER_HIB_RatIntro_Rat06);
+//END_REGION
+
+DB_HIB_GateFX(ITEM_HIB_GardenGate1HelperInvisible1, "Gate1");
+DB_HIB_GateFX(ITEM_HIB_GardenGate1HelperInvisible2, "Gate1");
+DB_HIB_GateFX(ITEM_HIB_GardenGate1HelperInvisible3, "Gate1");
+DB_HIB_GateFX(ITEM_HIB_GardenGate1HelperInvisible4, "Gate1");
+DB_HIB_GateFX(ITEM_HIB_GardenGate1HelperInvisible5, "Gate1");
+DB_HIB_GateFX(ITEM_HIB_GardenGate2HelperInvisible1, "Gate2");
+DB_HIB_GateFX(ITEM_HIB_GardenGate2HelperInvisible2, "Gate2");
+DB_HIB_GateFX(ITEM_HIB_GardenGate2HelperInvisible3, "Gate2");
+DB_HIB_GateFX(ITEM_HIB_GardenGate2HelperInvisible4, "Gate2");
+DB_HIB_GateFX(ITEM_HIB_GardenGate2HelperInvisible5, "Gate2");
+DB_HIB_GateFX(ITEM_HIB_GardenGate3HelperInvisible1, "Gate3");
+DB_HIB_GateFX(ITEM_HIB_GardenGate3HelperInvisible2, "Gate3");
+DB_HIB_GateFX(ITEM_HIB_GardenGate3HelperInvisible3, "Gate3");
+DB_HIB_GateFX(ITEM_HIB_GardenGate3HelperInvisible4, "Gate3");
+DB_HIB_GateFX(ITEM_HIB_GardenGate3HelperInvisible5, "Gate3");
+DB_HIB_GateFX(ITEM_HIB_GardenGate4HelperInvisible1, "Gate4");
+DB_HIB_GateFX(ITEM_HIB_GardenGate4HelperInvisible2, "Gate4");
+DB_HIB_GateFX(ITEM_HIB_GardenGate4HelperInvisible3, "Gate4");
+DB_HIB_GateFX(ITEM_HIB_GardenGate4HelperInvisible4, "Gate4");
+DB_HIB_GateFX(ITEM_HIB_GardenGate4HelperInvisible5, "Gate4");
+
+DB_DyingNpcOnBed(CHARACTER_HIB_Apprentice, ITEM_HIB_Apprentice_Invisibed);
+
+CharacterSetOnStage(CHARACTER_HIB_RatIntro_Hardcore_Alpha_01,0);
+CharacterSetOnStage(CHARACTER_HIB_RatIntro_Hardcore_Alpha_02,0);
+CharacterSetOnStage(CHARACTER_HIB_RatIntro_Hardcore_Beta_01,0);
+CharacterSetOnStage(CHARACTER_HIB_RatIntro_Hardcore_Beta_02,0);
+KBSECTION
+//REGION ARRIVAL / INIT
+IF
+CharacterDisplayTextEnded(_Player,"HIB_CommentOnArrival_1_1")
+THEN
+QuestAdd("LUC_WhiteWitch");
+QuestUpdate("LUC_WhiteWitch","EnteredHiberheim");
+
+IF
+CharacterDisplayTextEnded(_Player,"HIB_CommentOnArrival_2_2")
+THEN
+QuestAdd("LUC_WhiteWitch");
+QuestUpdate("LUC_WhiteWitch","EnteredHiberheim");
+
+IF
+DB_RatIntro(_IntroRat)						
+THEN
+CharacterSetOnStage(_IntroRat,0);
+
+IF
+DB_HIB_AlminaSentinels(_Char)
+THEN
+DB_DisableAttackReaction(_Char);
+
+//END_REGION
+
+//REGION APPRENTICE
+IF
+CharacterEvent(_Sentinel,"HIB_Almina_Talking")
+AND
+NOT CHARACTER_HIB_Apprentice.HIB_GaveFirstFlameComment()
+AND
+CharacterGetClosestAlivePlayer(_Sentinel,_Player)
+THEN
+CHARACTER_HIB_Apprentice.HIB_GaveFirstFlameComment();
+_Player.HIB_WillGiveFlameComment(_Sentinel);
+
+IF
+CharacterDisplayTextEnded(_Sentinel,_)
+AND
+_Player.HIB_WillGiveFlameComment(_Sentinel)
+THEN
+NOT _Player.HIB_WillGiveFlameComment(_Sentinel);
+Launch_PlayerComment(_Player,"HIB_CommentAfterFirstFlame");
+GlobalSetEvent("HIB_HeardApprenticeFlame");
+
+IF
+CharacterDisplayTextEnded(_Sentinel,_)
+AND
+DB_HIB_AlminaSentinels(_Sentinel)
+THEN
+NOT DB_HIB_AlminaSentinels(_Sentinel);
+CharacterDie(_Sentinel,0);
+
+IF
+DialogEnded("HIB_Apprentice",_)
+THEN
+CharacterDie(CHARACTER_HIB_Apprentice,0);
+QuestUpdate("LUC_WhiteWitch","MetApprentice");
+QuestUpdate("LUC_Apprentice","FoundApprentice");
+QuestClose("LUC_Apprentice");
+
+IF
+GlobalEventSet("HIB_ReachedApprentice")
+AND
+DB_HIB_AlminaSentinels(_Sentinel)
+THEN
+NOT DB_HIB_AlminaSentinels(_Sentinel);
+CharacterDie(_Sentinel,0);
+
+IF
+CharacterDied(_Char)
+AND
+DB_DyingNpcOnBed(_Char, _Bed)
+THEN
+ItemSetOnstage(_Bed, 0);
+//END_REGION
+
+//REGION GATE 1
+IF
+CharacterItemEvent(_Player,ITEM_HIB_GardenGate1_Lever, "activated")
+AND
+NOT ITEM_HIB_GardenGate1.opened()
+THEN
+PROC_HIB_LaunchGateFX("Gate1");
+ItemUnlockAndOpen(ITEM_HIB_GardenGate1);
+ITEM_HIB_GardenGate1.opened();
+
+PROC
+PROC_HIB_LaunchGateFX((STRING)_Gate)
+AND
+DB_HIB_GateFX(_Place, _Gate)
+THEN
+ItemPlayEffect(_Place, "FX_Creatures_Animals_Spider_Unburrow_A");
+//END_REGION
+
+//REGION GATE 2
+IF
+CharacterItemEvent(_,ITEM_HIB_PressurePlate_GardenGate2,"HIB_PressurePlate_GardenGate2_On")
+AND
+ITEM_HIB_GardenGate2.IsLocked()
+THEN
+PROC_HIB_LaunchGateFX("Gate2");
+ItemUnlockAndOpen(ITEM_HIB_GardenGate2);
+NOT ITEM_HIB_GardenGate2.isShut();
+
+IF
+CharacterItemEvent(_,ITEM_HIB_PressurePlate_GardenGate2,"HIB_PressurePlate_GardenGate2_Off")
+AND
+ITEM_HIB_GardenGate2.IsLocked()
+THEN
+PROC_HIB_LaunchGateFX("Gate2");
+ItemCloseAndLock(ITEM_HIB_GardenGate2,"Story");
+ITEM_HIB_GardenGate2.isShut();
+
+IF
+CharacterItemEvent(_Player,ITEM_HIB_GardenGate2_Lever, "activated")	
+AND
+ITEM_HIB_GardenGate2.isShut()
+THEN
+PROC_HIB_LaunchGateFX("Gate2");
+
+IF
+CharacterItemEvent(_Player,ITEM_HIB_GardenGate2_Lever, "activated")					
+THEN
+ItemUnlockAndOpen(ITEM_HIB_GardenGate2);
+TimerLaunch("HIB_RatIntro_SpawnTimer_01",600);
+NOT ITEM_HIB_GardenGate2.IsLocked();
+
+IF
+TimerFinished("HIB_RatIntro_SpawnTimer_01")
+THEN
+CharacterAppear(CHARACTER_HIB_RatIntro_Rat02,1);
+CharacterAppear(CHARACTER_HIB_RatIntro_Rat04,1);
+CharacterAppear(CHARACTER_HIB_RatIntro_Rat05,1);
+TimerLaunch("HIB_RatIntro_SpawnTimer_02",600);
+
+IF
+TimerFinished("HIB_RatIntro_SpawnTimer_02")
+THEN
+CharacterAppear(CHARACTER_HIB_RatIntro_Rat01,1);
+CharacterAppear(CHARACTER_HIB_RatIntro_Rat03,1);
+TimerLaunch("HIB_RatIntro_SpawnTimer_03",1300);
+
+IF
+TimerFinished("HIB_RatIntro_SpawnTimer_03")
+THEN
+CharacterAppear(CHARACTER_HIB_RatIntro_Rat06,1);
+
+IF
+TimerFinished("HIB_RatIntro_SpawnTimer_03")
+AND
+DB_RatIntro(_IntroRat)
+THEN
+NOT DB_RatIntro(_IntroRat);
+
+IF
+CharacterEvent(CHARACTER_HIB_RatIntro_Rat06,"CMBHC_HIB_RatLever_AdditionalRatAppears")
+AND
+IsHardcoreMode(1)
+THEN
+CharacterAppear(CHARACTER_HIB_RatIntro_Hardcore_Alpha_01,1);
+CharacterAppear(CHARACTER_HIB_RatIntro_Hardcore_Beta_01,1);
+TimerLaunch("HIB_RatIntro_SpawnTimer_04",700);
+
+IF
+TimerFinished("HIB_RatIntro_SpawnTimer_04")
+AND
+IsHardcoreMode(1)
+THEN
+CharacterAppear(CHARACTER_HIB_RatIntro_Hardcore_Alpha_02,1);
+CharacterAppear(CHARACTER_HIB_RatIntro_Hardcore_Beta_02,1);
+//END_REGION
+
+//REGION GATE 3
+IF
+CharacterItemEvent(_Player,ITEM_HIB_GardenGate3_Lever, "fireEvent")
+AND
+ItemIsLocked(ITEM_HIB_GardenGate3_Lever,0)
+AND
+ItemIsLocked(ITEM_HIB_GardenGate3,1)
+THEN
+PROC_HIB_LaunchGateFX("Gate3");
+ItemUnlockAndOpen(ITEM_HIB_GardenGate3);
+CharacterAppearAtTrigger(CHARACTER_HIB_GardenGate3_AmbushRooster1,TRIGGER_HIB_Point_GardenGate3_Ambush1,1);
+CharacterAppearAtTrigger(CHARACTER_HIB_GardenGate3_AmbushRooster2,TRIGGER_HIB_Point_GardenGate3_Ambush2,1);
+TimerLaunch("CMBHC_HIB_GardenGateAmbush_Timer01",800);
+
+IF
+TimerFinished("CMBHC_HIB_GardenGateAmbush_Timer01")
+AND
+IsHardcoreMode(1)
+THEN
+CharacterAppear(CHARACTER_HIB_GardenGate3_Hardcore_Rat01,1);
+TimerLaunch("CMBHC_HIB_GardenGateAmbush_Timer02",800);
+
+IF
+TimerFinished("CMBHC_HIB_GardenGateAmbush_Timer02")
+AND
+IsHardcoreMode(1)
+THEN
+CharacterAppear(CHARACTER_HIB_GardenGate3_Hardcore_Rat02,1);
+TimerLaunch("CMBHC_HIB_GardenGateAmbush_Timer03",800);
+
+IF
+TimerFinished("CMBHC_HIB_GardenGateAmbush_Timer03")
+AND
+IsHardcoreMode(1)
+THEN
+CharacterAppear(CHARACTER_HIB_GardenGate3_Hardcore_Rat03,1);
+
+PROC
+ReactOnKillCounter("HIB_CaveElementals")
+AND
+CharacterGetClosestPlayer(CHARACTER_HIB_GardenGate3_AmbushRooster1,_Player)
+THEN
+Launch_PlayerComment(_Player,"HIB_CommentCaveElementals");
+//END_REGION
+
+//REGION GATE 4
+IF
+CharacterItemEvent(_,ITEM_HIB_PressurePlate_GardenGate4,"HIB_PressurePlate_GardenGate4_On")
+AND
+ITEM_HIB_GardenGate4.IsLocked()
+THEN
+PROC_HIB_LaunchGateFX("Gate4");
+ItemUnlockAndOpen(ITEM_HIB_GardenGate4);
+NOT ITEM_HIB_GardenGate2.isShut();
+
+IF
+CharacterItemEvent(_,ITEM_HIB_PressurePlate_GardenGate4,"HIB_PressurePlate_GardenGate4_On")
+AND
+NOT ITEM_HIB_GardenGate4.HIB_HadComment()
+AND
+ItemGetClosestPlayer(ITEM_HIB_PressurePlate_GardenGate4,_Player)
+THEN
+ITEM_HIB_GardenGate4.HIB_HadComment();
+Launch_PlayerComment(_Player,"HIB_CommentGardenGate4");
+
+IF
+CharacterItemEvent(_,ITEM_HIB_PressurePlate_GardenGate4,"HIB_PressurePlate_GardenGate4_Off")
+AND
+ITEM_HIB_GardenGate4.IsLocked()
+THEN
+PROC_HIB_LaunchGateFX("Gate4");
+ItemCloseAndLock(ITEM_HIB_GardenGate4,"Story");
+ProcTriggerRegisterForPlayers(TRIGGER_HIB_WolfAmbush1_T02);
+ITEM_HIB_GardenGate2.isShut();
+
+IF
+CharacterItemEvent(_Player,ITEM_HIB_GardenGate4_Lever, "activated")
+THEN
+ItemUnlockAndOpen(ITEM_HIB_GardenGate4);
+NOT ITEM_HIB_GardenGate4.IsLocked();
+
+IF
+CharacterItemEvent(_Player,ITEM_HIB_GardenGate4_Lever, "activated")
+AND
+ITEM_HIB_GardenGate2.isShut()
+THEN
+PROC_HIB_LaunchGateFX("Gate4");
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

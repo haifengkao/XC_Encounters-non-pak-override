@@ -1,0 +1,57 @@
+new itemtype "Common","ffffff","","1",1,Common,Common,0
+new itemtype "Unique","c7a758","Item_Unique","2",1,Unique,Unique,4
+new itemtype "Uncommon","00a900","Item_Magical","1",1,Rare,Epic,2
+new boostgroup
+boost "Normal"
+boost "Small"
+new boostgroup
+boost "Small"
+boost "Small"
+new itemtype "Rare","33ccff","Item_Rare","1.1",1,Epic,Legendary,1
+new boostgroup
+boost "Normal"
+boost "Normal"
+new boostgroup
+boost "Large"
+boost "Small"
+new boostgroup
+boost "Large"
+boost "Normal"
+new itemtype "Epic","a346e9","Item_Epic","1.2",1,Legendary,Divine,5
+new boostgroup
+boost "Large"
+boost "Normal"
+boost "Normal"
+new boostgroup
+boost "Legendary"
+boost "Normal"
+boost "Small"
+new boostgroup
+boost "Large"
+boost "Large"
+new itemtype "Legendary","d1007c","Item_Legendary","1.3",1,Divine,Divine,6
+new boostgroup
+boost "Large"
+boost "Normal"
+boost "Normal"
+boost "Small"
+new boostgroup
+boost "Legendary"
+boost "Large"
+boost "Normal"
+new itemtype "Divine","ebc808","Item_Divine","1.5",1,Divine,Divine,3
+new boostgroup
+boost "Legendary"
+boost "Large"
+boost "Normal"
+boost "Small"
+new boostgroup
+boost "Legendary"
+boost "Large"
+boost "Normal"
+boost "Normal"
+new boostgroup
+boost "Legendary"
+boost "Large"
+boost "Large"
+boost "Normal"

@@ -1,0 +1,396 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+ItemToCharacter(ITEM_CYS_EvelynBloodStone,CHARACTER_CYS_Evelyn);
+TriggerRegisterForCharacter(TRIGGER_CYS_Area_StartDialogEvelyn,CHARACTER_Player1);
+TriggerRegisterForCharacter(TRIGGER_CYS_Area_StartDialogEvelyn,CHARACTER_Player2);
+
+DB_CYS_ThelyronPatients("CYS_Boris", CHARACTER_CYS_ThelyronPatientBoris);
+DB_CYS_ThelyronPatients("CYS_Steven", CHARACTER_CYS_ThelyronPatientSteven);
+
+DB_PlayerComments("CYS_Comment_ThelyronHealing","CYS_Comment_ThelyronHealing_1_1",1,1);
+DB_PlayerComments("CYS_Comment_ThelyronHealing","CYS_Comment_ThelyronHealing_2_1",2,1);
+DB_PlayerComments("CYS_Comment_ThelyronHealing","CYS_Comment_ThelyronHealing_2_2",2,2);
+
+CharacterSetAnimationSetOverride(CHARACTER_CYS_ThelyronPatientSteven,"Lying_Wounded");
+CharacterSetAnimationSetOverride(CHARACTER_CYS_ThelyronPatientBoris,"Lying_Wounded");
+KBSECTION
+IF
+GlobalEventSet("CYS_EvelynCaught")
+THEN
+GoalCompleted;
+
+IF
+CharacterEnteredTrigger(_Character,TRIGGER_CYS_Area_StartDialogEvelyn)
+THEN
+ProcDoTwoSpeakerDialog("CYS_Evelyn",CHARACTER_CYS_Evelyn,_Character);
+TriggerUnregisterForCharacter(TRIGGER_CYS_Area_StartDialogEvelyn,CHARACTER_Player1);
+TriggerUnregisterForCharacter(TRIGGER_CYS_Area_StartDialogEvelyn,CHARACTER_Player2);
+
+IF
+DB_CYS_ThelyronPatients(_,_Char)
+THEN
+CharacterSetCanFight(_Char,0);
+DB_NoDefaultBehavior(_Char);
+
+//REGION HEALING OF PATIENTS
+
+IF
+CharacterAttackedByCharacter(_Patient,_Player)
+AND
+_Player.DB_IsPlayer()
+AND
+DB_CYS_ThelyronPatients(_, _Patient)
+AND
+NOT DB_Dead(CHARACTER_CYS_Evelyn)
+AND
+CharacterCanSeeCharacter(CHARACTER_CYS_Evelyn,_Player,1)
+THEN
+ProcMakeNPCHostile(_Player,CHARACTER_CYS_Evelyn);
+
+IF
+DialogEnded("CYS_Evelyn",_Inst)
+AND
+NOT CHARACTER_CYS_Evelyn.WarnedPlayer()
+AND
+NOT CHARACTER_CYS_Evelyn.MadeDecision()
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+THEN
+CHARACTER_CYS_Evelyn.WarnedPlayer();
+TriggerRegisterForCharacter(TRIGGER_CYS_BoxLeaveEvelynTrigger,_Player);
+TriggerRegisterForCharacter(TRIGGER_CYS_BoxLeaveEvelynTrigger2,_Player);
+
+PROC
+ProcCYSDoEvelynWarningDialog((CHARACTER)_Player)
+AND
+ItemIsInCharacterInventory(ITEM_CYS_EvelynBloodStone,CHARACTER_CYS_Evelyn,1)
+THEN
+TriggerUnregisterForCharacter(TRIGGER_CYS_BoxLeaveEvelynTrigger2,_Player);
+TriggerUnregisterForCharacter(TRIGGER_CYS_BoxLeaveEvelynTrigger,_Player);
+ProcDoTwoSpeakerDialog("CYS_Evelyn_WarnPlayer", CHARACTER_CYS_Evelyn, _Player);
+
+IF
+CharacterEnteredTrigger(_Player,TRIGGER_CYS_BoxLeaveEvelynTrigger)
+THEN
+ProcCYSDoEvelynWarningDialog(_Player);
+
+IF
+CharacterEnteredTrigger(_Player,TRIGGER_CYS_BoxLeaveEvelynTrigger2)
+THEN
+ProcCYSDoEvelynWarningDialog(_Player);
+
+IF
+CharacterLeftTrigger(_Player,TRIGGER_CYS_Ownership_Cyseal_Thelyron_GF)
+THEN
+ProcCheckOtherPlayersInTrigger(_Player,TRIGGER_CYS_Ownership_Cyseal_Thelyron_GF);
+
+PROC
+ProcCheckOtherPlayersInTrigger(_Player,TRIGGER_CYS_Ownership_Cyseal_Thelyron_GF)
+AND
+NOT DB_OtherPlayersInRegion(TRIGGER_CYS_Ownership_Cyseal_Thelyron_GF,1)
+THEN
+ProcTriggerUnregisterForPlayers(TRIGGER_CYS_BoxLeaveEvelynTrigger2);
+ProcTriggerUnregisterForPlayers(TRIGGER_CYS_BoxLeaveEvelynTrigger);
+
+IF
+DialogEnded("CYS_Thelyron",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_Thelyron,"toldAboutHealing",1)
+THEN
+CharacterSetVarInteger(CHARACTER_CYS_Evelyn,"toldAboutHealing",1);
+Launch_PlayerComment(_Player,"CYS_Comment_ThelyronHealing");
+
+IF
+CharacterEnteredTrigger(_Player,TRIGGER_CYS_Area_StartDialogEvelyn)
+THEN
+CharacterSetVarFixedString(CHARACTER_CYS_Evelyn,"currentState","State_WaitingForDecision");
+CHARACTER_CYS_Evelyn.StartedHealingQuest();
+DB_Dialogs(CHARACTER_CYS_Evelyn,"CYS_Evelyn");
+GlobalSetEvent("CYS_StartedThelyronHealingQuest");
+
+IF
+CharacterLeftTrigger(_Player,TRIGGER_CYS_Ownership_Cyseal_Thelyron_GF)
+AND
+CHARACTER_CYS_Evelyn.StartedHealingQuest()
+THEN
+ProcCheckOtherPlayersInTrigger(_Player,TRIGGER_CYS_Ownership_Cyseal_Thelyron_GF);
+
+PROC
+ProcUseBloodStone(CHARACTER_CYS_Evelyn, _)
+THEN
+DB_DoEvelynBloodStoneTalk(1);
+
+PROC
+ProcCheckOtherPlayersInTrigger(_Player,TRIGGER_CYS_Ownership_Cyseal_Thelyron_GF)
+AND
+CHARACTER_CYS_Evelyn.StartedHealingQuest()
+AND
+NOT DB_OtherPlayersInRegion(TRIGGER_CYS_Ownership_Cyseal_Thelyron_GF,1)
+AND
+NOT CHARACTER_CYS_Evelyn.MadeDecision()
+THEN
+ProcCYSKillPatients(_Player,0);
+
+PROC
+ProcCheckOtherPlayersInTrigger(_Player,TRIGGER_CYS_Ownership_Cyseal_Thelyron_GF)
+AND
+CHARACTER_CYS_Evelyn.StartedHealingQuest()
+AND
+NOT DB_OtherPlayersInRegion(TRIGGER_CYS_Ownership_Cyseal_Thelyron_GF,1)
+AND
+DB_OnlyOnce("DDAfterThelyron")
+THEN
+ProcDefinePartyDialog("CYS_DD_LeftThelyron");
+DB_OnlyOnce("DDAfterThelyron");
+
+PROC
+ProcCheckOtherPlayersInTrigger(_Player,TRIGGER_CYS_Ownership_Cyseal_Thelyron_GF)
+AND
+CHARACTER_CYS_Evelyn.StartedHealingQuest()
+AND
+NOT DB_OtherPlayersInRegion(TRIGGER_CYS_Ownership_Cyseal_Thelyron_GF,1)
+AND
+CHARACTER_CYS_Evelyn.doneQuest()
+THEN
+ProcCYSKillPatients(_Player,0);
+GoalCompleted;
+
+IF
+DialogEnded("CYS_Thelyron",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_GlobalEvent("KnowsEvelynStone")
+THEN
+Proc_CompanionDialog(CHARACTER_Madoc,"MAD_CD_Thelyron",_Player);
+
+PROC
+ProcCYSKillPatients((CHARACTER)_Player,(INTEGER)_Die)
+THEN
+NOT DB_CYS_ThelyronPatients("CYS_Boris", CHARACTER_CYS_ThelyronPatientBoris);
+NOT DB_CYS_ThelyronPatients("CYS_Steven", CHARACTER_CYS_ThelyronPatientSteven);
+ProcCYSKillEvelynPatients(_Die);
+CharacterSetVarInteger(CHARACTER_CYS_Thelyron,"madePatientDecission",1);
+
+PROC
+ProcCYSKillEvelynPatients((INTEGER)_)
+THEN
+CharacterSetVarFixedString(CHARACTER_CYS_Evelyn,"currentState","State_ActionManager");
+ProcTriggerUnregisterForPlayers(TRIGGER_CYS_BoxLeaveEvelynTrigger2);
+ProcTriggerUnregisterForPlayers(TRIGGER_CYS_BoxLeaveEvelynTrigger);
+
+PROC
+ProcCYSKillEvelynPatients(0)
+THEN
+CharacterRemoveStatus(CHARACTER_CYS_ThelyronPatientBoris, "LYING");
+CharacterSetOnStage(CHARACTER_CYS_ThelyronPatientBoris,0);
+CharacterRemoveStatus(CHARACTER_CYS_ThelyronPatientSteven, "LYING");
+CharacterSetOnStage(CHARACTER_CYS_ThelyronPatientSteven,0);
+
+PROC
+ProcCYSKillEvelynPatients(1)
+THEN
+DialogRequestStopForCharacter(CHARACTER_CYS_Evelyn);
+CharacterPurgeQueue(CHARACTER_CYS_Evelyn);
+CharacterClearScriptframe(CHARACTER_CYS_Evelyn);
+CharacterSetHasDialog(CHARACTER_CYS_Evelyn,1);
+CHARACTER_CYS_Evelyn.MadeDecision();
+GlobalSetEvent("CYS_StartedThelyronHealingQuest");
+ProcCYSKillPatient(CHARACTER_CYS_ThelyronPatientBoris);
+ProcCYSKillPatient(CHARACTER_CYS_ThelyronPatientSteven);
+
+PROC
+ProcCYSKillPatient((CHARACTER)_Char)
+AND
+NOT DB_Dead(_Char)
+THEN
+CharacterDie(_Char,0);
+
+PROC
+ProcCYSKillPatients(_,_)
+AND
+NOT CHARACTER_CYS_Evelyn.MadeDecision()
+THEN
+GlobalSetEvent("CYS_EvelynPatientsDie");
+QuestUpdate("CYS_HealingPatients", "Update4");
+QuestClose("CYS_HealingPatients");
+
+IF
+CharacterKilledByCharacter(_Patient, _Player)
+AND
+DB_CYS_ThelyronPatients(_, _Patient)
+THEN
+QuestUpdate("CYS_HealingPatients", "Update4");
+QuestClose("CYS_HealingPatients");
+
+
+//handle teleporting away while the scene is going
+PROC
+ProcCYSKillPatients(_,_)
+AND
+DB_CYSEvelynHealsGuy(_dialog,_patient)
+THEN
+NOT DB_CYSEvelynHealsGuy(_dialog,_patient);
+CharacterSetHasDialog(CHARACTER_CYS_Evelyn,1);
+GlobalSetEvent("CYS_HealingPatientsDone");
+CharacterSetVarFixedString(CHARACTER_CYS_Evelyn,"currentState","State_ActionManager");
+
+IF
+CharacterUsedItem(_Player, ITEM_CYS_Evelyn_LabEntrance)
+AND
+NOT CHARACTER_CYS_Evelyn.MadeDecision()
+THEN
+ProcCYSKillEvelynPatients(1);
+
+IF
+GlobalEventSet("CYS_PatientStevenHasBeenCured")
+THEN
+CHARACTER_CYS_ThelyronPatientSteven.isCured();
+CharacterSetVarCharacter(CHARACTER_CYS_Evelyn,"targetPatient",CHARACTER_CYS_ThelyronPatientSteven);
+CHARACTER_CYS_Evelyn.MadeDecision();
+
+IF
+GlobalEventSet("CYS_PatientBorisHasBeenCured")
+THEN
+CHARACTER_CYS_ThelyronPatientBoris.isCured();
+CharacterSetVarCharacter(CHARACTER_CYS_Evelyn,"targetPatient",CHARACTER_CYS_ThelyronPatientBoris);
+CHARACTER_CYS_Evelyn.MadeDecision();
+
+IF
+CHARACTER_CYS_Evelyn.MadeDecision()
+THEN
+ProcTriggerUnregisterForPlayers(TRIGGER_CYS_BoxLeaveEvelynTrigger2);
+ProcTriggerUnregisterForPlayers(TRIGGER_CYS_BoxLeaveEvelynTrigger);
+
+IF
+DialogEnded("CYS_Evelyn",_ID)
+THEN
+ProcCYSCheckPatientCure(_ID);
+
+IF
+DialogEnded("CYS_Evelyn_WarnPlayer",_ID)
+THEN
+ProcCYSCheckPatientCure(_ID);
+
+PROC
+ProcCYSCheckPatientCure((INTEGER)_ID)
+AND
+DB_DialogPlayers(_ID,_Player,1)
+AND
+DB_CYS_ThelyronPatients(_dialog, _patient)
+AND
+_patient.isCured()
+THEN
+CharacterSetVarInteger(CHARACTER_CYS_Thelyron,"madePatientDecission",1);
+NOT DB_CYS_ThelyronPatients(_dialog, _patient);
+PROC_CYS_PatientsCheckWhoSurvived();
+NOT _patient.isCured();
+CharacterSetVarInteger(_patient, "willLive", 1);
+CharacterSetHasDialog(CHARACTER_CYS_Evelyn,0);
+CharacterSetScriptframe(CHARACTER_CYS_Evelyn,"DeliverStoneToPatient");
+DB_CYSEvelynHealsGuy(_dialog,_patient);
+
+IF
+CharacterScriptFrameFinished(CHARACTER_CYS_Evelyn,"DeliverStoneToPatient")
+AND
+CharacterGetVarCharacter(CHARACTER_CYS_Evelyn,"targetPatient",_Patient)
+THEN
+ProcUseBloodStone(CHARACTER_CYS_Evelyn, _Patient);
+CharacterSetHasDialog(CHARACTER_CYS_Evelyn,1);
+GlobalSetEvent("CYS_HealingPatientsDone");
+CharacterSetVarFixedString(CHARACTER_CYS_Evelyn,"currentState","State_ActionManager");
+ProcCYSPatientThanksPlayers();
+DialogStartOneSpeakerDialog("CYS_AD_EvelynStoneSurprise",CHARACTER_CYS_Evelyn);
+
+PROC
+ProcCYSPatientThanksPlayers()
+AND
+DB_CYSEvelynHealsGuy(_dialog,_Patient)
+THEN
+DB_Dialogs(_Patient,_dialog);
+CharacterSetVarFixedString(_Patient, "currentState", "State_IsRecovering");
+NOT DB_CYSEvelynHealsGuy(_Patient);
+DialogStartOneSpeakerDialog("CYS_AD_ThelyronPatientCured",_Patient);
+
+PROC
+PROC_CYS_PatientsCheckWhoSurvived()
+AND
+DB_CYS_ThelyronPatients(_dialog, _patient)
+AND
+NOT _patient.isCured()
+THEN
+DB_Dialogs(_patient,_dialog);
+CharacterSetVarFixedString(_patient, "currentState", "State_IsDoomed");
+CharacterSetVarInteger(_patient, "willDie", 1);
+
+IF
+GlobalEventSet("CYS_EvelynPatientsDie")
+AND
+DB_CYS_ThelyronPatients(_dialog, _patient)
+THEN
+CharacterSetVarFixedString(_patient, "currentState", "State_IsDoomed");
+CharacterSetVarInteger(_patient, "bothDie", 1);
+
+IF
+GlobalEventSet("CYS_EvelynPatientsDie")
+THEN
+ProcCYSEvelynCheckPlayersInHouse();
+
+
+PROC
+ProcCYSEvelynCheckPlayersInHouse()
+AND
+NOT CHARACTER_CYS_Evelyn.HasBeenMoved()
+THEN
+CharacterClearScriptframe(CHARACTER_CYS_Evelyn);
+CharacterPurgeQueue(CHARACTER_CYS_Evelyn);
+DB_Dialogs(CHARACTER_CYS_Evelyn,"CYS_Evelyn");
+
+PROC
+ProcCYSEvelynCheckPlayersInHouse()
+THEN
+CHARACTER_CYS_Evelyn.StartedHealingQuest();
+RemoveOneShotDialog(TRIGGER_CYS_Area_StartDialogEvelyn);
+QuestUpdate("CYS_HealingPatients", "Update4");
+QuestClose("CYS_HealingPatients");
+
+PROC
+ProcCYSEvelynCheckPlayersInHouse()
+AND
+_Player.DB_IsPlayer()
+AND
+DB_InRegion(_Player,TRIGGER_CYS_Ownership_Cyseal_Thelyron_GF)
+THEN
+DB_CYSPlayerInThelyronHouse(1);
+
+PROC
+ProcCYSEvelynCheckPlayersInHouse()
+AND
+NOT DB_CYSPlayerInThelyronHouse(1)
+THEN
+CharacterRemoveStatus(CHARACTER_CYS_ThelyronPatientSteven, "LYING");
+CharacterSetOnStage(CHARACTER_CYS_ThelyronPatientSteven,0);
+CharacterRemoveStatus(CHARACTER_CYS_ThelyronPatientBoris, "LYING");
+CharacterSetOnStage(CHARACTER_CYS_ThelyronPatientBoris,0);
+GoalCompleted;
+
+//END_REGION
+
+IF
+CharacterItemHandleEvent(_Player,_ItemHandle,"GLO_StarStoneZap")
+AND
+CharacterGetDistanceToCharacter(_Player, CHARACTER_CYS_Evelyn, _Dist)
+AND
+_Dist <= 30
+THEN
+CharacterSetVarInteger(CHARACTER_CYS_Evelyn, "sawStarstone", 1);
+CHARACTER_CYS_Evelyn.doneQuest();
+EXITSECTION
+NOT CHARACTER_CYS_Evelyn.StartedHealingQuest();
+NOT DB_CYSPlayerInThelyronHouse(1);
+RemoveOneShotDialog(TRIGGER_CYS_Area_StartDialogEvelyn);
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

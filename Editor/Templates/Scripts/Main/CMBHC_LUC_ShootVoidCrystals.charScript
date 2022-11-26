@@ -1,0 +1,109 @@
+INIT
+	CHARACTER:__Me
+	FLOAT:%ShooterSightRange=null
+	ITEMTEMPLATE:%VoidCrystal1_RT="Crystal_Void_Big_A_ee21e849-905f-4d99-9a49-588be2f0af44"
+	ITEMTEMPLATE:%VoidCrystal2_RT="Crystal_Void_Big_B_9c86435a-cf4d-4d02-b45c-0e5b732c4d32"
+	ITEMTEMPLATE:%VoidCrystal3_RT="Crystal_Void_Big_C_eabda25b-06e5-4165-bea4-6638f881c97f"
+	ITEMTEMPLATE:%SpecialVoidCrystal_RT="LUC_VoidCrystal_deaf6338-05a6-4988-8d28-b9a2829db4ea"
+	ITEM:%TargetedCrystal=null
+	CHARACTER:%DetectedCharacter=null
+
+//-----------------------
+BEHAVIOUR
+REACTION ScanFor_Crystals,0
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+ACTIONS
+	Set(%TargetedCrystal,null)
+	Set(%DetectedCharacter,null)
+	IterateItemsNear(__Me,%ShooterSightRange,"IterateForVoidCrystals")
+	IF "!(c1|c2)"
+		IsEqual(%TargetedCrystal,null)
+		IsEqual(%DetectedCharacter,null)
+	THEN
+		IF "c1&c2&c3"
+			CharacterCanCast(__Me,"Projectile_EnemyStaffOfMagusAir")
+			CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyStaffOfMagusAir")		
+			CharacterCanSee(__Me,%TargetedCrystal)
+		THEN
+			CharacterMoveInRange(%TargetedCrystal,_MinRange,_MaxRange,1)
+			CharacterUseSkill("Projectile_EnemyStaffOfMagusAir",%TargetedCrystal)
+		ELIF "c1&c2&c3"
+			CharacterCanCast(__Me,"Projectile_EnemyBlitzBolt")
+			CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyBlitzBolt")		
+			CharacterCanSee(__Me,%TargetedCrystal)
+		THEN
+			CharacterMoveInRange(%TargetedCrystal,_MinRange,_MaxRange,1)
+			CharacterUseSkill("Projectile_EnemyBlitzBolt",%TargetedCrystal)
+		ELIF "c1&c2&c3"
+			CharacterCanCast(__Me,"Target_EnemyInstantPressure")
+			CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyInstantPressure")		
+			CharacterCanSee(__Me,%TargetedCrystal)
+		THEN
+			CharacterMoveInRange(%TargetedCrystal,_MinRange,_MaxRange,1)
+			CharacterUseSkill("Target_EnemyInstantPressure",%TargetedCrystal)	
+		ELIF "!(c1|c2|c3)"
+			IsEqual(%TargetedCrystal,null)
+			IsEqual(%DetectedCharacter,null)
+			CharacterCanSee(__Me,%TargetedCrystal)
+		THEN
+			DebugText(__Me,"Detection OK but can't see crystal!")			
+		ENDIF
+	ELIF "c1&c2"
+		IsEqual(%TargetedCrystal,null)
+		IsEqual(%DetectedCharacter,null)
+	THEN
+		DebugText(__Me,"Crystal & Character are NULL!")	
+	ELIF "c1"
+		IsEqual(%TargetedCrystal,null)
+	THEN
+		DebugText(__Me,"TargetedCrystal is NULL!")	
+	ELIF "c1"
+		IsEqual(%DetectedCharacter,null)
+	THEN
+		DebugText(__Me,"DetectedCharacter is NULL!")				
+	ENDIF
+	SetPriority("ScanFor_Crystals",0)
+INTERRUPT
+	Reset()
+
+//-----------------------
+EVENTS
+EVENT OnInit_GetShooterSightRange
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%ShooterSightRange,__Me,Sight)
+	THEN
+	ENDIF
+
+EVENT OnTurn_IncreasePrioritiesOfScanningReaction
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("ScanFor_Crystals",500)		
+
+EVENT OnIterateItem_LookForVoidCrystalss
+VARS 
+	ITEM:_Crystal
+	ITEMTEMPLATE:_Crystal_RT
+ON
+	OnIterateItem(_Crystal,"IterateForVoidCrystals")
+ACTIONS	
+	IF "!c1&c2&(c3|c4|c5|c6)&c7&!c8"
+		ItemIsDestroyed(_Crystal)												//!c1
+		ItemGetTemplate(_Crystal,_Crystal_RT)									//c2
+		IsEqual(_Crystal_RT,%VoidCrystal1_RT)									//c3
+		IsEqual(_Crystal_RT,%VoidCrystal2_RT)									//c4
+		IsEqual(_Crystal_RT,%VoidCrystal3_RT)									//c5
+		IsEqual(_Crystal_RT,%SpecialVoidCrystal_RT)								//c6
+		CharacterGet(%DetectedCharacter,_Crystal,4,Lowest,Distance,Enemy)		//c7
+		CharacterHasStatus(%DetectedCharacter,"STUNNED")						//!c8
+	THEN
+		DebugText(_Crystal,"Valid crystal!")
+		DebugText(%DetectedCharacter,"Character detected!")
+		Set(%TargetedCrystal,_Crystal)
+	ENDIF

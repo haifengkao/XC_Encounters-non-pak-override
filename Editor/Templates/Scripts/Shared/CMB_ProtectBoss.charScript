@@ -1,0 +1,58 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%char	
+	EXTERN STRING:%bossname=null
+	EXTERN FIXEDSTRING:%protectbossreactionstring="CMB_ProtectBossReaction"
+	EXTERN INT:%protectBossDisplayText=1
+	
+BEHAVIOUR
+REACTION ProtectTheBoss,500
+USAGE COMBAT
+CHECK "!c1&!c2"
+	IsEqual(%char,null)
+	CharacterHasStatus(__Me,CHARMED)
+ACTIONS
+	IF "c1|c2|!c3"
+		CharacterIsDead(%char)
+		CharacterHasStatus(%char,CHARMED)
+		CharacterCanSee(__Me,%char)	
+	THEN
+		Set(%char,null)
+	ELSE
+		CharacterSetEnemy(__Me,%char)
+	ENDIF
+INTERRUPT 
+	Reset()
+
+/*REACTION FaceMeBoss,20
+USAGE WAITING
+CHECK "!c1&!c2&!c3"
+	IsEqual(%char,null)
+	CharacterHasStatus(%char,INVISIBLE)
+	CharacterHasStatus(%char,SNEAKING)
+ACTIONS
+	CharacterLookAt(%char)*/	//this reaction prevents the player from backstabbing this character (Edouard - 21/08/2015)
+
+EVENTS
+EVENT GetBossAttacker
+VARS
+	CHARACTER:_char
+ON
+	OnCharacterEvent(_char,%bossname)
+ACTIONS
+	IF "(c1|c2)&!c3&!c4&!c5&!c6"
+		IsEqual(%char,null)
+		IsRandom(0.5)
+		CharacterIsDead(__Me)
+		IsEqual(%char,_char)
+		IsEqual(%char,__Me)
+		CharacterIsAlly(__Me,_char)
+	THEN
+		Set(%char,_char)
+		IF "c1"
+			IsEqual(%protectBossDisplayText,1)
+		THEN
+			DisplayText(__Me,%protectbossreactionstring,4)
+		ENDIF
+	ENDIF
+	

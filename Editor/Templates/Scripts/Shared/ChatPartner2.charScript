@@ -1,0 +1,22 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+EXTERN CHARACTER:%Partner = null
+
+BEHAVIOUR
+
+REACTION State_Waiting, 0
+USAGE PEACE
+VARS
+	FLOAT:_Distance
+ACTIONS
+	Sleep(8)
+	IF "c1&c2"
+		GetDistance(_Distance,__Me,%Partner)
+		IsLessThen(_Distance,10)
+	THEN
+		CharacterLookAt(%Partner)
+		CharacterEvent(%Partner,"DialogRequest")
+	ENDIF

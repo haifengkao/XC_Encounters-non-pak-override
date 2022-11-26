@@ -1,0 +1,10 @@
+INIT
+	CHARACTER:__Me
+	
+EVENTS
+EVENT OnDie_DisplayBattleLogMessage
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	//DebugText(__Me,"So dead!")
+	CombatLogText(__Me,"CMB_SoulofDesperation_Fear",0,1)

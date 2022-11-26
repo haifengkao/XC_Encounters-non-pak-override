@@ -1,0 +1,43 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter
+
+EXTERN FLOAT:%WanderRange1 = 10
+EXTERN FLOAT:%WanderRange2 = 5
+EXTERN FLOAT:%WanderDuration1 = 5
+EXTERN FLOAT:%WanderDuration2 = 3
+EXTERN FLOAT:%Sleep1 = 3
+EXTERN FLOAT:%Sleep2 = 2
+EXTERN INT:%Run = 0
+EXTERN TRIGGER:%Anchor = null
+
+BEHAVIOUR
+
+REACTION Wandering1,1500
+USAGE PEACE
+CHECK "c1"
+	IsRandom(0.5)
+ACTIONS
+	IF "!c1"
+		IsEqual(%Anchor,null)
+	THEN
+		CharacterWander(%WanderRange1,%WanderDuration1,%Run,%Anchor)
+	ELSE
+		CharacterWander(%WanderRange1,%WanderDuration1,%Run)
+	ENDIF
+	Sleep(%Sleep1)
+
+REACTION Wandering2,1000
+USAGE PEACE
+ACTIONS
+	SetPriority(Wandering2,1501)
+	IF "!c1"
+		IsEqual(%Anchor,null)
+	THEN
+		CharacterWander(%WanderRange2,%WanderDuration2,%Run,%Anchor)
+	ELSE
+		CharacterWander(%WanderRange2,%WanderDuration2,%Run)
+	ENDIF
+	Sleep(%Sleep2)
+	SetPriority(Wandering2,1000)

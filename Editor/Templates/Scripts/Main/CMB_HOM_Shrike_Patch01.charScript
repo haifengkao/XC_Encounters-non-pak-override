@@ -1,0 +1,97 @@
+/*
+
+
+
+
+	/!\ /!\ THIS SCRIPT IS NOT USED ANYMORE - 12/01/2015 /!\ /!\ 
+
+
+
+
+
+INIT
+CHARACTER:__Me
+CHARACTER:%Leandra=HOM_Leandra_111ff690-48fc-4341-909e-815fd4e16936
+CHARACTER:%DeathPrince1=HOM_EndFight_DeathPrince_01_3604b313-9c3c-46db-837b-80b4e588b6f4
+CHARACTER:%DeathPrince2=HOM_EndFight_DeathPrince_02_f3a0faa0-ec92-4f3f-8431-2f2e88ae55fb
+INT:%LeandraIsHere=0
+FLOAT:%ShrikeSightRange
+
+//----------------
+BEHAVIOUR 
+REACTION WhenAlone_SummonShadowWhisperer,800
+USAGE COMBAT
+VARS
+CHARACTER:_Target
+CHECK "c1&c2&c3"
+	CharacterCanCast(__Me,Summon_EnemyShadowMageEF)
+	CharacterGet(_Target,__Me,%ShrikeSightRange,Highest,Distance,Enemy)
+	CharacterCanSee(__Me,_Target)
+ACTIONS
+	IF "c1"
+		IsEqual(%LeandraIsHere,0)	//Shrike is alone because Leandra was never here
+	THEN
+		CharacterUseSkill(Summon_EnemyShadowMageEF,_Target)
+	ELIF "c1&c2&c3&c4"
+		IsEqual(%LeandraIsHere,1)	//Shrike is alone because Leandra & friends are dead
+		CharacterIsDead(%Leandra)
+		CharacterIsDead(%DeathPrince1)
+		CharacterIsDead(%DeathPrince2)
+	THEN
+		CharacterUseSkill(Summon_EnemyShadowMageEF,_Target)
+	ELSE
+		SetPriority("WhenAlone_SummonShadowWhisperer",0)
+	ENDIF
+	
+REACTION WhenAlone_SummonShadowWanderer,750
+USAGE COMBAT
+VARS
+CHARACTER:_Target
+CHECK "c1&c2&c3"
+	CharacterCanCast(__Me,Summon_EnemyShadowCasterEF)
+	CharacterGet(_Target,__Me,%ShrikeSightRange,Highest,Distance,Enemy)
+	CharacterCanSee(__Me,_Target)
+ACTIONS
+	IF "c1"
+		IsEqual(%LeandraIsHere,0)	//Shrike is alone because Leandra was never here
+	THEN	
+		CharacterUseSkill(Summon_EnemyShadowCasterEF,_Target)
+	ELIF "c1&c2&c3&c4"
+		IsEqual(%LeandraIsHere,1)	//Shrike is alone because Leandra & friends are dead
+		CharacterIsDead(%Leandra)
+		CharacterIsDead(%DeathPrince1)
+		CharacterIsDead(%DeathPrince2)
+	THEN
+		CharacterUseSkill(Summon_EnemyShadowCasterEF,_Target)
+	ELSE
+		SetPriority("WhenAlone_SummonShadowWanderer",0)
+	ENDIF	
+	
+//----------------
+EVENTS
+EVENT OnInit_GiveSummoningSpellAndGetMySightRange
+ON
+	OnInit
+ACTIONS
+	IF "c1"
+		CharacterGetSightRange(%ShrikeSightRange,__Me)
+	THEN
+		CharacterAddSkill(Summon_EnemyShadowMageEF)
+		CharacterAddSkill(Summon_EnemyShadowCasterEF)
+	ENDIF
+	
+EVENT OnCharacterEvent_SetVariableDefiningThatLeandraIsHere
+ON
+	OnCharacterEvent(%Leandra,"HOM_EndFight_LeandraTakesPartIntoShrikeBattle_Event")
+ACTIONS
+	SetPriority("Combat_AttackSetEnemy",10)
+	Set(%LeandraIsHere,1)
+	
+EVENT OnTurn_ResetSummoningReactionsPriority
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("WhenAlone_SummonShadowWhisperer",800)
+	SetPriority("WhenAlone_SummonShadowWanderer",750)
+
+*/	

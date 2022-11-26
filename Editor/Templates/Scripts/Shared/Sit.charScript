@@ -1,0 +1,43 @@
+INIT
+
+CHARACTER:__Me
+EXTERN ITEM:%Seat = null
+
+BEHAVIOUR
+	
+REACTION WalkToBench, 150
+USAGE PEACE
+VARS
+	FLOAT:_dist
+CHECK "!c1&c2&c3"
+	IsEqual(%Seat,null)
+	GetDistance(_dist,__Me,%Seat)
+	IsGreaterThen(_dist,2.0)
+ACTIONS
+	CharacterMoveTo(%Seat)
+	CharacterUseItem(%Seat)
+		
+REACTION Sit, 140
+USAGE PEACE
+CHECK "!c1"
+	IsEqual(%Seat,null)
+ACTIONS
+	IF "!c1&!c2"
+		CharacterHasStatus(__Me,"SITTING")
+		CharacterHasStatus(__Me,"LYING")
+	THEN
+		CharacterUseItem(%Seat)
+	ENDIF
+	Sleep(3)
+
+EVENTS 
+
+EVENT FightStart
+ON
+	OnCombatStarted()
+ACTIONS
+	IF "c1"
+		CharacterHasStatus(__Me, SITTING)
+	THEN
+		CharacterRemoveStatus(__Me, SITTING)
+	ENDIF

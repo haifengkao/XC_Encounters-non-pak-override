@@ -1,0 +1,59 @@
+#INCLUDE State_Manager
+#INCLUDE DefaultCharacter
+
+INIT
+
+USING DefaultCharacter
+USING State_Manager
+CHARACTER:__Me
+INT:%freed = 0
+TRIGGER:%Camp = LUC_Point_SlaveCamp_a87fab10-14e3-49a1-807d-0a2bddeaff36
+
+BEHAVIOUR
+
+REACTION State_ActionManager, 0
+USAGE PEACE
+ACTIONS
+	IF "c1"
+		IsEqual(%freed,0)
+	THEN
+		GetRandom(%currentAction, "Action_Cower")
+	ELSE
+		GetRandom(%currentAction, "Action_Freed")
+	ENDIF	
+	SetPriority(%currentAction, 1100)
+	
+REACTION Action_Freed, 0
+USAGE PEACE
+VARS
+	CHARACTER:_Player
+ACTIONS
+	IF "c1"
+		CharacterGet(_Player,__Me,5,Lowest,Distance,Player)
+	THEN
+		GetRandom(%currentAnimation, "Wave_02", "Wave_03")
+		CharacterLookAt(_Player)
+	ELSE
+		CharacterWander(FLOAT:2.0,FLOAT:3.0,0,%Camp)
+		GetRandom(%currentAnimation,"Bored_01", "Bored_02","Bored_03")
+	ENDIF
+	CharacterPlayAnimation(%currentAnimation)
+	Sleep(1.0)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)	
+	
+REACTION Action_Cower, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%animationLoopCount, 2, 3, 4)
+	WHILE "c1"
+		IsGreaterThen(%animationLoopCount, 0)
+	DO
+		GetRandom(%currentAnimation, "Cower_01", "Cower_02")
+		CharacterPlayAnimation(%currentAnimation)
+		Subtract(%animationLoopCount, 1)
+	ENDWHILE
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)

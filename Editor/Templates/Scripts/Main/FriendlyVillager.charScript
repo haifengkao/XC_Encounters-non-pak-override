@@ -1,0 +1,36 @@
+#INCLUDE Base
+
+INIT
+USING Base
+CHARACTER:__Me
+CHARACTER:%Previous
+
+BEHAVIOUR
+
+REACTION Greet, 3
+USAGE PEACE
+VARS 
+	CHARACTER:_Character
+	FLOAT:_Dist
+	FLOAT:_Range
+CHECK "c1&!c2&c3&c4"
+	CharacterGet(_Character, __Me, 15, Lowest,Distance,null,null,null)
+	IsEqual(%Previous,_Character)
+	GetDistance(_Dist,__Me,_Character)
+	IsLessThen(_Dist,3)	
+ACTIONS	
+	Set(%Previous,_Character)
+	CharacterLookAt(_Character)
+	DebugText(__Me,"Hi friend!")
+	CharacterPlayAnimation("emotion_greeting")
+	Sleep(3)
+INTERRUPT
+	Reset()
+
+REACTION Wander, 1
+USAGE PEACE
+ACTIONS
+	CharacterWander(FLOAT:5, 10)	
+	Sleep(1.5)
+	CharacterWander(FLOAT:3,5)
+	Goto(Start)

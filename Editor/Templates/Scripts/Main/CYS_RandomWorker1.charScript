@@ -1,0 +1,64 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	CHARACTER:%Bull1 = Animals_Bull_A_001_43899409-a1c0-4f3b-9e9a-bf0d32b02a71
+	TRIGGER:%Point1 = CYS_RandomWorker1_1_be857bfe-efa7-4460-9ef3-d879a82c8565
+	TRIGGER:%Point2 = CYS_RandomWorker1_2_7ad7c988-d14c-446f-ba8e-c280ef1ccdee
+	TRIGGER:%Point3 = CYS_RandomWorker1_3_6f159f19-d1e8-4a80-a53d-07167a594eca
+
+BEHAVIOUR
+
+REACTION State_LiveIsLife, 0
+	USAGE PEACE
+	ACTIONS 
+		GetWeightedRandom(%currentAction, "Action_Wander",INT:3, "Action_PattingBull",INT:1, "Action_CheckingStock",INT:1, "Action_LoadingCart",INT:1)
+		SetPriority(%currentAction, 1100)
+
+REACTION Action_Wander, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterWander(FLOAT:3,3,0,%Point1)
+		CharacterPlayAnimation("Yawn_01")
+		CharacterWander(FLOAT:3,3,0,%Point1)
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)
+		
+REACTION Action_PattingBull, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterMoveTo(%Point2,0)
+		CharacterLookFrom(%Point2)
+		GlobalClearEvent("CYS_RandomWorkerAtTheStock")
+		GlobalSetEvent("CYS_RandomWorkerAtTheBull")
+		CharacterPlayAnimation("Fidget_Forward_02")
+		DialogStart("CYS_AD_RandomWorker1",__Me)
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)
+
+REACTION Action_CheckingStock, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterMoveTo(%Point1,0)
+		CharacterLookFrom(%Point1)
+		GlobalSetEvent("CYS_RandomWorkerAtTheStock")
+		GlobalClearEvent("CYS_RandomWorkerAtTheBull")
+		CharacterPlayAnimation("Stand_Read_01")
+		DialogStart("CYS_AD_RandomWorker1",__Me)
+		CharacterPlayAnimation("Idle_02")
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)
+
+REACTION Action_LoadingCart, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterMoveTo(%Point3,0)
+		CharacterLookAt(%Bull1)
+		CharacterPlayAnimation("LoadingCart_01")
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)

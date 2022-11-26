@@ -1,0 +1,48 @@
+INIT
+ITEM:__Me
+CHARACTER:%User = null
+INT:%EnemyKillCount = 0
+EXTERN CHARACTERTEMPLATE:%TargetTemplate1 = CYS_Shambling_Mound_Lava_f75718a3-08e1-4b11-8a89-de6b95d7ed9c
+EXTERN CHARACTERTEMPLATE:%TargetTemplate2 = Env_Shambling_Mound_Lava_822b45ad-ebeb-49fd-bb89-cc4fb1e2c599
+EXTERN CHARACTERTEMPLATE:%TargetTemplate3 = Env_Shambling_Mound_Moss_35abd36e-5397-4aac-8337-bc57efd0bda9
+EXTERN CHARACTERTEMPLATE:%TargetTemplate4 = Env_Shambling_Mound_Snow_e46fae8e-88a9-4e9c-bf9a-38350761a7fb
+
+EVENTS
+
+EVENT Activated
+VARS
+	CHARACTER:_Player
+ON
+	OnUseItem(_Player,__Me)
+ACTIONS
+	Set(%User,_Player)
+	CharacterPlayEffect(%User,"FX_GP_GoldSparkles_A")
+	IterateCharactersNear(%User,20.0,"Wand_EnemyKillCheck")
+	IF "c1"
+		IsEqual(%EnemyKillCount,0)
+	THEN
+		DisplayText(%User,"GLO_FailedUse",5)
+	ELSE
+		DisplayText(%User,"GLO_SuccessfulUse",5)
+		ItemDestroy(__Me)
+	ENDIF
+
+EVENT Iterator
+VARS
+	CHARACTER:_Character
+	CHARACTERTEMPLATE:_Template
+ON
+	OnIterateCharacter(_Character,"Wand_EnemyKillCheck")
+ACTIONS
+	IF "c1&(c2|c3|c4|c5)&!c6"
+		CharacterGetTemplate(_Character,_Template)
+		IsEqual(_Template,%TargetTemplate1)
+		IsEqual(_Template,%TargetTemplate2)
+		IsEqual(_Template,%TargetTemplate3)
+		IsEqual(_Template,%TargetTemplate4)
+		CharacterIsDead(_Character)
+	THEN
+		CharacterPlayEffect(_Character,"FX_GP_DeathStroke_A")
+		Add(%EnemyKillCount,1)
+		CharacterDie(_Character)
+	ENDIF

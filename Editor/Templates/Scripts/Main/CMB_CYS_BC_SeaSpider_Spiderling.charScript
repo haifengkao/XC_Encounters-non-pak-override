@@ -1,0 +1,47 @@
+INIT
+
+CHARACTER:__Me
+CHARACTER:%SeaSpider = CYS_BC_SeaSpider_71c50437-b2ed-4c15-a2eb-f580ddeae3d0
+FLOAT:%MyTinySpiderlingSightRange
+
+//-----------------------
+BEHAVIOUR 
+REACTION SeaSpiderling_UseChitinDartOnFarthest_FromSpider, 200
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+	CHARACTER:_Enemy
+CHECK "c1&c2&c3"
+	CharacterCanCast(__Me,Projectile_EnemyChitinDart)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,Projectile_EnemyChitinDart)
+	CharacterGet(_Enemy,%SeaSpider,%MyTinySpiderlingSightRange,Highest,Distance,Enemy)
+ACTIONS 
+	CharacterMoveInRange(_Enemy,_MinRange,_MaxRange,1)
+	CharacterUseSkill(Projectile_EnemyChitinDart,_Enemy)
+	
+REACTION SeaSpiderling_AttackFarthest_FromSpider, 100
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+CHECK "c1"
+	CharacterGet(_Enemy,%SeaSpider,%MyTinySpiderlingSightRange,Highest,Distance,Enemy)
+ACTIONS 
+	CharacterAttack(_Enemy)
+	
+REACTION Panic, 5
+USAGE COMBAT	
+ACTIONS 
+	CharacterEndTurn()
+
+//-----------------------
+EVENTS
+EVENT OnInit_GiveSpells
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%MyTinySpiderlingSightRange,__Me,Sight)
+	THEN
+		CharacterAddSkill(Projectile_EnemyChitinDart)
+	ENDIF

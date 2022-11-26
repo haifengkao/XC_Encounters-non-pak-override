@@ -1,0 +1,52 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	EXTERN STRING:%DialogString = ""
+	EXTERN ITEM:%Stock = null
+	EXTERN TRIGGER:%TalkingPoint_1 = null
+	EXTERN TRIGGER:%TalkingPoint_2 = null
+	INT:%IsSelling = 1
+
+BEHAVIOUR
+
+REACTION State_Selling, 0
+	USAGE PEACE
+	ACTIONS
+		GetRandom(%currentAction, "Action_SellingWares")
+		SetPriority(%currentAction, 1100)
+
+REACTION Action_SellingWares, 0
+	USAGE PEACE
+	CHECK "c1"
+		IsEqual(%IsSelling, 1)
+	VARS
+		FLOAT:_Wait
+	ACTIONS
+		IF "c1"
+			IsRandom(0.33)
+		THEN
+			DialogStart(%DialogString, __Me)
+			GetRandomBetween(_Wait,3.0,6.0)
+			Sleep(_Wait)
+		ENDIF
+		IF "c1"
+			IsRandom(0.5)
+		THEN
+			CharacterMoveTo(%TalkingPoint_1, 0)
+		ELSE
+			CharacterMoveTo(%TalkingPoint_2, 0)
+			IF "!c1"
+				IsEqual(%Stock, null)
+			THEN
+				CharacterUseItem(%Stock)
+			ENDIF
+		ENDIF
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)
+	
+EVENTS
+	
+STORY

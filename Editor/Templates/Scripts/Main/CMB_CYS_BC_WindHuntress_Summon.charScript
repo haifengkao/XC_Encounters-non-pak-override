@@ -1,0 +1,36 @@
+INIT
+CHARACTER:__Me
+FLOAT:%MySightRange
+
+//------------------------
+BEHAVIOUR
+REACTION AirRock_Death_Explode,300
+USAGE WAITING
+VARS
+	CHARACTER:_Player
+CHECK "c1&!c2&!c3&!c4"
+	CharacterGet(_Player,__Me,%MySightRange,Lowest,Distance,Enemy)	//c1
+	CharacterHasStatus(__Me,PETRIFIED)								//c2
+	CharacterHasStatus(__Me,FROZEN)									//c3
+	CharacterHasStatus(__Me,MUTED)									//c4
+ACTIONS
+	CharacterUseSkill(Shout_EnemyStunShout,_Player)
+	CharacterDie(__Me)
+	
+//------------------------
+EVENTS
+EVENT OnInit_AirRock_GiveSpell
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%MySightRange,__Me,Sight)
+	THEN
+		CharacterAddSkill(Shout_EnemyStunShout)	
+	ENDIF	
+	
+EVENT OnDie_AirRock_IncreaseExplosionPriority
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	SetPriority("AirRock_Death_Explode",1500)

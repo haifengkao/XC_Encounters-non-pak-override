@@ -1,0 +1,27 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+IF
+TextEventSet("secretTest")
+THEN
+AddSecret("Secret_1");
+
+IF
+TextEventSet("unlockability")
+THEN
+CharacterUnlockAbility(CHARACTER_Player1, "Blackrock");
+
+IF
+TextEventSet("blackrock")
+THEN
+CharacterUnlockAbility(CHARACTER_Player1,"Blackrock");
+CharacterAddAbility(CHARACTER_Player1,"Blackrock",1);
+CharacterUnlockAbility(CHARACTER_Player2,"Blackrock");
+CharacterAddAbility(CHARACTER_Player2,"Blackrock",1);
+
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

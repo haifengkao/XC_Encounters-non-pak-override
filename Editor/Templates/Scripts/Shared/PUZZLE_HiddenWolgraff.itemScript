@@ -1,0 +1,58 @@
+INIT
+ITEM:__Me
+INT:%WolgraffToldLine=0
+CHARACTER:%Wolgraff = Wolgraff_d46c5acb-2835-4f6b-b484-47afc1183e8a
+FIXEDSTRING:%EmptyString=""
+EXTERN FIXEDSTRING:%WolgraffCommentMute=""
+EXTERN FIXEDSTRING:%WolgraffCommentVoice=""
+EXTERN FLOAT:%MinDist=0
+
+
+EVENTS
+
+EVENT InitializeHiddenWolgraff
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		IsEqual(%WolgraffToldLine,0)
+	THEN
+		StartTimer("UpdateHiddenWolgraff",0.2,-1)
+	ENDIF
+	
+EVENT ShutdownHiddenWolgraff
+ON
+	OnShutdown()
+ACTIONS
+	StopTimer("UpdateHiddenWolgraff")
+
+EVENT UpdateHiddenWolgraff
+VARS
+FLOAT:_Dist
+INT:_VoiceBack
+ON
+	OnTimer("UpdateHiddenWolgraff")
+ACTIONS
+	IF "!c1&c2&c3" 
+		CharacterIsDead(%Wolgraff)
+		GetDistance(_Dist,%Wolgraff,__Me)
+		IsLessThen(_Dist,%MinDist)
+	THEN
+		Set(%WolgraffToldLine,1)
+		SetMaterial(__Me,"39ae3071-a9bd-42cf-9291-82df3c272d6e",3,1,1,1,1,1,0)
+		StopTimer("UpdateHiddenWolgraff")
+		IF "c1&c2&!c3"
+			GetVar(_VoiceBack,%Wolgraff,"VoiceBack")
+			IsEqual(_VoiceBack,0)
+			IsEqual(%WolgraffCommentMute,%EmptyString)
+		THEN
+			DisplayText(%Wolgraff,%WolgraffCommentMute,7.0)
+		ELIF "c1&c2&!c3"
+			GetVar(_VoiceBack,%Wolgraff,"VoiceBack")
+			IsEqual(_VoiceBack,1)
+			IsEqual(%WolgraffCommentVoice,%EmptyString)
+		THEN
+			DisplayText(%Wolgraff,%WolgraffCommentVoice,7.0)
+		ENDIF
+		ItemEvent(__Me,"StoryReveal")
+	ENDIF

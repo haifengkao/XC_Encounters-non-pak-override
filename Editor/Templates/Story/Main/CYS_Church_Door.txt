@@ -1,0 +1,329 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+ItemSetOwner(ITEM_CYS_Church_Door,CHARACTER_LUC_PickAxeHolderHack);
+ItemSetOnlyOwnerCanUse(ITEM_CYS_Church_Door,1);
+DB_NoForbiddenText(ITEM_CYS_Church_Door);
+ItemSetCanInteract(ITEM_CYS_ChurchCryptHatch,0);
+CharacterSetImmortal(CHARACTER_CYS_Church_BossThelyron_Backup,1);
+DB_Church_Titan(CHARACTER_CYS_Church_Titan1,ITEM_CYS_Church_Titan1_Statue,100);
+DB_Church_Titan(CHARACTER_CYS_Church_Titan2,ITEM_CYS_Church_Titan2_Statue,600);
+DB_Church_Titan(CHARACTER_CYS_Church_Titan3,ITEM_CYS_Church_Titan3_Statue,250);
+DB_Church_Titan(CHARACTER_CYS_Church_Titan4,ITEM_CYS_Church_Titan4_Statue,400);
+ItemToCharacter(ITEM_CYS_ThelyronLabKey,CHARACTER_CYS_Church_Cultist_Thelyron1);
+DB_Church_Cultist(CHARACTER_CYS_Church_Cultist_Thelyron1);
+DB_Church_Cultist(CHARACTER_CYS_Church_Cultist_Thelyron2);
+DB_Church_Cultist(CHARACTER_CYS_Church_Cultist_Thelyron3);
+DB_Church_Cultist(CHARACTER_CYS_Church_Cultist_Thelyron4);
+DB_Church_Cultist(CHARACTER_CYS_Church_BossThelyron_Backup);
+
+DB_Church_Painting(ITEM_CYS_Church_Painting1,TRIGGER_CYS_Church_Painting1_Open,ITEM_CYS_Church_Button1,ITEM_CYS_Church_AltarFire1);
+DB_Church_Painting(ITEM_CYS_Church_Painting2,TRIGGER_CYS_Church_Painting2_Open,ITEM_CYS_Church_Button2,ITEM_CYS_Church_AltarFire2);
+DB_Church_Painting(ITEM_CYS_Church_Painting3,TRIGGER_CYS_Church_Painting3_Open,ITEM_CYS_Church_Button3,ITEM_CYS_Church_AltarFire3);
+DB_Church_Painting(ITEM_CYS_Church_Painting4,TRIGGER_CYS_Church_Painting4_Open,ITEM_CYS_Church_Button4,ITEM_CYS_Church_AltarFire4);
+
+DB_PlayerComments("CYS_CommentChurchAltar", "CYS_CommentChurchAltar_1_1",1,1);
+DB_PlayerComments("CYS_CommentChurchAltar", "CYS_CommentChurchAltar_2_1",2,1);
+DB_PlayerComments("CYS_CommentChurchAltar", "CYS_CommentChurchAltar_2_2",2,2);
+
+Stack_Internal("CYS_Church_Buttons","CYS_Church_Fourth_Button_Pressed");
+Stack_Internal("CYS_Church_Buttons","CYS_Church_Third_Button_Pressed");
+Stack_Internal("CYS_Church_Buttons","CYS_Church_Second_Button_Pressed");
+Stack_Internal("CYS_Church_Buttons","CYS_Church_First_Button_Pressed");
+
+SneakTriggerSpotter(TRIGGER_CYS_Church_Scene1, CHARACTER_CYS_Church_BossThelyron_Backup);
+SneakTriggerSpotter(TRIGGER_CYS_Church_Scene1, CHARACTER_CYS_Church_Cultist_Thelyron2);
+SneakTriggerSpotter(TRIGGER_CYS_Church_Scene1, CHARACTER_CYS_Church_Cultist_Thelyron1);
+SneakTriggerSpotter(TRIGGER_CYS_Church_Scene1, CHARACTER_CYS_Church_Cultist_Thelyron3);
+SneakTriggerSpotter(TRIGGER_CYS_Church_Scene1, CHARACTER_CYS_Church_Cultist_Thelyron4);
+
+PROC_CMBHC_CYS_Church_HideAdditionalCultists();
+CharacterSetVisible(CHARACTER_CYS_Church_Titan1,0);
+CharacterApplyStatus(CHARACTER_CYS_Church_Titan1,"UNSHEATHED",-1.0,1);
+IsStoryNpc(CHARACTER_CYS_Church_Titan1);
+SetStoryNpcStatus(CHARACTER_CYS_Church_Titan1);
+DB_NoDefaultBehavior(CHARACTER_CYS_Church_Titan1);
+
+DB_OneShotPlayerTrigger(TRIGGER_CYS_Church_Combat);
+KBSECTION
+//REGION Hardcore - Hiding additional elements
+PROC
+PROC_CMBHC_CYS_Church_HideAdditionalCultists()
+AND
+IsHardcoreMode(1)
+THEN
+CharacterSetOnStage(CHARACTER_CMBHC_CYS_Church_Cultist_01,0);
+CharacterSetOnStage(CHARACTER_CMBHC_CYS_Church_Cultist_02,0);
+CharacterSetOnStage(CHARACTER_CMBHC_CYS_Church_Cultist_03,0);
+CharacterSetOnStage(CHARACTER_CMBHC_CYS_Church_Cultist_04,0);
+CharacterSetOnStage(CHARACTER_CMBHC_CYS_Church_Cultist_05,0);
+//END_REGION
+
+IF
+DB_Church_Titan(_Character,_Item,_Time)
+AND
+_Character != CHARACTER_CYS_Church_Titan1
+THEN
+CharacterSetOnStage(_Character,0);
+CharacterApplyStatus(_Character,"UNSHEATHED",-1.0,1);
+
+IF
+DB_Church_Cultist(_Character)
+THEN
+CharacterSetCanFight(_Character,0);
+
+IF
+CharacterUsedItemFailed(_Character,ITEM_CYS_Church_Door)
+AND
+DB_Companion(_Character)
+THEN
+ProcStartCompanionDialog(_Character,CHARACTER_CYS_Church_Titan1);
+
+IF
+CharacterUsedItemFailed(_Character,ITEM_CYS_Church_Door)
+AND
+NOT DB_Companion(_Character)
+THEN
+ProcDoTwoSpeakerDialog("CYS_Church_Door",CHARACTER_CYS_Church_Titan1,_Character);
+Proc_ThelyronRunAway();
+CHARACTER_CYS_Thelyron.alreadyFled();
+
+IF
+CharacterUsedItemFailed(_Character,ITEM_CYS_ChurchCryptHatch)
+THEN
+ItemDisplayText(ITEM_CYS_ChurchCryptHatch,"CYS_ChurchHatchBarred");
+
+PROC
+Proc_ThelyronRunAway()
+AND
+NOT DB_Dead(CHARACTER_CYS_Thelyron)
+AND
+CharacterGetPosition(CHARACTER_CYS_Thelyron,_X,_Y,_Z)
+THEN
+DialogRequestStopForCharacter(CHARACTER_CYS_Thelyron);
+CharacterTeleportToTrigger(CHARACTER_CYS_Thelyron,TRIGGER_CYS_Braccus_ThelyronWounded,"");
+CharacterSetVarInteger(CHARACTER_CYS_Thelyron,"Dying",1);
+PlayEffectAtPosition("FX_GP_TeleportSmoke_A",_X,_Y,_Z);
+ProcRemoveDialogEntryForSpeaker(CHARACTER_CYS_Thelyron, "CYS_Thelyron");
+DB_Dialogs(CHARACTER_CYS_Thelyron, "CYS_Braccus_WoundedThelyron");
+CharacterApplyStatus(CHARACTER_CYS_Thelyron,"BLACKROCKED",-1.0,1);
+CharacterSetHitpointsPercentage(CHARACTER_CYS_Thelyron,1);
+CharacterApplyStatus(CHARACTER_CYS_Thelyron, "UNHEALABLE", -1.0, 1);
+DB_NoDefaultBehavior(CHARACTER_CYS_Thelyron);
+CharacterUseItem(CHARACTER_CYS_Thelyron,ITEM_CYS_Thelyron_Dying_Mattress,"ThelyronDying");
+CharacterSetAnimationSetOverride(CHARACTER_CYS_Thelyron,"Lying_Wounded");
+DB_DyingNpcOnBed(CHARACTER_CYS_Thelyron, ITEM_CYS_Thelyron_Dying_Mattress);
+
+IF
+DialogEnded("CYS_Church_Door",_)
+AND
+DB_GlobalEvent("CYS_ChurchDoor_Fail")
+THEN
+ItemSetOnlyOwnerCanUse(ITEM_CYS_Church_Door,0);
+CharacterLookFromTrigger(CHARACTER_CYS_Church_Titan1,TRIGGER_CYS_Church_Titan_Dir,1);
+Proc_ChurchTitansFight();
+
+PROC
+Proc_ChurchTitansFight()
+AND
+DB_Church_Titan(_Character,_Item,_Time)
+THEN
+CharTimer(_Character,"Church_Titan_cometolife",_Time);
+NOT IsStoryNpc(CHARACTER_CYS_Church_Titan1);
+SetStoryNpcStatus(CHARACTER_CYS_Church_Titan1);
+CharacterSetOnStage(CHARACTER_CYS_Church_Titan1, 0);
+CharacterSetVisible(CHARACTER_CYS_Church_Titan1, 1);
+
+IF
+CharTimerFinished(_Character,"Church_Titan_cometolife")
+AND
+DB_Church_Titan(_Character,_Item,_)
+AND
+ItemGetPosition(_Item,_X,_Y,_Z)
+THEN
+CharacterAppearAtPosition(_Character,_X,_Y,_Z,1);
+ItemTimer(_Item,"Church_TitanGoOffStage",100);
+
+IF
+ItemTimerFinished(_Item,"Church_TitanGoOffStage")
+THEN
+ItemSetOnstage(_Item,0);
+
+IF
+DialogEnded("CYS_Church_Door",_)
+AND
+DB_GlobalEvent("CYS_ChurchDoor_Succes")
+THEN
+ItemSetOnlyOwnerCanUse(ITEM_CYS_Church_Door,0);
+ItemOpen(ITEM_CYS_Church_Door);
+CharacterSetOnStage(CHARACTER_CYS_Church_Titan1, 0);
+
+PROC
+ProcCharInTriggerSpotted(_Player, TRIGGER_CYS_Church_Scene1)
+THEN
+PROC_MendatoryDialog("CYS_Church_Scene",CHARACTER_CYS_Church_BossThelyron_Backup,_Player);
+
+IF
+DialogEnded("CYS_Church_Scene", _)
+THEN
+CHARACTER_CYS_Church_BossThelyron_Backup.leaving();
+CharacterMakeStoryNpc(CHARACTER_CYS_Church_BossThelyron_Backup,1);
+ProcCharacterMoveToTrigger(CHARACTER_CYS_Church_BossThelyron_Backup,TRIGGER_CYS_Church_Hatch,0,"CYS_Church_Boss_Arrived");
+QuestUpdate("CYS_FindingBraccus","Update2");
+
+IF
+CharacterEvent(_,"CYS_Church_Boss_Arrived")
+THEN
+CharacterSetOnStage(CHARACTER_CYS_Church_BossThelyron_Backup,0);
+CharacterMakeStoryNpc(CHARACTER_CYS_Church_BossThelyron_Backup,0);
+ItemMoveToTrigger(ITEM_CYS_Church_Altar,TRIGGER_CYS_ChurchAltarClosed,1.0,1.0,0);
+ProcSetAllChurchCultistsHostile();
+TimerLaunch("CYS_ChurchAltarClosed",2000);
+QuestAdd("CYS_Braccus");
+QuestUpdate("CYS_Braccus","Update2");
+
+IF
+TimerFinished("CYS_ChurchAltarClosed")
+THEN
+DialogRequestStopForCharacter(CHARACTER_CYS_Church_BossThelyron_Backup);
+
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Character,TRIGGER_CYS_Church_Combat)
+AND
+NOT CHARACTER_CYS_Church_BossThelyron_Backup.leaving()
+THEN
+NOT SneakTriggerSpotter(TRIGGER_CYS_Church_Scene1, CHARACTER_CYS_Church_BossThelyron_Backup);
+NOT SneakTriggerSpotter(TRIGGER_CYS_Church_Scene1, CHARACTER_CYS_Church_Cultist_Thelyron2);
+NOT SneakTriggerSpotter(TRIGGER_CYS_Church_Scene1, CHARACTER_CYS_Church_Cultist_Thelyron1);
+NOT SneakTriggerSpotter(TRIGGER_CYS_Church_Scene1, CHARACTER_CYS_Church_Cultist_Thelyron3);
+NOT SneakTriggerSpotter(TRIGGER_CYS_Church_Scene1, CHARACTER_CYS_Church_Cultist_Thelyron4);
+DialogRequestStopForCharacter(CHARACTER_CYS_Church_BossThelyron_Backup);
+ProcCharacterMoveToTrigger(CHARACTER_CYS_Church_BossThelyron_Backup,TRIGGER_CYS_Church_Hatch,0,"CYS_Church_Boss_Arrived");
+
+
+IF
+CharacterAttackedByCharacter(_Character,_)
+AND
+DB_Church_Cultist(_Character)
+AND
+NOT CHARACTER_CYS_Church_BossThelyron_Backup.leaving()
+THEN
+ProcTriggerUnregisterForPlayers(TRIGGER_CYS_Church_Scene1);
+DialogRequestStopForCharacter(CHARACTER_CYS_Church_BossThelyron_Backup);
+ProcCharacterMoveToTrigger(CHARACTER_CYS_Church_BossThelyron_Backup,TRIGGER_CYS_Church_Hatch,0,"CYS_Church_Boss_Arrived");
+
+PROC
+ProcSetAllChurchCultistsHostile()
+AND
+DB_Church_Cultist(_Character)
+THEN
+CharacterSetCanFight(_Character,1);
+
+IF
+DB_Church_Painting(_Painting,_PaintingTrigger,_Button,_AltarFire)
+THEN
+ItemSetOnstage(_Button,0);
+ItemSetOnstage(_AltarFire,0);
+
+IF
+CharacterUsedItem(_Character,_Painting)
+AND
+DB_Church_Painting(_Painting,_PaintingTrigger,_Button,_AltarFire)
+THEN
+ItemMoveToTrigger(_Painting,_PaintingTrigger,1.0,1.0,0);
+ItemSetOnstage(_Button,1);
+
+IF
+CharacterUsedItem(_Character,_Button)
+AND
+DB_Church_Painting(_Painting,_PaintingTrigger,_Button,_AltarFire)
+AND
+NOT DB_CYS_Church_FireIsLit(_AltarFire)
+AND
+TopOfStack("CYS_Church_Buttons",_PlayerResponse)
+THEN
+ItemSetOnstage(_AltarFire,1);
+DB_CYS_Church_FireIsLit(_AltarFire);
+CharacterDisplayText(_Character,_PlayerResponse);
+PopStack("CYS_Church_Buttons");
+
+IF
+DB_CYS_Church_FireIsLit(ITEM_CYS_Church_AltarFire1)
+AND
+DB_CYS_Church_FireIsLit(ITEM_CYS_Church_AltarFire2)
+AND
+DB_CYS_Church_FireIsLit(ITEM_CYS_Church_AltarFire3)
+AND
+DB_CYS_Church_FireIsLit(ITEM_CYS_Church_AltarFire4)
+AND
+NOT DB_OnlyOnce("DB_CYS_Church_FireIsLit")
+THEN
+DB_OnlyOnce("DB_CYS_Church_FireIsLit");
+ItemSetOnstage(ITEM_CYS_Church_AltarFire1,0);
+ItemSetOnstage(ITEM_CYS_Church_AltarFire2,0);
+ItemSetOnstage(ITEM_CYS_Church_AltarFire3,0);
+ItemSetOnstage(ITEM_CYS_Church_AltarFire4,0);
+ItemMoveToTrigger(ITEM_CYS_Church_Altar,TRIGGER_CYS_ChurchAltarOpen,1.0,1.0,0);
+ItemSetCanInteract(ITEM_CYS_ChurchCryptHatch,1);
+ItemSetCanInteract(ITEM_CYS_Church_Altar,0);
+ItemPlaySound(ITEM_CYS_Church_Altar,"Item_Door_Stone_Slide_Open");
+
+IF
+CharacterUsedItem(_Player,ITEM_CYS_Church_Altar)
+THEN
+Launch_PlayerComment(_Player,"CYS_CommentChurchAltar");
+ItemSetCanInteract(ITEM_CYS_Church_Altar,0);
+
+//REGION Graveyard Action - Hardcore Charming Ghosts
+IF
+CharacterKilledByCharacter(CHARACTER_CYS_Church_West_SoD_01,(CHARACTER)_Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+CharacterApplyStatus(_Player,"FEAR",4.0,0);
+//END_REGION
+
+//REGION Church - Hardcore - Altar Event
+IF
+CharacterEvent(CHARACTER_CYS_Church_Cultist_Thelyron3,"CMBHC_CYS_YoungCultist_Event")
+AND
+NOT DB_OnlyOnce("CMBHC_CYS_AltarEventReceived")
+THEN
+ItemMoveToTrigger(ITEM_CYS_Church_Altar,TRIGGER_CYS_ChurchAltarOpen,1.0,1.0,0);
+TimerLaunch("CMBHC_CYS_YoungCultist_Timer_01",1200);
+DB_OnlyOnce("CMBHC_CYS_AltarEventReceived");
+
+IF
+TimerFinished("CMBHC_CYS_YoungCultist_Timer_01")
+THEN
+CharacterSetOnStage(CHARACTER_CMBHC_CYS_Church_Cultist_01,1);
+CharacterSetOnStage(CHARACTER_CMBHC_CYS_Church_Cultist_02,1);
+CharacterMoveToTrigger(CHARACTER_CMBHC_CYS_Church_Cultist_01,TRIGGER_CMBHC_CYS_Church_Destination_01,1,"");
+CharacterMoveToTrigger(CHARACTER_CMBHC_CYS_Church_Cultist_02,TRIGGER_CMBHC_CYS_Church_Destination_02,1,"");
+TimerLaunch("CMBHC_CYS_YoungCultist_Timer_02",500);
+
+IF
+TimerFinished("CMBHC_CYS_YoungCultist_Timer_02")
+THEN
+CharacterSetOnStage(CHARACTER_CMBHC_CYS_Church_Cultist_03,1);
+CharacterSetOnStage(CHARACTER_CMBHC_CYS_Church_Cultist_04,1);
+CharacterMoveToTrigger(CHARACTER_CMBHC_CYS_Church_Cultist_03,TRIGGER_CMBHC_CYS_Church_Destination_03,1,"");
+CharacterMoveToTrigger(CHARACTER_CMBHC_CYS_Church_Cultist_04,TRIGGER_CMBHC_CYS_Church_Destination_04,1,"");
+TimerLaunch("CMBHC_CYS_YoungCultist_Timer_03",650);
+
+IF
+TimerFinished("CMBHC_CYS_YoungCultist_Timer_03")
+THEN
+CharacterSetOnStage(CHARACTER_CMBHC_CYS_Church_Cultist_05,1);
+CharacterMoveToTrigger(CHARACTER_CMBHC_CYS_Church_Cultist_05,TRIGGER_CMBHC_CYS_Church_Destination_05,1,"");
+TimerLaunch("CMBHC_CYS_YoungCultist_Timer_04",3000);
+//END_REGION
+
+IF
+TimerFinished("CMBHC_CYS_YoungCultist_Timer_04")
+THEN
+ItemMoveToTrigger(ITEM_CYS_Church_Altar,TRIGGER_CYS_ChurchAltarClosed,1.0,1.0,0);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

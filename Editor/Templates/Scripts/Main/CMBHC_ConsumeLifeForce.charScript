@@ -1,0 +1,63 @@
+INIT
+	CHARACTER:__Me
+	INT:%FXHandle1
+	INT:%FXHandle2	
+	EXTERN FLOAT:%VitalityThreshold=0.3
+	EXTERN FIXEDSTRING:%Animation1="emotion_panic_distress"
+	EXTERN FIXEDSTRING:%Animation2="emotion_sly_scheming"
+	EXTERN FIXEDSTRING:%Animation3="cast_long_cast"
+	EXTERN FIXEDSTRING:%Animation4="cast_ground_cast"
+	
+//---------
+BEHAVIOUR
+REACTION ConsumeLifeForce,0
+USAGE COMBAT
+VARS
+	FLOAT:_MyVitality
+	FLOAT:_AllysVitality
+	FLOAT3:_AllysPosition
+	CHARACTER:_Ally
+CHECK "c1&c2&c3"
+	CharacterGetStat(_MyVitality,__Me,Vitality)
+	IsLessThen(_MyVitality,%VitalityThreshold)
+	CharacterGet(_Ally,__Me,40,Lowest,Vitality,Ally,null,null,null,1)
+ACTIONS
+	IF "c1&c2&c3"
+		GetPosition(_Ally,_AllysPosition)
+		FindValidPosition(_AllysPosition, 2.0)
+		CharacterGetStat(_AllysVitality,_Ally,Vitality)
+	THEN
+		CharacterPlayAnimation(%Animation1,1,1)
+		CharacterPlayEffect(__Me,"FX_GP_ExclamationMark_A")
+		CharacterPlayLoopEffect(%FXHandle1,__Me,"FX_Skills_WitchCraft_Generic_A_Prepare")
+		Sleep(0.5)
+		CharacterPlayLoopEffect(%FXHandle2,_Ally,"FX_Skills_WitchCraft_Generic_A_Prepare")
+		CharacterPlayAnimation(%Animation2,1,1)		
+		CharacterPlayAnimation(%Animation3,0,0)
+		Sleep(1)		
+		CharacterDie(_Ally)
+		StopLoopEffect(%FXHandle1)		
+		CharacterTeleportTo(_AllysPosition)
+		Divide(_AllysVitality,3)
+		CharacterHeal(__Me,_AllysVitality)
+		CharacterPlayAnimation(%Animation4,1,1)
+		StopLoopEffect(%FXHandle2)		
+	ENDIF
+	SetPriority("ConsumeLifeForce",0)
+INTERRUPT
+	Reset()
+	
+//---------	
+EVENTS
+EVENT OnTurn_RestoreCLFPriority
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("ConsumeLifeForce",500)
+	
+EVENT OnDeactivate_StopLoopFX
+ON
+	OnDeactivate()
+ACTIONS
+	StopLoopEffect(%FXHandle1)
+	StopLoopEffect(%FXHandle2)

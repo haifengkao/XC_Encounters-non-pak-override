@@ -1,0 +1,23 @@
+#INCLUDE State_Manager_Item
+
+INIT
+USING State_Manager_Item
+ITEM:__Me
+EXTERN FIXEDSTRING:%Comment = ""
+	
+BEHAVIOUR
+
+REACTION State_CallingForHelp, 0
+USAGE PEACE
+VARS
+	CHARACTER:_Player
+ACTIONS
+	IF "c1"
+		CharacterGet(_Player,__Me,8,Lowest,Distance,Player)
+	THEN
+		CharacterItemEvent(_Player,__Me,"HIB_FirePrinceFlame_Talking")
+		DisplayText(__Me,%Comment,5)
+		Set(%currentState,"")
+	ELSE
+		Sleep(1)
+	ENDIF

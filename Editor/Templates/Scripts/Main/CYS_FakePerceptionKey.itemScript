@@ -1,0 +1,76 @@
+INIT
+ITEM:__Me
+INT:%CurrentIsVisible=1
+INT:%NewIsVisible=1
+INT:%TimerStopped=0
+EXTERN FLOAT:%MinPerception=0
+EXTERN FLOAT:%MinDistance=0
+EXTERN INT:%SayText = 1
+
+EVENTS
+
+EVENT InitializeShowing
+ON
+	OnInit()
+ACTIONS
+	StartTimer("UpdateShowing",0.2,-1)
+	SetVisible(__Me,%CurrentIsVisible)
+	
+EVENT ShutdownShowing
+ON
+	OnShutdown()
+ACTIONS
+	StopTimer("UpdateShowing")
+
+EVENT UpdateShowing
+ON
+	OnTimer("UpdateShowing")
+ACTIONS
+	Set(%NewIsVisible,1)
+	IterateParty("ShowingObjectCheck")
+	IF "!c1&c2"
+		IsEqual(%CurrentIsVisible,%NewIsVisible)
+		IsEqual(%TimerStopped,0)
+	THEN
+		PlayEffectAt(__Me, FX_GP_GoldSparkles_A)		
+		Set(%CurrentIsVisible,%NewIsVisible)
+		SetVisible(__Me,%CurrentIsVisible)
+	ENDIF
+
+EVENT CheckShowing
+VARS
+CHARACTER:_Char
+FLOAT:_Perception
+FLOAT:_Dist
+STRING:_Event
+ON
+	OnIterateCharacter(_Char,"ShowingObjectCheck")
+ACTIONS
+	IF "c1&!c2&c3&c4&!c5&c6&c7" 
+		IsEqual(%NewIsVisible,1)
+		CharacterIsDead(_Char)
+		CharacterGetStat(_Perception,_Char,Perception)
+		GetDistance(_Dist,_Char,__Me)
+		IsLessThen(_Perception,%MinPerception)
+		IsLessThen(_Dist,%MinDistance)
+		IsEqual(%TimerStopped,0)
+	THEN
+		Set(%NewIsVisible,0)
+		IF "c1"
+			IsEqual(%SayText, 1)
+		THEN
+			GetRandom(_Event, "FakePerceptionReveal", "FakePerceptionReveal2", "FakePerceptionReveal3", "FakePerceptionReveal4")
+			CharacterEvent(_Char,_Event)
+			StopTimer("UpdateShowing")
+		ENDIF
+	ENDIF
+	
+EVENT StoryReveal
+ON
+	OnItemEvent(__Me,"StoryReveal")
+ACTIONS
+	Set(%CurrentIsVisible,1)
+	Set(%NewIsVisible,1)
+	Set(%TimerStopped,1)
+	SetVisible(__Me,1)
+	StopTimer("UpdateHidden")

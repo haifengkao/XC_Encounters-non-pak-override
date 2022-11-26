@@ -1,0 +1,113 @@
+#TEMPLATE "_SKILL_Base" : Target_EnemyEndureElements_Water
+
+INIT
+CHARACTER:__Me
+FLOAT:%SkillTargetScore_Target_EnemyEndureElements_Water=-1000000
+// [GLOBAL_VARS]
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_Target_EnemyEndureElements_Water
+VARS
+	// [CALC_VARS]
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_Target_EnemyEndureElements_Water")
+ACTIONS
+	Set(%SkillTargetScore_Target_EnemyEndureElements_Water, -1000000)
+
+	// [CALC_ACTIONS_PRE]
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	IterateCharactersInCombat(__Me, "CalculateTarget_Target_EnemyEndureElements_Water", Random, Vitality)
+	IF "!c1"
+		IsEqual(%SkillTargetChar_Target_EnemyEndureElements_Water, null)
+	THEN
+		Add(%ActionScore_Target_EnemyEndureElements_Water, %SkillTargetScore_Target_EnemyEndureElements_Water)
+	ENDIF
+	// [~CALC_ACTIONS]
+
+	
+
+	
+// Calculate the character we should attack
+EVENT CalculateTarget_Target_EnemyEndureElements_Water
+VARS	
+	CHARACTER:_Char
+	// [CALC_TARGET_VARS]
+	FLOAT:_StatEarthResistance
+	FLOAT:_StatWaterResistance
+	FLOAT:_Score
+	FLOAT:_SkillRangeMin
+	FLOAT:_SkillRangeMax
+	FLOAT:_DistanceToChar
+	FLOAT:_DistanceScore
+	// [~CALC_TARGET_VARS]
+ON
+	OnIterateCharacter(_Char, "CalculateTarget_Target_EnemyEndureElements_Water")	
+ACTIONS
+	// [CALC_CHAR_TARGET_ACTIONS_PRE]
+	Set(_Score, 0.0)
+	// [~CALC_CHAR_TARGET_ACTIONS_PRE]
+	// [CALC_CHAR_TARGET_ACTIONS]
+	IF "(!c1&!c2&!c3)&(c4&c5)&(!((c6)|c7&c8))&(c9)&(c10)&(c11)"
+	    CharacterIsDead(_Char) // c1
+	    CharacterHasStatus(_Char, INVISIBLE) // c2
+	    CharacterHasStatus(_Char, SNEAKING) // c3
+	    CharacterGetStat(_StatEarthResistance, _Char, EarthResistance) // c4
+	    IsLessThen(_StatEarthResistance, 30) // c5
+	    CharacterHasStatus(_Char, SHIELD) // c6
+	    CharacterGetStat(_StatWaterResistance, _Char, WaterResistance) // c7
+	    IsGreaterThen(_StatWaterResistance, 50) // c8
+	    CharacterIsAlly(__Me, _Char) // c9
+	    CharacterGetSkillRange(_SkillRangeMin, _SkillRangeMax, __Me, Target_EnemyEndureElements_Water) // c10
+	    GetDistance(_DistanceToChar, __Me, _Char) // c11
+	THEN
+	    // Hostile count score calculation
+	    Add(_Score, 10.0) // HostileWeight
+	    
+	    // Range score calculation
+	    Set(_DistanceScore, _DistanceToChar)
+	    IF "(c1)"
+	        IsGreaterThen(_DistanceScore, _SkillRangeMax) // c1
+	    THEN
+	        Subtract(_DistanceScore, _SkillRangeMax)
+	        Multiply(_DistanceScore, -1.0)
+	    ELIF "(c1)"
+	        IsLessThen(_DistanceScore, _SkillRangeMin) // c1
+	    THEN
+	        Subtract(_DistanceScore, _SkillRangeMin)
+	        Multiply(_DistanceScore, 1.0)
+	    ELSE 
+	        Set(_DistanceScore, 0.0)
+	    ENDIF
+	    Add(_Score, _DistanceScore)
+	    
+	    // Can see score calculation
+	    IF "!c1"
+	    	CharacterCanSee(__Me, _Char)
+	    THEN
+	    	Add(_Score, -10.0)
+	    ENDIF
+	    
+	    IF "c1"
+	    	IsGreaterThen(_Score, %SkillTargetScore_Target_EnemyEndureElements_Water)
+	    THEN
+	    	Set(%SkillTargetChar_Target_EnemyEndureElements_Water, _Char)
+	    	Set(%SkillTargetScore_Target_EnemyEndureElements_Water, _Score)
+	    ENDIF	
+	ENDIF
+	// [~CALC_CHAR_TARGET_ACTIONS]
+	
+	
+	
+	
+	
+	
+	
+	

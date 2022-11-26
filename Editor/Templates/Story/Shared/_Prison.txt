@@ -1,0 +1,333 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+IF
+DB_Companion(_Companion)
+AND
+DB_PrisonComments((STRING)_Prison,(STRING)_,(INTEGER)_)
+THEN
+DB_CurrentPrisonComment(_Prison,_Companion,0);
+
+IF
+_Player.DB_IsPlayer()
+AND
+NOT DB_Companion(_Player)
+AND
+CharacterGetUUID(_Player,_UUID)
+AND
+StringConcatenate(_UUID,"_pris",_Timer)
+AND
+StringConcatenate(_UUID,"2",_Timer2)
+THEN
+PrisonEscapeTimers(_Player,_Timer,0);
+PrisonEscapeTimers(_Player,_Timer2,1);
+
+IF
+DB_Companion(_Companion)
+AND
+GetMultiplayerCharacter(_Companion,_Player)
+AND
+PrisonData(_Player,_Prison, _Dest,_Exit, _Door,_)
+AND
+DB_CompanionChest(_Prison,_Chest,CHARACTER_NULL)
+AND
+NOT PrisonData(_Companion,_Prison, _,_, _,_)
+THEN
+PrisonData(_Companion,_Prison, _Dest,_Exit, _Door,_Chest);
+NOT DB_CompanionChest(_Prison,_Chest,CHARACTER_NULL);
+DB_CompanionChest(_Prison,_Chest,_Companion);
+
+IF
+PrisonEscapeData((STRING)_,(TRIGGER)_Prohib,(CHARACTER)_,(STRING)_,(TRIGGER)_Jail)
+THEN
+ProcTriggerRegisterForPlayers(_Prohib);
+ProcTriggerRegisterForPlayers(_Jail);
+
+// Startcene, EndScene code not needed for this goal.
+PROC
+ImprisonPlayer((CHARACTER)_Player,(STRING)_)
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_player_in_prison",1);
+
+PROC
+ImprisonPlayer((CHARACTER)_Player,(STRING)_Prison)
+AND
+StringConcatenate("Player_WasIn_",_Prison,_Res)
+THEN
+CharacterSetVarInteger(_Player,_Res,1);
+
+PROC	
+ImprisonPlayer((CHARACTER)_Player,(STRING)_Prison) 
+AND
+PrisonData((CHARACTER)_Player,(STRING)_Prison,(TRIGGER)_LocationCell,(TRIGGER)_,(ITEM)_Door,(ITEM)_Chest/*,_*/)
+AND
+PrisonEscapeTimers(_Player,_Timer,0)
+AND
+PrisonDataDoorKeys((ITEM)_Door,(STRING)_Key)
+THEN
+ProcDisableFollow(_Player);
+CharacterTeleportToTrigger(_Player,_LocationCell,"");
+ItemClose(_Door);
+ItemLock(_Door,_Key);// DO NOT ALTER THE STRENGTH (the player should be able to escape by lockpicking the door)
+ShiftToNpc(_Player,0);
+CharacterMoveAllItemsToContainer(_Player,_Chest);
+ItemClose(_Chest);
+// Assert PlayerInPrison/1 with a 5 frame delay to give the engine the chance to generate all
+// region and seeing events. If we do not wait, we can get the erroneus situation that the
+// player is already PlayerInPrison while he still is "outside" according to the region events.
+// If this outside location happens to be in the prohibited area, then the PC who called the
+// guards in the first place will immediately call then again because the player "escaped" from prison.
+ImprisonPlayerTempPrisonVariable(_Player,_Prison);
+CharacterFlushQueue(_Player);
+CharacterLeaveCombat(_Player);
+TimerLaunch(_Timer,500);
+
+IF
+TimerFinished(_Timer)
+AND
+ PrisonEscapeTimers(_Player,_Timer,0)
+AND
+ImprisonPlayerTempPrisonVariable(_Player,_Prison)
+THEN
+NOT ImprisonPlayerTempPrisonVariable(_Player,_Prison);
+PlayerInPrison(_Player,_Prison);
+ProcLaunchPrisonComment(_Player);
+DB_TradeForPlayerDisabled(_Player);
+
+PROC
+ProcLaunchPrisonComment((CHARACTER)_Player)
+AND
+CharacterGetUUID(_Player,_String)
+THEN
+DB_PrisonComment(_Player,_String);
+TimerLaunch(_String,500);
+
+IF
+DB_PrisonComments((STRING)_,(STRING)_Comment,_)
+THEN
+DB_RepeatPlayerComment(_Comment);
+
+IF
+TimerFinished(_Timer)
+AND
+DB_PrisonComment(_Player,_Timer)
+THEN
+NOT DB_PrisonComment(_Player,_Timer);
+ProcCheckAndLaunchPrisonComment(_Player);
+
+PROC
+ProcGetCellmate((CHARACTER)_Player)
+AND
+DB_Cellmate(_Player,_Other)
+THEN
+NOT DB_Cellmate(_Player,_Other);
+
+PROC
+ProcGetCellmate((CHARACTER)_Player)
+AND
+PlayerInPrison(_Player,_Prison)
+AND
+_Other.DB_IsPlayer()
+AND
+_Player!=_Other
+AND
+PlayerInPrison(_Other,_Prison)
+AND
+NOT DB_Cellmate(_Player,_)
+THEN
+DB_Cellmate(_Player,_Other);
+
+PROC
+ProcCheckAndLaunchPrisonComment((CHARACTER)_Player)
+AND
+NOT DB_BusyDoingPrisonComment(_Player,_,_,_)
+THEN
+ProcGetCellmate(_Player);
+ProcCheckAndLaunchPrisonComment_2(_Player);
+
+PROC
+ProcCheckAndLaunchPrisonComment_2((CHARACTER)_Player)
+AND
+PlayerInPrison(_Player,_Prison)
+AND
+NOT DB_Cellmate(_Player,_)
+AND
+DB_CurrentPrisonComment(_Prison,_Player,_Nr)
+AND
+DB_PrisonComments(_Prison,_Comment,_Nr)
+THEN
+DB_BusyDoingPrisonComment(_Player,_Prison,_Comment,1);
+Launch_SinglePlayerComment(_Player,_Comment);
+
+PROC
+ProcCheckAndLaunchPrisonComment_2((CHARACTER)_Player)
+AND
+PlayerInPrison(_Player,_Prison)
+AND
+DB_Cellmate(_Player,_OtherPlayer)
+AND
+DB_BusyDoingPrisonComment(_OtherPlayer,_Prison,_,_)
+AND
+DB_CurrentPrisonComment(_Prison,_Player,_Nr)
+AND
+DB_PrisonComments(_Prison,_Comment,_Nr)
+THEN
+DB_BusyDoingPrisonComment(_Player,_Prison,_Comment,1);
+Launch_SinglePlayerComment(_Player,_Comment);
+
+PROC
+ProcCheckAndLaunchPrisonComment_2((CHARACTER)_Player)
+AND
+PlayerInPrison(_Player,_Prison)
+AND
+DB_Cellmate(_Player,_OtherPlayer)
+AND
+NOT DB_BusyDoingPrisonComment(_OtherPlayer,_Prison,_,_)
+AND
+DB_CurrentPrisonComment(_Prison,_Player,_Nr)
+AND
+DB_PrisonComments(_Prison,_Comment,_Nr)
+THEN
+DB_BusyDoingPrisonComment(_Player,_Prison,_Comment,1);
+DB_BusyDoingPrisonComment(_OtherPlayer,_Prison,_Comment,2);
+Launch_PlayerComment(_Player,_OtherPlayer,_Comment);
+
+PROC
+PROC_CleanUpPlayerComments((STRING)_Comment)
+AND
+DB_PrisonComments(_Prison,_Comment,_)
+AND
+DB_BusyDoingPrisonComment(_Player,_Prison,_Comment,1)
+AND
+DB_CurrentPrisonComment(_Prison,_Player,_Cur)
+AND
+IntegerSum(_Cur,1,_New)
+THEN
+NOT DB_CurrentPrisonComment(_Prison,_Player,_Cur);
+DB_CurrentPrisonComment(_Prison,_Player,_New);
+
+PROC
+PROC_CleanUpPlayerComments((STRING)_Comment)
+AND
+DB_PrisonComments(_Prison,_Comment,_)
+AND
+DB_BusyDoingPrisonComment(_Player,_Prison,_Comment,_Nr)
+THEN
+NOT DB_BusyDoingPrisonComment(_Player,_Prison,_Comment,_Nr);
+
+PROC
+FreePlayer((CHARACTER)_Player)
+AND
+PlayerInPrison(_Player,_Prison) 
+AND
+PrisonData(_Player,_Prison,_,_ExitLocation,_,_Chest/*,_*/)
+THEN	
+CharacterTeleportToTrigger(_Player,_ExitLocation,"");
+ContainerMoveAllItemsToCharacter(_Chest,_Player);
+DecreaseReputation(_Player,1);
+PlayerLeavesPrison(_Player,_Prison);
+
+// The player is considered "successfully escaped" when he can get out of the prison area unseen
+IF	
+CharacterLeftTrigger(_Player,_Region) 
+AND
+PlayerInPrison(_Player,_Prison) 
+AND
+PrisonEscapeData(_Prison,_,_,_,_Region)
+AND
+PrisonEscapeTimers(_Player,_Timer,1)
+THEN
+TimerLaunch(_Timer,400);	// small delay - useful for SF castle (see prison exceptional rules)
+PlayerLeavesPrison(_Player,_Prison);
+
+//TODO: commented block
+/*
+PROC
+PlayerLeavesPrison((INTEGER)_Prison)
+AND
+PrisonBed(_Prison,_Bed)
+THEN
+SetObjectProperty(_Bed,O_PROP_property,44);		// progibit player to sleep on the bed(s). Owner = 44 = Ralph, but could be any npc != 0
+*/
+
+PROC
+PlayerLeavesPrison((CHARACTER)_Player,(STRING)_Prison)
+THEN
+NOT DB_TradeForPlayerDisabled(_Player);
+NOT PlayerInPrison(_Player,_Prison);		// cleanup
+NOT NoPrisonEscapeCalls(_Player,1);		// allow again that npcs detect the hero escaping (for the next time he is thrown in prison)
+
+PROC
+PlayerLeavesPrison((CHARACTER)_Player,(STRING)_)
+THEN
+CharacterLockGroup(_Player,0);
+ProcClearCompanionPrisonChest(_Player);
+
+PROC
+PlayerLeavesPrison((CHARACTER)_Player,(STRING)_)
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_player_in_prison",0);
+
+// If the player enters the prohibited area (which is basically the entire prison minus his cell,
+// or the entire prison if there is never a guard nearby to see the player when he is in his cell)
+// and he is detected, it means trouble: the guards are called to kill!
+IF
+PlayerInPrison(_Player,_Prison) 
+AND
+DB_InRegion(_Player,_Region)
+AND 
+PrisonEscapeData(_Prison,_Region,_,_,_) 
+AND
+Sees(_Npc,_Player) 
+AND
+_Npc!=_Player
+AND
+NOT NoPrisonEscapeCalls(_Player,1) 
+AND		// CONDITION ORDER! this condition AFTER Sees() such that only the first _Npc of a multiple match for Sees() ripples through the rest of the conditions
+NOT GuardTypeNpc(_,_Npc,_,_) 
+AND		// exclude the guards themselves - if not: guards will call the guards,...
+NOT DB_EvilDude(_Npc) 
+AND		// exclude evil dudes (who don't wanna get attention from the guards)
+CharacterGetRepAttitudeTowardsPlayer(_Npc,_Player,_Att)
+AND
+_Att < 90	// exclude best friends,//TODO define ATTITUDE_BEST_FRIEND
+AND
+DB_IsGuard(_Npc)
+THEN
+ProcCheckIfGuardIsInCombat(_Player,_Npc);
+
+PROC
+ProcCheckIfGuardIsInCombat((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_Combat(_Player,_ID)
+AND
+DB_Combat(_Npc,_ID)
+THEN
+DB_GuardIsInCombat(1);
+
+PROC
+ProcCheckIfGuardIsInCombat((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT DB_GuardIsInCombat(1)
+THEN
+Story_CallGuards(_Player,_Npc,5,"Default_Prisoner_Escapes"); //TODO define ACTION_ALIGNMENT_CHANGE_TO_ENEMY
+NoPrisonEscapeCalls(_Player,1);	// assert NoPrisonEscapeCalls(1) until the player actually escaped. This prevents multiple npcs from saying "hey the prisoner escapes".
+
+PROC
+ProcCheckIfGuardIsInCombat((CHARACTER)_Player,(CHARACTER)_Npc)
+THEN
+NOT DB_GuardIsInCombat(1);
+
+IF
+DialogEnded("Default_Prisoner_Escapes",_Inst)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+THEN
+ProcMakeNPCHostile(_Player,_Npc);
+EXITSECTION
+
+ENDEXITSECTION

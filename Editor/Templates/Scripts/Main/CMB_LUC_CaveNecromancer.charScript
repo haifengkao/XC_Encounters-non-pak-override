@@ -1,0 +1,211 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%QuestBoar_Thuringer="LUC_WitchCave_Boar_a7ac677e-866f-45d6-b326-bf0eaafda40b"
+	FLOAT:%MySightRange
+	ITEM:%Corpse_Boar="COR_Animals_Boar_A_002_5e4d7692-0b76-4954-b192-8a029e70c71e"
+	ITEM:%Corpse_Wolf="COR_Animals_Wolf_A_004_b02b678e-9bc5-49e6-80de-daec7cebb161"
+	ITEM:%Corpse_Dog="COR_Animals_Dog_A_000_22a67c52-708a-4b48-9514-9ce7bb255c86"
+	INT:%Bool_CorpseDestroyed_Boar=0
+	INT:%Bool_CorpseDestroyed_Wolf=0
+	INT:%Bool_CorpseDestroyed_Dog=0
+
+//------------------------------
+BEHAVIOUR
+REACTION Necromancer_Summon,500
+USAGE COMBAT
+VARS
+	FLOAT3:_CorpsePosition
+	FLOAT:_DistanceBetweenCorpseAndMe
+	CHARACTER:_Spawnee
+CHECK "!c1&!c2&!c3&!c4&!c5"
+	CharacterHasStatus(__Me,"MUTED")								//c1
+	CharacterHasStatus(__Me,"CHARMED")								//c2
+	CharacterHasStatus(__Me,"PETRIFIED")							//c3
+	CharacterHasStatus(__Me,"FEAR")									//c4
+	CharacterHasStatus(__Me,"STUNNED")								//c5
+ACTIONS
+	IF "!c1&c2&!c3&c4"
+		IsEqual(%Bool_CorpseDestroyed_Boar,1)
+		GetDistance(_DistanceBetweenCorpseAndMe,__Me,%Corpse_Boar)
+		IsGreaterThen(_DistanceBetweenCorpseAndMe,25)
+		GetPosition(%Corpse_Boar,_CorpsePosition)
+	THEN
+		//DebugText(__Me,"Boar!")
+		CharacterLookAt(%Corpse_Boar)
+		CharacterPlayEffect(__Me,"FX_Skills_WitchCraft_Generic_A_Prepare")
+		PlayEffectAt(%Corpse_Boar,"FX_GP_Target_WitchCraft_A")			
+		CharacterPlayAnimation("Intimidate_01",1,1)
+		PlayEffectAt(_CorpsePosition,"FX_GP_Hit_Blood_A_Large")
+		ItemSetOnStage(%Corpse_Boar,0)
+		PlayEffectAt(%Corpse_Boar,"FX_Skills_WitchCraft_OathOfDesecration_Prepare_A")
+		Sleep(0.6)		
+		CharacterEvent(__Me,"CMB_LUC_WitchCave_NecroSummon_Boar")		
+		Set(%Bool_CorpseDestroyed_Boar,1)	
+		SetPriority("Necromancer_Summon",0)
+	ELIF "!c1&c2&!c3&c4"
+		IsEqual(%Bool_CorpseDestroyed_Wolf,1)
+		GetDistance(_DistanceBetweenCorpseAndMe,__Me,%Corpse_Wolf)
+		IsGreaterThen(_DistanceBetweenCorpseAndMe,25)		
+		GetPosition(%Corpse_Wolf,_CorpsePosition)
+	THEN
+		//DebugText(__Me,"Wolf!")
+		CharacterLookAt(%Corpse_Wolf)
+		CharacterPlayEffect(__Me,"FX_Skills_WitchCraft_Generic_A_Prepare")	
+		PlayEffectAt(%Corpse_Wolf,"FX_GP_Target_WitchCraft_A")
+		CharacterPlayAnimation("Intimidate_01",1,1)
+		PlayEffectAt(_CorpsePosition,"FX_GP_Hit_Blood_A_Large")
+		ItemSetOnStage(%Corpse_Wolf,0)		
+		PlayEffectAt(%Corpse_Wolf,"FX_Skills_WitchCraft_OathOfDesecration_Prepare_A")
+		Sleep(0.6)				
+		CharacterEvent(__Me,"CMB_LUC_WitchCave_NecroSummon_Wolf")		
+		Set(%Bool_CorpseDestroyed_Wolf,1)
+		SetPriority("Necromancer_Summon",0)
+	ELIF "!c1&c2&!c3&c4"
+		IsEqual(%Bool_CorpseDestroyed_Dog,1)
+		GetDistance(_DistanceBetweenCorpseAndMe,__Me,%Corpse_Dog)
+		IsGreaterThen(_DistanceBetweenCorpseAndMe,25)		
+		GetPosition(%Corpse_Dog,_CorpsePosition)
+	THEN
+		//DebugText(__Me,"Dog!")
+		CharacterLookAt(%Corpse_Dog)
+		CharacterPlayEffect(__Me,"FX_Skills_WitchCraft_Generic_A_Prepare")	
+		PlayEffectAt(%Corpse_Dog,"FX_GP_Target_WitchCraft_A")	
+		CharacterPlayAnimation("Intimidate_01",1,1)
+		PlayEffectAt(_CorpsePosition,"FX_GP_Hit_Blood_A_Large")
+		ItemSetOnStage(%Corpse_Dog,0)		
+		PlayEffectAt(%Corpse_Dog,"FX_Skills_WitchCraft_OathOfDesecration_Prepare_A")
+		Sleep(0.6)				
+		CharacterEvent(__Me,"CMB_LUC_WitchCave_NecroSummon_Dog")		
+		Set(%Bool_CorpseDestroyed_Dog,1)		
+		SetPriority("Necromancer_Summon",0)
+	ELSE
+		SetPriority("Necromancer_Summon",0)
+	ENDIF
+INTERRUPT
+	Reset()
+	
+REACTION Necromancer_CastCharmOnEnemy,400
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&!c4&c5&!(c6|c7|c8|c9|c10|c11|c12)&c13"
+	IsHardcore()																	//c1
+	CharacterCanCast(__Me,"Projectile_EnemyCharm")									//c2
+	CharacterGet(_ChosenTarget,__Me,%MySightRange,Highest,Strength,Enemy)			//c3
+	IsEqual(_ChosenTarget,%QuestBoar_Thuringer)										//!c4
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyCharm")		//c5
+	CharacterHasStatus(_ChosenTarget,"CHARMED")										//!c6
+	CharacterHasStatus(_ChosenTarget,"KNOCKED_DOWN")								//!c7
+	CharacterHasStatus(_ChosenTarget,"STUNNED")										//!c8
+	CharacterHasStatus(_ChosenTarget,"FEAR")										//!c9
+	CharacterHasStatus(_ChosenTarget,"FROZEN")										//!c10
+	CharacterHasStatus(_ChosenTarget,"BLIND")										//!c11
+	CharacterHasStatus(_ChosenTarget,"CURSED")										//!c12
+	IsRandom(0.5)																	//c13
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Projectile_EnemyCharm",_ChosenTarget)	
+	
+REACTION Necromancer_CastBoostOnAlly,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&c3&c4&(c5|c6|c7|c8|c9|c10|c11|c12)"
+	CharacterCanCast(__Me,"Target_EnemyTargetedDamageBoost")
+	CharacterGet(_ChosenTarget,__Me,%MySightRange,Highest,Strength,Ally)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyTargetedDamageBoost")
+	IsRandom(0.2)		
+	CharacterHasStatus(_ChosenTarget,"BOOST")
+	CharacterHasStatus(_ChosenTarget,"FROZEN")
+	CharacterHasStatus(_ChosenTarget,"KNOCKED_DOWN")
+	CharacterHasStatus(_ChosenTarget,"STUNNED")
+	CharacterHasStatus(_ChosenTarget,"FEAR")
+	CharacterHasStatus(_ChosenTarget,"CHARMED")
+	CharacterHasStatus(_ChosenTarget,"CURSED")
+	CharacterHasStatus(_ChosenTarget,"BLIND")
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Target_EnemyTargetedDamageBoost",_ChosenTarget)		
+INTERRUPT
+	Reset()
+
+REACTION Necromancer_CastBlindOnEnemy,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "c1&c2&!c3&c4&c5&(c6|c7|c8|c9|c10|c11|c12)"
+	CharacterCanCast(__Me,"Target_EnemyBlind")
+	CharacterGet(_ChosenTarget,__Me,%MySightRange,Highest,Dexterity,Enemy)
+	IsEqual(_ChosenTarget,%QuestBoar_Thuringer)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyBlind")
+	CharacterHasStatus(_ChosenTarget,"FROZEN")
+	CharacterHasStatus(_ChosenTarget,"KNOCKED_DOWN")
+	CharacterHasStatus(_ChosenTarget,"STUNNED")
+	CharacterHasStatus(_ChosenTarget,"FEAR")
+	CharacterHasStatus(_ChosenTarget,"CHARMED")
+	CharacterHasStatus(_ChosenTarget,"BLIND")	
+	CharacterHasStatus(_ChosenTarget,"CURSED")	
+	IsRandom(0.2)	
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Target_EnemyBlind",_ChosenTarget)	
+INTERRUPT
+	Reset()
+
+REACTION Necromancer_CastCurseOnEnemy,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&!c3&c4&c5&(c6|c7|c8|c9|c10|c11|c12)"
+	CharacterCanCast(__Me,"Target_EnemyTargetedCurse")
+	CharacterGet(_ChosenTarget,__Me,%MySightRange,Highest,Strength,Enemy)
+	IsEqual(_ChosenTarget,%QuestBoar_Thuringer)	
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyTargetedCurse")	
+	CharacterHasStatus(_ChosenTarget,"FROZEN")
+	CharacterHasStatus(_ChosenTarget,"KNOCKED_DOWN")
+	CharacterHasStatus(_ChosenTarget,"STUNNED")
+	CharacterHasStatus(_ChosenTarget,"FEAR")
+	CharacterHasStatus(_ChosenTarget,"CHARMED")
+	CharacterHasStatus(_ChosenTarget,"BLIND")	
+	CharacterHasStatus(_ChosenTarget,"CURSED")	
+	IsRandom(0.2)
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Target_EnemyTargetedCurse",_ChosenTarget)	
+INTERRUPT
+	Reset()
+	
+//------------------------------
+EVENTS	
+EVENT OnInit_GetSightRange_GiveSkills
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%MySightRange,__Me,Sight)
+	THEN
+		CharacterAddSkill("Target_EnemyTargetedDamageBoost")
+		CharacterAddSkill("Target_EnemyBlind")
+		CharacterAddSkill("Target_EnemyTargetedCurse")
+		CharacterAddSkill("Projectile_EnemyCharm")
+	ENDIF
+	
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	IF "c1|c2|c3"
+		IsEqual(%Bool_CorpseDestroyed_Boar,0)
+		IsEqual(%Bool_CorpseDestroyed_Wolf,0)
+		IsEqual(%Bool_CorpseDestroyed_Dog,0)
+	THEN
+		SetPriority("Necromancer_Summon",500)
+	ENDIF

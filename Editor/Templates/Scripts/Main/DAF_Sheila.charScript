@@ -1,0 +1,51 @@
+INIT
+CHARACTER:__Me
+INT:%State = 0
+
+BEHAVIOUR
+REACTION CryForRedemtion,1050
+USAGE PEACE
+VARS
+FIXEDSTRING:_Text
+FIXEDSTRING:_Animation
+CHECK "c1"
+	IsEqual(%State,0)
+ACTIONS
+	GetRandom(_Text,"DAF_SheilaCry_01","DAF_SheilaCry_02")
+	DisplayText(__Me,_Text,5)
+	GetRandom(_Animation,"Crying_01","emotion_sad")
+	CharacterPlayAnimation(_Animation)
+	Sleep(15)	
+INTERRUPT
+	Reset()
+	
+REACTION Leave,1500
+USAGE PEACE
+CHECK "c1"
+IsEqual(%State,1)
+ACTIONS
+	/*
+	CharacterMoveTo(_Point,0)
+	CharacterLookFrom(_Point)
+	Sleep(3)
+	DisplayText(__Me,"DAF_SheilaSpell_01",5)
+	CharacterPlayAnimation("skill_rain_cast")
+	Sleep(4)
+	DisplayText(__Me,"DAF_SheilaSpell_02",5)
+	Sleep(3)
+	*/
+	DisplayText(__Me,"DAF_SheilaFarewell_01",5)
+	Sleep(4)
+	CharacterSetOffStage()
+	//CharacterDisappear(FLOAT:20)
+INTERRUPT
+	Reset()
+	
+EVENTS
+	
+EVENT OpheliaSpellLifted
+ON
+	OnGlobalEventSet("DAF_SheilaLeaves")
+ACTIONS
+	Set(%State,1)
+	

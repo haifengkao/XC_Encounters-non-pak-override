@@ -1,0 +1,37 @@
+INIT
+
+ITEM:__Me
+
+INT:%ScanForPlayer = 1
+CHARACTER:%Player1 = Player1_dac1443f-a866-4ab3-b240-e705c0b20ec5
+CHARACTER:%Player2 = Player2_a0af7520-57ac-4f1c-b9d7-197bceebeade
+EXTERN ITEM:%Stone = null
+
+BEHAVIOUR
+
+REACTION State_ScanPlayers, 1000
+USAGE ALL
+CHECK "c1"
+	IsEqual(%ScanForPlayer,1)
+VARS
+	CHARACTER:_Player
+ACTIONS
+	IterateCharactersNear(__Me,5.0,"StarStoneCheck")
+	Sleep(1)
+	
+EVENTS
+
+EVENT Iterator
+VARS 
+	CHARACTER:_Char
+ON
+	OnIterateCharacter(_Char,"StarStoneCheck")
+ACTIONS
+	IF "(c1|c2)&c3"
+		IsEqual(_Char,%Player1)
+		IsEqual(_Char,%Player2)
+		IsEqual(%ScanForPlayer,1)
+	THEN	
+		CharacterItemEvent(_Char,%Stone,"LUC_IC_StarStoneZapped")
+		Set(%ScanForPlayer,0)
+	ENDIF

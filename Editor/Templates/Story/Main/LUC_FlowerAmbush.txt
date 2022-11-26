@@ -1,0 +1,180 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+//REGION Flower Ambush Chars & Triggers
+DB_LUC_FlowerAmbush(CHARACTER_LUC_Artillery_Flower_Ambush_01);
+DB_LUC_FlowerAmbush(CHARACTER_LUC_Artillery_Flower_Ambush_02);
+DB_LUC_FlowerAmbush(CHARACTER_LUC_Artillery_Flower_Ambush_03);
+DB_LUC_FlowerAmbush(CHARACTER_LUC_Artillery_Flower_Ambush_04);
+DB_LUC_FlowerAmbush(CHARACTER_LUC_Artillery_Flower_Ambush_05);
+DB_LUC_ButterflyAmbush(CHARACTER_LUC_Fanged_Butterfly_A_004,TRIGGER_LUC_ButterflyAmbush_D04);
+DB_LUC_ButterflyAmbush(CHARACTER_LUC_Fanged_Butterfly_A_005,TRIGGER_LUC_ButterflyAmbush_D05);
+DB_LUC_ButterflyAmbush(CHARACTER_LUC_Fanged_Butterfly_A_006,TRIGGER_LUC_ButterflyAmbush_D06);
+//END_REGION
+
+//REGION Spider Ambush Chars
+DB_LUC_SpiderAmbush(CHARACTER_LUC_Spider_Ambush1_01);
+DB_LUC_SpiderAmbush(CHARACTER_LUC_Spider_Ambush1_02);
+DB_LUC_SpiderAmbush(CHARACTER_LUC_Spider_Ambush1_03);
+//END_REGION
+
+//REGION EggSpider Ambush Triggers
+DB_LUC_EggSpiderAmbushTriggers(TRIGGER_LUC_BarrenLands_EggTrigger_01,CHARACTER_LUC_BarrenLands_SpiderEgg_03);
+DB_LUC_EggSpiderAmbushTriggers(TRIGGER_LUC_BarrenLands_EggTrigger_02,CHARACTER_LUC_BarrenLands_SpiderEgg_01);
+DB_LUC_EggSpiderAmbushTriggers(TRIGGER_LUC_BarrenLands_EggTrigger_02,CHARACTER_LUC_BarrenLands_SpiderEgg_02);
+DB_LUC_EggSpiderAmbushTriggers(TRIGGER_LUC_BarrenLands_EggTrigger_03,CHARACTER_LUC_BarrenLands_SpiderEgg_05);
+DB_LUC_EggSpiderAmbushTriggers(TRIGGER_LUC_BarrenLands_EggTrigger_04,CHARACTER_LUC_BarrenLands_SpiderEgg_06);
+DB_LUC_EggSpiderAmbushTriggers(TRIGGER_LUC_BarrenLands_EggTrigger_04,CHARACTER_LUC_BarrenLands_SpiderEgg_07);
+DB_LUC_EggSpiderAmbushTriggers(TRIGGER_LUC_BarrenLands_EggTrigger_04,CHARACTER_LUC_BarrenLands_SpiderEgg_08);
+DB_LUC_EggSpiderAmbushTriggers(TRIGGER_LUC_BarrenLands_EggTrigger_04,CHARACTER_LUC_BarrenLands_SpiderEgg_09);
+DB_LUC_EggSpiderAmbushTriggers(TRIGGER_LUC_BarrenLands_EggTrigger_05,CHARACTER_LUC_BarrenLands_SpiderEgg_10);
+DB_LUC_EggSpiderAmbushTriggers(TRIGGER_LUC_BarrenLands_EggTrigger_05,CHARACTER_LUC_BarrenLands_SpiderEgg_11);
+DB_LUC_EggSpiderAmbushTriggers(TRIGGER_LUC_BarrenLands_EggTrigger_05,CHARACTER_LUC_BarrenLands_SpiderEgg_12);
+DB_LUC_EggSpiderAmbushTriggers(TRIGGER_LUC_BarrenLands_EggTrigger_05,CHARACTER_LUC_BarrenLands_SpiderEgg_13);
+//END_REGION
+
+//REGION Orc StoneAmbush - Character, Destination, Event, Text
+DB_LUC_StoneAmbush(CHARACTER_LUC_StoneAmbush_Orc03, TRIGGER_LUC_StoneAmbush_D03, "LUC_StoneAmbush_OrcHasArrived_03", "LUC_StoneAmbush_OrcHasArrived_Text_03");
+DB_LUC_StoneAmbush(CHARACTER_LUC_StoneAmbush_Orc04, TRIGGER_LUC_StoneAmbush_D04, "LUC_StoneAmbush_OrcHasArrived_04", "LUC_StoneAmbush_OrcHasArrived_Text_04");
+DB_LUC_StoneAmbush(CHARACTER_LUC_StoneAmbush_Orc05, TRIGGER_LUC_StoneAmbush_D05, "LUC_StoneAmbush_OrcHasArrived_05", "LUC_StoneAmbush_OrcHasArrived_Text_05");
+DB_LUC_StoneAmbush(CHARACTER_LUC_StoneAmbush_Orc06, TRIGGER_LUC_StoneAmbush_D06, "LUC_StoneAmbush_OrcHasArrived_06", "LUC_StoneAmbush_OrcHasArrived_Text_06");
+DB_LUC_StoneAmbush(CHARACTER_LUC_StoneAmbush_Orc07, TRIGGER_LUC_StoneAmbush_D07, "LUC_StoneAmbush_OrcHasArrived_07", "LUC_StoneAmbush_OrcHasArrived_Text_07");
+//END_REGION
+
+PROC_LUC_FlowerAmbushInit();
+PROC_LUC_ButterflyAmbushInit();
+PROC_LUC_StoneAmbushInit();
+PROC_LUC_SpiderAmbushInit();
+AmbushTrigger(TRIGGER_LUC_SpiderAmbush_T01, ITEM_LUC_SpiderAmbushInvisible);
+ItemToCharacter(ITEM_LUC_LyngailsOrder, CHARACTER_LUC_StoneAmbush_Orc02);
+ProcTriggerRegisterForPlayers(TRIGGER_LUC_BarrenLands_EggTrigger_01);
+ProcTriggerRegisterForPlayers(TRIGGER_LUC_BarrenLands_EggTrigger_02);
+ProcTriggerRegisterForPlayers(TRIGGER_LUC_BarrenLands_EggTrigger_03);
+ProcTriggerRegisterForPlayers(TRIGGER_LUC_BarrenLands_EggTrigger_04);
+ProcTriggerRegisterForPlayers(TRIGGER_LUC_BarrenLands_EggTrigger_05);
+CharacterSetOnStage(CHARACTER_CMBHC_LUC_ArtilIntro_ShMound_01,0);
+KBSECTION
+//REGION INIT - Hide Flowers & Butterflies
+PROC
+PROC_LUC_FlowerAmbushInit()
+AND
+DB_LUC_FlowerAmbush(_Flower)					
+THEN
+CharacterSetOnStage(_Flower,0);
+
+PROC
+PROC_LUC_ButterflyAmbushInit()
+AND
+DB_LUC_ButterflyAmbush(_Butterfly,_)				
+THEN
+CharacterSetOnStage(_Butterfly,0);	
+//END_REGION
+
+//REGION INIT - Hide Orcs
+PROC
+PROC_LUC_StoneAmbushInit()
+AND
+DB_LUC_StoneAmbush(_Orc,_,_,_)				
+THEN
+CharacterSetOnStage(_Orc,0);	
+//END_REGION
+
+//REGION INIT - SpiderAmbushInit - Set spiders off stage & register triggers
+PROC
+PROC_LUC_SpiderAmbushInit()
+AND
+DB_LUC_SpiderAmbush(_Spider)					
+THEN
+CharacterSetOnStage(_Spider,0);
+//END_REGION
+
+//REGION Flower and Butterflies Ambush - Creatures appear
+IF
+ItemAddedToCharacter(ITEM_LUC_FlowerAmbush_CON_Herb_Mushroom_01,_Player)
+AND
+DB_LUC_FlowerAmbush(_Flower)
+THEN	
+CharacterAppear(_Flower,1);
+	NOT DB_LUC_FlowerAmbush(_Flower);
+
+IF
+ItemAddedToCharacter(ITEM_LUC_FlowerAmbush_CON_Herb_Mushroom_01,_Player)
+AND
+DB_LUC_ButterflyAmbush(_Butterfly,_Destination)
+THEN	
+CharacterAppear(_Butterfly,0);
+ProcCharacterMoveToTrigger(_Butterfly,_Destination,1,"");
+	NOT DB_LUC_ButterflyAmbush(_Butterfly,_Destination);
+//END_REGION
+
+//REGION SpiderAmbush - Creatures appear
+PROC
+ProcLaunchAmbush(TRIGGER_LUC_SpiderAmbush_T01, _Player)
+AND
+DB_LUC_SpiderAmbush(_Spider)
+THEN	
+CharacterAppear(_Spider,1);
+	NOT DB_LUC_SpiderAmbush(_Spider);
+
+IF
+CharacterEnteredCombat(CHARACTER_LUC_BarrenLands_SpiderEgg_01,_)
+AND
+DB_LUC_SpiderAmbush(_Spider)
+THEN	
+CharacterAppear(_Spider,1);
+	NOT DB_LUC_SpiderAmbush(_Spider);
+
+IF
+CharacterEnteredCombat(CHARACTER_LUC_BarrenLands_SpiderEgg_02,_)
+AND
+DB_LUC_SpiderAmbush(_Spider)
+THEN	
+CharacterAppear(_Spider,1);
+	NOT DB_LUC_SpiderAmbush(_Spider);
+//END_REGION
+
+//REGION SpiderEggAmbush - Egg Enters Combat When Player Enters Trigger
+IF
+CharacterEnteredTrigger(_Player,_Trigger)
+AND
+DB_LUC_EggSpiderAmbushTriggers(_Trigger,_SpiderEgg)
+THEN
+CharacterSetCanFight(_SpiderEgg,1);
+//END_REGION
+
+//REGION Drunken FlowerAmbush - Send event
+IF
+CharacterEnteredCombat(CHARACTER_LUC_DrunkGobs_Artillery_Flower_A_01,_)
+THEN	
+CharacterSetEvent(CHARACTER_LUC_DrunkGobs_Artillery_Flower_A_01,"EnteredCombat");
+//END_REGION
+
+//REGION StoneAmbush - Receive Event & make Orcs appear
+IF
+CharacterEvent(CHARACTER_LUC_StoneAmbush_Orc02,"LUC_StoneAmbush_SummonReinforcements")
+AND
+DB_LUC_StoneAmbush(_Orc,_Destination,_Event,_)
+THEN
+CharacterAppear(_Orc,0);
+ProcCharacterMoveToTrigger(_Orc,_Destination,1,_Event);
+
+IF
+CharacterEvent(_Orc,_Event)
+AND
+DB_LUC_StoneAmbush(_Orc,_Destination,_Event,_ArrivedText)
+THEN
+CharacterDisplayText(_Orc,_ArrivedText);
+	NOT DB_LUC_StoneAmbush(_Orc,_Destination,_Event,_ArrivedText);
+
+//END_REGION
+
+//-------HARDCORE
+IF
+CharacterEvent(CHARACTER_Env_Artillery_Flower_A_Luculla_001,"CMBHC_LUC_ShamblingMoundAppears")
+THEN
+CharacterAppear(CHARACTER_CMBHC_LUC_ArtilIntro_ShMound_01,1);
+PlayEffectAtCharacter("FX_Creatures_Undead_Skeleton_Spawn_A",CHARACTER_CMBHC_LUC_ArtilIntro_ShMound_01);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

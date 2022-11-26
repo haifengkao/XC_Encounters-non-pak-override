@@ -1,0 +1,88 @@
+INIT
+CHARACTER:__Me
+EXTERN STRING:%MyElement="Fire"
+EXTERN FLOAT:%ExplodeAtDistance=3
+
+//--------------------
+BEHAVIOUR
+REACTION ExplodeWhenCloseToTarget,500
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+	FLOAT:_DistanceToEnemy
+	INT:_CurrentExplosionCount=0
+	INT:_DesiredExplosionCount=8
+	INT:_ExplosionXOffset
+	INT:_ExplosionZOffset
+	FLOAT3:_MyPosition
+	FLOAT3:_MyOriginalPosition
+	FLOAT3:_ExplosionOffset={0;0;0}	
+CHECK "c1&c2&c3&c4"
+	CharacterGet(_Enemy,__Me,30,Lowest,Distance,Enemy)
+	CharacterIsPlayer(_Enemy)
+	GetDistance(_DistanceToEnemy,__Me,_Enemy)
+	IsLessThen(_DistanceToEnemy,%ExplodeAtDistance)
+ACTIONS
+	StartTimer("DAF_KT_StoneTitan_TimeToDie",3.0,0)
+	IF "c1"
+		IsEqual(%MyElement,"Fire")
+	THEN
+		CharacterPlayEffect(__Me,"FX_Creatures_Skills_IceKing_ChangeElement_Fire_Cast_A")
+		Sleep(2.0)
+		ExplodeAt(__Me,Projectile_EnemySuicideExplosionFire)
+		Sleep(1.0)		
+		CharacterEndTurn()
+	ELIF "c1"
+		IsEqual(%MyElement,"Water")
+	THEN
+		CharacterPlayEffect(__Me,"FX_Creatures_Skills_IceKing_ChangeElement_Ice_Cast_A")
+		Sleep(2.0)		
+		ExplodeAt(__Me,Projectile_EnemySuicideExplosionIce)
+		Sleep(1.0)			
+		CharacterEndTurn()		
+	ELIF "c1"
+		IsEqual(%MyElement,"Air")
+	THEN
+		CharacterPlayEffect(__Me,"FX_Creatures_Skills_IceKing_ChangeElement_Wind_Cast_A")
+		Sleep(2.0)	
+		ExplodeAt(__Me,Projectile_EnemySuicideExplosionAir)
+		Sleep(1.0)			
+		CharacterEndTurn()		
+	ELIF "c1"
+		IsEqual(%MyElement,"Earth")
+	THEN
+		CharacterPlayEffect(__Me,"FX_Creatures_Skills_IceKing_ChangeElement_Earth_Cast_A")
+		Sleep(2.0)		
+		ExplodeAt(__Me,Projectile_EnemySuicideExplosionEarth)
+		Sleep(1.0)			
+		CharacterEndTurn()		
+	ENDIF
+	
+//--------------------
+EVENTS
+EVENT DieRightAfterExplosions
+ON
+	OnTimer("DAF_KT_StoneTitan_TimeToDie")	//otherwise char never dies (cause combat is over)
+ACTIONS
+	IF "c1"
+		IsEqual(%MyElement,"Fire")
+	THEN
+		CharacterPlayEffect(__Me,"FX_Creatures_Undead_Skeleton_Metal_Death_A")
+		//CharacterPlayEffect(__Me,"FX_Creatures_Undead_Skeleton_Baby_Death_A")
+		CharacterDie(__Me)
+	ELIF "c1"
+		IsEqual(%MyElement,"Water")
+	THEN
+		CharacterPlayEffect(__Me,"FX_Creatures_Env_Snowman_A_Death")
+		CharacterDie(__Me)
+	ELIF "c1"
+		IsEqual(%MyElement,"Air")
+	THEN
+		CharacterPlayEffect(__Me,"FX_GP_Death_Lightning_A_Medium")
+		CharacterDie(__Me)
+	ELIF "c1"
+		IsEqual(%MyElement,"Earth")
+	THEN
+		CharacterPlayEffect(__Me,"FX_Creatures_Summons_ElementalEarth_A_Death")
+		CharacterDie(__Me)
+	ENDIF

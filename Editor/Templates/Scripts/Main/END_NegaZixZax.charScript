@@ -1,0 +1,57 @@
+INIT
+
+CHARACTER:__Me
+
+	ITEM:%Bench = END_Behavior_NegaKingsCrab_ZixZax_Stool_60cd510e-f500-494a-9498-f180c19bf61e
+	TRIGGER:%Stand = END_Point_Behavior_NegaKingsCrab_ZixZax_5b8572e2-1403-465a-b585-a6e49991c177
+	CHARACTER:%Weaver = END_NegaWeaverOfTime_d843c908-7be1-48f8-a825-6f8d01aaed3f
+	INT:%Sit = 0 
+	INT:%Handle
+	
+BEHAVIOUR
+
+REACTION Mutter, 1000
+USAGE PEACE
+VARS
+	FLOAT:_Distance
+	FIXEDSTRING:_Animation
+ACTIONS
+	IF "!c1&c2&c3"
+		ItemIsDestroyed(%Bench)
+		GetDistance(_Distance, %Bench, %Stand)
+		IsLessThen(_Distance, 2.0)
+	THEN
+		IF "!c1"
+			CharacterHasStatus(__Me, SITTING)
+		THEN
+			CharacterUseItem(%Bench)
+			Set(%Sit, 1)
+		ENDIF
+	ELSE
+		Set(%Sit, 0)
+		CharacterMoveTo(%Stand)
+		CharacterLookFrom(%Stand)
+	ENDIF
+	Sleep(30.0)	
+	
+	IF "c1&c2"
+		GetDistance(_Distance, __Me, %Weaver)
+		IsLessThen(_Distance, 7.0)
+	THEN
+		SetVar(%Weaver, "DialogLookAtChar", __Me)
+		CharacterLookAt(%Weaver)
+		DialogStart("END_AD_NegaKingsCrab_ZixZaxWeaver", __Me, %Weaver)
+	ENDIF
+	
+	IF "c1"
+		IsEqual(%Sit, 1)
+	THEN
+		GetRandom(_Animation, "Sit_No_01", "Sit_Annoyed_01", "Sit_Angry_01", "Sit_Reject_01", "Sit_Sigh_01")
+	ELSE	
+		GetRandom(_Animation, "Think_02", "Think_01", "Annoyed_01", "Depressed_01")	
+	ENDIF
+	CharacterPlayAnimation(_Animation)
+	Sleep(15.0)
+	Reset()
+
+

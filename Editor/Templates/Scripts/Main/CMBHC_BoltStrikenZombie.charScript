@@ -1,0 +1,12 @@
+INIT
+
+CHARACTER:__Me
+
+EVENTS
+
+EVENT Spawn
+ON
+	OnCharacterEvent(__Me, "RiseUp")
+ACTIONS
+	ShootLocalProjectile(Projectile_BlitzBoltStart, __Me, {0;10;0}, {0;-1;0})
+	CharacterEvent(__Me, "RiseFromTheGrave")

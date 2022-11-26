@@ -1,0 +1,57 @@
+INIT
+CHARACTER:__Me													
+FLOAT:%SkillMaxRange												
+FLOAT:%MySightRange												
+
+//------------------------
+BEHAVIOUR
+REACTION KeepYourDistance, 0
+USAGE COMBAT
+ACTIONS
+	CharacterFleeFrom(Enemy,%SkillMaxRange)
+	SetPriority("KeepYourDistance",0)
+	
+REACTION JustSkipTurn, 200
+USAGE COMBAT
+ACTIONS
+	CharacterEndTurn()
+
+//------------------------
+EVENTS
+EVENT Initialize
+ON
+	OnInit()
+VARS
+	FLOAT:_SkillMinRange
+ACTIONS
+	IF "c1&c2"
+		CharacterGetSkillRange(_SkillMinRange,%SkillMaxRange,__Me,Projectile_EnemyLowStunBlitzBolt)
+		CharacterGetSightRange(%MySightRange,__Me)
+	THEN
+		SetPriority("Combat_AttackSetEnemy",0)
+		Subtract(%SkillMaxRange,5)
+	ENDIF
+
+EVENT CheckDistance
+ON
+	OnTurn()
+VARS
+	FLOAT:_DistanceToEnemy
+	FLOAT:_MySightRange		
+	CHARACTER:_ClosestEnemy	
+	CHARACTERTEMPLATE:_Temp
+ACTIONS
+	IF "c1&!c2&c3&c4&c5&!(c6|c7|c8|c9|c10)"
+		CharacterGet(_ClosestEnemy,__Me,%MySightRange,Lowest,Distance,Enemy,null,null,null,__Me)
+		CharacterHasStatus(_ClosestEnemy,DYING)
+		GetDistance(_DistanceToEnemy,__Me,_ClosestEnemy)
+		IsLessThen(_DistanceToEnemy,%SkillMaxRange)
+		CharacterGetTemplate(_ClosestEnemy, _Temp)
+		IsEqual(_Temp, CHARACTERTEMPLATE:Env_Evil_Mushroom_B_e3f8248f-be02-4a55-a610-628fe0132971)
+		IsEqual(_Temp, CHARACTERTEMPLATE:Env_Evil_Mushroom_B_Summon_Air_aabfa6f5-5dd1-4e4e-b72b-a2faf20a9c5b)
+		IsEqual(_Temp, CHARACTERTEMPLATE:Env_Evil_Mushroom_B_Summon_Fire_c7087e6b-745f-4150-9c94-99131692cc85)	
+		IsEqual(_Temp, CHARACTERTEMPLATE:Env_Evil_Mushroom_B_Summon_Poison_056fe4f6-8483-4261-87fd-105572fdc124)
+		IsEqual(_Temp, CHARACTERTEMPLATE:Env_Evil_Mushroom_B_Summon_Water_c94de303-d3d1-4d09-b4ef-870624feef67)
+	THEN
+		SetPriority("KeepYourDistance",1200)
+	ENDIF

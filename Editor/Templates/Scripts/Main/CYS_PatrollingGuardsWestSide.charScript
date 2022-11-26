@@ -1,0 +1,45 @@
+#INCLUDE Base
+
+INIT
+USING Base
+CHARACTER:__Me
+
+CHARACTER:%Friend1 = CYS_VillageGuard06_762c1c84-0842-4bcc-9a5e-b2230865a546
+CHARACTER:%Friend2 = CYS_PatrollingGuardWest_2_e7aff1f9-5901-444e-9ff1-799091e7da79
+
+TRIGGER:%Point1 = CYS_Point_GuardPatrolPath_1_1_3c404c52-477b-4c01-b649-3e775b5370b2
+TRIGGER:%Point2 = CYS_Point_GuardPatrolPath_1_2_9a1d3e4a-7c2c-4985-890c-560e27cf2556
+TRIGGER:%Point3 = CYS_Point_GuardPatrolPath_1_3_9dc33162-f856-4e8d-9418-6a7d14e73deb
+TRIGGER:%Point4 = CYS_Point_GuardPatrolPath_1_4_7c90b8c6-611a-41e2-875b-7f6ede4663c6
+TRIGGER:%Point5 = CYS_Point_GuardPatrolPath_1_5_6c369e05-d6aa-45e9-acd1-23a41e43d765
+TRIGGER:%Point6 = CYS_Point_GuardPatrolPath_1_6_504fd111-6202-4492-8339-3a52b8258ca8
+TRIGGER:%Point7 = CYS_Point_GuardPatrolPath_1_7_7344ae5e-b68f-4be3-bc70-b67d776e90e2
+TRIGGER:%Point8 = CYS_Point_GuardPatrolPath_1_8_74fdecde-05be-4192-87fd-b59a9f1de5a1
+TRIGGER:%Point9 = CYS_Point_GuardPatrolPath_1_9_3c350670-4f63-401e-9a2c-a2a9104f6f23
+TRIGGER:%Point10 = CYS_Point_GuardPatrolPath_1_10_262412c6-4096-4b72-a164-4fbc482067aa
+
+BEHAVIOUR
+
+REACTION Patrol,1050
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Point1, 0)
+	CharacterMoveTo(%Point2, 0)
+	CharacterMoveTo(%Point3, 0)
+	CharacterEvent(%Friend2,"TalkToPatrolGuardWest")
+	CharacterMoveTo(%Point4, 0)
+	CharacterMoveTo(%Point5, 0)
+	CharacterMoveTo(%Point6, 0)
+	DisplayText(__Me, "CYS_PatrolGuardTalkToGuard_2", 5)
+	CharacterLookAt(%Friend1)
+	CharacterEvent(%Friend1,"AnswerPatrolGuardWest")
+	Sleep(5)
+	DisplayText(__Me,"CYS_PatrolGuardTalkToGuard_1_1", 5)
+	Sleep(3)
+	CharacterMoveTo(%Point7, 0)
+	CharacterMoveTo(%Point8, 0)
+	CharacterMoveTo(%Point9, 0)
+	CharacterEvent(%Friend2,"TalkToPatrolGuardWest")
+	CharacterMoveTo(%Point10, 0)
+	
+	

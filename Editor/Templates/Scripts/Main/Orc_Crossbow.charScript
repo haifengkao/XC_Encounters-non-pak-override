@@ -1,0 +1,22 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter
+CHARACTER:__Me
+
+BEHAVIOUR 
+/*
+REACTION Wander, 6 OVERRIDE
+USAGE PEACE
+ACTIONS
+	CharacterWander(FLOAT:5, 10, 0)
+*/
+REACTION FleeAndAttack, 1060
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+CHECK "c1"
+	CharacterGet(_Enemy,__Me,5,Lowest,Distance,Enemy)
+ACTIONS
+	CharacterFleeFrom(RELATION:Enemy, 10)
+	CharacterAttack(_Enemy)

@@ -1,0 +1,19 @@
+INIT
+ITEM:__Me
+EXTERN INT:%IAmTheGhostlyChest=0
+
+INIT
+ITEM:__Me
+
+EVENTS
+EVENT OnInitApplyGhostlyMaterial
+ON
+ OnInit()
+ACTIONS
+ IF "c1"
+  IsEqual(%IAmTheGhostlyChest,0)
+ THEN
+  SetMaterial(__Me,3c7f47ad-4fc2-4e9d-a3c2-b5f9c10b0d4a,-1,1,1,1)
+ ELSE
+  ItemSetOnStage(__Me,0)
+ ENDIF

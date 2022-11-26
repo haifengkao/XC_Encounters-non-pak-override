@@ -1,0 +1,55 @@
+#INCLUDE Base
+
+INIT
+USING Base
+CHARACTER:__Me
+
+EVENTS
+EVENT FlowerArtilleryStrongAddSkill
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill(Projectile_EnemyBigDeadlySpores)
+	CharacterAddSkill(Cone_EnemyArtilleryFlower)
+	
+BEHAVIOUR
+REACTION CastOozeSpray,300
+VARS
+	CHARACTER:_char
+	FLOAT:_minRange
+	FLOAT:_maxRange
+	FLOAT:_hp
+USAGE COMBAT
+CHECK "c1&c2&c3&c4"
+	CharacterCanCast(__Me,Cone_EnemyArtilleryFlower)
+	CharacterGetSkillRange(_minRange,_maxRange,__Me,Cone_EnemyArtilleryFlower)
+	CharacterGet(_char,__Me,_maxRange,Lowest,Distance,Enemy)
+	CharacterCanSee(__Me,_char)
+ACTIONS
+	CharacterUseSkill(Cone_EnemyArtilleryFlower,_char)
+INTERRUPT
+	Reset()
+	
+REACTION CastPoisonDart,250
+VARS
+	CHARACTER:_char
+	FLOAT:_minRange
+	FLOAT:_maxRange
+	FLOAT:_hp
+USAGE COMBAT
+CHECK "c1&c2&c3&c4"
+	CharacterCanCast(__Me,Projectile_EnemyBigDeadlySpores)
+	CharacterGetSkillRange(_minRange,_maxRange,__Me,Projectile_EnemyBigDeadlySpores)
+	CharacterGet(_char,__Me,_maxRange,Lowest,Distance,Enemy)
+	CharacterCanSee(__Me,_char)
+ACTIONS
+	CharacterUseSkill(Projectile_EnemyBigDeadlySpores,_char)
+INTERRUPT
+	Reset()
+
+REACTION CannotMoveSoEndTurn,200
+USAGE COMBAT
+ACTIONS
+	CharacterEndTurn()
+INTERRUPT
+	Reset()

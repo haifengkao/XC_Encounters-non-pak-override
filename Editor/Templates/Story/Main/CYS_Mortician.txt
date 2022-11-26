@@ -1,0 +1,226 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Dialogs(CHARACTER_CYS_Mortician,"CYS_Mortician");
+
+DB_ShovelArea(TRIGGER_CYS_ShovelJakeDog,"CYS_ShovelJakeDog",ITEM_CYS_ShovelJakeDogDirt);
+DB_ShovelRewardItemAppear("CYS_ShovelJakeDog",ITEM_CYS_JakeCoffin,TRIGGER_CYS_ShovelJakeDogPoint);
+
+ItemToContainer(ITEM_CYS_SheepCorpse,ITEM_CYS_JakeCoffin,-1);
+
+//Player comments
+
+DB_PlayerComments("CYS_Comment_LedgerMortician","CYS_Comment_LedgerMortician_1_1",1,1);
+DB_PlayerComments("CYS_Comment_LedgerMortician","CYS_Comment_LedgerMortician_2_1",2,1);
+DB_PlayerComments("CYS_Comment_LedgerMortician","CYS_Comment_LedgerMortician_2_2",2,2);
+
+DB_PlayerComments("CYS_Comment_SheepCorpse","CYS_Comment_SheepCorpse_1_1",1,1);
+DB_PlayerComments("CYS_Comment_SheepCorpse","CYS_Comment_SheepCorpse_2_1",2,1);
+DB_PlayerComments("CYS_Comment_SheepCorpse","CYS_Comment_SheepCorpse_2_2",2,2);
+
+// Text on Jake's Grave
+
+DB_Global_ItemDescriptions(ITEM_CYS_JakesGrave,"CYS_Descr_JakesGrave");
+KBSECTION
+//REGION Get Sheep From Grave
+
+IF
+CharacterUsedItem(_Player,ITEM_CYS_JakeCoffin)
+AND
+NOT ITEM_CYS_JakeCoffin.AlreadyUsed()
+THEN
+ITEM_CYS_JakeCoffin.AlreadyUsed();
+GlobalSetEvent("CYS_FoundSheepCorpse");
+GlobalSetEvent("CYS_KnowsJakeMurder"); // In case somebody just walks up to the grave and starts digging up Jake without talking to anybody.
+Launch_PlayerComment(_Player,"CYS_Comment_SheepCorpse");
+Proc_AddExplorationEvent("CYS_JakeCorpse");
+QuestAdd("CYS_JakesMurder");
+QuestUpdate("CYS_JakesMurder","Update4");
+QuestUpdate("CYS_Bertia","Update5");
+
+//END_REGION
+
+//REGION Use Ledger (backup if Mortician gets killed) // Maybe locked behind high level door, key only to be gotten from dead body?
+
+IF
+ItemAddedToCharacter(ITEM_CYS_MorticianLedger,_Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+GlobalSetEvent("CYS_HasMorticianLedger");
+
+IF
+ItemRemovedFromCharacter(ITEM_CYS_MorticianLedger,_Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+GlobalClearEvent("CYS_HasMorticianLedger");
+
+IF
+DialogCharacterEventSet("CYS_TakeMorticianLedger",_Player,_)
+AND
+ItemIsInPartyInventory(ITEM_CYS_MorticianLedger,_Player,1,1)
+THEN
+NOOP(1);
+
+IF
+GameBookInterfaceClosed(ITEM_CYS_MorticianLedger,_Player)
+AND
+NOT ITEM_CYS_MorticianLedger.AlreadyUsed()
+THEN
+ITEM_CYS_MorticianLedger.AlreadyUsed();
+GlobalSetEvent("CYS_JakeMurder_SuspectsKnown");
+GlobalSetEvent("CYS_LedgerRead");
+Launch_PlayerComment(_Player,"CYS_Comment_LedgerMortician");
+QuestAdd("CYS_JakesMurder");
+QuestUpdate("CYS_JakesMurder","Update5");
+
+
+//END_REGION
+
+//REGION Tell Bertia About Sheep
+
+IF
+DialogEnded("CYS_Bertia",_)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_Bertia,"RevengeForStolenSheep",1)
+AND
+NOT DB_Dead(CHARACTER_CYS_Aureus)
+AND
+NOT CHARACTER_CYS_Bertia.GoingToAureus()
+THEN
+CHARACTER_CYS_Bertia.GoingToAureus();
+CharacterSetVarFixedString(CHARACTER_CYS_Bertia,"currentState","");
+CharacterSetHasDialog(CHARACTER_CYS_Bertia,0);
+CharacterSetHasDialog(CHARACTER_CYS_Aureus,0);
+DialogRequestStopForCharacter(CHARACTER_CYS_Aureus);
+CharacterDisappearOutOfSight(CHARACTER_CYS_Bertia,90,1,"CYS_BertiaGoingToMortician",1);
+
+IF
+DialogEnded("CYS_Bertia",_)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_Bertia,"JAH_SheepBertia",1)
+THEN
+Proc_CompanionComment(CHARACTER_Jahan,"JAH_CC_WastingTimeBertia",CHARACTER_CYS_Bertia);
+
+IF
+CharacterEvent(CHARACTER_CYS_Bertia,"CYS_BertiaGoingToMortician")
+THEN
+CharacterTeleportToTrigger(CHARACTER_CYS_Bertia,TRIGGER_CYS_Point_BertiaOutsideMortician,"");
+CharacterFlushQueue(CHARACTER_CYS_Bertia);
+CharacterSetOnStage(CHARACTER_CYS_Bertia,1);
+CharacterSetVarFixedString(CHARACTER_CYS_Bertia,"currentState","");
+CharacterSetVarFixedString(CHARACTER_CYS_Aureus,"currentState","");
+CHARACTER_CYS_Bertia.willArrest();
+
+IF
+CharacterSawCharacter(_Player, CHARACTER_CYS_Bertia)
+AND
+_Player.DB_IsPlayer()
+AND
+CHARACTER_CYS_Bertia.willArrest()
+AND
+NOT DB_CYSStartedBertiaScene(1)
+THEN
+DB_CYSStartedBertiaScene(1);
+NOT CHARACTER_CYS_Bertia.willArrest();
+ProcCYSStartBertiaAureusScene();
+
+PROC
+ProcCYSStartBertiaAureusScene()
+AND
+NOT DB_Dead(CHARACTER_CYS_Bertia)
+AND
+NOT DB_Dead(CHARACTER_CYS_Aureus)
+THEN
+DB_TempCYSDidBertiaScene(1);
+DialogStartTwoSpeakerDialog("CYS_AD_AureusBertia",CHARACTER_CYS_Bertia,CHARACTER_CYS_Aureus);
+
+PROC
+ProcCYSStartBertiaAureusScene()
+AND
+NOT DB_Dead(CHARACTER_CYS_Bertia)
+AND
+NOT DB_Dead(CHARACTER_CYS_Aureus)
+AND
+CharacterGetVarFixedString(CHARACTER_CYS_Mortician,"currentState","State_DownStairs")
+THEN
+CharacterSetVarFixedString(CHARACTER_CYS_Mortician,"currentState","State_WaitForArrest");
+
+
+PROC
+ProcCYSStartBertiaAureusScene()
+AND
+NOT DB_Dead(CHARACTER_CYS_Bertia)
+AND
+NOT DB_Dead(CHARACTER_CYS_Aureus)
+AND
+CharacterGetVarFixedString(CHARACTER_CYS_Mortician,"currentState","State_UpStairs")
+THEN
+CharacterSetHasDialog(CHARACTER_CYS_Mortician, 0);
+DialogRequestStopForCharacter(CHARACTER_CYS_Mortician);
+ProcCharacterMoveToItem(CHARACTER_CYS_Mortician, ITEM_CYS_Mortician1FStairs, 0, "teleportDownstairs");
+
+IF
+CharacterEvent(CHARACTER_CYS_Mortician, "teleportDownstairs")
+THEN
+CharacterTeleportToTrigger(CHARACTER_CYS_Mortician, TRIGGER_CYS_Point_MorticianDown, "");
+CharacterSetVarFixedString(CHARACTER_CYS_Mortician,"currentState","State_WaitForArrest");
+CharacterSetHasDialog(CHARACTER_CYS_Mortician, 1);
+
+
+PROC
+ProcCYSStartBertiaAureusScene()
+AND
+NOT DB_TempCYSDidBertiaScene(1)
+AND
+NOT DB_Dead(CHARACTER_CYS_Bertia)
+THEN
+ProcCharacterMoveToTrigger(CHARACTER_CYS_Bertia,TRIGGER_CYS_PointBertia,1,"CYS_BertiaHome");
+
+PROC
+ProcCYSStartBertiaAureusScene()
+THEN
+NOT DB_TempCYSDidBertiaScene(1);
+
+IF
+AutomatedDialogEnded("CYS_AD_AureusBertia",_)
+THEN
+NOT DB_CYSStartedBertiaScene(1);
+CharacterSetHasDialog(CHARACTER_CYS_Aureus,1);
+ProcCharacterMoveToTrigger(CHARACTER_CYS_Bertia,TRIGGER_CYS_PointBertia,1,"CYS_BertiaHome");
+CharacterSetVarFixedString(CHARACTER_CYS_Aureus,"currentState","State_WanderingInRoom");
+GlobalSetEvent("CYS_MorticianArrest");
+
+IF
+CharacterEvent(CHARACTER_CYS_Bertia,"CYS_BertiaHome")
+THEN
+NOT DB_CYSStartedBertiaScene(1);
+CharacterSetHasDialog(CHARACTER_CYS_Bertia,1);
+CharacterSetVarFixedString(CHARACTER_CYS_Bertia,"currentState","State_Sales");
+
+IF
+ItemAddedToCharacter(ITEM_CYS_SheepCorpse,_Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+GlobalSetEvent("CYS_HasBertiaSheep");
+
+IF
+ItemRemovedFromCharacter(ITEM_CYS_SheepCorpse,_Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+GlobalClearEvent("CYS_HasBertiaSheep");
+
+IF
+DialogCharacterEventSet("CYS_TakeSheepCorpse",_Player,_)
+AND
+ItemIsInPartyInventory(ITEM_CYS_SheepCorpse,_Player,1,1)
+THEN
+ItemToCharacter(ITEM_CYS_SheepCorpse,CHARACTER_CYS_Bertia);
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

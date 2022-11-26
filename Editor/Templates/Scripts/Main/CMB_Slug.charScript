@@ -1,0 +1,107 @@
+INIT
+	CHARACTER:__Me
+	EXTERN INT:%Bool_WaterSlug=0
+	//EXTERN FLOAT:%WaterSlugTransfoThreshold=0.5
+	//EXTERN FLOAT:%WaterSlugTransfoThreshold_Tiny=0.5
+
+//-----
+BEHAVIOUR
+/*REACTION WaterSlug_BreakDownIntoTinySlugs,0											//WORK IN PROGRESS
+USAGE ALL
+VARS
+	CHARACTER:_SpawnedSlug_1
+	CHARACTER:_SpawnedSlug_2
+	INT:_FXHandle1	
+	INT:_FXHandle2	
+ACTIONS
+	CharacterPlayLoopEffect(_FXHandle1,__Me,"FX_Env_Water_Splash_River_A")
+	CharacterPlayLoopEffect(_FXHandle2,__Me,"FX_Creatures_Skills_Spider_WaterBeam_Splashes_A")
+	Sleep(2)
+	CharacterPlayEffect(__Me,"FX_Env_Water_Splash_Sea_A")
+	CreateSurfaceAt(__Me,Water,1.5,2)
+	StopLoopEffect(_FXHandle1)
+	StopLoopEffect(_FXHandle2)	
+	SpawnCharacter(_SpawnedSlug_1,"Animals_Water_Slug_B_ab907ea7-8395-4024-a0dc-73860aed8bc6",__Me,0)	
+	CharacterPlayEffect(_SpawnedSlug_1,"FX_Creatures_Skills_Spider_WaterBeam_Splashes_A")	
+	SpawnCharacter(_SpawnedSlug_2,"Animals_Water_Slug_B_ab907ea7-8395-4024-a0dc-73860aed8bc6",__Me,0)	
+	CharacterPlayEffect(_SpawnedSlug_2,"FX_Creatures_Skills_Spider_WaterBeam_Splashes_A")
+	CharacterSetOffStage()	
+
+REACTION WaterSlug_BreakDownIntoSuperTinySlugs,0
+USAGE ALL
+VARS
+	CHARACTER:_SpawnedSlug_1
+	CHARACTER:_SpawnedSlug_2
+	INT:_FXHandle1	
+	INT:_FXHandle2
+ACTIONS
+	CharacterPlayLoopEffect(_FXHandle1,__Me,"FX_Env_Water_Splash_River_A")
+	CharacterPlayLoopEffect(_FXHandle2,__Me,"FX_Creatures_Skills_Spider_WaterBeam_Splashes_A")
+	Sleep(2)
+	CharacterPlayEffect(__Me,"FX_Env_Water_Splash_Sea_A")
+	CreateSurfaceAt(__Me,Water,0.75,2)
+	StopLoopEffect(_FXHandle1)
+	StopLoopEffect(_FXHandle2)		
+	SpawnCharacter(_SpawnedSlug_1,"Animals_Water_Slug_C_cadefad5-aee3-4dd2-a564-877efe6cd42d",__Me,0)
+	CharacterPlayEffect(_SpawnedSlug_1,"FX_Creatures_Skills_Spider_WaterBeam_Splashes_A")	
+	SpawnCharacter(_SpawnedSlug_2,"Animals_Water_Slug_C_cadefad5-aee3-4dd2-a564-877efe6cd42d",__Me,0)
+	CharacterPlayEffect(_SpawnedSlug_1,"FX_Creatures_Skills_Spider_WaterBeam_Splashes_A")	
+	CharacterSetOffStage()*/
+
+EVENTS
+EVENT OnInit_StartTimer
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		IsEqual(%Bool_WaterSlug,0)
+	THEN
+		StartTimer("CMB_PoisonSlug_CreateOozeSurface_Timer",0.38,0)
+	ELSE	
+		StartTimer("CMB_WaterSlug_CreateOozeSurface_Timer",0.38,0)
+	ENDIF
+
+EVENT OnTimer_CreateOozeSurface
+ON
+	OnTimer("CMB_PoisonSlug_CreateOozeSurface_Timer")
+ACTIONS
+	IF "!c1&(c2|!c3)"
+		CharacterHasStatus(__Me,"BURNING")
+		CharacterIsInActiveTurn(__Me)
+		IsInCombat(__Me)
+	THEN	
+		CreateSurfaceAt(__Me,Ooze,0.5,2)
+	ENDIF
+	StartTimer("CMB_PoisonSlug_CreateOozeSurface_Timer",0.38,0)
+	
+/*EVENT OnTimer_CreateWaterSurface
+ON
+	OnTimer("CMB_WaterSlug_CreateOozeSurface_Timer")
+ACTIONS
+	CreateSurfaceAt(__Me,Water,0.5,2)
+	StartTimer("CMB_WaterSlug_CreateOozeSurface_Timer",0.38,0)
+
+EVENT OnDamage_IfWaterSlug_Become2SmallerSlugs
+VARS
+	FLOAT:_MyVitality
+	CHARACTERTEMPLATE:_MyCharTemplate
+	CHARACTERTEMPLATE:_WaterSlug="Animals_Water_Slug_A_ad7a25a0-94e4-4826-aa84-62fc8bb1fc3c"
+	CHARACTERTEMPLATE:_WaterSlug_Tiny="Animals_Water_Slug_B_ab907ea7-8395-4024-a0dc-73860aed8bc6"
+ON
+	OnVitalityChanged(_)
+ACTIONS
+	IF "c1&c2&c3&c4"
+		CharacterGetStat(_MyVitality,__Me,Vitality)
+		IsLessThen(_MyVitality,%WaterSlugTransfoThreshold)
+		CharacterGetTemplate(__Me,_MyCharTemplate)
+		IsEqual(_MyCharTemplate,_WaterSlug)
+	THEN
+		SetPriority("WaterSlug_BreakDownIntoTinySlugs",1000)
+	ELIF "c1&c2&c3&c4"
+		CharacterGetStat(_MyVitality,__Me,Vitality)
+		IsLessThen(_MyVitality,%WaterSlugTransfoThreshold_Tiny)
+		CharacterGetTemplate(__Me,_MyCharTemplate)
+		IsEqual(_MyCharTemplate,_WaterSlug_Tiny)
+	THEN
+		SetPriority("WaterSlug_BreakDownIntoSuperTinySlugs",1000)
+	ENDIF*/

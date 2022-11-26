@@ -1,0 +1,96 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter
+CHARACTER:__Me
+CHARACTER:%Goblin1 = LUC_FraudingGoblin1_6eff2f39-ba17-41eb-a114-LUC_FraudingGoblin1_6eff2f39-ba17-41eb-a114-3c5acbc807ba
+INT:%StateVar1 = 0
+INT:%StateVar2 = 0
+INT:%StateVar3 = 0
+
+EVENTS
+EVENT AskFirstTime
+ON
+	OnCharacterEvent(__Me,"AskFirstTime")
+ACTIONS
+	Set(%StateVar1,1)
+
+EVENT AskAgain
+ON
+	OnCharacterEvent(__Me,"AskAgain")
+ACTIONS
+	Set(%StateVar2,1)
+	
+EVENT AttackGoblin
+ON
+	OnCharacterEvent(__Me,"AttackGoblin")
+ACTIONS
+	Set(%StateVar3,1)
+
+EVENT Reset1
+ON
+	OnCharacterEvent(__Me,"Reset")
+ACTIONS
+	Set(%StateVar1,1)
+	Set(%StateVar2,0)
+	Set(%StateVar3,0)
+
+BEHAVIOUR
+REACTION DiscussingFraud1, 1000
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%StateVar1,1)
+ACTIONS
+	Set(%StateVar1,0)
+	DisplayText(__Me,"LUC_FraudOrc_Script_0") // I said, give the money back, you imp!
+	//CharacterPlayAnimation("Fidget_Forward_01")
+	Sleep(15)
+	CharacterEvent(%Goblin1,"Reply1")
+INTERRUPT
+	CharacterEvent(%Goblin1,"Reset")
+	Set(%StateVar1,0)
+	Set(%StateVar2,0)
+	Set(%StateVar3,0)
+	Reset()
+	
+REACTION DiscussingFraud2, 1000
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%StateVar2,1)
+ACTIONS
+	Set(%StateVar2,0)
+	DisplayText(__Me,"LUC_FraudOrc_Script_1") // You are making me angry!
+	//CharacterPlayAnimation("Fidget_Forward_01")
+	Sleep(15)
+	CharacterEvent(%Goblin1,"Reply2")
+INTERRUPT
+	CharacterEvent(%Goblin1,"Reset")
+	Set(%StateVar1,1)
+	Set(%StateVar2,0)
+	Set(%StateVar3,0)
+	Reset()
+
+REACTION AttackingGoblin, 1000
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%StateVar3,1)
+ACTIONS
+	Set(%StateVar3,0)
+	DisplayText(__Me,"LUC_FraudOrc_Script_2") // Wraaagh!
+	CharacterAttack(%Goblin1)
+	Sleep(15)
+	CharacterEvent(%Goblin1,"DontDoThat")
+INTERRUPT
+	CharacterEvent(%Goblin1,"Reset")
+	Set(%StateVar1,1)
+	Set(%StateVar2,0)
+	Set(%StateVar3,0)
+	Reset()
+	
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+STORY
+
+SCRIPTFRAME ShouldStartArguing
+	ACTIONS	
+	Set(%StateVar1,1)

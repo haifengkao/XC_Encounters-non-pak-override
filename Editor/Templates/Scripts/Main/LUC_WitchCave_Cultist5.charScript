@@ -1,0 +1,34 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+EXTERN TRIGGER:%Trigger = null
+
+BEHAVIOUR
+
+REACTION State_SearchingForSpirit, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+	FLOAT:_Time
+ACTIONS
+	GetRandom(_Animation,"Attentive_01","Listen_01","Look_Down_Long_01","Look_Left_Long_01","Look_Right_Long_01","Look_Up_Long_01","Think_01")
+	GetRandom(_Time,5,6,7,8)
+	CharacterWander(FLOAT:3,_Time,0,%Trigger)
+	CharacterMoveTo(%Trigger)
+	CharacterLookFrom(%Trigger)
+	Sleep(1)
+	CharacterPlayAnimation(_Animation)
+	Sleep(2)
+
+EVENTS
+
+EVENT SpottedPlayer
+ON
+	OnCombatStarted()
+VARS
+	FIXEDSTRING:_Text
+ACTIONS
+	GetRandom(_Text,"LUC_WitchCave_CultistSpotsPlayer_1","LUC_WitchCave_CultistSpotsPlayer_2","LUC_WitchCave_CultistSpotsPlayer_3","LUC_WitchCave_CultistSpotsPlayer_4")
+	DisplayText(__Me,_Text,5)

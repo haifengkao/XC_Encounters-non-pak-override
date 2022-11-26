@@ -1,0 +1,24 @@
+#INCLUDE Base
+
+INIT
+USING Base
+
+CHARACTER:__Me
+BEHAVIOUR
+
+REACTION CycleAnimations,1000
+USAGE ALL
+ACTIONS
+CharacterPlayAnimation("Salute_01")
+Sleep(5)
+CharacterPlayAnimation("walk")
+Sleep(5)
+CharacterPlayAnimation("WipeTable_01")
+Sleep(5)
+CharacterPlayAnimation("idle3")
+Sleep(5)
+CharacterPlayAnimation("7_run")
+Sleep(5)
+CharacterPlayAnimation("run")
+Sleep(5)
+Goto("Start")

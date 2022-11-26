@@ -1,0 +1,15 @@
+INIT
+	ITEM:__Me
+	EXTERN STRING:%Dialog = ""
+
+EVENTS
+
+EVENT OnClick
+	ON
+		OnUseItem(_,__Me)
+	ACTIONS
+		IF "!c1"
+			IsEqual(%Dialog, "")
+		THEN
+			DialogStart(%Dialog,__Me)
+		ENDIF

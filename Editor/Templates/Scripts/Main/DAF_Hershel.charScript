@@ -1,0 +1,171 @@
+INIT
+USING Base
+CHARACTER:__Me
+TRIGGER:%Point1 = DAF_PointHershel1_35e41722-9059-489b-bb17-dc9944a87c41
+TRIGGER:%Point2 = DAF_PointHershel2_4b3ba5c3-50c5-462d-a6ce-d63cf94b1214
+TRIGGER:%Point3 = DAF_PointHershel3_7a1ef439-996e-47ad-824d-13203d860fea
+CHARACTER:%Orc1 = DAF_BO_TavernOrc1_8499b5b0-3488-4452-bb83-4fa306171e20
+CHARACTER:%Orc3 = DAF_BO_TavernOrc3_29b87928-fd10-4bd2-93e9-48370374cfde
+CHARACTER:%Grutilda = DAF_Grutilda_773d828d-f27b-48a3-bd36-133da7cfbfd5
+INT:%State = 0
+CHARACTER:%ServedOrc = DAF_BO_TavernOrc1_8499b5b0-3488-4452-bb83-4fa306171e20
+INT:%DrinksServed = 0
+
+BEHAVIOUR
+
+REACTION Working,1050
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%State,0)
+VARS
+	FIXEDSTRING:_Text
+ACTIONS
+	Sleep(2)
+	GotoRand("Point1","Point2","Point3")
+
+	Label("Point1")
+	CharacterMoveTo(%Point1)
+	CharacterLookFrom(%Point1)
+	Sleep(1)
+	Goto("Wait")
+
+	Label("Point2")
+	CharacterMoveTo(%Point2)
+	CharacterLookFrom(%Point2)
+	Sleep(1)
+	Goto("Wait")
+
+	Label("Point3")
+	CharacterMoveTo(%Point3)
+	CharacterLookFrom(%Point3)
+	Sleep(1)
+	Goto("Wait")
+
+	Label("Wait")
+	Sleep(10)
+	Goto("Start")
+INTERRUPT
+	Reset()
+
+REACTION ServeOrc,1060
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%State,1)
+VARS
+	FIXEDSTRING:_Text1
+	FIXEDSTRING:_Text2
+	FIXEDSTRING:_Text3
+ACTIONS
+	CharacterLookAt(%ServedOrc)
+	GetRandom(_Text1,"DAF_Hershel_1","DAF_Hershel_2")
+	DisplayText(__Me,_Text1,2)
+	Sleep(1)
+	CharacterMoveTo(%Point1,1)
+	CharacterLookFrom(%Point1)
+	CharacterPlayAnimation("Fidget_Forward_01")
+	CharacterMoveTo(%ServedOrc,1)
+	CharacterLookAt(%ServedOrc)
+	CharacterPlayAnimation("Fidget_Forward_01")
+	GetRandom(_Text2,"DAF_Hershel_3","DAF_Hershel_4")
+	DisplayText(__Me,_Text2,5)
+	Sleep(3)
+	IF "c1"
+		IsEqual(%ServedOrc,%Grutilda)
+	THEN
+		GetRandom(_Text3,"DAF_BO_TavernOrcCallWaiter_6","DAF_BO_TavernOrcCallWaiter_7")
+	ELSE
+		GetRandom(_Text3,"DAF_BO_TavernOrcCallWaiter_4","DAF_BO_TavernOrcCallWaiter_5")
+	ENDIF
+	DisplayText(%ServedOrc,_Text3,5)
+	GlobalSetEvent("DAF_HershelAvailable")
+	Set(%State,0)
+	Add(%DrinksServed,1)
+INTERRUPT
+	Set(%State,0)
+	GlobalSetEvent("DAF_HershelAvailable")
+	Reset()
+	
+REACTION ServeGrutilda,1070
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%State,2)
+ACTIONS
+	Set(%State,1)
+	GlobalSetEvent("DAF_HershelCalled")
+
+REACTION FetchMoreWhisky,1200
+USAGE PEACE
+CHECK "c1"
+	IsGreaterThen(%DrinksServed,4)
+ACTIONS
+	GlobalSetEvent("DAF_HershelCalled")
+	DisplayText(__Me,"DAF_HershelOutOfWhisky",3)
+	CharacterMoveTo(ITEM:05m_HouseFarm_A_Hatch_A_Item_002_222de6c5-036b-498e-b4bd-398ecaff95ef,1,1,1)
+	CharacterUseItem(ITEM:05m_HouseFarm_A_Hatch_A_Item_002_222de6c5-036b-498e-b4bd-398ecaff95ef)
+	CharacterMoveTo(TRIGGER:DAF_WhiskyCellar1_c9de62a3-3ea4-4a5d-89ff-87172d5c51ed)
+	CharacterLookFrom(TRIGGER:DAF_WhiskyCellar1_c9de62a3-3ea4-4a5d-89ff-87172d5c51ed)
+	CharacterPlayAnimation("Fidget_Forward_01")
+	DisplayText(__Me,"DAF_WhiskyBarrelNearEmpty")
+	Sleep(5)
+	CharacterMoveTo(TRIGGER:DAF_WhiskyCellar_In_ec7137e2-5a70-4460-b541-f5ae5ed6d6ec)
+	CharacterUseItem(ITEM:05m_PoorHouse_A_Stair_Up_A_Item_004_3885817a-1397-4ef7-9fc3-c1bbc29dd05f)
+	CharacterMoveTo(TRIGGER:%Point2,1,1,1)
+	DisplayText(__Me,"DAF_MoreWhiskyFound")
+	Set(%DrinksServed,0)
+	GlobalSetEvent("DAF_HershelAvailable")
+	
+
+	
+
+EVENTS
+
+EVENT Init
+ON
+	OnInit()
+ACTIONS	
+	CharacterForceUpdate(1)
+
+EVENT Died
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	CharacterForceUpdate(0)
+
+EVENT CalledByOrc1
+ON
+	OnCharacterEvent(__Me,"CalledByOrc1")
+ACTIONS
+	IF "!c1"
+		IsInDialog(__Me)
+	THEN
+		Set(%State,1)
+		Set(%ServedOrc,%Orc1)
+	ENDIF
+
+EVENT CalledByOrc3
+ON
+	OnCharacterEvent(__Me,"CalledByOrc3")
+ACTIONS
+	IF "!c1"
+		IsInDialog(__Me)
+	THEN
+		Set(%State,1)
+		Set(%ServedOrc,%Orc3)
+	ENDIF
+	
+EVENT CalledByGrutilda
+ON
+	OnCharacterEvent(__Me,"BringWhiskyToGrutilda")
+ACTIONS
+	IF "!c1"
+		IsInDialog(__Me)
+	THEN
+		Set(%State,2)
+		Set(%ServedOrc,%Grutilda)
+	ENDIF
+	
+EVENT ForceWhiskyFetch
+ON
+	OnCharacterEvent(__Me,"ForceWhiskyFetch")
+ACTIONS
+	Set(%DrinksServed,5)

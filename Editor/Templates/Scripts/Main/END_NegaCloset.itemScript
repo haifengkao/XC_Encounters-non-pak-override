@@ -1,0 +1,26 @@
+INIT
+
+ITEM:__Me
+	EXTERN TRIGGER:%Tp = null
+
+EVENTS
+
+EVENT Use
+VARS 
+	CHARACTER:_Member
+	CHARACTER:_Character
+ON
+	OnUseItem(_Character, __Me)
+ACTIONS
+	IterateParty("END_NegaClosetTP")
+
+	
+EVENT Tp
+VARS
+	CHARACTER:_Player
+ON
+	OnIterateCharacter(_Player,"END_NegaClosetTP")
+ACTIONS
+	TeleportTo(_Player, %Tp, 1)
+	PlayEffectAt(_Player, "FX_GP_TeleportSmoke_A")
+	CharacterApplyStatus(_Player, STATUS:KNOCKED_DOWN, 0, 1)

@@ -1,0 +1,203 @@
+INIT
+	CHARACTER:__Me
+	CHARACTERTEMPLATE:%JarethBoar="LUC_Jareth_Boar_93aceef7-740c-4afe-a557-c913afbf2aa2"
+	CHARACTERTEMPLATE:%JarethWolf="LUC_Jareth_Wolf_e8c672c7-2798-463c-9474-bbe2bc79e19a"
+	CHARACTERTEMPLATE:%JarethBull="LUC_Jareth_Bull_839b9911-1080-4885-99df-7306f36e00dd"
+	INT:%EffectHandle = null
+	INT:%ShadowFXHandle = 0
+	INT:%Disabled = 0
+	INT:%Bool_BairdotrIsAnAlly=0
+
+//----------
+BEHAVIOUR
+REACTION JarethMovesToTrigger1, 2000	
+USAGE COMBAT
+VARS
+	TRIGGER:_Trigger_JarethCombatDest = LUC_BC_JarethCombatDestination_159e446a-c25b-4d5f-aab0-52905f7e0dda
+	FLOAT:_MyActionPoints
+CHECK "c1&!(c2|c3|c4|c5|c6|c7|c8)"
+	CharacterGetStat(_MyActionPoints,__Me,ActionPoints)			//c1
+	IsLessThen(_MyActionPoints,5)								//!c2
+	CharacterHasStatus(__Me,"CHARMED")							//!c3
+	CharacterHasStatus(__Me,"PETRIFIED")						//!c4
+	CharacterHasStatus(__Me,"FEAR")								//!c5
+	CharacterHasStatus(__Me,"STUNNED")							//!c6
+	CharacterHasStatus(__Me,"MUTED")							//!c7
+	CharacterHasStatus(__Me,"FEAR")								//!c8
+ACTIONS
+	CharacterMoveTo(_Trigger_JarethCombatDest,1)
+	SetPriority("JarethMovesToTrigger1",0)
+	
+REACTION JarethHyperSummon, 1500
+USAGE COMBAT
+VARS
+	INT:_FailedHowManyTimes=0
+	INT:_HyperSummonStatus=0
+	INT:_BossSummonStatus=0
+	CHARACTER:_Player
+	FLOAT3:_Double1SpawnPosition
+	FLOAT3:_Double2SpawnPosition
+	FLOAT3:_PosOffset
+	FLOAT3:_MyPosition
+	FLOAT:_Angle
+	FLOAT:_Dist
+	CHARACTER:_Summon
+CHECK "c1&!(c2|c3|c4|c5|c6|c7)"
+	CharacterGet(_Player,__Me,30,Lowest,Distance,Enemy)			//c1
+	CharacterHasStatus(__Me,"CHARMED")							//!c2
+	CharacterHasStatus(__Me,"PETRIFIED")						//!c3
+	CharacterHasStatus(__Me,"FEAR")								//!c4
+	CharacterHasStatus(__Me,"STUNNED")							//!c5
+	CharacterHasStatus(__Me,"MUTED")							//!c6
+	CharacterHasStatus(__Me,"FEAR")								//!c7
+ACTIONS
+	CharacterSetCombatTimeout(__Me,90.0)
+	Set(%Bool_BairdotrIsAnAlly,0)
+	IterateCharactersInCombat(__Me,"CMB_LUC_Jareth_CheckIfBairdotrIsAlly",Lowest,Distance)
+	CharacterLookAt(_Player)
+	WHILE "c1&c2"
+		IsLessThen(_HyperSummonStatus,5)
+		IsLessThen(_FailedHowManyTimes,30)
+	DO
+		IF "c1"
+			GetPosition(__Me,_MyPosition)
+		THEN
+			Set(_PosOffset,{1.3;0;0}) 
+			GetRandomBetween(_Angle,-270,90)
+			GetRandomBetween(_Dist,1,3.5)
+			RotateY(_PosOffset,_Angle)
+			Multiply(_PosOffset,_Dist)	
+			Add(_MyPosition,_PosOffset)
+		ENDIF
+		IF "c1&!c2&!c3&!c4&!c5&!c6"
+			FindValidPosition(_MyPosition,3)
+			ContainsSurface(_MyPosition,1,CloudPoison)
+			ContainsSurface(_MyPosition,1,Ooze)
+			ContainsSurface(_MyPosition,1,Ice)
+			ContainsSurface(_MyPosition,1,CloudStatic)
+			ContainsSurface(_MyPosition,1,Electrified)
+		THEN	
+			CharacterSwitchWeaponType("Unarmed")
+			CharacterPlayAnimation("Cast_Summon_01",0,0)
+			IF "c1"
+				IsEqual(_HyperSummonStatus,0)
+			THEN	
+				Sleep(1.4)
+				GlobalSetEvent("LUC_BloodCave_JarethStartsSummoning")		//caught by the Event below
+				Sleep(1.5)
+				DebugText(__Me,"Wolf1")
+				PlayEffectAt(_MyPosition,"FX_Creatures_Animals_Blood_Spawn_A")	
+				CharacterPlayEffect(__Me,"FX_GP_CameraShake_B")			
+				SpawnCharacter(_Summon,%JarethWolf,_MyPosition,0,1,__Me)				
+				Add(_HyperSummonStatus,1)				
+			ELIF "c1"
+				IsEqual(_HyperSummonStatus,1)
+			THEN
+				DebugText(__Me,"Wolf2")
+				PlayEffectAt(_MyPosition,"FX_Creatures_Animals_Blood_Spawn_A")
+				CharacterPlayEffect(__Me,"FX_GP_CameraShake_B")	
+				SpawnCharacter(_Summon,%JarethWolf,_MyPosition,0,1,__Me)				
+				Add(_HyperSummonStatus,1)
+			ELIF "c1"
+				IsEqual(_HyperSummonStatus,2)
+			THEN
+				Sleep(2.3)			
+				DebugText(__Me,"Pig1")
+				PlayEffectAt(_MyPosition,"FX_Creatures_Animals_Blood_Spawn_A")				
+				SpawnCharacter(_Summon,%JarethBoar,_MyPosition,0,1,__Me)
+				CharacterPlayEffect(__Me,"FX_GP_CameraShake_B")					
+				Add(_HyperSummonStatus,1)	
+			ELIF "c1"
+				IsEqual(_HyperSummonStatus,3)
+			THEN
+				DebugText(__Me,"Pig2")
+				PlayEffectAt(_MyPosition,"FX_Creatures_Animals_Blood_Spawn_A")		
+				CharacterPlayEffect(__Me,"FX_GP_CameraShake_B")									
+				SpawnCharacter(_Summon,%JarethBoar,_MyPosition,0,1,__Me)
+				Add(_HyperSummonStatus,1)	
+			ELIF "c1&c2"
+				IsEqual(_HyperSummonStatus,4)
+				IsEqual(%Bool_BairdotrIsAnAlly,0)
+			THEN
+				Sleep(0.6)					
+				DebugText(__Me,"Red Bull")
+				PlayEffectAt(_MyPosition,"FX_Creatures_Animals_Blood_Spawn_A")	
+				CharacterPlayEffect(__Me,"FX_GP_CameraShake_B")					
+				SpawnCharacter(_Summon,%JarethBull,_MyPosition,0,1,__Me)	
+				Sleep(2.1)
+				Add(_HyperSummonStatus,1)	
+			ELIF "c1&c2"
+				IsEqual(_HyperSummonStatus,4)
+				IsEqual(%Bool_BairdotrIsAnAlly,1)
+			THEN
+				DebugText(__Me,"Bairdotr is an ally!")
+				Add(_HyperSummonStatus,1)					
+			ELSE
+				Add(_FailedHowManyTimes,1)
+			ENDIF
+		ELSE
+			 Add(_FailedHowManyTimes,1)
+		ENDIF
+	ENDWHILE
+	IF "c1"
+		IsEqual(_FailedHowManyTimes,50)
+	THEN
+		Set(_FailedHowManyTimes,0)
+		CharacterEndTurn()	
+	ENDIF
+	Set(_HyperSummonStatus,0)
+	CharacterResetCombatTimeout(__Me)
+	CharacterSwitchWeaponType("PoleArms") 			//revert to Staves when animators are done w/ categories
+	SetPriority("JarethHyperSummon",0)
+INTERRUPT
+	Reset()
+
+REACTION JarethMovesToTrigger2, 1000
+USAGE COMBAT
+VARS
+	TRIGGER:_Trigger_JarethCombatDest = LUC_BC_JarethCombatDestination_159e446a-c25b-4d5f-aab0-52905f7e0dda
+	TRIGGER:_Trigger_JarethCombatDest2 = LUC_BC_JarethCombatDestination2_40f8b5db-e7e9-400b-93fa-7a0f9ca9ba2a
+	FLOAT:_MyActionPoints
+	CHARACTER:_Target
+CHECK "c1&!(c2|c3|c4|c5|c6|c7|c8)&c9"
+	CharacterGetStat(_MyActionPoints,__Me,ActionPoints)			//c1
+	IsLessThen(_MyActionPoints,5)								//!c2
+	CharacterHasStatus(__Me,"CHARMED")							//!c3
+	CharacterHasStatus(__Me,"PETRIFIED")						//!c4
+	CharacterHasStatus(__Me,"FEAR")								//!c5
+	CharacterHasStatus(__Me,"STUNNED")							//!c6
+	CharacterHasStatus(__Me,"MUTED")							//!c7
+	CharacterHasStatus(__Me,"FEAR")								//!c8
+	CharacterGet(_Target,__Me,50,Lowest,Distance,Enemy)			//c9
+ACTIONS
+	CharacterMoveTo(_Trigger_JarethCombatDest2,1)
+	Sleep(0.5)
+	CharacterLookAt(_Trigger_JarethCombatDest,0)
+	Sleep(0.5)
+	SetPriority("JarethMovesToTrigger2",0)
+INTERRUPT
+	CharacterEndTurn()
+
+//-------------	
+EVENTS
+EVENT OnIterateCharacter_CheckIfBairdotrIsAnAlly
+VARS
+	CHARACTER:_Ally
+ON
+	OnIterateCharacter(_Ally,"CMB_LUC_Jareth_CheckIfBairdotrIsAlly")
+ACTIONS
+	IF "c1&c2"
+		CharacterGet(_Ally,__Me,30,Lowest,Distance,Ally)
+		IsEqual(_Ally,"LUC_Jareth_Bairdotr_00effffb-3e39-4119-8114-9dba114a174c")
+	THEN
+		DebugText(_Ally,"Gotcha!")
+		Set(%Bool_BairdotrIsAnAlly,1)
+	ENDIF
+	
+EVENT CatchGlobalEvent_PlayFXAtJarethTrigger	//we are playing this FX here, otherwise it disrupts the Hypersummon's animations
+VARS
+	TRIGGER:_Trigger_JarethCombatDest = "LUC_BC_JarethCombatDestination_159e446a-c25b-4d5f-aab0-52905f7e0dda"
+ON
+	OnGlobalEventSet("LUC_BloodCave_JarethStartsSummoning")
+ACTIONS
+	CharacterPlayEffect(__Me,"FX_Creatures_Skills_Animals_Blood_Cast_A")

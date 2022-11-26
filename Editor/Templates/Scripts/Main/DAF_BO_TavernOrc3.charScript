@@ -1,0 +1,79 @@
+INIT
+
+CHARACTER:__Me
+CHARACTER:%Waiter = DAF_Hershel_c880dffc-364b-4367-ab3b-f0d2484add58
+CHARACTER:%Friend = DAF_BO_TavernOrc4_10015e1b-216c-4e14-8e55-301c8aaab1cc
+INT:%State = 0
+INT:%CanCall = 0
+
+BEHAVIOUR
+
+REACTION Patrol,1050
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Action
+ACTIONS
+	GetRandom(_Action,"InRoom","AtTable")
+	SetPriority(_Action,1070)
+INTERRUPT
+	Reset()
+
+REACTION InRoom,0
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%State,0)
+VARS
+	FIXEDSTRING:_Animation
+	FIXEDSTRING:_Text
+ACTIONS
+	Sleep(1)
+	IF "!c1"
+		CharacterHasStatus(__Me,"SITTING")
+	THEN
+		CharacterUseItem(ITEM:FUR_Rich_Chair_A_050_9709402c-e6de-4a82-af57-469330b4da6f)
+	ENDIF
+	CharacterEvent(%Friend,"DialogRequest")
+	Sleep(12)
+	SetPriority("InRoom",0)
+
+REACTION AtTable,0
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%State,0)
+VARS
+	FIXEDSTRING:_Text
+ACTIONS
+	IF "c1"
+		IsEqual(%CanCall,1)
+	THEN
+		CharacterMoveTo(ITEM:FUR_Rich_Chair_A_026_1f1961d5-9828-4c87-b9d5-5d5dddae13f9,0,1,1)
+		CharacterUseItem(ITEM:FUR_Rich_Chair_A_026_1f1961d5-9828-4c87-b9d5-5d5dddae13f9)
+		GlobalSetEvent("DAF_HershelCalled")
+		GetRandom(_Text,"DAF_BO_TavernOrcCallWaiter_1","DAF_BO_TavernOrcCallWaiter_2","DAF_BO_TavernOrcCallWaiter_3")
+		DisplayText(__Me,_Text,5)
+		CharacterEvent(%Waiter,"CalledByOrc3")
+		Sleep(20)
+		CharacterMoveTo(ITEM:FUR_Rich_Chair_A_050_9709402c-e6de-4a82-af57-469330b4da6f,0,1,1)
+	ELSE
+		//Play drink animation
+		Sleep(5)
+	ENDIF
+	SetPriority("AtTable",0)
+	SetPriority("InRoom",1070)
+INTERRUPT
+	Reset()
+
+EVENTS
+
+EVENT HershelCalled
+ON
+	OnGlobalEventSet("DAF_HershelCalled")
+ACTIONS
+	Set(%CanCall,0)
+
+EVENT HershelAvailable
+ON
+	OnGlobalEventSet("DAF_HershelAvailable")
+ACTIONS
+	Set(%CanCall,1)
+	

@@ -1,0 +1,24 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	CHARACTER:%FaceTarget = null
+	INT:%DialogRequested  = 0
+	INT:%DoTalk = 0
+
+BEHAVIOUR
+
+REACTION State_IdleAtPortal, 0
+USAGE PEACE
+ACTIONS
+	CharacterLookFrom(TRIGGER:HOM_IcaraDialogDest_844cbcdf-10fd-4144-9007-f849a2ad14bb)
+	Sleep(2.0)
+
+STORY
+
+SCRIPTFRAME resZandy
+ACTIONS
+	CharacterAddSkill(Target_Quest_ResurrectIcara)
+	CharacterUseSkill(Target_Quest_ResurrectIcara, CHARACTER:Zandalor_2535a516-8e0f-4c00-abe6-285e545fdc9b)
+	CharacterEvent(__Me, "ZandyResurrected")

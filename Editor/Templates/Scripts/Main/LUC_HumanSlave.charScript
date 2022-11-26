@@ -1,0 +1,9 @@
+INIT
+	CHARACTER:__Me
+	
+//---------------------------------
+BEHAVIOUR
+REACTION Cower, 100
+	USAGE PEACE
+	ACTIONS
+		CharacterPlayAnimation("Loop_Cower_03",0,1)

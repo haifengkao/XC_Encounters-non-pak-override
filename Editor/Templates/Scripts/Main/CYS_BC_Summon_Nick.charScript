@@ -1,0 +1,131 @@
+INIT
+
+CHARACTER:__Me
+FIXEDSTRING:%CMBLine1 = "GLO_NickTurnInCombat1"
+FIXEDSTRING:%CMBLine2 = "GLO_NickTurnInCombat2"
+FIXEDSTRING:%CMBLine3 = "GLO_NickTurnInCombat3"
+FIXEDSTRING:%CMBLine4 = "GLO_NickTurnInCombat4"
+FIXEDSTRING:%CMBLine5 = "GLO_NickTurnInCombat5"
+FIXEDSTRING:%CMBLine6 = "GLO_NickTurnInCombat6"
+FIXEDSTRING:%CMBLine7 = "GLO_NickTurnInCombat7"
+FIXEDSTRING:%CMBLine8 = "GLO_NickTurnInCombat8"
+FIXEDSTRING:%CMBLine9 = "GLO_NickTurnInCombat9"
+FIXEDSTRING:%CMBLine10 = "GLO_NickTurnInCombat10"
+FIXEDSTRING:%CMBLine11 = "GLO_NickTurnInCombat11"
+FIXEDSTRING:%CMBLine12 = "GLO_NickTurnInCombat12"
+FIXEDSTRING:%CMBLine13 = "GLO_NickTurnInCombat13"
+FIXEDSTRING:%CMBLine14 = "GLO_NickTurnInCombat14"
+INT:%CMBLine1Counter = 1
+INT:%CMBLine2Counter = 1
+INT:%CMBLine3Counter = 1
+INT:%CMBLine4Counter = 1
+INT:%CMBLine5Counter = 1
+INT:%CMBLine6Counter = 1
+INT:%CMBLine7Counter = 1
+INT:%CMBLine8Counter = 1
+INT:%CMBLine9Counter = 1
+INT:%CMBLine10Counter = 1
+INT:%CMBLine11Counter = 1
+INT:%CMBLine12Counter = 1
+INT:%CMBLine13Counter = 1
+INT:%CMBLine14Counter = 1
+INT:%InCombat = 0
+CHARACTER:%Pontius = CYS_BC_PontiusSkeleton_502fd557-6069-4feb-ac7a-729b31f6d449
+
+EVENTS
+
+EVENT Init
+ON
+	OnInit()
+ACTIONS
+	StartTimer("SayFieldLine", 7.0, 0)
+
+EVENT Combat
+ON
+	OnCombatStarted()
+ACTIONS
+	Set(%InCombat, 1)
+	
+EVENT Timer
+ON
+	OnTimer("SayFieldLine")
+ACTIONS
+	IF "c1"
+		IsEqual(%InCombat, 0)
+	THEN
+		DialogStart("GLO_AD_NickSummoned", __Me)
+	ENDIF
+
+EVENT SayLineOnTurn
+ON
+	OnTurn()
+VARS
+	FIXEDSTRING:_Text
+ACTIONS
+	IF "!c1"
+		CharacterIsDead(__Me)
+	THEN
+		IF "c1"
+			IsInCombatWith(__Me, %Pontius)
+		THEN
+			DialogStart("CYS_AD_NickAgainstPontius", __Me)
+		ELSE
+			GetWeightedRandom(_Text, %CMBLine1, %CMBLine1Counter, %CMBLine2, %CMBLine2Counter, %CMBLine3, %CMBLine3Counter, %CMBLine4, %CMBLine4Counter, %CMBLine5, %CMBLine5Counter, %CMBLine6, %CMBLine6Counter, %CMBLine7, %CMBLine7Counter, %CMBLine8, %CMBLine8Counter, %CMBLine9, %CMBLine9Counter, %CMBLine10, %CMBLine10Counter, %CMBLine11, %CMBLine11Counter, %CMBLine12, %CMBLine12Counter, %CMBLine13, %CMBLine13Counter, %CMBLine14, %CMBLine14Counter)
+			IF "c1"
+				IsEqual(_Text, %CMBLine1)
+			THEN
+				Set(%CMBLine1Counter, 0)
+			ELIF "c1"
+				IsEqual(_Text, %CMBLine2)
+			THEN
+				Set(%CMBLine2Counter, 0)
+			ELIF "c1"
+				IsEqual(_Text, %CMBLine3)
+			THEN
+				Set(%CMBLine3Counter, 0)
+			ELIF "c1"
+				IsEqual(_Text, %CMBLine4)
+			THEN
+				Set(%CMBLine4Counter, 0)
+			ELIF "c1"
+				IsEqual(_Text, %CMBLine5)
+			THEN
+				Set(%CMBLine5Counter, 0)
+			ELIF "c1"
+				IsEqual(_Text, %CMBLine6)
+			THEN
+				Set(%CMBLine6Counter, 0)
+			ELIF "c1"
+				IsEqual(_Text, %CMBLine7)
+			THEN
+				Set(%CMBLine7Counter, 0)
+			ELIF "c1"
+				IsEqual(_Text, %CMBLine8)
+			THEN
+				Set(%CMBLine8Counter, 0)
+			ELIF "c1"
+				IsEqual(_Text, %CMBLine9)
+			THEN
+				Set(%CMBLine9Counter, 0)
+			ELIF "c1"
+				IsEqual(_Text, %CMBLine10)
+			THEN
+				Set(%CMBLine10Counter, 0)
+			ELIF "c1"
+				IsEqual(_Text, %CMBLine11)
+			THEN
+				Set(%CMBLine11Counter, 0)
+			ELIF "c1"
+				IsEqual(_Text, %CMBLine12)
+			THEN
+				Set(%CMBLine12Counter, 0)
+			ELIF "c1"
+				IsEqual(_Text, %CMBLine13)
+			THEN
+				Set(%CMBLine13Counter, 0)
+			ELSE
+				Set(%CMBLine14Counter, 0)
+			ENDIF
+			DisplayText(__Me, _Text, 5)
+		ENDIF
+	ENDIF

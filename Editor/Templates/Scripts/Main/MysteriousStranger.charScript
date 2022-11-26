@@ -1,0 +1,11 @@
+INIT
+
+CHARACTER:__Me
+
+BEHAVIOUR
+
+REACTION Idle, 1000
+USAGE PEACE
+ACTIONS
+	CharacterWander(FLOAT:2.0,3.0)
+	Sleep(5.0)

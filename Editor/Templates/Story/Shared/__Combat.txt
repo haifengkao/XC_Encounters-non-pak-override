@@ -1,0 +1,38 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+PROC
+ProcClearPreviousCombat((CHARACTER)_Char)
+AND
+DB_WasInCombat((CHARACTER)_Char,(INTEGER)_Combat)
+THEN
+NOT DB_WasInCombat(_Char,_Combat);
+
+IF
+CharacterEnteredCombat(_Character,_Combat)
+THEN
+ProcClearPreviousCombat(_Character);
+DB_Combat(_Character,_Combat);
+
+IF
+CharacterSwitchedCombat(_Character,_Old,_New)
+THEN
+NOT DB_Combat(_Character,_Old);
+DB_Combat(_Character,_New);
+
+PROC
+ProcCharacterLeftCombat((CHARACTER)_Char,(INTEGER)_Combat)
+THEN
+NOP(1);
+
+IF
+CharacterLeftCombat(_Character,_Combat)
+THEN
+DB_WasInCombat(_Character,_Combat);
+NOT DB_Combat(_Character,_Combat);
+ProcCharacterLeftCombat(_Character,_Combat);
+EXITSECTION
+
+ENDEXITSECTION

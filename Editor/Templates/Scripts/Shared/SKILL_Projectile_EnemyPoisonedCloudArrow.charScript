@@ -1,0 +1,82 @@
+#TEMPLATE "_SKILL_Base" : Projectile_EnemyPoisonedCloudArrow
+
+INIT
+CHARACTER:__Me
+FLOAT:%SkillTargetScore_Projectile_EnemyPoisonedCloudArrow=-1000000
+// [GLOBAL_VARS]
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_Projectile_EnemyPoisonedCloudArrow
+VARS
+ON
+	OnFunction("CalculateScore_Projectile_EnemyPoisonedCloudArrow")
+ACTIONS
+	Set(%SkillTargetScore_Projectile_EnemyPoisonedCloudArrow, -1000000)
+	// [GLOBAL_ACTIONS]
+	// [~GLOBAL_ACTIONS]
+	IterateCharactersInCombat(__Me, "CalculateTarget_Projectile_EnemyPoisonedCloudArrow", Random, Vitality)
+	IF "!c1"
+		IsEqual(%SkillTargetChar_Projectile_EnemyPoisonedCloudArrow, null)
+	THEN
+		Add(%ActionScore_Projectile_EnemyPoisonedCloudArrow, %SkillTargetScore_Projectile_EnemyPoisonedCloudArrow)
+	ELSE
+		Set(%ActionScore_Projectile_EnemyPoisonedCloudArrow, 0)
+	ENDIF
+	
+// Calculate the character we should attack
+EVENT CalculateTarget_Projectile_EnemyPoisonedCloudArrow
+VARS	
+	CHARACTER:_Char
+	FLOAT:_Score=0
+	// [CALC_TARGET_VARS]
+	FLOAT:_StatEarthResistance
+	// [~CALC_TARGET_VARS]
+ON
+	OnIterateCharacter(_Char, "CalculateTarget_Projectile_EnemyPoisonedCloudArrow")	
+ACTIONS
+	Set(_Score, 0)
+	// [CALC_TARGET_PRE_ACTIONS]
+	// [~CALC_TARGET_PRE_ACTIONS]
+	IF /*[CALC_TARGET_COND_CHECK]*/"(!c1&!c2&!c3)&(!((c4&c5)|c6))&(c7)"/*[~CALC_TARGET_COND_CHECK]*/
+		// [CALC_TARGET_CONDS]
+		CharacterIsDead(_Char)
+		CharacterHasStatus(_Char, INVISIBLE)
+		CharacterHasStatus(_Char, SNEAKING)
+		CharacterGetStat(_StatEarthResistance, _Char, EarthResistance)
+		IsGreaterThen(_StatEarthResistance, 50)
+		CharacterHasStatus(_Char, POISONED)
+		CharacterIsEnemy(__Me, _Char)
+		// [~CALC_TARGET_CONDS]
+	THEN
+		// [CALC_TARGET_ACTIONS]
+		// Hostile count score calculation
+		Add(_Score, 10.0) // HostileWeight
+		
+		// [~CALC_TARGET_ACTIONS]
+		// Can see score calculation
+		IF "!c1"
+			CharacterCanSee(__Me, _Char)
+		THEN
+			Add(_Score, -10.0)
+		ENDIF
+		
+		IF "c1"
+			IsGreaterThen(_Score, %SkillTargetScore_Projectile_EnemyPoisonedCloudArrow)
+		THEN
+			Set(%SkillTargetChar_Projectile_EnemyPoisonedCloudArrow, _Char)
+			Set(%SkillTargetScore_Projectile_EnemyPoisonedCloudArrow, _Score)
+		ENDIF	
+	ENDIF
+	
+	
+	
+	
+	
+	
+	

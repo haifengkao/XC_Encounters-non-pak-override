@@ -1,0 +1,15 @@
+INIT
+ITEM:__Me
+
+EVENTS
+
+EVENT UpdateShooting
+ON
+	OnItemEvent(__Me,"Shoot")
+VARS 
+	FLOAT3:_Dir
+	SKILL:_Skill
+	INT:_Level
+ACTIONS
+	GetForwardDirection(__Me,_Dir)
+	ShootLocalProjectile("Projectile_TrapFireballWithSurface",__Me,{0;0;0},_Dir,15)

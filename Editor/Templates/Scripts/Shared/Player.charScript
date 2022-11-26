@@ -1,0 +1,87 @@
+#INCLUDE Base
+INIT
+CHARACTER:__Me
+FIXEDSTRING:%ForceAnim = ""
+TRIGGER:%CreationPoint = null
+
+USING Base
+
+EVENTS
+
+EVENT CharacterCreationStarted
+VARS 
+	TRIGGER:_CreationTrigger
+ON 
+	OnCharacterCreationStarted(__Me, _CreationTrigger)
+ACTIONS
+	SetPriority("IdleCharacterCreation", 1000000)
+	SetPriority("CharacterCreationMoveToTrigger", 1000002)
+	//SetPriority("NewClassCharacterCreation", 1000001)
+	Set(%CreationPoint, _CreationTrigger)
+
+EVENT CharacterCreationStopped
+ON 
+	OnCharacterCreationStopped(__Me)
+ACTIONS
+	SetPriority("IdleCharacterCreation", 0)
+	SetPriority("CharacterCreationMoveToTrigger", 0)
+	//SetPriority("NewClassCharacterCreation", 0)
+	CharacterStopAnimation()
+ 
+// Enable when Thierry has the Idles
+/*EVENT CharacterClassChanged
+VARS 
+	FIXEDSTRING:_Class
+ON 
+	OnCharacterClassChanged(__Me, _Class)
+ACTIONS
+	Set(%ForceAnim, _Class)*/
+		
+BEHAVIOUR
+
+REACTION CharacterCreationMoveToTrigger, 0
+USAGE PEACE
+VARS 
+CHECK "c1&!c2"
+	CharacterInCreation(__Me, _)
+	IsEqual(%CreationPoint, null)
+ACTIONS		
+	CharacterTeleportTo(%CreationPoint)
+	CharacterLookFrom(%CreationPoint, 1)
+	Set(%CreationPoint, null)
+
+// Enable when Thierry has the Idles
+/*REACTION NewClassCharacterCreation, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+	INT:_Index
+CHECK "!c1&c2"
+	IsEqual(%ForceAnim, "")
+	CharacterInCreation(__Me, _Index)
+ACTIONS
+	IF "c1"
+		IsEqual(_Index, 0)
+	THEN
+		GetRandom(_Animation, "Character_Creation_Player_1_Idle_01", "Character_Creation_Player_1_Idle_02", "Character_Creation_Player_1_Idle_03")
+	ELSE
+		GetRandom(_Animation, "Character_Creation_Player_2_Idle_01", "Character_Creation_Player_2_Idle_02", "Character_Creation_Player_2_Idle_03")
+	ENDIF
+	CharacterPlayAnimation(_Animation)
+	Set(%ForceAnim, "")*/
+
+REACTION IdleCharacterCreation, 0
+USAGE PEACE
+VARS 
+	INT:_Index
+	FIXEDSTRING:_Animation
+CHECK "c1"
+	CharacterInCreation(__Me, _Index)
+ACTIONS		
+	IF "c1"
+		IsEqual(_Index, 0)
+	THEN
+		CharacterPlayAnimation("Character_Creation_Player_1_Still",0,0)
+	ELSE
+		CharacterPlayAnimation("Character_Creation_Player_2_Still",0,0)
+	ENDIF

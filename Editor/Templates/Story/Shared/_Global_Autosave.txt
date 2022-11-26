@@ -1,0 +1,21 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+IF
+DB_AutoSaveTrigger((TRIGGER)_Trigger)
+THEN
+DB_OneShotPlayerTrigger(_Trigger);
+
+PROC
+ProcOneShotTriggerEntered(_,_Trigger)
+AND
+DB_AutoSaveTrigger(_Trigger)
+THEN
+NOT DB_AutoSaveTrigger(_Trigger);
+AutoSave();
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "__Start"

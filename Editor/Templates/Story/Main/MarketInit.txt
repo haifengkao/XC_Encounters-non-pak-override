@@ -1,0 +1,29 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DBMarketStands("Cyseal",TRIGGER_CYS_Ownership_Market_WeaponTrader,CHARACTER_CYS_ArrowSeller);
+DBMarketStands("Cyseal",TRIGGER_CYS_Ownership_Market_CheeseTrader,CHARACTER_CYS_CheeseSeller);
+DBMarketStands("Cyseal",TRIGGER_CYS_Ownership_Market_MiscTrader,CHARACTER_CYS_MarketJunkSeller);
+DBMarketStands("Cyseal",TRIGGER_CYS_Ownership_Market_FishTrader,CHARACTER_CYS_FishSeller);
+DBMarketStands("Cyseal",TRIGGER_CYS_Ownership_Market_VegetableTrader,CHARACTER_CYS_VegetableSeller);
+
+SetCharacterStats(CHARACTER_CYS_CookMorris,-50,100,1000);
+
+Unintelligent(CHARACTER_CYS_ChickenRocky);
+DB_NoDefaultBehavior(CHARACTER_CYS_ChickenRocky);
+DB_NoDefaultBehavior(CHARACTER_CYS_HarbourBull_01);
+DB_NoDefaultBehavior(CHARACTER_CYS_HarbourBull_02);
+
+DB_Dialogs(CHARACTER_CYS_HarbourBull_01,"CYS_Bull");
+DB_Dialogs(CHARACTER_CYS_HarbourBull_02,"CYS_Bill");
+KBSECTION
+IF
+DBMarketStands(_Region,_Trigger,_Owner)
+THEN
+DB_ItemOwnerShipTriggers(_Region,_Trigger,_Owner);
+IsTrader(_Owner);
+SetCharacterStats(_Owner,-50,100,1000);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

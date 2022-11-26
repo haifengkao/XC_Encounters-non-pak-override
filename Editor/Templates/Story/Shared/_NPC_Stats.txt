@@ -1,0 +1,327 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+Start("NPC Stats");
+KBSECTION
+/*
+RepAttitude((NPC)_Npc,(INTEGER)_Attitude)
+RepAttitude is the 'memory' of the _Npc ans sums how the _Npc thinks about the player.
+_Npc: owner of this attitude towards the player
+_Attitude: -100: sworn enemy
+				0: indifferent
+				+100: best friend, bloodbrother
+
+CanHeal((NPC)_Npc)
+NoIdentify((NPC)_Npc)
+NoRepair((NPC)_Npc)
+Must be asserted for the dialog/trade window to allow for healing, identify and repair.
+(The default for these predicates is: not asserted.)
+If CannotTrade(_Npc) is not asserted, trade with the _Npc is always possible,
+but if the npc dislikes the player very much, "trading" can only be used
+by the player to GIVE items to the npc for free. The npc will not have anything to sell.
+
+CannotTrade((NPC)_Npc)
+Assertion of the fact CannotTrade(_Npc) prevents startup of the trade window.
+This prevents the npc from interacting via the trade window, hence from repairing, healing or identifying as well.
+So in fact, this predicate overrules the previous 3 (CanHeal, NoIdentify, NoRepair).
+By default, CannotTrade(_Npc) is not asserted, so trade is possible.
+
+DB_CharacterStats((NPC)npc,(INTEGER)tolerance_thievery,(INTEGER)value_cheap,(INTEGER)value_expensive)
+_Npc: owner of these stats
+_Tolerance_Thievery: -100: (lawful good) even theft of the most insignificant thing has high consequences
+							   0: (neutral) a cheap item: don't talk about it, a famous or expensive thing or something of my own...
+						   +100: (chaotic evil) if you can steal from somebody. You are smart, the other one is stupid!
+		Important note: Tolerance_Thievery is NEVER applied when it concerns my own items
+		(but ONLY if MY OWN items. My wife's items is something different.)
+_Value_Cheap: I consider items with this price or lower as "cheap"
+_Value_Expensive: I consider items with this price or lower as "expensive"
+
+Notes:
+_Value_Cheap: if you steal items that are "cheap", you might get away with it
+_Value_Expensive: if you offer goods or trade a LOT, you gain 5 attitude points
+	for every time the Npc has a net trade result with you = _Value_Expensive
+	Example: Otho's _Value_Expensive == 1000. I trade with objects having
+			real value 3000 but I only charge 2000, Otho will gain 1000 on it,
+			so I get 5 attitude points extra. Given the default relative trade
+			factors, any npc you visit frequently to trade with will get your
+			best friend sooner or later.
+			TO-DO: balance this.
+
+Declare all objects that are famous, using:
+   DB_FamousObject(object);		// necessary because IF... NOT DB_FamousObject(object,_,_) is not allowed
+   DB_FamousObject(object, fame);		// fame: between 0 and 100
+
+Declare relations between npcs. It is supposed that people who have a strong relation
+(negative or positive) know a lot about (the objects of) the other person.
+   Relation(npc1,npc2);		// necessary because IF... NOT Relation(A,B,_) is not supported
+   Relation(npc1,npc2,R);	// R = 100: married couple, R>=90: best friend, R>75: good friends
+								// R = 0: no relation (equivalent to no Relation/2,/3 facts asserted
+								// R < 0... R == -100: sworn enemies.
+
+PlayerHasThievesRelationWith(_Npc). _Npc will allow you to steal stuff if the object is not too important to him.
+
+
+*/
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// DB_CharacterStats
+//
+PROC	
+CreateDefaultCharacterStats((CHARACTER)_Npc)
+AND
+DB_CharacterStats((CHARACTER)_Npc,(INTEGER)_,(INTEGER)_,(INTEGER)_)
+THEN
+TmpNpc(_Npc);		// skip all if DB_CharacterStats already manually defined
+
+PROC
+CreateDefaultCharacterStats((CHARACTER)_Npc)
+AND
+NOT TmpNpc(_Npc) 
+AND
+IsRich(_Npc)
+THEN
+DB_CharacterStats(_Npc,-50,1000,10000);	//TODO define RICH_GUY_TOLERANCE_THIEVERY,RICH_GUY_CHEAP,RICH_GUY_EXPENSIVE
+TmpNpc(_Npc);		// IsRich() overrides the others
+
+PROC
+CreateDefaultCharacterStats((CHARACTER)_Npc)
+AND
+NOT TmpNpc(_Npc)
+AND
+IsTrader(_Npc)
+THEN
+DB_CharacterStats(_Npc,-20,250,5000); //TODO define TRADER_TOLERANCE_THIEVERY,TRADER_CHEAP,TRADER_EXPENSIVE
+TmpNpc(_Npc);		// IsTrader() comes next
+
+PROC
+CreateDefaultCharacterStats((CHARACTER)_Npc)
+AND 
+NOT TmpNpc(_Npc)
+AND
+IsHealer(_Npc)
+THEN	
+DB_CharacterStats(_Npc,0,100,2000); //TODO define AVERAGE_GUY_TOLERANCE_THIEVERY,AVERAGE_GUY_CHEAP,AVERAGE_GUY_EXPENSIVE
+TmpNpc(_Npc);		// IsHealer() comes next - is a special sort of trader (a not so rich one)
+
+PROC	
+CreateDefaultCharacterStats((CHARACTER)_Npc)
+AND
+NOT TmpNpc(_Npc)
+AND
+IsPoor(_Npc)
+THEN	
+DB_CharacterStats(_Npc,25,5,50); //TODO define POOR_GUY_TOLERANCE_THIEVERY,POOR_GUY_CHEAP,POOR_GUY_EXPENSIVE
+TmpNpc(_Npc);		// IsPoor() comes only before the default
+
+PROC
+CreateDefaultCharacterStats((CHARACTER)_Npc) 
+AND
+NOT TmpNpc(_Npc)
+THEN
+DB_CharacterStats(_Npc,0,100,2000); //TODO define AVERAGE_GUY_TOLERANCE_THIEVERY,AVERAGE_GUY_CHEAP,AVERAGE_GUY_EXPENSIVE
+
+PROC
+CreateDefaultCharacterStats((CHARACTER)_Npc)
+THEN	
+NOT TmpNpc(_Npc);				// cleanup temp assertion
+
+// Proc to assert new or to replace existing character stats:
+PROC	
+SetCharacterStats((CHARACTER)_Npc,(INTEGER)_,(INTEGER)_,(INTEGER)_)
+AND
+DB_CharacterStats(_Npc,_p1,_p2,_p3)
+THEN
+NOT DB_CharacterStats(_Npc,_p1,_p2,_p3);
+
+PROC
+SetCharacterStats(_Npc,_tolerance_thievery,_value_cheap,_value_expensive)
+THEN	
+DB_CharacterStats(_Npc,_tolerance_thievery,_value_cheap,_value_expensive);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+PROC
+DecreaseToleranceThievery((CHARACTER)_Npc,(INTEGER)_I)
+AND
+DB_CharacterStats(_Npc,_ToleranceThievery,_,_)
+AND
+IntegerSubtract(_ToleranceThievery,_I,_NewTolerance)
+THEN
+DecreaseToleranceThievery_1(_Npc,_NewTolerance);
+
+PROC	
+DecreaseToleranceThievery_1((CHARACTER)_Npc,(INTEGER)_NewTolerance)
+AND
+_NewTolerance >= -100
+AND
+DB_CharacterStats(_Npc,_,_p2,_p3)
+THEN	
+SetCharacterStats(_Npc,_NewTolerance,_p2,_p3);
+
+PROC
+DecreaseToleranceThievery_1((CHARACTER)_Npc,(INTEGER)_NewTolerance)
+AND
+_NewTolerance < -100 
+AND
+DB_CharacterStats(_Npc,_,_p2,_p3)
+THEN	
+SetCharacterStats(_Npc,-100,_p2,_p3);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// TradeStats/8
+//
+
+// Hmpf... What started as being the exception, this turns out to be quite general
+// (I'd better have noted down who CAN trade, but never mind.)
+// So, from now on, as a default, we define that npcs who have TradeStats can trade, the others cannot.
+//
+PROC
+CreateDefaultTradeStats((CHARACTER)_Npc)
+AND
+NOT DB_NoInitialTrade(_Npc)
+AND
+NOT DB_EvilDude(_Npc)
+AND
+CharacterIsTagged(_Npc, "Animal", 0)
+THEN
+DB_Trader(_Npc);
+
+PROC
+CreateDefaultTradeStats((CHARACTER)_Npc)
+AND
+DB_NoInitialTrade(_Npc)
+THEN
+ProcDisablePlayerTrade(_Npc);
+
+PROC
+CreateDefaultTradeStats((CHARACTER)_Npc)
+AND
+CharacterIsTagged(_Npc, "Animal", 1)
+THEN
+ProcDisablePlayerTrade(_Npc);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// SetStoryNpc
+PROC	
+SetStoryNpcStatus((CHARACTER)_Npc) 
+AND
+IsStoryNpc(_Npc)
+THEN
+CharacterMakeStoryNpc(_Npc,1);
+
+PROC
+SetStoryNpcStatus((CHARACTER)_Npc) 
+AND 
+NOT IsStoryNpc(_Npc)
+THEN
+CharacterMakeStoryNpc(_Npc,0);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// Alignment
+// Dante 6-5-2002: changed code to prevent that npcs who get unhostile get attitude boosted to 0:
+
+PROC
+SetHatredAlignmentWithHero((CHARACTER)_Player,(CHARACTER)_Npc)
+THEN
+CharacterSetTemporaryHostileRelation(_Npc,_Player);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+PROC
+RemoveBrol((CHARACTER)_Npc) 
+AND 
+DB_RemoveNpc(_Npc)
+THEN
+DoRemoveNpc(_Npc);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// Initialize the facts for all npcs once (i.e. when the init section of this goal is executed)
+PROC	
+Start("NPC Stats")
+THEN
+InitializeAllNpcs();
+
+PROC	
+InitializeAllNpcs()
+THEN
+CharacterLaunchIterator("ITERATOR_NPC_STATS");
+
+// Create defaults if not manually asserted:
+IF
+CharacterEvent(_Npc,"ITERATOR_NPC_STATS")
+THEN
+DB_NoRunAway(_Npc);
+CreateDefaultCharacterStats(_Npc);
+SetEvilDudeStatus(_Npc);
+SetStoryNpcStatus(_Npc);
+RemoveBrol(_Npc);		// only useful once at startup
+CreateDefaultTradeStats(_Npc);
+
+IF
+CharacterEvent(_Npc,"ITERATOR_NPC_STATS")
+AND
+CharacterGetVarInteger(_Npc,"Group_Animal",1)
+AND
+NOT DB_Pets(_Npc,(CHARACTER)_)
+THEN
+DB_IsNotMessingAround(_Npc);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// An evil dude is an npc whose alignment relations define him to be agressive towards a good guy -
+// let's take Lanilor as the definition of a good guy.
+// Note: this does not mean that the evil dude will be agressive towards the player - au contraire!
+// The evil dude will be smart enough to feign friendlyness to the player in an attempt to mislead him.
+// This is done automatically at game start by calling SetFriendlyAlignmentWithHero(_Npc);
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// DB_Amoral npcs don't mind if they're addressed by the hero when he has weapons drawn
+// DB_Amoral npcs don't mind/comment about stealing.
+//
+// MoralNpc/1 overrides as you can see in the following rules:
+//
+IF
+DB_EvilDude(_Npc)
+AND
+NOT MoralNpc(_Npc)
+THEN	
+DB_Amoral(_Npc);
+
+IF	
+Unintelligent(_Npc)
+AND
+NOT MoralNpc(_Npc)
+THEN	
+DB_Amoral(_Npc);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// Evil dudes do not trade
+IF
+DB_EvilDude(_Npc)
+THEN
+ProcDisablePlayerTrade(_Npc);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// Healers are pacifists.
+IF	
+IsHealer(_Npc)
+THEN	
+MustNotBecomeHostile_UnlessAttacked(_Npc);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+PROC	PreStartDialog(_,(CHARACTER)_Npc,(STRING)_) 
+AND
+IsFemale(_Npc)
+THEN
+SetAndRememberDialogEvent(_Npc,"EVENT_npc_is_female",1);
+
+PROC
+PreStartDialog(_,(CHARACTER)_Npc,(STRING)_) 
+AND
+NOT IsFemale(_Npc)
+THEN	
+SetAndRememberDialogEvent(_Npc,"EVENT_npc_is_female",0);
+EXITSECTION
+
+ENDEXITSECTION

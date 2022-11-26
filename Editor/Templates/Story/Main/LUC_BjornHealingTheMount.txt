@@ -1,0 +1,164 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+NoRunAway(CHARACTER_LUC_Bjorn);
+KBSECTION
+//REGION healing the mount
+
+IF
+GlobalEventSet("LUC_CanHealBjornMount")
+THEN
+QuestAdd("LUC_HealingTheMount");
+QuestUpdate("LUC_HealingTheMount","Start");
+
+IF
+GlobalEventSet("LUC_HealedBjornMount")
+THEN
+CHARACTER_LUC_BjornMount.willBeHealed();
+
+IF
+DialogEnded("LUC_BjornMount", _Inst)
+AND
+CHARACTER_LUC_BjornMount.willBeHealed()
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+NOT CHARACTER_LUC_BjornMount.isHealed()
+THEN
+NOT CHARACTER_LUC_BjornMount.willBeHealed();
+CharacterSetEvent(CHARACTER_LUC_BjornMount,"healed");
+CHARACTER_LUC_BjornMount.isHealed();
+ProcUseBloodStone(_Player,CHARACTER_LUC_BjornMount);
+ProcLUCMountCheckRunAway();
+
+IF
+CharacterUsedSkillOnTarget(_Player,CHARACTER_LUC_BjornMount,_,"Heal")
+AND
+NOT DB_LUCBjornEscortDone(1)
+AND
+NOT DB_Dead(CHARACTER_LUC_BjornMount)
+AND
+NOT DB_LUCStartedEscort(1)
+AND
+NOT CHARACTER_LUC_BjornMount.isHealed()
+THEN
+ProcLUCWarnPlayerOfHurtingAlfie(_Player);
+
+IF
+CharacterStatusChange(CHARACTER_LUC_BjornMount,"HEALING",_,_)
+AND
+NOT DB_LUCBjornEscortDone(1)
+AND
+NOT DB_LUCStartedEscort(1)
+AND
+NOT CHARACTER_LUC_BjornMount.isHealed()
+THEN
+CharacterRemoveStatus(CHARACTER_LUC_BjornMount,"HEALING");
+
+PROC
+ProcLUCWarnPlayerOfHurtingAlfie((CHARACTER)_Player)
+THEN
+DecreaseAttitude(_Player,CHARACTER_LUC_BjornMount,5);
+ProcLUCStartAlfieHurtDialog(_Player);
+
+PROC
+ProcLUCStartAlfieHurtDialog((CHARACTER)_Player)
+AND
+NOT DB_LUCAlfieHealer(_)
+THEN
+CharacterSetHitpointsPercentage(CHARACTER_LUC_BjornMount,10);
+ProcCheckCanTalkWithAnimal(CHARACTER_LUC_BjornMount,_Player);
+DialogRequestStopForCharacter(CHARACTER_LUC_BjornMount);
+DB_LUCAlfieHealer(_Player);
+DialogStartOneSpeakerDialog("LUC_AD_AlfieInPain",CHARACTER_LUC_BjornMount);
+
+IF
+AutomatedDialogEnded("LUC_AD_AlfieInPain",_)
+AND
+DB_LUCAlfieHealer(_Player)
+THEN
+NOT DB_LUCAlfieHealer(_Player);
+DialogRequestStopForCharacter(CHARACTER_LUC_Bjorn);
+ProcDoTwoSpeakerDialog("LUC_BjornPlayerHurtAlfie",CHARACTER_LUC_Bjorn,_Player);
+
+IF
+DialogEnded("LUC_BjornPlayerHurtAlfie",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+THEN
+DecreaseAttitude(_Player,CHARACTER_LUC_Bjorn,25);
+
+PROC
+ProcLUCMountCheckRunAway()
+THEN
+DB_FinishLUCMountQuest(1);
+
+PROC
+ProcLUCMountCheckRunAway()
+AND
+DB_LUCStartedEscort(1)
+THEN
+CHARACTER_LUC_BjornMount.DoRunAway();
+
+IF
+DialogEnded("LUC_BjornMount",_)
+AND
+DB_FinishLUCMountQuest(1)
+THEN
+QuestUpdate("LUC_HealingTheMount","Healed");
+ProcAddMountRunawayEntry();
+
+PROC
+ProcAddMountRunawayEntry()
+AND
+CHARACTER_LUC_BjornMount.DoRunAway()
+THEN
+QuestUpdate("LUC_HealingTheMount","RanAway");
+
+PROC
+ProcAddMountRunawayEntry()
+THEN
+QuestClose("LUC_HealingTheMount");
+
+IF
+DialogEnded("LUC_BjornMount",_)
+AND
+CHARACTER_LUC_BjornMount.DoRunAway()
+THEN
+NOT CHARACTER_LUC_BjornMount.DoRunAway();
+//Run away if the others are already moving away!
+CharacterDisappearOutOfSight(CHARACTER_LUC_BjornMount,0,1,"LUC_BjornMountFree",1);
+ProcRemoveDialogEntryForSpeaker(CHARACTER_LUC_BjornMount,"LUC_BjornMount");
+CharacterSetHasDialog(CHARACTER_LUC_BjornMount,0);
+GoalCompleted;
+
+//END_REGION
+
+//REGION killing the CHARACTER_LUC_BjornMount
+
+IF
+GlobalEventSet("LUC_KillBjornMount")
+THEN
+CHARACTER_LUC_BjornMount.GoesToHeaven();
+
+
+IF
+CHARACTER_LUC_BjornMount.GoesToHeaven()
+AND
+NOT CHARACTER_LUC_BjornMount.DB_IsInDialog()
+THEN
+ProcLUCKillAlfie();
+
+PROC
+ProcLUCKillAlfie()
+THEN
+NOT CHARACTER_LUC_BjornMount.GoesToHeaven();
+CharacterDie(CHARACTER_LUC_BjornMount,0);
+QuestUpdate("LUC_HealingTheMount","Killed");
+QuestClose("LUC_HealingTheMount");
+
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

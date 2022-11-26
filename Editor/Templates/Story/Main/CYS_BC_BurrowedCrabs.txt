@@ -1,0 +1,163 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+//REGION Crab Databases
+DB_CYS_BC_CrabAmbush_01(CHARACTER_CYS_BC_BurrowedCrab_01,CHARACTER_CYS_BC_BurrowedCrab_02,CHARACTER_CYS_BC_BurrowedCrab_03,CHARACTER_CYS_BC_BurrowedCrab_04);
+DB_CYS_BC_CrabAmbush_02(CHARACTER_CYS_BC_BurrowedCrab_05,CHARACTER_CYS_BC_BurrowedCrab_06,CHARACTER_CYS_BC_BurrowedCrab_07,CHARACTER_CYS_BC_BurrowedCrab_Abo_01);
+DB_CYS_BC_CrabAmbush_03(CHARACTER_CYS_BC_BurrowedCrab_08,CHARACTER_CYS_BC_BurrowedCrab_09,CHARACTER_CYS_BC_BurrowedCrab_10,CHARACTER_CYS_BC_BurrowedCrab_Archer_01,CHARACTER_CYS_BC_BurrowedCrab_Archer_02,CHARACTER_CYS_BC_BurrowedCrab_Bomber_01);
+//END_REGION
+
+AmbushTrigger(TRIGGER_CYS_BC_BurrowedCrab_T01, ITEM_CYS_BC_BurrowedCrab_AmbushInvis_01);
+AmbushTrigger(TRIGGER_CYS_BC_BurrowedCrab_T02, ITEM_CYS_BC_BurrowedCrab_AmbushInvis_02);
+AmbushTrigger(TRIGGER_CYS_BC_BurrowedCrab_T03, ITEM_CYS_BC_BurrowedCrab_AmbushInvis_03);
+
+PROC_CYS_BC_CrabAmbushInit();
+CharacterSetOnStage(CHARACTER_CYS_BC_BurrowedCrab_Bomber_02,0);
+CharacterSetOnStage(CHARACTER_CYS_BC_BurrowedCrab_Bomber_03,0);
+DB_IsNotMessingAround(CHARACTER_CYS_BC_BurrowedCrab_AngryChest_01);
+KBSECTION
+//REGION Init
+PROC
+PROC_CYS_BC_CrabAmbushInit()
+AND
+DB_CYS_BC_CrabAmbush_01(_Crab1,_Crab2,_Crab3,_Crab4)
+AND
+DB_CYS_BC_CrabAmbush_02(_Crab5,_Crab6,_Crab7,_CrabAbo)
+AND
+DB_CYS_BC_CrabAmbush_03(_Crab8,_Crab9,_Crab10,_Archer1,_Archer2,_Bomber)
+THEN
+CharacterSetOnStage(_Crab1,0);
+CharacterSetOnStage(_Crab2,0);
+CharacterSetOnStage(_Crab3,0);
+CharacterSetOnStage(_Crab4,0);
+CharacterSetOnStage(_Crab5,0);
+CharacterSetOnStage(_Crab6,0);
+CharacterSetOnStage(_Crab7,0);
+CharacterSetOnStage(_CrabAbo,0);
+CharacterSetOnStage(_Crab8,0);
+CharacterSetOnStage(_Crab9,0);
+CharacterSetOnStage(_Crab10,0);
+CharacterSetOnStage(_Archer1,0);
+CharacterSetOnStage(_Archer2,0);
+CharacterSetOnStage(_Bomber,0);
+//END_REGION
+
+//REGION Crab Ambush 1 (intro)
+PROC
+ProcLaunchAmbush(TRIGGER_CYS_BC_BurrowedCrab_T01, _Player)
+AND
+IsHardcoreMode(0)
+AND
+DB_CYS_BC_CrabAmbush_01(_Crab1,_,_,_)
+THEN
+CharacterAppear(_Crab1,1);
+TimerLaunch("CYS_BC_CrabAmbush01_Timer01",400);
+
+IF
+CharacterEvent(CHARACTER_CYS_BC_BurrowedCrab_AngryChest_01,"CMBHC_CYSBC_AngryChest_DetectsPlayer")
+AND
+IsHardcoreMode(1)
+AND
+DB_CYS_BC_CrabAmbush_01(_Crab1,_,_,_)
+THEN
+CharacterAppear(_Crab1,1);
+TimerLaunch("CYS_BC_CrabAmbush01_Timer01",400);
+
+IF
+TimerFinished("CYS_BC_CrabAmbush01_Timer01")
+AND
+DB_CYS_BC_CrabAmbush_01(_,_Crab2,_,_Crab4)
+THEN
+CharacterAppear(_Crab2,1);
+CharacterAppear(_Crab4,1);
+TimerLaunch("CYS_BC_CrabAmbush01_Timer02",800);
+
+IF
+TimerFinished("CYS_BC_CrabAmbush01_Timer02")
+AND
+DB_CYS_BC_CrabAmbush_01(_Crab1,_Crab2,_Crab3,_Crab4)
+THEN
+CharacterAppear(_Crab3,1);
+	NOT DB_CYS_BC_CrabAmbush_01(_Crab1,_Crab2,_Crab3,_Crab4);
+//END_REGION
+
+//REGION Crab Ambush 2 (left path)
+PROC
+ProcLaunchAmbush(TRIGGER_CYS_BC_BurrowedCrab_T02, _Player)
+AND
+DB_CYS_BC_CrabAmbush_02(_Crab5,_,_,_)
+THEN
+CharacterAppear(_Crab5,1);
+TimerLaunch("CYS_BC_CrabAmbush02_Timer01",400);
+
+IF
+TimerFinished("CYS_BC_CrabAmbush02_Timer01")
+AND
+DB_CYS_BC_CrabAmbush_02(_,_Crab6,_,_)
+THEN
+CharacterAppear(_Crab6,1);
+TimerLaunch("CYS_BC_CrabAmbush02_Timer02",800);
+
+IF
+TimerFinished("CYS_BC_CrabAmbush02_Timer02")
+AND
+DB_CYS_BC_CrabAmbush_02(_Crab5,_Crab6,_Crab7,_CrabAbo)
+THEN
+CharacterAppear(_CrabAbo,1);
+CharacterAppear(_Crab7,1);
+	NOT DB_CYS_BC_CrabAmbush_02(_Crab5,_Crab6,_Crab7,_CrabAbo);
+//END_REGION
+
+//REGION Crab Ambush 3 (right path)
+PROC
+ProcLaunchAmbush(TRIGGER_CYS_BC_BurrowedCrab_T03, _Player)
+AND
+DB_CYS_BC_CrabAmbush_03(_Crab8,_,_Crab10,_,_,_)
+THEN
+CharacterAppear(_Crab8,1);
+CharacterAppear(_Crab10,1);
+TimerLaunch("CYS_BC_CrabAmbush03_Timer01",400);
+
+IF
+TimerFinished("CYS_BC_CrabAmbush03_Timer01")
+AND
+DB_CYS_BC_CrabAmbush_03(_,_Crab9,_,_,_,_)
+THEN
+CharacterAppear(_Crab9,1);
+TimerLaunch("CYS_BC_CrabAmbush03_Timer02",1200);
+
+IF
+TimerFinished("CYS_BC_CrabAmbush03_Timer02")
+AND
+DB_CYS_BC_CrabAmbush_03(_,_,_,_Archer1,_,_)
+THEN
+CharacterAppear(_Archer1,1);
+TimerLaunch("CYS_BC_CrabAmbush03_Timer03",800);
+
+IF
+TimerFinished("CYS_BC_CrabAmbush03_Timer03")
+AND
+DB_CYS_BC_CrabAmbush_03(_,_,_,_,_Archer2,_)
+THEN
+CharacterAppear(_Archer2,1);
+
+IF
+CharacterEvent(CHARACTER_CYS_BC_BurrowedCrab_Archer_01,"CYS_BC_BurrowedCrabs_ArcherIsDead")
+AND
+DB_CYS_BC_CrabAmbush_03(_Crab8,_Crab9,_Crab10,_Archer1,_Archer2,_Bomber)
+THEN
+CharacterAppear(_Bomber,1);
+	NOT DB_CYS_BC_CrabAmbush_03(_Crab8,_Crab9,_Crab10,_Archer1,_Archer2,_Bomber);
+
+IF
+CharacterEvent(CHARACTER_CYS_BC_BurrowedCrab_Archer_01,"CYS_BC_BurrowedCrabs_ArcherIsDead")
+AND
+IsHardcoreMode(1)
+THEN
+CharacterAppear(CHARACTER_CYS_BC_BurrowedCrab_Bomber_02,1);
+CharacterAppear(CHARACTER_CYS_BC_BurrowedCrab_Bomber_03,1);
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

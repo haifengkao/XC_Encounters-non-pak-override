@@ -1,0 +1,148 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+// Story_CallGuards can be used to call the guards bypassing the usual system of thievery events
+// or attitudes. There are three versions:
+// 		Story_CallGuards((NPC)_NpcCallingGuards,(INTEGER)_Reason,(DIALOG)_CallGuardsDialog)
+// 		Story_CallGuards((NPC)_NpcCallingGuards,(INTEGER)_Reason)
+// 		Story_CallGuards((INTEGER)_Reason)
+//	 All versions will check IF the guards can come to aid, and if so, they'll do. 
+// In this case, the version providing a dialog as 3rd parameter will first run this dialog
+// and summon the guards only after finishing the dialog. Version 2 and 3 skip the dialog.
+// The difference between the first two and the last version is that the first two prevent
+// than one npc calls the guards twice if they are still around. The 3rd version will always
+// bring on the guards if you are in a guarded region.
+//
+// Note that if you want to have the guards react properly on thievery, you have to:
+// 1) call DeleteThieveryFacts(1);
+// 2) assert:
+//					DB_ValueStolen((INTEGER)_Value)
+//					OwnerStolenGoods((NPC)_Npc)
+//	 3) if an object is stolen assert as well:
+//					DB_ObjectStolen((OBJECT)_Object)
+//	 4) if an object class is stolen assert as well:
+//					ObjectClassStolen((OBJECT_CLASS)_ObjectClass,(INTEGER)_Amount)
+//
+// It is adviced to use the standard system though, setting the property flags and having
+// an npc close by witnessing the theft.
+//
+
+//
+// Story_CallGuards/3
+//
+
+// TryCallGuards should be called with NOT DB_NpcGotHelp, or else, they won't come/
+PROC	
+Story_CallGuards((CHARACTER)_Player,(CHARACTER)_NpcCallingGuards,(INTEGER)_Reason,(STRING)_CallGuardsDialog) 
+AND
+NOT DB_NpcCannotCallGuards(_NpcCallingGuards) 
+AND
+DB_NpcGotHelp(_NpcCallingGuards)
+THEN
+NOT DB_NpcGotHelp(_NpcCallingGuards);
+
+// The actual code:
+// 1) Try calling the guards
+PROC	
+Story_CallGuards(_Player,_NpcCallingGuards,_Reason,_CallGuardsDialog) 
+AND
+NOT DB_NpcCannotCallGuards(_NpcCallingGuards)
+THEN
+TryCallGuards(_Player,_NpcCallingGuards,_Reason);		// asserts DB_NpcGotHelp(_NpcCallingGuards) if succesful
+
+// 2) If the guards come to help, start the help dialog and remember that
+//		 at the end of this dialog we need to "launch" the guards:
+PROC
+Story_CallGuards(_Player,_NpcCallingGuards,_Reason,_CallGuardsDialog)
+AND
+NOT DB_NpcCannotCallGuards(_NpcCallingGuards)
+AND
+DB_NpcGotHelp(_NpcCallingGuards)
+THEN	
+SetAndStartDialog(_Player,_NpcCallingGuards,_CallGuardsDialog);
+DB_Story_CallGuards_1(_Player,_CallGuardsDialog);
+
+// for in case the caller set a OverrideGuardDialog and the guards don't come, we remove the override dialog.
+PROC	
+Story_CallGuards(_Player,_NpcCallingGuards,_Reason,_CallGuardsDialog) 
+AND
+NOT DB_NpcCannotCallGuards(_NpcCallingGuards) 
+AND
+NOT DB_NpcGotHelp(_NpcCallingGuards)
+THEN
+ClearOverrideGuardDialog(_Player,1);
+ProcCheckToPlayGuardDialog(_Player,_NpcCallingGuards,_Reason,_CallGuardsDialog);
+
+PROC
+ProcCheckToPlayGuardDialog((CHARACTER)_Player,(CHARACTER)_NpcCallingGuards,5,(STRING)_CallGuardsDialog)
+THEN
+SetAndStartDialog(_Player,_NpcCallingGuards,_CallGuardsDialog);
+
+IF
+DialogEnded(_Dialog,_Instance)
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+AND
+DB_Story_CallGuards_1(_Player,_Dialog)
+THEN
+NOT DB_Story_CallGuards_1(_Player,_Dialog);		// cleanup
+GetGuardsPronto(_Player,1);
+
+//
+// Story_CallGuards/2
+//
+
+// TryCallGuards should be called with NOT DB_NpcGotHelp, or else, they won't come/
+PROC	
+Story_CallGuards((CHARACTER)_Player,(CHARACTER)_NpcCallingGuards,(INTEGER)_Reason) 
+AND
+NOT DB_NpcCannotCallGuards(_NpcCallingGuards) 
+AND
+DB_NpcGotHelp(_NpcCallingGuards)
+THEN
+NOT DB_NpcGotHelp(_NpcCallingGuards);
+
+// The actual code:
+// 1) Try calling the guards
+PROC	
+Story_CallGuards((CHARACTER)_Player,_NpcCallingGuards,_Reason) 
+AND
+NOT DB_NpcCannotCallGuards(_NpcCallingGuards)
+THEN	
+TryCallGuards(_Player,_NpcCallingGuards,_Reason);		// asserts DB_NpcGotHelp(_NpcCallingGuards) if succesful
+
+// 2) If the guards come to help, "launch" them:
+PROC	
+Story_CallGuards((CHARACTER)_Player,_NpcCallingGuards,_Reason)
+AND
+NOT DB_NpcCannotCallGuards(_NpcCallingGuards) 
+AND
+DB_NpcGotHelp(_NpcCallingGuards)
+THEN	
+GetGuardsPronto(_Player,1);
+
+// for in case the caller set a OverrideGuardDialog and the guards don't come, we remove the override dialog.
+PROC	
+Story_CallGuards(_Player,_NpcCallingGuards,_Reason) 
+AND
+NOT DB_NpcCannotCallGuards(_NpcCallingGuards)
+AND
+NOT DB_NpcGotHelp(_NpcCallingGuards)
+THEN	
+ClearOverrideGuardDialog(_Player,1);
+
+//
+// Story_CallGuards((INTEGER)_Reason)
+//
+PROC	
+Story_CallGuards((CHARACTER)_Player,(INTEGER)_Reason) 
+AND
+DB_InRegion(_Player,_Region)
+THEN
+CallGuards(_Player,_Region,_Reason);
+GetGuardsPronto(_Player,1);
+EXITSECTION
+
+ENDEXITSECTION

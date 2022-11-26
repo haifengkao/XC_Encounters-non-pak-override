@@ -1,0 +1,254 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_OneShotPlayerTrigger(TRIGGER_LUC_BG_ZixZaxMeeting);
+DB_OneShotPlayerTrigger(TRIGGER_LUC_BG_ZixZaxMeeting2);
+DB_OneShotPlayerTrigger(TRIGGER_LUC_BG_ZixZaxMeeting3);
+
+DB_LUC_BG_ZixZaxMeeting(TRIGGER_LUC_BG_ZixZaxMeeting, TRIGGER_LUC_BG_ZixZaxSpawn);
+DB_LUC_BG_ZixZaxMeeting(TRIGGER_LUC_BG_ZixZaxMeeting2, TRIGGER_LUC_BG_ZixZaxSpawn2);
+DB_LUC_BG_ZixZaxMeeting(TRIGGER_LUC_BG_ZixZaxMeeting3, TRIGGER_LUC_BG_ZixZaxSpawn3);
+
+SneakTriggerSpotter(TRIGGER_LUC_BG_ImmaculateTrigger,CHARACTER_LUC_BG_ImmaculateLeader);
+DB_OneShot_DialogTrigger_NewSystem(TRIGGER_LUC_BG_ImmaculateTrigger,"LUC_BG_ImmaculateWarning", CHARACTER_LUC_BG_ImmaculateLeader);
+SneakTriggerSpotter(TRIGGER_LUC_BG_ImmaculatteAggro, CHARACTER_LUC_BG_SittingImmaculate1);
+SneakTriggerSpotter(TRIGGER_LUC_BG_ImmaculatteAggro, CHARACTER_LUC_BG_SittingImmaculate2);
+SneakTriggerSpotter(TRIGGER_LUC_BG_ImmaculatteAggro, CHARACTER_LUC_BG_SittingImmaculate3);
+SneakTriggerSpotter(TRIGGER_LUC_BG_ImmaculatteAggro, CHARACTER_LUC_BG_LyingImmaculate1);
+SneakTriggerSpotter(TRIGGER_LUC_BG_ImmaculatteAggro, CHARACTER_LUC_BG_LyingImmaculate2);
+SneakTriggerSpotter(TRIGGER_LUC_BG_ImmaculatteAggro, CHARACTER_LUC_BG_Barricade02_Imma01);
+SneakTriggerSpotter(TRIGGER_LUC_BG_ImmaculatteAggro, CHARACTER_LUC_BG_Barricade02_Imma02);
+SneakTriggerSpotter(TRIGGER_LUC_BG_ImmaculatteAggro, CHARACTER_LUC_BG_Barricade02_Imma03);
+SneakTriggerSpotter(TRIGGER_LUC_BG_ImmaculatteAggro, CHARACTER_LUC_BG_Barricade02_Imma04);
+SneakTriggerSpotter(TRIGGER_LUC_BG_ImmaculatteAggro, CHARACTER_LUC_BG_Barricade02_Imma05);
+SneakTriggerSpotter(TRIGGER_LUC_BG_ImmaculatteAggro, CHARACTER_LUC_BG_Barricade02_Imma06);
+SneakTriggerSpotter(TRIGGER_LUC_BG_ImmaculatteAggro, CHARACTER_LUC_BG_Barricade02_Imma07);
+//REGION Demons Database
+LUC_BG_Demons(CHARACTER_LUC_BG_Demon3);
+LUC_BG_Demons(CHARACTER_LUC_BG_Demon4);
+LUC_BG_Demons(CHARACTER_LUC_BG_Demon5);
+LUC_BG_Demons(CHARACTER_LUC_BG_Demon6);
+LUC_BG_Demons(CHARACTER_LUC_BG_Demon7);
+LUC_BG_Demons(CHARACTER_LUC_BG_Demon8);
+LUC_BG_Demons(CHARACTER_LUC_BG_Demon10);
+LUC_BG_Demons(CHARACTER_LUC_BG_Demon13);
+LUC_BG_Demons(CHARACTER_LUC_BG_Demon15);
+//END_REGION
+
+//REGION Infernal Goat Database
+LUC_BG_DemonGoats(CHARACTER_LUC_DemonPlains_Hellhound_A_000);
+LUC_BG_DemonGoats(CHARACTER_LUC_DemonPlains_Hellhound_A_001);
+LUC_BG_DemonGoats(CHARACTER_LUC_DemonPlains_Hellhound_A_002);
+LUC_BG_DemonGoats(CHARACTER_LUC_DemonPlains_Hellhound_A_003);
+LUC_BG_DemonGoats(CHARACTER_LUC_DemonPlains_Hellhound_A_004);
+LUC_BG_DemonGoats(CHARACTER_LUC_DemonPlains_Hellhound_A_005);
+//END_REGION
+
+DB_ImmacBarricade(CHARACTER_LUC_BG_SittingImmaculate1);
+DB_ImmacBarricade(CHARACTER_LUC_BG_SittingImmaculate2);
+DB_ImmacBarricade(CHARACTER_LUC_BG_SittingImmaculate3);
+DB_ImmacBarricade(CHARACTER_LUC_BG_LyingImmaculate1);
+DB_ImmacBarricade(CHARACTER_LUC_BG_LyingImmaculate2);
+DB_ImmacBarricade(CHARACTER_LUC_BG_Barricade02_Imma01);
+DB_ImmacBarricade(CHARACTER_LUC_BG_Barricade02_Imma02);
+DB_ImmacBarricade(CHARACTER_LUC_BG_Barricade02_Imma03);
+DB_ImmacBarricade(CHARACTER_LUC_BG_Barricade02_Imma04);
+DB_ImmacBarricade(CHARACTER_LUC_BG_Barricade02_Imma05);
+DB_ImmacBarricade(CHARACTER_LUC_BG_Barricade02_Imma06);
+DB_ImmacBarricade(CHARACTER_LUC_BG_Barricade02_Imma07);
+
+//REGION Player Comments
+DB_PlayerComments("LUC_BG_CommentBloodStone", "LUC_BG_CommentBloodStone_1_1",1,1);
+DB_PlayerComments("LUC_BG_CommentBloodStone", "LUC_BG_CommentBloodStone_2_1",2,1);
+DB_PlayerComments("LUC_BG_CommentBloodStone", "LUC_BG_CommentBloodStone_2_2",2,2);
+DB_PlayerComment_Trigger(TRIGGER_LUC_BG_BloodStoneComment,"LUC_BG_CommentBloodStone");
+//END_REGION
+KBSECTION
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,(TRIGGER) _Trigger)
+AND
+DB_LUC_BG_ZixZaxMeeting(_Trigger, _Spawn)
+AND
+DB_CurrentLevel(_)
+THEN
+ProcDoZixzaxMeeting(_Spawn);
+
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,(TRIGGER) _Trigger)
+AND
+DB_LUC_BG_ZixZaxMeeting(_Trigger, _Spawn)
+AND
+NOT DB_CurrentLevel(_)
+THEN
+DB_NeedToStartZixzaxMeeting(_Spawn);
+
+IF
+RegionStarted(_)
+AND
+DB_NeedToStartZixzaxMeeting(_Spawn)
+THEN
+NOT DB_NeedToStartZixzaxMeeting(_Spawn);
+ProcDoZixzaxMeeting(_Spawn);
+
+PROC
+ProcDoZixzaxMeeting((TRIGGER)_Spawn)
+THEN
+ProcMakeZixzaxAppearAt(_Spawn,"AtTheBG");
+NOT DB_OneShotPlayerTrigger(TRIGGER_LUC_BG_ZixZaxMeeting);
+NOT DB_OneShotPlayerTrigger(TRIGGER_LUC_BG_ZixZaxMeeting2);
+NOT DB_OneShotPlayerTrigger(TRIGGER_LUC_BG_ZixZaxMeeting3);
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_BG_ZixZaxMeeting);
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_BG_ZixZaxMeeting2);
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_BG_ZixZaxMeeting3);
+
+IF
+CharacterEvent(CHARACTER_CYS_Zixzax, "AtTheBG")
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_CYS_Zixzax, _Player)
+THEN
+PROC_MendatoryDialog("LUC_BG_ZixZaxIntro", CHARACTER_CYS_Zixzax, _Player);
+
+IF
+DB_NoMoreQueued(CHARACTER_CYS_Zixzax, "LUC_BG_ZixZaxIntro")
+THEN
+DB_QueuedDialog(CHARACTER_CYS_Zixzax, "LUC_BG_ZixZaxIntro");
+NOT DB_NoMoreQueued(CHARACTER_CYS_Zixzax, "LUC_BG_ZixZaxIntro");
+
+IF
+DialogEnded("LUC_BG_ZixZaxIntro", _)
+THEN
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_CYS_Zixzax);
+ProcSetZixzaxBackInHomestead("AtTheHomestead");
+
+IF
+CharacterEvent(CHARACTER_CYS_Zixzax, "AtTheHomestead")
+THEN
+PROC_LUC_BG_ShowAttacker();
+
+IF
+DialogEnded("LUC_BG_ImmaculateWarning", _)
+AND
+CharacterGetVarInteger(CHARACTER_LUC_BG_ImmaculateLeader, "isHappy", 1)
+THEN
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_BG_ImmaculatteAggro);
+DB_Dialogs(CHARACTER_LUC_BG_SittingImmaculate1, "LUC_BG_Immaculate");
+DB_Dialogs(CHARACTER_LUC_BG_SittingImmaculate2, "LUC_BG_Immaculate");
+DB_Dialogs(CHARACTER_LUC_BG_SittingImmaculate3, "LUC_BG_Immaculate");
+DB_Dialogs(CHARACTER_LUC_BG_ImmaculateLeader, "LUC_BG_Immaculate");
+DB_Dialogs(CHARACTER_LUC_BG_Barricade02_Imma01, "LUC_BG_Immaculate");
+DB_Dialogs(CHARACTER_LUC_BG_Barricade02_Imma02, "LUC_BG_Immaculate");
+DB_Dialogs(CHARACTER_LUC_BG_Barricade02_Imma03, "LUC_BG_Immaculate");
+DB_Dialogs(CHARACTER_LUC_BG_Barricade02_Imma04, "LUC_BG_Immaculate");
+DB_Dialogs(CHARACTER_LUC_BG_Barricade02_Imma05, "LUC_BG_Immaculate");
+DB_Dialogs(CHARACTER_LUC_BG_Barricade02_Imma06, "LUC_BG_Immaculate");
+DB_Dialogs(CHARACTER_LUC_BG_Barricade02_Imma07, "LUC_BG_Immaculate");
+
+IF
+DialogEnded("LUC_BG_ImmaculateWarning", _)
+AND
+CharacterGetVarInteger(CHARACTER_LUC_BG_ImmaculateLeader, "isAngry", 1)
+THEN
+SetRelationFactionToPlayers("LUC_BG_Immaculate", 0);
+
+PROC
+ProcHandleSneakSpotted((CHARACTER)_Char)
+AND
+DB_ImmacBarricade(_Char)
+THEN
+SetRelationFactionToPlayers("LUC_BG_Immaculate", 0);
+
+IF
+CharacterEnteredCombat(CHARACTER_LUC_BG_SittingImmaculate3, _)
+THEN
+DialogRequestStopForCharacter(CHARACTER_LUC_BG_SittingImmaculate3);
+
+IF
+ItemDestroying(ITEM_LUC_BG_BloodStone)
+THEN
+PlayEffectAtItem("FX_GP_BloodStoneShake_A", ITEM_LUC_BG_BloodStone);
+PlayEffectAtItem("FX_GP_BloodStoneShockwave_A", ITEM_LUC_BG_BloodStone);
+
+IF
+ItemDestroyed(ITEM_LUC_BG_BloodStone)
+THEN
+PROC_LUC_BG_HideAttacker();
+QuestUpdate("LUC_BlackGate", "End");
+QuestClose("LUC_BlackGate");
+QuestUpdate("HOM_Starstones", "DestroyedDemonGate");
+ProcMakeZixzaxAppearAt(TRIGGER_LUC_BG_ZixZaxOutro,"AtTheBGEnd");
+
+IF
+CharacterEvent(CHARACTER_CYS_Zixzax, "AtTheBGEnd")
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_CYS_Zixzax, _Player)
+THEN
+PROC_MendatoryDialog("LUC_BG_ZixZaxOutro", CHARACTER_CYS_Zixzax, _Player);
+
+IF
+DialogEnded("LUC_BG_ZixZaxOutro", _)
+THEN
+ProcSetZixzaxBackInHomestead("AfterBG");
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_CYS_Zixzax);
+
+IF
+ItemDestroyed(ITEM_LUC_BG_BloodStone)
+AND
+LUC_BG_Demons(_Demon)
+THEN
+CharacterRemoveStatus(_Demon, "VOID_AURA");
+CharacterDie(_Demon,0);
+
+IF
+ItemDestroyed(ITEM_LUC_BG_BloodStone)
+AND
+LUC_BG_DemonGoats(_Demon)
+THEN
+CharacterRemoveStatus(_Demon, "VOID_AURA");
+CharacterDie(_Demon,0);
+
+PROC
+PROC_LUC_BG_HideAttacker()
+THEN
+GlobalSetEvent("GLO_HomeStead_VoidDemonDefeated");
+GlobalClearEvent("GLO_HomeStead_VoidDemonAttack");
+CharacterSetVarInteger(CHARACTER_CYS_Zixzax, "homesteadAttack", 0);
+TimerCancel("HOM_UpdateShooters");
+ProcHOMEnableRoomUnlocking();
+
+
+PROC
+PROC_LUC_BG_ShowAttacker()
+THEN
+GlobalSetEvent("GLO_HomeStead_VoidDemonAttack");
+QuestUpdate("HOM_Starstones","VoidDemon");
+CharacterSetVarInteger(CHARACTER_CYS_Zixzax, "homesteadAttack", 1);
+ProcHOMDisableRoomUnlocking();
+
+IF
+CharacterAttackedByCharacter(_Demon,_Player)
+AND
+LUC_BG_Demons(_Demon)
+THEN
+CharacterSetEvent(_Demon,"LUC_DemonPlains_DemonUnderAttack");
+
+IF
+CharacterAttackedByCharacter(_Goat,_Player)
+AND
+LUC_BG_DemonGoats(_Goat)
+THEN
+CharacterSetEvent(_Goat,"LUC_DemonPlains_GoatUnderAttack");
+
+//REGION Test functions: destroying the Blood Stone
+IF
+TextEventSet("BloodStoneDestroyed")
+THEN
+PROC_LUC_BG_HideAttacker();
+QuestUpdate("LUC_BlackGate", "End");
+QuestClose("LUC_BlackGate");
+QuestUpdate("HOM_Starstones", "DestroyedDemonGate");
+ProcMakeZixzaxAppearAt(TRIGGER_LUC_BG_ZixZaxOutro,"AtTheBGEnd");
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

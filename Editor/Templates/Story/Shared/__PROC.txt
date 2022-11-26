@@ -1,0 +1,2219 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_InternalGroup_Count(0);
+
+KBSECTION
+PROC
+ProcFaceCharacter((CHARACTER)_Char,(CHARACTER)_Target)
+THEN
+CharacterLookAtCharacter(_Char,_Target,0);
+
+PROC
+ProcFaceEachother((CHARACTER)_Char,(CHARACTER)_Target)
+THEN
+CharacterLookAtCharacter(_Char,_Target,0);
+CharacterLookAtCharacter(_Target,_Char,0);
+
+//REGION Check Players Involved in Dialog
+
+IF
+DialogStartRequested(_,_Player)
+THEN
+ProcDoDualDialogPlayerCheck(_Player);
+
+IF
+DialogStartRequested(_Char,_Player)
+AND
+CharacterIsTagged(_Char,"Animal",1)
+THEN
+DialogSetCharacterEvent("NPC_Is_Animal",_Char,0);
+ProcCheckCanTalkWithAnimal(_Char,_Player);
+
+
+PROC
+ProcCheckCanTalkWithAnimal((CHARACTER)_Char,(CHARACTER)_Player)
+THEN
+DialogClearCharacterEvent("Can_Talk_To_Animals",_Player,0);
+DialogClearCharacterEvent("Can_Talk_To_Animals",_Char,0);
+
+PROC
+ProcCheckCanTalkWithAnimal((CHARACTER)_Char,(CHARACTER)_Player)
+AND
+CharacterHasTalent(_Player,"AnimalEmpathy",1)
+THEN
+DialogSetCharacterEvent("Can_Talk_To_Animals",_Player,0);
+DialogSetCharacterEvent("Can_Talk_To_Animals",_Char,0);
+
+PROC
+ProcSetClosestOtherPlayerDist((CHARACTER)_Char,(CHARACTER)_OtherPlayer,(REAL)_Dist)
+AND
+DB_ClosestOtherPlayerDist(_Char,_ClosestPlayer,_ClosestDist)
+AND
+_Dist<_ClosestDist
+THEN
+NOT DB_ClosestOtherPlayerDist(_Char,_ClosestPlayer,_ClosestDist);
+DB_ClosestOtherPlayerDist(_Char,_OtherPlayer,_Dist);
+
+PROC
+ProcSetClosestOtherPlayerDist((CHARACTER)_Char,(CHARACTER)_OtherPlayer,(REAL)_Dist)
+AND
+NOT DB_ClosestOtherPlayerDist(_Char,_,_)
+THEN
+DB_ClosestOtherPlayerDist(_Char,_OtherPlayer,_Dist);
+
+QRY
+QryGetDistanceToClosestOtherPlayer((CHARACTER)_Char)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_Companion(_Player)
+AND
+NOT DB_Dead(_Player)
+AND
+_Player!=_Char
+AND
+CharacterGetDistanceToCharacter(_Player,_Char,_Dist)
+THEN
+ProcSetClosestOtherPlayerDist(_Char,_Player,_Dist);
+
+PROC
+ProcDoDualDialogPlayerCheck((CHARACTER)_Player)
+AND
+QryGetDistanceToClosestOtherPlayer(_Player)
+AND
+DB_ClosestOtherPlayerDist(_Player,_OtherPlayer,_Dist)
+AND
+_Dist <= 10.0
+THEN
+DialogSetCharacterEvent("GLO_TwoPlayersInvolved",_Player,0);
+NOT DB_ClosestOtherPlayerDist(_Player,_OtherPlayer,_Dist);
+
+IF
+DialogEnded(_,_Instance)
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+THEN
+DialogClearCharacterEvent("GLO_TwoPlayersInvolved",_Player,0);
+//END_REGION
+
+//REGION Start Quest Choice Dialog
+IF
+DualDialogStart(_Dialog,_Instance)
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+AND
+NOT DB_Companion(_Player)
+THEN
+ProcDoDualDialogDistanceCheck(_Player,_Dialog);
+
+IF
+DualDialogStart(_Dialog,_Instance)
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+AND
+DB_Companion(_Player)
+AND
+DB_DialogPlayers(_Instance,_Player2,2)
+AND
+NOT DB_Companion(_Player2)
+THEN
+ProcDoDualDialogDistanceCheck(_Player2,_Dialog);
+
+PROC
+ProcDoDualDialogDistanceCheck((CHARACTER)_Player,(STRING)_Dialog)
+AND
+QryGetDistanceToClosestOtherPlayer(_Player)
+THEN
+DB_Noop(1);
+
+PROC
+ProcDoDualDialogDistanceCheck((CHARACTER)_Player,(STRING)_Dialog)
+AND
+DB_ClosestOtherPlayerDist(_Player,_OtherPlayer,_Dist)
+THEN
+ProcDualDialogDistanceCheck(_Dist,_Dialog,_Player,_OtherPlayer);
+
+PROC
+ProcDoDualDialogDistanceCheck((CHARACTER)_Player,(STRING)_Dialog)
+AND
+NOT DB_ClosestOtherPlayerDist(_Player,_,_)
+THEN
+ProcDualDialogDistanceCheck(6666666.0,_Dialog,_Player,CHARACTER_NULL);
+
+PROC
+ProcDoDualDialogDistanceCheck((CHARACTER)_Player,(STRING)_Dialog)
+AND
+DB_ClosestOtherPlayerDist(_Player,_OtherPlayer,_Dist)
+THEN
+NOT DB_ClosestOtherPlayerDist(_Player,_OtherPlayer,_Dist);
+
+PROC
+ProcDualDialogDistanceCheck((REAL)_Distance,(STRING)_Dialog,(CHARACTER)_Player,(CHARACTER)_Player2)
+AND
+DB_DualDialogsDisabled(1)
+THEN
+DialogStartOneSpeakerDialog(_Dialog,_Player);
+
+PROC
+ProcDualDialogDistanceCheck((REAL)_Distance,(STRING)_Dialog,(CHARACTER)_Player,(CHARACTER)_Player2)
+AND
+NOT DB_DualDialogsDisabled(1)
+AND
+_Distance <= 10.0
+THEN
+ProcStartDualDialogIfPlayer2IsValid(_Dialog,_Player,_Player2);
+
+
+//handle the case where a dialgo with both playersi n starts a dual dialog 
+//in that cse we can ignore the busy flag of the second player (it'll get put back whern the dual dialog starts)
+PROC
+ProcStartDualDialogIfPlayer2IsValid((STRING)_Dialog,(CHARACTER)_Player,(CHARACTER)_Player2)
+AND
+NOT DB_Dead(_Player2)
+AND
+NOT DB_Combat(_Player2,_)
+AND
+DB_DialogPlayers(_Inst,_Player,_)
+AND
+DB_DialogPlayers(_Inst,_Player2,_)
+THEN
+NOT _Player2.DB_IsInDialog();
+
+PROC
+ProcStartDualDialogIfPlayer2IsValid((STRING)_Dialog,(CHARACTER)_Player,(CHARACTER)_Player2)
+AND
+NOT DB_Dead(_Player2)
+AND
+NOT _Player2.DB_IsInDialog()
+AND
+NOT DB_Combat(_Player2,_)
+THEN
+_Player2.DB_IsInDialog();
+DialogStartTwoSpeakerDialog(_Dialog,_Player,_Player2);
+DB_ValidPlayer2(1);
+
+PROC
+ProcStartDualDialogIfPlayer2IsValid((STRING)_Dialog,(CHARACTER)_Player,(CHARACTER)_Player2)
+AND
+NOT DB_ValidPlayer2(1)
+THEN
+DialogStartOneSpeakerDialog(_Dialog,_Player);
+
+PROC
+ProcStartDualDialogIfPlayer2IsValid((STRING)_Diag,(CHARACTER)_Player,(CHARACTER)_Player2)
+THEN
+NOT DB_ValidPlayer2(1);
+
+PROC
+ProcDualDialogDistanceCheck((REAL)_Distance,(STRING)_Dialog,(CHARACTER)_Player,(CHARACTER)_Player2)
+AND
+NOT DB_DualDialogsDisabled(1)
+AND
+_Distance > 10.0
+THEN
+DialogStartOneSpeakerDialog(_Dialog,_Player);
+//END_REGION
+
+//REGION Internal Dialog Logic
+PROC
+ProcIncreaseInternalCount()
+AND
+DB_InternalGroup_Count(_Nr)
+AND
+IntegerSum(_Nr,1,_New)
+THEN
+NOT DB_InternalGroup_Count(_Nr);
+DB_InternalGroup_Count(_New);
+
+IF
+DB_Dialogs((CHARACTER)_Npc,(STRING)_Dialog)
+THEN
+SetDefaultDialog(_Npc,_Dialog,1);
+ProcIncreaseInternalCount();
+ProcInteralCounterEntry(_Npc,_Dialog);
+
+PROC
+ProcInteralCounterEntry((CHARACTER)_Npc,(STRING)_Dialog)
+AND
+DB_InternalGroup_Count(_New)
+THEN
+DB_InternalCounter(_New,_Dialog,1);
+DB_Internal_Dialogs(_Npc,_Dialog,_New,1);
+
+IF
+DB_Dialogs((CHARACTER)_Npc,(CHARACTER)_Npc2,(STRING)_Dialog)
+THEN
+SetDefaultDialog(_Npc,_Dialog,1);
+SetDefaultDialog(_Npc2,_Dialog,1);
+ProcIncreaseInternalCount();
+ProcInteralCounterEntry(_Npc,_Npc2,_Dialog);
+
+PROC
+ProcInteralCounterEntry((CHARACTER)_Npc,(CHARACTER)_Npc2,(STRING)_Dialog)
+AND
+DB_InternalGroup_Count(_Group)
+THEN
+DB_InternalCounter(_Group,_Dialog,2);
+DB_Internal_Dialogs(_Npc,_Dialog,_Group,1);
+DB_Internal_Dialogs(_Npc2,_Dialog,_Group,2);
+
+IF
+DB_Dialogs((CHARACTER)_Npc,(CHARACTER)_Npc2,(CHARACTER)_Npc3,(STRING)_Dialog)
+THEN
+SetDefaultDialog(_Npc,_Dialog,1);
+SetDefaultDialog(_Npc2,_Dialog,1);
+SetDefaultDialog(_Npc3,_Dialog,1);
+ProcIncreaseInternalCount();
+ProcInteralCounterEntry(_Npc,_Npc2,_Npc3,_Dialog);
+
+PROC
+ProcInteralCounterEntry((CHARACTER)_Npc,(CHARACTER)_Npc2,(CHARACTER)_Npc3,(STRING)_Dialog)
+AND
+DB_InternalGroup_Count(_Group)
+THEN
+DB_InternalCounter(_Group,_Dialog,3);
+DB_Internal_Dialogs(_Npc,_Dialog,_Group,1);
+DB_Internal_Dialogs(_Npc2,_Dialog,_Group,2);
+DB_Internal_Dialogs(_Npc3,_Dialog,_Group,3);
+
+IF
+DB_Dialogs((CHARACTER)_Npc,(CHARACTER)_Npc2,(CHARACTER)_Npc3,(CHARACTER)_Npc4,(STRING)_Dialog)
+THEN
+SetDefaultDialog(_Npc,_Dialog,1);
+SetDefaultDialog(_Npc2,_Dialog,1);
+SetDefaultDialog(_Npc3,_Dialog,1);
+SetDefaultDialog(_Npc4,_Dialog,1);
+ProcIncreaseInternalCount();
+ProcInteralCounterEntry(_Npc,_Npc2,_Npc3,_Npc4,_Dialog);
+
+PROC
+ProcInteralCounterEntry((CHARACTER)_Npc,(CHARACTER)_Npc2,(CHARACTER)_Npc3,(CHARACTER)_Npc4,(STRING)_Dialog)
+AND
+DB_InternalGroup_Count(_Group)
+THEN
+DB_InternalCounter(_Group,_Dialog,4);
+DB_Internal_Dialogs(_Npc,_Dialog,_Group,1);
+DB_Internal_Dialogs(_Npc2,_Dialog,_Group,2);
+DB_Internal_Dialogs(_Npc3,_Dialog,_Group,3);
+DB_Internal_Dialogs(_Npc4,_Dialog,_Group,4);
+
+PROC
+ProcCheckDialogGroupNPCs((INTEGER)_Group,(CHARACTER)_Player)
+AND
+_Player.DB_IsInDialog()
+THEN
+DB_TempNPCBusy(_Group,_Player);
+
+PROC
+ProcCheckDialogGroupNPCs((INTEGER)_Group,(CHARACTER)_Player)
+AND
+DB_Internal_Dialogs(_Npc,_,_Group,_)
+AND
+_NPC.DB_IsInDialog()
+THEN
+DB_TempNPCBusy(_Group,_Player);
+
+PROC
+ProcMarkGroupAsBusy((STRING)_Dialog,(INTEGER)_Group)
+AND
+DB_Internal_Dialogs(_Npc,_Dialog,_Group,_)
+THEN
+_NPC.DB_IsInDialog();
+
+PROC
+ProcStartNPCDialog((CHARACTER)_Player,(STRING)_Dialog,(INTEGER)_Group)
+AND
+NOT DB_TempNPCBusy(_Group,_Player)
+AND
+DB_InternalCounter(_Group,_Dialog,1)
+AND
+DB_Internal_Dialogs(_Npc,_Dialog,_Group,1)
+THEN
+SetTradeStatus(_Player,_Npc);
+DialogRequestStopForCharacter(_Player);
+DialogRequestStopForCharacter(_NPC);
+CharacterMakeStoryNpc(_Npc,1);
+CharacterMakeStoryNpc(_Player,1);
+ProcFaceEachother(_Npc,_Player);
+DialogStartTwoSpeakerDialog(_Dialog,_NPC,_Player);
+
+PROC
+ProcStartNPCDialog((CHARACTER)_Player,(STRING)_Dialog,(INTEGER)_Group)
+AND
+NOT DB_TempNPCBusy(_Group,_Player)
+AND
+DB_InternalCounter(_Group,_Dialog,2)
+AND
+DB_Internal_Dialogs(_Npc,_Dialog,_Group,1)
+AND
+DB_Internal_Dialogs(_Npc2,_Dialog,_Group,2)
+THEN
+SetTradeStatus(_Player,_Npc);
+DialogRequestStopForCharacter(_Player);
+DialogRequestStopForCharacter(_NPC);
+DialogRequestStopForCharacter(_NPC2);
+CharacterMakeStoryNpc(_Npc,1);
+CharacterMakeStoryNpc(_Npc2,1);
+CharacterMakeStoryNpc(_Player,1);
+ProcFaceCharacter(_Player,_NPC);
+ProcFaceCharacter(_NPC,_Player);
+ProcFaceCharacter(_Npc2,_Player);
+DialogStartThreeSpeakerDialog(_Dialog,_NPC,_NPC2,_Player);
+
+PROC
+ProcStartNPCDialog((CHARACTER)_Player,(STRING)_Dialog,(INTEGER)_Group)
+AND
+NOT DB_TempNPCBusy(_Group,_Player)
+AND
+DB_InternalCounter(_Group,_Dialog,3)
+AND
+DB_Internal_Dialogs(_Npc,_Dialog,_Group,1)
+AND
+DB_Internal_Dialogs(_Npc2,_Dialog,_Group,2)
+AND
+DB_Internal_Dialogs(_Npc3,_Dialog,_Group,3)
+THEN
+SetTradeStatus(_Player,_Npc);
+DialogRequestStopForCharacter(_Player);
+DialogRequestStopForCharacter(_NPC);
+DialogRequestStopForCharacter(_NPC2);
+DialogRequestStopForCharacter(_NPC3);
+CharacterMakeStoryNpc(_Npc,1);
+CharacterMakeStoryNpc(_Npc2,1);
+CharacterMakeStoryNpc(_Npc3,1);
+CharacterMakeStoryNpc(_Player,1);
+ProcFaceCharacter(_Player,_NPC);
+ProcFaceCharacter(_NPC,_Player);
+ProcFaceCharacter(_NPC2,_Player);
+ProcFaceCharacter(_NPC3,_Player);
+DialogStartFourSpeakerDialog(_Dialog,_NPC,_NPC2,_NPC3,_Player);
+
+PROC
+ProcStartNPCDialog((CHARACTER)_Player,(STRING)_Dialog,(INTEGER)_Group)
+AND
+NOT DB_TempNPCBusy(_Group,_Player)
+THEN
+ProcMarkGroupAsBusy(_Dialog,_Group);
+_Player.DB_IsInDialog();
+
+PROC
+DefaultDialogStartRequested((CHARACTER)_Npc,(CHARACTER)_Player)
+THEN
+DB_TempRequestingPlayer(_Player);
+ProcSelectDialogToStart(_Npc);
+ProcDoStartRequested(_Npc,_Player);
+NOT DB_TempRequestingPlayer(_Player);
+
+PROC
+ProcSelectDialogToStart((CHARACTER)_Npc)
+AND
+DB_Internal_Dialogs(_Npc,_Dialog,_Group,1)
+AND
+NOT DB_TempRequested(_NPC,_,_)
+THEN
+DB_TempRequested(_NPC,_Dialog,_Group);
+
+PROC
+ProcSelectDialogToStart((CHARACTER)_Npc)
+AND
+DB_Internal_Dialogs(_Npc,_Dialog,_Group,_)
+AND
+NOT DB_TempRequested(_NPC,_,_)
+THEN
+DB_TempRequested(_NPC,_Dialog,_Group);
+
+
+PROC
+ProcDoStartRequested((CHARACTER)_Npc,(CHARACTER)_Player)
+AND
+DB_TempRequested(_NPC,_Dialog,_Group)
+THEN
+NOT DB_TempRequested(_NPC,_Dialog,_Group);
+ProcCheckDialogGroupNPCs(_Group,_Player);
+ProcStartNPCDialog(_Player,_Dialog,_Group);
+NOT DB_TempNPCBusy(_Group,_Player);
+
+PROC
+ProcRemoveAllDialogEntriesForSpeaker((CHARACTER)_NPC)
+AND
+DB_Internal_Dialogs(_Npc,_Dialog,_Group,1)
+THEN
+ProcRemoveInternalDialogEntries(_Dialog,_Group);
+ProcRemoveExternalDialogEntry(_Npc,_Dialog,_Group);
+
+PROC
+ProcRemoveDialogEntryForSpeaker((CHARACTER)_NPC,(STRING)_Dialog)
+AND
+DB_Internal_Dialogs(_Npc,_Dialog,_Group,1)
+THEN
+ProcRemoveInternalDialogEntries(_Dialog,_Group);
+ProcRemoveExternalDialogEntry(_Npc,_Dialog,_Group);
+
+//remove dialogs when an NPC dies.
+IF
+DB_Dead((CHARACTER)_Npc)
+AND
+DB_Internal_Dialogs(_Npc,_Dialog,_Group,_Nr)
+AND
+DB_Internal_Dialogs(_FirstSpeaker,_Dialog,_Group,1)
+THEN
+ProcRemoveDialogEntryForSpeaker(_FirstSpeaker,_Dialog);
+
+PROC
+ProcRemoveExternalDialogEntry((CHARACTER)_Npc,(STRING)_Dialog,(INTEGER)_Group)
+AND
+DB_InternalCounter(_Group,_Dialog,1)
+AND
+DB_Dialogs(_Npc,_Dialog)
+THEN
+NOT DB_Dialogs(_Npc,_Dialog);
+NOT DB_InternalCounter(_Group,_Dialog,1);
+
+PROC
+ProcRemoveExternalDialogEntry((CHARACTER)_Npc,(STRING)_Dialog,(INTEGER)_Group)
+AND
+DB_InternalCounter(_Group,_Dialog,2)
+AND
+DB_Dialogs(_Npc,_Npc2,_Dialog)
+THEN
+NOT DB_Dialogs(_Npc,_Npc2,_Dialog);
+NOT DB_InternalCounter(_Group,_Dialog,2);
+
+PROC
+ProcRemoveExternalDialogEntry((CHARACTER)_Npc,(STRING)_Dialog,(INTEGER)_Group)
+AND
+DB_InternalCounter(_Group,_Dialog,3)
+AND
+DB_Dialogs(_Npc,_Npc2,_Npc3,_Dialog)
+THEN
+NOT DB_Dialogs(_Npc,_Npc2,_Npc3,_Dialog);
+NOT DB_InternalCounter(_Group,_Dialog,3);
+
+PROC
+ProcRemoveExternalDialogEntry((CHARACTER)_Npc,(STRING)_Dialog,(INTEGER)_Group)
+AND
+DB_InternalCounter(_Group,_Dialog,4)
+AND
+DB_Dialogs(_Npc,_Npc2,_Npc3,_Npc4,_Dialog)
+THEN
+NOT DB_Dialogs(_Npc,_Npc2,_Npc3,_Npc4,_Dialog);
+NOT DB_InternalCounter(_Group,_Dialog,4);
+
+PROC
+ProcRemoveInternalDialogEntries((STRING)_Dialog,(INTEGER)_Group)
+AND
+DB_Internal_Dialogs(_Npc,_Dialog,_Group,_Nr)
+THEN
+NOT DB_Internal_Dialogs(_Npc,_Dialog,_Group,_Nr);
+
+//END_REGION
+
+//REGION Start Dialog Logic
+
+PROC
+ProcDoTwoSpeakerDialog((STRING)_Dialog,(CHARACTER)_Npc,(CHARACTER)_Player)
+AND
+NOT _Npc.DB_IsInDialog()
+AND
+NOT DB_Dead(_Npc)
+AND
+NOT _Player.DB_IsInDialog()
+AND
+NOT DB_Dead(_Player)
+AND
+QryGetValidDialogSpeaker(_Player)
+AND
+DB_DialogSpeaker(_ActualSpeaker)
+THEN
+SetTradeStatus(_ActualSpeaker,_Npc);
+ProcDoTwoSpeakerDialog2(_Dialog,_ActualSpeaker,_Npc);
+
+IF
+DB_ReplacedCompanionSpeaker(_)
+THEN
+PROC_CheckPlayTut("TUT_CompanionStoryTalk");
+
+PROC
+ProcDoTwoSpeakerDialog2((STRING)_Dialog,(CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+_Player.DB_IsInDialog()
+AND
+DB_ReplacedCompanionSpeaker(_Companion)
+THEN
+ProcHandleBlockedCompanionDialog(_Player);
+DB_BlockedCompanionDialog(_Dialog,2,_Npc,_Companion);
+
+PROC
+ProcDoTwoSpeakerDialog2((STRING)_Dialog,(CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT _Player.DB_IsInDialog()
+THEN
+DialogRequestStopForCharacter(_Player);
+DialogRequestStopForCharacter(_Npc);
+CharacterMakeStoryNpc(_Npc,1);
+CharacterMakeStoryNpc(_Player,1);
+ProcFaceEachother(_Player,_NPC);
+DialogStartTwoSpeakerDialog(_Dialog,_Npc,_Player);
+_Player.DB_IsInDialog();
+_Npc.DB_IsInDialog();
+
+PROC
+ProcDoThreeSpeakerDialog((STRING)_Dialog,(CHARACTER)_Npc,(CHARACTER)_Npc2,(CHARACTER)_Player)
+AND
+NOT _Npc.DB_IsInDialog()
+AND
+NOT DB_Dead(_Npc)
+AND
+NOT _Npc2.DB_IsInDialog()
+AND
+NOT DB_Dead(_Npc2)
+AND
+NOT _Player.DB_IsInDialog()
+AND
+NOT DB_Dead(_Player)
+AND
+QryGetValidDialogSpeaker(_Player)
+AND
+DB_DialogSpeaker(_ActualSpeaker)
+THEN
+SetTradeStatus(_ActualSpeaker,_Npc);
+ProcDoThreeSpeakerDialog2(_Dialog,_ActualSpeaker,_Npc,_Npc2);
+
+PROC
+ProcDoThreeSpeakerDialog2((STRING)_Dialog,(CHARACTER)_Player,(CHARACTER)_Npc,(CHARACTER)_Npc2)
+AND
+_Player.DB_IsInDialog()
+AND
+DB_ReplacedCompanionSpeaker(_Companion)
+THEN
+DB_BlockedCompanionDialog(_Dialog,3,_Npc,_Npc2,_Companion);
+ProcHandleBlockedCompanionDialog(_Player);
+
+PROC
+ProcDoThreeSpeakerDialog2((STRING)_Dialog,(CHARACTER)_Player,(CHARACTER)_Npc,(CHARACTER)_Npc2)
+AND
+NOT _Player.DB_IsInDialog()
+THEN
+DialogRequestStopForCharacter(_Player);
+DialogRequestStopForCharacter(_Npc);
+DialogRequestStopForCharacter(_Npc2);
+CharacterMakeStoryNpc(_Npc,1);
+CharacterMakeStoryNpc(_Npc2,1);
+CharacterMakeStoryNpc(_Player,1);
+ProcFaceEachother(_Player,_NPC);
+ProcFaceCharacter(_Npc2,_Player);
+DialogStartThreeSpeakerDialog(_Dialog,_Npc,_Npc2,_Player);
+_Player.DB_IsInDialog();
+_Npc.DB_IsInDialog();
+_Npc2.DB_IsInDialog();
+
+PROC
+ProcDoFourSpeakerDialog((STRING)_Dialog,(CHARACTER)_Npc,(CHARACTER)_Npc2,(CHARACTER)_Npc3,(CHARACTER)_Player)
+AND
+NOT _Npc.DB_IsInDialog()
+AND
+NOT DB_Dead(_Npc)
+AND
+NOT _Npc2.DB_IsInDialog()
+AND
+NOT DB_Dead(_Npc2)
+AND
+NOT _Npc3.DB_IsInDialog()
+AND
+NOT DB_Dead(_Npc3)
+AND
+NOT _Player.DB_IsInDialog()
+AND
+NOT DB_Dead(_Player)
+AND
+QryGetValidDialogSpeaker(_Player)
+AND
+DB_DialogSpeaker(_ActualSpeaker)
+THEN
+SetTradeStatus(_ActualSpeaker,_Npc);
+ProcDoFourSpeakerDialog2(_Dialog,_ActualSpeaker,_Npc,_Npc2,_Npc3);
+
+PROC
+ProcDoFourSpeakerDialog2((STRING)_Dialog,(CHARACTER)_Player,(CHARACTER)_Npc,(CHARACTER)_Npc2,(CHARACTER)_Npc3)
+AND
+_Player.DB_IsInDialog()
+AND
+DB_ReplacedCompanionSpeaker(_Companion)
+THEN
+DB_BlockedCompanionDialog(_Dialog,4,_Npc,_Npc2,_Npc3,_Companion);
+ProcHandleBlockedCompanionDialog(_Player);
+
+PROC
+ProcDoFourSpeakerDialog2((STRING)_Dialog,(CHARACTER)_Player,(CHARACTER)_Npc,(CHARACTER)_Npc2,(CHARACTER)_Npc3)
+AND
+NOT _Player.DB_IsInDialog()
+THEN
+DialogRequestStopForCharacter(_Player);
+DialogRequestStopForCharacter(_Npc);
+DialogRequestStopForCharacter(_Npc2);
+DialogRequestStopForCharacter(_Npc3);
+CharacterMakeStoryNpc(_Npc,1);
+CharacterMakeStoryNpc(_Npc2,1);
+CharacterMakeStoryNpc(_Npc3,1);
+CharacterMakeStoryNpc(_Player,1);
+ProcFaceEachother(_Player,_NPC);
+ProcFaceCharacter(_Npc2,_Player);
+ProcFaceCharacter(_Npc3,_Player);
+DialogStartFourSpeakerDialog(_Dialog,_Npc,_Npc2,_Npc3,_Player);
+_Player.DB_IsInDialog();
+_Npc.DB_IsInDialog();
+_Npc2.DB_IsInDialog();
+_Npc3.DB_IsInDialog();
+
+///////////////////////////////////
+
+PROC
+ProcDoFiveSpeakerDialog((STRING)_Dialog,(CHARACTER)_Npc,(CHARACTER)_Npc2,(CHARACTER)_Npc3,(CHARACTER)_Npc4,(CHARACTER)_Player)
+AND
+NOT _Npc.DB_IsInDialog()
+AND
+NOT DB_Dead(_Npc)
+AND
+NOT _Npc2.DB_IsInDialog()
+AND
+NOT DB_Dead(_Npc2)
+AND
+NOT _Npc3.DB_IsInDialog()
+AND
+NOT DB_Dead(_Npc3)
+AND
+NOT _Npc4.DB_IsInDialog()
+AND
+NOT DB_Dead(_Npc4)
+AND
+NOT _Player.DB_IsInDialog()
+AND
+NOT DB_Dead(_Player)
+AND
+QryGetValidDialogSpeaker(_Player)
+AND
+DB_DialogSpeaker(_ActualSpeaker)
+THEN
+SetTradeStatus(_ActualSpeaker,_Npc);
+ProcDoFiveSpeakerDialog2(_Dialog,_ActualSpeaker,_Npc,_Npc2,_Npc3,_Npc4);
+
+PROC
+ProcDoFiveSpeakerDialog2((STRING)_Dialog,(CHARACTER)_Player,(CHARACTER)_Npc,(CHARACTER)_Npc2,(CHARACTER)_Npc3,(CHARACTER)_Npc4)
+AND
+_Player.DB_IsInDialog()
+AND
+DB_ReplacedCompanionSpeaker(_Companion)
+THEN
+DB_BlockedCompanionDialog(_Dialog,5,_Npc,_Npc2,_Npc3,_Npc4,_Companion);
+ProcHandleBlockedCompanionDialog(_Player);
+
+PROC
+ProcDoFiveSpeakerDialog2((STRING)_Dialog,(CHARACTER)_Player,(CHARACTER)_Npc,(CHARACTER)_Npc2,(CHARACTER)_Npc3,(CHARACTER)_Npc4)
+AND
+NOT _Player.DB_IsInDialog()
+THEN
+DialogRequestStopForCharacter(_Player);
+DialogRequestStopForCharacter(_Npc);
+DialogRequestStopForCharacter(_Npc2);
+DialogRequestStopForCharacter(_Npc3);
+DialogRequestStopForCharacter(_Npc4);
+CharacterMakeStoryNpc(_Npc,1);
+CharacterMakeStoryNpc(_Npc2,1);
+CharacterMakeStoryNpc(_Npc3,1);
+CharacterMakeStoryNpc(_Npc4,1);
+CharacterMakeStoryNpc(_Player,1);
+ProcFaceEachother(_Player,_NPC);
+ProcFaceCharacter(_Npc2,_Player);
+ProcFaceCharacter(_Npc3,_Player);
+ProcFaceCharacter(_Npc4,_Player);
+DialogStartFiveSpeakerDialog(_Dialog,_Npc,_Npc2,_Npc3,_Npc4,_Player);
+_Player.DB_IsInDialog();
+_Npc.DB_IsInDialog();
+_Npc2.DB_IsInDialog();
+_Npc3.DB_IsInDialog();
+_Npc4.DB_IsInDialog();
+
+///////////////////////////////
+
+PROC
+ProcDoTwoSpeakerItemDialog((STRING)_Dialog,(CHARACTER)_Npc,(ITEM)_Item)
+AND
+NOT _Npc.DB_IsInDialog()
+AND
+NOT DB_Dead(_Npc)
+AND
+NOT _Item.DB_IsInItemDialog()
+AND
+QryGetValidDialogSpeaker(_Npc)
+AND
+DB_DialogSpeaker(_ActualSpeaker)
+THEN
+ProcDoTwoSpeakerItemDialog2(_Dialog,_ActualSpeaker,_Item);
+
+PROC
+ProcDoTwoSpeakerItemDialog2((STRING)_Dialog,(CHARACTER)_Player,(ITEM)_Item)
+AND
+_Player.DB_IsInDialog()
+AND
+DB_ReplacedCompanionSpeaker(_Companion)
+THEN
+ProcHandleBlockedCompanionDialog(_Player);
+DB_BlockedCompanionItemDialog(_Dialog,2,_Item,_Companion);
+
+PROC
+ProcDoTwoSpeakerItemDialog2((STRING)_Dialog,(CHARACTER)_Player,(ITEM)_Item)
+AND
+NOT _Player.DB_IsInDialog()
+THEN
+DialogRequestStopForCharacter(_Player);
+CharacterMakeStoryNpc(_Player,1);
+_Item.DB_IsInItemDialog();
+_Player.DB_IsInDialog();
+CharacterLookAtItem(_Player,_Item,0);
+DialogStartTwoSpeakerItemDialog(_Dialog,_Item,_Player);
+DB_ItemDialog(2,_Item,_Player);
+
+PROC
+ProcDoThreeSpeakerItemDialog((STRING)_Dialog,(CHARACTER)_Npc,(CHARACTER)_Npc2,(ITEM)_Item)
+AND
+NOT _Npc.DB_IsInDialog()
+AND
+NOT DB_Dead(_Npc)
+AND
+NOT _Npc2.DB_IsInDialog()
+AND
+NOT DB_Dead(_Npc2)
+AND 
+NOT _Item.DB_IsInItemDialog()
+AND
+QryGetValidDialogSpeaker(_Npc)
+AND
+DB_DialogSpeaker(_ActualSpeaker)
+THEN
+ProcDoThreeSpeakerItemDialog2(_Dialog, _ActualSpeaker, _Npc2, _Item);
+
+PROC
+ProcDoThreeSpeakerItemDialog2((STRING)_Dialog,(CHARACTER)_Player,(CHARACTER)_Npc,(ITEM)_Item)
+AND
+_Player.DB_IsInDialog()
+AND
+DB_ReplacedCompanionSpeaker(_Companion)
+THEN
+ProcHandleBlockedCompanionDialog(_Player);
+DB_BlockedCompanionItemDialog(_Dialog,3,_Item,_Npc,_Companion);
+
+PROC
+ProcDoThreeSpeakerItemDialog2((STRING)_Dialog,(CHARACTER)_Player,(CHARACTER)_Npc,(ITEM)_Item)
+AND
+NOT _Player.DB_IsInDialog()
+THEN
+DialogRequestStopForCharacter(_Npc);
+DialogRequestStopForCharacter(_Player);
+CharacterMakeStoryNpc(_Npc,1);
+CharacterMakeStoryNpc(_Player,1);
+CharacterLookAtItem(_Npc,_Item,0);
+CharacterLookAtItem(_Player,_Item,0);
+DialogStartThreeSpeakerItemDialog(_Dialog,_Player,_Npc,_Item);
+_Npc.DB_IsInDialog();
+_Player.DB_IsInDialog();
+_Item.DB_IsInItemDialog();
+DB_ItemDialog(3,_Player,_Npc,_Item);
+//END_REGION
+
+//REGION Start Party Dialog with 2 Players 
+
+IF
+DialogStartRequested(_Player1,_Player2)
+AND
+DB_PartyDialogs(_Player1,_Dialog)
+AND
+NOT DB_Companion(_Player2)
+THEN
+ProcPartyDialogCheck(_Dialog,_Player2,_Player1);
+
+PROC
+ProcPartyDialogCheck((STRING)_Dialog,(CHARACTER)_Player2,(CHARACTER)_Player1)
+AND
+NOT _Player1.DB_IsInDialog()
+AND
+NOT _Player2.DB_IsInDialog()
+AND
+_Dialog != "__KickStarter__"
+THEN
+_Player1.DB_IsInDialog();
+_Player2.DB_IsInDialog();
+DialogRequestStopForCharacter(_Player2);
+DialogRequestStopForCharacter(_Player1);
+ProcFaceEachother(_Player1,_Player2);
+ProcStartPartyDialog(_Dialog,_Player2,_Player1);
+CharacterMakeStoryNpc(_Player2,1);
+CharacterMakeStoryNpc(_Player1,1);
+
+PROC
+ProcStartPartyDialog((STRING)_Dialog,(CHARACTER)_Player2,(CHARACTER)_Player1)
+AND
+NOT DB_PartyDialogSrc(_,_Dialog)
+THEN
+DialogStartTwoSpeakerDialog(_Dialog,_Player2,_Player1);
+
+PROC
+ProcStartPartyDialog((STRING)_Dialog,(CHARACTER)_Player2,(CHARACTER)_Player1)
+AND
+DB_PartyDialogSrc((CHARACTER)_SrcPlayer,(STRING)_Dialog)
+AND
+_Player2 == _SrcPlayer
+THEN
+NOT DB_PartyDialogSrc(_SrcPlayer,_Dialog);
+DialogStartTwoSpeakerDialog(_Dialog,_Player2,_Player1);
+
+PROC
+ProcStartPartyDialog((STRING)_Dialog,(CHARACTER)_Player2,(CHARACTER)_Player1)
+AND
+DB_PartyDialogSrc(_SrcPlayer,_Dialog)
+AND
+_Player1 == _SrcPlayer
+THEN
+NOT DB_PartyDialogSrc(_SrcPlayer,_Dialog);
+DialogStartTwoSpeakerDialog(_Dialog,_Player1,_Player2);
+
+PROC
+ProcPartyDialogCheck("__KickStarter__",(CHARACTER)_Player2,(CHARACTER)_Player1)
+AND
+NOT _Player1.DB_IsInDialog()
+AND
+NOT _Player2.DB_IsInDialog()
+THEN
+_Player1.DB_IsInDialog();
+_Player2.DB_IsInDialog();
+ProcCancelPartyDialog("__KickStarter__");
+DialogRequestStopForCharacter(_Player2);
+DialogRequestStopForCharacter(_Player1);
+ProcFaceEachother(_Player1,_Player2);
+DialogStartKickstarterDualDialog(_Player1,_Player2);
+CharacterMakeStoryNpc(_Player2,1);
+CharacterMakeStoryNpc(_Player1,1);
+//END_REGION
+
+//REGION Start Dialog with 1 Item 
+
+IF
+CharacterUsedItem(_Player,_Item)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_Companion(_Player)
+AND
+DB_ItemPlayerOnlyDialogs((ITEM)_Item,(STRING)_Dialog)
+THEN
+ProcItemDialogCheck(_Dialog,_Player,_Item);
+
+IF
+CharacterUsedItem(_Player,_Item)
+AND
+DB_ItemDialogs((ITEM)_Item,(STRING)_Dialog)
+AND
+DB_Companion(_Player)
+THEN
+ProcStartCompanionItemDialog(_Player,_Item,_Dialog);
+
+PROC
+ProcStartCompanionItemDialog((CHARACTER)_Player,(ITEM)_Item,(STRING)_Dialog)
+AND
+NOT DB_NoCompanionReplace(_Item)
+AND
+DB_Combat(_Player, _)
+THEN
+CharacterDisplayText(_Player, "GLOBAL_CannotUseNow");
+
+PROC
+ProcStartCompanionItemDialog((CHARACTER)_Player,(ITEM)_Item,(STRING)_Dialog)
+AND
+NOT DB_NoCompanionReplace(_Item)
+AND
+NOT DB_Combat(_Player, _)
+THEN
+ProcItemDialogCheck("Default_Companion",_Player,_Item);
+DB_ItemCompDialog(_Item, _Player);
+
+PROC
+ProcStartCompanionItemDialog((CHARACTER)_Player,(ITEM)_Item,(STRING)_Dialog)
+AND
+DB_NoCompanionReplace(_Item)
+THEN
+ProcItemDialogCheck(_Dialog,_Player,_Item);
+
+IF
+CharacterUsedItem(_Player,_Item)
+AND
+DB_ItemDialogs(_Item,_Dialog)
+AND
+NOT DB_Companion(_Player)
+AND
+DB_Combat(_Player, _)
+AND
+NOT DB_IgnoreCombatItems((ITEM) _Item)
+THEN
+CharacterDisplayText(_Player, "GLOBAL_CannotUseNow");
+
+IF
+CharacterUsedItem(_Player,_Item)
+AND
+DB_ItemDialogs(_Item,_Dialog)
+AND
+NOT DB_Companion(_Player)
+AND
+NOT DB_Combat(_Player, _)
+THEN
+ProcItemDialogCheck(_Dialog,_Player,_Item);
+
+IF
+CharacterUsedItem(_Player,_Item)
+AND
+DB_ItemDialogs(_Item,_Dialog)
+AND
+NOT DB_Companion(_Player)
+AND
+DB_Combat(_Player, _)
+AND
+DB_IgnoreCombatItems((ITEM) _Item)
+THEN
+ProcItemDialogCheck(_Dialog,_Player,_Item);
+
+PROC
+ProcItemDialogCheck((STRING)_Dialog,(CHARACTER)_Player,(ITEM)_Item)
+AND
+NOT _Item.isInItemDialog()
+THEN
+_Item.isInItemDialog();
+_Player.DB_IsInDialog();
+CharacterMakeStoryNpc(_Player,1);
+DialogRequestStopForCharacter(_Player);
+DialogStartTwoSpeakerItemDialog(_Dialog,_Item,_Player);
+//END_REGION
+
+//REGION Clear Involved Items in Dialog 
+
+IF
+DialogEnded(_Dialog,_Instance)
+AND
+DB_ItemPlayerOnlyDialogs(_Item,_Dialog)
+AND
+_Item.isInItemDialog()
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+THEN
+CharacterMakeStoryNpc(_Player,0);
+NOT _Player.DB_IsInDialog();
+NOT _Item.isInItemDialog();
+
+IF
+DialogEnded(_Dialog,_Instance)
+AND
+DB_ItemDialogs(_Item,_Dialog)
+AND
+_Item.isInItemDialog()
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+THEN
+CharacterMakeStoryNpc(_Player,0);
+NOT _Player.DB_IsInDialog();
+NOT _Item.isInItemDialog();
+
+IF
+DialogEnded("Default_Companion",_Instance)
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+AND
+DB_ItemCompDialog(_Item, _Player)
+AND
+_Item.isInItemDialog()
+THEN
+CharacterMakeStoryNpc(_Player,0);
+NOT _Player.DB_IsInDialog();
+NOT _Item.isInItemDialog();
+//END_REGION
+
+//REGION SetHasDialog Logic
+IF
+DB_Dialogs(_Character,_)
+THEN
+CharacterSetHasDialog(_Character,1);
+
+IF
+DB_Dialogs(_Character,_Character2,_)
+THEN
+CharacterSetHasDialog(_Character,1);
+CharacterSetHasDialog(_Character2,1);
+
+IF
+DB_Dialogs(_Character,_Character2,_Character3,_)
+THEN
+CharacterSetHasDialog(_Character,1);
+CharacterSetHasDialog(_Character2,1);
+CharacterSetHasDialog(_Character3,1);
+//END_REGION
+
+//REGION Clear Involved NPCs in Dialog
+PROC
+ProcClearDialogFlagsForPlayers((INTEGER)_Instance)
+AND
+DB_DialogPlayers(_Instance,_Player,_Index)
+THEN
+ProcClearPlayerIfNotInOtherDialog(_Instance,_Player);
+
+PROC
+ProcClearPlayerIfNotInOtherDialog((INTEGER)_Inst,(CHARACTER)_Player)
+AND
+DB_DialogPlayers(_OtherInstance,_Player,_)
+AND
+_OtherInstance!=_Inst
+AND
+NOT DB_AutomatedDialog(_OtherInstance)
+THEN
+DB_TempIsInOtherDialog(_Player,1);
+
+PROC
+ProcClearPlayerIfNotInOtherDialog((INTEGER)_Inst,(CHARACTER)_Player)
+AND
+NOT DB_TempIsInOtherDialog(_Player,1)
+THEN
+//Order of execution important or MendatoryDialog breaks story NPC mode
+SetStoryNpcStatus(_Player);
+NOT _Player.DB_IsInDialog();
+
+PROC
+ProcClearPlayerIfNotInOtherDialog((INTEGER)_Inst,(CHARACTER)_Player)
+THEN
+NOT DB_TempIsInOtherDialog(_Player,1);
+
+PROC
+ProcClearDialogFlagsForNPCs((INTEGER)_Instance)
+AND
+DB_DialogNPCs(_Instance,_Npc,_Index)
+THEN
+ProcClearNPCIfNotInOtherDialog(_Instance,_Npc);
+
+PROC
+ProcClearNPCIfNotInOtherDialog((INTEGER)_Inst,(CHARACTER)_Npc)
+AND
+DB_DialogNPCs(_OtherInstance,_Npc,_)
+AND
+_OtherInstance!=_Inst
+AND
+NOT DB_AutomatedDialog(_OtherInstance)
+THEN
+DB_TempIsInOtherDialog(_Npc,1);
+
+PROC
+ProcClearNPCIfNotInOtherDialog((INTEGER)_Inst,(CHARACTER)_Npc)
+AND
+NOT DB_TempIsInOtherDialog(_Npc,1)
+THEN
+//Order of execution important or MendatoryDialog breaks story NPC mode
+SetStoryNpcStatus(_Npc);
+NOT _Npc.DB_IsInDialog();
+
+PROC
+ProcClearNPCIfNotInOtherDialog((INTEGER)_Inst,(CHARACTER)_Npc)
+THEN
+NOT DB_TempIsInOtherDialog(_Npc,1);
+
+
+//END_REGION
+
+//REGION Set Relation to Players
+PROC
+SetRelationFactionToPlayers((STRING)_Faction,(INTEGER)_Relation)
+THEN
+CharacterSetRelationFactionToFaction(_Faction,"Hero",_Relation);
+CharacterSetRelationFactionToFaction("Hero",_Faction,_Relation);
+CharacterSetRelationFactionToFaction(_Faction,"Companion",_Relation);
+CharacterSetRelationFactionToFaction("Companion",_Faction,_Relation);
+
+PROC
+SetRelationIndivFactionToPlayers((CHARACTER)_char,(INTEGER)_Relation)
+THEN
+CharacterSetRelationIndivFactionToFaction(_Char,"Hero",_Relation);
+CharacterSetRelationFactionToIndivFaction("Hero",_Char,_Relation);
+CharacterSetRelationIndivFactionToFaction(_Char,"Companion",_Relation);
+CharacterSetRelationFactionToIndivFaction("Companion",_Char,_Relation);
+
+
+PROC
+ProcSetRelationToPlayers((CHARACTER)_Character,(INTEGER)_Relation)
+AND
+_Relation == 0
+AND
+CharacterGetFaction(_Character,_Faction)
+THEN
+CharacterSetFaction(_Character,"Evil NPC");
+DB_PreviousAlignment(_Character,_Faction);
+
+PROC
+ProcSetRelationToPlayers((CHARACTER)_Character,(INTEGER)_Relation)
+AND
+_Relation == 100
+AND
+NOT DB_PreviousAlignment(_Character,_)
+AND
+CharacterGetFaction(_Character,_Faction)
+THEN
+CharacterSetRelationFactionToFaction(_Faction,"Hero",100);
+CharacterSetRelationFactionToFaction("Hero",_Faction,100);
+CharacterSetRelationFactionToFaction(_Faction,"Companion",100);
+CharacterSetRelationFactionToFaction("Companion",_Faction,100);
+
+PROC
+ProcSetRelationToPlayers((CHARACTER)_Character,(INTEGER)_Relation)
+AND
+DB_IsPlayer(_Player)
+AND
+_Relation == 100
+AND
+DB_PreviousAlignment(_Character,_Faction)
+THEN
+CharacterSetFaction(_Character,_Faction);
+CharacterSetRelationFactionToFaction(_Faction,"Hero",100);
+CharacterSetRelationFactionToFaction("Hero",_Faction,100);
+CharacterSetRelationFactionToFaction(_Faction,"Companion",100);
+CharacterSetRelationFactionToFaction("Companion",_Faction,100);
+NOT DB_PreviousAlignment(_Character,_Faction);
+//END_REGION
+
+//REGION Change Attitude
+IF
+DialogCharacterEventSet("ChangeAttitude",_Player,_Instance)
+AND
+CharacterGetVarInteger(_Player,"ChangeAttitude",_Value)
+AND
+DB_DialogNPCs(_Instance,_Npc,1)
+THEN
+DialogClearCharacterEvent("ChangeAttitude",_Player,_Instance);
+CharacterAddAttitudeTowardsPlayer(_Npc,_Player,_Value);
+
+
+PROC
+ChangeAttitude((CHARACTER)_NPC,(CHARACTER)_Player,(INTEGER)_Value)
+THEN
+CharacterAddAttitudeTowardsPlayer(_Npc,_Player,_Value);
+//END_REGION
+
+//REGION Dual Dialogs
+IF
+CharacterUsedItem(_Player,_Item)
+AND
+DB_ItemGivesDualDialog((ITEM)_Item,(STRING)_Dialog)
+THEN
+NOT DB_ItemGivesDualDialog(_Item,_Dialog);
+ProcDefineDualDialog(_Player, _Dialog);
+
+PROC
+ProcDefineDualDialog((CHARACTER)_Player, (STRING)_Dialog)
+AND
+_Player.DB_IsPlayer()
+THEN
+ProcDoDefineDualDialog(_Player,_Dialog);
+
+PROC
+ProcDoDefineDualDialog((CHARACTER)_Player, (STRING)_Dialog)
+AND
+QryGetDistanceToClosestOtherPlayer(_Player)
+THEN
+DB_Noop(1);
+
+PROC
+ProcDoDefineDualDialog((CHARACTER)_Player, (STRING)_Dialog)
+AND
+DB_ClosestOtherPlayerDist(_Player,_OtherPlayer,_Dist)
+THEN
+ProcDualDialogDistanceCheck(_Dist,_Dialog,_Player,_OtherPlayer);
+
+PROC
+ProcDoDefineDualDialog((CHARACTER)_Player, (STRING)_Dialog)
+AND
+NOT DB_ClosestOtherPlayerDist(_Player,_,_)
+THEN
+ProcDualDialogDistanceCheck(66666666666.0,_Dialog,_Player,CHARACTER_NULL);
+
+PROC
+ProcDoDefineDualDialog((CHARACTER)_Player, (STRING)_Dialog)
+AND
+DB_ClosestOtherPlayerDist(_Player,_OtherPlayer,_Dist)
+THEN
+NOT DB_ClosestOtherPlayerDist(_Player,_OtherPlayer,_Dist);
+
+//END_REGION
+
+//REGION Peace Timer
+PROC
+PROC_PeaceTimerLaunch((STRING)_TimerName,(INTEGER)_TimerLength)
+AND
+DB_Combat(_Player,_)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_PeaceTimer(_TimerName)
+THEN
+DB_PeaceTimer(_TimerName);
+DB_PeaceTimerStillToStart(_TimerName,_TimerLength);
+
+PROC
+PROC_PeaceTimerLaunch((STRING)_TimerName,(INTEGER)_TimerLength)
+AND
+NOT DB_PeaceTimer(_TimerName)
+THEN
+DB_PeaceTimer(_TimerName);
+TimerLaunch(_TimerName,_TimerLength);
+
+IF
+CharacterEnteredCombat(_Player,_)
+AND
+_Player.DB_IsPlayer()
+AND
+DB_PeaceTimer(_TimerName)
+THEN
+TimerPause(_TimerName);
+
+IF
+CharacterLeftCombat(_Player,_)
+AND
+_Player.DB_IsPlayer()
+AND
+DB_PeaceTimer(_TimerName)
+THEN
+ProcUnPausePeaceTimerIfNoPlayerInCombat(_TimerName);
+
+PROC
+ProcUnPausePeaceTimerIfNoPlayerInCombat((STRING)_TimerName)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_Companion(_Player)
+AND
+DB_Combat(_Player,_)
+THEN
+DB_PlayerInCombat(1);
+
+PROC
+ProcUnPausePeaceTimerIfNoPlayerInCombat((STRING)_TimerName)
+AND
+NOT DB_PlayerInCombat(1)
+AND
+NOT DB_PeaceTimerStillToStart(_TimerName,_)
+THEN
+TimerUnpause(_TimerName);
+
+PROC
+ProcUnPausePeaceTimerIfNoPlayerInCombat((STRING)_TimerName)
+AND
+NOT DB_PlayerInCombat(1)
+AND
+DB_PeaceTimerStillToStart(_TimerName,_TimerLength)
+THEN
+TimerLaunch(_TimerName,_TimerLength);
+NOT DB_PeaceTimerStillToStart(_TimerName,_TimerLength);
+
+PROC
+ProcUnPausePeaceTimerIfNoPlayerInCombat((STRING)_TimerName)
+THEN
+NOT DB_PlayerInCombat(1);
+
+IF
+TimerFinished(_TimerName)
+AND
+DB_PeaceTimer(_TimerName)
+THEN
+NOT DB_PeaceTimer(_TimerName);
+
+//END_REGION
+
+//REGION Party Dialogs
+
+IF
+KillCounterCounts(_Name, _Count)
+AND
+DB_KillCounterGivesPartyDialog((STRING)_Name, (INTEGER)_Count, (STRING)_Dialog)
+THEN
+NOT DB_KillCounterGivesPartyDialog(_Name, _Count, _Dialog);
+ProcDefinePartyDialog(_Dialog);
+
+IF
+CharacterUsedItem(_,_Item)
+AND
+DB_ItemGivesPartyDialog((ITEM)_Item,(STRING)_Dialog)
+THEN
+NOT DB_ItemGivesPartyDialog(_Item,_Dialog);
+PlayersGetItemPartyDialog(_Item,_Dialog);
+
+IF
+DialogCharacterEventSet(_Event,_,_DialogInstance)
+AND
+DB_EventGivesPartyDialog((STRING)_Event,(STRING)_Dialog)
+THEN
+NOT DB_EventGivesPartyDialog(_Event,_Dialog);
+PlayersGetPartyDialog(_DialogInstance,_Dialog);
+
+IF
+DB_TriggerGivesPartyDialog(_Trigger,_)
+THEN
+ProcTriggerRegisterForPlayers(_Trigger);
+
+PROC
+ProcDefinePartyDialog((STRING)_Dialog)
+AND
+NOT DB_DualDialogsDisabled(1)
+AND
+DB_PartyDialogs(_Player,_CurrentDialog)
+THEN
+ProcCancelPartyDialog(_CurrentDialog);
+
+PROC
+ProcDefinePartyDialog((STRING)_Dialog)
+AND
+NOT DB_DualDialogsDisabled(1)
+THEN
+ProcDefinePartyDialogIfPlayersAvailable(_Dialog);
+
+PROC
+ProcDefinePartyDialogIfPlayersAvailable((STRING)_Dialog)
+THEN
+DB_AvailablePartyDialogPlayers(0);
+
+PROC
+ProcDefinePartyDialogIfPlayersAvailable((STRING)_Dialog)
+AND
+DB_AvailablePartyDialogPlayer(_Player)
+THEN
+NOT DB_AvailablePartyDialogPlayer(_Player);
+
+PROC
+ProcDefinePartyDialogIfPlayersAvailable((STRING)_Dialog)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_Companion(_Player)
+AND
+NOT DB_Dead(_Player)
+AND
+DB_AvailablePartyDialogPlayers(_Count)
+AND
+IntegerSum(_Count,1,_New)
+THEN
+NOT DB_AvailablePartyDialogPlayers(_Count);
+DB_AvailablePartyDialogPlayers(_New);
+DB_AvailablePartyDialogPlayer(_Player);
+
+PROC
+ProcDefinePartyDialogIfPlayersAvailable((STRING)_Dialog)
+AND
+DB_AvailablePartyDialogPlayers(_Count)
+AND
+_Count>=2
+THEN
+PROC_CheckPlayTutWithDelay("TUT_DualDialog",500);
+ProcLaunchPartyDialogTimer(_Dialog);
+
+PROC
+ProcLaunchPartyDialogTimer((STRING)_Dialog)
+AND
+NOT DB_HandledTutorial("TUT_DualDialog")
+THEN
+DB_WaitingToLaunchPartyTimer(_Dialog);
+
+IF
+TutorialBoxClosed(_,_Tut)
+AND
+DB_DualDialogTutorials(_Tut)
+THEN
+DB_HandledTutorial("TUT_DualDialog");
+
+IF
+TutorialBoxClosed(_,_Tut)
+AND
+DB_DualDialogTutorials(_Tut)
+AND
+DB_WaitingToLaunchPartyTimer(_Dialog)
+THEN
+NOT DB_WaitingToLaunchPartyTimer(_Dialog);
+PROC_PeaceTimerLaunch(_Dialog,60000);
+
+PROC
+ProcLaunchPartyDialogTimer((STRING)_Dialog)
+AND
+DB_HandledTutorial("TUT_DualDialog")
+THEN
+PROC_PeaceTimerLaunch(_Dialog,60000);
+
+PROC
+ProcDefinePartyDialogIfPlayersAvailable((STRING)_Dialog)
+AND
+DB_AvailablePartyDialogPlayers(_Count)
+AND
+_Count>=2
+AND
+DB_AvailablePartyDialogPlayer(_Player)
+THEN
+PROC_LoopEffectAtCharacter("FX_GP_ExclamationMark_A",_Player,"ExclamationMark","__ANY__");
+CharacterSetHasDialog(_Player,1);
+DB_PartyDialogs(_Player,_Dialog);
+
+PROC
+ProcDefinePartyDialogIfPlayersAvailable((STRING)_)
+AND
+DB_AvailablePartyDialogPlayers(_Count)
+THEN
+NOT DB_AvailablePartyDialogPlayers(_Count);
+
+IF
+CharacterDied(_Char)
+AND
+_Char.DB_IsPlayer()
+AND
+DB_PartyDialogs(_Char,_Dialog)
+THEN
+ProcCancelPartyDialog(_Dialog);
+
+PROC
+ProcCancelPartyDialog((STRING)_DualDialog)
+THEN
+TimerCancel(_DualDialog);
+NOT DB_WaitingToLaunchPartyTimer(_DualDialog);
+
+PROC
+ProcCancelDualDialogs()
+AND
+DB_PartyDialogs(_Player,_Dialog)
+THEN
+ProcCancelPartyDialog(_Dialog);
+
+PROC
+ProcCancelPartyDialog((STRING)_DualDialog)
+AND
+DB_PartyDialogs(_Player,_Dialog)
+THEN
+PROC_StopEffectAtCharacter(_Player,"ExclamationMark");
+NOT DB_PartyDialogs(_Player,_DualDialog);
+CharacterSetHasDialog(_Player,0);
+
+IF
+CharacterEnteredTrigger(_Player, _Trigger)
+AND
+DB_TriggerGivesPartyDialog(_Trigger, (STRING)_Dialog)
+THEN
+ProcTriggerUnregisterForPlayers(_Trigger);
+NOT DB_TriggerGivesPartyDialog(_Trigger,_Dialog);
+ProcDefinePartyDialog(_Dialog);
+
+IF
+CharacterEvent(_Character,_Event)
+AND
+DB_CharacterEventGivesPartyDialog(_Character,_Event,(STRING)_DualDialog)
+THEN
+NOT DB_CharacterEventGivesPartyDialog(_Character,_Event,_DualDialog);
+ProcDefinePartyDialog(_DualDialog);
+
+IF
+DialogEnded(_,_DialogInstance)
+AND
+PlayersGetPartyDialog(_DialogInstance,_DualDialog)
+THEN
+NOT PlayersGetPartyDialog(_DialogInstance,_DualDialog);
+ProcDefinePartyDialog(_DualDialog);
+
+IF
+GameBookInterfaceClosed(_Item,_)
+AND
+PlayersGetItemPartyDialog(_Item,_DualDialog)
+THEN
+NOT PlayersGetItemPartyDialog(_Item,_DualDialog);
+ProcDefinePartyDialog(_DualDialog);
+
+IF
+DialogStarted(_DualDialog,_)
+AND
+DB_PartyDialogs(_,_DualDialog)
+THEN
+TimerCancel(_DualDialog);
+NOT DB_WaitingToLaunchPartyTimer("DualDialog");
+ProcRemoveExclamationMarkFromPlayers(_DualDialog);
+
+PROC
+ProcRemoveExclamationMarkFromPlayers((STRING)_DualDialog)
+AND
+DB_PartyDialogs(_Player,_DualDialog)
+THEN
+PROC_StopEffectAtCharacter(_Player,"ExclamationMark");
+
+IF
+DialogEnded(_DualDialog,_)
+AND
+DB_PartyDialogs(_Player,_DualDialog)
+THEN
+NOT DB_PartyDialogs(_Player,_DualDialog);
+CharacterSetHasDialog(_Player,0);
+IncreaseStats(_Player);
+
+IF
+TimerFinished(_DualDialog)
+AND
+DB_PartyDialogs(_Player,_DualDialog)
+THEN
+ProcRemoveExclamationMarkFromPlayers(_DualDialog);
+NOT DB_PartyDialogs(_Player,_DualDialog);
+CharacterSetHasDialog(_Player,0);
+//END_REGION
+
+//REGION Doors
+
+PROC
+ItemCloseAndLock((ITEM)_Item,(STRING)_Key)
+THEN
+ItemClose(_Item);
+ItemLock(_Item,_Key);
+
+PROC
+ItemUnlockAndOpen((ITEM)_Item)
+THEN
+ItemUnLock(_Item);
+ItemOpen(_Item);
+//END_REGION
+
+//REGION  Automated dialogs CharacterAttackedByCharacter
+
+IF
+DB_AD_Dialog((CHARACTER)_Char,(STRING)_)
+THEN
+CharacterSetHasDialog(_Char,1);
+
+IF
+DB_AD_Dialog((CHARACTER)_Char1,(CHARACTER)_Char2,(STRING)_)
+THEN
+CharacterSetHasDialog(_Char1,1);
+CharacterSetHasDialog(_Char2,1);
+
+IF
+DialogStartRequested(_Char,_)
+AND
+DB_AD_Dialog((CHARACTER)_Char,(STRING)_Dialog)
+AND
+NOT DB_IsInDialog(_Char)
+AND
+NOT DB_ADRequested(_Char)
+THEN
+DialogStartOneSpeakerAutomatedDialog(_Dialog,_Char);
+DB_ADRequested(_Char);
+
+IF
+DialogStartRequested(_Char1,_)
+AND
+DB_AD_Dialog((CHARACTER)_Char1,(CHARACTER)_Char2,(STRING)_Dialog)
+AND
+NOT DB_IsInDialog(_Char1)
+AND
+NOT DB_ADRequested(_Char1)
+AND
+NOT DB_IsInDialog(_Char2)
+AND
+NOT DB_ADRequested(_Char2)
+AND
+NOT DB_Dead(_Char2)
+THEN
+DialogStartTwoSpeakerAutomatedDialog(_Dialog,_Char1,_Char2);
+DB_ADRequested(_Char1);
+DB_ADRequested(_Char2);
+
+IF
+DialogStartRequested(_Char2,_)
+AND
+DB_AD_Dialog((CHARACTER)_Char1,(CHARACTER)_Char2,(STRING)_Dialog)
+AND
+NOT DB_IsInDialog(_Char1)
+AND
+NOT DB_ADRequested(_Char1)
+AND
+NOT DB_Dead(_Char1)
+AND
+NOT DB_IsInDialog(_Char2)
+AND
+NOT DB_ADRequested(_Char2)
+THEN
+DialogStartTwoSpeakerAutomatedDialog(_Dialog,_Char1,_Char2);
+DB_ADRequested(_Char1);
+DB_ADRequested(_Char2);
+
+IF
+AutomatedDialogEnded(_Dialog,_Inst)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+AND
+DB_AD_Dialog(_Npc,_Dialog)
+THEN
+NOT DB_ADRequested(_Npc);
+
+IF
+AutomatedDialogEnded(_Dialog,_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_AD_Dialog(_Player,_Dialog)
+THEN
+NOT DB_ADRequested(_Player);
+
+IF
+AutomatedDialogEnded(_Dialog,_Inst)
+AND
+DB_DialogNPCs(_Inst,_Npc,_)
+AND
+DB_AD_Dialog(_,_,_Dialog)
+THEN
+NOT DB_ADRequested(_Npc);
+
+IF
+AutomatedDialogEnded(_Dialog,_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_AD_Dialog(_,_,_Dialog)
+THEN
+NOT DB_ADRequested(_Player);
+
+PROC
+ProcRemoveNPCADs((CHARACTER)_Npc)
+AND
+DB_AD_Dialog(_Npc,_Dialog)
+THEN
+NOT DB_AD_Dialog(_Npc,_Dialog);
+NOT DB_ADRequested(_Npc);
+
+PROC
+ProcRemoveNPCADs((CHARACTER)_Npc)
+AND
+DB_AD_Dialog(_Npc,_Npc2,_Dialog)
+THEN
+NOT DB_AD_Dialog(_Npc,_Npc2,_Dialog);
+NOT DB_ADRequested(_Npc);
+NOT DB_ADRequested(_Npc2);
+
+PROC
+ProcRemoveNPCADs((CHARACTER)_Npc2)
+AND
+DB_AD_Dialog(_Npc,_Npc2,_Dialog)
+THEN
+NOT DB_AD_Dialog(_Npc,_Npc2,_Dialog);
+NOT DB_ADRequested(_Npc);
+NOT DB_ADRequested(_Npc2);
+
+//END_REGION
+
+
+//REGION blood stones
+
+IF
+DialogCharacterEventSet("GLO_Use_BloodStone",_Player,_Inst)
+THEN
+ItemTemplateRemoveFromCharacter("Quest_Stone_Blood_B_b3f5e7ac-2bf5-4d89-9163-8e52f9a10ac5",_Player,1);
+DialogClearCharacterEvent("GLO_Use_BloodStone",_Player,_Inst);
+
+//END_REGION
+
+//REGION item timer
+PROC
+ItemTimer((ITEM)_Item,(STRING)_TimerName,(INTEGER)_Time)
+AND
+ItemGetUUID(_Item,_UUID)
+AND
+StringConcatenate(_UUID,_TimerName,_ItemTimerName)
+THEN
+DB_ItemTimer(_Item,_ItemTimerName,_TimerName);
+TimerLaunch(_ItemTimerName,_Time);
+
+PROC
+ItemTimerCancel((ITEM)_Item,(STRING)_TimerName)
+AND
+DB_ItemTimer(_Item,_ItemTimerName,_TimerName)
+THEN
+NOT DB_ItemTimer(_Item,_ItemTimerName,_TimerName);
+TimerCancel(_ItemTimerName);
+
+IF
+TimerFinished(_ItemTimerName)
+AND
+DB_ItemTimer(_Item,_ItemTimerName,_TimerName)
+THEN
+NOT DB_ItemTimer(_Item,_ItemTimerName,_TimerName);
+ItemTimerFinished(_Item,_TimerName);
+NOT ItemTimerFinished(_Item,_TimerName);
+
+//END_REGION
+
+//REGION character timer
+PROC
+CharTimer((CHARACTER)_Character,(STRING)_TimerName,(INTEGER)_Time)
+AND
+CharacterGetUUID(_Character,_UUID)
+AND
+StringConcatenate(_UUID,_TimerName,_CharTimerName)
+THEN
+DB_CharTimer(_Character,_CharTimerName,_TimerName);
+TimerLaunch(_CharTimerName,_Time);
+
+PROC
+CharTimerCancel((CHARACTER)_Character,(STRING)_TimerName)
+AND
+DB_CharTimer(_Character,_CharTimerName,_TimerName)
+THEN
+NOT DB_CharTimer(_Character,_CharTimerName,_TimerName);
+TimerCancel(_CharTimerName);
+
+IF
+TimerFinished(_CharTimerName)
+AND
+DB_CharTimer(_Character,_CharTimerName,_TimerName)
+THEN
+NOT DB_CharTimer(_Character,_CharTimerName,_TimerName);
+CharTimerFinished(_Character,_TimerName);
+NOT CharTimerFinished(_Character,_TimerName);
+//END_REGION
+
+//REGION Tutorial Messages
+
+PROC
+PROC_CheckPlayTut((STRING)_Message)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_Companion(_Player)
+THEN
+PROC_CheckPlayTut(_Player,_Message);
+
+PROC
+PROC_CheckPlayTut((CHARACTER)_Player,(STRING)_Message)
+AND
+DB_StartTutMessages(1)
+THEN
+ProcPlayTut(_Player,_Message);
+
+PROC
+PROC_CheckPlayTutWithDelay((STRING)_Message,(INTEGER)_Delay)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_Companion(_Player)
+THEN
+PROC_CheckPlayTutWithDelay(_Player,_Message,_Delay);
+
+PROC
+PROC_CheckPlayTutWithDelay((CHARACTER)_Player,(STRING)_Message,(INTEGER)_Delay)
+AND
+NOT DB_TutorialMessage(_Player,_Message,_)
+AND
+CharacterGetUUID(_Player,_Timer)
+AND
+StringConcatenate(_Timer,"_Tut",_TimerMsg)
+THEN
+TimerLaunch(_TimerMsg,_Delay);
+DB_TutorialMessage(_Player,_Message,_TimerMsg);
+
+IF
+TimerFinished(_TimerMsg)
+AND
+DB_StartTutMessages(1)
+AND
+DB_TutorialMessage(_Player,_Message,_TimerMsg)
+THEN
+NOT DB_TutorialMessage(_Player,_Message,_TimerMsg);
+ProcPlayTut(_Player,_Message);
+//END_REGION
+
+//REGION Move to changes 
+
+PROC
+ProcSaveGenericBehaviourState((CHARACTER)_Char)
+AND
+NOT DB_StoryMoving(_Char,1)
+AND
+DB_IsNotMessingAround(_Char)
+THEN
+DB_NPCWasMessingAround(_Char,1);
+
+PROC
+ProcSaveGenericBehaviourState((CHARACTER)_Char)
+AND
+NOT DB_StoryMoving(_Char,1)
+AND
+DB_NoDefaultBehavior(_Char)
+THEN
+DB_NPCHadNoDefaultBehavior(_Char,1);
+
+PROC
+ProcSaveGenericBehaviourState((CHARACTER)_Char)
+AND
+NOT DB_StoryMoving(_Char,1)
+AND
+DB_DisableAttackReaction(_Char)
+THEN
+DB_NPCHadDisableAttackReaction(_Char,1);
+
+PROC
+ProcSaveGenericBehaviourState((CHARACTER)_Char)
+AND
+NOT DB_StoryMoving(_Char,1)
+AND
+DB_Internal_Dialogs(_Char,_,_,_)
+THEN
+DB_NPCHadDialog(_Char,1);
+
+PROC
+ProcSaveGenericBehaviourState((CHARACTER)_Char)
+AND
+NOT DB_StoryMoving(_Char,1)
+AND
+DB_AD_Dialog(_Char,_)
+THEN
+DB_NPCHadDialog(_Char,1);
+
+PROC
+ProcDisableGenericBehaviours((CHARACTER)_Char)
+THEN
+NOT DB_IsNotMessingAround(_Char);
+DB_NoDefaultBehavior(_Char);
+CharacterSetHasDialog(_Char,0);
+
+PROC
+ProcRestoreGenericBehaviour((CHARACTER)_Char)
+THEN
+NOT DB_NoDefaultBehavior(_Char);
+
+PROC
+ProcRestoreGenericBehaviour((CHARACTER)_Char)
+AND
+DB_NPCWasMessingAround(_Char,1)
+THEN
+NOT DB_NPCWasMessingAround(_Char,1);
+DB_IsNotMessingAround(_Char);
+
+PROC
+ProcRestoreGenericBehaviour((CHARACTER)_Char)
+AND
+DB_NPCHadNoDefaultBehavior(_Char,1)
+THEN
+NOT DB_NPCHadNoDefaultBehavior(_Char,1);
+DB_NoDefaultBehavior(_Char);
+
+PROC
+ProcRestoreGenericBehaviour((CHARACTER)_Char)
+AND
+DB_NPCHadDisableAttackReaction(_Char,1)
+THEN
+NOT DB_NPCHadDisableAttackReaction(_Char,1);
+DB_DisableAttackReaction(_Char);
+
+PROC
+ProcRestoreGenericBehaviour((CHARACTER)_Char)
+AND
+DB_NPCHadDialog(_Char,1)
+THEN
+NOT DB_NPCHadDialog(_Char,1);
+CharacterSetHasDialog(_Char,1);
+
+PROC
+ProcSetMoveEvent((STRING)_Event)
+AND
+_Event!=""
+THEN
+DB_MoveEvent(_Event);
+
+PROC
+ProcSetMoveEvent("")
+THEN
+DB_MoveEvent("_ResetGenericBehaviours_");
+
+PROC
+ProcExecuteMove((CHARACTER)_Char,(TRIGGER)_Point,(INTEGER)_Running)
+AND
+DB_MoveEvent(_Event)
+AND
+DB_CharMovementCommandID(_Char,_ID)
+THEN
+NOT DB_MoveEvent(_Event);
+CharacterMoveToTrigger(_Char,_Point,_Running,_Event);
+DB_CharacterMovement(_Char,_Event,_ID);
+
+PROC
+ProcExecuteItemMove((CHARACTER)_Char,(ITEM)_Point,(INTEGER)_Running)
+AND
+DB_CharMovementCommandID(_Char,_ID)
+AND
+DB_MoveEvent(_Event)
+THEN
+NOT DB_MoveEvent(_Event);
+CharacterMoveToItem(_Char,_Point,_Running,_Event);
+DB_CharacterMovement(_Char,_Event,_ID);
+
+PROC
+ProcBumpOsirisMoveCommandID((CHARACTER)_Char)
+AND
+NOT DB_CharMovementCommandID(_Char,_)
+THEN
+DB_CharMovementCommandID(_Char,0);
+
+PROC
+ProcBumpOsirisMoveCommandID((CHARACTER)_Char)
+AND
+DB_CharMovementCommandID(_Char,_ID)
+AND
+IntegerSum(1,_ID,_New)
+THEN
+NOT DB_CharMovementCommandID(_Char,_ID);
+DB_CharMovementCommandID(_Char,_New);
+
+PROC
+ProcCharacterMoveToTrigger((CHARACTER)_Char,_,_,_)
+THEN
+ProcBumpOsirisMoveCommandID(_Char);
+
+PROC
+ProcCharacterMoveToTrigger((CHARACTER)_Char,(TRIGGER)_Point,(INTEGER)_Running,(STRING)_Event)
+AND
+DB_CharMovementCommandID(_Char,_ID)
+THEN
+ProcSaveGenericBehaviourState(_Char);
+ProcDisableGenericBehaviours(_Char);
+ProcSetMoveEvent(_Event);
+ProcExecuteMove(_Char,_Point,_Running);
+DB_StoryMoving(_Char,1);
+DB_MovingToTrigger(_Char,_Point,_Running,_ID);
+
+PROC
+ProcCharacterMoveToItem((CHARACTER)_Char,_,_,_)
+THEN
+ProcBumpOsirisMoveCommandID(_Char);
+
+PROC
+ProcCharacterMoveToItem((CHARACTER)_Char,(ITEM)_Point,(INTEGER)_Running,(STRING)_Event)
+AND
+DB_CharMovementCommandID(_Char,_ID)
+THEN
+ProcSaveGenericBehaviourState(_Char);
+ProcDisableGenericBehaviours(_Char);
+ProcSetMoveEvent(_Event);
+ProcExecuteItemMove(_Char,_Point,_Running);
+DB_StoryMoving(_Char,1);
+DB_MovingToItem(_Char,_Point,_Running,_ID);
+
+PROC
+ProcResumeStoryMoving((CHARACTER)_Char)
+AND
+DB_CharacterMovement(_Char,_Event,_ID)
+AND
+NOT DB_SelectedMove(_Char)
+THEN
+ProcSelectMove(_Char,_ID);
+
+PROC
+ProcSelectMove((CHARACTER)_Char,(INTEGER)_ID)
+AND
+DB_MovingToItem(_Char,_Point,_Running,_ID)
+AND
+DB_CharacterMovement(_Char,_Event,_ID)
+THEN
+DB_SelectedMove(_Char);
+CharacterMoveToItem(_Char,_Point,_Running,_Event);
+
+PROC
+ProcSelectMove((CHARACTER)_Char,(INTEGER)_ID)
+AND
+DB_CharacterMovement(_Char,_Event,_ID)
+AND
+DB_MovingToTrigger(_Char,_Point,_Running,_ID)
+AND
+DB_CharacterMovement(_Char,_Event,_ID)
+THEN
+DB_SelectedMove(_Char);
+CharacterMoveToTrigger(_Char,_Point,_Running,_Event);
+
+PROC
+ProcResumeStoryMoving((CHARACTER)_Char)
+THEN
+NOT DB_SelectedMove(_Char);
+
+PROC
+ProcClearMovingFacts((CHARACTER)_Char)
+AND
+DB_CharacterMovement(_Char,_Event,_ID)
+THEN
+NOT DB_CharacterMovement(_Char,_Event,_ID);
+
+PROC
+ProcClearMovingFacts((CHARACTER)_Char)
+AND
+DB_MovingToTrigger(_Char,_Point,_Running,_ID)
+THEN
+NOT DB_MovingToTrigger(_Char,_Point,_Running,_ID);
+
+PROC
+ProcClearMovingFacts((CHARACTER)_Char)
+AND
+DB_MovingToItem(_Char,_Point,_Running,_ID)
+THEN
+NOT DB_MovingToItem(_Char,_Point,_Running,_ID);
+
+IF
+CharacterEvent(_Char,_Event)
+AND
+DB_CharacterMovement(_Char,_Event,_ID)
+AND
+DB_MovingToItem(_Char,_Point,_Running,_ID)
+AND
+NOT DB_ClearedMoveEvent(_Char)
+THEN
+DB_ClearedMoveEvent(_Char);
+NOT DB_MovingToItem(_Char,_Point,_Running,_ID);
+
+IF
+CharacterEvent(_Char,_Event)
+AND
+DB_CharacterMovement(_Char,_Event,_ID)
+AND
+DB_MovingToTrigger(_Char,_Point,_Running,_ID)
+AND
+NOT DB_ClearedMoveEvent(_Char)
+THEN
+DB_ClearedMoveEvent(_Char);
+NOT DB_MovingToTrigger(_Char,_Point,_Running,_ID);
+
+IF
+CharacterEvent(_Char,_Event)
+AND
+DB_CharacterMovement(_Char,_Event,_ID)
+AND
+NOT DB_HandledMoveEvent(_Char)
+THEN
+DB_HandledMoveEvent(_Char);
+NOT DB_CharacterMovement(_Char,_Event,_ID);
+ProcCheckRestoreGenericBehaviours(_Char);
+
+IF
+CharacterEvent(_Char,_Event)
+THEN
+NOT DB_ClearedMoveEvent(_Char);
+NOT DB_HandledMoveEvent(_Char);
+
+PROC
+ProcCheckRestoreGenericBehaviours((CHARACTER)_Char)
+AND
+NOT DB_CharacterMovement(_Char,_,_)
+THEN
+NOT DB_StoryMoving(_Char,1);
+ProcRestoreGenericBehaviour(_Char);
+
+IF
+CharacterAttackedByCharacter(_Char,_Source)
+AND
+_Source.DB_IsPlayer()
+AND
+DB_StoryMoving(_Char,1)
+AND
+NOT DB_Combat(_Char,_)
+THEN
+ProcMakeNPCHostile(_Source,_Char);
+
+IF
+DB_Dead(_Char)
+AND
+DB_StoryMoving(_Char,1)
+THEN
+NOT DB_StoryMoving(_Char,1);
+ProcRestoreGenericBehaviour(_Char);
+ProcClearMovingFacts(_Char);
+
+IF
+CharacterEnteredCombat(_Char,_)
+AND
+DB_StoryMoving(_Char,1)
+THEN
+CharacterPurgeQueue(_Char);
+
+IF
+CharacterLeftCombat(_Char,_)
+AND
+NOT DB_Dead(_Char)
+AND
+DB_StoryMoving(_Char,1)
+THEN
+ProcResumeStoryMoving(_Char);
+
+PROC
+ProcClearStoryMove((CHARACTER)_Char)
+THEN
+NOT DB_StoryMoving(_Char,1);
+ProcRestoreGenericBehaviour(_Char);
+ProcClearMovingFacts(_Char);
+
+//END_REGION
+
+//REGION Gender vars 
+IF
+CharacterCreationFinished(CHARACTER_NULL)
+AND
+_Player.DB_IsPlayer()
+THEN
+ProcSetGenderVar(_Player);
+
+IF
+CharacterCreationFinished(_Player)
+THEN
+ProcSetGenderVar(_Player);
+
+PROC
+ProcSetGenderVar((CHARACTER)_Player)
+AND
+CharacterIsFemale(_Player,1)
+THEN
+DialogSetCharacterEvent("EVENT_player_is_female",_Player,0);
+
+PROC
+ProcSetGenderVar((CHARACTER)_Player)
+AND
+CharacterIsFemale(_Player,0)
+THEN
+DialogClearCharacterEvent("EVENT_player_is_female",_Player,0);
+
+IF
+DB_Companion(_Companion)
+THEN
+ProcSetGenderVar(_Companion);
+//END_REGION
+
+//REGION Overhead Warning
+PROC
+ProcLaunchOverheadDialogReplacement((CHARACTER) _NPC)
+AND
+Random(5, _Rand)
+AND
+IntegerSum(_Rand, 1, _Add)
+AND
+IntegertoString(_Add, _RandStr)
+AND
+StringConcatenate("GEN_Warning_", _RandStr, _Display)
+THEN
+CharacterDisplayText(_NPC, _Display);
+
+PROC
+ProcLaunchOverheadDialogReplacementItem((ITEM) _Item)
+AND
+Random(5, _Rand)
+AND
+IntegerSum(_Rand, 1, _Add)
+AND
+IntegertoString(_Add, _RandStr)
+AND
+StringConcatenate("GEN_Warning_", _RandStr, _Display)
+THEN
+ItemDisplayText(_Item, _Display);
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "__Start"

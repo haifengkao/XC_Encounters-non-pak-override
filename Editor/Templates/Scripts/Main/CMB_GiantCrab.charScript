@@ -1,0 +1,30 @@
+INIT
+CHARACTER:__Me
+FLOAT:%AmountOfKids = 0
+BEHAVIOUR
+
+REACTION SpawnKids,1
+USAGE COMBAT
+CHECK "c1&!c2"
+	IsLessThen(%AmountOfKids,2)
+	CharacterHasStatus(__Me,CHARMED)
+ACTIONS
+	Add(%AmountOfKids,1)
+	CharacterPlayEffect(__Me,"FX_GP_CameraShake_B")
+	CharacterUseSkill(Summon_EnemySmallCrab,__Me)
+	CharacterEndTurn()
+INTERRUPT
+	SetPriority(SpawnKids,1)
+	
+EVENTS
+EVENT GiantCrabInit
+ON 
+	OnInit()
+ACTIONS
+	CharacterAddSkill(Summon_EnemySmallCrab)
+	
+EVENT GiantCrabTurn
+ON 
+	OnTurn()
+ACTIONS
+	SetPriority(SpawnKids, 1000)

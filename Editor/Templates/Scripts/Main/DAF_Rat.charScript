@@ -1,0 +1,72 @@
+INIT
+CHARACTER:__Me
+FIXEDSTRING:%CurrentAction = "ChooseAction"
+FIXEDSTRING:%PreviousAction = ""
+FLOAT3:%StartPos
+EXTERN TRIGGER:%Hidyhole = 0
+INT:%Active = 1
+
+BEHAVIOUR
+REACTION FirstTime,2000
+USAGE ALL
+ACTIONS
+	CharacterForceUpdate(1)
+	GetPosition(__Me,%StartPos)
+	SetPriority(FirstTime,0)
+	
+REACTION Hiding, 1999
+USAGE ALL
+CHECK "c1"
+	IsEqual(%Active,0)
+ACTIONS
+	Sleep(15)
+
+REACTION ChooseAction, 1060
+USAGE PEACE
+ACTIONS
+	GetRandom(%CurrentAction, "Wander", "Sleep", "Hide")
+	GotoIfEqual(%PreviousAction, %CurrentAction, "Start")
+	Set(%PreviousAction, %CurrentAction)
+	SetPriority(%CurrentAction, 1070)
+	
+REACTION Wander, 0
+USAGE PEACE
+VARS
+	FLOAT:_Dist
+ACTIONS
+	IF "c1&c2"
+		GetDistance(_Dist,__Me,%StartPos)
+		IsGreaterThen(_Dist,15.0)
+	THEN
+		CharacterMoveTo(%StartPos,1,1,1)
+	ENDIF
+	CharacterWander(FLOAT:10.0,5.0,1)
+	SetPriority("Wander", 0)
+	
+REACTION Sleep, 0
+USAGE PEACE
+ACTIONS
+	Sleep(3)
+	SetPriority("Sleep", 0)
+	
+REACTION Hide, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Hidyhole,1,1,1)
+	CharacterSetOffStage()
+	Sleep(5)
+	CharacterSetOnStage()
+	CharacterWander(FLOAT:10.0,5.0,1)
+	SetPriority("Hide", 0)
+INTERRUPT
+	CharacterSetOnStage()
+	Reset()
+
+EVENTS	
+EVENT Permahide
+ON
+	OnCharacterEvent(__Me,"Hiding")
+ACTIONS
+	Set(%Active,0)
+	CharacterForceUpdate(0)
+	CharacterSetOffStage()

@@ -1,0 +1,37 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+CHARACTER:%Target = HIB_Hopper_84871638-73dd-481e-9b61-02f808a76805
+
+BEHAVIOUR
+
+REACTION State_Chasing, 0
+USAGE PEACE
+VARS
+	FLOAT:_Distance
+ACTIONS
+	IF "c1&c2"
+		GetDistance(_Distance,__Me,%Target)
+		IsGreaterThen(_Distance,4)
+	THEN
+		CharacterLookAt(%Target)
+		DialogStart("HIB_AD_HopperSnowman",__Me)
+		CharacterMoveTo(%Target,0,0,0)
+	ENDIF
+	Set(%currentState,"State_Waiting")
+	Sleep(0.5)
+
+REACTION State_Waiting, 0
+USAGE PEACE
+ACTIONS
+	Sleep(0.5)
+
+EVENTS
+
+EVENT HopperFled
+ON
+	OnCharacterEvent(__Me,"HIB_HopperFled")
+ACTIONS
+	Set(%currentState,"State_Chasing")

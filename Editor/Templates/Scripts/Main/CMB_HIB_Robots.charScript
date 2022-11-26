@@ -1,0 +1,207 @@
+INIT
+	CHARACTER:__Me
+	FLOAT3:%RobotMsl_Spot	
+	FLOAT:%MySightRange=null
+	INT:%BombFuseHandle = 0
+	INT:%EmergencyModeEngaged=0
+	INT:%RobotMsl_FXHandle
+	INT:%Bool_MissilesEnRoute=0
+	EXTERN INT:%AmAlpha=0
+	EXTERN INT:%Bool_CanUseMetalRain=0	
+	EXTERN INT:%RobotMsl_Current=2
+	EXTERN INT:%RobotMsl_Desired=2
+	
+//--------------------
+BEHAVIOUR
+REACTION Robot_EngageEmergencyMode,0
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+CHECK "c1&c2"
+	IsEqual(%AmAlpha,0)
+	CharacterGet(_Enemy,__Me,%MySightRange,Highest,Vitality,Enemy)
+ACTIONS
+	CharacterMoveTo(_Enemy,1,1,0,1.5)
+	CharacterPlayEffect(__Me,"FX_Creatures_Undead_Skeleton_Baby_Death_A")
+	CharacterDie(__Me)
+	SetPriority("Robot_EngageEmergencyMode",0)
+INTERRUPT
+	ON
+		OnMovementFailed(_)
+	ACTIONS
+		CharacterEndTurn()
+
+REACTION Robot_Hardcore_PlaceMarkOnTheGround,0
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MyCurrentAP
+CHECK "c1&c2&c3&c4&c5&!c6"
+	IsHardcore()
+	IsEqual(%Bool_CanUseMetalRain,1)
+	CharacterGet(_Target,__Me,%MySightRange,Highest,Distance,Enemy)
+	GetPosition(_Target,%RobotMsl_Spot)
+	CharacterGetStat(_MyCurrentAP,__Me,ActionPoints)
+	IsLessThen(_MyCurrentAP,4)
+ACTIONS
+	CharacterLookAt(_Target)	
+	CharacterPlayAnimation("skill_rain_start",1,1)
+	CharacterPlayAnimation("skill_rain_loop",1,1)
+	//CharacterPlayEffect(__Me,"FX_Skills_Fire_Flare_Impact_A")	
+	CharacterPlayAnimation("skill_rain_cast",1,0)
+	CharacterPlayEffect(__Me,"FX_Creatures_Skills_MetalRain_Cast_Chicken_A")	
+	Sleep(0.2)
+	PlayLoopEffectAt(%RobotMsl_FXHandle,%RobotMsl_Spot,"FX_Creatures_Skills_MetalRain_Target_Chicken_A")
+	Sleep(3.5)
+	Set(%Bool_MissilesEnRoute,1)
+	SetPriority("Robot_Hardcore_PlaceMarkOnTheGround",0)
+INTERRUPT
+	Reset()
+
+REACTION Robot_Hardcore_ExplodeAt,0
+USAGE COMBAT
+CHECK "c1&c2&c3"
+	IsHardcore()
+	IsEqual(%Bool_CanUseMetalRain,1)	
+	IsEqual(%Bool_MissilesEnRoute,1)
+ACTIONS
+	//DebugText(__Me,"Missiles falling!")
+	CharacterMoveInRange(%RobotMsl_Spot,6,10,1)
+	CharacterLookAt(%RobotMsl_Spot)
+	Sleep(0.5)
+	PlayEffectAt(%RobotMsl_Spot,"FX_Creatures_Skills_MetalRain_Impact_Chicken_A")
+	Sleep(1.5)
+	ExplodeAt(%RobotMsl_Spot,Projectile_EnemyFireball,15,__Me)
+	CreateSurfaceAt(%RobotMsl_Spot,"Fire",2.5,2)
+	StopLoopEffect(%RobotMsl_FXHandle)
+	Set(%Bool_MissilesEnRoute,0)
+	Set(%RobotMsl_Current,0)	
+	//DebugText(__Me,"Bools killed!")
+	SetPriority("Robot_Hardcore_ExplodeAt",0)
+INTERRUPT
+	StopLoopEffect(%RobotMsl_FXHandle)	//the robot can hurt itself, interrupting its own script: interrupts need to be handled
+	Set(%Bool_MissilesEnRoute,0)
+	Set(%RobotMsl_Current,0)	
+	//DebugText(__Me,"INTERRUPT - bools killed!")	
+	Reset()
+	
+//--------------------
+EVENTS
+EVENT OnInit_GetStats_RestoreFX
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%MySightRange,__Me,Sight)
+	THEN
+		StartTimer("CMB_HIB_Robot_StatusCheckTimer",2,0)
+	ENDIF
+	Set(%BombFuseHandle,0)
+	IF "c1"
+		IsEqual(%Bool_MissilesEnRoute,1)
+	THEN
+		PlayLoopEffectAt(%RobotMsl_FXHandle,%RobotMsl_Spot,"FX_Creatures_Skills_MetalRain_Target_Chicken_A")
+	ENDIF
+	
+EVENT OnCombatStarted_DisplayText
+VARS
+	FIXEDSTRING:_RobotText
+ON
+	OnCombatStarted()
+ACTIONS
+	IF "c1"
+		IsRandom(0.3)
+	THEN
+		GetRandom(_RobotText,"HIB_Robot_TargetAcquired_01","HIB_Robot_TargetAcquired_02","HIB_Robot_TargetAcquired_03")
+		DisplayText(__Me,_RobotText,4)
+	ENDIF
+	
+EVENT OnTurn_GeneralControl
+VARS
+	FIXEDSTRING:_RobotText_Attempt
+	FLOAT:_MyVitality
+	FLOAT:_SelfDestructThreshold=0.8
+ON
+	OnTurn()
+ACTIONS
+	IF "!c1&!c2&c3&c4&!c5"
+		IsEqual(%AmAlpha,1)
+		IsEqual(%EmergencyModeEngaged,1)
+		CharacterGetStat(_MyVitality,__Me,Vitality)
+		IsLessThen(_MyVitality,_SelfDestructThreshold)
+		CharacterIsDead(__Me)
+	THEN
+		SetPriority("Robot_EngageEmergencyMode",800)
+		DisplayText(__Me,"HIB_Robot_EmergencyMeasuresEngaged_01",4)
+		CharacterPlayLoopEffect(%BombFuseHandle,__Me,"FX_GP_Bomber_Sparks","Bip001 Spine")
+		Set(%EmergencyModeEngaged,1)
+	ELIF "c1"
+		IsRandom(0.3)
+	THEN
+		GetRandom(_RobotText_Attempt,"HIB_Robot_TerminateThreat_01","HIB_Robot_TerminateThreat_02","HIB_Robot_TerminateThreat_03")
+		DisplayText(__Me,_RobotText_Attempt,4)
+	ENDIF
+	IF "c1&c2"							//missile control
+		IsHardcore()	
+		IsLessThen(%RobotMsl_Current,%RobotMsl_Desired)
+	THEN
+		Add(%RobotMsl_Current,1)
+	ELIF "c1&c2"
+		IsHardcore()
+		IsEqual(%RobotMsl_Current,%RobotMsl_Desired)
+	THEN
+		Add(%RobotMsl_Current,1)
+		SetPriority("Robot_Hardcore_PlaceMarkOnTheGround",500)
+	ELIF "c1&c2&c3"
+		IsHardcore()
+		IsGreaterThen(%RobotMsl_Current,%RobotMsl_Desired)
+		IsEqual(%Bool_MissilesEnRoute,1)
+	THEN
+		SetPriority("Robot_Hardcore_ExplodeAt",1100)
+	ENDIF
+	
+EVENT OnTimer_CheckStatus
+ON
+	OnTimer("CMB_HIB_Robot_StatusCheckTimer")
+ACTIONS
+	IF "c1&c2&c3"
+		IsInSurface(__Me,Fire)
+		IsEqual(%AmAlpha,0)
+		IsEqual(%EmergencyModeEngaged,0)		
+	THEN
+		SetPriority("Robot_EngageEmergencyMode",800)
+		DisplayText(__Me,"HIB_Robot_EmergencyMeasuresEngaged_01",4)
+		CharacterPlayLoopEffect(%BombFuseHandle,__Me,"FX_GP_Bomber_Sparks","Bip001 Spine")
+		Set(%EmergencyModeEngaged,1)
+	ELSE
+		StartTimer("CMB_HIB_Robot_StatusCheckTimer",2,0)
+	ENDIF
+
+EVENT OnDie_DuringEmergencyMode
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	IF "c1"
+		IsEqual(%EmergencyModeEngaged,1)
+	THEN
+		ExplodeAt(__Me,Projectile_EnemyFireball,15)
+		StopLoopEffect(%BombFuseHandle)
+		Set(%BombFuseHandle,0)
+		CharacterSetOffStage()
+	ELSE
+		StopTimer("CMB_HIB_Robot_StatusCheckTimer")
+		DisplayText(__Me,"HIB_Robot_Die_01",4)
+		StopLoopEffect(%BombFuseHandle)
+		Set(%BombFuseHandle,0)
+	ENDIF	
+	
+EVENT OnDeactivate_StopLoopingFX
+ON
+	OnDie(__Me,_,_,_)
+	OnDeactivate()
+	OnCombatEnded()
+ACTIONS
+	StopLoopEffect(%BombFuseHandle)
+	StopLoopEffect(%RobotMsl_FXHandle)
+	Set(%Bool_MissilesEnRoute,0)
+	Set(%RobotMsl_Current,2)

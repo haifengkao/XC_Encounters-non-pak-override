@@ -1,0 +1,15 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_PlayerComment_Trigger(TRIGGER_HIB_Comment_GotOutside_T01,"HIB_GotOutside");
+
+DB_PlayerComments("HIB_GotOutside","HIB_GotOutside_1_1",1,1);
+DB_PlayerComments("HIB_GotOutside","HIB_GotOutside_2_1",2,1);
+DB_PlayerComments("HIB_GotOutside","HIB_GotOutside_2_2",2,2);
+
+KBSECTION
+
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

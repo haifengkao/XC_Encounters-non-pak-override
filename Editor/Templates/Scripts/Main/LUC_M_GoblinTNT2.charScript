@@ -1,0 +1,26 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter
+CHARACTER:__Me
+ITEM:%Barrel1 = LUC_TNTBarrel1_365a686c-88fb-4e52-8147-481901ee0643
+ITEM:%Barrel2 = LUC_TNTBarrel3_ae349aee-71b4-4402-8427-aef247361fd3
+ITEM:%Barrel3 = LUC_TNTBarrel4_76c0d81c-5203-4561-9f05-41a1ba5ed0b2
+
+BEHAVIOUR
+
+REACTION PatrolBarrels,1050
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Text
+	ITEM:_Barrel
+ACTIONS
+	GetRandom(_Barrel,%Barrel1,%Barrel2,%Barrel3)
+	CharacterMoveTo(_Barrel)
+	CharacterLookAt(_Barrel)
+	Sleep(1)
+	GetRandom(_Text,"LUC_M_GoblinTNT_3","LUC_M_GoblinTNT_4")
+	DisplayText(__Me,_Text,5)
+	Sleep(12)
+INTERRUPT
+	Reset()

@@ -1,0 +1,31 @@
+INIT
+CHARACTER:__Me
+EXTERN ITEM:%Seat = null
+CHARACTER:%Pokerbuddy1 = DAF_BO_GarrickGuard_01_c4b3a63c-b456-4be3-a5b8-8c157a4bad46
+CHARACTER:%Pokerbuddy2 = DAF_BO_GarrickGuard_02_159cb173-0d69-4f8e-be64-5ac2232af0b8
+BEHAVIOUR
+REACTION WalkToBench, 150
+VARS
+	FLOAT:_dist
+USAGE PEACE
+CHECK "!c1"
+	CharacterHasStatus(__Me,"SITTING")
+ACTIONS
+	CharacterMoveTo(%Seat)
+	CharacterUseItem(%Seat)
+	GlobalSetEvent("DAF_PokerAvailable")
+REACTION Sit, 140USAGE PEACE
+ACTIONS
+	Sleep(10)
+	DialogStart("DAF_AD_Pokergame",__Me,%Pokerbuddy1,%Pokerbuddy2)
+		
+EVENTS
+EVENT CombatStopsDialog
+ON	OnCombatStarted()
+ACTIONS	DialogRequestStop("DAF_AD_Pokergame")
+	
+EVENT GetUp
+ON
+	OnCharacterStatusRemoved(__Me, "SITTING")
+ACTIONS
+	GlobalClearEvent("DAF_PokerAvailable")

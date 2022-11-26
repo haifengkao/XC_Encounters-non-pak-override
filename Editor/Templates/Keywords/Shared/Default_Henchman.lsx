@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<save>
+    <header version="2" time="1418287717" />
+    <version major="1" minor="3" revision="0" build="0" />
+    <region id="keywordDialog">
+        <node id="root">
+            <attribute id="KeywordVoiced" value="0" type="19" />
+            <attribute id="PlayGreeting" value="0" type="19" />
+            <attribute id="keywordAutoImport" value="0" type="19" />
+            <attribute id="keywordName" value="Default_Henchman" type="22" />
+            <children>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="0ac97eb7-748b-4ca2-866b-7790f72454bb" type="22" />
+                    <attribute id="keywordContentMapValue" value="Why don&apos;t you ask again when you&apos;ve got some extra room in your crew." handle="hb4b7ceafg94f6g4d6bgba66gfadebcd60a67" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="0f640465-ca61-410c-a82f-b506920a9aee" type="22" />
+                    <attribute id="keywordContentMapValue" value="I require your services once more." handle="hde04e60bg45fdg4e16g9deeg956c9ada101c" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="2857ed35-e65d-435d-8a23-9bf8d0da6498" type="22" />
+                    <attribute id="keywordContentMapValue" value="I don&apos;t know... it seems you&apos;ve got all the help you need, for the moment. I&apos;m not about to play the extra wheel!" handle="h21cd7640gd29dg4e19g99e0g39c3760512c1" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="32d7a180-3dc6-4f5f-97d7-7f4fe9b2965c" type="22" />
+                    <attribute id="keywordContentMapValue" value="I&apos;m pleased to hear it. Onward!" handle="hfc65cdb0g2e50g4b01g9e7bgd0eb499f7dc0" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="4bd28aff-7838-4c8c-bd70-6d0c2e78c01c" type="22" />
+                    <attribute id="keywordContentMapValue" value="Missed me, did you? Come, then: to battle!" handle="hd0831c31g816cg412eg9d69gd6e743914fe4" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="5bf7dc26-89d3-4378-8920-08246eacf61a" type="22" />
+                    <attribute id="keywordContentMapValue" value="I&apos;ll take my leave." handle="h5d76f117g2200g43fdga4c7gc708cbd3edfc" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="79b423f9-7154-4c3a-ba60-c4bf2ea9d5da" type="22" />
+                    <attribute id="keywordContentMapValue" value="As you wish!" handle="h0a7907b6g17fcg44d7g8ba3g6a4dea581632" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="7c19f24d-5590-460c-b8f5-b6bdac3cfa7e" type="22" />
+                    <attribute id="keywordContentMapValue" value="I need you to leave the party for now." handle="h6653417ag5cbfg4917gac03gdb0096e517ea" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="7fb60218-cc04-4580-a13e-52b2df75f3a6" type="22" />
+                    <attribute id="keywordContentMapValue" value="Aye, commander!" handle="h46b14f5ag09c5g4541gaea4gf3c9fc2ea6d7" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="9fa783da-7a91-47ab-8296-474cdcbe1d67" type="22" />
+                    <attribute id="keywordContentMapValue" value="At the ready!" handle="h309a447cgf0a5g43b5gb52eg92d9578340a9" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="c25fce21-58a6-4c82-8fd7-c48e3a33ea1f" type="22" />
+                    <attribute id="keywordContentMapValue" value="I am happy to rejoin you, Source Hunter." handle="h48b300edgc646g41a1gb98dg66243e077af5" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="da24b8f8-1dc2-4ee9-843b-fbe167ad662c" type="22" />
+                    <attribute id="keywordContentMapValue" value="As you say, commander!" handle="hd38792f4gdb9fg4dfdgadd6gcae0b59f6766" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="e575d8fc-702b-496f-8df7-7666dbf32f9d" type="22" />
+                    <attribute id="keywordContentMapValue" value="My arm is your strength!" handle="h488a13e1g0adag472eg92c5g05efc5f9a15b" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="e9d5b9cc-45a9-4ff2-8bb7-17bb3f13b5a3" type="22" />
+                    <attribute id="keywordContentMapValue" value="Why, so I can hang back while you and your cronies snag all the glory? Hah! Ask again when you&apos;ve freed up a spot for yours truly." handle="hbf45acdag992eg4502g8aadg15a77292e125" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="ea2a89bb-af1a-4635-9654-60d585239c11" type="22" />
+                    <attribute id="keywordContentMapValue" value="Greeting" handle="h7f890f24g8572g4902g90b4gd362b7e9bdf2" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="ff77d6ef-e657-4443-86e4-800e372ca4f7" type="22" />
+                    <attribute id="keywordContentMapValue" value="Command me, Source Hunter!" handle="hceb9b623g76a4g435egaaf0g7694418e203e" type="28" />
+                </node>
+                <node id="keywordNode">
+                    <attribute id="keywordActions" value="" type="23" />
+                    <attribute id="keywordConditions" value="" type="23" />
+                    <attribute id="keywordDisplayedText" value="ea2a89bb-af1a-4635-9654-60d585239c11" type="22" />
+                    <attribute id="keywordId" value="Greeting" type="22" />
+                    <attribute id="keywordLast" value="0" type="19" />
+                    <attribute id="keywordOwner" value="1" type="4" />
+                    <attribute id="keywordShow" value="0" type="19" />
+                    <attribute id="keywordSource" value="0" type="5" />
+                    <children>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value="" type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="9fa783da-7a91-47ab-8296-474cdcbe1d67" type="22" />
+                                </node>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="e575d8fc-702b-496f-8df7-7666dbf32f9d" type="22" />
+                                </node>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="ff77d6ef-e657-4443-86e4-800e372ca4f7" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="keywordNode">
+                    <attribute id="keywordActions" value="" type="23" />
+                    <attribute id="keywordConditions" value='CONDITION IsCharacterFlag(&quot;GEN_DismissedHenchman&quot;,0,1)&#x0D;&#x0A;CHECK !c' type="23" />
+                    <attribute id="keywordDisplayedText" value="7c19f24d-5590-460c-b8f5-b6bdac3cfa7e" type="22" />
+                    <attribute id="keywordId" value="Dismiss" type="22" />
+                    <attribute id="keywordLast" value="0" type="19" />
+                    <attribute id="keywordOwner" value="1" type="4" />
+                    <attribute id="keywordShow" value="1" type="19" />
+                    <attribute id="keywordSource" value="0" type="5" />
+                    <children>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value='ACTION SetCharacterFlag(&quot;GEN_DismissHenchman&quot;,1,1)' type="23" />
+                            <attribute id="keywordConditions" value="" type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="79b423f9-7154-4c3a-ba60-c4bf2ea9d5da" type="22" />
+                                </node>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="da24b8f8-1dc2-4ee9-843b-fbe167ad662c" type="22" />
+                                </node>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="7fb60218-cc04-4580-a13e-52b2df75f3a6" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="keywordNode">
+                    <attribute id="keywordActions" value="" type="23" />
+                    <attribute id="keywordConditions" value="" type="23" />
+                    <attribute id="keywordDisplayedText" value="5bf7dc26-89d3-4378-8920-08246eacf61a" type="22" />
+                    <attribute id="keywordId" value="Leave" type="22" />
+                    <attribute id="keywordLast" value="1" type="19" />
+                    <attribute id="keywordOwner" value="1" type="4" />
+                    <attribute id="keywordShow" value="1" type="19" />
+                    <attribute id="keywordSource" value="0" type="5" />
+                    <children>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value="" type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="1" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="2" type="6" />
+                        </node>
+                    </children>
+                </node>
+                <node id="keywordNode">
+                    <attribute id="keywordActions" value="" type="23" />
+                    <attribute id="keywordConditions" value='CONDITION IsCharacterFlag(&quot;GEN_DismissedHenchman&quot;,0,1)&#x0D;&#x0A;CHECK c' type="23" />
+                    <attribute id="keywordDisplayedText" value="0f640465-ca61-410c-a82f-b506920a9aee" type="22" />
+                    <attribute id="keywordId" value="Rehire" type="22" />
+                    <attribute id="keywordLast" value="0" type="19" />
+                    <attribute id="keywordOwner" value="1" type="4" />
+                    <attribute id="keywordShow" value="1" type="19" />
+                    <attribute id="keywordSource" value="0" type="5" />
+                    <children>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value='ACTION SetCharacterFlag(&quot;GEN_RehireHenchman&quot;,0,1)&#x0D;&#x0A;' type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsFlag(&quot;GEN_PartyFull&quot;,1)&#x0D;&#x0A;CHECK !c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="c25fce21-58a6-4c82-8fd7-c48e3a33ea1f" type="22" />
+                                </node>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="32d7a180-3dc6-4f5f-97d7-7f4fe9b2965c" type="22" />
+                                </node>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="4bd28aff-7838-4c8c-bd70-6d0c2e78c01c" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value='CONDITION IsFlag(&quot;GEN_PartyFull&quot;,1)&#x0D;&#x0A;CHECK c' type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordSpeakerOverride" value="" type="23" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="2857ed35-e65d-435d-8a23-9bf8d0da6498" type="22" />
+                                </node>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="e9d5b9cc-45a9-4ff2-8bb7-17bb3f13b5a3" type="22" />
+                                </node>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="0ac97eb7-748b-4ca2-866b-7790f72454bb" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="keywordSpeakerNames">
+                    <children>
+                        <node id="keywordSpeakerName">
+                            <attribute id="Name" value="GEN_Human_Henchman_F;GEN_Human_Henchman_M" type="23" />
+                        </node>
+                        <node id="keywordSpeakerName">
+                            <attribute id="Name" value="" type="23" />
+                        </node>
+                        <node id="keywordSpeakerName">
+                            <attribute id="Name" value="" type="23" />
+                        </node>
+                        <node id="keywordSpeakerName">
+                            <attribute id="Name" value="" type="23" />
+                        </node>
+                    </children>
+                </node>
+            </children>
+        </node>
+    </region>
+</save>

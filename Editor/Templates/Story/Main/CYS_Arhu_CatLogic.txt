@@ -1,0 +1,226 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Dialogs(CHARACTER_CYS_Arhu,"CYS_ArhuIntro");
+
+DB_Singleton("IsArhuCat",1);
+
+DB_ArhuCat(CHARACTER_DAF_Arhu,CHARACTER_DAF_Arhu_Cat);
+DB_ArhuCat(CHARACTER_LUC_Arhu,CHARACTER_LUC_Arhu_Cat);
+DB_ArhuCat(CHARACTER_SAC_Arhu,CHARACTER_SAC_Arhu_Cat);
+
+DB_NoRunAway(CHARACTER_LUC_Arhu);
+DB_NoRunAway(CHARACTER_DAF_Arhu);
+DB_NoRunAway(CHARACTER_DAF_Arhu_Cat);
+DB_NoRunAway(CHARACTER_LUC_Arhu_Cat);
+DB_NoRunAway(CHARACTER_CYS_Arhu);
+DB_NoRunAway(CHARACTER_SAC_Arhu);
+DB_NoRunAway(CHARACTER_SAC_Arhu_Cat);
+
+TriggerRegisterForItems(TRIGGER_CYS_Ownership_Cyseal_Barracks_1F);
+
+
+DB_Arhus(CHARACTER_LUC_Arhu);
+DB_Arhus(CHARACTER_DAF_Arhu);
+DB_Arhus(CHARACTER_DAF_Arhu_Cat);
+DB_Arhus(CHARACTER_LUC_Arhu_Cat);
+DB_Arhus(CHARACTER_CYS_Arhu);
+DB_Arhus(CHARACTER_HIB_Arhu_Cat);
+DB_Arhus(CHARACTER_HIB_Arhu);
+DB_Arhus(CHARACTER_SAC_Arhu);
+DB_Arhus(CHARACTER_SAC_Arhu_Cat);
+KBSECTION
+IF
+CharacterLeftTrigger(_Char,TRIGGER_CYS_REGION_Barracks_Arhu)
+AND
+NOT DB_GlobalEvent("HOM_ArhuInHomestead")
+AND
+NOT DB_InRegion(_,TRIGGER_CYS_REGION_Barracks_Arhu)
+AND
+Random(10,_Rand)
+THEN
+ProcCYSSetArhuVisual(_Rand);
+ProcSetupNewArhuVisual();
+
+PROC
+ProcCYSSetArhuVisual((INTEGER)_Random)
+AND
+_Random>=5
+THEN
+DB_Singleton("IsArhuCat",1);
+
+PROC
+ProcCYSSetArhuVisual((INTEGER)_Random)
+AND
+_Random<5
+THEN
+DB_Singleton("IsArhuCat",0);
+
+IF
+GlobalEventSet("ArhuToHuman")
+THEN
+DB_Singleton("IsArhuCat",0);
+GlobalClearEvent("ArhuToHuman");
+
+IF
+GlobalEventSet("ArhuToCat")
+THEN
+DB_Singleton("IsArhuCat",1);
+GlobalClearEvent("ArhuToCat");
+
+IF
+DB_Singleton("IsArhuCat",1)
+AND
+NOT DB_GlobalEvent("ArhuPermaHuman")
+THEN
+CharacterPlayAnimation(CHARACTER_CYS_Arhu,"Custom_Morph_To_01","ArhuHuman2CatMorph1");
+
+IF
+CharacterEvent(CHARACTER_CYS_Arhu,"ArhuHuman2CatMorph1")
+THEN
+CharacterTransformIntoCharacterTemplate(CHARACTER_CYS_Arhu,"Animals_Cat_Arhu_8e7f08c1-3df2-43f4-9776-58be80c7fbc9",0);
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A",CHARACTER_CYS_Arhu);
+CharacterPlayAnimation(CHARACTER_CYS_Arhu,"Custom_Morph_From_01","");
+ProcClearTradeFacts(CHARACTER_CYS_Arhu);
+
+IF
+DB_Singleton("IsArhuCat",0)
+AND
+NOT DB_GlobalEvent("ArhuPermaCat")
+AND
+NOT DB_GlobalEvent("ArhuRefusesToMorphToHuman")
+THEN
+CharacterPlayAnimation(CHARACTER_CYS_Arhu,"Custom_Morph_To_01","ArhuCat2HumanMorph1");
+
+IF
+CharacterEvent(CHARACTER_CYS_Arhu,"ArhuCat2HumanMorph1")
+THEN
+CharacterTransformIntoCharacterTemplate(CHARACTER_CYS_Arhu,"NPC_Arhu_08751fe3-865f-4d82-904c-bca89a63ec89",0);
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A",CHARACTER_CYS_Arhu);
+CharacterPlayAnimation(CHARACTER_CYS_Arhu,"Custom_Morph_From_01","");
+ProcClearTradeFacts(CHARACTER_CYS_Arhu);
+
+PROC
+IncreaseAttitude((CHARACTER)_Player,_Arhu,(INTEGER)_Delta)
+AND
+DB_Arhus(_Arhu)
+THEN
+DB_AttitudeAdjustmentSrc(_Player,_Arhu);
+
+PROC
+DecreaseAttitude((CHARACTER)_Player,_Arhu,(INTEGER)_Delta)
+AND
+DB_Arhus(_Arhu)
+THEN
+DB_AttitudeAdjustmentSrc(_Player,_Arhu);
+
+IF
+CharacterAttitudeTowardsPlayerChanged(_Arhu,_Player,_New)
+AND
+DB_AttitudeAdjustmentSrc(_Player,_Arhu)
+AND
+DB_Arhus(_OtherArhu)
+AND
+_Arhu != _OtherArhu
+AND
+CharacterGetAttitudeTowardsPlayer(_OtherArhu,_Player,_Att)
+AND
+IntegerSubtract(_New,_Att,_Diff)
+THEN
+CharacterAddAttitudeTowardsPlayer(_OtherArhu,_Player,_Diff);
+
+IF
+CharacterAttitudeTowardsPlayerChanged(_Arhu,_Player,_New)
+AND
+DB_AttitudeAdjustmentSrc(_Player,_Arhu)
+THEN
+NOT DB_AttitudeAdjustmentSrc(_Player,_Arhu);
+
+IF
+CharacterEnteredCombat(CHARACTER_CYS_Arhu,_)
+THEN
+DB_Singleton("IsArhuCat",0);
+
+IF
+CharacterDied(_Arhu)
+AND
+DB_Arhus(_Arhu)
+AND
+DB_Arhus(_OtherArhu)
+AND
+_Arhu != _OtherArhu
+THEN
+CharacterSetOnStage(_OtherArhu,0);
+GlobalSetEvent("GLO_ArhuKilled");
+GoalCompleted;
+
+IF
+DB_Combat(_Cat,_ID)
+AND
+DB_Combat(_Player,_ID)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_ArhuCombatHandled(_Cat, _)
+AND
+DB_ArhuCat(_Arhu,_Cat)
+AND
+CharacterGetPosition(_Cat,_X,_Y,_Z)
+THEN
+DB_ArhuCombatHandled(_Cat, _Player);
+CharacterAppearAtPosition(_Arhu,_X,_Y,_Z,0);
+ProcSaveCatAlignmentState(_Cat,_Player);
+Poof(_Cat);
+
+PROC
+ProcSaveCatAlignmentState((CHARACTER)_Cat,(CHARACTER)_)
+THEN
+NOT DB_ArhuCatHostile(_Cat);
+
+PROC
+ProcSaveCatAlignmentState((CHARACTER)_Cat,(CHARACTER)_Player)
+AND
+CharacterGetRelationToCharacter(_Cat,_Player,_Rel)
+AND
+_Rel<=25
+THEN
+DB_ArhuCatHostile(_Cat);
+
+IF
+CharacterLeftCombat(_Cat,_)
+AND
+DB_ArhuCat(_Arhu,_Cat)
+AND
+DB_ArhuCombatHandled(_Cat, _)
+THEN
+CharTimer(_Cat,"ArhuHostile",100);
+
+IF
+CharTimerFinished(_Cat, "ArhuHostile")
+AND
+DB_ArhuCat(_Arhu,_Cat)
+AND
+DB_ArhuCombatHandled(_Cat, _Player)
+AND
+DB_ArhuCatHostile(_Cat)
+THEN
+NOT DB_ArhuCatHostile(_Cat);
+ProcMakeNPCHostile(_Player,_Arhu);
+
+IF
+CharTimerFinished(_Cat, "ArhuHostile")
+AND
+DB_ArhuCat(_Arhu,_Cat)
+AND
+DB_ArhuCombatHandled(_Cat, _Player)
+THEN
+NOT DB_ArhuCombatHandled(_Cat,_Player);
+
+IF
+CharacterLeftCombat(CHARACTER_LUC_Arhu, _)
+THEN
+Poof(CHARACTER_LUC_Arhu);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

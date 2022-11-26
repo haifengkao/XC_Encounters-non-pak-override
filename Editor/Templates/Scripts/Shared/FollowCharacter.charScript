@@ -1,0 +1,14 @@
+#INCLUDE Base
+
+INIT
+USING Base
+CHARACTER:__Me
+EXTERN CHARACTER:%Char = __Me
+EXTERN FLOAT:%Seconds = 1.0
+EXTERN INT:%RunMode = -1
+
+BEHAVIOUR
+REACTION Follow,10
+USAGE ALL
+ACTIONS
+	CharacterFollow(%Char,%Seconds,%RunMode)

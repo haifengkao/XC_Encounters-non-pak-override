@@ -1,0 +1,90 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_LUC_SpiderWorshippers(CHARACTER_LUC_SpiderWorshipper_01);
+DB_LUC_SpiderWorshippers(CHARACTER_LUC_SpiderWorshipper_02);
+DB_LUC_SpiderWorshippers(CHARACTER_LUC_SpiderWorshipper_03);
+DB_LUC_SpiderWorshippers(CHARACTER_LUC_SpiderWorshipper_04);
+
+DB_LUC_SpiderWorshippersEgg(CHARACTER_LUC_WorshipedEgg1);
+DB_LUC_SpiderWorshippersEgg(CHARACTER_LUC_WorshipedEgg2);
+DB_LUC_SpiderWorshippersEgg(CHARACTER_LUC_WorshipedEgg3);
+DB_LUC_SpiderWorshippersEgg(CHARACTER_LUC_WorshipedEgg4);
+DB_LUC_SpiderWorshippersEgg(CHARACTER_LUC_WorshipedEgg5);
+DB_LUC_SpiderWorshippersEgg(CHARACTER_LUC_WorshipedEgg6);
+DB_LUC_SpiderWorshippersEgg(CHARACTER_LUC_WorshipedEgg7);
+DB_LUC_SpiderWorshippersEgg(CHARACTER_LUC_WorshipedEgg8);
+
+DB_Dialogs(CHARACTER_LUC_SpiderWorshipper_01, "LUC_SpiderWorshipper");
+DB_Dialogs(CHARACTER_LUC_SpiderWorshipper_02, "LUC_SpiderWorshipper");
+DB_Dialogs(CHARACTER_LUC_SpiderWorshipper_03, "LUC_SpiderWorshipperLeader");
+DB_Dialogs(CHARACTER_LUC_SpiderWorshipper_04, "LUC_SpiderWorshipper");
+KBSECTION
+IF
+GlobalEventSet("LUC_WorshipperLeave")
+THEN
+CHARACTER_LUC_SpiderWorshipper_01.isGoingAway();
+
+IF
+DialogEnded("LUC_SpiderWorshipperLeader", _)
+AND
+NOT CHARACTER_LUC_SpiderWorshipper_01.isGoingAway()
+THEN	
+ProcTriggerRegisterForPlayers(TRIGGER_LUC_SpiderWorshippers);
+
+IF
+CharacterLeftTrigger(_Player, TRIGGER_LUC_SpiderWorshippers)
+AND
+NOT DB_InRegion(_, TRIGGER_LUC_SpiderWorshippers)
+THEN
+TimerLaunch("LUC_WorshipedEggSpawn", 5000);
+
+IF
+CharacterAttackedByCharacter(_Egg, _Player)
+AND
+_Player.DB_IsPlayer()
+AND
+DB_LUC_SpiderWorshippersEgg(_Egg)
+THEN
+SetRelationFactionToPlayers("LUC_SpiderWorshippers", 0);
+
+
+IF
+DialogEnded("LUC_SpiderWorshipperLeader", _)
+AND
+CHARACTER_LUC_SpiderWorshipper_01.isGoingAway()
+AND
+DB_LUC_SpiderWorshippers(_Dude)
+THEN
+CharacterSetHasDialog(_Dude, 0);
+CharacterDisappearOutOfSight(_Dude, 0, 1, "", 1);
+
+IF
+DialogEnded("LUC_SpiderWorshipperLeader", _)
+AND
+CHARACTER_LUC_SpiderWorshipper_01.isGoingAway()
+THEN
+TimerLaunch("LUC_WorshipedEggSpawn", 1000);
+
+IF
+TimerFinished("LUC_WorshipedEggSpawn")
+AND
+DB_LUC_SpiderWorshippersEgg(_Egg)
+THEN
+CharacterSetEvent(_Egg, "panicHatch");
+
+
+IF
+TimerFinished("LUC_WorshipedEggSpawn")
+AND
+DB_LUC_SpiderWorshippers(_Dude)
+AND
+DB_Dialogs(_Dude, _Dialog)
+THEN
+ProcRemoveDialogEntryForSpeaker(_Dude, _Dialog);
+DB_AD_Dialog(_Dude, "LUC_AD_Worshippers");
+CharacterSetVarFixedString(_Dude, "currentState", "State_Crying");
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

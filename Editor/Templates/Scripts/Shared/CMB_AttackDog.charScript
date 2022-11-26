@@ -1,0 +1,84 @@
+INIT
+	CHARACTER:__Me
+	FIXEDSTRING:%MyOriginalFaction					
+	EXTERN CHARACTER:%DogMaster=null						
+		
+//--------------
+BEHAVIOUR
+REACTION AttackDog_GoWeep, 0
+USAGE ALL
+CHECK "c1"
+	CharacterIsDead(%DogMaster)
+ACTIONS	
+	CharacterEvent(__Me,"IAmWeeping")
+	CharacterSetFaction(__Me,"Animal")
+	CharacterMoveTo(%DogMaster,0,1)
+	CharacterLookAt(%DogMaster)	
+	CharacterPlayAnimation("emotion_sad")	
+	SetPriority("AttackDog_WeepNearMastersBody", 2000)
+    SetPriority("AttackDog_GoWeep", 0)
+
+REACTION AttackDog_WeepNearMastersBody, 0
+USAGE ALL
+VARS 
+	FIXEDSTRING:_SadAnimation
+ACTIONS
+	IF "c1"
+		CharacterIsDead(%DogMaster)
+	THEN
+		CharacterMoveTo(%DogMaster,1,1,0)
+		CharacterLookAt(%DogMaster)	
+		GetRandom(_SadAnimation,"use_inspect","idle2","emotion_sad")
+		CharacterPlayAnimation(_SadAnimation,1,1)
+		CharacterEndTurn()
+	ELSE
+		CharacterSetFaction(__Me,%MyOriginalFaction)
+		SetPriority("AttackDog_WeepNearMastersBody", 0)
+	ENDIF
+INTERRUPT
+	Reset()
+	
+//--------------	
+EVENTS
+EVENT OnInit_StoreOriginalFaction
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetFaction(%MyOriginalFaction, __Me)
+	THEN
+	ENDIF
+
+EVENT OnDamage_StopWeeping
+ON
+	OnDamage(_,_,_,_)
+	OnMiss(_,_,__Me,_)
+ACTIONS
+	SetPriority("AttackDog_WeepNearMastersBody",0)
+
+EVENT OnDie_PlayFX
+ON
+	OnDie(%DogMaster,_,_,_)
+ACTIONS
+	CharacterPlayEffect(__Me,"FX_GP_ExclamationMark_A")
+    SetPriority("AttackDog_GoWeep",2500)
+	
+EVENT OnDamage_RestoreFaction
+ON
+	OnDamage(_,_,_,_)
+ACTIONS
+	IF "c1"
+		CharacterIsDead(%DogMaster)
+	THEN
+		CharacterSetFaction(__Me,%MyOriginalFaction)
+	ENDIF
+	
+EVENT OnDeactivate_SetOffStage
+ON
+	OnDeactivate()
+ACTIONS
+	IF "c1"
+		CharacterIsDead(%DogMaster)
+	THEN
+		CharacterSetOffStage()
+	ENDIF

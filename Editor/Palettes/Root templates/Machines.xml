@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<palette xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <palettes />
+  <objectids>
+    <guid>ebbff8f2-22eb-4ad3-af68-36e2250215c6</guid>
+    <guid>70f16056-3b7e-4851-a85f-a606333d3aa8</guid>
+    <guid>417172f3-e006-4137-82b4-de027a9abbc1</guid>
+    <guid>c9384713-898a-437a-bac8-29e1f2b1566e</guid>
+    <guid>eafac1ba-d72a-4286-919e-18ec7931af09</guid>
+    <guid>c63878c6-9236-4edc-807e-f0691b04ac7f</guid>
+    <guid>5d5d748b-7e55-4300-9c17-c02da23ceecc</guid>
+    <guid>26dbf50b-7071-4f41-ad8d-91713c3e1741</guid>
+    <guid>a97ce064-20f7-4a2a-9b9f-df75e137c997</guid>
+    <guid>133a4aae-8d03-4b5b-8f76-f351f734d1e4</guid>
+    <guid>a22c6a39-079e-49f6-8158-ad88c1787db9</guid>
+    <guid>f1efe494-7c63-4f7e-9496-ff7caaaeadfb</guid>
+    <guid>6c3e3076-180f-4c85-a316-6dccb6b50210</guid>
+    <guid>1ceae9ca-1aa0-4d1d-b6b2-88f1346f5631</guid>
+    <guid>36c889d5-ce04-48b3-8bdd-07d0060c0a0a</guid>
+    <guid>166e173b-0a95-4d98-9e7b-fbf7f0fb1c75</guid>
+    <guid>9ea9489d-d964-4a2d-9568-286e47e2453c</guid>
+    <guid>88deea24-2228-4184-b5ed-7c18bc43472a</guid>
+    <guid>7737f153-44cc-4e71-b4d6-ea3900036f0f</guid>
+    <guid>e1bf6b94-3722-4772-9c11-4454bbad8678</guid>
+    <guid>a0295f05-2b58-4bba-b466-a8cfa15249e5</guid>
+    <guid>f6a0e851-9578-4cdc-99d5-60626077a8b2</guid>
+    <guid>e2657e93-b215-4355-aa68-ac784df5fd5c</guid>
+    <guid>88f9c4c5-a82b-4390-ac3b-956be4522afd</guid>
+    <guid>fa15e5e4-9f29-4bc8-b9f6-f9733366b0ca</guid>
+    <guid>e25af1db-63a8-45f5-9581-b00fb05b0852</guid>
+    <guid>5af8e8eb-a03b-4c56-a16f-e1406dc2c440</guid>
+    <guid>7a9a8097-4505-49f7-97fe-550cc62c5728</guid>
+    <guid>e161421a-ed8d-49d5-9b8a-a6fa250c528e</guid>
+    <guid>25f12bb0-ebe6-4c1c-8475-51fe6465f3db</guid>
+    <guid>a745a478-cb7f-47cb-87d2-b563a6110a84</guid>
+    <guid>e087d9dd-9d11-4426-87a5-47e52c18a751</guid>
+    <guid>4c31e69e-a3ba-4f02-bf07-334cff803384</guid>
+    <guid>c557c4a3-643f-47ed-a2dc-42cda724ce10</guid>
+    <guid>c27d2890-b8e2-48dd-9e7a-0e09f92d69f8</guid>
+    <guid>fcd64cf7-fcb1-4dd6-975f-43c060337898</guid>
+    <guid>498f8ea8-611b-4e6d-807d-88f9b7296025</guid>
+    <guid>fe3aa8f0-3c90-47db-9575-805c9f1747a2</guid>
+    <guid>942ccb4b-a8b9-4001-a73e-037ff1561be9</guid>
+  </objectids>
+  <name>Machines</name>
+</palette>

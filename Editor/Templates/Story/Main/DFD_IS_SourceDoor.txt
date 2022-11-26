@@ -1,0 +1,38 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+ItemSetOwner(ITEM_DFD_IS_SourceDoor,CHARACTER_LUC_PickAxeHolderHack);
+ItemSetOnlyOwnerCanUse(ITEM_DFD_IS_SourceDoor,1);
+DB_NoForbiddenText(ITEM_DFD_IS_SourceDoor);
+DB_OneShotPlayerTrigger(TRIGGER_DFD_IS_UpdateShortcut);
+KBSECTION
+IF
+CharacterUsedItemFailed(_Character,ITEM_DFD_IS_SourceDoor)
+AND
+NOT DB_Companion(_Character)
+THEN
+ProcCheckIfAllStarstonesCollected();
+ProcDoTwoSpeakerItemDialog("DFD_IS_SourceDoor",_Character,ITEM_DFD_IS_SourceDoor);
+
+PROC
+ProcCheckIfAllStarstonesCollected()
+AND
+NOT DB_RoomUnlockSequence(_,_,_,_)
+THEN
+GlobalSetEvent("AllStarstoneRoomsUnlocked");
+
+IF
+GlobalEventSet("DFD_IS_Open_SourceDoor")
+THEN
+ItemOpen(ITEM_DFD_IS_SourceDoor);
+ItemSetOnlyOwnerCanUse(ITEM_DFD_IS_SourceDoor,0);
+
+PROC
+ProcOneShotTriggerEntered(_Player, TRIGGER_DFD_IS_UpdateShortcut)
+THEN
+QuestUpdate("HOM_Starstones", "OnEnteringSourceTempleAndDiscoveringBrokenMirror");
+EXITSECTION
+
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

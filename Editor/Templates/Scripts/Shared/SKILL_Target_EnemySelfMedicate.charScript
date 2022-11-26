@@ -1,0 +1,43 @@
+#TEMPLATE "_SKILL_Base" : Target_EnemySelfMedicate
+
+INIT
+CHARACTER:__Me
+// [GLOBAL_VARS]
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_Target_EnemySelfMedicate
+VARS
+	// [CALC_VARS]
+	FLOAT:_StatVitality
+	FLOAT:_Score
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_Target_EnemySelfMedicate")
+ACTIONS	
+	// [CALC_ACTIONS_PRE]
+	Set(_Score, 0.0)
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	IF "((c1&c2)|c3)&(!(c4))"
+	    CharacterGetStat(_StatVitality, __Me, Vitality) // c1
+	    IsLessThen(_StatVitality, 0.5) // c2
+	    IsLessThen(_StatVitality, 0.2) // c3
+	    IsGreaterThen(_StatVitality, 0.8) // c4
+	THEN
+	    // Hostile count score calculation
+	    Add(_Score, 10.0) // HostileWeight
+	    
+	    Set(%SkillTargetChar_Target_EnemySelfMedicate, __Me)
+	    Add(%ActionScore_Target_EnemySelfMedicate, _Score)
+	ENDIF
+	// [~CALC_ACTIONS]
+
+	
+
+	

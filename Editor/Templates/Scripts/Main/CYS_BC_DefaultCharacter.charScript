@@ -1,0 +1,47 @@
+#INCLUDE DefaultCharacter
+#INCLUDE State_Manager
+INIT
+	USING DefaultCharacter
+	USING State_Manager
+	CHARACTER:__Me
+	TRIGGER:%Fishrack = CYS_BC_DesdemonaFishrackPoint_600b882f-08db-4050-a5a8-47fee0d6d774
+	TRIGGER:%Food = CYS_BC_GhostCookPoint1_325e8ff4-a67e-4221-b96d-2d9be511540a
+	CHARACTER:%Ebe = CYS_BC_EbenezerListener1
+BEHAVIOUR
+
+REACTION State_WaitingForTheShip, 0
+USAGE PEACE
+ACTIONS
+	GetWeightedRandom(%currentAction, "Action_Wander",INT:5, "Action_FishRack",INT:1, "Action_GoToEbenezer",INT:3, "Action_FetchFood",INT:1)
+	SetPriority(%currentAction, 1100)
+	
+REACTION Action_Wander, 0
+USAGE PEACE
+ACTIONS
+	CharacterWander(FLOAT:5, 10, 0)
+	SetPriority(%currentAction, 0)
+	
+REACTION Action_FishRack, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Fishrack, 0)
+	CharacterPlayAnimation("Fidget_Forward_01")
+	Sleep(2)
+	SetPriority(%currentAction, 0)
+	
+REACTION Action_FetchFood, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Food, 0)
+	CharacterLookFrom(%Food)
+	CharacterPlayAnimation("Fidget_Forward_01")
+	Sleep(2)
+	SetPriority(%currentAction, 0)
+	
+REACTION Action_GoToEbenezer, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Ebe, 0)
+	Sleep(2)
+	SetPriority(%currentAction, 0)
+	

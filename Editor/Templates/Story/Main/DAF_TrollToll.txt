@@ -1,0 +1,190 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_IsNotMessingAround(CHARACTER_DAF_TrollBridge);
+ProcTriggerRegisterForPlayers(TRIGGER_DAF_TrollBridge_Scene);
+SneakTriggerSpotter(TRIGGER_DAF_AreaTrollBridge_Fight, CHARACTER_DAF_TrollBridge);
+SneakTriggerSpotter(TRIGGER_DAF_AreaTrollBridge_Fight, CHARACTER_DAF_TrollBridge_Leader);
+DB_OneShotPlayerTrigger(TRIGGER_DAF_AreaTrollBridge_Fight2);
+
+DB_DAF_Troll_NPC(CHARACTER_DAF_TrollBridge);
+DB_DAF_Troll_NPC(CHARACTER_DAF_TrollBridge_Guard1);
+DB_DAF_Troll_NPC(CHARACTER_DAF_TrollBridge_Guard2);
+DB_DAF_Troll_NPC(CHARACTER_DAF_TrollBridge_Leader);
+DB_DAF_Troll_NPC(CHARACTER_DAF_TrollBridge_Prisoner1);
+DB_DAF_Troll_NPC(CHARACTER_DAF_TrollBridge_Prisoner2);
+DB_DAF_Troll_NPC(CHARACTER_DAF_TrollBridge_Prisoner3);
+
+DB_DAF_TrollSlavers(CHARACTER_DAF_TrollBridge_Guard1);
+DB_DAF_TrollSlavers(CHARACTER_DAF_TrollBridge_Guard2);
+DB_DAF_TrollSlavers(CHARACTER_DAF_TrollBridge_Leader);
+KBSECTION
+IF
+CharacterEnteredTrigger(_Character,TRIGGER_DAF_TrollBridge_Scene)
+AND
+NOT DB_Dead(CHARACTER_DAF_TrollBridge)
+AND
+NOT DB_Dead(CHARACTER_DAF_TrollBridge_Leader)
+AND
+NOT DB_OnlyOnce("DAF_Trollbridge_DD")
+AND
+NOT DB_OnlyOnce("DAF_AD_Trollbridge")
+THEN
+DB_OnlyOnce("DAF_AD_Trollbridge");
+DialogStartTwoSpeakerDialog("DAF_AD_Trollbridge",CHARACTER_DAF_TrollBridge,CHARACTER_DAF_TrollBridge_Leader);
+ProcTriggerUnregisterForPlayers(TRIGGER_DAF_TrollBridge_Scene);
+
+IF
+AutomatedDialogEnded("DAF_AD_Trollbridge",_Inst)
+THEN
+ProcTriggerRegisterForPlayers(TRIGGER_DAF_TrollBridge_Scene);
+NOT DB_OnlyOnce("DAF_AD_Trollbridge");
+
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Character,TRIGGER_DAF_AreaTrollBridge_Fight2)
+AND
+NOT DB_OnlyOnce("DAF_Trollbridge_FightStarted")
+AND
+NOT DB_GlobalEvent("DAF_TrollBridge_Paid")
+THEN
+DB_OnlyOnce("DAF_Trollbridge_FightStarted");
+DialogRequestStopForCharacter(CHARACTER_DAF_TrollBridge);
+CharacterDisplayText(CHARACTER_DAF_TrollBridge_Leader,"DAF_TrollBridge_Attack");
+QuestUpdate("DAF_TrollBridge","Refuse");
+QuestClose("DAF_TrollBridge");
+CharacterSetRelationFactionToFaction("DAF_Troll_Immaculate","LUC_Troll",0);
+CharacterSetRelationFactionToFaction("LUC_Troll","DAF_Troll_Immaculate",0);
+SetRelationFactionToPlayers("DAF_Troll_Immaculate",0);
+SetRelationIndivFactionToPlayers(CHARACTER_DAF_TrollBridge,0);
+TimerLaunch("DAF_TrollBridge_FightStarts",3000);
+DB_OnlyOnce("DAF_Trollbridge_DD");
+CharacterDisappearOutOfSight(CHARACTER_DAF_TrollBridge_Prisoner1, 0, 1, "", 1);
+CharacterDisappearOutOfSight(CHARACTER_DAF_TrollBridge_Prisoner2, 0, 1, "", 1);
+CharacterDisappearOutOfSight(CHARACTER_DAF_TrollBridge_Prisoner3, 0, 1, "", 1);
+
+IF
+CharacterAttackedByCharacter(_Character,_)
+AND
+DB_DAF_Troll_NPC(_Character)
+AND
+NOT DB_OnlyOnce("DAF_Trollbridge_FightStarted")
+THEN
+DB_OnlyOnce("DAF_Trollbridge_FightStarted");
+DialogRequestStopForCharacter(CHARACTER_DAF_TrollBridge);
+CharacterDisplayText(CHARACTER_DAF_TrollBridge_Leader,"DAF_TrollBridge_Attack");
+QuestUpdate("DAF_TrollBridge","Refuse");
+QuestClose("DAF_TrollBridge");
+CharacterSetRelationFactionToFaction("DAF_Troll_Immaculate","LUC_Troll",0);
+CharacterSetRelationFactionToFaction("LUC_Troll","DAF_Troll_Immaculate",0);
+SetRelationFactionToPlayers("DAF_Troll_Immaculate",0);
+SetRelationIndivFactionToPlayers(CHARACTER_DAF_TrollBridge,0);
+TimerLaunch("DAF_TrollBridge_FightStarts",3000);
+DB_OnlyOnce("DAF_Trollbridge_DD");
+CharacterDisappearOutOfSight(CHARACTER_DAF_TrollBridge_Prisoner1, 0, 1, "", 1);
+CharacterDisappearOutOfSight(CHARACTER_DAF_TrollBridge_Prisoner2, 0, 1, "", 1);
+CharacterDisappearOutOfSight(CHARACTER_DAF_TrollBridge_Prisoner3, 0, 1, "", 1);
+
+PROC
+ProcCharInTriggerSpotted((CHARACTER)_Character,TRIGGER_DAF_AreaTrollBridge_Fight)
+AND
+NOT DB_OnlyOnce("DAF_Trollbridge_DD")
+THEN
+PROC_MendatoryDialogThreeSpeaker("DAF_Trollbridge",CHARACTER_DAF_TrollBridge,CHARACTER_DAF_TrollBridge_Leader,_Character);
+DB_OnlyOnce("DAF_Trollbridge_DD");
+
+IF
+DialogCharacterEventSet("DAF_TakeImmacAmulet",_Player,_)
+AND
+ItemTemplateIsInPartyInventory(_Player,"Quest_Immaculate_Amulet_A_c6882e7a-9896-4e74-ac91-1a2ea087933e",1,_)
+THEN
+NOOP(1);
+
+IF
+DialogEnded("DAF_Trollbridge",_)
+AND
+DB_GlobalEvent("DAF_TrollBridge_Paid")
+THEN
+ProcCharacterMoveToTrigger(CHARACTER_DAF_TrollBridge,TRIGGER_DAF_PointTrollBridge_Pass,0,"Arrived");
+ProcCharacterMoveToTrigger(CHARACTER_DAF_TrollBridge_Guard1,TRIGGER_DAF_Point_FromLuculla,0,"");
+ProcCharacterMoveToTrigger(CHARACTER_DAF_TrollBridge_Prisoner1,TRIGGER_DAF_Point_FromLuculla,0,"");
+ProcCharacterMoveToTrigger(CHARACTER_DAF_TrollBridge_Prisoner2,TRIGGER_DAF_Point_FromLuculla,0,"");
+ProcCharacterMoveToTrigger(CHARACTER_DAF_TrollBridge_Prisoner3,TRIGGER_DAF_Point_FromLuculla,0,"");
+ProcCharacterMoveToTrigger(CHARACTER_DAF_TrollBridge_Guard2,TRIGGER_DAF_Point_FromLuculla,0,"");	//commented out b/c Archer
+ProcCharacterMoveToTrigger(CHARACTER_DAF_TrollBridge_Leader,TRIGGER_DAF_Point_FromLuculla,0,"Arrived");
+CharacterDisplayText(CHARACTER_DAF_TrollBridge_Guard2,"DAF_TrollBridge_Letsgo");
+QuestUpdate("DAF_TrollBridge","Paid");
+QuestClose("DAF_TrollBridge");
+DB_AD_Dialog(CHARACTER_DAF_TrollBridge_Guard1,"DAF_AD_TrollBridge_Guard_Paid");
+DB_AD_Dialog(CHARACTER_DAF_TrollBridge_Guard2,"DAF_AD_TrollBridge_Guard_Paid");
+DB_AD_Dialog(CHARACTER_DAF_TrollBridge_Leader,"DAF_AD_TrollBridge_Guard_Paid");
+DB_AD_Dialog(CHARACTER_DAF_TrollBridge_Prisoner1,"DAF_AD_TrollBridge_Prisoner_Paid");
+DB_AD_Dialog(CHARACTER_DAF_TrollBridge_Prisoner2,"DAF_AD_TrollBridge_Prisoner_Paid");
+DB_AD_Dialog(CHARACTER_DAF_TrollBridge_Prisoner3,"DAF_AD_TrollBridge_Prisoner_Paid");
+DB_Dialogs(CHARACTER_DAF_TrollBridge,"DAF_TrollBridge_Paid");
+
+IF
+CharacterEvent(CHARACTER_DAF_TrollBridge,"Arrived")
+THEN
+CharacterLookFromTrigger(CHARACTER_DAF_TrollBridge,TRIGGER_DAF_PointTrollBridge_Pass,0);
+TimerLaunch("DAF_TrollBridge_Wander",5000);
+
+IF
+TimerFinished("DAF_TrollBridge_Wander")
+THEN
+CharacterDisplayText(CHARACTER_DAF_TrollBridge,"DAF_TrollBridge_King");
+CharacterSetScriptframe(CHARACTER_DAF_TrollBridge,"Wander");
+
+IF
+CharacterEvent(CHARACTER_DAF_TrollBridge_Leader,"Arrived")
+THEN
+CharacterSetOnStage(CHARACTER_DAF_TrollBridge_Leader,0);
+CharacterSetOnStage(CHARACTER_DAF_TrollBridge_Guard1,0);
+CharacterSetOnStage(CHARACTER_DAF_TrollBridge_Guard2,0);
+CharacterSetOnStage(CHARACTER_DAF_TrollBridge_Prisoner1,0);
+CharacterSetOnStage(CHARACTER_DAF_TrollBridge_Prisoner2,0);
+CharacterSetOnStage(CHARACTER_DAF_TrollBridge_Prisoner3,0);
+
+IF
+DialogCharacterEventSet("DAF_TrollBridge_GiveMedal",_Player,_)
+THEN
+ItemToCharacter(ITEM_DAF_Immaculate_Token_Troll,_Player);
+
+IF
+DialogEnded("DAF_Trollbridge",_)
+AND
+DB_GlobalEvent("DAF_TrollBridge_Refuse")
+THEN
+CharacterDisplayText(CHARACTER_DAF_TrollBridge_Leader,"DAF_TrollBridge_Attack");
+QuestUpdate("DAF_TrollBridge","Refuse");
+QuestClose("DAF_TrollBridge");
+CharacterSetRelationFactionToFaction("DAF_Troll_Immaculate","LUC_Troll",0);
+CharacterSetRelationFactionToFaction("LUC_Troll","DAF_Troll_Immaculate",0);
+SetRelationFactionToPlayers("DAF_Troll_Immaculate",0);
+SetRelationIndivFactionToPlayers(CHARACTER_DAF_TrollBridge,0);
+CharacterMoveToCharacter(CHARACTER_DAF_TrollBridge_Guard1,CHARACTER_DAF_TrollBridge,1,"arrived",0);
+//CharacterMoveToCharacter(CHARACTER_DAF_TrollBridge_Guard2,CHARACTER_DAF_TrollBridge,1,"arrived",0);	//ed - this char is an archer, should stay behind :)
+TimerLaunch("DAF_TrollBridge_FightStarts",3000);
+
+IF
+TimerFinished("DAF_TrollBridge_FightStarts")
+THEN
+CharacterDisplayText(CHARACTER_DAF_TrollBridge_Prisoner1,"DAF_TrollBridge_Flee");
+ProcCharacterMoveToTrigger(CHARACTER_DAF_TrollBridge_Prisoner1,TRIGGER_DAF_Slaves_Flee,1,"GEN_GoOffStage");
+ProcCharacterMoveToTrigger(CHARACTER_DAF_TrollBridge_Prisoner2,TRIGGER_DAF_Slaves_Flee,1,"GEN_GoOffStage");
+ProcCharacterMoveToTrigger(CHARACTER_DAF_TrollBridge_Prisoner3,TRIGGER_DAF_Slaves_Flee,1,"GEN_GoOffStage");
+
+IF
+CharacterEnteredCombat(_Char, _)
+AND
+DB_DAF_TrollSlavers(_Char)
+THEN
+CharacterPurgeQueue(CHARACTER_DAF_TrollBridge_Prisoner1);
+CharacterDisappearOutOfSight(CHARACTER_DAF_TrollBridge_Prisoner1, 180, 1, "", 1);
+CharacterPurgeQueue(CHARACTER_DAF_TrollBridge_Prisoner2);
+CharacterDisappearOutOfSight(CHARACTER_DAF_TrollBridge_Prisoner2, 180, 1, "", 1);	
+CharacterPurgeQueue(CHARACTER_DAF_TrollBridge_Prisoner3);
+CharacterDisappearOutOfSight(CHARACTER_DAF_TrollBridge_Prisoner3, 180, 1, "", 1);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

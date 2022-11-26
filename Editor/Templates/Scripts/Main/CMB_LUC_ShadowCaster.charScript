@@ -1,0 +1,53 @@
+INIT
+
+CHARACTER:__Me													
+FLOAT:%SkillMaxRange												
+FLOAT:%MySightRange												
+
+//------------------------
+BEHAVIOUR
+
+REACTION KeepYourDistance, 0
+USAGE COMBAT
+ACTIONS
+	CharacterFleeFrom(Enemy,%SkillMaxRange)
+	SetPriority("KeepYourDistance",0)
+	
+REACTION JustSkipTurn, 200
+USAGE COMBAT
+ACTIONS
+	CharacterEndTurn()
+	
+//------------------------
+EVENTS
+
+EVENT Initialize
+ON
+	OnInit()
+VARS
+	FLOAT:_SkillMinRange
+ACTIONS
+	IF "c1&c2"	//yeah i know
+		CharacterGetSkillRange(_SkillMinRange,%SkillMaxRange,__Me,Projectile_EnemyLowStunBlitzBolt)
+		CharacterGetSightRange(%MySightRange,__Me)
+	THEN
+		SetPriority("Combat_AttackSetEnemy",0)
+		Subtract(%SkillMaxRange,5)
+	ENDIF
+
+EVENT CheckDistance
+ON
+	OnTurn()
+VARS
+	FLOAT:_DistanceToEnemy
+	FLOAT:_MySightRange		
+	CHARACTER:_ClosestEnemy		
+ACTIONS
+	IF "c1&!c2&c3&c4"
+		CharacterGet(_ClosestEnemy,__Me,%MySightRange,Lowest,Distance,Enemy,null,null,null,__Me)
+		CharacterHasStatus(_ClosestEnemy,DYING)
+		GetDistance(_DistanceToEnemy,__Me,_ClosestEnemy)
+		IsLessThen(_DistanceToEnemy,%SkillMaxRange)
+	THEN
+		SetPriority("KeepYourDistance",1200)
+	ENDIF

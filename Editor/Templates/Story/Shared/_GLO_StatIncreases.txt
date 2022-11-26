@@ -1,0 +1,95 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_StatIncreases("GLO_IncreaseCompassionate","Compassionate");
+DB_StatIncreases("GLO_IncreaseHeartless","Heartless");
+DB_StatIncreases("GLO_IncreaseEgotistical","Egotistical");
+DB_StatIncreases("GLO_IncreaseAltruistic","Altruistic");
+DB_StatIncreases("GLO_IncreaseSpiritual","Spiritual");
+DB_StatIncreases("GLO_IncreaseMaterialistic","Materialistic");
+DB_StatIncreases("GLO_IncreasePragmatic","Pragmatic");
+DB_StatIncreases("GLO_IncreaseRomantic","Romantic");
+DB_StatIncreases("GLO_IncreaseVindictive","Vindictive");
+DB_StatIncreases("GLO_IncreaseForgiving","Forgiving");
+DB_StatIncreases("GLO_IncreaseBold","Bold");
+DB_StatIncreases("GLO_IncreaseTimid","Timid");
+DB_StatIncreases("GLO_IncreaseIndependent","Independent");
+DB_StatIncreases("GLO_IncreaseObedient","Obedient");
+DB_StatIncreases("GLO_IncreaseRighteous","Righteous");
+DB_StatIncreases("GLO_IncreaseRenegade","Renegade");
+DB_StatIncreases("GLO_IncreaseBlunt","Blunt");
+DB_StatIncreases("GLO_IncreaseConsiderate","Considerate");
+KBSECTION
+IF
+DialogCharacterEventSet(_Event,_Player, _Id)
+AND
+DB_StatIncreases(_Event,_)
+THEN
+StatCurrentDialogDB(_Event, _Player, _Id);
+ProcCloneSocialStat(_Player,_Event,_ID);
+
+IF
+DialogCharacterEventSet("GLO_Yield",_Player, _Id)
+AND
+StatCurrentDialogDB(_Event, _Player, _Id)
+THEN
+DialogClearCharacterEvent("GLO_Yield",_Player,0);
+NOT StatCurrentDialogDB(_Event, _Player, _Id);
+StatCurrentDialogDB("GLO_IncreaseObedient", _Player, _Id);
+
+IF
+DialogEnded(_, _Id)
+AND
+StatCurrentDialogDB(_Event, _Player, _Id)
+AND
+DB_StatIncreases(_Event,_Trait)
+THEN
+CharacterAddTrait(_Player,_Trait,1);
+CharacterIncreaseSocialStat(_Player,_Event);
+DialogClearCharacterEvent(_Event,_Player,1);
+PROC_CheckPlayTut(_Player, "TUT_TraitDialog");
+
+PROC
+ProcCloneSocialStat((CHARACTER)_FirstPlayer,(STRING)_Event,(INTEGER)_ID)
+AND
+DB_DualDialogsDisabled(1)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_Companion(_Player)
+AND
+_Player!=_FirstPlayer
+AND
+DB_StatIncreases(_Event,_)
+THEN
+StatCurrentDialogDB(_Event, _Player, _ID);
+
+PROC
+ProcCheckPartyForTrait((STRING)_Trait,(CHARACTER)_Player1,(STRING)_Event)
+THEN
+GlobalClearEvent(_Event);
+
+PROC
+ProcCheckPartyForTrait((STRING)_Trait,(CHARACTER)_Player1,(STRING)_Event)
+AND
+CharacterHasTrait(_Player1,_Trait,1)
+THEN
+GlobalSetEvent(_Event);
+
+PROC
+ProcCheckPartyForTrait((STRING)_Trait,(CHARACTER)_Player1,(STRING)_Event)
+AND
+_Player2.DB_IsPlayer()
+AND
+_Player2!=_Player1
+AND
+CharacterHasTrait(_Player2,_Trait,1)
+AND
+CharacterGetDistanceToCharacter(_Player1,_Player2,_Dist)
+AND
+_Dist < 10.0
+THEN
+GlobalSetEvent(_Event);
+EXITSECTION
+
+ENDEXITSECTION

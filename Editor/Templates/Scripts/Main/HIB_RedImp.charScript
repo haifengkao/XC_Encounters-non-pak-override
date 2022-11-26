@@ -1,0 +1,54 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+TRIGGER:%Point1 = HIB_Point_RedImp_89abb715-e051-4a7b-992c-9606c580bfce
+ITEM:%Corpse1 = HIB_ImpCorpse1_ec10bce9-ad74-48c6-a378-0801706e840e
+ITEM:%Corpse2 = HIB_ImpCorpse2_cefe9469-1cf8-42d6-be70-011ee6a1d938
+ITEM:%Corpse3 = HIB_ImpCorpse3_a0c6fefc-11e8-4a2c-9b4a-966ad1875685
+ITEM:%Corpse4 = HIB_ImpCorpse4_04e2ec66-b8af-4fbc-a094-2097d8556cb3
+ITEM:%Corpse5 = HIB_ImpCorpse5_642a41a0-36ed-43ab-9e1a-ab23facf3fba
+INT:%HIB_RedImpAtBody = 0
+
+BEHAVIOUR
+
+REACTION State_Wandering, 0
+USAGE PEACE
+ACTIONS
+	GetWeightedRandom(%currentAction,"Action_Wander",FLOAT:2,"Action_GoToCorpse",FLOAT:1)
+	SetPriority(%currentAction,1100)
+
+REACTION Action_GoToCorpse, 0
+USAGE PEACE
+VARS
+	ITEM:_Corpse
+	FLOAT:_Dist
+ACTIONS
+	GetRandom(_Corpse,%Corpse1,%Corpse2,%Corpse3,%Corpse4,%Corpse5)
+	IF "c1&c2"
+		GetDistance(_Dist,_Corpse,__Me)
+		IsLessThen(_Dist,10)
+	THEN
+		CharacterMoveTo(_Corpse)
+		CharacterLookAt(_Corpse)
+		Sleep(1)
+		Set(%HIB_RedImpAtBody,1)
+		DialogStart("HIB_AD_RedImp",__Me)
+		Sleep(3)
+	ENDIF
+	SetPriority(%currentAction,0)
+INTERRUPT
+	SetPriority(%currentAction,0)
+
+REACTION Action_Wander, 0
+USAGE PEACE
+ACTIONS
+	CharacterWander(FLOAT:4,4,0,%Point1)
+	Sleep(1)
+	CharacterPlayAnimation("still")
+	DialogStart("HIB_AD_RedImp",__Me)
+	CharacterWander(FLOAT:4,4,0,%Point1)
+	SetPriority(%currentAction,0)
+INTERRUPT
+	SetPriority(%currentAction,0)

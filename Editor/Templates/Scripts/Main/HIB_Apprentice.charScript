@@ -1,0 +1,18 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+
+BEHAVIOUR
+
+REACTION State_Dying, 0
+USAGE PEACE
+ACTIONS
+	IF "!c1"
+		CharacterHasStatus(__Me,"LYING")
+	THEN
+		CharacterUseItem(HIB_Apprentice_Invisibed_3cc5ac4b-d869-4ad7-a063-a54c08f267bf)
+	ENDIF
+	Sleep(25)
+	DialogStart("HIB_AD_Apprentice",__Me)

@@ -1,0 +1,83 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Dialogs(CHARACTER_LUC_Kadraskaz, "LUC_Kadraskaz");
+DB_Dialogs(CHARACTER_LUC_KadraskazMount, "LUC_KadraskazMount");
+DB_IsNotMessingAround(CHARACTER_LUC_Kadraskaz);
+SetDefaultThreatenedDialog(CHARACTER_LUC_Kadraskaz, "LUC_Kadraskaz");
+NoStealingReaction(CHARACTER_LUC_KadraskazMount);
+TriggerRegisterForCharacter(TRIGGER_LUC_KadraskazRemoveNode, CHARACTER_LUC_Kadraskaz);
+KBSECTION
+IF
+CharacterEvent(CHARACTER_LUC_Kadraskaz, "atTheShop")
+THEN
+CHARACTER_LUC_Kadraskaz.freeMountOver();
+CharacterSetFaction(CHARACTER_LUC_KadraskazMount, "Good NPC");
+
+IF
+CharacterAttackedByCharacter(CHARACTER_LUC_KadraskazMount,_Player)
+AND
+DB_IsPlayer(_Player)
+AND
+CharacterCanSeeCharacter(CHARACTER_LUC_KadraskazMount,_Player,1)
+THEN
+DialogRequestStopForCharacter(CHARACTER_LUC_Kadraskaz);
+ProcMakeNPCHostile(_Player,CHARACTER_LUC_Kadraskaz);
+
+IF
+CharacterDied(CHARACTER_LUC_Kadraskaz)
+AND
+NOT CHARACTER_LUC_Kadraskaz.freeMountOver()
+AND
+CharacterGetClosestPlayerWithTalent(CHARACTER_LUC_KadraskazMount, "AnimalEmpathy", _Player)
+AND
+CharacterGetDistanceToCharacter(CHARACTER_LUC_KadraskazMount, _Player, _Dist)
+AND
+_Dist <= 20
+THEN
+CHARACTER_LUC_KadraskazMount.talk();
+DialogRequestStopForCharacter(CHARACTER_LUC_KadraskazMount);
+NOT CHARACTER_LUC_KadraskazMount.DB_IsInDialog();
+PROC_MendatoryDialog("LUC_KadraskazMountThank", CHARACTER_LUC_KadraskazMount, _Player);
+
+IF
+CharacterDied(CHARACTER_LUC_Kadraskaz)
+AND
+NOT CHARACTER_LUC_KadraskazMount.talk()
+AND
+NOT CHARACTER_LUC_Kadraskaz.freeMountOver()
+THEN
+CHARACTER_LUC_KadraskazMount.DB_Gone();
+DialogRequestStopForCharacter(CHARACTER_LUC_KadraskazMount);
+CharacterSetHasDialog(CHARACTER_LUC_KadraskazMount,0);
+CharacterDisappearOutOfSight(CHARACTER_LUC_KadraskazMount, 120, 1, "", 1);
+
+IF
+DialogEnded("LUC_KadraskazMountThank", _)
+ THEN
+CHARACTER_LUC_KadraskazMount.DB_Gone();
+CharacterSetHasDialog(CHARACTER_LUC_KadraskazMount,0);
+CharacterDisappearOutOfSight(CHARACTER_LUC_KadraskazMount, 120, 1, "", 1);
+
+IF
+CharacterEnteredTrigger(CHARACTER_LUC_Kadraskaz, TRIGGER_LUC_KadraskazRemoveNode)
+THEN
+GlobalSetEvent("LUC_KadraskazOutOfStorm");
+
+IF
+CharacterLeftCombat(CHARACTER_LUC_Kadraskaz, _)
+AND
+NOT DB_Dead(CHARACTER_LUC_KadraskazMount)
+AND
+NOT CHARACTER_LUC_KadraskazMount.DB_Gone()
+THEN
+CharacterSetHasDialog(CHARACTER_LUC_KadraskazMount, 1);
+
+IF
+CharacterEnteredCombat(CHARACTER_LUC_Kadraskaz, _)
+THEN
+CharacterSetHasDialog(CHARACTER_LUC_KadraskazMount, 0);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

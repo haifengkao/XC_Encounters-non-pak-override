@@ -1,0 +1,44 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+DB_PlayerComments("CYS_CommentShereth","CYS_Comment_Shereth_1_1",1,1);
+DB_PlayerComments("CYS_CommentShereth","CYS_Comment_Shereth_2_1",2,1);
+DB_PlayerComments("CYS_CommentShereth","CYS_Comment_Shereth_2_2",2,2);
+KBSECTION
+IF
+TradeEnds(_Player,CHARACTER_CYS_Shereth)
+THEN
+GlobalSetEvent("CYS_TradedWithSourceTrader");
+
+IF
+DialogStarted("CYS_DD_SourceTrader",_)
+THEN
+CHARACTER_CYS_Shereth.hadDD();
+
+IF
+TradeEnds(_Player,CHARACTER_CYS_Shereth)
+AND
+NOT _Player.DB_IsInDialog()
+AND
+NOT CHARACTER_CYS_Shereth.hadDD()
+AND
+NOT DB_OnlyOnce("DoSherethComments")
+THEN
+DB_OnlyOnce("DoSherethComments");
+Launch_PlayerComment(_Player, "CYS_CommentShereth");
+
+IF
+DialogEnded("CYS_Shereth",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_GlobalEvent("CYS_KillSourceTrader")
+THEN
+CharacterSetHasDialog(CHARACTER_CYS_Shereth,0);
+SetRelationIndivFactionToPlayers(CHARACTER_CYS_Shereth,0);
+GoalCompleted;
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

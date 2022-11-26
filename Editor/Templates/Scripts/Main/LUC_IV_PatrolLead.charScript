@@ -1,0 +1,38 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	CHARACTER:%Friend = LUC_IV_PatrolFollow_1265954a-72bf-4a6e-8093-ed7ebdfe44c8
+	TRIGGER:%Point1 = LUC_IV_Patrol1_bbccce31-9f41-419b-a318-0a455bfb7fd7
+	TRIGGER:%Point2 = LUC_IV_Patrol2_e8e611ff-ff25-4b7e-aaba-00c383d0e174
+	TRIGGER:%Point3 = LUC_IV_Patrol3_9a7d0179-9bdd-4c81-a5da-2bd804898188
+	TRIGGER:%Point4 = LUC_IV_Patrol4_4be44365-cf2a-4595-a0fd-bf1de0590ce1
+	TRIGGER:%Point5 = LUC_IV_Patrol5_62537d7e-d6a4-4864-8177-654b8b6adf87
+	TRIGGER:%Point55 = LUC_IV_Patrol5_5_df1a00cb-c654-44cf-9fe3-2cb460405252
+	TRIGGER:%Point6 = LUC_IV_Patrol6_9d0c38be-d6da-4206-bea9-8284c61c5d4d
+
+BEHAVIOUR
+
+REACTION State_Patroling, 0
+	USAGE PEACE
+	ACTIONS
+		GetRandom(%currentAction, "Action_Patrol")
+		SetPriority(%currentAction, 1100)
+
+REACTION Action_Patrol, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterMoveTo(%Point1, 0)
+		CharacterMoveTo(%Point2, 0)
+		CharacterMoveTo(%Point2, 0)
+		CharacterMoveTo(%Point3, 0)
+		CharacterMoveTo(%Point4, 0)
+		CharacterMoveTo(%Point5, 0)
+		CharacterMoveTo(%Point55, 0)
+		CharacterMoveTo(%Point6, 0)
+		CharacterLookFrom(%Point6)
+		CharacterEvent(%Friend,"TalkToPatrol")
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)

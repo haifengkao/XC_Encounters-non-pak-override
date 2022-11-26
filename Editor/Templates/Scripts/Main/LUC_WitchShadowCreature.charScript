@@ -1,0 +1,20 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+
+EVENTS
+
+EVENT BlueMushroomKills
+ON
+	OnCharacterEvent(__Me,"LUC_BlueMushroomKills")
+VARS
+	CHARACTER:_Player
+ACTIONS
+	IF "c1"
+		GetClosestPlayer(_Player,__Me)
+	THEN
+		CharacterEvent(_Player,"LUC_KilledByMushroom")
+	ENDIF
+	CharacterDie(__Me)

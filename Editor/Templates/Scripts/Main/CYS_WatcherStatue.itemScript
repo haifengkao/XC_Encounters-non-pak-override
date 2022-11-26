@@ -1,0 +1,62 @@
+INIT
+
+	ITEM:__Me
+	EXTERN DAMAGE:%Type = null
+	EXTERN DAMAGE:%ExtraType = null
+	EXTERN SURFACE:%SurfaceOne = null
+	EXTERN SURFACE:%SurfaceTwo = null
+	INT:%StillActive = 1
+	
+EVENTS
+
+EVENT OnDamageTaken
+	VARS
+		DAMAGE:_Dmg
+	ON
+		OnDamage(_Dmg, _, _, _)
+	ACTIONS
+		IF "c3&(c1|c2)"
+			IsEqual(_Dmg, %Type)
+			IsEqual(_Dmg, %ExtraType)
+			IsEqual(%StillActive, 1)
+		THEN
+			ItemEvent(__Me, "MakeDemonAppear")
+			StopTimer("checkForSurface")
+			Set(%StillActive, 0)
+		ENDIF
+		
+EVENT TimerSurface
+	ON
+		OnTimer("checkForSurface")
+	ACTIONS
+		IF "c3&(c1|c2)"
+			IsInSurface(__Me, %SurfaceOne)
+			IsInSurface(__Me, %SurfaceTwo)
+			IsEqual(%StillActive, 1)
+		THEN
+			ItemEvent(__Me, "MakeDemonAppear")
+			Set(%StillActive, 0)
+			StopTimer("checkForSurface")
+		ENDIF
+		
+EVENT Initialize
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		IsEqual(%StillActive, 1)
+	THEN
+		StartTimer("checkForSurface",0.1,-1)
+	ENDIF
+	IF "c1"
+		IsEqual(%ExtraType, null)
+	THEN
+		Set(%ExtraType, %Type)
+	ENDIF
+	
+
+EVENT Shutdown
+ON
+	OnShutdown()
+ACTIONS
+	StopTimer("checkForSurface")

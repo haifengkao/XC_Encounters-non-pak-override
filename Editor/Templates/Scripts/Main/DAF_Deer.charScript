@@ -1,0 +1,23 @@
+INIT
+CHARACTER:__Me
+EXTERN TRIGGER:%CurrentTrigger = null
+
+BEHAVIOUR
+
+REACTION WanderInForest, 1050
+VARS
+	FLOAT:_seconds
+USAGE PEACE
+ACTIONS
+	GetRandom(_seconds, 5, 4, 6, 7)
+	CharacterWander(%CurrentTrigger, _seconds)
+	CharacterPlayAnimation("Idle2")
+	
+STORY
+
+SCRIPTFRAME CommentOnHumans
+VARS
+	FIXEDSTRING:_text
+ACTIONS
+	GetRandom(_text, "DAF_Deer_Human_01", "DAF_Deer_Human_02", "DAF_Deer_Human_03")
+	DisplayText(__Me, _text, 5)

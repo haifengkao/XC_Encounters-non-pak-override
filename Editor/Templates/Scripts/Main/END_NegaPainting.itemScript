@@ -1,0 +1,22 @@
+INIT
+
+ITEM:__Me
+
+	EXTERN STRING:%Dialog = "END_AD_NegaKingsCrab_Painting"
+	ITEM:%Helper
+	
+EVENTS
+
+
+EVENT Use
+ON
+	OnUseItem(_, __Me)
+ACTIONS
+	DialogStart(%Dialog, %Helper)
+
+
+EVENT Initialize
+ON
+	OnGlobalEventSet("END_Nega_Init")
+ACTIONS
+	SpawnItem("58a6e7e3-a4de-48ee-9aa4-2ff126bda3bc", __Me, %Helper)

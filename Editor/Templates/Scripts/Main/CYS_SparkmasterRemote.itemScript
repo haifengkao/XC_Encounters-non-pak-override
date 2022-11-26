@@ -1,0 +1,19 @@
+INIT
+
+ITEM:__Me
+
+EVENTS
+
+EVENT BlowUp
+ON
+	OnItemEvent(__Me, "blowUp")
+VARS
+	CHARACTER:_Char
+ACTIONS
+	IF "c1"
+		GetClosestPlayer(_Char, __Me)
+	THEN
+		ExplodeAt(_Char, Projectile_TrapFlare, 5)
+		ItemDestroy(__Me)
+		ItemSetOnStage(__Me, 0)
+	ENDIF

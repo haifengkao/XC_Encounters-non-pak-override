@@ -1,0 +1,43 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter
+
+CHARACTER:__Me
+CHARACTER:%Friend = CYS_PatrollingGuardEast_1_41b50b7d-64ef-4975-a569-9d19ce950037
+
+INT:%TalkToPatrolGuardEast = 0
+
+BEHAVIOUR
+REACTION FollowingGuard,1050
+USAGE PEACE
+ACTIONS
+	CharacterFollow(%Friend,50,0)
+INTERRUPT
+	Reset()
+	
+REACTION TalkToPatrolGuardEast, 1060
+USAGE PEACE
+	VARS
+		FLOAT:_Dist
+	CHECK "c1"
+		IsEqual(%TalkToPatrolGuardEast,1)
+	ACTIONS
+		IF "c1&c2"
+			GetDistance(_Dist, __Me, %Friend)
+			IsLessThen(_Dist, 10)
+		THEN
+			DisplayText(__Me, "CYS_PatrolGuardEastSide_1", 5)
+			DisplayText(__Me,"CYS_PatrolGuardEastSide_2",5)
+		ELSE
+			CharacterMoveTo(%Friend,1,1)
+		ENDIF
+		Set(%TalkToPatrolGuardEast,0)
+		
+	
+EVENTS	
+EVENT TalkToPatrolGuardEast
+	ON	
+	OnCharacterEvent(__Me,"TalkToPatrolGuardEast")
+	ACTIONS	
+	Set(%TalkToPatrolGuardEast,1)

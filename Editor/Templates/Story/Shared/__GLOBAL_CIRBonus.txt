@@ -1,0 +1,16 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+IF
+GlobalEventSet(_Event)
+AND
+DB_CIRDialog((STRING)_Event,(INTEGER)_Act,(INTEGER)_ActPart,(INTEGER)_Gain)
+THEN
+PartyAddCharismaExperience(_Act, _ActPart, _Gain);
+NOT DB_CIRDialog(_Event, _Act, _ActPart, _Gain);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "__Start"

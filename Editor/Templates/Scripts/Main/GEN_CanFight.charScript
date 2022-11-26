@@ -1,0 +1,20 @@
+INIT
+	CHARACTER:__Me
+	EXTERN INT:%Bool_CombatEndsDeactCanFight=0
+	
+EVENTS
+EVENT OnDamage_SetCanFightToTrue
+ON
+	OnDamage(_,_,_,_)
+ACTIONS
+	CharacterSetCanFight(__Me,1)
+	
+EVENT OnCombatEnded_DeactCanFight
+ON
+	OnCombatEnded()
+ACTIONS
+	IF "c1"
+		IsEqual(%Bool_CombatEndsDeactCanFight,1)
+	THEN
+		CharacterSetCanFight(__Me,0)
+	ENDIF

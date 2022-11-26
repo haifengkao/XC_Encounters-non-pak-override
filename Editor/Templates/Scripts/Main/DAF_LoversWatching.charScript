@@ -1,0 +1,30 @@
+INIT
+CHARACTER:__Me
+
+BEHAVIOUR
+REACTION State_Inspecting, 1000
+USAGE PEACE
+VARS
+	FLOAT:_SightRange
+ACTIONS
+	IF "c1"
+		CharacterGetSightRange(_SightRange,__Me)
+	THEN
+		IterateCharactersNear(__Me,_SightRange,"CheckForPartyMember")
+	ENDIF
+	Sleep(1.0)
+
+EVENTS
+EVENT PartyMemberIterator
+VARS 
+	CHARACTER:_Player
+ON
+	OnIterateCharacter(_Player,"CheckForPartyMember")
+ACTIONS
+	IF "c1&c2"
+		CharacterIsPlayer(_Player)
+		CharacterCanSee(__Me,_Player,1)
+	THEN
+		//This is an empty body.
+		//The reason for this is to get the NPC saw Player events in story for this character.
+	ENDIF

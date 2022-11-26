@@ -1,0 +1,710 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+//REGION Texts
+DB_Dialogs(CHARACTER_LUC_ImpMaster,"LUC_ImpMaster");
+DB_Dialogs(CHARACTER_LUC_ImpSlave,"LUC_ImpSlave");
+DB_IsNotMessingAround(CHARACTER_LUC_ImpMaster);
+DB_PlayerComment_Trigger(TRIGGER_LUC_Area_Comment_ImpMasterCellar,"LUC_Comment_ImpMasterCellar");
+
+DB_PlayerComments("LUC_Comment_ImpMasterCellar","LUC_Comment_ImpMasterCellar_1_1",1,1);
+DB_PlayerComments("LUC_Comment_ImpMasterCellar","LUC_Comment_ImpMasterCellar_2_1",2,1);
+DB_PlayerComments("LUC_Comment_ImpMasterCellar","LUC_Comment_ImpMasterCellar_2_2",2,2);
+
+DB_PlayerComment_Trigger(TRIGGER_LUC_IM_CommentLair,"LUC_IM_CommentLair");
+
+DB_PlayerComments("LUC_IM_CommentLair","LUC_IM_CommentLair_1_1",1,1);
+DB_PlayerComments("LUC_IM_CommentLair","LUC_IM_CommentLair_2_1",2,1);
+DB_PlayerComments("LUC_IM_CommentLair","LUC_IM_CommentLair_2_2",2,2);
+
+DB_PlayerComment_Trigger(TRIGGER_LUC_IM_CommentMaradinoStudy,"LUC_IM_CommentStudy");
+
+DB_PlayerComments("LUC_IM_CommentStudy","LUC_IM_CommentStudy_1_1",1,1);
+DB_PlayerComments("LUC_IM_CommentStudy","LUC_IM_CommentStudy_2_1",2,1);
+DB_PlayerComments("LUC_IM_CommentStudy","LUC_IM_CommentStudy_2_2",2,2);
+
+DB_PlayerComments("LUC_IM_CommentTopHill","LUC_IM_CommentTopHill_1_1",1,1);
+DB_PlayerComments("LUC_IM_CommentTopHill","LUC_IM_CommentTopHill_2_1",2,1);
+DB_PlayerComments("LUC_IM_CommentTopHill","LUC_IM_CommentTopHill_2_2",2,2);
+
+DB_PlayerComments("LUC_IM_CommentHiddenStudy","LUC_IM_CommentHiddenStudy_1_1",1,1);
+DB_PlayerComments("LUC_IM_CommentHiddenStudy","LUC_IM_CommentHiddenStudy_2_1",2,1);
+DB_PlayerComments("LUC_IM_CommentHiddenStudy","LUC_IM_CommentHiddenStudy_2_2",2,2);
+
+DB_PlayerComments("LUC_Comment_KnowImpMasterBloodStone","LUC_Comment_KnowImpMasterBloodStone_1_1",1,1);
+DB_PlayerComments("LUC_Comment_KnowImpMasterBloodStone","LUC_Comment_KnowImpMasterBloodStone_2_1",2,1);
+DB_PlayerComments("LUC_Comment_KnowImpMasterBloodStone","LUC_Comment_KnowImpMasterBloodStone_2_2",2,2);
+
+DB_PlayerComments("LUC_Comment_NotKnowImpMasterBloodStone","LUC_Comment_NotKnowImpMasterBloodStone_1_1",1,1);
+DB_PlayerComments("LUC_Comment_NotKnowImpMasterBloodStone","LUC_Comment_NotKnowImpMasterBloodStone_2_1",2,1);
+DB_PlayerComments("LUC_Comment_NotKnowImpMasterBloodStone","LUC_Comment_NotKnowImpMasterBloodStone_2_2",2,2);
+//END_REGION
+
+CharacterSetHitpointsPercentage(CHARACTER_LUC_ImpMaster,1);
+CharacterApplyStatus(CHARACTER_LUC_ImpMaster, "UNHEALABLE", -1.0, 1);
+CharacterSetVarInteger(CHARACTER_LUC_ImpMaster,"LUC_PlayerMetMaster",0);
+DB_NoDefaultBehavior(CHARACTER_LUC_ImpMaster);
+
+PROC_RegisterHiddenWall(ITEM_LUC_BloodStoneHiddenWall);
+PROC_LUC_RegisterWaysToOpenHiddenWallBloodStone();
+
+ProcTriggerRegisterForPlayers(TRIGGER_LUC_BoxImpMaster);
+ProcTriggerRegisterForPlayers(TRIGGER_LUC_Box_ImpMasterSecretChamber);
+
+DB_EventGivesPartyDialog("LUC_ImpSlaveKilledByMaster", "LUC_PD_ImpMaster");
+DB_EventGivesPartyDialog("LUC_IS_ImpFree", "LUC_PD_ImpGone");
+
+DB_IsNotMessingAround(CHARACTER_LUC_ImpMaster);
+KBSECTION
+//REGION BloodStone Hidden Wall
+
+IF
+CharacterUsedItem(_Player,ITEM_LUC_BloodStoneHiddenWallLever)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT ITEM_LUC_BloodStoneHiddenWallLever.isAlreadyUsed()
+THEN
+ITEM_LUC_BloodStoneHiddenWallLever.isAlreadyUsed();
+
+PROC
+PROC_LUC_RegisterWaysToOpenHiddenWallBloodStone()
+AND
+HiddenWallDB(_WallIndex, ITEM_LUC_BloodStoneHiddenWall)
+THEN
+HiddenWallItemDB(ITEM_LUC_BloodStoneHiddenWallLever, _WallIndex);
+
+//END_REGION
+
+//REGION BloodStone Pickup
+
+IF
+ItemAddedToCharacter(ITEM_LUC_ImpMaster_BloodStone,_Player)
+AND
+_Player.DB_IsPlayer()
+AND
+CharacterGetVarInteger(CHARACTER_LUC_ImpMaster,"LUC_PlayerMetMaster",1)
+AND
+NOT ITEM_LUC_ImpMaster_BloodStone.HasHadPlayerComment(_)
+THEN
+ITEM_LUC_ImpMaster_BloodStone.HasHadPlayerComment(_Player);
+Launch_PlayerComment(_Player,"LUC_Comment_KnowImpMasterBloodStone");
+QuestUpdate("LUC_FredoStone", "FoundBS");
+
+IF
+ItemAddedToCharacter(ITEM_LUC_ImpMaster_BloodStone,_Player)
+AND
+_Player.DB_IsPlayer()
+AND
+CharacterGetVarInteger(CHARACTER_LUC_ImpMaster,"LUC_PlayerMetMaster",0)
+AND
+NOT ITEM_LUC_ImpMaster_BloodStone.HasHadPlayerComment(_)
+THEN
+ITEM_LUC_ImpMaster_BloodStone.HasHadPlayerComment(_Player);
+Launch_PlayerComment(_Player,"LUC_Comment_NotKnowImpMasterBloodStone");
+QuestAdd("LUC_FredoStone");
+QuestUpdate("LUC_FredoStone", "StumbleBS");
+//END_REGION
+
+//REGION Imp Leaving
+IF
+DialogStarted("LUC_ImpSlave", _)
+AND
+NOT CHARACTER_LUC_ImpSlave.alreadyMet()
+AND
+CharacterGetVarInteger(CHARACTER_LUC_ImpMaster, "wasTalkTo", 1)
+THEN
+CHARACTER_LUC_ImpSlave.alreadyMet();
+QuestUpdate("LUC_ImpMaster", "FoundImp");
+
+IF
+DialogStarted("LUC_ImpSlave", _)
+AND
+NOT CHARACTER_LUC_ImpSlave.alreadyMet()
+AND
+CharacterGetVarInteger(CHARACTER_LUC_ImpMaster, "wasTalkTo", 0)
+THEN
+CHARACTER_LUC_ImpSlave.alreadyMet();
+QuestAdd("LUC_ImpMaster");
+QuestUpdate("LUC_ImpMaster", "StartImp");
+
+
+IF
+DialogEnded("LUC_ImpSlave",_)
+AND
+CharacterGetVarInteger(CHARACTER_LUC_ImpSlave,"LUC_ImpSlaveDone",1)
+THEN
+CharacterSetVarFixedString(CHARACTER_LUC_ImpSlave,"currentState","State_Nothing");
+CharacterSetHasDialog(CHARACTER_LUC_ImpSlave,0);
+CharacterMoveToTrigger(CHARACTER_LUC_ImpSlave,TRIGGER_LUC_Point_HiddenSlaveCellarIn,1,"LUC_ImpSlaveOut");
+
+IF
+CharacterEvent(CHARACTER_LUC_ImpSlave,"LUC_ImpSlaveOut")
+THEN
+CharacterTeleportToTrigger(CHARACTER_LUC_ImpSlave, TRIGGER_LUC_Point_HiddenSlaveCellarOut,"");
+GlobalSetEvent("LUC_IS_ImpDone");
+CharacterMoveToCharacter(CHARACTER_LUC_ImpSlave, CHARACTER_LUC_ImpMaster, 1, "isAtMaster",0);
+
+PROC
+PROC_LUC_IM_ImpIsOut()
+AND
+DB_Dead(CHARACTER_LUC_ImpMaster)
+THEN
+DB_LUC_IS_SlaveMaster("Out","Dead");
+
+PROC
+PROC_LUC_IM_ImpIsOut()
+AND
+NOT DB_Dead(CHARACTER_LUC_ImpMaster)
+AND
+NOT CHARACTER_LUC_ImpMaster.IsAlreadyGone()
+AND
+CharacterGetVarInteger(CHARACTER_LUC_ImpSlave,"LUC_ImpSlaveStandDown",1)
+THEN
+DB_LUC_IS_SlaveMaster("Shame","Sick");
+
+PROC
+PROC_LUC_IM_ImpIsOut()
+AND
+NOT DB_Dead(CHARACTER_LUC_ImpMaster)
+AND
+NOT CHARACTER_LUC_ImpMaster.IsAlreadyGone()
+AND
+CharacterGetVarInteger(CHARACTER_LUC_ImpSlave,"LUC_ImpSlaveStandUp",1)
+THEN
+DB_LUC_IS_SlaveMaster("Leave","Sick");
+
+PROC
+PROC_LUC_IM_ImpIsOut()
+AND
+NOT DB_Dead(CHARACTER_LUC_ImpMaster)
+AND
+CHARACTER_LUC_ImpMaster.IsAlreadyGone()
+THEN
+DB_LUC_IS_SlaveMaster("Out","Dead");
+
+IF
+CharacterEvent(CHARACTER_LUC_ImpSlave, "isAtMaster")
+THEN
+PROC_LUC_IM_ImpIsOut();
+CHARACTER_LUC_ImpMaster.readyForScene();
+CharacterSetHasDialog(CHARACTER_LUC_ImpSlave, 0);
+CharacterSetHasDialog(CHARACTER_LUC_ImpMaster, 0);
+DialogRequestStopForCharacter(CHARACTER_LUC_ImpMaster);
+DialogRequestStopForCharacter(CHARACTER_LUC_ImpSlave);
+PROC_LUC_IM_AlreadyHere();
+
+IF
+PROC_LUC_IM_AlreadyHere()
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_LUC_ImpSlave, _Player)
+AND
+CharacterCanSeeCharacter(_Player, CHARACTER_LUC_ImpSlave, 1)
+AND
+CHARACTER_LUC_ImpMaster.readyForScene()
+AND
+DB_LUC_IS_SlaveMaster("Out","Dead")
+AND
+NOT DB_Combat(CHARACTER_LUC_ImpSlave, _)
+THEN
+NOT DB_LUC_IS_SlaveMaster("Out","Dead");
+NOT CHARACTER_LUC_ImpMaster.readyForScene();
+DialogStartOneSpeakerDialog("LUC_IS_AD_DeadMaster", CHARACTER_LUC_ImpSlave);
+
+IF
+PROC_LUC_IM_AlreadyHere()
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_LUC_ImpSlave, _Player)
+AND
+CharacterCanSeeCharacter(_Player, CHARACTER_LUC_ImpSlave, 1)
+AND
+CHARACTER_LUC_ImpMaster.readyForScene()
+AND
+DB_LUC_IS_SlaveMaster("Shame","Sick")
+AND
+NOT DB_Combat(CHARACTER_LUC_ImpSlave, _)
+THEN
+NOT DB_LUC_IS_SlaveMaster("Shame","Sick");
+NOT CHARACTER_LUC_ImpMaster.readyForScene();
+DialogStartTwoSpeakerDialog("LUC_AD_ImpMasterBeforeKill", CHARACTER_LUC_ImpMaster, CHARACTER_LUC_ImpSlave);
+
+IF
+PROC_LUC_IM_AlreadyHere()
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_LUC_ImpSlave, _Player)
+AND
+CharacterCanSeeCharacter(_Player, CHARACTER_LUC_ImpSlave, 1)
+AND
+CHARACTER_LUC_ImpMaster.readyForScene()
+AND
+DB_LUC_IS_SlaveMaster("Leave","Sick")
+AND
+NOT DB_Combat(CHARACTER_LUC_ImpSlave, _)
+THEN
+NOT DB_LUC_IS_SlaveMaster("Leave","Sick");
+NOT CHARACTER_LUC_ImpMaster.readyForScene();
+DialogStartTwoSpeakerDialog("LUC_AD_ImpMasterIsLeft", CHARACTER_LUC_ImpSlave, CHARACTER_LUC_ImpMaster);
+
+IF
+CharacterSawCharacter(_Player, CHARACTER_LUC_ImpSlave)
+AND
+_Player.DB_IsPlayer()
+AND
+CHARACTER_LUC_ImpMaster.readyForScene()
+AND
+DB_LUC_IS_SlaveMaster("Out","Dead")
+AND
+NOT DB_Combat(CHARACTER_LUC_ImpSlave, _)
+THEN
+NOT DB_LUC_IS_SlaveMaster("Out","Dead");
+NOT CHARACTER_LUC_ImpMaster.readyForScene();
+DialogStartOneSpeakerDialog("LUC_IS_AD_DeadMaster", CHARACTER_LUC_ImpSlave);
+
+IF
+CharacterSawCharacter(_Player, CHARACTER_LUC_ImpSlave)
+AND
+_Player.DB_IsPlayer()
+AND
+CHARACTER_LUC_ImpMaster.readyForScene()
+AND
+DB_LUC_IS_SlaveMaster("Shame","Sick")
+AND
+NOT DB_Combat(CHARACTER_LUC_ImpSlave, _)
+THEN
+NOT DB_LUC_IS_SlaveMaster("Shame","Sick");
+NOT CHARACTER_LUC_ImpMaster.readyForScene();	
+DialogStartTwoSpeakerDialog("LUC_AD_ImpMasterBeforeKill", CHARACTER_LUC_ImpMaster, CHARACTER_LUC_ImpSlave);
+
+IF
+CharacterSawCharacter(_Player, CHARACTER_LUC_ImpSlave)
+AND
+_Player.DB_IsPlayer()
+AND
+CHARACTER_LUC_ImpMaster.readyForScene()
+AND
+DB_LUC_IS_SlaveMaster("Leave","Sick")
+AND
+NOT DB_Combat(CHARACTER_LUC_ImpSlave, _)
+THEN
+NOT DB_LUC_IS_SlaveMaster("Leave","Sick");
+NOT CHARACTER_LUC_ImpMaster.readyForScene();
+DialogStartTwoSpeakerDialog("LUC_AD_ImpMasterIsLeft", CHARACTER_LUC_ImpSlave, CHARACTER_LUC_ImpMaster);
+
+IF
+PROC_LUC_IM_AlreadyHere()
+AND
+DB_Companion(_Companion)
+AND
+CharacterCanSeeCharacter(_Companion, CHARACTER_LUC_ImpSlave, 1)
+AND
+CHARACTER_LUC_ImpMaster.readyForScene()
+AND
+DB_LUC_IS_SlaveMaster("Out","Dead")
+AND
+NOT DB_Combat(CHARACTER_LUC_ImpSlave, _)
+THEN
+NOT DB_LUC_IS_SlaveMaster("Out","Dead");
+NOT CHARACTER_LUC_ImpMaster.readyForScene();
+DialogStartOneSpeakerDialog("LUC_IS_AD_DeadMaster", CHARACTER_LUC_ImpSlave);
+
+IF
+PROC_LUC_IM_AlreadyHere()
+AND
+DB_Companion(_Companion)
+AND
+CharacterCanSeeCharacter(_Companion, CHARACTER_LUC_ImpSlave, 1)
+AND
+CHARACTER_LUC_ImpMaster.readyForScene()
+AND
+DB_LUC_IS_SlaveMaster("Shame","Sick")
+AND
+NOT DB_Combat(CHARACTER_LUC_ImpSlave, _)
+THEN
+NOT DB_LUC_IS_SlaveMaster("Shame","Sick");
+NOT CHARACTER_LUC_ImpMaster.readyForScene();
+DialogStartTwoSpeakerDialog("LUC_AD_ImpMasterBeforeKill", CHARACTER_LUC_ImpMaster, CHARACTER_LUC_ImpSlave);
+
+IF
+PROC_LUC_IM_AlreadyHere()
+AND
+DB_Companion(_Companion)
+AND
+CharacterCanSeeCharacter(_Companion, CHARACTER_LUC_ImpSlave, 1)
+AND
+CHARACTER_LUC_ImpMaster.readyForScene()
+AND
+DB_LUC_IS_SlaveMaster("Leave","Sick")
+AND
+NOT DB_Combat(CHARACTER_LUC_ImpSlave, _)
+THEN
+NOT DB_LUC_IS_SlaveMaster("Leave","Sick");
+NOT CHARACTER_LUC_ImpMaster.readyForScene();
+DialogStartTwoSpeakerDialog("LUC_AD_ImpMasterIsLeft", CHARACTER_LUC_ImpSlave, CHARACTER_LUC_ImpMaster);
+
+IF
+CharacterSawCharacter(_Companion, CHARACTER_LUC_ImpSlave)
+AND
+DB_Companion(_Companion)
+AND
+CHARACTER_LUC_ImpMaster.readyForScene()
+AND
+DB_LUC_IS_SlaveMaster("Out","Dead")
+AND
+NOT DB_Combat(CHARACTER_LUC_ImpSlave, _)
+THEN
+NOT DB_LUC_IS_SlaveMaster("Out","Dead");
+NOT CHARACTER_LUC_ImpMaster.readyForScene();
+DialogStartOneSpeakerDialog("LUC_IS_AD_DeadMaster", CHARACTER_LUC_ImpSlave);
+
+IF
+CharacterSawCharacter(_Companion, CHARACTER_LUC_ImpSlave)
+AND
+DB_Companion(_Companion)
+AND
+CHARACTER_LUC_ImpMaster.readyForScene()
+AND
+DB_LUC_IS_SlaveMaster("Shame","Sick")
+AND
+NOT DB_Combat(CHARACTER_LUC_ImpSlave, _)
+THEN
+NOT DB_LUC_IS_SlaveMaster("Shame","Sick");
+NOT CHARACTER_LUC_ImpMaster.readyForScene();	
+DialogStartTwoSpeakerDialog("LUC_AD_ImpMasterBeforeKill", CHARACTER_LUC_ImpMaster, CHARACTER_LUC_ImpSlave);
+
+IF
+CharacterSawCharacter(_Companion, CHARACTER_LUC_ImpSlave)
+AND
+DB_Companion(_Companion)
+AND
+CHARACTER_LUC_ImpMaster.readyForScene()
+AND
+DB_LUC_IS_SlaveMaster("Leave","Sick")
+AND
+NOT DB_Combat(CHARACTER_LUC_ImpSlave, _)
+THEN
+NOT DB_LUC_IS_SlaveMaster("Leave","Sick");
+NOT CHARACTER_LUC_ImpMaster.readyForScene();
+DialogStartTwoSpeakerDialog("LUC_AD_ImpMasterIsLeft", CHARACTER_LUC_ImpSlave, CHARACTER_LUC_ImpMaster);
+
+
+IF
+AutomatedDialogEnded("LUC_IS_AD_DeadMaster", _)
+THEN
+CharacterDisappearOutOfSight(CHARACTER_LUC_ImpSlave, -90, 1, "", 1);
+GlobalSetEvent("LUC_IS_ImpFree");
+QuestUpdate("LUC_ImpMaster", "ImpFreeMasterDead");
+QuestClose("LUC_ImpMaster");
+
+
+IF
+AutomatedDialogEnded("LUC_AD_ImpMasterIsLeft", _)
+THEN
+CharacterDisappearOutOfSight(CHARACTER_LUC_ImpSlave, -90, 1, "", 1);
+GlobalSetEvent("LUC_IS_ImpFree");
+CharacterSetHasDialog(CHARACTER_LUC_ImpMaster, 1);
+QuestUpdate("LUC_ImpMaster", "ImpFree");
+QuestClose("LUC_ImpMaster");
+
+
+//END_REGION
+
+//REGION ImpMaster Kills The Slave
+
+IF
+AutomatedDialogEnded("LUC_AD_ImpMasterBeforeKill", _)
+THEN
+CharacterSetAnimationOverride(CHARACTER_LUC_ImpMaster, "");
+CharacterSetVarFixedString(CHARACTER_LUC_ImpMaster,"currentState","State_KillImp");
+TimerLaunch("LUC_KillImpSlave",3000);
+GlobalSetEvent("LUC_ImpSlaveKilledByMaster");	
+
+IF
+TimerFinished("LUC_KillImpSlave")
+AND
+NOT DB_Combat(CHARACTER_LUC_ImpSlave, _)
+THEN
+ProcCharacterMoveToTrigger(CHARACTER_LUC_ImpSlave,TRIGGER_LUC_Point_ImpSlaveRunAway,1,"LUC_ImpSlaveRunningAway");
+
+
+IF
+CharacterEvent(_,"LUC_ImpSlaveRunningAway")
+THEN
+CharacterLookFromTrigger(CHARACTER_LUC_ImpSlave,TRIGGER_LUC_Point_ImpSlaveRunAway,0);
+DialogStartOneSpeakerDialog("LUC_AD_ImpSlave",CHARACTER_LUC_ImpSlave);
+
+
+IF
+CharacterDied(CHARACTER_LUC_ImpSlave)
+AND
+DB_GlobalEvent("LUC_ImpSlaveKilledByMaster")
+THEN
+CharacterSetHasDialog(CHARACTER_LUC_ImpMaster, 1);
+GlobalSetEvent("LUC_IS_ImpDone");
+QuestUpdate("LUC_ImpMaster", "ImpKilled");
+QuestClose("LUC_ImpMaster");
+
+IF
+CharacterDied(CHARACTER_LUC_ImpSlave)
+AND
+DB_GlobalEvent("LUC_ImpSlaveKilledByMaster")
+AND
+NOT CHARACTER_LUC_ImpMaster.ishealed()
+THEN
+CharacterSetAnimationOverride(CHARACTER_LUC_ImpMaster, "");
+//END_REGION
+
+//REGION Found BloodStone Chard
+IF
+ItemAddedToCharacter(ITEM_LUC_IM_PotionRecipe, _Player)
+THEN
+QuestUpdate("LUC_ImpMaster", "PotionRecipe");
+
+IF
+ItemTemplateAddedToCharacter("Quest_Potion_FearlessImp_cb388cd7-52fd-40ab-8082-4ce36be682e60", _Handle, _Player)
+THEN
+QuestUpdate("LUC_ImpMaster", "PotionMade");
+
+//END_REGION
+
+//REGION Give Imp Master The BloodStone
+
+IF
+DialogEnded("LUC_ImpMaster", _)
+AND
+CharacterGetVarInteger(CHARACTER_LUC_ImpMaster,"isGoingbackSick",1)
+THEN
+CharacterSetHasDialog(CHARACTER_LUC_ImpMaster,0);
+CharacterDisappearOutOfSight(CHARACTER_LUC_ImpMaster,180,0,"putBack",1);
+CHARACTER_LUC_ImpMaster.IsAlreadyGone();
+
+IF
+CharacterEvent(CHARACTER_LUC_ImpMaster,"putBack")
+THEN
+CharacterTeleportToTrigger(CHARACTER_LUC_ImpMaster, TRIGGER_LUC_Point_ImpSlave_GoToMaster, "");
+
+IF
+DialogEnded("LUC_ImpMaster",_Inst)
+AND
+CharacterGetVarInteger(CHARACTER_LUC_ImpMaster,"LUC_GiveMasterBloodStone",1)
+AND
+NOT CHARACTER_LUC_ImpMaster.isHealedBefore()
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+THEN
+CHARACTER_LUC_ImpMaster.isHealedBefore();
+CharacterSetHasDialog(CHARACTER_LUC_ImpMaster,0);
+NOT DB_NoDefaultBehavior(CHARACTER_LUC_ImpMaster);
+ProcRemoveDialogEntryForSpeaker(CHARACTER_LUC_ImpMaster,"LUC_ImpMaster");
+CharacterRemoveStatus(CHARACTER_LUC_ImpMaster, "UNHEALABLE");
+ProcUseBloodStone(_Player, CHARACTER_LUC_ImpMaster);
+TimerLaunch("LUC_ImpMasterCounter",5000);
+DB_NoDefaultBehavior(CHARACTER_LUC_ImpMaster);
+CharacterSetVarFixedString(CHARACTER_LUC_ImpMaster, "currentState", "");
+
+IF
+TimerFinished("LUC_ImpMasterCounter")
+THEN
+CharacterDisplayText(CHARACTER_LUC_ImpMaster, "LUC_ImpMaster_Script_8");
+CharacterSetAnimationOverride(CHARACTER_LUC_ImpMaster, "");
+
+IF
+CharacterDisplayTextEnded(CHARACTER_LUC_ImpMaster, "LUC_ImpMaster_Script_8")
+AND
+CharacterGetVarInteger(CHARACTER_LUC_ImpMaster,"isGoingToKickAss",1)
+THEN
+CharacterMoveToTrigger(CHARACTER_LUC_ImpMaster, TRIGGER_LUC_Point_HiddenSlaveCellarOut, 1, "getDown");
+CHARACTER_LUC_ImpMaster.ishealed();
+
+IF
+CharacterEvent(CHARACTER_LUC_ImpMaster, "getDown")
+THEN
+CharacterTeleportToTrigger(CHARACTER_LUC_ImpMaster, TRIGGER_LUC_Point_HiddenSlaveCellarIn,"");
+CharacterMoveToTrigger(CHARACTER_LUC_ImpMaster, TRIGGER_LUC_IS_MasterIncave,1, "killTheImp");
+
+
+IF
+CharacterEvent(CHARACTER_LUC_ImpMaster, "killTheImp")
+THEN
+CharacterSetHasDialog(CHARACTER_LUC_ImpSlave, 0);
+CharacterSetHasDialog(CHARACTER_LUC_ImpMaster, 0);
+DialogRequestStopForCharacter(CHARACTER_LUC_ImpMaster);
+DialogRequestStopForCharacter(CHARACTER_LUC_ImpSlave);
+CHARACTER_LUC_ImpMaster.killInCave();
+PROC_LUC_IM_AlreadyHereCave();
+
+PROC
+PROC_LUC_IM_AlreadyHereCave()
+AND
+DB_Dead(CHARACTER_LUC_ImpSlave)
+AND
+CHARACTER_LUC_ImpMaster.killInCave()
+THEN
+CharacterSetFaction(CHARACTER_LUC_ImpMaster, "Evil NPC");
+NOT CHARACTER_LUC_ImpMaster.killInCave();
+
+IF
+CharacterSawCharacter(_Player, CHARACTER_LUC_ImpMaster)
+AND
+DB_Dead(CHARACTER_LUC_ImpSlave)
+AND
+CHARACTER_LUC_ImpMaster.killInCave()
+THEN
+NOT CHARACTER_LUC_ImpMaster.killInCave();
+CharacterSetFaction(CHARACTER_LUC_ImpMaster, "Evil NPC");
+
+IF
+CharacterSawCharacter(_Companion, CHARACTER_LUC_ImpMaster)
+AND
+DB_Companion(_Companion)
+AND
+CHARACTER_LUC_ImpMaster.killInCave()
+AND
+NOT DB_Combat(CHARACTER_LUC_ImpSlave, _)
+THEN
+NOT CHARACTER_LUC_ImpMaster.killInCave();
+DialogStartTwoSpeakerDialog("LUC_IS_AD_MasterInCave", CHARACTER_LUC_ImpSlave, CHARACTER_LUC_ImpMaster);
+
+PROC
+PROC_LUC_IM_AlreadyHereCave()
+AND
+DB_Companion(_Companion)
+AND
+CharacterCanSeeCharacter(_Companion, CHARACTER_LUC_ImpMaster, 1)
+AND
+CHARACTER_LUC_ImpMaster.killInCave()
+AND
+NOT DB_Combat(CHARACTER_LUC_ImpSlave, _)
+THEN
+NOT CHARACTER_LUC_ImpMaster.killInCave();
+DialogStartTwoSpeakerDialog("LUC_IS_AD_MasterInCave", CHARACTER_LUC_ImpSlave, CHARACTER_LUC_ImpMaster);
+
+IF
+CharacterSawCharacter(_Player, CHARACTER_LUC_ImpMaster)
+AND
+_Player.DB_IsPlayer()
+AND
+CHARACTER_LUC_ImpMaster.killInCave()
+AND
+NOT DB_Combat(CHARACTER_LUC_ImpSlave, _)
+THEN
+NOT CHARACTER_LUC_ImpMaster.killInCave();
+DialogStartTwoSpeakerDialog("LUC_IS_AD_MasterInCave", CHARACTER_LUC_ImpSlave, CHARACTER_LUC_ImpMaster);
+
+PROC
+PROC_LUC_IM_AlreadyHereCave()
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_LUC_ImpMaster, _Player)
+AND
+CharacterCanSeeCharacter(_Player, CHARACTER_LUC_ImpMaster, 1)
+AND
+CHARACTER_LUC_ImpMaster.killInCave()
+AND
+NOT DB_Combat(CHARACTER_LUC_ImpSlave, _)
+THEN
+NOT CHARACTER_LUC_ImpMaster.killInCave();
+DialogStartTwoSpeakerDialog("LUC_IS_AD_MasterInCave", CHARACTER_LUC_ImpSlave, CHARACTER_LUC_ImpMaster);
+
+IF
+AutomatedDialogEnded("LUC_IS_AD_MasterInCave", _)
+THEN
+CharacterSetVarFixedString(CHARACTER_LUC_ImpMaster,"currentState","State_KillImp");
+GlobalSetEvent("LUC_ImpSlaveKilledByMaster");
+
+IF
+CharacterDisplayTextEnded(CHARACTER_LUC_ImpMaster, "LUC_ImpMaster_Script_8")
+AND
+CharacterGetVarInteger(CHARACTER_LUC_ImpMaster,"isGoingHome",1)
+THEN
+CharacterSetCanFight(CHARACTER_LUC_ImpMaster, 1);
+CharacterSetFaction(CHARACTER_LUC_ImpMaster, "Evil NPC");
+QuestUpdate("LUC_FredoStone", "GiveBSNoImp");
+QuestClose("LUC_FredoStone");
+
+IF
+CharacterDied(CHARACTER_LUC_ImpSlave)
+AND
+DB_GlobalEvent("LUC_ImpSlaveKilledByMaster")
+AND
+CharacterGetVarInteger(CHARACTER_LUC_ImpMaster,"isGoingToKickAss",1)
+THEN
+CharacterSetCanFight(CHARACTER_LUC_ImpMaster, 1);
+CharacterSetFaction(CHARACTER_LUC_ImpMaster, "Evil NPC");
+
+//END_REGION
+
+IF
+GlobalEventSet("LUC_KnowsSlave")
+AND
+NOT ITEM_LUC_IM_MaradinoEntry.used()
+THEN
+DB_PlayerComment_Trigger(TRIGGER_LUC_IM_CommentHiddenStudy,"LUC_IM_CommentHiddenStudy");
+DB_PlayerComment_Trigger(TRIGGER_LUC_IM_CommentTopHill,"LUC_IM_CommentTopHill");
+
+IF
+CharacterUsedItem(_Player, ITEM_LUC_IM_MaradinoEntry)
+THEN
+ITEM_LUC_IM_MaradinoEntry.used();
+
+IF
+RegionEnded("LucullaForest")
+AND
+CharacterGetVarInteger(CHARACTER_LUC_ImpMaster,"LUC_PlayerMetMaster",1)
+AND
+NOT DB_Dead(CHARACTER_LUC_ImpMaster)
+THEN
+CharacterDie(CHARACTER_LUC_ImpMaster,0);
+
+IF
+CharacterAttackedByCharacter(CHARACTER_LUC_ImpMaster, _Player)
+THEN
+CharacterSetCanFight(CHARACTER_LUC_ImpMaster, 1);
+
+IF
+CharacterEnteredTrigger(_Player, TRIGGER_LUC_BoxImpMaster)
+AND
+DB_Dead(CHARACTER_LUC_ImpMaster)
+AND
+DB_GlobalEvent("LUC_FredStarted")
+AND
+NOT DB_GlobaEvent("LUC_ClosedFredo")
+AND
+NOT DB_OnlyOnce("LUC_ClosedFredoQuest")
+THEN
+QuestUpdate("LUC_FredoStone", "FredoDead");
+QuestClose("LUC_FredoStone");
+DB_OnlyOnce("LUC_ClosedFredoQuest");
+
+IF
+CharacterEnteredTrigger(_Player, TRIGGER_LUC_BoxImpMaster)
+AND
+DB_Dead(CHARACTER_LUC_ImpMaster)
+AND
+DB_GlobalEvent("LUC_YoxStays")
+AND
+NOT DB_OnlyOnce("LUC_ClosedYoxQuest")
+THEN
+QuestClose("LUC_ImpMaster");
+DB_OnlyOnce("LUC_ClosedYoxQuest");
+
+IF
+CharacterEnteredCombat(CHARACTER_LUC_ImpMaster, _)
+THEN
+CharacterPurgeQueue(CHARACTER_LUC_ImpMaster);
+
+IF
+CharacterDied(CHARACTER_LUC_ImpMaster)
+AND
+DB_GlobalEvent("LUC_ImpFateLock")
+THEN
+GlobalClearEvent("LUC_ImpFateLock");
+
+IF
+CharacterDied(CHARACTER_LUC_ImpSlave)
+AND
+DB_GlobalEvent("LUC_ImpFateLock")
+THEN
+GlobalClearEvent("LUC_ImpFateLock");
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

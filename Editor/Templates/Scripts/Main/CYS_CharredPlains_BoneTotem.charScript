@@ -1,0 +1,73 @@
+INIT 
+	CHARACTER:__Me
+	INT:%TotemResurrect_Current=0
+	INT:%TotemResurrect_Desired=4
+	
+	//this is used in combination with CYS_CharredPlains_Totem.itemscript
+
+//------------------------	
+BEHAVIOUR 
+REACTION Totem_CastFear,1100
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+CHECK "c1&c2&!c3"
+	CharacterGet(_Target,__Me,6,Lowest,Distance,Enemy)
+	CharacterCanCast(__Me,"Shout_EnemyFear")
+	IsCasual()
+ACTIONS
+	CharacterUseSkill("Shout_EnemyFear",_Target)
+
+REACTION Totem_CastNullifyRes,1100
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+CHECK "c1&c2&!c3"
+	CharacterGet(_Target,__Me,6,Lowest,Distance,Enemy)
+	CharacterCanCast(__Me,"Shout_EnemyNullResistance")
+	IsCasual()
+ACTIONS
+	CharacterUseSkill("Shout_EnemyNullResistance",_Target)	
+	
+REACTION Totem_EndTurn,200
+USAGE COMBAT
+ACTIONS
+	CharacterEndTurn()
+	
+//------------------------		
+EVENTS 
+EVENT OnInit_KillDefaultActions
+ON
+	OnInit()
+ACTIONS
+	SetPriority("TurnToChar",0)
+	SetPriority("TurnToItem",0)
+	SetPriority("Idle_Combat",0)
+	SetPriority("BlindReaction",0)
+	SetPriority("Idle_Peace",0)
+	SetPriority("StartFollow",0)
+	SetPriority("FearCower",0)
+	SetPriority("FearFlee",0)
+	SetPriority("Combat_AttackSetEnemy",0)
+	SetPriority("Combat_MoveToSetEnemy",0)
+	CharacterAddSkill("Shout_EnemyFear")
+	CharacterAddSkill("Shout_EnemyNullResistance")
+	
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	IF "!c1"
+		CharacterIsDead(__Me)
+	THEN
+		IF "c1"
+			IsLessThen(%TotemResurrect_Current,%TotemResurrect_Desired)
+		THEN
+			Add(%TotemResurrect_Current,1)
+		ELIF "c1"
+			IsEqual(%TotemResurrect_Current,%TotemResurrect_Desired)
+		THEN
+			CharacterEvent(__Me,"CYS_CharredPlains_TimeToResurrectSkeletons")
+			Set(%TotemResurrect_Current,0)		
+		ENDIF
+	ENDIF

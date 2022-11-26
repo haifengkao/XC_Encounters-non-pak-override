@@ -1,0 +1,196 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+ItemSetOnstage(ITEM_CYS_Braccus_Starstone,0);
+ItemToCharacter(ITEM_CYS_BraccusKey, CHARACTER_CYS_Braccus);
+SneakTriggerSpotter(TRIGGER_CYS_Braccus_FightArea,CHARACTER_CYS_Braccus);
+DB_OneShot_DialogTrigger_NewSystem(TRIGGER_CYS_Braccus_FightArea,"CYS_Braccus",CHARACTER_CYS_Braccus);
+DB_OneShotPlayerTrigger(TRIGGER_CYS_ThelyronDialogArea);
+
+DB_PlayerComment_Trigger(TRIGGER_CYS_Area_MeetAttila, "CYS_Comment_Braccus_Forcefield");
+DB_PlayerComments("CYS_Comment_Braccus_Forcefield", "CYS_Comment_Braccus_Forcefield_1_1", 1,1);
+DB_PlayerComments("CYS_Comment_Braccus_Forcefield", "CYS_Comment_Braccus_Forcefield_2_1", 2,1);
+DB_PlayerComments("CYS_Comment_Braccus_Forcefield", "CYS_Comment_Braccus_Forcefield_2_2", 2,2);
+
+DB_PlayerComments("CYS_Comment_Braccus_Finished", "CYS_Comment_Braccus_Finished_1_1", 1,1);
+DB_PlayerComments("CYS_Comment_Braccus_Finished", "CYS_Comment_Braccus_Finished_2_1", 2,1);
+DB_PlayerComments("CYS_Comment_Braccus_Finished", "CYS_Comment_Braccus_Finished_2_2", 2,2);
+
+CharacterSetOnStage(CHARACTER_CYS_Lighthouse_Horror_Braccus,0);
+CharacterSetOnStage(CHARACTER_CYS_SkeletonKing_Braccus,0);
+CharacterSetOnStage(CHARACTER_CYS_Chimera_Braccus,0);
+KBSECTION
+PROC
+ProcOneShotTriggerEntered(_Player, TRIGGER_CYS_ThelyronDialogArea)
+AND
+NOT DB_Dead(CHARACTER_CYS_Thelyron)
+THEN
+PROC_MendatoryDialog("CYS_Braccus_WoundedThelyron",CHARACTER_CYS_Thelyron, _Player);
+
+IF
+CharacterDied(CHARACTER_CYS_ZombieJake)
+THEN
+GlobalSetEvent("CYS_ZombieJakeDead");
+
+IF
+CharacterEnteredTrigger(_,TRIGGER_CYS_Area_MeetAttila)
+THEN
+QuestUpdate("CYS_Braccus","Update3");
+QuestUpdate("CYS_FindingBraccus","Update3");
+
+IF
+CharacterUsedItem(_Character,ITEM_CYS_Braccus_Forcefield_Panel)
+AND
+ItemTemplateIsInPartyInventory(_Character,"Quest_Immaculate_Amulet_A_c6882e7a-9896-4e74-ac91-1a2ea087933e",0,0)
+THEN
+ItemDisplayText(ITEM_CYS_Braccus_Forcefield_Panel,"CYS_Braccus_FF_NoAmulet");
+
+IF
+CharacterUsedItem(_Character,ITEM_CYS_Braccus_Forcefield_Panel)
+AND
+NOT DB_OnlyOnce("CYS_Braccus_FF")
+AND
+ItemTemplateIsInPartyInventory(_Character,"Quest_Immaculate_Amulet_A_c6882e7a-9896-4e74-ac91-1a2ea087933e",1,_Count)
+AND
+_Count > 0
+THEN
+DB_OnlyOnce("CYS_Braccus_FF");
+ItemDisplayText(ITEM_CYS_Braccus_Forcefield_Panel,"CYS_Braccus_FF_Amulet");
+ItemSetEvent(ITEM_CYS_Braccus_Forcefield1, "shutDown");
+ItemSetEvent(ITEM_CYS_Braccus_Forcefield2, "shutDown");
+DialogStartOneSpeakerDialog("CYS_AD_Braccus_WoundedThelyron",CHARACTER_CYS_Thelyron);
+
+IF
+ItemTemplateCombinedWithItemTemplate("Quest_Immaculate_Amulet_A_c6882e7a-9896-4e74-ac91-1a2ea087933e","Quest_ControlPanel_A_4da550e5-844e-4a04-8da2-a03528860532",_Character,_)
+AND
+NOT DB_OnlyOnce("CYS_Braccus_FF")
+THEN
+DB_OnlyOnce("CYS_Braccus_FF");
+ItemDisplayText(ITEM_CYS_Braccus_Forcefield_Panel,"CYS_Braccus_FF_Amulet");
+ItemSetEvent(ITEM_CYS_Braccus_Forcefield1, "shutDown");
+ItemSetEvent(ITEM_CYS_Braccus_Forcefield2, "shutDown");
+DialogStartOneSpeakerDialog("CYS_AD_Braccus_WoundedThelyron",CHARACTER_CYS_Thelyron);
+
+IF
+DialogEnded("CYS_Braccus_WoundedThelyron",_)
+THEN
+QuestUpdate("CYS_Braccus","Update4");
+QuestUpdate("CYS_FindingBraccus","Update4");
+CharacterDie(CHARACTER_CYS_Thelyron, 0);
+
+IF
+DialogEnded("CYS_Braccus_WoundedThelyron",_)
+AND
+DB_GlobalEvent("Start_WoundedThelyron_DD")
+THEN
+ProcDefinePartyDialog("CYS_DD_WoundedThelyron");
+
+IF
+DialogEnded("CYS_Braccus",_)
+THEN
+ProcStartBraccusFight();
+
+IF
+CharacterReceivedDamage(CHARACTER_CYS_Braccus)
+THEN
+ProcStartBraccusFight();
+
+IF
+CharacterAttackedByCharacter(CHARACTER_CYS_Braccus,_)
+THEN
+ProcStartBraccusFight();
+
+PROC
+ProcStartBraccusFight()
+AND 
+NOT DB_OnlyOnce("BraccusFightStarted")
+THEN
+DB_OnlyOnce("BraccusFightStarted");
+DialogRequestStopForCharacter(CHARACTER_CYS_Braccus);
+CharacterSetCanFight(CHARACTER_CYS_Braccus,1);
+CharacterDisplayText(CHARACTER_CYS_Braccus,"CYS_Braccus_GuardiansToMe");
+CharacterSetReactionPriority(CHARACTER_CYS_Braccus,"Braccus_WaitWhileSummoningHisFriends",1000);
+TimerLaunch("CYS_Braccus_Summon_1",1000);
+TimerLaunch("CYS_Braccus_Summon_2",2000);
+TimerLaunch("CYS_Braccus_Summon_3",3000);
+
+IF
+CharacterDied(CHARACTER_CYS_Braccus)
+THEN
+GlobalSetEvent("CYS_BraccusKilled");
+QuestUpdate("CYS_Braccus","Update5");
+QuestUpdate("HOM_Starstones", "AfterBraccusRex");
+QuestUpdate("CYS_FindingBraccus","End");
+QuestClose("CYS_FindingBraccus");
+
+IF
+CharacterDied(CHARACTER_CYS_Braccus)
+AND
+CharacterGetClosestPlayer(CHARACTER_CYS_Braccus,_Player)
+THEN
+Launch_PlayerComment(_Player,"CYS_Comment_Braccus_Finished");
+Proc_CompanionDialog(CHARACTER_Jahan,"JAH_CD_Braccus",_Player);
+
+IF
+DB_Dead(CHARACTER_CYS_Braccus)
+AND
+DB_Dead(CHARACTER_CYS_Lighthouse_Horror_Braccus)
+AND
+DB_Dead(CHARACTER_CYS_SkeletonKing_Braccus)
+AND
+DB_Dead(CHARACTER_CYS_Chimera_Braccus)
+THEN
+TimerLaunch("BraccusFightOver",5000);
+
+IF
+TimerFinished("BraccusFightOver")
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_CYS_Braccus,_Player)
+THEN
+GlobalSetEvent("CYS_BraccusFightDone");
+DB_Singleton("IsArhuCat",1);
+PROC_Delayed_ArhuExMachina(_Player,"CYS_Arhu_AfterBraccus");
+
+PROC
+Proc_ArhuExMachina(_,"CYS_Arhu_AfterBraccus",0)
+THEN
+DB_Singleton("IsArhuCat",1);
+
+IF
+DialogEnded("CYS_Arhu_AfterBraccus",_)
+THEN
+ProcDefinePartyDialog("CYS_DD_ArhuAfterBraccus");
+
+IF
+TimerFinished("CYS_Braccus_Summon_1")
+THEN
+ProcCYSSpawnBraccusBoss(CHARACTER_CYS_Lighthouse_Horror_Braccus,TRIGGER_CYS_Braccus_Summon_1);
+ProcCharacterMoveToTrigger(CHARACTER_CYS_Lighthouse_Horror_Braccus,TRIGGER_CYS_Braccus_SummonDestination_01,1,"");
+TriggerCreatePuddle(TRIGGER_CYS_Braccus_Summon_1,"Ooze",300,300,30,30,0.1);
+
+IF
+TimerFinished("CYS_Braccus_Summon_2")
+THEN
+ProcCYSSpawnBraccusBoss(CHARACTER_CYS_SkeletonKing_Braccus,TRIGGER_CYS_Braccus_Summon_2);
+ProcCharacterMoveToTrigger(CHARACTER_CYS_SkeletonKing_Braccus,TRIGGER_CYS_Braccus_SummonDestination_02,1,"");
+TriggerCreatePuddle(TRIGGER_CYS_Braccus_Summon_2,"Blood",300,300,30,30,0.1);
+
+IF
+TimerFinished("CYS_Braccus_Summon_3")
+THEN
+ProcCYSSpawnBraccusBoss(CHARACTER_CYS_Chimera_Braccus,TRIGGER_CYS_Braccus_Summon_3);
+ProcCharacterMoveToTrigger(CHARACTER_CYS_Chimera_Braccus,TRIGGER_CYS_Braccus_SummonDestination_03,1,"");
+TriggerCreatePuddle(TRIGGER_CYS_Braccus_Summon_3,"Fire",300,300,30,30,0.1);
+
+IF
+ItemOpened(ITEM_CYS_BraccusChest)
+AND
+NOT DB_OnlyOnce("BraccusStartsoneScene")
+THEN
+ItemSetOnstage(ITEM_CYS_Braccus_Starstone, 1);
+ItemDragToTrigger(ITEM_CYS_Braccus_Starstone, TRIGGER_CYS_BraccusStarstoneLeap);
+DB_OnlyOnce("BraccusStartsoneScene");
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

@@ -1,0 +1,415 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%Character1
+	CHARACTER:%Character2
+	CHARACTER:%Character3
+	CHARACTER:%Character4	
+	INT:%IterateStatus=1
+	INT:%Bool_ActedThisTurn=0
+	EXTERN INT:%TurnCount_Current=2
+	EXTERN INT:%TurnCount_Desired=2
+	
+//----------
+BEHAVIOUR
+REACTION ArcaneVortex_AcquireTargets_TeleportThem,0
+USAGE COMBAT
+VARS
+	CHARACTER:_PlayersAlly
+	FLOAT:_MyAP
+	INT:_Success=0
+	INT:_Failures=0
+	FLOAT3:_MyPosition
+	FLOAT3:_Spot1
+	FLOAT3:_Spot2
+	FLOAT3:_Spot3
+	FLOAT3:_Spot4
+	FLOAT3:_PosOffset
+	FLOAT:_Dist
+	FLOAT:_Angle
+CHECK "!(c1|c2|c3|c4|c5|c6)&c7&!c8"
+	CharacterHasStatus(__Me,"FROZEN")					//!c1
+	CharacterHasStatus(__Me,"STUNNED")					//!c2
+	CharacterHasStatus(__Me,"CHARMED")					//!c3
+	CharacterHasStatus(__Me,"PETRIFIED")				//!c4
+	CharacterHasStatus(__Me,"KNOCKED_DOWN")				//!c5
+	CharacterHasStatus(__Me,"MUTED")					//!c6
+	CharacterGetStat(_MyAP,__Me,"ActionPoints")			//c7
+	IsLessThen(_MyAP,4)									//!c8
+ACTIONS
+	Set(_Spot1,{0;0;0})
+	Set(_Spot2,{0;0;0})
+	Set(_Spot3,{0;0;0})
+	Set(_Spot4,{0;0;0})
+	Set(%Character1,null)
+	Set(%Character2,null)
+	Set(%Character3,null)
+	Set(%Character4,null)
+	//DebugText(__Me,"Looking around!")
+	Set(%IterateStatus,1)								//resetting iterator's loop value
+	IterateCharactersInCombat(__Me,"CMBHC_ArcaneVortex_ScanForCharactersInCombat",Lowest,Distance)
+	IF "c1&c2&c3&c4"
+		IsEqual(%Character1,null)
+		IsEqual(%Character2,null)
+		IsEqual(%Character3,null)
+		IsEqual(%Character4,null)
+	THEN
+		//Sleep(1)	//remove me
+		//DebugText(__Me,"No one found or everyone in surfaces!")	
+	ENDIF
+	//CHARACTER 1
+	IF "!(c1|c2|c3)"
+		IsEqual(%Character1,null)
+		CharacterHasStatus(%Character1,"INVISIBLE")										//check added by Edouard on 12/11/15 - AV shouldn't teleport invisible / sneaking chars
+		CharacterHasStatus(%Character1,"SNEAKING")
+	THEN
+		WHILE "c1&c2"
+			IsLessThen(_Success,1)
+			IsLessThen(_Failures,15)
+		DO
+			IF "((c1|c2|c3|c4|c5|c6)&!c7)|(c8&c9)"
+				FindSurface(_Spot1,__Me,5,15,"Lava")						//c1 - find a dangerous surface & store it into _SpotX
+				FindSurface(_Spot1,__Me,5,15,"Fire")						//c2 - with maximum 0 enemies (to %Character1) already inside
+				FindSurface(_Spot1,__Me,5,15,"Ooze")						//c3
+				FindSurface(_Spot1,__Me,5,15,"CloudPoison")					//c4
+				FindSurface(_Spot1,__Me,5,15,"Electrified")					//c5				
+				FindSurface(_Spot1,__Me,5,15,"Ice")							//c6
+				CharacterGet(_PlayersAlly,_Spot1,2,Lowest,Distance,Enemy)	//!c7 - checking to see if someone isn't already there
+				GetPosition(__Me,_MyPosition)								//c8 - couldn't find a surface? get my own position...
+				GetPosition(__Me,_Spot1)									//c9 - ... and then override _SpotX (since no surface was found)
+			THEN
+				IF "!c1&c2&!c3"
+					IsEqual(_MyPosition,_Spot1)									//found a surface, so _MyPosition != _SpotX
+					FindValidPosition(_Spot1,3)									//check if _SpotX is valid
+					CharacterGet(_PlayersAlly,_Spot1,2,Lowest,Distance,Enemy)
+				THEN
+					//DebugText(__Me,"TP'ing [1] to surface!",%Character1)
+					CharacterUseSkill("Teleportation_EnemyArcaneVortex",%Character1,_Spot1)
+					Set(%Bool_ActedThisTurn,1)				
+					Add(_Success,1)
+				ELIF "c1"
+					IsEqual(_MyPosition,_Spot1)									//couldn't find a surface, so _MyPosition = _SpotX
+				THEN
+					Set(_PosOffset,{1.3;0;0}) 
+					GetRandomBetween(_Angle,0,360)
+					GetRandomBetween(_Dist,5,9)
+					RotateY(_PosOffset,_Angle)
+					Multiply(_PosOffset,_Dist)
+					Add(_Spot1,_PosOffset)
+					IF "c1"
+						FindValidPosition(_Spot1,3)
+					THEN
+						//DebugText(__Me,"TP'ing [1] to random!",%Character1)
+						CharacterUseSkill("Teleportation_EnemyArcaneVortex",%Character1,_Spot1)
+						Set(%Bool_ActedThisTurn,1)				
+						Add(_Success,1)
+					ELSE
+						Add(_Failures,1)
+						//DebugText(__Me,"[1] failures!",_Failures)
+					ENDIF
+				ELSE
+					Add(_Failures,1)
+					//DebugText(__Me,"[1] failures!",_Failures)
+				ENDIF
+			ENDIF
+		ENDWHILE
+		IF "c1"
+			IsEqual(_Failures,15)
+		THEN
+			Set(_Failures,0)
+		ENDIF
+		Set(_Success,0)
+	ENDIF
+	//CHARACTER 2	
+	IF "!(c1|c2|c3)"
+		IsEqual(%Character2,null)
+		CharacterHasStatus(%Character2,"INVISIBLE")										//check added by Edouard on 12/11/15 - AV shouldn't teleport invisible / sneaking chars
+		CharacterHasStatus(%Character2,"SNEAKING")
+	THEN
+		WHILE "c1&c2"
+			IsLessThen(_Success,1)
+			IsLessThen(_Failures,15)
+		DO
+			IF "((c1|c2|c3|c4|c5|c6)&!c7)|(c8&c9)"
+				FindSurface(_Spot2,__Me,5,15,"Lava")						//c1
+				FindSurface(_Spot2,__Me,7,17,"Fire")						//c2
+				FindSurface(_Spot2,__Me,5,15,"Ooze")						//c3
+				FindSurface(_Spot2,__Me,5,15,"CloudPoison")					//c4
+				FindSurface(_Spot2,__Me,5,15,"Electrified")					//c5				
+				FindSurface(_Spot2,__Me,5,15,"Ice")							//c6
+				CharacterGet(_PlayersAlly,_Spot2,2,Lowest,Distance,Enemy)	//!c7
+				GetPosition(__Me,_MyPosition)								//c8
+				GetPosition(__Me,_Spot2)									//c9
+			THEN
+				IF "!c1&c2"
+					IsEqual(_MyPosition,_Spot2)
+					FindValidPosition(_Spot2,3)
+				THEN
+					//DebugText(__Me,"TP'ing [1] to surface!",%Character2)
+					CharacterUseSkill("Teleportation_EnemyArcaneVortex",%Character2,_Spot2)
+					Set(%Bool_ActedThisTurn,1)				
+					Add(_Success,1)
+				ELIF "c1"
+					IsEqual(_MyPosition,_Spot2)
+				THEN
+					Set(_PosOffset,{1.3;0;0}) 
+					GetRandomBetween(_Angle,0,360)
+					GetRandomBetween(_Dist,5,9)
+					RotateY(_PosOffset,_Angle)
+					Multiply(_PosOffset,_Dist)
+					Add(_Spot2,_PosOffset)
+					IF "c1"
+						FindValidPosition(_Spot2,3)
+					THEN
+						//DebugText(__Me,"TP'ing [1] to random!",%Character2)
+						CharacterUseSkill("Teleportation_EnemyArcaneVortex",%Character2,_Spot2)
+						Set(%Bool_ActedThisTurn,1)				
+						Add(_Success,1)
+					ELSE
+						Add(_Failures,1)
+						//DebugText(__Me,"[1] failures!",_Failures)
+					ENDIF
+				ELSE
+					Add(_Failures,1)
+					//DebugText(__Me,"[1] failures!",_Failures)
+				ENDIF
+			ENDIF
+		ENDWHILE
+		IF "c1"
+			IsEqual(_Failures,15)
+		THEN
+			Set(_Failures,0)
+		ENDIF
+		Set(_Success,0)	
+	ENDIF		
+	//CHARACTER 3
+	IF "!(c1|c2|c3)"
+		IsEqual(%Character3,null)
+		CharacterHasStatus(%Character3,"INVISIBLE")										//check added by Edouard on 12/11/15 - AV shouldn't teleport invisible / sneaking chars
+		CharacterHasStatus(%Character3,"SNEAKING")
+	THEN
+		WHILE "c1&c2"
+			IsLessThen(_Success,1)
+			IsLessThen(_Failures,15)
+		DO
+			IF "((c1|c2|c3|c4|c5|c6)&!c7)|(c8&c9)"
+				FindSurface(_Spot3,__Me,5,15,"Lava")						//c1
+				FindSurface(_Spot3,__Me,8,18,"Fire")						//c2
+				FindSurface(_Spot3,__Me,5,15,"Ooze")						//c3
+				FindSurface(_Spot3,__Me,5,15,"CloudPoison")					//c4
+				FindSurface(_Spot3,__Me,5,15,"Electrified")					//c5				
+				FindSurface(_Spot3,__Me,5,15,"Ice")							//c6
+				CharacterGet(_PlayersAlly,_Spot3,2,Lowest,Distance,Enemy)	//!c7
+				GetPosition(__Me,_MyPosition)								//c8
+				GetPosition(__Me,_Spot3)									//c9
+			THEN
+				IF "!c1&c2"
+					IsEqual(_MyPosition,_Spot3)
+					FindValidPosition(_Spot3,3)
+				THEN
+					//DebugText(__Me,"TP'ing [1] to surface!",%Character3)
+					CharacterUseSkill("Teleportation_EnemyArcaneVortex",%Character3,_Spot3)
+					Set(%Bool_ActedThisTurn,1)				
+					Add(_Success,1)
+				ELIF "c1"
+					IsEqual(_MyPosition,_Spot3)
+				THEN
+					Set(_PosOffset,{1.3;0;0}) 
+					GetRandomBetween(_Angle,0,360)
+					GetRandomBetween(_Dist,5,9)
+					RotateY(_PosOffset,_Angle)
+					Multiply(_PosOffset,_Dist)
+					Add(_Spot3,_PosOffset)
+					IF "c1"
+						FindValidPosition(_Spot3,3)
+					THEN
+						//DebugText(__Me,"TP'ing [1] to random!",%Character3)
+						CharacterUseSkill("Teleportation_EnemyArcaneVortex",%Character3,_Spot3)
+						Set(%Bool_ActedThisTurn,1)				
+						Add(_Success,1)
+					ELSE
+						Add(_Failures,1)
+						//DebugText(__Me,"[1] failures!",_Failures)
+					ENDIF
+				ELSE
+					Add(_Failures,1)
+					//DebugText(__Me,"[1] failures!",_Failures)
+				ENDIF
+			ENDIF
+		ENDWHILE
+		IF "c1"
+			IsEqual(_Failures,15)
+		THEN
+			Set(_Failures,0)
+		ENDIF
+		Set(_Success,0)	
+	ENDIF
+	//CHARACTER 4
+	IF "!(c1|c2|c3)"
+		IsEqual(%Character4,null)
+		CharacterHasStatus(%Character4,"INVISIBLE")										//check added by Edouard on 12/11/15 - AV shouldn't teleport invisible / sneaking chars
+		CharacterHasStatus(%Character4,"SNEAKING")
+	THEN
+		WHILE "c1&c2"
+			IsLessThen(_Success,1)
+			IsLessThen(_Failures,15)
+		DO
+			IF "((c1|c2|c3|c4|c5|c6)&!c7)|(c8&c9)"
+				FindSurface(_Spot4,__Me,5,15,"Lava")						//c1
+				FindSurface(_Spot4,__Me,9,19,"Fire")						//c2
+				FindSurface(_Spot4,__Me,5,15,"Ooze")						//c3
+				FindSurface(_Spot4,__Me,5,15,"CloudPoison")					//c4
+				FindSurface(_Spot4,__Me,5,15,"Electrified")					//c5				
+				FindSurface(_Spot4,__Me,5,15,"Ice")							//c6
+				CharacterGet(_PlayersAlly,_Spot4,2,Lowest,Distance,Enemy)	//!c7
+				GetPosition(__Me,_MyPosition)								//c8
+				GetPosition(__Me,_Spot4)									//c9
+			THEN
+				IF "!c1&c2"
+					IsEqual(_MyPosition,_Spot4)
+					FindValidPosition(_Spot4,3)
+				THEN
+					//DebugText(__Me,"TP'ing [1] to surface!",%Character4)
+					CharacterUseSkill("Teleportation_EnemyArcaneVortex",%Character4,_Spot4)
+					Set(%Bool_ActedThisTurn,1)				
+					Add(_Success,1)
+				ELIF "c1"
+					IsEqual(_MyPosition,_Spot1)
+				THEN
+					Set(_PosOffset,{1.3;0;0}) 
+					GetRandomBetween(_Angle,0,360)
+					GetRandomBetween(_Dist,5,9)
+					RotateY(_PosOffset,_Angle)
+					Multiply(_PosOffset,_Dist)
+					Add(_Spot4,_PosOffset)
+					IF "c1"
+						FindValidPosition(_Spot4,3)
+					THEN
+						//DebugText(__Me,"TP'ing [1] to random!",%Character4)
+						CharacterUseSkill("Teleportation_EnemyArcaneVortex",%Character4,_Spot4)
+						Set(%Bool_ActedThisTurn,1)				
+						Add(_Success,1)
+					ELSE
+						Add(_Failures,1)
+						//DebugText(__Me,"[1] failures!",_Failures)
+					ENDIF
+				ELSE
+					Add(_Failures,1)
+					//DebugText(__Me,"[1] failures!",_Failures)
+				ENDIF
+			ENDIF
+		ENDWHILE
+		IF "c1"
+			IsEqual(_Failures,15)
+		THEN
+			SetPriority("ArcaneVortex_AcquireTargets_TeleportThem",0)
+		ENDIF
+		Set(_Failures,0)
+		Set(_Success,0)	
+	ENDIF	
+	IF "c1"
+		IsEqual(%Bool_ActedThisTurn,1)	//if the vortex hasn't acted this turn, he stands ready until the conditions are favorable
+	THEN
+		Set(%TurnCount_Current,0)
+		Set(%Bool_ActedThisTurn,0)
+		SetPriority("ArcaneVortex_AcquireTargets_TeleportThem",0)		
+	ENDIF
+	CharacterUseActionPoints(__Me,4)
+	CharacterEndTurn()
+	
+REACTION ArcaneVortex_Fallback,50
+USAGE COMBAT
+CHECK "!c1"
+	CharacterHasStatus(__Me,"CHARMED")
+ACTIONS
+	CharacterEndTurn()
+
+//----------	
+EVENTS
+EVENT OnInit_GiveAppropriateSpell
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill("Teleportation_EnemyArcaneVortex")
+	CharacterApplyStatus(__Me,WIND_WALKER,-1,1)
+
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	IF "c1"
+		IsLessThen(%TurnCount_Current,%TurnCount_Desired)
+	THEN
+		Add(%TurnCount_Current,1)
+	ELSE
+		SetPriority("ArcaneVortex_AcquireTargets_TeleportThem",500)
+	ENDIF
+	IF "c1"										//check added by Edouard on 12/11/15 - AV shouldn't teleport targets if charmed
+		CharacterHasStatus(__Me,"CHARMED")
+	THEN
+		SetPriority("ArcaneVortex_AcquireTargets_TeleportThem",0)
+	ENDIF	
+	
+EVENT OnIterate_GetEnemies
+VARS
+	CHARACTER:_Enemy
+ON
+	OnIterateCharacter(_Enemy,"CMBHC_ArcaneVortex_ScanForCharactersInCombat")
+ACTIONS
+	IF "!(c1|c2|c3|c4)&c5&c6"
+		CharacterIsDead(_Enemy)												//!c1
+		CharacterHasStatus(_Enemy,"INVISIBLE")								//!c2
+		CharacterHasStatus(_Enemy,"SNEAKING")								//!c3
+		CharacterIsSummon(_Enemy)											//!c4
+		CharacterIsInParty(_Enemy)											//c5	
+		CharacterCanSee(__Me,_Enemy)										//c6
+	THEN
+		IF "c1"
+			IsEqual(%IterateStatus,1)
+		THEN
+			IF "!c1"
+				IsInDangerousSurface(_Enemy)
+			THEN
+				Set(%Character1,_Enemy)
+				//DebugText(__Me,"Char1 = [1]",%Character1)
+				Add(%IterateStatus,1)
+			ELSE
+				//DebugText(_Enemy,"Already in surface!")
+			ENDIF
+		ELIF "c1"
+			IsEqual(%IterateStatus,2)
+		THEN
+			IF "!c1"
+				IsInDangerousSurface(_Enemy)
+			THEN
+				Set(%Character2,_Enemy)
+				//DebugText(__Me,"Char2 = [1]",%Character2)
+				Add(%IterateStatus,1)
+			ELSE
+				//DebugText(_Enemy,"Already in surface!")
+			ENDIF			
+		ELIF "c1"
+			IsEqual(%IterateStatus,3)
+		THEN
+			IF "!c1"
+				IsInDangerousSurface(_Enemy)
+			THEN
+				Set(%Character3,_Enemy)
+				//DebugText(__Me,"Char3 = [1]",%Character3)
+				Add(%IterateStatus,1)
+			ELSE
+				//DebugText(_Enemy,"Already in surface!")
+			ENDIF
+		ELIF "c1"
+			IsEqual(%IterateStatus,4)
+		THEN
+			IF "!c1"
+				IsInDangerousSurface(_Enemy)
+			THEN
+				Set(%Character4,_Enemy)
+				//DebugText(__Me,"Char4 = [1]",%Character4)
+				Add(%IterateStatus,1)
+			ELSE
+				//DebugText(_Enemy,"Already in surface!")
+			ENDIF
+		ENDIF
+	ENDIF

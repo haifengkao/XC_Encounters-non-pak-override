@@ -1,0 +1,31 @@
+INIT
+CHARACTER:__Me
+TRIGGER:%Trigger1 = LUC_IV_OutsideTeacher1_55150348-c6f1-4ee3-b493-df96f3547e8a
+TRIGGER:%Trigger2 = LUC_IV_OutsideTeacher2_244a2f5d-1cdf-4a4f-9cb9-91749fd2f4c2
+TRIGGER:%Trigger3 = LUC_IV_OutsideTeacher3_0cc032e2-ee69-4e8d-8438-17e1fe5e9b5d
+TRIGGER:%Trigger4 = LUC_IV_OutsideTeacher4_1b186ef8-c654-40fa-91b2-8926fa791d72
+TRIGGER:%Trigger5 = LUC_IV_OutsideTeacher5_32ffb136-f1c8-47b4-957d-7c2ad0ed11cb
+TRIGGER:%Trigger6 = LUC_IV_OutsideTeacher6_bfec35e9-5833-471d-9335-b1d3c9ac70dc
+
+BEHAVIOUR
+REACTION TeachStudents, 1000
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Trigger1,0,1,1)
+	CharacterLookFrom(%Trigger1)
+	DialogStart("LUC_IV_OutsideTeacher1",__Me)
+	CharacterMoveTo(%Trigger2,0,1,1)
+	CharacterLookFrom(%Trigger2)
+	DialogStart("LUC_IV_OutsideTeacher2",__Me)
+	CharacterLookFrom(%Trigger3)
+	CharacterMoveTo(%Trigger3,0,1,1)
+	DialogStart("LUC_IV_OutsideTeacher3",__Me)
+	CharacterMoveTo(%Trigger4,0,1,1)
+	CharacterLookFrom(%Trigger4)
+	DialogStart("LUC_IV_OutsideTeacher4",__Me)
+	CharacterMoveTo(%Trigger5,0,1,1)
+	CharacterLookFrom(%Trigger5)
+	DialogStart("LUC_IV_OutsideTeacher5",__Me)
+	CharacterMoveTo(%Trigger6,0,1,1)
+	CharacterLookFrom(%Trigger6)
+	DialogStart("LUC_IV_OutsideTeacher6",__Me)

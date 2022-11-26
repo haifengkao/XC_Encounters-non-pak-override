@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<palette xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <palettes />
+  <objectids>
+    <guid>81a9c66e-462b-4a45-9181-db283a030825</guid>
+    <guid>07bd84bb-c855-47f8-ba79-630cc6b86fa6</guid>
+    <guid>74076331-15a0-4812-94c6-631c5ac0fd8c</guid>
+    <guid>4f785664-d09b-41b2-8c27-c7ef2fdfc058</guid>
+    <guid>d8879db9-8334-4d7b-be45-5384bbf65ae8</guid>
+    <guid>7a79d451-1dba-44af-9506-ea868b8ed7b3</guid>
+  </objectids>
+  <name>Doors</name>
+</palette>

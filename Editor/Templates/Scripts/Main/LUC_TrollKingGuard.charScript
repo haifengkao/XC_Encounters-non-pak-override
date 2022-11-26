@@ -1,0 +1,113 @@
+#INCLUDE State_Manager
+INIT 
+	USING State_Manager
+	CHARACTER:__Me
+	CHARACTER:%TrollKing="LUC_TrollKing_3ddc465b-0f9a-4677-bce8-9e5f3909c101"
+	EXTERN TRIGGER:%Waypoint1 = null
+	EXTERN TRIGGER:%Waypoint2 = null
+	EXTERN TRIGGER:%Waypoint3 = null
+	EXTERN TRIGGER:%Waypoint4 = null
+	EXTERN TRIGGER:%Extra1 = null
+	EXTERN TRIGGER:%Extra2 = null	
+	EXTERN FIXEDSTRING:%Action = null
+	
+//-----------
+BEHAVIOUR
+REACTION TrollGuard_RunToKing,0
+USAGE PEACE
+VARS
+	CHARACTER:_Enemy
+CHECK "c1"
+	CharacterGet(_Enemy,%TrollKing,20,Lowest,Distance,Enemy)
+ACTIONS
+	CharacterMoveTo(_Enemy,1,0,0)
+	SetPriority("TrollGuard_RunToKing",0)
+
+REACTION State_Patrolling, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, %Action)
+	SetPriority(%currentAction, 1100)
+	
+REACTION Action_Patrol1, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Waypoint1)
+	SetPriority("Action_Speak",2000)
+	CharacterMoveTo(%Waypoint2)
+	SetPriority("Action_Speak",2000)
+	CharacterMoveTo(%Waypoint3)
+	CharacterLookAt(%Extra1)
+	Sleep(3)
+	CharacterLookAt(%Extra2)
+	Sleep(3)
+	SetPriority("Action_Speak",2000)
+	SetPriority(%currentAction,0)
+		
+REACTION Action_Patrol2, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Waypoint1)
+	CharacterLookAt(%Extra1)
+	SetPriority("Action_Speak",2000)
+	CharacterMoveTo(%Waypoint2)
+	SetPriority("Action_Speak",2000)
+	CharacterMoveTo(%Waypoint3)
+	SetPriority("Action_Speak",2000)
+	CharacterMoveTo(%Waypoint4)
+	CharacterLookAt(%Extra2)
+	SetPriority("Action_Speak",2000)
+	SetPriority(%currentAction,0)
+
+REACTION Action_Patrol3, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Waypoint1)
+	SetPriority("Action_Speak",2000)
+	CharacterMoveTo(%Waypoint2)
+	CharacterLookAt(%Extra1)
+	Sleep(3)
+	SetPriority("Action_Speak",2000)
+	CharacterMoveTo(%Waypoint3)
+	SetPriority("Action_Speak",2000)
+	CharacterMoveTo(%Waypoint4)
+	SetPriority("Action_Speak",2000)
+	SetPriority(%currentAction,0)
+		
+REACTION Action_Patrol4, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Waypoint1)
+	CharacterLookAt(%Extra1)
+	SetPriority("Action_Speak",2000)
+	CharacterMoveTo(%Waypoint2)
+	SetPriority("Action_Speak",2000)
+	CharacterMoveTo(%Waypoint3)
+	SetPriority("Action_Speak",2000)
+	CharacterMoveTo(%Waypoint4)
+	CharacterLookAt(%Extra2)
+	SetPriority("Action_Speak",2000)
+	SetPriority(%currentAction,0)
+		
+REACTION Action_Speak, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_trollText
+	FIXEDSTRING:_trollAnim
+ACTIONS
+	GetRandom(_trollText,"LUC_TrollKingGuard_01","LUC_TrollKingGuard_02","LUC_TrollKingGuard_03","LUC_TrollKingGuard_04","LUC_TrollKingGuard_05","LUC_TrollKingGuard_06","LUC_TrollKingGuard_07","LUC_TrollKingGuard_08","LUC_TrollKingGuard_09","LUC_TrollKingGuard_10")
+	DisplayText(__Me,_trollText,3)
+	GetWeightedRandom(_trollAnim,"idle1",INT:1,"idle2",INT:1,"idle3",INT:1)
+	CharacterPlayAnimation(_trollAnim)
+	Sleep(8)
+	SetPriority("Action_Speak",0)
+	
+//-----------
+EVENTS
+EVENT OnCharacterEvent_RunTowardsTheKing
+ON
+	OnCharacterEvent(%TrollKing,"LUC_TrollKing_CallsForHelp_Event")
+ACTIONS
+	CharacterSetCanFight(__Me,1,1)
+	DisplayText(__Me,"LUC_TrollKing_CallsForHelp_Response",3)
+	SetPriority("TrollGuard_RunToKing",3000)

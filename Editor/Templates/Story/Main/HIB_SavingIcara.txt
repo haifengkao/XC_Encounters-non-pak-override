@@ -1,0 +1,531 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+ItemToCharacter(ITEM_HIB_FireRune,CHARACTER_HIB_ElementalGuardian_Fire);
+
+DB_HIB_GoodElementals(CHARACTER_HIB_ElementalGuardian_Earth,TRIGGER_HIB_Point_ElementalEarth_1,"HIB_ElementalGuardian_Earth");
+DB_HIB_GoodElementals(CHARACTER_HIB_ElementalGuardian_Fire,TRIGGER_HIB_Point_ElementalFire_1,"HIB_ElementalGuardian_Fire");
+DB_HIB_GoodElementals(CHARACTER_HIB_ElementalGuardian_Wind,TRIGGER_HIB_Point_ElementalWind_1,"HIB_ElementalGuardian_Air");
+PROC_HIB_GoodElementalsInit();
+
+DB_Dialogs(CHARACTER_HIB_Arhu,"HIB_Arhu");
+
+DB_IsNotMessingAround(CHARACTER_HIB_Icara);
+DB_IsNotMessingAround(CHARACTER_HIB_ElementalGuardian_Fire);
+
+DB_BigTrader(CHARACTER_HIB_Arhu);
+DB_BigTrader(CHARACTER_HIB_Arhu_Cat);
+
+ProcDisablePlayerTrade(CHARACTER_HIB_Icara);
+ProcDisablePlayerTrade(CHARACTER_HOM_Icara);
+KBSECTION
+//REGION FREEING ELEMENTALS
+IF
+CharacterUsedItem(_Player, ITEM_HIB_ElementalForge)
+THEN
+CharacterDisplayText(_Player, "GLO_FailedUse");
+
+PROC
+PROC_HIB_GoodElementalsInit()
+AND
+DB_HIB_GoodElementals(_Character,_,_)
+THEN
+CharacterSetOnStage(_Character,0);
+DB_NoRunAway(_Character);
+NeverThreatenedDialog(_Character); 
+
+IF
+ItemTemplateCombinedWithItemTemplate("WPN_Trolls_2H_Staff_IceKing_A_Human_e9e9b525-66fa-485a-8c4e-1a733a563c77","2m_DungeonPrison_A_Smith_Fireplace_A_Item_b7f00fad-8fd6-47c5-bbc7-2b71e15e795a",_Player,_)
+THEN
+GlobalSetEvent("HIB_SavedHiberheim");
+PROC_HIB_GoodElementalsAppear();
+TimerLaunch("HIB_GoodElementalsAppear",2000);
+
+PROC
+PROC_HIB_GoodElementalsAppear()
+AND
+DB_HIB_GoodElementals(_Character,_Trigger,_Dialog)
+THEN
+CharacterAppearAtTrigger(_Character,_Trigger,1);
+DB_Dialogs(_Character,_Dialog);
+PlayEffectAtTrigger("FX_GP_TeleportSmoke_A",_Trigger);
+
+IF
+TimerFinished("HIB_GoodElementalsAppear")
+THEN
+TRIGGER_HIB_Area_BloodStone.DoingElementalScene();
+DB_OneShotPlayerTrigger(TRIGGER_HIB_Area_BloodStone);
+QuestUpdate("HIB_Boreas","BrokeStaff");
+QuestClose("HIB_Boreas");
+
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,TRIGGER_HIB_Area_BloodStone)
+AND
+TRIGGER_HIB_Area_BloodStone.DoingElementalScene()
+AND
+NOT CHARACTER_HIB_ElementalGuardian_Fire.DB_IsInDialog()
+AND
+NOT DB_Dead(CHARACTER_HIB_ElementalGuardian_Fire)
+THEN
+NOT TRIGGER_HIB_Area_BloodStone.DoingElementalScene();
+PROC_MendatoryDialog("HIB_ElementalGuardian_Fire",CHARACTER_HIB_ElementalGuardian_Fire,_Player);
+//END_REGION
+
+//REGION FREEING ICARA
+IF
+CharacterUsedItem(_Player,ITEM_HIB_IcePrisonIcara)
+THEN
+QuestUpdate("LUC_WhiteWitch","FoundWitch");
+GlobalSetEvent("HIB_FoundIcara");
+Launch_PlayerComment(_Player,"HIB_CommentIcaraFrozen");
+
+IF
+DialogEnded("HIB_Arhu", _)
+THEN
+QuestUpdate("LUC_WhiteWitch","FoundWitch");
+GlobalSetEvent("HIB_FoundIcara");
+
+IF
+DialogEnded("HIB_ElementalGuardian_Fire",_ID)
+AND
+CharacterGetVarInteger(CHARACTER_HIB_ElementalGuardian_Fire,"HIB_GivesFireRune",1)
+AND
+DB_DialogPlayers(_ID,_Player,1)
+THEN
+CharacterSetVarInteger(CHARACTER_HIB_ElementalGuardian_Fire,"HIB_GivesFireRune",0);
+ItemToCharacter(ITEM_HIB_FireRune,_Player);
+DialogRequestStopForCharacter(CHARACTER_HIB_ElementalGuardian_Earth);
+CharacterSetHasDialog(CHARACTER_HIB_ElementalGuardian_Earth, 0);
+DialogRequestStopForCharacter(CHARACTER_HIB_ElementalGuardian_Wind);
+CharacterSetHasDialog(CHARACTER_HIB_ElementalGuardian_Wind, 0);
+DialogStartOneSpeakerDialog("HIB_AD_LurreanLeave", CHARACTER_HIB_ElementalGuardian_Earth);
+
+IF
+AutomatedDialogEnded("HIB_AD_LurreanLeave", _)
+THEN
+Poof(CHARACTER_HIB_ElementalGuardian_Earth);
+Poof(CHARACTER_HIB_ElementalGuardian_Wind);
+
+IF
+DialogEnded("HIB_ElementalGuardian_Fire",_)
+AND
+CharacterGetVarInteger(CHARACTER_HIB_ElementalGuardian_Fire,"goesAway",1)
+THEN
+Poof(CHARACTER_HIB_ElementalGuardian_Fire);
+
+IF
+CharacterDied(CHARACTER_HIB_ElementalGuardian_Fire)
+THEN
+TimerLaunch("HIB_Rez_Sua",3000);
+
+IF
+TimerFinished("HIB_Rez_Sua")
+THEN
+GlobalSetEvent("HIB_SuaRezzed");
+CharacterResurrect(CHARACTER_HIB_ElementalGuardian_Fire);
+
+IF
+CharacterResurrected(CHARACTER_HIB_ElementalGuardian_Fire)
+THEN
+DB_Dialogs(CHARACTER_HIB_ElementalGuardian_Fire,"HIB_ElementalGuardian_Fire");
+
+IF
+CharacterUsedItem(_Player,ITEM_HIB_FireRune)
+AND
+DB_InRegion(_Player,TRIGGER_HIB_Area_Icara)
+AND
+NOT DB_Dead(CHARACTER_HIB_ElementalGuardian_Fire)
+AND
+NOT DB_Combat(CHARACTER_HIB_ElementalGuardian_Fire,_)
+AND
+NOT ITEM_HIB_FireRune.HIB_CanBeUsed()
+THEN
+ITEM_HIB_FireRune.HIB_CanBeUsed();
+ItemRemove(ITEM_HIB_FireRune);
+ItemSetOnstage(ITEM_HIB_FireRune, 0);
+ProcTriggerUnregisterForPlayers(TRIGGER_HIB_Area_Icara);
+DialogRequestStopForCharacter(CHARACTER_HIB_ElementalGuardian_Fire);
+CharacterSetHasDialog(CHARACTER_HIB_ElementalGuardian_Fire,0);
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A",CHARACTER_HIB_ElementalGuardian_Fire);
+CharacterSetOnStage(CHARACTER_HIB_ElementalGuardian_Fire,0);
+CharacterSetVarInteger(CHARACTER_HIB_ElementalGuardian_Fire,"HIB_SummonedFireElemental",1);
+TimerLaunch("HIB_SummonFireElemental_1",1500);
+CharacterSetVarInteger(CHARACTER_HIB_Arhu,"SuaArrived",1);
+
+IF
+CharacterUsedItem(_Player,ITEM_HIB_FireRune)
+AND
+NOT ITEM_HIB_FireRune.HIB_CanBeUsed()
+THEN
+CharacterDisplayText(_Player,"HIB_FireRuneFailed");
+
+IF
+TimerFinished("HIB_SummonFireElemental_1")
+THEN
+NOT ITEM_HIB_FireRune.HIB_CanBeUsed();
+CharacterSetImmortal(CHARACTER_HIB_ElementalGuardian_Fire,1);
+CharacterAppearAtTrigger(CHARACTER_HIB_ElementalGuardian_Fire,TRIGGER_HIB_Point_ElementalFire_2,1);
+TimerLaunch("HIB_SummonFireElemental_2",1500);
+DialogRequestStopForCharacter(CHARACTER_HIB_Arhu);
+CharacterSetHasDialog(CHARACTER_HIB_Arhu,0);
+
+IF
+TimerFinished("HIB_SummonFireElemental_2")
+AND 
+DB_CurrentLevel("ThePrisonGardenOfStoneKing")
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_HIB_ElementalGuardian_Fire,_Player)
+THEN
+PROC_MendatoryDialog("HIB_ElementalGuardian_Fire",CHARACTER_HIB_ElementalGuardian_Fire,_Player);
+
+IF
+TimerFinished("HIB_SummonFireElemental_2")
+AND 
+NOT DB_CurrentLevel("ThePrisonGardenOfStoneKing")
+THEN
+DB_HIB_WaitingForFireElementalScene(1);
+DB_OneShotPlayerTrigger(TRIGGER_HIB_Area_Icara);
+
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,TRIGGER_HIB_Area_Icara)
+AND
+DB_HIB_WaitingForFireElementalScene(1)
+THEN
+NOT DB_HIB_WaitingForFireElementalScene(1);
+PROC_MendatoryDialog("HIB_ElementalGuardian_Fire",CHARACTER_HIB_ElementalGuardian_Fire,_Player);
+
+IF
+TimerFinished("HIB_SummonFireElemental_2")
+THEN
+NOT DB_HIBStartedFireDialog(1);
+
+IF
+DialogEnded("HIB_ElementalGuardian_Fire",_)
+AND
+CharacterGetVarInteger(CHARACTER_HIB_ElementalGuardian_Fire,"HIB_SummonedFireElemental",1)
+THEN
+NOT DB_IsNotMessingAround(CHARACTER_HIB_ElementalGuardian_Fire);
+CharacterSetVarInteger(CHARACTER_HIB_ElementalGuardian_Fire,"HIB_SummonedFireElemental",0);
+CharacterLookAtItem(CHARACTER_HIB_ElementalGuardian_Fire,ITEM_HIB_IcePrisonIcara,0);
+CharacterSetHasDialog(CHARACTER_HIB_ElementalGuardian_Fire,0);
+CharacterPlayAnimation(CHARACTER_HIB_ElementalGuardian_Fire, "cast_target_start", "readyToBlast");
+
+IF
+CharacterEvent(CHARACTER_HIB_ElementalGuardian_Fire, "readyToBlast")
+THEN
+CharacterSetEvent(CHARACTER_HIB_ElementalGuardian_Fire, "playAnimation");
+CharacterPlayBeamEffectToItem(CHARACTER_HIB_ElementalGuardian_Fire, ITEM_HIB_IcePrisonIcara, "FX_GP_SuaBeam_A", "Dummy_CastFX", "Dummy_Target");
+ItemSetVisible(ITEM_HIB_IcePrisonIcara, 0);
+PlayEffectAtItem("FX_GP_IcePrison_A_Destruct_A", ITEM_HIB_IcePrisonIcara);
+TimerLaunch("HIB_SuaFlame", 6000);
+
+IF
+TimerFinished("HIB_SuaFlame")
+THEN
+CHARACTER_HIB_Icara.DB_Freed();
+ItemSetOnstage(ITEM_HIB_IcePrisonIcara, 0);
+CharacterSetEvent(CHARACTER_HIB_ElementalGuardian_Fire, "StopAnimation");
+DB_IsNotMessingAround(CHARACTER_HIB_ElementalGuardian_Fire);
+GlobalSetEvent("HIB_SavedIcara");
+CharacterRemoveStatus(CHARACTER_HIB_Icara,"FROZEN");
+CharacterUnfreeze(CHARACTER_HIB_Icara);
+NOT IsStoryNpc(CHARACTER_HIB_Icara);
+SetStoryNpcStatus(CHARACTER_HIB_Icara);
+TimerLaunch("HIB_IcaraFreed",3000);
+
+IF
+CharacterStatusRemoved(CHARACTER_HIB_Icara,"FROZEN")
+AND
+NOT CHARACTER_HIB_Icara.DB_Freed()
+THEN
+CharacterApplyStatus(CHARACTER_HIB_Icara,"FROZEN",-1.0, 1);
+
+IF
+CharacterEvent(CHARACTER_HIB_ElementalGuardian_Fire,"HIB_BackFromIcara")
+THEN
+CharacterSetHasDialog(CHARACTER_HIB_ElementalGuardian_Fire,1);
+
+IF
+TimerFinished("HIB_IcaraFreed")
+THEN
+CharacterSetHasDialog(CHARACTER_Zandalor, 1);
+GlobalSetEvent("DFD_IS_ZandalorIcaraFree");
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A",CHARACTER_HIB_ElementalGuardian_Fire);
+CharacterTeleportToTrigger(CHARACTER_HIB_ElementalGuardian_Fire,TRIGGER_HIB_Point_ElementalFire_1,"HIB_BackFromIcara");
+CharacterSetImmortal(CHARACTER_HIB_ElementalGuardian_Fire,0);
+QuestUpdate("LUC_WhiteWitch","FreedWitch");
+QuestClose("LUC_WhiteWitch");
+QuestUpdate("HOM_Starstones", "FreedIcara");
+
+IF
+TimerFinished("HIB_IcaraFreed")
+AND 
+DB_CurrentLevel("ThePrisonGardenOfStoneKing")
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_HIB_Icara,_Player)
+THEN
+Proc_HIB_FreeIcaraDialog(_Player);
+
+PROC
+Proc_HIB_FreeIcaraDialog((CHARACTER)_Player)
+THEN
+DB_DoingIcaraScene(1);
+
+PROC
+Proc_HIB_FreeIcaraDialog((CHARACTER)_Player)
+AND
+NOT DB_GlobalEvent("GLO_ArhuKilled")
+THEN
+DialogRequestStopForCharacter(CHARACTER_CYS_Arhu);
+Proc_ForceArhuHuman();
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A",CHARACTER_CYS_Arhu);
+PROC_MendatoryDialogThreeSpeaker("LUC_IcaraArhu",CHARACTER_HIB_Icara,CHARACTER_HIB_Arhu,_Player);
+
+PROC
+Proc_HIB_FreeIcaraDialog((CHARACTER)_Player)
+AND
+DB_GlobalEvent("GLO_ArhuKilled")
+THEN
+PROC_MendatoryDialog("LUC_Icara",CHARACTER_HIB_Icara,_Player);
+
+IF
+TimerFinished("HIB_IcaraFreed")
+AND 
+NOT DB_CurrentLevel("ThePrisonGardenOfStoneKing")
+THEN
+DB_HIB_WaitingForIcaraScene(1);
+DB_OneShotPlayerTrigger(TRIGGER_HIB_Area_Icara);
+
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,TRIGGER_HIB_Area_Icara)
+AND
+DB_HIB_WaitingForIcaraScene(1)
+THEN
+NOT DB_HIB_WaitingForIcaraScene(1);
+Proc_HIB_FreeIcaraDialog(_Player);
+
+IF
+DialogEnded("LUC_IcaraArhu",_ID)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_GlobalEvent("HIB_PlayJakeMurderMovie")
+THEN
+ProcStartMovie("JakesMurder.bik");
+DB_HIB_AfterMurderVideo("LUC_IcaraArhu",_Player);
+
+IF
+MovieFinished("JakesMurder.bik")
+AND
+DB_HIB_AfterMurderVideo("LUC_IcaraArhu",_Player)
+THEN
+NOT DB_HIB_AfterMurderVideo("LUC_IcaraArhu",_Player);
+PROC_MendatoryDialogThreeSpeaker("LUC_IcaraArhu",CHARACTER_HIB_Icara,CHARACTER_HIB_Arhu,_Player);
+
+IF
+DialogEnded("LUC_Icara",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_GlobalEvent("HIB_PlayJakeMurderMovie")
+THEN
+ProcStartMovie("JakesMurder.bik");
+DB_HIB_AfterMurderVideo("LUC_Icara",_Player);
+
+IF
+MovieFinished("JakesMurder.bik")
+AND
+DB_HIB_AfterMurderVideo("LUC_Icara",_Player)
+THEN
+NOT DB_HIB_AfterMurderVideo("LUC_Icara",_Player);
+PROC_MendatoryDialog("LUC_Icara",CHARACTER_HIB_Icara,_Player);
+
+IF
+DialogEnded("LUC_IcaraArhu",_)
+AND
+NOT DB_GlobalEvent("HIB_PlayJakeMurderMovie")
+AND
+CharacterGetVarInteger(CHARACTER_HIB_Icara,"HIB_IcaraFirstDialog",1)
+THEN
+CharacterSetVarInteger(CHARACTER_HIB_Icara,"HIB_IcaraFirstDialog",0);
+ProcHIBDoZixzaxDialogIfPossible();
+
+IF
+DialogEnded("LUC_Icara",_)
+AND
+CharacterGetVarInteger(CHARACTER_HIB_Icara,"HIB_IcaraFirstDialog",1)
+THEN
+CharacterSetVarInteger(CHARACTER_HIB_Icara,"HIB_IcaraFirstDialog",0);
+ProcHIBDoZixzaxDialogIfPossible();
+
+PROC
+ProcHIBDoZixzaxDialogIfPossible()
+AND
+NOT DB_Dead(CHARACTER_CYS_Zixzax)
+THEN
+ProcMakeZixzaxAppearAt(TRIGGER_HIB_Point_Zixzax,"");
+DB_IsNotMessingAround(CHARACTER_CYS_Zixzax);
+TimerLaunch("HIB_ZixzaxAppears",1000);
+DB_HIB_WaitingForIcaraZixzaxScene(1);
+
+PROC
+ProcHIBCancelZixzaxICaraScene()
+THEN
+TimerCancel("HIB_ZixzaxAppears");
+NOT DB_HIB_WaitingForIcaraZixzaxScene(1);
+NOT DB_HIB_WaitingForZixzaxIcaraDialog(1);
+NOT DB_DoingIcaraScene(1);
+
+PROC
+ProcHIBCancelZixzaxIcaraScene()
+AND
+NOT DB_Dead(CHARACTER_HIB_Icara)
+THEN
+DialogRequestStopForCharacter(CHARACTER_HIB_Icara);
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_HIB_Icara);
+CharacterSetOnStage(CHARACTER_HIB_Icara,0);
+ProcHOMSetIcaraInHomestead();
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_HIB_Arhu);
+CharacterSetOnStage(CHARACTER_HIB_Arhu,0);
+
+PROC
+ProcHIBCancelZixzaxICaraScene()
+AND
+NOT DB_Dead(CHARACTER_CYS_Zixzax)
+THEN
+DialogRequestStopForCharacter(CHARACTER_CYS_Zixzax);
+ProcSetZixzaxBackInHomestead("hibBack");
+CharacterSetOnStage(CHARACTER_CYS_Zixzax, 1);
+NOT DB_IsNotMessingAround(CHARACTER_CYS_Zixzax);
+
+IF
+RegionEnded("ThePrisonGardenOfStoneKing")
+AND
+DB_DoingIcaraScene(1)
+THEN
+ProcHIBCancelZixzaxICaraScene();
+
+IF
+DB_Dead(CHARACTER_HIB_Icara)
+AND
+DB_HIB_WaitingForIcaraZixzaxScene(1)
+THEN
+ProcHIBCancelZixzaxICaraScene();
+
+IF
+DB_HIB_WaitingForIcaraZixzaxScene(1)
+THEN
+NOT DB_IsNotMessingAround(CHARACTER_HIB_Icara);
+
+IF
+CharacterAttackedByCharacter(CHARACTER_HIB_Icara,_)
+AND
+DB_HIB_WaitingForIcaraZixzaxScene(1)
+THEN
+ProcHIBCancelZixzaxICaraScene();
+
+IF
+DB_Combat(CHARACTER_HIB_Icara,_)
+AND
+DB_HIB_WaitingForIcaraZixzaxScene(1)
+THEN
+ProcHIBCancelZixzaxICaraScene();
+
+IF
+DB_Dead(CHARACTER_CYS_Zixzax)
+AND
+DB_HIB_WaitingForIcaraZixzaxScene(1)
+THEN
+ProcHIBCancelZixzaxICaraScene();
+
+IF
+DB_Combat(CHARACTER_CYS_Zixzax,_)
+AND
+DB_HIB_WaitingForIcaraZixzaxScene(1)
+THEN
+ProcHIBCancelZixzaxICaraScene();
+
+IF
+TimerFinished("HIB_ZixzaxAppears")
+AND
+NOT DB_Dead(CHARACTER_CYS_Zixzax)
+AND
+NOT DB_Combat(CHARACTER_CYS_Zixzax,_)
+THEN
+DB_HIB_WaitingForZixzaxIcaraDialog(1);
+DB_OneShotPlayerTrigger(TRIGGER_HIB_Area_Icara);
+
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,TRIGGER_HIB_Area_Icara)
+AND
+DB_HIB_WaitingForZixzaxIcaraDialog(1)
+THEN
+NOT DB_HIB_WaitingForZixzaxIcaraDialog(1);
+PROC_MendatoryDialog("HIB_ZixzaxCommentIcara",CHARACTER_CYS_Zixzax,_Player);
+
+IF
+DialogEnded("HIB_ZixzaxCommentIcara",_)
+AND
+NOT DB_Dead(CHARACTER_HIB_Icara)
+AND
+NOT DB_Combat(CHARACTER_HIB_Icara,_)
+THEN
+CharacterLookAtCharacter(CHARACTER_CYS_Zixzax,CHARACTER_HIB_Icara);
+DialogStartTwoSpeakerDialog("HIB_AD_IcaraZixzax",CHARACTER_CYS_Zixzax,CHARACTER_HIB_Icara);
+
+IF
+AutomatedDialogEnded("HIB_AD_IcaraZixzax",_)
+AND
+PlayLoopEffectAtTrigger("FX_GP_TeleportSmoke_B",TRIGGER_HIB_ZZ_TP_FX,_FxHandle)
+THEN
+NOT DB_HIB_WaitingForIcaraZixzaxScene(1);
+ProcDefinePartyDialog("HIB_PD_IcaraReflect");
+DB_HIB_Zixzax_Teleport_FX(_FxHandle);
+TimerLaunch("HIB_WaitTillPortalActive",1000);
+
+IF
+TimerFinished("HIB_WaitTillPortalActive")
+THEN
+CharacterMoveToTrigger(CHARACTER_CYS_Zixzax,TRIGGER_HIB_ZZ_TP_FX,0,"ArrivedAtHIBPortal");
+TimerLaunch("HIB_FinishZixzaxIcaraScene",5000);
+
+IF
+CharacterEvent(CHARACTER_CYS_Zixzax,"ArrivedAtHIBPortal")
+THEN
+CharacterMoveToTrigger(CHARACTER_HIB_Icara,TRIGGER_HIB_ZZ_TP_FX,0,"ArrivedAtHIBPortal");
+CharacterMoveToTrigger(CHARACTER_HIB_Arhu,TRIGGER_HIB_ZZ_TP_FX,0,"ArrivedAtHIBPortal");
+
+IF
+CharacterEvent(_Character,"ArrivedAtHIBPortal")
+THEN
+CharacterSetOnStage(_Character,0);
+PlayEffectAtTrigger("FX_GP_TeleportSmoke_B_Flash_A",TRIGGER_HIB_ZZ_TP_FX);
+ProcSetZixzaxBackInHomestead();
+NOT DB_IsNotMessingAround(CHARACTER_CYS_Zixzax);
+
+IF
+TimerFinished("HIB_FinishZixzaxIcaraScene")
+AND
+DB_HIB_Zixzax_Teleport_FX(_FxHandle)
+THEN
+StopLoopEffect(_FxHandle);
+ProcHIBCancelZixzaxICaraScene();
+NOT DB_HIB_Zixzax_Teleport_FX(_FxHandle);
+//END_REGION
+
+
+//REGION OE
+IF
+TextEventSet("IcaraSaved")
+THEN
+CharacterRemoveStatus(CHARACTER_HIB_Icara,"FROZEN");
+CharacterUnfreeze(CHARACTER_HIB_Icara);
+NOT IsStoryNpc(CHARACTER_HIB_Icara);
+SetStoryNpcStatus(CHARACTER_HIB_Icara);
+ProcHOMSetIcaraInHomestead();
+CharacterSetHasDialog(CHARACTER_Zandalor, 1);
+GlobalSetEvent("DFD_IS_ZandalorIcaraFree");
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

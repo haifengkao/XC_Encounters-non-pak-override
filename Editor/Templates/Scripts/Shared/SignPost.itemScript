@@ -1,0 +1,17 @@
+INIT
+ITEM:__Me
+EXTERN FIXEDSTRING:%Directions = ""
+
+EVENTS
+EVENT UseItem
+	ON 
+	OnUseItem(_,__Me)
+ACTIONS
+	SetPriority("DisplayDirections", 1060)
+	
+BEHAVIOUR
+REACTION DisplayDirections, 0
+USAGE ALL
+ACTIONS
+		DisplayText(__Me, %Directions, 7)
+	SetPriority("DisplayDirections", 0)

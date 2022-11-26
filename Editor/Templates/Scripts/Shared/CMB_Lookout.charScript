@@ -1,0 +1,16 @@
+INIT 
+	CHARACTER:__Me
+	EXTERN TRIGGER:%LookoutTarget1 = null
+	EXTERN TRIGGER:%LookoutTarget2 = null
+	EXTERN FLOAT:%LookoutSleep1 = 8
+	EXTERN FLOAT:%LookoutSleep2 = 8
+
+BEHAVIOUR
+
+REACTION Lookout, 1200
+	USAGE PEACE
+	ACTIONS
+		CharacterLookAt(%LookoutTarget1,0)
+		Sleep(%LookoutSleep1)
+		CharacterLookAt(%LookoutTarget2,0)
+		Sleep(%LookoutSleep2)

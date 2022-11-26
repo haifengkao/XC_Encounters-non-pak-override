@@ -1,0 +1,60 @@
+INIT
+TRIGGER:%CurrentTrigger = null
+TRIGGER:%PreviousTrigger = null
+EXTERN TRIGGER:%PatrolSpot1 = null
+EXTERN TRIGGER:%PatrolSpot2 = null
+EXTERN TRIGGER:%PatrolSpot3 = null
+EXTERN TRIGGER:%PatrolSpot4 = null
+EXTERN TRIGGER:%PatrolSpot5 = null
+EXTERN TRIGGER:%PatrolSpot6 = null
+EXTERN INT:%PointsUsed = 2
+EXTERN FLOAT:%SleepTime = 5
+
+BEHAVIOUR
+
+REACTION ChooseAction, 1060
+USAGE PEACE
+CHECK "c1&c2"
+	IsGreaterThen(%PointsUsed,1)
+	IsLessThen(%PointsUsed,7)
+ACTIONS
+    IF "c1"
+		IsEqual(%PointsUsed,2)
+	THEN
+		GetRandom(%CurrentTrigger, %PatrolSpot1, %PatrolSpot2)
+	ELIF "c1"
+		IsEqual(%PointsUsed,3)
+	THEN
+		GetRandom(%CurrentTrigger, %PatrolSpot1, %PatrolSpot2, %PatrolSpot3)
+	ELIF "c1"
+		IsEqual(%PointsUsed,4)
+	THEN
+		GetRandom(%CurrentTrigger, %PatrolSpot1, %PatrolSpot2, %PatrolSpot3, %PatrolSpot4)
+	ELIF "c1"
+		IsEqual(%PointsUsed,5)
+	THEN
+		GetRandom(%CurrentTrigger, %PatrolSpot1, %PatrolSpot2, %PatrolSpot3, %PatrolSpot4, %PatrolSpot5)
+	ELIF "c1"
+		IsEqual(%PointsUsed,6)
+	THEN
+		GetRandom(%CurrentTrigger, %PatrolSpot1, %PatrolSpot2, %PatrolSpot3, %PatrolSpot4, %PatrolSpot5, %PatrolSpot6)
+	ENDIF
+	GotoIfEqual(%PreviousTrigger, %CurrentTrigger, "Start")
+	Set(%PreviousTrigger, %CurrentTrigger)
+	SetPriority("GoToSpot", 1070)
+	
+REACTION GoToSpot, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%CurrentTrigger, 0)
+	IF "c1"
+		IsGreaterThen(%SleepTime,0)
+	THEN
+		CharacterLookFrom(%CurrentTrigger)
+		Sleep(%SleepTime)
+	ENDIF
+	SetPriority("GoToSpot", 0)
+INTERRUPT
+	Reset()
+
+EVENTS

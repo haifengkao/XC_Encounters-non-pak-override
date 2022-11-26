@@ -1,0 +1,109 @@
+#INCLUDE DefaultCharacter
+INIT
+	CHARACTER:__Me
+	USING DefaultCharacter
+	
+//------------
+BEHAVIOUR
+REACTION NecroTroll_OnMoveFailedTeleportTargetToMe,0 
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+	INT:_Failures=0
+	INT:_Successes=0
+	FLOAT:_Angle
+	FLOAT:_Dist
+	FLOAT3:_MyPosition
+	FLOAT3:_PosOffset
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3"
+	CharacterCanCast(__Me,"Teleportation_EnemyFreeFall_NecroTroll")
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Teleportation_EnemyFreeFall_NecroTroll")
+	CharacterGetEnemy(_Enemy,__Me)
+ACTIONS
+	//DebugText(__Me,"Necroporting [1]!",_Enemy)
+	WHILE "c1&c2"
+		IsLessThen(_Successes,1)
+		IsLessThen(_Failures,15)
+	DO
+		//DebugText(__Me,"Necroportation loop started!")
+		IF "c1"
+			GetPosition(__Me,_MyPosition)
+		THEN
+			Set(_PosOffset,{1;0;0})
+			GetRandomBetween(_Angle,0,360)
+			GetRandomBetween(_Dist,3,5)
+			RotateY(_PosOffset,_Angle)
+			Multiply(_PosOffset,_Dist)
+			Add(_MyPosition,_PosOffset)
+		ENDIF
+		IF "c1"
+			FindValidPosition(_MyPosition,3)
+		THEN
+			CharacterMoveInRange(_Enemy,_MinRange,_MaxRange,1)
+			CharacterUseSkill("Teleportation_EnemyFreeFall_NecroTroll",_Enemy,_MyPosition)
+			Add(_Successes,1)
+		ELSE
+			Add(_Failures,1)
+		ENDIF
+	ENDWHILE
+	IF "c1"
+		IsEqual(_Failures,15)
+	THEN
+		//DebugText(__Me,"Failed necroporting!")
+		Set(_Failures,0)
+		CharacterEndTurn()
+	ENDIF
+	Set(_Successes,0)
+	Set(_Failures,0)
+	SetPriority("NecroTroll_OnMoveFailedTeleportTargetToMe",0)
+INTERRUPT
+	//DebugText(__Me,"Necroporting interrupted!")
+	Reset()
+
+REACTION Combat_AttackSetEnemy, 8 OVERRIDE
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+	FLOAT:_dist
+CHECK "c1&(c2|(c3&!c4))"
+	CharacterGetEnemy(_Enemy,__Me) // returns false if null
+	CharacterCanSee(__Me,_Enemy)
+	GetInnerDistance(_dist,__Me,_Enemy)
+	IsGreaterThen(_dist,4.0)
+ACTIONS
+	CharacterAttack(_Enemy)
+INTERRUPT
+ON
+	OnMovementFailed(_)
+ACTIONS
+	//DebugText(__Me,"Movement Failed!")
+	SetPriority("NecroTroll_OnMoveFailedTeleportTargetToMe",1200)
+
+REACTION Combat_MoveToSetEnemy, 7 OVERRIDE
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+	FLOAT:_dist
+CHECK "c1&(!c2|(c3&c4))"
+	CharacterGetEnemy(_Enemy,__Me)
+	CharacterCanSee(__Me,_Enemy)
+	GetInnerDistance(_dist,__Me,_Enemy)
+	IsGreaterThen(_dist,1.0)
+ACTIONS	
+	CharacterMoveTo(_Enemy,1)
+INTERRUPT
+ON
+	OnMovementFailed(_)
+ACTIONS
+	//DebugText(__Me,"Movement Failed!")
+	SetPriority("NecroTroll_OnMoveFailedTeleportTargetToMe",1200)	
+	
+//------------
+EVENTS
+EVENT OnInit_AddSkills
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill("Teleportation_EnemyFreeFall_NecroTroll")

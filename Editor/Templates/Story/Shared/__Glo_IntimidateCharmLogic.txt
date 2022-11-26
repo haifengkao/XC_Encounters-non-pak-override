@@ -1,0 +1,259 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_DialogPersuasionEvents("ApplyReason","Reason","GLO_ShowReason_Bonus");
+DB_DialogPersuasionEvents("ApplyIntimidate","Intimidate","GLO_ShowIntimidate_Bonus");
+DB_DialogPersuasionEvents("ApplyCharm","Charm","GLO_ShowCharm_Bonus");
+
+DB_DialogPersuasionNodes(0,"Charm");
+DB_DialogPersuasionNodes(0,"Intimidate");
+DB_DialogPersuasionNodes(0,"Reason"); 
+DB_DialogPersuasionNodes(0,"Charm2");
+DB_DialogPersuasionNodes(0,"Intimidate2");
+DB_DialogPersuasionNodes(0,"Reason2");
+DB_DialogPersuasionNodes(1,"(2P) Player 1: A (Intimidate)");
+DB_DialogPersuasionNodes(1,"(2P) Player 1: A (Charm)");
+DB_DialogPersuasionNodes(1,"(2P) Player 1: A (Reason)");
+DB_DialogPersuasionNodes(1,"(2P) Player 1: B (Intimidate)");
+DB_DialogPersuasionNodes(1,"(2P) Player 1: B (Charm)");
+DB_DialogPersuasionNodes(1,"(2P) Player 1: B (Reason)");
+DB_DialogPersuasionNodes(2,"(2P) Player 2: A (Intimidate)");
+DB_DialogPersuasionNodes(2,"(2P) Player 2: A (Charm)");
+DB_DialogPersuasionNodes(2,"(2P) Player 2: A (Reason)");
+DB_DialogPersuasionNodes(2,"(2P) Player 2: B (Intimidate)");
+DB_DialogPersuasionNodes(2,"(2P) Player 2: B (Charm)");
+DB_DialogPersuasionNodes(2,"(2P) Player 2: B (Reason)");
+
+KBSECTION
+//REGION calculate persuasion score
+PROC
+ProcCalculatePersuasionScore((CHARACTER)_Char,_,_)
+AND
+DB_CharPersuasionScore(_Char,_Score)
+THEN
+NOT DB_CharPersuasionScore(_Char,_Score);
+
+PROC
+ProcCalculatePersuasionScore((CHARACTER)_Char,(STRING)_Option,(INTEGER)_Modifier)
+AND
+_Char.DB_IsPlayer()
+AND
+DB_DialogPersuasionEvents(_Option,_,_Text)
+THEN
+CharacterDisplayTextWithParam(_Char,_Text,_Modifier);
+
+PROC
+ProcCalculatePersuasionScore((CHARACTER)_Char,"ApplyReason",(INTEGER)_Modifier)
+AND
+CharacterGetAbility(_Char,"Reason",_Score)
+THEN
+DB_CharPersuasionScore(_Char,_Score);
+ProcApplyModifier(_Char,_Modifier);
+DB_CharStatUsed(_Char,"Reason");
+
+PROC
+ProcCalculatePersuasionScore((CHARACTER)_Char,"ApplyIntimidate",(INTEGER)_Modifier)
+AND
+CharacterGetAbility(_Char,"Intimidate",_Score)
+THEN
+DB_CharPersuasionScore(_Char,_Score);
+ProcApplyModifier(_Char,_Modifier);
+DB_CharStatUsed(_Char,"Intimidate");
+
+PROC
+ProcCalculatePersuasionScore((CHARACTER)_Char,"ApplyCharm",(INTEGER)_Modifier)
+AND
+CharacterGetAbility(_Char,"Charm",_Score)
+THEN
+DB_CharPersuasionScore(_Char,_Score);
+ProcApplyModifier(_Char,_Modifier);
+DB_CharStatUsed(_Char,"Charm");
+
+PROC
+ProcApplyModifier((CHARACTER)_Char,(INTEGER)_Modifier)
+AND
+_Char.DB_IsPlayer()
+AND
+DB_CharPersuasionScore(_Char,_OldScore)
+AND
+IntegerSum(_Modifier,_OldScore,_Final)
+THEN
+NOT DB_CharPersuasionScore(_Char,_OldScore);
+DB_CharPersuasionScore(_Char,_Final);
+DB_CharBonus(_Char,_Modifier);
+
+PROC
+ProcApplyModifier((CHARACTER)_Char,(INTEGER)_Modifier)
+AND
+NOT _Char.DB_IsPlayer()
+THEN
+DB_CharBonus(_Char,0);
+
+IF
+DialogCharacterEventSet(_Event,_Player,_Inst)
+AND
+DB_DialogPersuasionEvents(_Event,_LocalEvent,_Text)
+AND
+DialogGetLocalEvent(_Inst,_LocalEvent,_Bonus)
+THEN
+DialogClearCharacterEvent(_Event,_Player,0);
+DialogClearCharacterEvent("GLO_WonPersuasionConflict",_Player,0);
+DB_PersuasionConflictSpeakers(_Inst,_Player);
+ProcCalculatePersuasionScore(_Player,_Event,_Bonus);
+
+//END_REGION
+
+//REGION Compare scores
+IF
+DialogCharacterEventSet("ResolvePersuasionConflict",_Character,_Inst)
+AND
+DB_PersuasionConflictSpeakers(_Inst,_Character)
+AND
+DB_PersuasionConflictSpeakers(_Inst,_OtherCharacter)
+AND
+_OtherCharacter!=_Character
+THEN
+DialogClearCharacterEvent("ResolvePersuasionConflict",_Character,0);
+NOT DB_PersuasionConflictSpeakers(_Inst,_Character);
+NOT DB_PersuasionConflictSpeakers(_Inst,_OtherCharacter);
+ProcResolveConflict(_Character,_OtherCharacter,_Inst);
+
+PROC
+ProcResolveConflict((CHARACTER)_Char,_,(INTEGER)_Inst)
+AND
+DB_CharPersuasionScore(_Char,0)
+THEN
+DB_RollScore(_Char,0);
+
+PROC
+ProcResolveConflict((CHARACTER)_Char,_,(INTEGER)_Inst)
+AND
+DB_CharPersuasionScore(_Char,_Score)
+AND
+_Score!=0
+AND
+Random(_Score,_CharScore)
+THEN
+DB_RollScore(_Char,_CharScore);
+
+PROC
+ProcResolveConflict(_,_OtherChar,(INTEGER)_Inst)
+AND
+DB_CharPersuasionScore(_OtherChar,0)
+THEN
+DB_RollScore(_OtherChar,0);
+
+PROC
+ProcResolveConflict(_,_OtherChar,(INTEGER)_Inst)
+AND
+DB_CharPersuasionScore(_OtherChar,_Score)
+AND
+_Score!=0
+AND
+Random(_Score,_CharScore)
+THEN
+DB_RollScore(_OtherChar,_CharScore);
+
+PROC
+ProcResolveConflict((CHARACTER)_Char,(CHARACTER)_OtherChar,(INTEGER)_Inst)
+AND
+DB_CharPersuasionScore(_Char,_Score)
+AND
+DB_CharPersuasionScore(_OtherChar,_OtherScore)
+AND
+DB_RollScore(_Char,_CharScore)
+AND
+DB_RollScore(_OtherChar,_OtherCharScore)
+THEN
+NOT DB_RollScore(_Char,_CharScore);
+NOT DB_RollScore(_OtherChar,_OtherCharScore);
+ProcComparePersuasionScores(_CharScore,_OtherCharScore,_Char,_OtherChar,_Inst);
+
+PROC
+ProcComparePersuasionScores((INTEGER)_Score,(INTEGER)_OtherScore,(CHARACTER)_Char,(CHARACTER)_OtherChar,(INTEGER)_Inst)
+AND
+DB_CharStatUsed(_Char,_Stat1)
+AND
+DB_CharStatUsed(_OtherChar,_Stat2)
+AND
+DB_CharBonus(_Char,_Bonus1)
+AND
+DB_CharBonus(_OtherChar,_Bonus2)
+THEN
+StartDialogConflict(_Char,_Stat1,_Bonus1,_OtherChar,_Stat2,_Bonus2,_Inst);
+NOT DB_CharStatUsed(_Char,_Stat1);
+NOT DB_CharStatUsed(_OtherChar,_Stat2);
+NOT DB_CharBonus(_Char,_Bonus1);
+NOT DB_CharBonus(_OtherChar,_Bonus2);
+
+//END_REGION
+
+//REGION Network bonuses
+
+PROC
+ProcSetNodeFlagsForDialog((INTEGER)_Inst,(INTEGER)_Type,(CHARACTER)_Player)
+THEN
+ProcCheckPerceptionNeededForHint(_Inst,_Type,_Player);
+ProcDoCIRPerceptionCheck(_Inst,_Player);
+
+PROC
+ProcCheckPerceptionNeededForHint((INTEGER)_Inst,_,(CHARACTER)_Player)
+AND
+DB_CIR_NeededLevel(_Player,_Needed)
+THEN
+NOT DB_CIR_NeededLevel(_Player,_Needed);
+
+PROC
+ProcCheckPerceptionNeededForHint((INTEGER)_Inst,0,(CHARACTER)_Player)
+AND
+DB_DialogNPCs(_Inst,_Npc,1)
+AND
+CharacterGetLevel(_Npc,_Lvl)
+AND
+IntegerDivide(_Lvl,2,_Tmp)
+AND
+IntegerSum(_Tmp,3,_Needed)
+THEN
+DB_CIR_NeededLevel(_Player,_Needed);
+
+PROC
+ProcCheckPerceptionNeededForHint((INTEGER)_Inst,_Type,(CHARACTER)_Player)
+AND
+_Type!=0
+THEN
+DB_CIR_NeededLevel(_Player,10);
+
+PROC
+ProcDoCIRPerceptionCheck((INTEGER)_Inst,(CHARACTER)_Player)
+AND
+CharacterGetAttribute(_Player,"Perception",_Val)
+AND
+DB_CIR_NeededLevel(_Player,_Lvl)
+AND
+_Val>=_Lvl
+AND
+DB_DialogPersuasionNodes(_Type,_Node)
+THEN
+DialogSetNodeFlag(_Inst,_Node,"FLAG_CUSTOM_DATA");
+
+IF
+DialogCharacterEventSet("Set_Persuasion_Flags",_Player,_Inst)
+THEN
+DialogClearCharacterEvent("Set_Persuasion_Flags",_Player,0);
+ProcSetNodeFlagsForDialog(_Inst,0,_Player);
+
+IF
+DialogCharacterEventSet("Set_Persuasion_Flags_DD",_Player,_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_DialogPlayers(_Inst,_OtherPlayer,2)
+THEN
+DialogClearCharacterEvent("Set_Persuasion_Flags_DD",_Player,0);
+ProcSetNodeFlagsForDialog(_Inst,1,_Player);
+ProcSetNodeFlagsForDialog(_Inst,2,_OtherPlayer);
+
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION

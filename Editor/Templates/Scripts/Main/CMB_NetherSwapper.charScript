@@ -1,0 +1,182 @@
+INIT
+	CHARACTER:__Me
+	FLOAT:%NS_SightRange
+	INT:%AlliesAroundMe=0
+	INT:%EnemiesAroundMe=0
+	INT:%EnemiesAroundFriend=0
+	INT:%EnemiesAroundTarget=0
+	CHARACTER:%SacrificeTarget
+	EXTERN INT:%SwapSelf_WithFriend_Prio=400
+	EXTERN INT:%SwapSelf_WithEnemy_Prio=300
+	EXTERN INT:%Bool_SacrificeToSaveFriends=0
+	EXTERN FLOAT:%Float_SacrificeThreshold=0.7
+	EXTERN COMPARE:%NS_Compare_Target=Lowest
+	EXTERN COMPAREFUNC:%NS_CompareFunc_Target=Vitality
+
+//-----------
+BEHAVIOUR
+REACTION Swap_Self_WithFriend,0
+USAGE COMBAT
+VARS
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+	FLOAT:_MyVitality
+CHECK "c1&c2&c3&!c4&c5"
+	IsEqual(%Bool_SacrificeToSaveFriends,1)														//c1
+	CharacterCanCast(__Me,"Teleportation_EnemyNetherswap")										//c2
+	CharacterGetStat(_MyVitality,__Me,Vitality)													//c3
+	IsLessThen(_MyVitality,%Float_SacrificeThreshold)											//!c4	
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Teleportation_EnemyNetherswap")			//c5
+ACTIONS
+	Set(%SacrificeTarget,null)
+	Set(%EnemiesAroundMe,0)
+	Set(%AlliesAroundMe,0)
+	IterateCharactersInCombat(__Me,"CMB_NetherSwapper_IterateForAllies_InDifficultCondition",Lowest,Distance)
+	IterateCharactersNear(__Me,5,"CMB_NetherSwapper_IterateForEnemies",Lowest,Distance)	
+	IF "!c1&!c2&!c3&c4"
+		IsEqual(%SacrificeTarget,null)
+		IsGreaterThen(%EnemiesAroundMe,0)
+		IsInDangerousSurface(__Me)
+		CharacterCanSee(__Me,%SacrificeTarget)
+	THEN
+		//DebugText(__Me,"NSDebug: sacrificing for friend!")
+		CharacterUseSkill("Teleportation_EnemyNetherswap",%SacrificeTarget,__Me)
+	ELSE
+		SetPriority("Swap_Self_WithFriend",0)
+	ENDIF
+	SetPriority("Swap_Self_WithFriend",0)
+
+REACTION Swap_Self_WithEnemy,0
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT3:_DestinationPos	
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+	FLOAT:_DistBtwMeAndTarget
+CHECK "c1&c2&c3&!c4&c5&c6&c7"
+	CharacterCanCast(__Me,"Teleportation_EnemyNetherswap")													//c1
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Teleportation_EnemyNetherswap")						//c2
+	CharacterGet(_Target,__Me,%NS_SightRange,%NS_Compare_Target,%NS_CompareFunc_Target,Enemy)				//c3
+	CharacterIsSummon(_Target)																				//!c4
+	CharacterCanSee(__Me,_Target)																			//c5
+	GetDistance(_DistBtwMeAndTarget,__Me,_Target)															//c6
+	IsGreaterThen(_DistBtwMeAndTarget,5)																	//c7
+ACTIONS
+	SetPriority("Combat_AttackSetEnemy",0)
+	SetPriority("Combat_MoveToSetEnemy",0)
+	Set(%AlliesAroundMe,0)
+	Set(%EnemiesAroundMe,0)
+	Set(%EnemiesAroundTarget,0)
+	IterateCharactersNear(__Me,7,"CMB_NetherSwapper_IterateForAllies",Lowest,Distance)
+	IterateCharactersNear(__Me,5,"CMB_NetherSwapper_IterateForEnemies",Lowest,Distance)
+	IterateCharactersNear(_Target,5,"CMB_NetherSwapper_IterateForEnemiesAroundTarget",Lowest,Distance)
+	IF "c1"	//for debug info
+		IsGreaterThen(%EnemiesAroundTarget,2)
+	THEN
+		//DebugText(__Me,"NSwap: too many enemies arnd Target ([1])!",%EnemiesAroundTarget)
+	ENDIF
+	IF "c1"	//for debug info
+		IsLessThen(_DistBtwMeAndTarget,5)
+	THEN
+		//DebugText(__Me,"NSwap: distance to target too short ([1])!",_DistBtwMeAndTarget)
+	ENDIF	
+	IF "c1&!c2"
+		IsInDangerousSurface(__Me)
+		IsInDangerousSurface(_Target)
+	THEN
+		//DebugText(__Me,"NSwap: I'm in a dangerous surface!")
+		CharacterUseSkill("Teleportation_EnemyNetherswap",_Target,__Me)
+	ELIF "!(c1|c2)"
+		IsLessThen(%AlliesAroundMe,2)
+		IsGreaterThen(%EnemiesAroundTarget,2)
+	THEN
+		//DebugText(__Me,"NSwap: tp'ing enemy near my allies!")
+		CharacterUseSkill("Teleportation_EnemyNetherswap",_Target,__Me)		
+	ELIF "c1&!c2"
+		IsGreaterThen(%EnemiesAroundMe,2)
+		IsGreaterThen(%EnemiesAroundTarget,2)
+	THEN
+		//DebugText(__Me,"NSwap: too many enemies around me!")
+		CharacterUseSkill("Teleportation_EnemyNetherswap",_Target,__Me)		
+	ELSE
+		SetPriority("Combat_AttackSetEnemy",7)
+		SetPriority("Combat_MoveToSetEnemy",6)
+		SetPriority("Swap_Self_WithEnemy",0)
+	ENDIF
+	SetPriority("Swap_Self_WithEnemy",0)
+
+//-----------
+EVENTS
+EVENT OnInit_GetMySightRange_Nether
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%NS_SightRange,__Me,Sight)
+	THEN
+		CharacterAddSkill("Teleportation_EnemyNetherswap")
+	ENDIF
+
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("Swap_Self_WithFriend",%SwapSelf_WithFriend_Prio)
+	SetPriority("Swap_Self_WithEnemy",%SwapSelf_WithEnemy_Prio)
+	SetPriority("Combat_AttackSetEnemy",7)
+	SetPriority("Combat_MoveToSetEnemy",6)
+
+EVENT OnIterate_GetAllies_InDifficultCondition
+VARS
+	CHARACTER:_Ally
+	FLOAT:_AllysVitality
+ON
+	OnIterateCharacter(_Ally,"CMB_NetherSwapper_IterateForAllies_InDifficultCondition")
+ACTIONS
+	IF "(c1&c2)|c3"
+		CharacterGetStat(_AllysVitality,_Ally,Vitality)				//c1
+		IsLessThen(_AllysVitality,0.4)								//c2
+		IsInDangerousSurface(_Ally)									//c3
+	THEN
+		Set(%SacrificeTarget,_Ally)
+	ENDIF
+
+EVENT OnIterate_GetEnemiesAroundMe
+VARS
+	CHARACTER:_Enemy
+ON
+	OnIterateCharacter(_Enemy,"CMB_NetherSwapper_IterateForEnemies")
+ACTIONS
+	IF "!c1&c2"
+		CharacterIsDead(_Enemy)
+		CharacterIsEnemy(__Me,_Enemy)
+	THEN
+		Add(%EnemiesAroundMe,1)
+	ENDIF
+
+EVENT OnIterate_GetEnemiesAroundTarget
+VARS
+	CHARACTER:_Enemy
+ON
+	OnIterateCharacter(_Enemy,"CMB_NetherSwapper_IterateForEnemiesAroundTarget")
+ACTIONS
+	IF "!c1&c2"
+		CharacterIsDead(_Enemy)
+		CharacterIsEnemy(__Me,_Enemy)
+	THEN
+		Add(%EnemiesAroundTarget,1)
+	ENDIF
+	
+EVENT OnIterate_GetAlliesAroundMe
+VARS
+	CHARACTER:_Ally
+ON
+	OnIterateCharacter(_Ally,"CMB_NetherSwapper_IterateForAllies")
+ACTIONS
+	IF "!c1&c2"
+		CharacterIsDead(_Ally)
+		CharacterIsAlly(__Me,_Ally)
+	THEN
+		Add(%AlliesAroundMe,1)
+	ENDIF

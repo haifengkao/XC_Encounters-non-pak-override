@@ -1,0 +1,30 @@
+INIT
+CHARACTER:__Me
+CHARACTER:%oneSkillTarget=null
+SKILL:%chooseSkill = Target_DeathKnightBane
+
+BEHAVIOUR
+REACTION CastDKBane, 5000
+VARS
+	CHARACTER:_char
+	FLOAT:_minRange
+	FLOAT:_maxRange
+	FLOAT:_hp
+USAGE COMBAT
+CHECK "c1&c2"
+	CharacterCanCast(__Me,%chooseSkill)
+	CharacterGetSkillRange(_minRange,_maxRange,__Me,%chooseSkill)
+ACTIONS
+	CharacterMoveInRange(%oneSkillTarget,_minRange,_maxRange,1)
+	CharacterUseSkill(%chooseSkill,%oneSkillTarget)
+
+EVENTS
+EVENT AddSkill1
+ON
+	OnInit()
+ACTIONS
+	IF "!c1"
+		IsEqual(%chooseSkill,null)
+	THEN
+		CharacterAddSkill(%chooseSkill)
+	ENDIF

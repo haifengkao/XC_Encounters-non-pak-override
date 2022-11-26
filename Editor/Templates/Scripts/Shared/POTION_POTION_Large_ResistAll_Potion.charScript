@@ -1,0 +1,47 @@
+#TEMPLATE "_POTION_Base" : POTION_Large_ResistAll_Potion
+
+INIT
+CHARACTER:__Me
+// [GLOBAL_VARS]
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_POTION_Large_ResistAll_Potion
+VARS
+	// [CALC_VARS]
+	FLOAT:_StatAirResistance
+	FLOAT:_Score
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_POTION_Large_ResistAll_Potion")
+ACTIONS		
+	// [CALC_ACTIONS_PRE]
+	Set(_Score, 0.0)
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	IF "((((((((((c1)|c2)|c3)|c4)|c5)|c6)|c7)|c8)|c9)|c10)&(!(c11&c12))"
+	    CharacterHasBeenHitBy(__Me, Air) // c1
+	    CharacterHasHadStatus(__Me, STUNNED) // c2
+	    CharacterHasBeenHitBy(__Me, Water) // c3
+	    CharacterHasHadStatus(__Me, FROZEN) // c4
+	    CharacterHasBeenHitBy(__Me, Earth) // c5
+	    CharacterHasStatus(__Me, POISONED) // c6
+	    CharacterHasHadStatus(__Me, POISONED) // c7
+	    CharacterHasBeenHitBy(__Me, Fire) // c8
+	    CharacterHasStatus(__Me, BURNING) // c9
+	    CharacterHasHadStatus(__Me, BURNING) // c10
+	    CharacterGetStat(_StatAirResistance, __Me, AirResistance) // c11
+	    IsGreaterThen(_StatAirResistance, 50) // c12
+	THEN
+	    Add(_Score, %ActionScore_POTION_Large_ResistAll_Potion)
+	ENDIF
+	// [~CALC_ACTIONS]
+
+	Cast(%ActionScore_POTION_Large_ResistAll_Potion, _Score)
+
+

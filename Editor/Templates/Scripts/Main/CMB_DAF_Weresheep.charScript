@@ -1,0 +1,200 @@
+INIT
+	CHARACTER:__Me
+	CHARACTERTEMPLATE:%Weresheep_Summon_RT="Animals_WereSheep_Summon_15f91179-d425-46f8-aa03-0434caabaefa"
+	INT:%SpecialIronComm_Current=0
+	INT:%SpecialIronComm_Desired=2	
+	INT:%FXHandle1	
+	INT:%FXHandle2	
+	
+	//no need for phases
+	//hits insanely hard, has insane HP & armor, inflicts bleeding with his attack; 
+	//can purify healing & shields; can use special crawling infestation; immune to lava
+	
+	//teleports target, casts iron command on a player & summons 4 (regular looking) sheeps around them that explode when killed
+	//delayed explo that creates lava
+	//if lava available then teleports someone into it
+	//can consume the life force of a sheep to regain hp
+	//if hp < 30%, can cast Haste, Rage
+	
+	//ironcommand, delexplo (lava), consumelifeforce, teleport are hardscripted
+	//phys attack is defchar; crawlinfest & purifire are scripts
+	
+//------------------------
+BEHAVIOUR
+REACTION Weresheep_SpecialIronCommand,0
+USAGE COMBAT
+VARS
+	INT:_Failures=0
+	INT:_Successes=0
+	CHARACTER:_Player
+	FLOAT:_MyAP
+	FLOAT:_MyVitality
+	FLOAT3:_PosOffset
+	FLOAT3:_MyPosition
+	FLOAT:_Angle
+	FLOAT:_Dist
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+	CHARACTER:_Summon
+CHECK "c1&c2&!c3&c4&c5"
+	CharacterGet(_Player,__Me,30,Lowest,Distance,Enemy)							//c1
+	CharacterGetStat(_MyAP,__Me,ActionPoints)									//c2
+	IsLessThen(_MyAP,8)															//!c3
+	CharacterCanCast(__Me,"Target_EnemyIronCommand")							//c4	(cooldown = 4 turns)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyIronCommand")	//c5
+ACTIONS
+	//CharacterMoveInRange(_Player,_MinRange,_MaxRange,1)
+	CharacterFleeFrom(Enemy,9)
+	CharacterUseSkill("Target_EnemyIronCommand",_Player)
+	CharacterPlayLoopEffect(%FXHandle1,__Me,"FX_Skills_WitchCraft_Generic_A_Prepare")
+	CharacterPlayAnimation("idle3",1,1)
+	CharacterPlayAnimation("cast_ground_cast",1,0)
+	WHILE "c1&c2"
+		IsLessThen(_Successes,5)
+		IsLessThen(_Failures,20)
+	DO
+		IF "c1"
+			GetPosition(__Me,_MyPosition)
+		THEN
+			Set(_PosOffset,{1.3;0;0}) 
+			GetRandomBetween(_Angle,0,360)
+			GetRandomBetween(_Dist,1.5,2)
+			RotateY(_PosOffset,_Angle)
+			Multiply(_PosOffset,_Dist)	
+			Add(_MyPosition,_PosOffset)
+		ENDIF
+		IF "c1"
+			FindValidPosition(_MyPosition,3)
+		THEN
+			PlayEffectAt(_MyPosition,"FX_Skills_WitchCraft_Generic_A_Cast_A")	
+			SpawnCharacter(_Summon,%Weresheep_Summon_RT,_MyPosition,1)		
+			Add(_Successes,1)
+		ELSE
+			Add(_Failures,1)
+		ENDIF
+	ENDWHILE
+	IF "c1"
+		IsEqual(_Failures,20)
+	THEN
+		Set(_Failures,0)	
+		SetPriority("Weresheep_SpecialIronCommand",0)
+	ENDIF	
+	Set(_Successes,0)	
+	Set(_Failures,0)
+	StopLoopEffect(%FXHandle1)	
+	CharacterUseActionPoints(__Me,3)
+	SetPriority("Weresheep_SpecialIronCommand",0)
+INTERRUPT
+	Reset()
+
+REACTION Weresheep_TeleportIntoLava,500
+USAGE COMBAT
+VARS
+	CHARACTER:_Player
+	FLOAT3:_LavaZone
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&c4&c5&c6"
+	CharacterCanCast(__Me,"Teleportation_EnemyFreeFall")								//c1
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Teleportation_EnemyFreeFall")		//c2
+	CharacterGet(_Player,__Me,_MaxRange,Highest,Vitality,Enemy,None)					//c3
+	FindSurface(_LavaZone,__Me,0,_MaxRange,"Lava")										//c4
+	FindValidPosition(_LavaZone,4,_Player)												//c5
+	IsRandom(0.4)																		//c6
+ACTIONS
+	CharacterMoveInRange(_Player,_MinRange,_MaxRange,1)
+	CharacterUseSkill("Teleportation_EnemyFreeFall",_Player,_LavaZone)
+	Set(%SpecialIronComm_Current,0)
+	SetPriority("Weresheep_TeleportIntoLava",0)
+INTERRUPT
+	Reset()
+	
+REACTION Weresheep_ConsumeLifeForce,1200
+USAGE COMBAT
+VARS
+	FLOAT:_MyVitality
+	FLOAT:_AllysVitality
+	FLOAT3:_AllysPosition
+	CHARACTER:_Ally
+CHECK "c1&c2&c3"
+	CharacterGetStat(_MyVitality,__Me,Vitality)
+	IsLessThen(_MyVitality,0.2)
+	CharacterGet(_Ally,__Me,40,Lowest,Vitality,Ally,null,null,null,1)
+ACTIONS
+	IF "c1&c2"
+		GetPosition(_Ally,_AllysPosition)
+		CharacterGetStat(_AllysVitality,_Ally,Vitality)
+	THEN
+		CharacterPlayEffect(__Me,"FX_GP_ExclamationMark_A")
+		CharacterPlayLoopEffect(%FXHandle1,__Me,"FX_Skills_WitchCraft_Generic_A_Prepare")
+		Sleep(0.5)
+		CharacterPlayLoopEffect(%FXHandle2,_Ally,"FX_Skills_WitchCraft_Generic_A_Prepare")		
+		CharacterPlayAnimation("cast_ground_start",1,1)
+		CharacterPlayAnimation("cast_ground_loop",1,1)		
+		CharacterDie(_Ally)
+		StopLoopEffect(%FXHandle1)		
+		CharacterTeleportTo(_AllysPosition)
+		Divide(_AllysVitality,3)
+		CharacterHeal(__Me,_AllysVitality)
+		CharacterPlayAnimation("cast_ground_cast",1,1)
+		StopLoopEffect(%FXHandle2)		
+	ENDIF
+	SetPriority("Weresheep_ConsumeLifeForce",0)
+INTERRUPT
+	Reset()	
+	
+//-----------------------
+EVENTS
+EVENT OnInit_GiveSpells
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill("Target_EnemyIronCommand")
+	CharacterAddSkill("Teleportation_EnemyFreeFall")
+	
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("Weresheep_ConsumeLifeForce",1200)
+	SetPriority("Weresheep_TeleportIntoLava",500)
+	IF "c1"
+		IsLessThen(%SpecialIronComm_Current,%SpecialIronComm_Desired)
+	THEN
+		Add(%SpecialIronComm_Current,1)
+	ELSE
+		SetPriority("Weresheep_SpecialIronCommand",600)
+	ENDIF
+	
+EVENT OnCombatEnded_CleanUp
+ON
+	OnCombatEnded()
+ACTIONS
+	//DebugText(__Me,"Cleanup!")
+	StopLoopEffect(%FXHandle1)
+	StopLoopEffect(%FXHandle2)
+	IterateCharactersNear(__Me,30,"CMB_DAF_CleanUpRemainingSheeps",Lowest,Distance)
+	
+EVENT OnIterateCharacter_CleanUpRemainingSheeps
+VARS
+	CHARACTER:_Sheep
+	CHARACTERTEMPLATE:_SheepTemplate
+ON
+	OnIterateCharacter(_Sheep,"CMB_DAF_CleanUpRemainingSheeps")
+ACTIONS
+	IF "c1&!c2&c3&c4"
+		CharacterIsAlly(__Me,_Sheep)
+		CharacterIsDead(_Sheep)
+		CharacterGetTemplate(_Sheep,_SheepTemplate)
+		IsEqual(_SheepTemplate,%Weresheep_Summon_RT)
+	THEN
+		CharacterDestroy(_Sheep)
+	ENDIF
+	
+EVENT OnDie_StopLoopingFX
+ON
+	OnDie(__Me,_,_,_)
+	OnDeactivate()
+ACTIONS
+	StopLoopEffect(%FXHandle1)
+	StopLoopEffect(%FXHandle2)

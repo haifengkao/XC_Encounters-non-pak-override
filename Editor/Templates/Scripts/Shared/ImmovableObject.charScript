@@ -1,0 +1,14 @@
+INIT
+CHARACTER:__Me
+
+BEHAVIOUR
+REACTION DontTryToMove, 100
+USAGE COMBAT
+VARS
+	FLOAT:_move
+CHECK "c1&c2"
+	CharacterGetStat(_move,__Me,Movement)
+	IsGreaterThen(_move,0)
+	//IsEqual(_move,0)
+ACTIONS
+	CharacterEndTurn()

@@ -1,0 +1,489 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+IF
+CharacterSpottedItemTemplateDestroyed_Redhanded(_Player,_Spotter,_Owner,_,_,_Value,_CrimeID)
+AND
+NOT NoStealingReaction(_Spotter)
+AND
+NOT DB_GenericsBlockedFor(_Player)
+AND
+CharacterIsTagged(_Spotter,"Animal",0)
+AND
+NOT DB_Combat(_Spotter,_)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_Combat(_Player,_)
+AND
+ValueDestroyed(_Player,_I)
+AND
+IntegerSum(_I,_Value,_New)
+AND
+NOT DB_CrimeHandled(_Player,_CrimeID)
+THEN
+NOT ValueDestroyed(_Player,_I);
+ValueDestroyed(_Player,_New);
+
+IF
+CharacterSpottedItemTemplateAttacked_Redhanded(_Player,_Spotter,_Owner,_,_,_Value,_,_CrimeID,_Handle)
+AND
+NOT DB_GenericsBlockedFor(_Player)
+AND
+NOT NoStealingReaction(_Spotter)
+AND
+CharacterIsTagged(_Spotter,"Animal",0)
+AND
+NOT DB_Combat(_Spotter,_)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_Combat(_Player,_)
+AND
+ValueDestroyed(_Player,_I)
+AND
+IntegerSum(_I,_Value,_New)
+AND
+NOT DB_CrimeHandled(_Player,_CrimeID)
+AND
+ItemHandleGetHealthPoints(_Handle,_HP)
+AND
+_HP>0
+THEN
+NOT ValueDestroyed(_Player,_I);
+ValueDestroyed(_Player,_New);
+
+IF
+CharacterSpottedItemTemplateAttacked_Redhanded(_Player,_Spotter,_Owner,_,_,_Value,_,_CrimeID,_Handle)
+AND
+NOT NoStealingReaction(_Spotter)
+AND
+NOT DB_GenericsBlockedFor(_Player)
+AND
+CharacterIsTagged(_Spotter,"Animal",0)
+AND
+NOT DB_NoDefaultBehavior(_Spotter)
+AND
+NOT DB_Combat(_Spotter,_)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_Combat(_Player,_)
+AND
+NOT ValueDestroyed(_Player,_)
+AND
+NOT DB_CrimeHandled(_Player,_CrimeID)
+AND
+NOT _Spotter.DB_IsInDialog()
+AND
+ItemHandleGetHealthPoints(_Handle,_HP)
+AND
+_HP>0
+THEN
+DB_CrimeHandled(_Player,_CrimeID);
+DB_GenericsBlockedFor(_Player);
+DeleteVandalismFacts(_Player);
+ValueDestroyed(_Player,_Value);
+DisapproveVandalism(_Player,_Spotter,_Owner,_Value);
+
+IF
+CharacterSpottedItemTemplateDestroyed_Redhanded(_Player,_Spotter,_Owner,_,_,_Value,_CrimeID)
+AND
+NOT DB_GenericsBlockedFor(_Player)
+AND
+CharacterIsTagged(_Spotter,"Animal",0)
+AND
+NOT NoStealingReaction(_Spotter)
+AND
+NOT DB_NoDefaultBehavior(_Spotter)
+AND
+NOT DB_Combat(_Spotter,_)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_Combat(_Player,_)
+AND
+NOT ValueDestroyed(_Player,_)
+AND
+NOT DB_CrimeHandled(_Player,_CrimeID)
+THEN
+DB_CrimeHandled(_Player,_CrimeID);
+DB_GenericsBlockedFor(_Player);
+DeleteVandalismFacts(_Player);
+ValueDestroyed(_Player,_Value);
+DisapproveVandalism(_Player,_Spotter,_Owner,_Value);
+
+IF
+CharacterSpottedItemTemplateDestroyed_Redhanded(_Player,_Spotter,_Owner,_,_,_Value,_CrimeID)
+AND
+NOT NoStealingReaction(_Spotter)
+AND
+CharacterIsTagged(_Spotter,"Animal",0)
+AND
+DB_Combat(_Spotter,_ID)
+AND
+NOT DB_Combat(_Player,_ID)
+AND
+NOT DB_CrimeHandled(_Player,_CrimeID)
+THEN
+DB_CrimeHandled(_Player,_CrimeID);
+ProcMakeNPCHostile(_Player,_Spotter);
+
+PROC
+DeleteVandalismFacts((CHARACTER)_character)
+AND
+InvolvmentVandalism(_character,_I)
+THEN
+NOT InvolvmentVandalism(_character,_I);
+
+PROC
+DeleteVandalismFacts((CHARACTER)_character)
+THEN
+ClearTemperedInvolvementVandalism(_character);
+
+PROC
+ClearTemperedInvolvementVandalism((CHARACTER)_Character)
+AND
+TemperedInvolvmentVandalism(_character,_I)
+THEN
+NOT TemperedInvolvmentVandalism(_character,_I);
+
+PROC
+ClearVandalismValue((CHARACTER)_character)
+AND
+ValueDestroyed(_character,_I)
+THEN
+NOT ValueDestroyed(_character,_I);
+
+PROC
+DeleteVandalismFacts((CHARACTER)_character)
+THEN
+NOT InvolvmentVandalismAsserted(_character,1);
+NOT TemperedInvolvmentVandalismAsserted(_Character,1);
+
+
+//follows same logic as stealing, makes sense since you lose the item as well I guess!
+PROC
+DisapproveVandalism((CHARACTER)_Character,(CHARACTER)_Spotter,(CHARACTER)_Owner,(INTEGER)_)
+THEN
+DecreaseToleranceThievery(_Spotter,25);
+
+PROC
+DisapproveVandalism((CHARACTER)_Character,(CHARACTER)_Owner,(CHARACTER)_Owner,(INTEGER)_)
+THEN
+InvolvmentVandalism(_Character,100);
+InvolvmentVandalismAsserted(_Character,1);
+
+// if somebody else's object stolen: Relation/3 defines involvment
+PROC
+DisapproveVandalism((CHARACTER)_Character,_Spotter,_Owner,(INTEGER)_)
+AND
+NOT InvolvmentVandalismAsserted(_Character,1)
+AND
+Relation(_Spotter,_Owner,(INTEGER)_R)
+AND
+_R >= 90	//TODO DEFINE ATTITUDE_BEST_FRIEND
+THEN
+DestroyingFromSpottersBestFriend(_Character,1);
+ 
+PROC
+DisapproveVandalism((CHARACTER)_Character,_Spotter,_Owner,(INTEGER)_)
+AND 
+NOT InvolvmentVandalismAsserted(_Character,1)
+AND
+Relation(_Spotter,_Owner,(INTEGER)_R)
+AND
+IntegerDivide(_R,2,_I)		// cfr. AccordingAlignmentValue
+THEN	
+InvolvmentVandalism(_Character,_I);
+InvolvmentVandalismAsserted(_Character,1);
+
+// if not own object and not a relation with owner: check alignment relation:
+PROC
+DisapproveVandalism((CHARACTER)_Character,_Spotter,_Owner,(INTEGER)_)
+AND
+NOT InvolvmentVandalismAsserted(_Character,1)
+AND
+CharacterGetRelationToCharacter(_Spotter,_Owner,_Alignment)
+THEN
+ReactOnVandalism_AccordingAlignmentValue(_Character,_Alignment);
+
+// Helper function
+//PROC	ReactOnTheft_AccordingAlignmentValue(100)
+//THEN	StealingFromSpottersBestFriend(1);		// this is too strong
+PROC
+ReactOnVandalism_AccordingAlignmentValue((CHARACTER)_Character,(INTEGER)_Alignment)
+AND
+_Alignment > 25
+AND
+IntegerDivide(_Alignment,2,_I)		// cfr. Relation
+THEN
+InvolvmentVandalism(_Character,_I);
+InvolvmentVandalismAsserted(_Character,1);
+
+PROC
+ReactOnVandalism_AccordingAlignmentValue((CHARACTER)_Character,_Alignment) 
+AND
+NOT InvolvmentVandalismAsserted(_Character,1)
+THEN
+InvolvmentVandalism(_Character,0);
+InvolvmentVandalismAsserted(_Character,1);
+
+// at this moment, InvolvmentTheft/1 is always asserted and between -50 and +100
+PROC
+DisapproveVandalism((CHARACTER)_Character,_Spotter,_,_Value)
+THEN
+TemperVandalismInvolvmentAccordingValue(_Character,_Spotter,_Value);
+
+
+// OVERRULING: firing one time per game:
+PROC
+TemperVandalismInvolvmentAccordingValue((CHARACTER)_Character,(CHARACTER)_Spotter,(INTEGER)_Value)
+AND
+NOT PlayerAlreadyDestroyedInThisGame(_Character,1)
+THEN
+ClearTemperedInvolvementVandalism(_Character);
+PlayerAlreadyDestroyedInThisGame(_Character,1);
+TemperedInvolvmentVandalism(_Character,10);
+TemperedInvolvmentVandalismAsserted(_Character,1);
+
+// if approving theft: do not temper reaction
+PROC
+TemperVandalismInvolvmentAccordingValue((CHARACTER)_Character,(CHARACTER)_Spotter,(INTEGER)_Value)
+AND
+NOT TemperedInvolvmentVandalismAsserted(_Character,1)
+AND
+InvolvmentVandalism(_Character,_Involvment)
+AND
+_Involvment < 0
+THEN
+TemperedInvolvmentVandalism(_Character,_Involvment);
+TemperedInvolvmentVandalismAsserted(_Character,1);
+
+// do not temper reaction if stealing of one of my best friends:
+PROC
+TemperVandalismInvolvmentAccordingValue((CHARACTER)_Character,(CHARACTER)_Spotter,(INTEGER)_Value)
+AND
+NOT TemperedInvolvmentVandalismAsserted(_Character,1)
+AND
+DestroyingFromSpottersBestFriend(_Character,1)
+AND
+InvolvmentVandalism(_Character,_Involvment)
+THEN
+TemperedInvolvmentVandalism(_Character,_Involvment);
+TemperedInvolvmentVandalismAsserted(_Character,1);
+
+
+// Else, if the item(s) stolen are considered expensive: react with full involvment
+PROC	
+TemperVandalismInvolvmentAccordingValue((CHARACTER)_Character,(CHARACTER)_Spotter,(INTEGER)_Value)
+AND
+NOT TemperedInvolvmentVandalismAsserted(_Character,1)
+AND
+DB_CharacterStats(_Spotter,_,_,_ValueExpensive)
+AND
+_Value >= _ValueExpensive 
+AND
+InvolvmentVandalism(_Character,_Involvment)
+THEN
+TemperedInvolvmentVandalism(_Character,_Involvment);
+TemperedInvolvmentVandalismAsserted(_Character,1);
+
+// Else, if the item(s) stolen are considered not cheap: react with 1/3rd of the involvment
+PROC
+TemperVandalismInvolvmentAccordingValue((CHARACTER)_Character,(CHARACTER)_Spotter,(INTEGER)_Value)
+AND
+NOT TemperedInvolvmentVandalismAsserted(_Character,1)
+AND
+DB_CharacterStats(_Spotter,_,_ValueCheap,_) 
+AND
+_Value > _ValueCheap 
+AND
+InvolvmentVandalism(_Character,_Involvment) 
+AND
+IntegerDivide(_Involvment,3,_TI)
+THEN
+TemperedInvolvmentVandalism(_Character,_TI);
+TemperedInvolvmentVandalismAsserted(_Character,1);
+
+// Else: react with 1/10th of the involvment
+// (i.e. when cheap item, not with personal value, and not from best friend
+PROC
+TemperVandalismInvolvmentAccordingValue((CHARACTER)_Character,(CHARACTER)_Spotter,(INTEGER)_Value)
+AND
+NOT TemperedInvolvmentVandalismAsserted(_Character,1)
+AND
+InvolvmentVandalism(_Character,_Involvment)
+AND
+IntegerDivide(_Involvment,10,_TI)
+THEN	
+TemperedInvolvmentVandalism(_Character,_TI);
+
+PROC
+DisapproveVandalism((CHARACTER)_Player,(CHARACTER)_Spotter,(CHARACTER)_Owner,(INTEGER)_)
+AND
+TemperedInvolvmentVandalism(_Player,(INTEGER)_TI)
+AND
+_TI >= 0
+THEN
+DoDisapproveVandalism(_Player,_Spotter,_Owner);
+
+PROC
+DisapproveVandalism((CHARACTER)_Player,(CHARACTER)_Spotter,(CHARACTER)_Owner,(INTEGER)_)
+AND
+TemperedInvolvmentVandalism(_Player,(INTEGER)_TI)
+AND
+_TI < 0
+THEN
+NOT DB_GenericsBlockedFor(_Player);
+
+//This NPC is already dealing with a crime. Short circuit and turn them hostile
+PROC
+DoDisapproveVandalism((CHARACTER)_Player,(CHARACTER)_Spotter,(CHARACTER)_Owner)
+AND
+NOT DB_CrimeInProgress(_,_Spotter,_)
+THEN
+DoDisapproveVandalism_1(_Player,_Spotter,_Owner);
+DB_VandalismHandled(1);
+
+PROC
+DoDisapproveVandalism((CHARACTER)_Player,(CHARACTER)_Spotter,(CHARACTER)_Owner)
+AND
+DB_CrimeInProgress(_,_Spotter,_)
+AND
+NOT DB_VandalismHandled(1)
+THEN
+NOT DB_GenericsBlockedFor(_Player);
+ProcHandleCrimeInterrupt(_Player,_Spotter);
+
+PROC
+DoDisapproveVandalism((CHARACTER)_Player,(CHARACTER)_Spotter,(CHARACTER)_Owner)
+THEN
+NOT DB_VandalismHandled(1);
+
+PROC
+DoDisapproveVandalism_1((CHARACTER)_Player,(CHARACTER)_Spotter,(CHARACTER)_Owner)
+THEN
+DB_CrimeInProgress(_Player,_Spotter,"Vandalism");
+
+IF
+DialogEnded("Vandalism_PayFine",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_CrimeInProgress(_Player,_Spotter,"Vandalism")
+THEN
+NOT DB_CrimeInProgress(_Player,_Spotter,"Vandalism");
+NOT DB_GenericsBlockedFor(_Player);
+ClearVandalismValue(_Player);
+
+IF
+DialogEnded("Npc_accepts_destruction_of_own_objects",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_CrimeInProgress(_Player,_Spotter,"Vandalism")
+THEN
+NOT DB_CrimeInProgress(_Player,_Spotter,"Vandalism");
+NOT DB_GenericsBlockedFor(_Player);
+ClearVandalismValue(_Player);
+
+PROC
+DoDisgustedAction(_Player,_Npc)
+AND
+DB_CrimeInProgress(_Player,_Npc,"Vandalism")
+THEN
+NOT DB_GenericsBlockedFor(_Player);
+ClearVandalismValue(_Player);
+NOT DB_CrimeInProgress(_Player,_Npc,"Vandalism");
+
+PROC
+DoDisapproveVandalism_1((CHARACTER)_Player,(CHARACTER)_Owner,(CHARACTER)_Owner)
+THEN
+DialogSetCharacterEvent("EVENT_npc_isOwner",_Owner,0);
+
+PROC
+DoDisapproveVandalism_1((CHARACTER)_Player,(CHARACTER)_Spotter,(CHARACTER)_Owner)
+AND
+_Spotter!=_Owner
+THEN
+DialogClearCharacterEvent("EVENT_npc_isOwner",_Spotter,0);
+
+PROC
+DoDisapproveVandalism_1((CHARACTER)_Player,(CHARACTER)_Spotter,(CHARACTER)_Owner)
+AND
+DB_IsGuard(_Spotter)
+THEN
+DoRevenge(_Player,_Spotter,4); //TODO define ACTION_DESTROY_PROPERTY
+
+PROC
+DoDisapproveVandalism_1((CHARACTER)_Player,(CHARACTER)_Spotter,(CHARACTER)_Owner)
+AND
+NOT DB_IsGuard(_Spotter)
+AND
+TemperedInvolvmentVandalism(_Player,_Involvment)
+AND
+DB_CharacterStats(_Spotter,(INTEGER)_ToleranceThievery,(INTEGER)_,(INTEGER)_)
+AND
+_ToleranceThievery < 0
+AND
+IntegerSubtract(_Involvment,_ToleranceThievery,_R)
+AND
+IntegerDivide(_R,2,_AttDrop)
+THEN
+DecreaseAttitude(_Player,_Spotter,_AttDrop);
+ProcCheckIfHostile(_Player,_Spotter);
+ProcDecideVandalismAction(_Player,_Spotter,_R);
+
+PROC
+DoDisapproveVandalism_1((CHARACTER)_Player,(CHARACTER)_Spotter,(CHARACTER)_Owner)
+AND
+NOT DB_IsGuard(_Spotter)
+AND
+TemperedInvolvmentVandalism(_Player,_Involvment)
+AND
+DB_CharacterStats(_Spotter,(INTEGER)_ToleranceThievery,(INTEGER)_,(INTEGER)_)
+AND
+_ToleranceThievery >= 0
+AND
+IntegerDivide(_Involvment,2,_AttDrop)
+THEN
+DecreaseAttitude(_Player,_Spotter,_AttDrop);
+ProcCheckIfHostile(_Player,_Spotter);
+ProcDecideVandalismAction(_Player,_Spotter,_Involvment);
+
+PROC
+ProcDecideVandalismAction((CHARACTER)_Player,(CHARACTER)_Spotter,(INTEGER)_)
+THEN
+NOT DB_NpcGotHelp(_Spotter);
+
+PROC
+ProcDecideVandalismAction((CHARACTER)_Player,(CHARACTER)_Spotter,(INTEGER)_)
+AND
+DB_IsHostile(_Player,_Spotter)
+THEN
+ProcClearCrimesFor(_Player);
+ClearVandalismValue(_Player);
+DoRevenge(_Player,_Spotter,5);	//you'll go hostile, so call the guards to attack
+
+IF
+CharacterEnteredCombat(_Player,_)
+AND
+DB_GenericsBlockedFor(_Player)
+THEN
+NOT DB_GenericsBlockedFor(_Player);
+ProcClearCrimesFor(_Player);
+ClearVandalismValue(_Player);
+
+PROC
+ProcDecideVandalismAction((CHARACTER)_Player,(CHARACTER)_Spotter,(INTEGER)_R)
+AND
+NOT DB_IsHostile(_Player,_Spotter)
+THEN
+ActNegatively(_Player,_Spotter,_R,4);  //TODO define ACTION_DESTROY_PROPERTY
+
+EXITSECTION
+
+ENDEXITSECTION

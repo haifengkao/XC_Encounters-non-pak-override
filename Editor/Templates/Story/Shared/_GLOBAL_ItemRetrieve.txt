@@ -1,0 +1,38 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+IF
+ItemAddedToCharacter(_Item, _Player)
+AND
+_Player.DB_IsPlayer()
+AND
+ItemDB((ITEM)_Item, (STRING)_PlayerKnowsAboutItem, (STRING)_PlayerHasItem, (STRING)_PlayerGaveItem)
+THEN
+CharacterSetVarInteger(_Player, _PlayerHasItem, 1);
+GlobalSetEvent(_PlayerKnowsAboutItem);
+
+IF
+ItemRemovedFromCharacter(_Item, _Player)
+AND
+_Player.DB_IsPlayer()
+AND
+ItemDB((ITEM)_Item, (STRING)_PlayerKnowsAboutItem, (STRING)_PlayerHasItem, (STRING)_PlayerGaveItem)
+THEN
+CharacterSetVarInteger(_Player, _PlayerHasItem, 0);
+
+IF
+GlobalEventSet(_Event)
+AND
+ItemDB((ITEM)_Item, (STRING)_PlayerKnowsAboutItem, (STRING)_PlayerHasItem, (STRING)_Event)
+AND
+ItemToCharacterDB((ITEM)_Item, (CHARACTER)_Character, (INTEGER)_xp)
+AND
+NOT _Item.hasBeenGiven()
+THEN
+_Item.hasBeenGiven();
+ItemToCharacter(_Item, _Character);
+EXITSECTION
+
+ENDEXITSECTION

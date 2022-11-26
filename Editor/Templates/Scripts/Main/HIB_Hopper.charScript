@@ -1,0 +1,73 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+TRIGGER:%PointFlee1 = HIB_Point_Hopper1_1_9c8344db-1929-48e9-ac54-93d67d8a9a8f
+TRIGGER:%PointFlee2 = HIB_Point_Hopper1_2_e2756a44-d2d1-44e4-b4ea-6e42570bec89
+TRIGGER:%PointFlee3 = HIB_Point_Hopper1_3_0c991ee7-02fe-4795-a4f4-f2e17daca6ad
+TRIGGER:%PointCurrent = HIB_Point_Hopper1_1_9c8344db-1929-48e9-ac54-93d67d8a9a8f
+TRIGGER:%PointPit = HIB_Point_Hopper2_d876bb5d-d63d-4551-ab41-f32b25b7190c
+CHARACTER:%Pursuer = HIB_Hopper_Snowman_bbd3e93f-5775-4df1-ae34-1a144c5af7a9
+
+BEHAVIOUR
+
+REACTION State_Fleeing, 0
+USAGE PEACE
+VARS
+	TRIGGER:_PointNext
+	FLOAT:_Distance
+	FIXEDSTRING:_State
+ACTIONS
+	IF "c1&c2"
+		GetDistance(_Distance,__Me,%Pursuer)
+		IsLessThen(_Distance,6)
+	THEN
+		IF "c1"
+			IsEqual(%PointCurrent,%PointFlee1)
+		THEN
+			Set(_PointNext,%PointFlee2)
+		ELIF "c1"
+			IsEqual(%PointCurrent,%PointFlee2)
+		THEN
+			Set(_PointNext,%PointFlee3)
+		ELSE
+			Set(_PointNext,%PointFlee1)
+		ENDIF
+		CharacterMoveTo(_PointNext,1,0,0)
+		Set(%PointCurrent,_PointNext)
+		CharacterEvent(%Pursuer,"HIB_HopperFled")
+		DialogStart("HIB_AD_Hopper",__Me)
+	ELIF "c1&c2"
+		GetVar(_State,%Pursuer,"currentState")
+		IsEqual(_State,"State_Waiting")
+	THEN	
+		//make sure the snowman comes chasing after us
+		CharacterEvent(%Pursuer,"HIB_HopperFled")
+	ENDIF
+INTERRUPT
+	Reset()
+
+REACTION State_Wandering, 0
+USAGE PEACE
+VARS
+	FLOAT:_Duration
+ACTIONS
+	GetRandom(_Duration,4,5,6,7,8)
+	CharacterWander(FLOAT:5,_Duration,0,%PointFlee1)
+	Sleep(2)
+	CharacterPlayAnimation("idle1")
+	Sleep(2)
+
+REACTION State_WaitingAtPit, 0
+USAGE PEACE
+VARS
+	FLOAT:_Duration
+ACTIONS
+	GetRandom(_Duration,4,5,6,7,8)
+	CharacterWander(FLOAT:3,_Duration,0,%PointPit)
+	Sleep(2)
+	CharacterPlayAnimation("idle1")
+	CharacterMoveTo(%PointPit)
+	CharacterLookFrom(%PointPit)
+	Sleep(5)

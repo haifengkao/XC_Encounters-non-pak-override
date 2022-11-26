@@ -1,0 +1,38 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+EXTERN CHARACTER:%Partner = null
+EXTERN STRING:%Dialog = null
+
+BEHAVIOUR
+
+REACTION State_Waiting, 0
+USAGE PEACE
+ACTIONS
+	Sleep(2)
+
+REACTION State_Dialog, 0
+USAGE PEACE
+CHECK "!c1&!c2"
+	IsInDialog(%Partner)
+	IsInDialog(__Me)
+ACTIONS
+	IF "!c1"
+		CharacterIsDead(%Partner)
+	THEN
+		CharacterLookAt(%Partner)
+		DialogStart(%Dialog,%Partner,__Me)
+	ENDIF
+	Set(%currentState,"State_Waiting")
+INTERRUPT
+	Set(%currentState,"State_Waiting")
+
+EVENTS
+
+EVENT StartDialog
+ON
+	OnCharacterEvent(__Me,"DialogRequest")
+ACTIONS
+	Set(%currentState,"State_Dialog")

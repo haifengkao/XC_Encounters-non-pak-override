@@ -1,0 +1,39 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+CHARACTER:%FleeingImp = LUC_ImpSlave_fd7b752a-b1fb-4b60-b24f-a6ee3ef0a3ca
+
+BEHAVIOUR
+
+REACTION State_Moaning,0
+USAGE PEACE
+VARS
+	FIXEDSTRING:%Text = ""
+	FIXEDSTRING:%Animation = ""
+ACTIONS
+	GetRandom(%Text,"LUC_ImpMaster_Script_2","LUC_ImpMaster_Script_3","LUC_ImpMaster_Script_4")
+	DisplayText(__Me,%Text,3) // Awwwwww. // Owwwwww. // That blasted orc!
+	CharacterSetAnimationOverride(__Me, "Loop_Ground_Wounded_03")
+	Sleep(15)
+INTERRUPT
+	Reset()
+	
+REACTION State_KillImp,0
+USAGE PEACE
+ACTIONS
+	CharacterAddSkill(Target_FrederickKillingSpell)
+	DisplayText(__Me,"LUC_ImpMaster_Script_7",3) // Running won't save you, slave!
+	CharacterUseSkill(Target_FrederickKillingSpell,%FleeingImp)
+	DisplayText(__Me,"LUC_ImpMaster_Script_6",4) // Ahhh! What a satisfying feeling! Thank you for sending him back!
+	Sleep(5)
+	Set(%currentState,"State_Moaning")
+	
+EVENTS
+
+EVENT Combat
+ON
+	OnCombatStarted()
+ACTIONS
+	CharacterSetAnimationOverride(__Me, "")

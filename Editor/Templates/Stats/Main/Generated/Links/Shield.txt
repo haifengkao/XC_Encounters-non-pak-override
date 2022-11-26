@@ -1,0 +1,10 @@
+object itemstat "_Cyseal_Guard_Shield","1710451f-79f2-46cb-a447-02ae4d2963db","",0,0,"",-1,-1,-1,0,-1,-1
+object itemstat "_Cyseal_Guard_Shield_Donovan","1710451f-79f2-46cb-a447-02ae4d2963db","",0,0,"",-1,-1,-1,0,-1,-1
+object itemstat "_Cyseal_Dietmar_Henchman_Shield","c1b10ee6-cf8a-403d-810b-1960d250ecc0","",0,0,"",-1,-1,-1,0,-1,-1
+object itemstat "_Luculla_Guard_Shield","1710451f-79f2-46cb-a447-02ae4d2963db","",0,0,"",-1,-1,-1,0,-1,-1
+object itemstat "_Luculla_Loic_Henchman_Shield","1710451f-79f2-46cb-a447-02ae4d2963db","",0,0,"",-1,-1,-1,0,-1,-1
+object itemstat "_DAF_Imal_Tank_Shield","0b89f216-8ac7-415f-b5c5-3975f0487530","",0,0,"",-1,-1,-1,0,-1,-1
+object itemstat "_DAF_Imal_Heal_Shield","1c5926f4-7048-458c-ba57-4cf3940590b6","",0,0,"",-1,-1,-1,0,-1,-1
+object itemstat "_Shield_CYS_SparringGuy","c1b10ee6-cf8a-403d-810b-1960d250ecc0","",0,0,"",-1,-1,-1,0,-1,-1
+object itemstat "_Shield_DAF_MountainWarrior_Shield","c1b10ee6-cf8a-403d-810b-1960d250ecc0","",0,0,"",-1,-1,-1,0,-1,-1
+object itemstat "_SAC_NPC_HunterBase_Fighter_Shield","2689081c-0c6c-4134-9e23-57a79db1eac1","",0,0,"",-1,-1,-1,0,-1,-1

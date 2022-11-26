@@ -1,0 +1,42 @@
+INIT
+
+	CHARACTER:__Me
+	EXTERN ITEM:%TargetedObject1 = null
+	EXTERN ITEM:%TargetedObject2 = null
+	INT:%currentTarget = 1
+	INT:%idleCount = 3
+
+//------------------------
+BEHAVIOUR
+
+REACTION IdlingNearTarget, 500
+USAGE PEACE
+VARS
+	FIXEDSTRING:_anim
+CHECK "!c1"
+	IsEqual(%idleCount,3)
+ACTIONS
+	Add(%idleCount,1)
+	GetRandom(_anim,"idle1","idle2","idle3")
+	CharacterPlayAnimation(_anim)
+INTERRUPT
+	Reset()
+				
+REACTION Patrolling,400
+USAGE PEACE
+ACTIONS
+	Sleep(2)
+		IF "c1"
+			IsEqual(%currentTarget,1)
+		THEN
+			CharacterMoveTo(%TargetedObject1,0,0,1)
+			Set(%currentTarget,2)
+			ELIF "c1"
+				IsEqual(%currentTarget,2)
+			THEN
+				CharacterMoveTo(%TargetedObject2,0,0,1)
+				Set(%currentTarget,1)
+		ENDIF
+	Set(%idleCount,1)
+INTERRUPT
+	Reset()

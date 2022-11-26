@@ -1,0 +1,73 @@
+#INCLUDE PUZZLE_GasPitOnOff
+
+INIT
+USING PUZZLE_GasPitOnOff
+
+ITEM:__Me
+CHARACTER:%Sentinel1 = HIB_Sentinel_Prison1_076210c9-fad2-4cea-ade3-7b77a3aa9176
+CHARACTER:%Sentinel2 = HIB_Sentinel_Prison2_84ddc053-9cda-43af-a086-31459344be8b
+CHARACTER:%Sentinel3 = HIB_Sentinel_Prison3_ad2721a4-8c1f-45b1-b1aa-de1d935f14e2
+CHARACTER:%Sentinel4 = HIB_Sentinel_Prison4_41c797c9-6dfd-4c04-a6bb-f0bf726d7bac
+CHARACTER:%CurrentActive = HIB_Sentinel_Prison1_076210c9-fad2-4cea-ade3-7b77a3aa9176
+INT:%Triggered = 0
+
+EVENTS
+EVENT Initialize OVERRIDE
+ON
+	OnInit
+ACTIONS
+	IF "c1"
+		IsEqual(%Triggered,0)
+	THEN
+		StartTimer("SwitchActive",6.0,-1)
+	ENDIF
+
+EVENT Shutdown OVERRIDE
+ON
+	OnShutdown
+ACTIONS
+	StopTimer("SwitchActive")
+
+EVENT Restart
+ON
+	OnItemEvent(__Me,"HIB_SentinelManager_Restart")
+ACTIONS
+	StartTimer("SwitchActive",6.0,-1)
+
+EVENT SwitchActive
+ON
+	OnTimer("SwitchActive")
+ACTIONS
+	IF "c1"
+		IsEqual(%Triggered,0)
+	THEN
+		CharacterItemEvent(%CurrentActive,__Me,"HIB_SentinelInactive")
+		IF "c1"
+			IsEqual(%CurrentActive,%Sentinel1)
+		THEN
+			Set(%CurrentActive,%Sentinel2)
+		ELIF "c1"
+			IsEqual(%CurrentActive,%Sentinel2)
+		THEN
+			Set(%CurrentActive,%Sentinel3)
+		ELIF "c1"
+			IsEqual(%CurrentActive,%Sentinel3)
+		THEN
+			Set(%CurrentActive,%Sentinel4)
+		ELSE
+			Set(%CurrentActive,%Sentinel1)
+		ENDIF
+		CharacterItemEvent(%CurrentActive,__Me,"HIB_SentinelActive")
+	ENDIF
+
+EVENT Spotted
+ON
+	OnCharacterEvent(%CurrentActive,"HIB_SentinelSpotted")
+ACTIONS
+	Set(%Triggered,1)
+	StopTimer("SwitchActive")
+	CharacterItemEvent(%Sentinel1,__Me,"HIB_SentinelAlarm")
+	CharacterItemEvent(%Sentinel2,__Me,"HIB_SentinelAlarm")
+	CharacterItemEvent(%Sentinel3,__Me,"HIB_SentinelAlarm")
+	CharacterItemEvent(%Sentinel4,__Me,"HIB_SentinelAlarm")
+	CharacterItemEvent(%CurrentActive,__Me,%OnEvent)

@@ -1,0 +1,93 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%Cow01="Animals_Cow_A_001_64c4a5bc-0556-4d57-9d19-4e75c8779da6"
+	CHARACTER:%Player1="Player1_dac1443f-a866-4ab3-b240-e705c0b20ec5"
+	CHARACTER:%Player2="Player2_a0af7520-57ac-4f1c-b9d7-197bceebeade"	
+	EXTERN CHARACTER:%SpellTarget="Animals_Cow_A_001_64c4a5bc-0556-4d57-9d19-4e75c8779da6"
+	EXTERN SKILL:%Spell="Projectile_EnemyEarthShard"
+	EXTERN STRING:%DebugText="Earth Shard!"
+	EXTERN INT:%Bool_CastOnSelf=0
+	
+BEHAVIOUR
+REACTION TestScript_WelcomeMessage,200
+USAGE ALL
+CHECK "c1"
+	IsEqual(__Me,%Cow01)
+ACTIONS
+	DebugText(__Me,"Shoot NPC to test skill!")
+	Sleep(2)
+
+REACTION TestScript_TurnToFaceTarget,600
+USAGE ALL
+CHECK "!c1"
+	IsEqual(__Me,%Cow01)
+ACTIONS
+	CharacterLookAt(%SpellTarget)
+	SetPriority("TestScript_TurnToFaceTarget",0)
+	
+REACTION TestScript_ShootTargetAndWait,0
+USAGE ALL
+VARS
+	CHARACTER:_Character
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "!c1&c2&c3"
+	IsEqual(__Me,%Cow01)
+	CharacterCanCast(__Me,%Spell)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,%Spell))
+ACTIONS
+	IF "c1"
+		IsEqual(%Bool_CastOnSelf,0)
+	THEN
+		CharacterMoveInRange(%SpellTarget,_MinRange,_MaxRange,1)
+		CharacterUseSkill(%Spell,%SpellTarget)		
+	ELSE
+		CharacterUseSkill(%Spell,__Me)
+	ENDIF
+	SetPriority("TestScript_ShootTargetAndWait",0)
+
+REACTION TestScript_Failed,0
+USAGE ALL
+VARS
+	CHARACTER:_Character
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "!c1&!c2"
+	IsEqual(__Me,%Cow01)
+	CharacterCanCast(__Me,%Spell)
+ACTIONS
+	DebugText(__Me,"In cooldown!")
+	SetPriority("TestScript_Failed",0)
+	
+EVENTS
+EVENT OnInit_AddSpells
+ON
+	OnInit()
+ACTIONS
+	IF "!c1"
+		IsEqual(__Me,%Cow01)
+	THEN
+		CharacterAddSkill(%Spell)
+	ENDIF
+	
+EVENT OnDamage_UseSkill
+VARS
+	CHARACTER:_Attacker
+ON
+	OnDamage(_,_,_Attacker,_)
+	OnMiss(_Attacker,_,__Me,_)
+ACTIONS
+	IF "!c1&(c2|c3)"
+		IsEqual(__Me,%Cow01)
+		IsEqual(_Attacker,%Player1)
+		IsEqual(_Attacker,%Player2)
+	THEN
+		DebugText(__Me,%DebugText)
+		SetPriority("TestScript_ShootTargetAndWait",500)
+		SetPriority("TestScript_Failed",400)
+	ENDIF
+	IF "c1"
+		IsEqual(__Me,%Cow01)
+	THEN
+		SetPriority("TestScript_WelcomeMessage",0)
+	ENDIF

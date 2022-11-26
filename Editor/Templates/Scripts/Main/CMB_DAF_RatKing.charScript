@@ -1,0 +1,166 @@
+INIT
+	CHARACTER:__Me
+	CHARACTERTEMPLATE:%Rat_Chancellor_RT="Animals_Rat_King_A_Chancellor_fd8bbb36-42b0-48bf-9335-a95a4ceb1fbc"			//black
+	CHARACTERTEMPLATE:%Rat_Warchief_RT="Animals_Rat_King_A_Warchief_e30f233d-7747-4939-b3ec-b589d8b38afc"				//black
+	CHARACTERTEMPLATE:%Rat_Prince_RT="Animals_Rat_King_A_Prince_a6e45ab0-77aa-4590-815e-7eacde98e5c2"					//black
+	CHARACTERTEMPLATE:%Rat_Buffoon_RT="Animals_Rat_King_A_Buffoon_02c5ff14-71df-4c74-8f9f-a2ec59c142f2"					//gray
+	CHARACTERTEMPLATE:%Rat_Secretary_RT="Animals_Rat_King_A_Secretary_5e0c51b3-de4c-4384-b856-7222ba4ab4f9"				//gray
+	CHARACTERTEMPLATE:%Rat_FirstKnight_RT="Animals_Rat_King_A_FirstKnight_27c7f7e0-dc7a-47db-ae84-03ed771242af"			//gray
+	ITEM:%SelectedLair
+	ITEMTEMPLATE:%RatKingLair_RT="NAT_Hole_Entrance_B_fa0496eb-ae1b-4051-b7aa-6d55540a9eb7"
+	INT:%Bool_AlreadySummoned=0	
+	INT:%SummoningFX_Handle
+	
+//-------------------
+BEHAVIOUR
+REACTION RatKing_SummonsHisCourt,1500
+USAGE COMBAT
+VARS
+	CHARACTER:_Rat
+	CHARACTER:_Player
+	FLOAT:_MyAP
+	INT:_Failures=0
+	INT:_Successes=0
+	FLOAT3:_PosOffset
+	FLOAT3:_LairsPosition
+	FLOAT:_Angle
+	FLOAT:_Dist
+CHECK "c1&c2&!(c3|c4|c5|c6|c7|c8|c9)&c10"
+	IsEqual(%Bool_AlreadySummoned,0)							//c1
+	CharacterGetStat(_MyAP,__Me,ActionPoints)					//c2	
+	IsLessThen(_MyAP,5)											//!c3
+	CharacterHasStatus(__Me,"CHARMED")							//!c4
+	CharacterHasStatus(__Me,"PETRIFIED")						//!c5
+	CharacterHasStatus(__Me,"FEAR")								//!c6
+	CharacterHasStatus(__Me,"STUNNED")							//!c7
+	CharacterHasStatus(__Me,"MUTED")							//!c8
+	CharacterHasStatus(__Me,"FEAR")								//!c9
+	CharacterGetEnemy(_Player,__Me)								//c10
+ACTIONS
+	Set(%SelectedLair,null)
+	IterateItemsNear(__Me,30,"CMB_DAF_RatKing_ScanForNearbyLair")
+	IF "c1"
+		IsEqual(%SelectedLair,null)
+	THEN
+		SetPriority("RatKing_SummonsHisCourt",0)
+	ENDIF
+	CharacterMoveTo(%SelectedLair,1)
+	CharacterLookAt(%SelectedLair)
+	CharacterPlayLoopEffect(%SummoningFX_Handle,__Me,"FX_Skills_WitchCraft_Summon_Prepare_A")
+	CharacterPlayAnimation("cast_shout_cast",1,1)
+	CharacterLookAt(_Player)
+	WHILE "c1&c2"
+		IsLessThen(_Successes,6)
+		IsLessThen(_Failures,30)
+	DO
+		IF "c1"
+			GetPosition(%SelectedLair,_LairsPosition)
+		THEN
+			Set(_PosOffset,{1;0;0}) 
+			GetRandomBetween(_Angle,90,270)
+			GetRandomBetween(_Dist,2,3)
+			RotateY(_PosOffset,_Angle)
+			Multiply(_PosOffset,_Dist)	
+			Add(_LairsPosition,_PosOffset)
+		ENDIF
+		IF "c1"
+			FindValidPosition(_LairsPosition,3)
+		THEN	
+			IF "c1"
+				IsEqual(_Successes,0)
+			THEN	
+				PlayEffectAt(%SelectedLair,"FX_Creatures_Undead_Zombie_Crawler_Spawn_A")				
+				SpawnCharacter(_Rat,%Rat_Chancellor_RT,_LairsPosition,0)
+				CharacterPlayEffect(_Rat,"FX_Creatures_Undead_Zombie_Crawler_Spawn_A")
+				Add(_Successes,1)				
+			ELIF "c1"
+				IsEqual(_Successes,1)
+			THEN		
+				PlayEffectAt(%SelectedLair,"FX_Creatures_Undead_Zombie_Crawler_Spawn_A")				
+				SpawnCharacter(_Rat,%Rat_Warchief_RT,_LairsPosition,0)
+				CharacterPlayEffect(_Rat,"FX_Creatures_Undead_Zombie_Crawler_Spawn_A")			
+				Add(_Successes,1)
+			ELIF "c1"
+				IsEqual(_Successes,2)
+			THEN		
+				PlayEffectAt(%SelectedLair,"FX_Creatures_Undead_Zombie_Crawler_Spawn_A")				
+				SpawnCharacter(_Rat,%Rat_Prince_RT,_LairsPosition,0)
+				CharacterPlayEffect(_Rat,"FX_Creatures_Undead_Zombie_Crawler_Spawn_A")				
+				Add(_Successes,1)
+			ELIF "c1"
+				IsEqual(_Successes,3)
+			THEN		
+				PlayEffectAt(%SelectedLair,"FX_Creatures_Undead_Zombie_Crawler_Spawn_A")				
+				SpawnCharacter(_Rat,%Rat_Buffoon_RT,_LairsPosition,0)	
+				CharacterPlayEffect(_Rat,"FX_Creatures_Undead_Zombie_Crawler_Spawn_A")				
+				Add(_Successes,1)	
+			ELIF "c1"
+				IsEqual(_Successes,4)
+			THEN		
+				PlayEffectAt(%SelectedLair,"FX_Creatures_Undead_Zombie_Crawler_Spawn_A")				
+				SpawnCharacter(_Rat,%Rat_Secretary_RT,_LairsPosition,0)				
+				CharacterPlayEffect(_Rat,"FX_Creatures_Undead_Zombie_Crawler_Spawn_A")				
+				Add(_Successes,1)	
+			ELIF "c1"
+				IsEqual(_Successes,5)				
+			THEN		
+				PlayEffectAt(%SelectedLair,"FX_Creatures_Undead_Zombie_Crawler_Spawn_A")				
+				SpawnCharacter(_Rat,%Rat_FirstKnight_RT,_LairsPosition,0)	
+				CharacterPlayEffect(_Rat,"FX_Creatures_Undead_Zombie_Crawler_Spawn_A")				
+				Add(_Successes,1)
+			ELSE
+				Add(_Failures,1)				
+			ENDIF
+		ENDIF
+	ENDWHILE
+	IF "c1"
+		IsEqual(_Failures,30)
+	THEN
+		Set(_Failures,0)
+		CharacterEndTurn()	
+	ENDIF
+	Set(_Successes,0)
+	Set(%Bool_AlreadySummoned,1)
+	StopLoopEffect(%SummoningFX_Handle)
+	CharacterUseActionPoints(__Me,5)
+	SetPriority("RatKing_SummonsHisCourt",0)
+INTERRUPT
+	Reset()
+	
+//-------------------
+EVENTS	
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	IF "c1"
+		IsEqual(%Bool_AlreadySummoned,0)
+	THEN
+		SetPriority("RatKing_SummonsHisCourt",1500)
+	ENDIF
+	
+EVENT OnIterateItem_ScanForNearbyLair
+VARS
+	ITEM:_Item
+ON
+	OnIterateItem(_Item,"CMB_DAF_RatKing_ScanForNearbyLair")
+ACTIONS
+	IF "!c1&(c2|c3|c4|c5|c6|c7)"
+		ItemIsDestroyed(_Item)
+		IsEqual(_Item,"DAF_RatPalace_0827e825-ba0f-40d8-b7ab-e0076895df6f")
+		IsEqual(_Item,"DAF_RatKingHidingHole1_b3fca35f-b12c-43c2-8e60-80d3a1a944fd")
+		IsEqual(_Item,"DAF_RatKingHidingHole2_3d0d6f3c-53d9-47a6-85d6-dd2e64cb2ab7")
+		IsEqual(_Item,"DAF_RatKingHidingHole3_7479b2bf-9318-482a-bbb4-f54337165091")
+		IsEqual(_Item,"DAF_RatKingHidingHole4_cb63d397-4d62-4587-8f70-89a2e4e1ada2")
+		IsEqual(_Item,"DAF_RatKingHidingHole5_b40407ee-c6a2-44ef-a4d1-df7162e978fb")
+	THEN
+		Set(%SelectedLair,_Item)
+	ENDIF
+	
+EVENT OnCombatEnded_StopLoopingFX
+ON
+	OnDie(__Me,_,_,_)
+	OnCombatEnded()
+	OnDeactivate()
+ACTIONS
+	StopLoopEffect(%SummoningFX_Handle)

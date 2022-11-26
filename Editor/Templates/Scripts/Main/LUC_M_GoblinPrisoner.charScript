@@ -1,0 +1,46 @@
+INIT
+CHARACTER:__Me
+INT:%Counter = 0
+EXTERN INT:%AmITheLeader = 0
+INT:%DoorHasBeenOpened = 0
+ITEM:%LUCM_PrisonLever_Item = LUC_M_PrisonLever_0f9e5553-e02f-43ba-9442-16b9e382f581
+
+//-----------------
+BEHAVIOUR
+REACTION Main, 500
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Text
+CHECK "c1"
+	IsEqual(%AmITheLeader,1)
+ACTIONS
+	GetElement(_Text,%Counter,"LUC_M_GoblinPrisoner1","LUC_M_GoblinPrisoner2","LUC_M_GoblinPrisoner3")
+	DisplayText(__Me,_Text,3)
+	IF "c1"
+		IsEqual(%Counter,2)
+	THEN
+		Set(%Counter,0)
+	ELSE
+		Add(%Counter,1)
+	ENDIF
+	Sleep(15)
+
+REACTION CantFightBackSoGoToTheBackOfTheCell,1500
+USAGE COMBAT
+VARS
+	FIXEDSTRING:_ChosenText
+CHECK "c1"
+	IsEqual(%DoorHasBeenOpened,0)
+ACTIONS
+	GetWeightedRandom(_ChosenText,"LUC_M_PrisonerCantFightBack_01",INT:1,"LUC_M_PrisonerCantFightBack_02",INT:1,"LUC_M_PrisonerCantFightBack_03",INT:1,"LUC_M_PrisonerCantFightBack_04",INT:1,"LUC_M_PrisonerCantFightBack_05",INT:1)
+	DisplayText(__Me,_ChosenText,2)
+	CharacterFleeFrom(Enemy,40)
+	CharacterEndTurn()
+	
+//-----------------
+EVENTS
+EVENT DoorIsOpenEventReceived
+ON
+	OnItemEvent(%LUCM_PrisonLever_Item,"LUCM_PrisonDoorOpened_ItemEvent")
+ACTIONS
+	Set(%DoorHasBeenOpened,1)

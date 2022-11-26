@@ -1,0 +1,612 @@
+INIT
+	CHARACTER:__Me
+	CHARACTERTEMPLATE:%RedSpiderEgg = "LUC_SpiderBoss_EggChar_Red_90e8e41b-1df3-4eed-8863-f9e384489966"
+	CHARACTERTEMPLATE:%RegularSpiderEgg = "LUC_SpiderBoss_EggChar_Regular_3e005355-5820-4b3e-b7c2-d6dd7f8a4cc5"
+	CHARACTERTEMPLATE:%LastSpiderling = "LUC_SpiderBoss_Spiderling_d4c7abfb-1cd9-4f34-b156-a0919ecfa992"
+	FLOAT3:%PoisonMeteorShootOffset = {0;0;0}
+	FLOAT3:%PoisonWeb_Pivot = {0;0;0}
+	FLOAT3:%PoisonWeb_Anchor_01 = {0;0;0}
+	FLOAT3:%PoisonWeb_Anchor_02 = {0;0;0}
+	FLOAT3:%PoisonWeb_Anchor_03 = {0;0;0}
+	INT:%LayEgg_FXHandle
+	INT:%PoisonWeb_FXHandle_01
+	INT:%PoisonWeb_FXHandle_02
+	INT:%PoisonWeb_FXHandle_03
+	INT:%Bool_FXRestore_Anchor_01=0
+	INT:%Bool_FXRestore_Anchor_02=0
+	INT:%Bool_FXRestore_Anchor_03=0	
+	INT:%PoisonWebStatus=0	
+	INT:%LayEggs_Current = 0
+	INT:%LayEggs_Desired = 2
+	INT:%MiscAttack_Current = 1
+	INT:%MiscAttack_Desired = 1
+	INT:%PoisonMeteor_Current = 1
+	INT:%PoisonMeteor_Desired = 1
+	INT:%PoisonWeb_Current = 0
+	INT:%PoisonWeb_Desired = 2
+	INT:%SpiderlingCount=0
+	CHARACTER:%RedSpider=null
+	
+//------------------------
+BEHAVIOUR
+REACTION SpiderQueen_ScanForExplosiveSpiders,0
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1"
+	IsHardcore()
+ACTIONS
+	Set(%RedSpider,null)
+	IterateCharactersNear(__Me,20,"Iterate_ScanFor_RedSpiders")
+	IF "!c1"
+		IsEqual(%RedSpider,null)
+	THEN
+		Set(%SpiderlingCount,0)
+		IterateCharactersNear(%RedSpider,5,"Iterate_ScanFor_Spiderlings")
+	ENDIF
+	IF "!c1&!c2&c3&c4"
+		IsEqual(%RedSpider,null)
+		IsGreaterThen(%SpiderlingCount,2)
+		CharacterCanCast(__Me,"Projectile_EnemyPoisonHair")
+		CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyPoisonHair")		
+	THEN
+		CharacterMoveInRange(%RedSpider,6,_MaxRange,1)
+		CharacterUseSkill("Projectile_EnemyPoisonHair",%RedSpider)
+	ENDIF
+	SetPriority("SpiderQueen_ScanForExplosiveSpiders",0)
+	
+REACTION SpiderQueen_PoisonWeb, 0
+USAGE COMBAT
+VARS
+	FLOAT:_AP
+	CHARACTER:_Target
+	INT:_Successes=0
+	INT:_Failures=0
+	FLOAT:_RandomFactor
+	FLOAT:_Angle
+	FLOAT:_Dist	
+	FLOAT3:_AnchorOffset
+CHECK "c1&c2&c3&!c4"
+	IsHardcore()
+	CharacterGet(_Target,__Me,20,Highest,Distance,Enemy)
+	CharacterGetStat(_AP,__Me,"ActionPoints")
+	IsLessThen(_AP,4)
+ACTIONS
+	CharacterPlayEffect(__Me,"FX_Skills_Earth_PoisonDart_Prepare_A")
+	CharacterPlayAnimation("cast_long_loop",1,1)
+	CharacterPlayAnimation("cast_self_cast",1,0)
+	IF "c1&c2"
+		IsEqual(%PoisonWebStatus,0)
+		GetPosition(_Target,%PoisonWeb_Pivot)
+	THEN
+		Set(%PoisonWeb_Anchor_01,%PoisonWeb_Pivot)
+		WHILE "c1&c2"
+			IsLessThen(_Successes,1)
+			IsLessThen(_Failures,15)
+		DO
+			Set(_AnchorOffset,{1;0;0}) 
+			GetRandomBetween(_Angle,20,60)
+			GetRandomBetween(_Dist,6,9)
+			RotateY(_AnchorOffset,_Angle)
+			Multiply(_AnchorOffset,_Dist)		
+			Add(%PoisonWeb_Anchor_01,_AnchorOffset)
+			IF "c1"
+				FindValidPosition(%PoisonWeb_Anchor_01,3)
+			THEN
+				Set(_Successes,1)
+			ELSE
+				Add(_Failures,1)
+			ENDIF
+		ENDWHILE
+		IF "c1"
+			IsEqual(_Failures,15)
+		THEN
+			SetPriority("SpiderQueen_PoisonWeb",0)
+		ENDIF
+		PlayEffectAt(%PoisonWeb_Anchor_01,"FX_Creatures_Summons_ElementalOoze_A_Spawn")
+		CreateSurfaceAt(%PoisonWeb_Anchor_01,"Ooze",1,3)
+		PlayLoopEffectAt(%PoisonWeb_FXHandle_01,%PoisonWeb_Anchor_01,"FX_GP_LightPillarGreen_A")
+		Set(%Bool_FXRestore_Anchor_01,1)
+		Set(_Successes,0)
+		Set(_Failures,0)		
+		Add(%PoisonWebStatus,1)
+		Sleep(1)		
+	ELIF "c1"
+		IsEqual(%PoisonWebStatus,1)
+	THEN
+		Set(%PoisonWeb_Anchor_02,%PoisonWeb_Pivot)
+		WHILE "c1&c2"
+			IsLessThen(_Successes,1)
+			IsLessThen(_Failures,15)
+		DO
+			Set(_AnchorOffset,{1;0;0}) 
+			GetRandomBetween(_Angle,140,180)
+			GetRandomBetween(_Dist,6,9)
+			RotateY(_AnchorOffset,_Angle)
+			Multiply(_AnchorOffset,_Dist)					
+			Add(%PoisonWeb_Anchor_02,_AnchorOffset)
+			IF "c1"
+				FindValidPosition(%PoisonWeb_Anchor_02,3)
+			THEN
+				Set(_Successes,1)
+			ELSE
+				Add(_Failures,1)
+			ENDIF
+		ENDWHILE
+		IF "c1"
+			IsEqual(_Failures,15)
+		THEN
+			StopLoopEffect(%PoisonWeb_FXHandle_01)
+			SetPriority("SpiderQueen_PoisonWeb",0)
+		ENDIF		
+		PlayEffectAt(%PoisonWeb_Anchor_02,"FX_Creatures_Summons_ElementalOoze_A_Spawn")
+		CreateSurfaceAt(%PoisonWeb_Anchor_02,"Ooze",1,2)
+		PlayLoopEffectAt(%PoisonWeb_FXHandle_02,%PoisonWeb_Anchor_02,"FX_GP_LightPillarGreen_A")
+		Set(%Bool_FXRestore_Anchor_02,1)
+		Set(_Successes,0)
+		Set(_Failures,0)		
+		Add(%PoisonWebStatus,1)
+		Sleep(1)		
+	ELIF "c1"
+		IsEqual(%PoisonWebStatus,2)
+	THEN
+		Set(%PoisonWeb_Anchor_03,%PoisonWeb_Pivot)
+		WHILE "c1&c2"
+			IsLessThen(_Successes,1)
+			IsLessThen(_Failures,15)
+		DO
+			Set(_AnchorOffset,{1;0;0}) 
+			GetRandomBetween(_Angle,280,320)
+			GetRandomBetween(_Dist,6,9)
+			RotateY(_AnchorOffset,_Angle)
+			Multiply(_AnchorOffset,_Dist)	
+			Add(%PoisonWeb_Anchor_03,_AnchorOffset)
+			IF "c1"
+				FindValidPosition(%PoisonWeb_Anchor_03,3)
+			THEN
+				Set(_Successes,1)
+			ELSE
+				Add(_Failures,1)
+			ENDIF
+		ENDWHILE
+		IF "c1"
+			IsEqual(_Failures,15)
+		THEN
+			StopLoopEffect(%PoisonWeb_FXHandle_01)
+			StopLoopEffect(%PoisonWeb_FXHandle_02)
+			SetPriority("SpiderQueen_PoisonWeb",0)
+		ENDIF		
+		PlayEffectAt(%PoisonWeb_Anchor_03,"FX_Creatures_Summons_ElementalOoze_A_Spawn")
+		CreateSurfaceAt(%PoisonWeb_Anchor_03,"Ooze",1,1)		
+		PlayLoopEffectAt(%PoisonWeb_FXHandle_03,%PoisonWeb_Anchor_03,"FX_GP_LightPillarGreen_A")		
+		CharacterUseActionPoints(__Me,4)
+		Set(%Bool_FXRestore_Anchor_03,1)
+		Set(_Successes,0)
+		Set(_Failures,0)
+		Add(%PoisonWebStatus,1)
+		CharacterEndTurn()
+		SetPriority("SpiderQueen_PoisonWeb",0)
+	ENDIF
+	
+REACTION SpiderQueen_ReleasePoison,0
+USAGE COMBAT
+CHECK "c1"
+	IsEqual(%PoisonWebStatus,3)
+ACTIONS	
+	CharacterPlayEffect(__Me,"FX_Skills_Earth_PoisonDart_Prepare_A")
+	CharacterPlayAnimation("cast_long_loop",1,1)
+	CharacterPlayAnimation("cast_self_cast",0,0)
+	PlayEffectAt(%PoisonWeb_Anchor_01,"FX_Creatures_Summons_ElementalOoze_A_Spawn")
+	PlayEffectAt(%PoisonWeb_Anchor_02,"FX_Creatures_Summons_ElementalOoze_A_Spawn")
+	PlayEffectAt(%PoisonWeb_Anchor_03,"FX_Creatures_Summons_ElementalOoze_A_Spawn")
+	Sleep(1)
+	StopLoopEffect(%PoisonWeb_FXHandle_01)
+	StopLoopEffect(%PoisonWeb_FXHandle_02)
+	StopLoopEffect(%PoisonWeb_FXHandle_03)	
+	Set(%Bool_FXRestore_Anchor_01,0)
+	Set(%Bool_FXRestore_Anchor_02,0)
+	Set(%Bool_FXRestore_Anchor_03,0)
+	CreatePolygonSurfaceAt(__Me,"CloudPoison",4,%PoisonWeb_Anchor_01,%PoisonWeb_Anchor_02,%PoisonWeb_Anchor_03)
+	Set(%PoisonWebStatus,0)
+	Set(%PoisonWeb_Current,0)
+	Sleep(2)
+	SetPriority("SpiderQueen_ReleasePoison",0)
+
+REACTION SpiderQueen_LaySpiderEggs,700
+USAGE COMBAT
+VARS
+	FLOAT:_AP
+	CHARACTER:_Player
+	CHARACTER:_Egg	
+	FLOAT3:_EggPosition
+	FLOAT3:_NextStep
+	FLOAT3:_EggOffset
+	FLOAT:_Angle
+	FLOAT:_Dist
+	INT:_Failures = 0
+	INT:_CurrentEggAmount = 0
+	INT:_PlannedEggAmount = 3
+	CHARACTERTEMPLATE:_ChosenEggTemplate
+CHECK "!c1&!c2&!c3&!c4&c5&c6&!c7"
+	CharacterHasStatus(__Me,DYING)
+	CharacterHasStatus(__Me,CHARMED)
+	CharacterHasStatus(__Me,MUTED)
+	CharacterHasStatus(__Me,STUNNED)
+	CharacterGet(_Player,__Me,30,Lowest,Distance,Enemy)
+	CharacterGetStat(_AP,__Me,"ActionPoints")
+	IsLessThen(_AP,4)
+ACTIONS
+	Set(_CurrentEggAmount,0)
+	CharacterMoveInRange(_Player,5,10,1)
+	GetRandomBetween(_PlannedEggAmount,5,8)
+	CharacterPlayAnimation("cast_long_loop",0,0)
+	CharacterPlayLoopEffect(%LayEgg_FXHandle,__Me,"FX_Skills_Earth_PoisonDart_Prepare_A")	
+		WHILE "c1&c2"
+			IsLessThen(_CurrentEggAmount,_PlannedEggAmount)
+			IsLessThen(_Failures,20)
+		DO
+			GetPosition(__Me,_EggPosition)	
+			GetRandomBetween(_Angle,0,360)
+			GetRandomBetween(_Dist,4,8)
+			GetWeightedRandom(_ChosenEggTemplate,%RedSpiderEgg,INT:2,%RegularSpiderEgg,INT:2)
+			Set(_EggOffset,{1;0;0})
+			RotateY(_EggOffset,_Angle)
+			Multiply(_EggOffset,_Dist)
+			Add(_EggPosition,_EggOffset)
+			IF "c1&!(c2|c3|c4|c5|c6|c7)"
+				FindValidPosition(_EggPosition,2)
+				ContainsSurface(_EggPosition,2,"Fire")
+				ContainsSurface(_EggPosition,2,"Oil")
+				ContainsSurface(_EggPosition,2,"Electrified")
+				ContainsSurface(_EggPosition,2,"BloodElectrified")
+				ContainsSurface(_EggPosition,2,"CloudStatic")
+				ContainsSurface(_EggPosition,2,"CloudSmoke")
+			THEN
+				PlayEffectAt(_EggPosition,"FX_GP_Hit_Ooze_A_Large")
+				SpawnCharacter(_Egg,_ChosenEggTemplate,_EggPosition,1)
+				Add(_CurrentEggAmount,1)
+			ELSE
+				Add(_Failures,1)
+			ENDIF
+		ENDWHILE
+		IF "c1"
+			IsEqual(_Failures,20)
+		THEN
+			Set(_Failures,0)
+			CharacterEndTurn()
+		ENDIF
+	CharacterPlayAnimation("cast_long_cast")
+	StopLoopEffect(%LayEgg_FXHandle)
+	Set(_Failures,0)
+	CharacterLookAt(_Player)
+	CharacterUseActionPoints(__Me,4)
+	//CharacterEndTurn()
+	Set(%LayEggs_Current,0)
+	SetPriority("SpiderQueen_LaySpiderEggs",0)
+	
+REACTION SpiderQueen_PoisonMeteorRain, 0
+USAGE COMBAT
+VARS
+	FLOAT:_AP
+	CHARACTER:_Player
+	SKILL:_Skill
+	FLOAT3:_Offset1
+	FLOAT3:_Offset2
+	FLOAT3:_Offset3
+	FLOAT3:_Offset4
+	FLOAT3:_Offset5
+	FLOAT3:_Offset6
+	FLOAT3:_Offset7
+	FLOAT3:_Offset8
+	FLOAT3:_Offset9	
+	FLOAT3:_Target1
+	FLOAT3:_Target2
+	FLOAT3:_Target3
+	FLOAT3:_Target4
+	FLOAT3:_Target5
+	FLOAT3:_Target6
+	FLOAT3:_Target7
+	FLOAT3:_Target8
+	FLOAT3:_Target9	
+CHECK "!c1&!c2&!c3&c4&c5&c6&!c7"
+	CharacterHasStatus(__Me,CHARMED)
+	CharacterHasStatus(__Me,FEAR)
+	CharacterHasStatus(__Me,STUNNED)
+	CharacterCanCast(__Me,"Projectile_SpiderBoss_PoisonMeteor")
+	CharacterGet(_Player,__Me,30,Highest,Distance,Enemy)
+	CharacterGetStat(_AP,__Me,"ActionPoints")
+	IsLessThen(_AP,5)
+ACTIONS	
+	CharacterMoveInRange(_Player,5,10,1)
+	CharacterPlayAnimation("cast_long_loop",0,0)
+	GetPosition(_Player,_Target1)
+	GetPosition(_Player,_Target2)
+	GetPosition(_Player,_Target3)
+	GetPosition(_Player,_Target4)
+	GetPosition(_Player,_Target5)
+	GetPosition(_Player,_Target6)
+	GetPosition(_Player,_Target7)
+	GetPosition(_Player,_Target8)
+	GetPosition(_Player,_Target9)
+	Set(_Offset1,{3;10;2})
+	Set(_Offset2,{-2;10;-3})
+	Set(_Offset3,{4;10;-5})
+	Set(_Offset4,{-1;10;3})
+	Set(_Offset5,{0;10;0})
+	Set(_Offset6,{2;10;-3})
+	Set(_Offset7,{-3;10;5})
+	Set(_Offset8,{-3;10;4})
+	Set(_Offset9,{2;10;-5})
+	CharacterPlayEffect(__Me,"FX_GP_Animal_Spider_Boss_B_Attack_A")
+	Add(_Target1,_Offset1)
+	Add(_Target2,_Offset2)
+	Add(_Target3,_Offset3)
+	Add(_Target4,_Offset4)
+	Add(_Target5,_Offset5)
+	Add(_Target6,_Offset6)
+	Add(_Target7,_Offset4)
+	Add(_Target8,_Offset5)
+	Add(_Target9,_Offset6)
+	Subtract(_Target1,{0;10;0})
+	CharacterLookAt(_Player)
+	ShootLocalProjectileAt(Projectile_SpiderBoss_PoisonMeteor,__Me,_Offset1,_Target1)
+	Sleep(0.2)
+	Subtract(_Target2,{0;10;0})
+	ShootLocalProjectileAt(Projectile_SpiderBoss_PoisonMeteor,__Me,_Offset2,_Target2)
+	Sleep(0.3)
+	Subtract(_Target3,{0;10;0})
+	ShootLocalProjectileAt(Projectile_SpiderBoss_PoisonMeteor,__Me,_Offset3,_Target3)
+	Sleep(0.1)
+	Subtract(_Target4,{0;10;0})
+	ShootLocalProjectileAt(Projectile_SpiderBoss_PoisonMeteor,__Me,_Offset4,_Target4)
+	Sleep(0.2)
+	Subtract(_Target5,{0;10;0})
+	ShootLocalProjectileAt(Projectile_SpiderBoss_PoisonMeteor,__Me,_Offset5,_Target5)
+	Sleep(0.1)	
+	Subtract(_Target6,{0;10;0})
+	ShootLocalProjectileAt(Projectile_SpiderBoss_PoisonMeteor,__Me,_Offset6,_Target6)
+	Subtract(_Target7,{0;10;0})
+	ShootLocalProjectileAt(Projectile_SpiderBoss_PoisonMeteor,__Me,_Offset7,_Target7)
+	Sleep(0.1)
+	Subtract(_Target8,{0;10;0})
+	ShootLocalProjectileAt(Projectile_SpiderBoss_PoisonMeteor,__Me,_Offset8,_Target8)
+	Sleep(0.2)	
+	Subtract(_Target9,{0;10;0})
+	ShootLocalProjectileAt(Projectile_SpiderBoss_PoisonMeteor,__Me,_Offset9,_Target9)
+	CharacterPlayAnimation("cast_long_cast")
+	CharacterLookAt(_Player)
+	CharacterUseActionPoints(__Me,4)
+	CharacterEndTurn()
+	Set(%PoisonMeteor_Current,0)
+	SetPriority("SpiderQueen_PoisonMeteorRain",0)
+	
+REACTION SpiderQueen_SwipeAttack, 0
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+CHECK "c1&c2&c3&!c4&!c5&!c6"
+	CharacterCanCast(__Me,"Cone_SeaSpider_SwipeAttack")
+	CharacterGet(_Enemy,__Me,7,Lowest,Distance,Enemy)
+	CharacterCanSee(__Me,_Enemy)
+	CharacterHasStatus(__Me,CHARMED)
+	CharacterHasStatus(__Me,FEAR)
+	CharacterHasStatus(__Me,STUNNED)
+ACTIONS
+	CharacterLookAt(_Enemy)
+	CharacterUseSkill("Cone_SeaSpider_SwipeAttack",_Enemy)
+	Set(%MiscAttack_Current,0)	
+	SetPriority("SpiderQueen_SwipeAttack",0)
+	
+REACTION SpiderQueen_RangeAttack, 0
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+CHECK "c1&c2&c3&!c4&!c5&!c6"
+	CharacterCanCast(__Me,"Projectile_Enemy_PoisonHailAttack")
+	CharacterGet(_Enemy,__Me,30,Highest,Distance,Enemy)
+	CharacterCanSee(__Me,_Enemy)
+	CharacterHasStatus(__Me,CHARMED)
+	CharacterHasStatus(__Me,FEAR)
+	CharacterHasStatus(__Me,STUNNED)
+ACTIONS	
+	CharacterLookAt(_Enemy)
+	CharacterUseSkill("Projectile_Enemy_PoisonHailAttack",_Enemy)
+	Set(%MiscAttack_Current,0)	
+	SetPriority("SpiderQueen_RangeAttack",0)
+	
+//------------------------
+EVENTS
+EVENT OnInit_GiveSpells_FXRestore
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill("Projectile_EnemyBigDeadlySpores")
+	CharacterAddSkill("Projectile_SpiderBoss_PoisonMeteor")
+	CharacterAddSkill("Projectile_Enemy_PoisonHailAttack")
+	CharacterAddSkill("Cone_SeaSpider_SwipeAttack")
+	IF "c1"
+		IsHardcore()
+	THEN
+		CharacterAddSkill("Projectile_EnemyPoisonHair")
+	ENDIF
+	IF "c1"
+		IsEqual(%Bool_FXRestore_Anchor_01,1)
+	THEN
+		PlayLoopEffectAt(%PoisonWeb_FXHandle_01,%PoisonWeb_Anchor_01,"FX_GP_LightPillarGreen_A")		
+	ENDIF
+	IF "c1"
+		IsEqual(%Bool_FXRestore_Anchor_02,1)
+	THEN
+		PlayLoopEffectAt(%PoisonWeb_FXHandle_02,%PoisonWeb_Anchor_02,"FX_GP_LightPillarGreen_A")		
+	ENDIF		
+	IF "c1"
+		IsEqual(%Bool_FXRestore_Anchor_03,1)
+	THEN
+		PlayLoopEffectAt(%PoisonWeb_FXHandle_03,%PoisonWeb_Anchor_03,"FX_GP_LightPillarGreen_A")		
+	ENDIF		
+	
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("SpiderQueen_ScanForExplosiveSpiders",1200)
+	IF "c1"
+		IsLessThen(%PoisonWeb_Current,%PoisonWeb_Desired)
+	THEN
+		Add(%PoisonWeb_Current,1)
+	ENDIF
+	IF "c1&c2&c3"
+		IsHardcore()
+		IsEqual(%PoisonWeb_Current,%PoisonWeb_Desired)
+		IsLessThen(%PoisonWebStatus,3)
+	THEN
+		SetPriority("SpiderQueen_PoisonWeb",1000)
+	ELIF "c1&c2"
+		IsHardcore()
+		IsEqual(%PoisonWebStatus,3)
+	THEN
+		SetPriority("SpiderQueen_ReleasePoison",1000)
+	ENDIF
+	IF "c1"
+		IsLessThen(%PoisonMeteor_Current,%PoisonMeteor_Desired)
+	THEN		
+		Add(%PoisonMeteor_Current,1)
+	ELSE
+		SetPriority("SpiderQueen_PoisonMeteorRain",600)
+		//CombatLogText(__Me,"CMB_LUC_SpiderBoss_PoisonMeteor_Ready",0,1)
+	ENDIF	
+	IF "c1"
+		IsLessThen(%LayEggs_Current,%LayEggs_Desired)
+	THEN		
+		Add(%LayEggs_Current,1)
+	ELSE
+		SetPriority("SpiderQueen_LaySpiderEggs",700)
+	ENDIF		
+	IF "c1"
+		IsLessThen(%MiscAttack_Current,%MiscAttack_Desired)
+	THEN		
+		Add(%MiscAttack_Current,1)
+	ELSE
+		SetPriority("SpiderQueen_SwipeAttack",500)
+		SetPriority("SpiderQueen_RangeAttack",500)
+	ENDIF	
+
+EVENT OnIterate_ScanFor_RedSpiders
+VARS 
+	CHARACTER:_DetectedSpider
+	CHARACTER:_Player
+	CHARACTERTEMPLATE:_DetectedSpider_RT
+	CHARACTERTEMPLATE:_RedSpider_RT="LUC_SpiderBoss_Spiderling_Red_02f66eaf-9f40-4a38-9dd3-6772b030b48c"
+ON
+	OnIterateCharacter(_DetectedSpider,"Iterate_ScanFor_RedSpiders")
+ACTIONS	
+	IF "!c1&c2&c3&c4"
+		CharacterIsDead(_DetectedSpider)	
+		CharacterGetTemplate(_DetectedSpider,_DetectedSpider_RT)
+		IsEqual(_DetectedSpider_RT,_RedSpider_RT)
+		CharacterGet(_Player,_DetectedSpider,3,Lowest,Distance,Enemy)
+	THEN
+		Set(%RedSpider,_DetectedSpider)
+	ENDIF
+	Set(_DetectedSpider,null)
+
+EVENT OnIterate_ScanFor_Spiderlings
+VARS 
+	CHARACTER:_DetectedSpider
+	CHARACTERTEMPLATE:_DetectedSpider_RT
+	CHARACTERTEMPLATE:_Spiderling_RT="LUC_SpiderBoss_Spiderling_d4c7abfb-1cd9-4f34-b156-a0919ecfa992"
+ON
+	OnIterateCharacter(_DetectedSpider,"Iterate_ScanFor_Spiderlings")
+ACTIONS	
+	IF "!c1&c2&c3"
+		CharacterIsDead(_DetectedSpider)	
+		CharacterGetTemplate(_DetectedSpider,_DetectedSpider_RT)
+		IsEqual(_DetectedSpider_RT,_Spiderling_RT)
+	THEN
+		Add(%SpiderlingCount,1)
+	ENDIF
+	Set(_DetectedSpider,null)	
+	
+EVENT OnIterate_CleanUp
+VARS 
+	CHARACTER:_DetectedSpider
+	CHARACTERTEMPLATE:_DetectedSpider_RT
+	CHARACTERTEMPLATE:_Spiderling_RT="LUC_SpiderBoss_Spiderling_d4c7abfb-1cd9-4f34-b156-a0919ecfa992"
+	CHARACTERTEMPLATE:_RedSpider_RT="LUC_SpiderBoss_Spiderling_Red_02f66eaf-9f40-4a38-9dd3-6772b030b48c"
+ON
+	OnIterateCharacter(_DetectedSpider,"LUC_SpiderBoss_CleanUp")
+ACTIONS	
+	IF "!c1&c2&(c3|c4)"
+		CharacterIsDead(_DetectedSpider)	
+		CharacterGetTemplate(_DetectedSpider,_DetectedSpider_RT)
+		IsEqual(_DetectedSpider_RT,_Spiderling_RT)
+		IsEqual(_DetectedSpider_RT,_RedSpider_RT)
+	THEN
+		CharacterDie(_DetectedSpider)
+	ENDIF
+	Set(_DetectedSpider,null)	
+
+EVENT OnDie_CreateSpiders
+VARS
+	FLOAT3:_MyPosition
+	FLOAT3:_PositionOffset1 = {1;0;0}
+	FLOAT3:_PositionOffset2 = {1;0;2}
+	FLOAT3:_PositionOffset3 = {-2;0;1}
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS 
+	CharacterPlayEffect(__Me,"FX_GP_Footstep_A_Large_Ooze")
+	CharacterPlayEffect(__Me,"FX_GP_Hit_Ooze_A_Medium")
+	IF "c1"
+		GetPosition(__Me,_MyPosition)
+	THEN
+		Add(_MyPosition,_PositionOffset1)
+		SpawnCharacter(_,%LastSpiderling,_MyPosition,0)
+		Add(_MyPosition,_PositionOffset2)
+		SpawnCharacter(_,%LastSpiderling,_MyPosition,0)
+		Add(_MyPosition,_PositionOffset3)
+		SpawnCharacter(_,%LastSpiderling,_MyPosition,0)
+	ENDIF
+	IF "c1"
+		IsHardcore()
+	THEN
+		StopLoopEffect(%PoisonWeb_FXHandle_01)
+		StopLoopEffect(%PoisonWeb_FXHandle_02)
+		StopLoopEffect(%PoisonWeb_FXHandle_03)
+		StopLoopEffect(%LayEgg_FXHandle)
+	ENDIF
+	
+EVENT OnCombatEnded_CleanUp
+ON
+	OnCombatEnded()
+ACTIONS
+	IterateCharacters("LUC_SpiderBoss_CleanUp",Lowest,Distance)
+	StartTimer("CMB_LUC_SpiderBoss_PeaceCleanUp",15,0)
+	IF "c1"
+		IsHardcore()
+	THEN
+		StopLoopEffect(%PoisonWeb_FXHandle_01)
+		StopLoopEffect(%PoisonWeb_FXHandle_02)
+		StopLoopEffect(%PoisonWeb_FXHandle_03)
+		Set(%Bool_FXRestore_Anchor_01,0)
+		Set(%Bool_FXRestore_Anchor_02,0)
+		Set(%Bool_FXRestore_Anchor_03,0)
+		StopLoopEffect(%LayEgg_FXHandle)		
+	ENDIF
+	
+EVENT OnTimer_CleanUp
+ON
+	OnTimer("CMB_LUC_SpiderBoss_PeaceCleanUp")
+ACTIONS
+	IterateCharacters("LUC_SpiderBoss_CleanUp",Lowest,Distance)
+	
+EVENT OnDeactivate_StopLoopingFX
+ON
+	OnDeactivate()
+ACTIONS
+	StopLoopEffect(%PoisonWeb_FXHandle_01)
+	StopLoopEffect(%PoisonWeb_FXHandle_02)
+	StopLoopEffect(%PoisonWeb_FXHandle_03)
+	StopLoopEffect(%LayEgg_FXHandle)

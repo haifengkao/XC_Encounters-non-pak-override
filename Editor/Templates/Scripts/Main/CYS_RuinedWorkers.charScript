@@ -1,0 +1,55 @@
+#INCLUDE CYS_BurningShipHelper
+INIT
+USING CYS_BurningShipHelper
+FIXEDSTRING:%questAction = "Action_Cry"
+CHARACTER:__Me
+TRIGGER:%lookDir = null
+
+BEHAVIOUR 
+	
+REACTION State_ActionManager, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, %questAction)
+	SetPriority(%currentAction, 1100)
+
+REACTION Action_Cheer, 0
+VARS
+	FIXEDSTRING:_CurrentAnimation = ""
+	TRIGGER:%WanderTrigger = CYS_BoxRuinedWorkersWander_316e3972-a30c-4482-8343-9469367ec2fd
+USAGE PEACE
+ACTIONS
+	CharacterWander(%WanderTrigger,5)
+	GetRandom(_CurrentAnimation, "Fidget_Low_02")
+	DialogStart("CYS_AD_RuinedWorkerWorking", __Me)
+	CharacterPlayAnimation(_CurrentAnimation)
+	SetPriority(%currentAction, 0)
+
+REACTION Action_Cry, 0
+VARS
+	FIXEDSTRING:_CurrentAnimation = ""
+	FLOAT:_SleepTime
+	CHARACTER:_Player
+USAGE PEACE
+ACTIONS
+	CharacterLookFrom(%lookDir,0)
+	GetRandom(_CurrentAnimation, "Crying_01", "Depressed_01","Sigh_01")
+	IF "c1&c2&!c3"
+		IsRandom(0.3)
+		CharacterGet(_Player,__Me,5,Lowest,Distance,Player)
+		IsInDialog(_Player)
+	THEN
+		CharacterLookAt(_Player,0)
+		DialogStart("CYS_AD_RuinedWorkerSadAskHelp", __Me)
+	ENDIF
+	CharacterPlayAnimation(_CurrentAnimation)
+	GetRandom(_SleepTime,0,2,3.5,5,6)
+	Sleep(_SleepTime)
+	SetPriority(%currentAction, 0)
+	
+EVENTS 
+EVENT CptJackArrival
+ON
+	OnGlobalEventSet("CYS_ThanksTalk")
+ACTIONS
+	Set(%questAction, "Action_Cheer")

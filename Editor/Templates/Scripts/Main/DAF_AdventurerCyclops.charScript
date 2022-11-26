@@ -1,0 +1,77 @@
+INIT
+
+CHARACTER:__Me
+TRIGGER:%Point1 = DAF_Point_AdventureCyclops1_100d2554-e42e-4e98-a684-2ce38e0aa000
+TRIGGER:%Point2 = DAF_Point_AdventureCyclops2_f9bb7e1c-6558-4469-bf76-23a68a3ac470
+TRIGGER:%Point3 = DAF_Point_AdventureCyclops3_7fdf5b3d-5f47-4990-a6f2-1bd69dc3cc92
+
+FIXEDSTRING:%CurrentAction = "ChooseAction"
+FIXEDSTRING:%RandomWalkLine = ""
+FIXEDSTRING:%RandomFallLine = ""
+FIXEDSTRING:%PreviousAction = ""
+
+INT:%IsTakingOver = 1
+
+BEHAVIOUR
+REACTION ChooseAction, 1060
+USAGE PEACE
+CHECK"c1"
+	IsEqual(%IsTakingOver, 1)
+ACTIONS
+	GetRandom(%CurrentAction, "MoveToPoint1","MoveToPoint2","MoveToPoint3")
+	GotoIfEqual(%PreviousAction, %CurrentAction, "Start")
+	Set(%PreviousAction, %CurrentAction)
+	GetRandom(%RandomWalkLine, "DAF_AdventurerCyclops_Script_0", "DAF_AdventurerCyclops_Script_2", "DAF_AdventurerCyclops_Script_4")
+	GetRandom(%RandomFallLine, "DAF_AdventurerCyclops_Script_1", "DAF_AdventurerCyclops_Script_3", "DAF_AdventurerCyclops_Scipt_5")
+	SetPriority(%CurrentAction, 1070)
+	
+REACTION MoveToPoint1,0
+USAGE PEACE
+ACTIONS
+	DisplayText(__Me,%RandomWalkLine,3) //Get off me! You filthy thing!
+	CharacterMoveTo(%Point1,1)
+	CharacterPlayAnimation("knockdown_fall",0,1)
+	DisplayText(__Me,%RandomFallLine,3) // Come on. I can't see anything. Get away from me!
+	CharacterPlayAnimation("knockdown_getup")
+	SetPriority(%CurrentAction,0)
+INTERRUPT
+	SetPriority(%CurrentAction,0)
+
+REACTION MoveToPoint2,0
+USAGE PEACE
+ACTIONS
+	DisplayText(__Me,%RandomWalkLine,3) // Stupid slimer. You are blocking my sight.
+	CharacterMoveTo(%Point2,1)
+	DisplayText(__Me,%RandomFallLine,3) //Auch.
+	CharacterPlayAnimation("hit")
+	Sleep(3)
+	SetPriority(%CurrentAction,0)
+INTERRUPT
+	SetPriority(%CurrentAction,0)
+
+REACTION MoveToPoint3,0
+USAGE PEACE
+ACTIONS
+	DisplayText(__Me,%RandomWalkLine,3) //Hello? Anyone there?
+	CharacterMoveTo(%Point3,1)
+	CharacterPlayAnimation("knockdown_fall",0,1)
+	CharacterPlayAnimation("knockdown_getup")
+	SetPriority(%CurrentAction,0)
+INTERRUPT
+	SetPriority(%CurrentAction,0)
+	
+BEHAVIOUR
+REACTION BeAggressive, 1060
+USAGE PEACE
+VARS
+	TRIGGER:_Trigger = ""
+CHECK"c1"
+	IsEqual(%IsTakingOver, 0)
+ACTIONS
+	Check()
+	GetRandom(_Trigger,%Point1,%Point2,%Point3)
+	CharacterMoveTo(_Trigger,0)
+	CharacterWander(FLOAT:10,5,0,_Trigger)
+INTERRUPT
+	Reset()	
+	

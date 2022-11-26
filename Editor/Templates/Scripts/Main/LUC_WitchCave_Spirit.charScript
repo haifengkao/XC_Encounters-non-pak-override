@@ -1,0 +1,61 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+TRIGGER:%PointHiberheim = HIB_Point_Izotza1_a97fb7af-fb31-4546-b0e6-1b490384fb35
+INT:%InLuculla = 1
+
+BEHAVIOUR
+
+REACTION State_Wandering, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	GetRandom(_Animation,"idle1","idle2","idle3")
+	CharacterWander(FLOAT:8,5,0)
+	DialogStart("LUC_AD_WitchCave_Izotza",__Me)
+	CharacterPlayAnimation(_Animation)
+
+REACTION State_InHiberheim, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	GetRandom(_Animation,"idle1","idle2","idle3")
+	CharacterWander(FLOAT:3.0,4.0,0,%PointHiberheim)
+	Sleep(2)
+	CharacterPlayAnimation(_Animation)
+	CharacterMoveTo(%PointHiberheim)
+	CharacterLookFrom(%PointHiberheim)
+	DialogStart("HIB_AD_Izotza",__Me)
+	Sleep(3)
+
+EVENTS
+
+EVENT Initialize
+ON
+	OnInit
+ACTIONS
+	StartTimer("LUC_WitchCave_IzotzaMelting",15,0)
+
+EVENT Melted
+ON
+	OnTimer("LUC_WitchCave_IzotzaMelting")
+VARS
+	FLOAT:_Timer
+ACTIONS
+	IF "c1"
+		IsEqual(%InLuculla,1)
+	THEN
+		GetRandom(_Timer,FLOAT:20,FLOAT:25,FLOAT:30,FLOAT:35,FLOAT:40)
+		DialogRequestStop("LUC_AD_WitchCave_Izotza")
+		CreateSurfaceAt(__Me,Water,1,4)
+		IF "!c1"
+			IsInDialog(__Me)
+		THEN
+			DialogStart("LUC_AD_WitchCave_IzotzaMelting",__Me)
+		ENDIF
+		StartTimer("LUC_WitchCave_IzotzaMelting",_Timer,0)
+	ENDIF

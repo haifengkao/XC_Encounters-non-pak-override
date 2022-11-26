@@ -1,0 +1,81 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+//REGION BridgeAmbush Characters
+DB_LUC_BridgeAmbush(CHARACTER_LUCS_Ambush_Ranger_01,TRIGGER_LUC_WC_BridgeAmbush_Ranger01,"LUCS_WC_BridgeAmbush02");
+DB_LUC_BridgeAmbush(CHARACTER_LUCS_Ambush_Cleric_01,TRIGGER_LUC_WC_BridgeAmbush_Cleric01,"LUCS_WC_BridgeAmbush03");
+DB_LUC_BridgeAmbush(CHARACTER_LUCS_Ambush_Swordsman_01,TRIGGER_LUC_WC_BridgeAmbush_Sword01,"LUCS_WC_BridgeAmbush04");
+DB_LUC_BridgeAmbush(CHARACTER_LUCS_Ambush_Swordsman_02,TRIGGER_LUC_WC_BridgeAmbush_Sword02,"LUCS_WC_BridgeAmbush05");
+//END_REGION
+
+PROC_LUC_BridgeAmbushInit();
+KBSECTION
+//REGION INIT - BridgeAmbushInit - Set Immaculates off stage
+PROC
+PROC_LUC_BridgeAmbushInit()
+AND
+DB_LUC_BridgeAmbush(_Enemy,_,_)
+THEN
+CharacterSetOnStage(_Enemy,0);
+//END_REGION
+
+//REGION INIT - BridgeAmbush - Commence battle
+IF
+CharacterEnteredCombat(CHARACTER_LUCS_Ambush_BridgeImma_01,_)
+AND
+DB_LUC_BridgeAmbush(_Enemy,_Destination,_)
+THEN
+CharacterSetOnStage(_Enemy,1);	
+ProcCharacterMoveToTrigger(_Enemy,_Destination,1,"BridgeAmbushDisplayText");
+//END_REGION
+
+IF
+CharacterEvent(_Enemy,"BridgeAmbushDisplayText")
+AND
+DB_LUC_BridgeAmbush(_Enemy,_,_Text)
+THEN
+CharacterLookAtCharacter(_Enemy,CHARACTER_LUCS_Ambush_BridgeImma_01,0);
+CharacterDisplayText(_Enemy,_Text);
+
+IF
+CharacterEnteredCombat(CHARACTER_LUCS_Ambush_BridgeImma_01,_)
+THEN
+CharacterDisplayText(CHARACTER_LUCS_Ambush_BridgeImma_01,"LUCS_WC_BridgeAmbush01");
+
+//REGION LiquidStone (Luculla)
+IF
+CharacterEvent(CHARACTER_LUC_LiquidStone_Orc_Shaman_Normal_01,"LUC_LiquidStone_Event_Open")
+AND
+CharacterGetVarCharacter(CHARACTER_LUC_LiquidStone_Orc_Shaman_Normal_01,"Target",_Player)
+AND
+_Player.DB_IsPlayer()
+AND
+CharacterPlayLoopBeamEffect(CHARACTER_LUC_LiquidStone_Orc_Shaman_Normal_01,_Player,"FX_Skills_Earth_EnemyLiquidStone_Beam_A","Dummy_CastFX","Bip001",_LiquidStone_FXHandle)
+THEN
+CharacterPlayAnimation(_Player,"hit","");
+DB_LUC_LiquidStone(_Player,_LiquidStone_FXHandle);
+
+IF
+CharacterEvent(CHARACTER_LUC_LiquidStone_Orc_Shaman_Normal_01,"LUC_LiquidStone_Event_Close")
+AND
+DB_LUC_LiquidStone(_Player,_LiquidStone_FXHandle)
+AND
+_Player.DB_IsPlayer()
+THEN
+StopLoopEffect(_LiquidStone_FXHandle);
+NOT DB_LUC_LiquidStone(_Player,_LiquidStone_FXHandle);
+
+IF
+CharacterDied(_Player)
+AND
+DB_LUC_LiquidStone(_Player,_LiquidStone_FXHandle)
+AND
+_Player.DB_IsPlayer()
+THEN
+StopLoopEffect(_LiquidStone_FXHandle);
+NOT DB_LUC_LiquidStone(_Player,_LiquidStone_FXHandle);
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

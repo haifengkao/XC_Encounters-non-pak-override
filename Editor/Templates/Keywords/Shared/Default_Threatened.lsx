@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<save>
+    <header version="2" time="1398342027" />
+    <version major="1" minor="3" revision="0" build="0" />
+    <region id="keywordDialog">
+        <node id="root">
+            <attribute id="keywordAutoImport" value="0" type="19" />
+            <attribute id="keywordName" value="Default_Threatened" type="22" />
+            <attribute id="KeywordVoiced" value="0" type="19" />
+            <attribute id="PlayGreeting" value="0" type="19" />
+            <children>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="070a36d7-4e00-4d3a-89c3-757cfb15d672" type="22" />
+                    <attribute id="keywordContentMapValue" value="Careful, comrade! You&apos;re liable to poke someone&apos;s eye out with that thing!" handle="h28456a36g18d1g4377gbff8ga0614bff0047" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="1a4adb64-c60a-430c-9bec-28a9e5b42ac7" type="22" />
+                    <attribute id="keywordContentMapValue" value="Oh, no hard feelings! It&apos;s just that I much prefer to face a fellow without the threat of losin&apos; my head!" handle="h91fd02bbga96eg4ed6gad58g13859362e410" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="4f52dc6b-6875-4a25-8416-ab2e94dda944" type="22" />
+                    <attribute id="keywordContentMapValue" value="It was hardly my intention to disturb you! I&apos;ll sheathe my weapon." handle="hd3a89f09gcb74g4b8bg8076g424a880be70e" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="61f591d6-8b97-4a3a-8463-3dbe11b90220" type="22" />
+                    <attribute id="keywordContentMapValue" value="Do you mean to trounce in here brandishing that thing? For the love of the Seven, sheathe your weapon!" handle="h74cea397g5689g4249gae34g15826478d167" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="d7837211-a45f-41b4-8d74-a854d1dc2981" type="22" />
+                    <attribute id="keywordContentMapValue" value="Well hello there! I know you&apos;re on the job, but that skin-splitter in your hand is making me a bit uneasy." handle="h638795f0ge49fg45c4g87e8g03cf46af95a6" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="e230faa7-2ac3-4f03-94f7-340d537a6739" type="22" />
+                    <attribute id="keywordContentMapValue" value="greeting" handle="h97c95cbcg9bb7g457cg8c97ge515e0d28bf9" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="e7e74454-6872-4b78-bad7-2bad8baf2810" type="22" />
+                    <attribute id="keywordContentMapValue" value="Stand down with that weapon or I&apos;ll lodge a formal complaint with the Council of Seven!" handle="h403c1c13g933dg48acg92c1ga96d42cbee02" type="28" />
+                </node>
+                <node id="keywordContentMap">
+                    <attribute id="keywordContentMapKey" value="e92a3b13-9ccc-40b9-91b7-0d905e12e08e" type="22" />
+                    <attribute id="keywordContentMapValue" value="Who are you to issue orders to the likes of me? En garde!" handle="h7f335462g75a5g49acg9d15g999c5ecd5205" type="28" />
+                </node>
+                <node id="keywordNode">
+                    <attribute id="keywordActions" value="ACTION SetLocalFlag(&quot;PickedGreeting&quot;,0)" type="23" />
+                    <attribute id="keywordConditions" value="" type="23" />
+                    <attribute id="keywordDisplayedText" value="e230faa7-2ac3-4f03-94f7-340d537a6739" type="22" />
+                    <attribute id="keywordId" value="Greeting" type="22" />
+                    <attribute id="keywordLast" value="0" type="19" />
+                    <attribute id="keywordOwner" value="-1" type="4" />
+                    <attribute id="keywordShow" value="0" type="19" />
+                    <attribute id="keywordSource" value="0" type="5" />
+                    <children>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="ACTION SetLocalFlag(&quot;PickedGreeting&quot;,1)" type="23" />
+                            <attribute id="keywordConditions" value="CONDITION IsCharacterFlag(&quot;EVENT_npc_is_best_friend&quot;,0,1)&#x0D;&#x0A;CHECK c" type="23" />
+                            <attribute id="keywordEmotion" value="4" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="d7837211-a45f-41b4-8d74-a854d1dc2981" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="ACTION SetLocalFlag(&quot;PickedGreeting&quot;,1)" type="23" />
+                            <attribute id="keywordConditions" value="CONDITION IsCharacterFlag(&quot;EVENT_npc_is_helpful&quot;,0,1)&#x0D;&#x0A;CHECK c" type="23" />
+                            <attribute id="keywordEmotion" value="4" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="070a36d7-4e00-4d3a-89c3-757cfb15d672" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value="CONDITION IsCharacterFlag(&quot;EVENT_dialog_random3_1&quot;,1,1)&#x0D;&#x0A;CONDITION IsLocalFlag(&quot;PickedGreeting&quot;,1)&#x0D;&#x0A;CHECK c&amp;!c&#x0D;&#x0A;" type="23" />
+                            <attribute id="keywordEmotion" value="1" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="61f591d6-8b97-4a3a-8463-3dbe11b90220" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="" type="23" />
+                            <attribute id="keywordConditions" value="CONDITION IsCharacterFlag(&quot;EVENT_dialog_random3_2&quot;,1,1)&#x0D;&#x0A;CONDITION IsLocalFlag(&quot;PickedGreeting&quot;,1)&#x0D;&#x0A;CHECK c&amp;!c&#x0D;&#x0A;" type="23" />
+                            <attribute id="keywordEmotion" value="1" type="5" />
+                            <attribute id="keywordEndDialog" value="0" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="e7e74454-6872-4b78-bad7-2bad8baf2810" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="keywordNode">
+                    <attribute id="keywordActions" value="" type="23" />
+                    <attribute id="keywordConditions" value="" type="23" />
+                    <attribute id="keywordDisplayedText" value="4f52dc6b-6875-4a25-8416-ab2e94dda944" type="22" />
+                    <attribute id="keywordId" value="Sorry" type="22" />
+                    <attribute id="keywordLast" value="0" type="19" />
+                    <attribute id="keywordOwner" value="-1" type="4" />
+                    <attribute id="keywordShow" value="1" type="19" />
+                    <attribute id="keywordSource" value="0" type="5" />
+                    <children>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="ACTION SetCharacterFlag(&quot;EVENT_npc_player_puts_down_weapons_for&quot;,0,1)" type="23" />
+                            <attribute id="keywordConditions" value="" type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordStub" value="0" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                            <children>
+                                <node id="keywordTextUid">
+                                    <attribute id="Object" value="1a4adb64-c60a-430c-9bec-28a9e5b42ac7" type="22" />
+                                </node>
+                            </children>
+                        </node>
+                    </children>
+                </node>
+                <node id="keywordNode">
+                    <attribute id="keywordActions" value="" type="23" />
+                    <attribute id="keywordConditions" value="" type="23" />
+                    <attribute id="keywordDisplayedText" value="e92a3b13-9ccc-40b9-91b7-0d905e12e08e" type="22" />
+                    <attribute id="keywordId" value="Duel" type="22" />
+                    <attribute id="keywordLast" value="0" type="19" />
+                    <attribute id="keywordOwner" value="-1" type="4" />
+                    <attribute id="keywordShow" value="1" type="19" />
+                    <attribute id="keywordSource" value="0" type="5" />
+                    <children>
+                        <node id="keywordText">
+                            <attribute id="PopCount" value="1" type="5" />
+                            <attribute id="keywordActions" value="ACTION SetCharacterFlag(&quot;EVENT_npc_player_attacks&quot;,0,1)" type="23" />
+                            <attribute id="keywordConditions" value="" type="23" />
+                            <attribute id="keywordEmotion" value="0" type="5" />
+                            <attribute id="keywordEndDialog" value="1" type="19" />
+                            <attribute id="keywordPushPop" value="0" type="5" />
+                            <attribute id="keywordSpeaker" value="0" type="5" />
+                            <attribute id="keywordStub" value="1" type="19" />
+                            <attribute id="keywordTransition" value="0" type="5" />
+                            <attribute id="keywordWaitSeconds" value="3" type="6" />
+                        </node>
+                    </children>
+                </node>
+                <node id="keywordSpeakerNames" />
+            </children>
+        </node>
+    </region>
+</save>

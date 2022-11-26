@@ -1,0 +1,55 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_CYS_Jailed(CHARACTER_CYS_MarketFishThief, ITEM_CYS_PrisonDoor3, TRIGGER_LUC_FishThiefJailBreak);
+DB_CYS_Jailed(CHARACTER_CYS_Esmeralda, ITEM_CYS_EsmeraldaJailDoor, TRIGGER_LUC_EsmeraldaJailBreak);
+DB_CYS_Jailed(CHARACTER_CYS_Mortician, ITEM_CYS_MorticianPrisonDoor, TRIGGER_LUC_MorticianJailBreak);
+DB_CYS_Jailed(CHARACTER_CYS_Eglandaer, ITEM_CYS_EglandaerPrisonDoor, TRIGGER_LUC_EglandaerJailBreak);
+KBSECTION
+IF
+ItemOpened(_Door)
+AND
+DB_CYS_Jailed(_Vilain, _Door, _Trigger)
+AND
+CharacterGetVarInteger(_Vilain, "inJail", 1)
+THEN
+ProcCharacterMoveToTrigger(_Vilain, _Trigger, 1, "outsideOfJail");
+
+IF
+CharacterEvent(_Vilain, "outsideOfJail")
+AND
+NOT DB_Dead(CHARACTER_CYS_Prison_Guard)
+THEN
+ProcCharacterMoveToTrigger(_Vilain, TRIGGER_CYS_Point_PrisonBasementDown, 1, "escaped");
+CharacterSetEvent(_Vilain, "killVilain");
+CharacterSetVarInteger(_Vilain, "escaping", 1);
+
+IF
+CharacterEvent(_Vilain, "escaped")
+THEN
+CharacterSetOnStage(_Vilain, 0);
+CharacterDisplayText(CHARACTER_CYS_Prison_Guard, "CYS_PrisonerEscaped");
+
+IF
+CharacterDied(_Vilain)
+AND
+CharacterGetVarInteger(_Vilain, "escaping", 1)
+THEN
+CharacterDisplayText(CHARACTER_CYS_Prison_Guard, "CYS_GuardShootPrisoner");
+
+
+IF
+TextEventSet("ac1")
+THEN
+DB_Dialogs(CHARACTER_CYS_MarketFishThief, "CYS_FishThief");
+CharacterSetOnStage(CHARACTER_CYS_MarketFishThief,1);
+CharacterSetVarInteger(CHARACTER_CYS_MarketFishThief, "inJail", 1);
+CharacterTeleportToTrigger(CHARACTER_CYS_MarketFishThief,TRIGGER_CYS_FishThiefJailtime,"");
+CHARACTER_CYS_Eglandaer.InJail();
+CharacterSetHasDialog(CHARACTER_CYS_Eglandaer,1);
+CharacterAppearAtTrigger(CHARACTER_CYS_Eglandaer,TRIGGER_CYS_Point_EglandaerJail,0);
+CharacterSetVarInteger(CHARACTER_CYS_Eglandaer, "inJail", 1);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

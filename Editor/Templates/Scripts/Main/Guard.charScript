@@ -1,0 +1,55 @@
+#INCLUDE DefaultCharacter
+//////////////////////////
+INIT
+	USING DefaultCharacter
+CHARACTER:__Me
+
+//EXTERN TRIGGER:%GuardLeakTarget = null
+//EXTERN TRIGGER:%GuardDest = null
+CHARACTER:%GuardRunTarget = null
+
+//////////////////////////
+BEHAVIOUR 
+/*
+REACTION Attack, 1000
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+	FLOAT:_Range(15)
+CHECK "c1"		
+	CharacterGet(_Enemy,__Me,_Range,Lowest,Distance,Enemy,null,null)
+ACTIONS
+	CharacterAttack(_Enemy)*/
+
+/* Doesn't work, because character don't have potions
+REACTION Heal, 4000
+USAGE COMBAT
+USAGE PEACE
+VARS
+	ITEM:_item
+	FLOAT:_vitality
+CHECK "!c1&c2&c3&c4"
+	CharacterHasStatus(__Me,CONSUME)
+	CharacterGetStat(_vitality,__Me,Vitality)
+	IsLessThen(_vitality,0.5)
+	CharacterGetItemFromInventory(_item,__Me,Potion,Vitality)
+ACTIONS
+	CharacterUseItem(_item)*/
+	
+/*REACTION Guard, 2000
+USAGE PEACE
+CHECK "!c1"
+	IsEqual(%GuardDest,null)
+ACTIONS
+	CharacterMoveTo(%GuardDest,0)
+	CharacterPlayAnimation("Idle_02")
+INTERRUPT
+	Reset()*/
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+STORY
+
+SCRIPTFRAME Guard_1_to_hero
+ACTIONS
+	CharacterMoveTo(%GuardRunTarget,1,1,1)
+	

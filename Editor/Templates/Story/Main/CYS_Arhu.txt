@@ -1,0 +1,343 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_OneShotPlayerTrigger(TRIGGER_CYS_AreaOrcArrival);
+ProcTriggerRegisterForPlayers(TRIGGER_CYS_Box_OrcLandingShake);
+
+KillCounter("CYS_ArhuOrcs",5);
+
+CharacterSetInvulnerable(CHARACTER_CYS_Arhu_Orc4,1);
+CharacterSetInvulnerable(CHARACTER_CYS_Arhu_Guard1,1);
+CharacterSetInvulnerable(CHARACTER_CYS_Arhu_Guard2,1);
+CharacterSetInvulnerable(CHARACTER_CYS_Arhu_Guard3,1);
+
+DB_CYS_ArhuOrc(CHARACTER_CYS_Arhu_Orc1, TRIGGER_CYS_PointArhuOrc1);
+DB_CYS_ArhuOrc(CHARACTER_CYS_Arhu_Orc2, TRIGGER_CYS_PointArhuOrc2);
+DB_CYS_ArhuOrc(CHARACTER_CYS_ArhuOrc3,TRIGGER_CYS_PointArhuOrc3);
+DB_CYS_ArhuOrc(CHARACTER_CYS_ArhuCultist,TRIGGER_CYS_PointArhuCultist);
+DB_CYS_ArhuOrc(CHARACTER_CYS_ArhuCultist2,TRIGGER_CYS_PointArhuCultist2);
+DB_CYS_ArhuOrc(CHARACTER_CYS_ArhuCultist3,TRIGGER_CYS_PointArhuCultist3);
+PROC_CYS_InitArhuOrcs();
+
+DB_CYS_ArhuGuard(CHARACTER_CYS_Arhu_Guard1, TRIGGER_CYS_PointArhuGuards1);
+DB_CYS_ArhuGuard(CHARACTER_CYS_Arhu_Guard2, TRIGGER_CYS_PointArhuGuards2);
+DB_CYS_ArhuGuard(CHARACTER_CYS_Arhu_Guard3, TRIGGER_CYS_PointArhuGuards3);
+
+DB_IsGuard(CHARACTER_CYS_Arhu_Guard1);
+DB_IsGuard(CHARACTER_CYS_Arhu_Guard2);
+DB_IsGuard(CHARACTER_CYS_Arhu_Guard3);
+
+ItemLock(ITEM_CYS_Cyseal_Gate_Arhu,"Key");
+
+DB_NoDefaultBehavior(CHARACTER_CYS_ArhuCultist);
+DB_NoDefaultBehavior(CHARACTER_CYS_ArhuCultist2);
+DB_NoDefaultBehavior(CHARACTER_CYS_Arhu_Orc1);
+DB_NoDefaultBehavior(CHARACTER_CYS_Arhu_Orc2);
+DB_NoDefaultBehavior(CHARACTER_CYS_Arhu_Orc4);
+DB_NoDefaultBehavior(CHARACTER_CYS_ArhuOrc3);
+DB_NoDefaultBehavior(CHARACTER_CYS_Arhu_Guard1);
+DB_NoDefaultBehavior(CHARACTER_CYS_Arhu_Guard2);
+DB_NoDefaultBehavior(CHARACTER_CYS_Arhu_Guard3);
+DB_NoDefaultBehavior(CHARACTER_CYS_Arhu);
+DB_Dialogs(CHARACTER_CYS_Arhu_Guard1,"CYS_ArhuGuards");
+DB_Dialogs(CHARACTER_CYS_Arhu_Guard2,"CYS_ArhuGuards");
+DB_Dialogs(CHARACTER_CYS_Arhu_Guard3,"CYS_ArhuGuards");
+
+CharacterSetImmortal(CHARACTER_CYS_Arhu,1);
+
+DB_IsNotMessingAround(CHARACTER_CYS_Arhu);
+
+CharacterAddSkill(CHARACTER_CYS_Arhu, "Projectile_ArhuKillingSpell");
+
+KillCounterDB(CHARACTER_CYS_Arhu_Orc4, "CYS_ArhuOrcs");
+
+DB_PlayerComments("CYS_CommentArhuFight","CYS_CommentArhuFight_1_1",1,1);
+DB_PlayerComments("CYS_CommentArhuFight","CYS_CommentArhuFight_2_1",2,1);
+DB_PlayerComments("CYS_CommentArhuFight","CYS_CommentArhuFight_2_2",2,2);
+
+DB_PlayerComments("CYS_CommentArhuIntro","CYS_CommentArhuIntro_1_1",1,1);
+DB_PlayerComments("CYS_CommentArhuIntro","CYS_CommentArhuIntro_2_1",2,1);
+DB_PlayerComments("CYS_CommentArhuIntro","CYS_CommentArhuIntro_2_2",2,2);
+
+DB_NoTradeTut(CHARACTER_CYS_Arhu);
+KBSECTION
+//REGION ORC INIT
+PROC
+PROC_CYS_InitArhuOrcs()
+THEN
+PROC_CYS_ArhuOrcsSetOnStage(0);
+PROC_CYS_ArhuOrcsFillUpKillCounterDB();
+
+PROC
+PROC_CYS_ArhuOrcsFillUpKillCounterDB()
+AND
+DB_CYS_ArhuOrc(_orc, _)
+THEN
+KillCounterDB(_orc, "CYS_ArhuOrcs");
+//END_REGION
+
+//REGION ORC BOAT LANDING
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,TRIGGER_CYS_AreaOrcArrival)
+THEN
+CharacterSetInvulnerable(CHARACTER_CYS_Arhu_Orc4,0);
+TimerLaunch("OrcShipSound",2000);
+ItemPlaySound(ITEM_CYS_OrcLanding_SoundSpot,"Scripted_Cys_OrcShip_Landing_full");
+ProcChangeTutorialAtmosphere("default");
+
+IF
+TimerFinished("OrcShipSound")
+THEN
+ItemMoveToTrigger(ITEM_CYS_OrcShip_001,TRIGGER_CYS_PointOrcArrival,10.0,0.0,0);
+CharacterSetEvent(CHARACTER_CYS_Arhu_Orc4,"CYS_OrcShip_SplashEvent");
+TimerLaunch("CYS_OrcShip_ShakeTimer",2300);
+
+IF
+TimerFinished("CYS_OrcShip_ShakeTimer")
+AND
+DB_IsPlayer(_Player)
+AND
+DB_InRegion(_Player,TRIGGER_CYS_Box_OrcLandingShake)
+THEN
+CharacterPlayEffect(_Player,"FX_GP_CameraShake_A");
+
+IF
+TimerFinished("CYS_OrcShip_ShakeTimer")
+THEN
+ProcTriggerUnregisterForPlayers(TRIGGER_CYS_Box_OrcLandingShake);
+
+IF
+ItemMoved(ITEM_CYS_OrcShip_001)
+THEN
+DB_CYSArhuLoopEffects(TRIGGER_CYS_PointOrcArrivalEffect_001,"splash");
+DB_CYSArhuLoopEffects(TRIGGER_CYS_PointOrcArrivalEffect_002,"splash");
+ItemPlayAnimation(ITEM_CYS_OrcShip_001,"open");
+TimerLaunch("CYS_OrcArrivalTimer",1000);
+
+IF
+DB_CYSArhuLoopEffects((TRIGGER)_Trigger,(STRING)_ID)
+THEN
+PROC_LoopEffectAtTrigger("FX_Env_Water_Splash_Sea_A",_Trigger,_ID,"Cyseal");
+
+IF
+TimerFinished("CYS_OrcArrivalTimer")
+THEN
+PROC_CYS_DisableArhuEffects();
+PROC_CYS_SetArhuGuard();
+PROC_CYS_ArhuOrcsSetOnStage(1);
+TimerLaunch("CYS_OrcArrivalTimer2",100);
+TimerLaunch("CYS_OrcArrivalTimer3",4000);
+QuestAdd("CYS_OrcFight");
+QuestUpdate("CYS_OrcFight","Update1");
+
+PROC
+PROC_CYS_ArhuOrcsSetOnStage((INTEGER)_bool)
+AND
+DB_CYS_ArhuOrc(_orc, _)
+THEN
+CharacterSetOnStage(_orc, _bool);
+
+PROC
+PROC_CYS_SetArhuGuard()
+AND
+DB_CYS_ArhuGuard(_Guard,_Trigger)
+THEN
+CharacterSetInvulnerable(_Guard,0);
+CharacterSetReactionPriority(_Guard,"State_FightingFirstOrc",0);
+
+PROC
+PROC_CYS_DisableArhuEffects()
+AND
+DB_CYSArhuLoopEffects(_Trigger,_Effect)
+THEN
+PROC_StopEffectAtTrigger(_Trigger,_Effect);
+
+IF
+TimerFinished("CYS_OrcArrivalTimer2")
+AND
+DB_CYS_ArhuOrc(_Orc,_Trigger)
+THEN
+ProcCharacterMoveToTrigger(_Orc,_Trigger,1,"");
+
+IF
+TimerFinished("CYS_OrcArrivalTimer3")
+THEN
+CharacterDisplayText(CHARACTER_CYS_ArhuCultist,"CYS_Arhu_DarkCultist_Charge");
+
+IF
+DB_Combat(CHARACTER_CYS_ArhuCultist,_ID)
+AND
+DB_Combat(_Player,_ID)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_ArhuOrcFightPlayer(_)
+THEN
+DB_ArhuOrcFightPlayer(_Player);
+//END_REGION
+
+//REGION ORC FIGHT
+IF
+CharacterDied(_Character)
+AND
+DB_CYS_ArhuGuard(_Character,_Trigger)
+THEN
+NOT DB_CYS_ArhuGuard(_Character, _Trigger);
+//END_REGION
+
+//REGION DOOR OPENING
+PROC
+ReactOnKillCounter("CYS_ArhuOrcs")
+THEN
+DB_OneShotPlayerTrigger(TRIGGER_CYS_Arhu_Gate_Area);
+DB_OneShot_DialogTrigger(TRIGGER_CYS_Arhu_Gate_Area2,"CYS_ArhuIntro",CHARACTER_CYS_Arhu);
+PROC_CYS_CheckArhuGuardAfterFight();
+NOT DB_NoDefaultBehavior(CHARACTER_CYS_Arhu_Guard1);
+NOT DB_NoDefaultBehavior(CHARACTER_CYS_Arhu_Guard2);
+NOT DB_NoDefaultBehavior(CHARACTER_CYS_Arhu_Guard3); 
+QuestUpdate("CYS_OrcFight","Update2");
+QuestClose("CYS_OrcFight");
+QuestUpdate("HOM_Starstones", "OrcLanding");
+ProcCYSLaunchArhuFightComment();
+
+PROC
+ReactOnKillCounter("CYS_ArhuOrcs")
+AND
+_Player.DB_IsPlayer()
+THEN
+PROC_CheckPlayTut(_Player,"TUT_Tooltips");
+
+PROC
+ProcCYSLaunchArhuFightComment()
+AND
+DB_ArhuOrcFightPlayer(_Player)
+THEN
+NOT DB_ArhuOrcFightPlayer(_Player);
+Launch_PlayerComment(_Player,"CYS_CommentArhuFight");
+
+
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,TRIGGER_CYS_Arhu_Gate_Area)
+THEN
+ItemUnlockAndOpen(ITEM_CYS_Cyseal_Gate_Arhu);
+ProcCharacterMoveToTrigger(CHARACTER_CYS_Arhu, TRIGGER_CYS_Point_BodyGuard1, 1, "");
+//END_REGION
+
+//REGION ARHU TALKS TO PLAYER
+IF
+DialogEnded("CYS_ArhuIntro",_Inst)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_Arhu,"CYS_ArhuLeaves",1)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+CharacterGetPosition(CHARACTER_CYS_Arhu,_X,_Y,_Z)
+THEN
+ProcShowMarker("SUBREGION_Barracks_Aureus");
+ProcShowMarker("SUBREGION_Barracks_Arhu");
+CharacterSetVarInteger(CHARACTER_CYS_Arhu,"CYS_ArhuLeaves",0);
+PlayEffectAtPosition("FX_GP_TeleportSmoke_A",_X,_Y,_Z);
+CharacterTeleportToTrigger(CHARACTER_CYS_Arhu,TRIGGER_CYS_PointArhu,"");
+CharacterSetVarFixedString(CHARACTER_CYS_Arhu,"currentState","State_UpStairs");
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_CYS_Arhu);
+DB_Dialogs(CHARACTER_CYS_Arhu,"CYS_Arhu");
+CharacterSetImmortal(CHARACTER_CYS_Arhu,0);
+NOT DB_IsNotMessingAround(CHARACTER_CYS_Arhu);
+NOT DB_NoDefaultBehavior(CHARACTER_CYS_Arhu);
+Launch_PlayerComment(_Player,"CYS_CommentArhuIntro");
+GoalCompleted;
+
+//END_REGION
+
+//REGION GUARDS AFTER FIGHT
+PROC
+PROC_CYS_CheckArhuGuardAfterFight()
+AND
+DB_CYS_ArhuGuard(_Character,_)
+AND
+NOT DB_CYS_ArhuGuardRunningBack(_)
+AND
+NOT DB_GlobalEvent("CYS_BJHelped")
+THEN
+DB_CYS_ArhuGuardRunningBack(_Character);
+CharacterSetHasDialog(_Character,0);
+CharacterPlayAnimation(_Character, "Intimidate_01", "SayMyTextBJAtBridge");
+
+IF
+CharacterDisplayTextEnded(_Dude, "CYS_ArhuGuardAfterFight_CultistRemark")
+AND
+DB_CYS_ArhuGuardRunningBack(_Character)
+THEN
+CharacterDisplayText(_Character,"CYS_ArhuGuardAfterFight_1");
+
+IF
+CharacterEvent(_Character, "ImAllAlone")
+AND
+DB_CYS_ArhuGuardRunningBack(_Character)
+THEN
+CharacterDisplayText(_Character,"CYS_ArhuGuardAfterFight_1");
+
+PROC
+PROC_CYS_CheckArhuGuardAfterFight()
+AND
+DB_CYS_ArhuGuard(_Character,_)
+AND
+NOT DB_CYS_ArhuGuardRunningBack(_Character)
+AND
+NOT DB_CYS_ArhuGuardMakingCultistComment(_)
+THEN
+DB_CYS_ArhuGuardMakingCultistComment(_Character);
+CharacterPlayAnimation(_Character, "Revolt_01", "DisplayMyTextRemarkCultist");
+
+PROC
+PROC_CYS_CheckArhuGuardAfterFight()
+AND
+DB_CYS_ArhuGuardRunningBack(_Character)
+AND
+NOT DB_CYS_ArhuGuardMakingCultistComment(_)
+THEN
+CharacterSetEvent(_Character, "ImAllAlone");
+
+IF
+CharacterEvent(_Character, "DisplayMyTextRemarkCultist")
+AND
+DB_CYS_ArhuGuardMakingCultistComment(_Character)
+THEN
+CharacterDisplayText(_Character,"CYS_ArhuGuardAfterFight_CultistRemark");
+
+PROC
+PROC_CYS_CheckArhuGuardAfterFight()
+AND
+DB_CYS_ArhuGuard(_Character,_)
+AND
+NOT DB_CYS_ArhuGuardRunningBack(_Character)
+AND
+NOT DB_CYS_ArhuGuardMakingCultistComment(_Character)
+THEN
+CharacterSetVarFixedString(_Character,"currentState","State_AfterFight");
+CharacterSetReactionPriority(_Character,"State_FightingOtherOrcs", 0);
+
+IF
+CharacterDisplayTextEnded(_Character,"CYS_ArhuGuardAfterFight_CultistRemark")
+THEN
+CharacterSetVarFixedString(_Character,"currentState","State_AfterFight");
+CharacterSetReactionPriority(_Character,"State_FightingOtherOrcs", 0);
+
+IF
+CharacterDisplayTextEnded(_Character,"CYS_ArhuGuardAfterFight_1")
+THEN
+ProcCharacterMoveToTrigger(_Character,TRIGGER_CYS_ArhuGuardAfterFight,1,"CYS_BJ_atTheBridge");
+CharacterSetVarFixedString(_Character,"currentState","State_AtBridge");
+
+IF
+CharacterEvent(_Char, "CYS_BJ_atTheBridge")
+THEN
+DialogRequestStopForCharacter(CHARACTER_CYS_IntroGuards_Bibius);
+DialogRequestStopForCharacter(CHARACTER_CYS_IntroGuards_Junius);
+CharacterSetVarFixedString(CHARACTER_CYS_IntroGuards_Bibius,"currentState","State_BeingYelledAt");
+CharacterSetVarFixedString(CHARACTER_CYS_IntroGuards_Junius,"currentState","State_BeingYelledAt");
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

@@ -1,0 +1,16 @@
+INIT
+	CHARACTER:__Me
+	
+EVENTS
+
+EVENT playAnimation
+	ON
+		OnCharacterEvent(__Me, "playAnimation")
+	ACTIONS
+		CharacterSetAnimationOverride(__Me,"Magic_01")
+		
+EVENT StopAnimation
+	ON
+		OnCharacterEvent(__Me, "StopAnimation")
+	ACTIONS
+		CharacterSetAnimationOverride(__Me,"")

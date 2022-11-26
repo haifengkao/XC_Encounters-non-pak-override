@@ -1,0 +1,473 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%Cassandra_Human="DAF_Cassandr_71c8efba-2a62-40a9-b75a-a502be7d6873"
+	ITEM:%Cassandra_Throne="DAF_Cassandra_Throne_001_210a1abc-6a5a-44a0-a7ed-ad4b6804d642"
+	CHARACTERTEMPLATE:%Summon_P1_TypeA="Cassandra_Zombie_P1_Strong_569e0e35-1949-45ea-a1fb-8081b8c7fe78"
+	CHARACTERTEMPLATE:%Summon_P1_TypeB="Cassandra_Zombie_P1_Headless_47ed9f3e-a1d5-4442-9652-71c6cc06091f"
+	CHARACTERTEMPLATE:%Summon_P2_TypeA="Cassandra_Zombie_P2_Bolt_e2d054d9-549d-4b11-ae91-092326882910"
+	CHARACTERTEMPLATE:%Summon_P2_TypeB="Cassandra_Zombie_P2_Enchanted_59c2e342-8189-4505-9473-2ea8978e6e16"
+	TRIGGER:%Summon_Trigg_01="DAF_Cassandra_CorpseSpawn_01_e5679765-2cec-4b17-809f-342aee75b093"
+	TRIGGER:%Summon_Trigg_02="DAF_Cassandra_CorpseSpawn_02_5cbb1c4e-504b-47e8-8ba8-a682d83b357c"
+	TRIGGER:%Summon_Trigg_03="DAF_Cassandra_CorpseSpawn_03_fa667e78-9c08-48a0-b86a-aa11e025987b"
+	TRIGGER:%Summon_Trigg_04="DAF_Cassandra_CorpseSpawn_04_84ff4a70-5beb-439b-a7fd-b5eb8a444d8a"
+	TRIGGER:%Summon_Trigg_05="DAF_Cassandra_CorpseSpawn_05_1db51812-8ad2-4e0b-8377-1d35f8fc400a"
+	INT:%CurrentPhase=1
+	INT:%SummoningFX_Handle
+	INT:%ReusableHandle_01
+	INT:%ReusableHandle_02
+	INT:%ReusableHandle_03
+	INT:%ReusableHandle_04
+	INT:%ReusableHandle_05
+	CHARACTER:%Arhu="CYS_Arhu_ad261b7d-16e1-4d91-b0af-f55edd588c5d"
+	INT:%Bool_ShouldBeSitting=1		
+	
+	//Phase 1: Cassandra summons regular zombies, headless zombies
+	//Phase 2: Cassandra summons bolt-stricken zombies, enchanted armours
+	//Phase 3: Cassandra nukes
+	
+//----------------------------	
+BEHAVIOUR
+REACTION Arhu_Finished,900
+USAGE PEACE
+ACTIONS
+	IF "!c1&c2"
+		CharacterHasStatus(__Me,SITTING)
+		IsEqual(%Bool_ShouldBeSitting,1)
+	THEN
+		CharacterUseItem(DAF_Cassandra_Throne_001_210a1abc-6a5a-44a0-a7ed-ad4b6804d642)
+	ENDIF
+	Sleep(5.0)
+	IF "!c1"
+		CharacterIsDead(%Arhu)
+	THEN
+		DialogStart("DAF_AD_CassForcesArhuHuman",__Me,%Arhu)
+		Sleep(8.0)
+		DialogStart("DAF_AD_CassForcesArhuHuman2",__Me,%Arhu)
+		Sleep(8.0)
+	ENDIF
+
+REACTION Arhu_Start,1000
+USAGE PEACE
+ACTIONS
+	IF "!c1&c2"
+		CharacterHasStatus(__Me,SITTING)
+		IsEqual(%Bool_ShouldBeSitting,1)
+	THEN
+		CharacterUseItem(DAF_Cassandra_Throne_001_210a1abc-6a5a-44a0-a7ed-ad4b6804d642)
+	ENDIF
+	Sleep(5.0)
+	IF "!c1"
+		CharacterIsDead(%Arhu)
+	THEN
+		DialogStart("DAF_AD_CassArhu",__Me,%Arhu)
+		Sleep(5.0)
+		CharacterMoveTo(TRIGGER:DAF_Cassandra_NearCage_0ca55284-00a4-456f-98cb-ae866647b624)
+		CharacterLookAt(%Arhu)
+		CharacterPlayEffect(__Me,"FX_Skills_WitchCraft_UndeadHeal_Cast_A")
+		CharacterPlayAnimation("cast_long_start",1,1)
+		CharacterPlayAnimation("cast_long_loop",1,1)
+		CharacterPlayAnimation("cast_long_cast",1,0)
+		CharacterPlayEffect(%Arhu,"FX_Skills_WitchCraft_UndeadHeal_Impact_A")
+		Sleep(2.0)
+		DialogStart("DAF_AD_CassArhu2",__Me,%Arhu)
+	ENDIF
+	Sleep(2.0)
+	
+REACTION Cassandra_Phase1_Hypersummon,1400
+USAGE COMBAT
+VARS
+	FLOAT:_MyAP
+	FLOAT:_DistBtwMeAndThrone
+CHECK "c1&c2&!(c3|c4|c5|c6|c7|c8|c9|c10)&c11&!c12"
+	IsEqual(%CurrentPhase,1)										//c1
+	CharacterGetStat(_MyAP,__Me,ActionPoints)						//c2
+	IsLessThen(_MyAP,5)												//!c3
+	CharacterHasHadStatus(__Me,"CHARMED")							//!c4
+	CharacterHasHadStatus(__Me,"FEAR")								//!c5
+	CharacterHasHadStatus(__Me,"STUNNED")							//!c6
+	CharacterHasHadStatus(__Me,"FROZEN")							//!c7
+	CharacterHasHadStatus(__Me,"KNOCKED_DOWN")						//!c8
+	CharacterHasHadStatus(__Me,"PETRIFIED")							//!c9
+	CharacterHasHadStatus(__Me,"MUTED")								//!c10
+	GetDistance(_DistBtwMeAndThrone,__Me,%Cassandra_Throne)			//c11
+	IsGreaterThen(_DistBtwMeAndThrone,30)							//!c12
+ACTIONS
+	DebugText(__Me,"P1 Summoning")
+	CharacterPlayLoopEffect(%SummoningFX_Handle,__Me,"FX_Skills_WitchCraft_Summon_Prepare_A")
+	PlayLoopEffectAt(%ReusableHandle_01,%Summon_Trigg_01,"FX_Skills_WitchCraft_Summon_Prepare_A")
+	PlayLoopEffectAt(%ReusableHandle_02,%Summon_Trigg_02,"FX_Skills_WitchCraft_Summon_Prepare_A")
+	PlayLoopEffectAt(%ReusableHandle_03,%Summon_Trigg_03,"FX_Skills_WitchCraft_Summon_Prepare_A")
+	PlayLoopEffectAt(%ReusableHandle_04,%Summon_Trigg_04,"FX_Skills_WitchCraft_Summon_Prepare_A")
+	PlayLoopEffectAt(%ReusableHandle_05,%Summon_Trigg_05,"FX_Skills_WitchCraft_Summon_Prepare_A")
+	CharacterPlayAnimation("cast_self_start",1,1)
+	CharacterPlayAnimation("cast_self_loop",1,1)
+	CharacterPlayAnimation("cast_self_cast",1,0)
+	SpawnCharacter(_,"Cassandra_Zombie_P1_Strong_569e0e35-1949-45ea-a1fb-8081b8c7fe78",%Summon_Trigg_01,1)
+	StopLoopEffect(%ReusableHandle_01)
+	PlayEffectAt(%Summon_Trigg_01,"FX_Skills_WitchCraft_Summon_Summon_A")
+	Sleep(0.2)
+	SpawnCharacter(_,"Cassandra_Zombie_P1_Strong_569e0e35-1949-45ea-a1fb-8081b8c7fe78",%Summon_Trigg_02,1)
+	StopLoopEffect(%ReusableHandle_02)
+	PlayEffectAt(%Summon_Trigg_02,"FX_Skills_WitchCraft_Summon_Summon_A")
+	Sleep(0.4)
+	SpawnCharacter(_,"Cassandra_Zombie_P1_Headless_47ed9f3e-a1d5-4442-9652-71c6cc06091f",%Summon_Trigg_03,1)
+	StopLoopEffect(%ReusableHandle_03)
+	PlayEffectAt(%Summon_Trigg_03,"FX_Skills_WitchCraft_Summon_Summon_A")
+	Sleep(0.6)	
+	SpawnCharacter(_,"Cassandra_Zombie_P1_Headless_47ed9f3e-a1d5-4442-9652-71c6cc06091f",%Summon_Trigg_04,1)
+	StopLoopEffect(%ReusableHandle_04)
+	PlayEffectAt(%Summon_Trigg_03,"FX_Skills_WitchCraft_Summon_Summon_A")
+	Sleep(0.1)	
+	SpawnCharacter(_,"Cassandra_Zombie_P1_Strong_569e0e35-1949-45ea-a1fb-8081b8c7fe78",%Summon_Trigg_05,1)
+	StopLoopEffect(%ReusableHandle_05)	
+	PlayEffectAt(%Summon_Trigg_05,"FX_Skills_WitchCraft_Summon_Summon_A")	
+	Sleep(0.2)	
+	CharacterUseActionPoints(__Me,4)
+	StopLoopEffect(%SummoningFX_Handle)	
+	SetPriority("Cassandra_Phase1_Hypersummon",0)
+	
+REACTION Cassandra_Phase2_Hypersummon,1400
+USAGE COMBAT
+VARS
+	FLOAT:_MyAP
+	FLOAT:_DistBtwMeAndThrone
+CHECK "c1&c2&!(c3|c4|c5|c6|c7|c8|c9|c10)&c11&!c12"
+	IsEqual(%CurrentPhase,2)										//c1
+	CharacterGetStat(_MyAP,__Me,ActionPoints)						//c2
+	IsLessThen(_MyAP,5)												//!c3
+	CharacterHasHadStatus(__Me,"CHARMED")							//!c4
+	CharacterHasHadStatus(__Me,"FEAR")								//!c5
+	CharacterHasHadStatus(__Me,"STUNNED")							//!c6
+	CharacterHasHadStatus(__Me,"FROZEN")							//!c7
+	CharacterHasHadStatus(__Me,"KNOCKED_DOWN")						//!c8
+	CharacterHasHadStatus(__Me,"PETRIFIED")							//!c9
+	CharacterHasHadStatus(__Me,"MUTED")								//!c10
+	GetDistance(_DistBtwMeAndThrone,__Me,%Cassandra_Throne)			//c11
+	IsGreaterThen(_DistBtwMeAndThrone,30)							//!c12
+ACTIONS
+	DebugText(__Me,"P2 Summoning")
+	CharacterPlayLoopEffect(%SummoningFX_Handle,__Me,"FX_Skills_WitchCraft_Summon_Prepare_A")
+	PlayLoopEffectAt(%ReusableHandle_01,%Summon_Trigg_01,"FX_Skills_WitchCraft_Summon_Prepare_A")
+	PlayLoopEffectAt(%ReusableHandle_02,%Summon_Trigg_02,"FX_Skills_WitchCraft_Summon_Prepare_A")
+	PlayLoopEffectAt(%ReusableHandle_03,%Summon_Trigg_03,"FX_Skills_WitchCraft_Summon_Prepare_A")
+	PlayLoopEffectAt(%ReusableHandle_04,%Summon_Trigg_04,"FX_Skills_WitchCraft_Summon_Prepare_A")
+	PlayLoopEffectAt(%ReusableHandle_05,%Summon_Trigg_05,"FX_Skills_WitchCraft_Summon_Prepare_A")
+	CharacterPlayAnimation("cast_self_start",1,1)
+	CharacterPlayAnimation("cast_self_loop",1,1)
+	CharacterPlayAnimation("cast_self_cast",1,0)
+	SpawnCharacter(_,"Cassandra_Zombie_P2_Bolt_e2d054d9-549d-4b11-ae91-092326882910",%Summon_Trigg_01,1)
+	StopLoopEffect(%ReusableHandle_01)
+	PlayEffectAt(%Summon_Trigg_01,"FX_Skills_WitchCraft_Summon_Summon_A")
+	Sleep(0.2)
+	SpawnCharacter(_,"Cassandra_Zombie_P2_Enchanted_59c2e342-8189-4505-9473-2ea8978e6e16",%Summon_Trigg_02,1)
+	StopLoopEffect(%ReusableHandle_02)
+	PlayEffectAt(%Summon_Trigg_02,"FX_Skills_WitchCraft_Summon_Summon_A")
+	Sleep(0.4)
+	SpawnCharacter(_,"Cassandra_Zombie_P2_Bolt_e2d054d9-549d-4b11-ae91-092326882910",%Summon_Trigg_03,1)
+	StopLoopEffect(%ReusableHandle_03)
+	PlayEffectAt(%Summon_Trigg_03,"FX_Skills_WitchCraft_Summon_Summon_A")
+	Sleep(0.6)	
+	SpawnCharacter(_,"Cassandra_Zombie_P2_Enchanted_59c2e342-8189-4505-9473-2ea8978e6e16",%Summon_Trigg_04,1)
+	StopLoopEffect(%ReusableHandle_04)
+	PlayEffectAt(%Summon_Trigg_03,"FX_Skills_WitchCraft_Summon_Summon_A")
+	Sleep(0.1)	
+	SpawnCharacter(_,"Cassandra_Zombie_P2_Bolt_e2d054d9-549d-4b11-ae91-092326882910",%Summon_Trigg_05,1)
+	StopLoopEffect(%ReusableHandle_05)	
+	PlayEffectAt(%Summon_Trigg_05,"FX_Skills_WitchCraft_Summon_Summon_A")	
+	Sleep(0.2)	
+	CharacterUseActionPoints(__Me,4)
+	StopLoopEffect(%SummoningFX_Handle)	
+	SetPriority("Cassandra_Phase2_Hypersummon",0)
+
+REACTION Cassandra_Phase3_Hypersummon,1400
+USAGE COMBAT
+VARS
+	FLOAT:_MyAP
+	FLOAT:_DistBtwMeAndThrone
+CHECK "c1&c2&!c3"
+	IsEqual(%CurrentPhase,3)										//c1
+	GetDistance(_DistBtwMeAndThrone,__Me,%Cassandra_Throne)			//c2
+	IsGreaterThen(_DistBtwMeAndThrone,30)							//!c3
+ACTIONS
+	DebugText(__Me,"P3 Summoning")
+	SpawnCharacter(_,%Summon_P1_TypeA,%Summon_Trigg_01,1)
+	Sleep(0.6)	
+	SpawnCharacter(_,%Summon_P2_TypeA,%Summon_Trigg_01,1)
+	Sleep(0.2)
+	SpawnCharacter(_,%Summon_P2_TypeA,%Summon_Trigg_02,1)
+	Sleep(0.2)
+	SpawnCharacter(_,%Summon_P2_TypeA,%Summon_Trigg_02,1)
+	Sleep(0.4)
+	SpawnCharacter(_,%Summon_P1_TypeA,%Summon_Trigg_03,1)
+	SpawnCharacter(_,%Summon_P1_TypeA,%Summon_Trigg_03,1)
+	Sleep(0.6)	
+	SpawnCharacter(_,%Summon_P2_TypeA,%Summon_Trigg_04,1)
+	SpawnCharacter(_,%Summon_P2_TypeA,%Summon_Trigg_04,1)
+	Sleep(0.1)	
+	SpawnCharacter(_,%Summon_P1_TypeA,%Summon_Trigg_05,1)	
+	Sleep(0.6)	
+	SpawnCharacter(_,%Summon_P1_TypeA,%Summon_Trigg_05,1)		
+	SetPriority("Cassandra_Phase3_Hypersummon",0)
+	
+REACTION Cassandra_Phase3_Rage,500
+USAGE COMBAT
+CHECK "c1&c2&!c3"
+	IsEqual(%CurrentPhase,3)																	//c1
+	CharacterCanCast(__Me,"Shout_EnemyRage")													//c2
+	CharacterHasStatus(__Me,"RAGED")															//!c3
+ACTIONS
+	CharacterUseSkill("Shout_EnemyRage",__Me)	
+	
+REACTION Cassandra_Phase3_MeteorShower,600
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MyVitality
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&c4&c5"
+	IsEqual(%CurrentPhase,3)																	//c1
+	CharacterCanCast(__Me,"ProjectileStrike_EnemyMeteorShower")									//c2
+	CharacterGet(_ChosenTarget,__Me,30,Lowest,FireResistance,Enemy)								//c3
+	CharacterGetStat(_MyVitality,__Me,Vitality)													//c4
+	IsLessThen(_MyVitality,0.15)																//c5
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill("ProjectileStrike_EnemyMeteorShower",_ChosenTarget)	
+	
+REACTION Cassandra_NotPhase3_CastFlare,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "!c1&c2&c3&!(c4|c5|c6|c7|c8)&c9&c10"
+	IsEqual(%CurrentPhase,3)																	//!c1
+	CharacterCanCast(__Me,"Projectile_EnemyFlare")												//c2
+	CharacterGet(_ChosenTarget,__Me,30,Lowest,FireResistance,Enemy)								//c3
+	CharacterHasStatus(_ChosenTarget,"INVULNERABLE")											//!c4
+	CharacterHasStatus(_ChosenTarget,"VOID_AURA")												//!c5
+	CharacterHasStatus(_ChosenTarget,"FROZEN")													//!c6
+	CharacterHasStatus(_ChosenTarget,"FIRE_IMMUNITY_AURA")										//!c7
+	CharacterHasStatus(_ChosenTarget,"FIRE_IMMUNITY")											//!c8	
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyFlare")					//c9
+	IsRandom(0.3)																				//c10	
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,0)
+	CharacterUseSkill("Projectile_EnemyFlare",_ChosenTarget)
+	
+REACTION Cassandra_NotPhase3_CastIceShard,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "!c1&c2&c3&!(c4|c5|c6|c7|c8)&c9&c10"
+	IsEqual(%CurrentPhase,3)																	//!c1
+	CharacterCanCast(__Me,"Projectile_EnemyIceShard")											//c2
+	CharacterGet(_ChosenTarget,__Me,30,Lowest,WaterResistance,Enemy)							//c3
+	CharacterHasStatus(_ChosenTarget,"INVULNERABLE")											//!c4
+	CharacterHasStatus(_ChosenTarget,"VOID_AURA")												//!c5
+	CharacterHasStatus(_ChosenTarget,"BURNING")													//!c6
+	CharacterHasStatus(_ChosenTarget,"WATER_IMMUNITY_AURA")										//!c7
+	CharacterHasStatus(_ChosenTarget,"WATER_IMMUNITY")											//!c8		
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyIceShard")					//c9
+	IsRandom(0.3)																				//c10	
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,0)
+	CharacterUseSkill("Projectile_EnemyIceShard",_ChosenTarget)
+	
+REACTION Cassandra_NotPhase3_CastEarthShard,300
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "!c1&c2&c3&!(c4|c5|c6|c7|c8)&c9&c10"
+	IsEqual(%CurrentPhase,3)																	//!c1
+	CharacterCanCast(__Me,"Projectile_EnemyEarthShard")											//c2
+	CharacterGet(_ChosenTarget,__Me,30,Lowest,EarthResistance,Enemy)							//c3
+	CharacterHasStatus(_ChosenTarget,"PETRIFIED")												//!c4
+	CharacterHasStatus(_ChosenTarget,"INVULNERABLE")											//!c5
+	CharacterHasStatus(_ChosenTarget,"VOID_AURA")												//!c6
+	CharacterHasStatus(_ChosenTarget,"EARTH_IMMUNITY_AURA")										//!c7
+	CharacterHasStatus(_ChosenTarget,"EARTH_IMMUNITY")											//!c8
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyEarthShard")				//c9
+	IsRandom(0.3)																				//c10	
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,0)
+	CharacterUseSkill("Projectile_EnemyEarthShard",_ChosenTarget)
+	
+REACTION Cassandra_NotPhase3_CastIronCommand,500
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "!c1&c2&c3&c4&!c5"
+	IsEqual(%CurrentPhase,3)																	//!c1
+	CharacterCanCast(__Me,"Target_EnemyIronCommand")											//c2
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyEarthShard")				//c3
+	CharacterGet(_ChosenTarget,__Me,30,Lowest,Vitality,Enemy)									//c4
+	CharacterHasStatus(_ChosenTarget,"AGGRO_MARKED")											//!c5
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,0)
+	CharacterUseSkill("Target_EnemyIronCommand",_ChosenTarget)
+	
+REACTION Cassandra_NotPhase3_CastVoidShard,200
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "!c1&c2&c3&!c4"
+	IsEqual(%CurrentPhase,3)																	//!c1
+	CharacterCanCast(__Me,"Projectile_EnemyVoidShard")											//c2
+	CharacterGet(_ChosenTarget,__Me,30,Random,Distance,Enemy)									//c3
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyVoidShard")				//c9	
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,0)
+	CharacterUseSkill("Projectile_EnemyVoidShard",_ChosenTarget)
+	
+REACTION Cassandra_NotPhase3_CastMagusFire,200
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "!c1&c2&c3&!c4"
+	IsEqual(%CurrentPhase,3)																	//!c1
+	CharacterCanCast(__Me,"Projectile_EnemyStaffOfMagusFire")									//c2
+	CharacterGet(_ChosenTarget,__Me,30,Lowest,FireResistance,Enemy)								//c3
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyStaffOfMagusFire")		 	//c9	
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,0)
+	CharacterUseSkill("Projectile_EnemyStaffOfMagusFire",_ChosenTarget)
+	
+REACTION Cassandra_PhaseManager,2000
+USAGE COMBAT
+VARS
+	FLOAT:_MyVitality
+ACTIONS
+	IF "c1"
+		IsEqual(%CurrentPhase,1)
+	THEN
+		IF "c1&c2"
+			CharacterGetStat(_MyVitality,__Me,Vitality)
+			IsLessThen(_MyVitality,0.7)
+		THEN
+			DebugText(__Me,"Entering Phase 2")
+			Set(%CurrentPhase,2)
+			SetPriority("Cassandra_PhaseManager",0)
+		ENDIF
+		SetPriority("Cassandra_PhaseManager",0)
+	ELIF "c1"
+		IsEqual(%CurrentPhase,2)
+	THEN
+		IF "c1&c2"
+			CharacterGetStat(_MyVitality,__Me,Vitality)
+			IsLessThen(_MyVitality,0.2)
+		THEN
+			DebugText(__Me,"Entering Phase 3")
+			Set(%CurrentPhase,3)
+			SetPriority("Combat_AttackSetEnemy",7)
+			SetPriority("Combat_MoveToSetEnemy",6)
+			SetPriority("Cassandra_PhaseManager",0)
+		ENDIF
+		SetPriority("Cassandra_PhaseManager",0)
+	ELIF "c1"
+		IsEqual(%CurrentPhase,3)
+	THEN
+		SetPriority("Cassandra_PhaseManager",0)
+	ENDIF
+INTERRUPT
+	Reset()
+	
+//----------------------------
+EVENTS
+EVENT OnInit_GiveSpells
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill("Projectile_EnemyStaffOfMagusFire")
+	CharacterAddSkill("Projectile_EnemyVoidShard")
+	CharacterAddSkill("Target_EnemyIronCommand")
+	CharacterAddSkill("Projectile_EnemyFlare")
+	CharacterAddSkill("Projectile_EnemyIceShard")
+	CharacterAddSkill("Projectile_EnemyBlitzBolt")
+	CharacterAddSkill("Projectile_EnemyEarthShard")
+	CharacterAddSkill("Shout_EnemyRage")
+	CharacterAddSkill("ProjectileStrike_EnemyMeteorShower")
+
+EVENT OnCombatStarted_KillDefCharPriorities
+ON
+	OnCombatStarted()
+ACTIONS
+	SetPriority("Combat_AttackSetEnemy",0)
+	SetPriority("Combat_MoveToSetEnemy",0)	
+	
+EVENT OnGlobalEventSet_SetSittingBool
+ON
+	OnGlobalEventSet("CassandraBodyBurnt")
+ACTIONS
+	Set(%Bool_ShouldBeSitting,0)
+	
+EVENT OnGlobalEventSet_SetAruhPermaCat
+ON
+	OnGlobalEventSet("ArhuPermaCat")
+ACTIONS
+	SetPriority("Arhu_Start",0)
+	
+EVENT OnGlobalEventSet_SetAruhPermaHuman
+ON
+	OnGlobalEventSet("ArhuPermaHuman")
+ACTIONS
+	SetPriority("Arhu_Start",0)
+	
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("Cassandra_PhaseManager",2000)
+	
+EVENT OnIterateCharacter_ScanForZombiesToKill
+VARS
+	CHARACTER:_Character
+	CHARACTERTEMPLATE:_CharactersRootTemplate
+ON
+	OnIterateCharacter(_Character,"CMB_DAF_Cassandra_CleanUp")
+ACTIONS
+	IF "c1&c2|c3|c4|c5"
+		CharacterGetTemplate(_Character,_CharactersRootTemplate)
+		IsEqual(_CharactersRootTemplate,%Summon_P1_TypeA)
+		IsEqual(_CharactersRootTemplate,%Summon_P1_TypeB)
+		IsEqual(_CharactersRootTemplate,%Summon_P2_TypeA)
+		IsEqual(_CharactersRootTemplate,%Summon_P2_TypeB)
+	THEN
+		CharacterDie(_Character)
+	ENDIF
+	
+EVENT OnCombatEnded_Reset
+ON
+	OnCombatEnded()
+ACTIONS
+	IterateCharacters("CMB_DAF_Cassandra_CleanUp",Lowest,Distance)
+	Set(%CurrentPhase,1)
+
+EVENT OnDie_CleanUp
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	IterateCharacters("CMB_DAF_Cassandra_CleanUp",Lowest,Distance)
+	
+EVENT OnDeactivate_StopLoopFX
+ON
+	OnDeactivate()
+	OnCombatEnded()
+ACTIONS
+	StopLoopEffect(%SummoningFX_Handle)
+	StopLoopEffect(%ReusableHandle_01)
+	StopLoopEffect(%ReusableHandle_02)
+	StopLoopEffect(%ReusableHandle_03)
+	StopLoopEffect(%ReusableHandle_04)
+	StopLoopEffect(%ReusableHandle_05)

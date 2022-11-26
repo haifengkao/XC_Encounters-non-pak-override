@@ -1,0 +1,78 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_TreasureMap("BOOK_TreasureMap1_2ccf5344-fce2-4ce6-b321-3475f0374eb5","CYS_SecretLow1");
+DB_TreasureMap("BOOK_TreasureMap2_193cc080-f14d-4399-866d-bdf8492b817a","CYS_SecretLow2");
+DB_TreasureMap("BOOK_TreasureMap3_b4ab2f1e-66f1-45e3-a285-4a6b26d55287","CYS_SecretMedium1");
+DB_TreasureMap("BOOK_TreasureMap4_183e4e8c-6166-4370-9270-9cae888e97a5","CYS_SecretMedium2");
+DB_TreasureMap("BOOK_TreasureMap5_142bd62c-9b69-441a-ab0e-5e8b12d8f567","CYS_SecretHigh1");
+DB_TreasureMap("BOOK_TreasureMap6_07cb6c2c-6def-486c-94fb-80e7d3823408","CYS_SecretHigh2");
+
+DB_TreasureMap("BOOK_TellerMap1_d08107e6-1901-433f-b7f2-e1103954724f","CYS_SecretBlackCoveStone");
+DB_TreasureMap("BOOK_TellerMap2_942ef786-5e7f-425e-b4c6-b35524fb8e7e","LUC_SecretMaradinoStone");
+DB_TreasureMap("BOOK_TellerMap3_b0dbfd62-3dcb-408d-add5-44befe7eb588","LUC_SecretCathedral");
+DB_TreasureMap("BOOK_TellerMap4_c1c62469-b8fb-4c8c-82ff-eb5a6ec68aad","HIB_SecretIronMaidenStone");
+DB_TreasureMap("BOOK_TellerMap5_a22b735c-d7c8-4477-b173-d4c2e5ba32f5","HIB_SecretBoreasTreaure");
+DB_TreasureMap("BOOK_TellerMundane1_8b1813ca-65b1-464b-963f-92a3b4ecaeb5","LUC_SacredStoneChest");
+DB_TreasureMap("BOOK_TellerMundane2_e7cbb835-de41-42c9-83a4-13dd9604a6a9","CYS_BC_SecretKey");
+DB_TreasureMap("BOOK_TellerMundane3_8567c623-33b1-411f-90be-646b48dc48b0","LUC_WitchDirt");
+DB_TreasureMap("BOOK_TellerMundane4_13549127-219e-4965-8ca0-5dc942066fa6","LUC_JumpChest");
+DB_TreasureMap("BOOK_TellerMundane5_44461313-9459-4cd8-9cc1-dbf035d7ec0f","LUC_Maradino");
+DB_TreasureMap("BOOK_TellerMundane6_794dec7c-6064-48f4-b67c-8fd3aea1d13b","HIB_ShamanChest");
+DB_TreasureMap("BOOK_TellerSkill1_e7363d62-7f21-462f-bef8-09ca3b671db3","CYS_PoisonDart");
+DB_TreasureMap("BOOK_TellerSkill2_b41c4d66-1f5f-4fe8-8499-4ef1b6364650","CYS_Flare");
+DB_TreasureMap("BOOK_TellerSkill3_e06059e3-6ae9-4838-b5de-f28390dc8086","CYS_Multishot");
+DB_TreasureMap("BOOK_TellerSkill4_27f93ad4-4c3d-44eb-b3d6-7f074e284ee8","CYS_Whirlwind");
+DB_TreasureMap("BOOK_TellerSkill5_f2f40534-bcda-446f-8291-24e8d106c984","CYS_Undead");
+DB_TreasureMap("BOOK_TellerSkill6_6482343c-f8da-4c42-bf51-1486d61b3cc7","CYS_BC_EyeGouge");
+DB_TreasureMap("BOOK_TellerSkill7_fcdae1ee-54fd-472c-ab36-94a771c89167","LUC_BlitzBolt");
+DB_TreasureMap("BOOK_TellerSkill8_016d2697-d07a-4a3b-b9e6-760c4941eaa3","LUC_Wolf");
+DB_TreasureMap("BOOK_TellerSkill9_df55411f-cc36-4bde-aa64-4992286cd2b4","DFD_KT_Fear");
+DB_TreasureMap("BOOK_TellerSkill10_23b5ada1-beb3-48a1-a603-eb4847412128","HIB_IceWall");
+DB_TreasureMap("BOOK_TellerSkill11_dbf84592-73db-4d8c-ad84-1616a74665cf","DFD_Druid_Invulnerability");
+DB_TreasureMap("BOOK_TellerScrollI_b494db45-9062-435e-a720-33ddd30f526e","HOM_MagicalScroll1");
+DB_TreasureMap("BOOK_TellerScrollII_dde1540a-f263-4d3f-a206-f6b7eaafc107","HOM_MagicalScroll2");
+DB_TreasureMap("BOOK_TellerScrollIII_b5f2c516-7fb1-4d5c-a1eb-25f2854d4036","HOM_MagicalScroll3");
+
+DB_ShovelArea(TRIGGER_CYS_ShovelTreasureMap1,"CYS_TreasureMap1",ITEM_CYS_ShovelTreasureMap1Dirt);
+DB_ShovelArea(TRIGGER_CYS_ShovelTreasureMap2,"CYS_TreasureMap2",ITEM_CYS_ShovelTreasureMap2Dirt);
+DB_ShovelArea(TRIGGER_CYS_ShovelTreasureMap3,"CYS_TreasureMap3",ITEM_CYS_ShovelTreasureMap3Dirt);
+DB_ShovelArea(TRIGGER_CYS_ShovelTreasureMap4,"CYS_TreasureMap4",ITEM_CYS_ShovelTreasureMap4Dirt);
+DB_ShovelArea(TRIGGER_CYS_ShovelTreasureMap5,"CYS_TreasureMap5",ITEM_CYS_ShovelTreasureMap5Dirt);
+DB_ShovelArea(TRIGGER_CYS_ShovelTreasureMap6,"CYS_TreasureMap6",ITEM_CYS_ShovelTreasureMap6Dirt);
+
+DB_ShovelRewardItemAppear("CYS_TreasureMap1",ITEM_CYS_ShovelTreasureMap1Chest,TRIGGER_CYS_ShovelTreasureMap1Point);
+DB_ShovelRewardItemAppear("CYS_TreasureMap2",ITEM_CYS_ShovelTreasureMap2Chest,TRIGGER_CYS_ShovelTreasureMap2Point);
+DB_ShovelRewardItemAppear("CYS_TreasureMap3",ITEM_CYS_ShovelTreasureMap3Chest,TRIGGER_CYS_ShovelTreasureMap3Point);
+DB_ShovelRewardItemAppear("CYS_TreasureMap4",ITEM_CYS_ShovelTreasureMap4Chest,TRIGGER_CYS_ShovelTreasureMap4Point);
+DB_ShovelRewardItemAppear("CYS_TreasureMap5",ITEM_CYS_ShovelTreasureMap5Chest,TRIGGER_CYS_ShovelTreasureMap5Point);
+DB_ShovelRewardItemAppear("CYS_TreasureMap6",ITEM_CYS_ShovelTreasureMap6Chest,TRIGGER_CYS_ShovelTreasureMap6Point);
+
+ItemTemplateAddToCharacter("BOOK_TreasureMap1_2ccf5344-fce2-4ce6-b321-3475f0374eb5", CHARACTER_CYS_Gerome, 1);
+ItemTemplateAddToCharacter("BOOK_TreasureMap2_193cc080-f14d-4399-866d-bdf8492b817a", CHARACTER_CYS_Gerome, 1);
+ItemTemplateAddToCharacter("BOOK_TreasureMap3_b4ab2f1e-66f1-45e3-a285-4a6b26d55287", CHARACTER_CYS_Gerome, 1);
+ItemTemplateAddToCharacter("BOOK_TreasureMap4_183e4e8c-6166-4370-9270-9cae888e97a5", CHARACTER_CYS_Gerome, 1);
+ItemTemplateAddToCharacter("BOOK_TreasureMap5_142bd62c-9b69-441a-ab0e-5e8b12d8f567", CHARACTER_CYS_Gerome, 1);
+ItemTemplateAddToCharacter("BOOK_TreasureMap6_07cb6c2c-6def-486c-94fb-80e7d3823408", CHARACTER_CYS_Gerome, 1);
+KBSECTION
+IF
+CharacterUsedItemTemplate(_Player, _Map, _)
+AND
+DB_MapRead(_Map)
+THEN
+CharacterDisplayText(_Player, "GLO_OldTreasureMap");
+
+IF
+CharacterUsedItemTemplate(_Player, _Map, _)
+AND
+DB_TreasureMap(_Map, _Secret)
+AND
+NOT DB_MapRead(_Map)
+THEN
+DB_MapRead(_Map);
+CharacterDisplayText(_Player, "GLO_NewTreasureMap");
+AddSecret(_Secret);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

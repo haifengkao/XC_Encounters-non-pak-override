@@ -1,0 +1,57 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+// DB_CIRDialog(_FlagName,_ActPart,_Act,_Gain);
+DB_CIRDialog("CIRWon_Bath", 1, 2, 4);
+DB_CIRDialog("CIRWon_ChurchDoor", 1, 7, 7);
+DB_CIRDialog("CIRWon_CrowdWarmer", 1, 2, 3);
+DB_CIRDialog("CIRWon_Grieving", 1, 5, 4);
+DB_CIRDialog("CIRWon_Mortician1", 1, 2, 3);
+DB_CIRDialog("CIRWon_Mortician2", 1, 2, 5);
+DB_CIRDialog("CIRWon_Victoria", 1, 3, 5);
+DB_CIRDialog("CIRWon_Yoranus", 1, 6, 3);
+DB_CIRDialog("CIRWon_Curtius", 1, 3, 4);
+DB_CIRDialog("CIRWon_Torturers", 1, 16, 3);
+DB_CIRDialog("CIRWon_George", 1, 16, 3);
+DB_CIRDialog("CIRWon_Hershel", 1, 16, 3);
+DB_CIRDialog("CIRWon_Jinxika", 1, 16, 3);
+DB_CIRDialog("CIRWon_IcePrisoner1", 1, 11, 5);
+DB_CIRDialog("CIRWon_Charmer1", 1, 10, 5);
+DB_CIRDialog("CIRWon_Charmer2", 1, 10, 4);
+DB_CIRDialog("CIRWon_ImmacGood1", 1, 10, 5);
+DB_CIRDialog("CIRWon_ImmacGood2", 1, 10, 4);
+DB_CIRDialog("CIRWon_ImmacInfo1", 1, 10, 5);
+DB_CIRDialog("CIRWon_ImmacInfo2", 1, 10, 4);
+DB_CIRDialog("CIRWon_William", 1, 11, 5);
+DB_CIRDialog("CIRWon_BabyTroll", 1, 15, 3);
+DB_CIRDialog("CIRWon_BlackGate", 1, 16, 5);
+DB_CIRDialog("CIRWon_GoblinVillage", 1, 15, 7);
+DB_CIRDialog("CIRWon_ImmacBridge", 1, 14, 7);
+DB_CIRDialog("CIRWon_ImmacOutside", 1, 14, 3);
+DB_CIRDialog("CIRWon_Frederick", 1, 15, 3);
+DB_CIRDialog("CIRWon_Atten1", 1, 15, 3);
+DB_CIRDialog("CIRWon_Atten2", 1, 15, 3);
+DB_CIRDialog("CIRWon_Atten3", 1, 15, 3);
+DB_CIRDialog("CIRWon_Kadraskaz", 1, 14, 4);
+DB_CIRDialog("CIRWon_Hiding", 1, 13, 6);
+DB_CIRDialog("CIRWon_Priests", 1, 13, 6);
+DB_CIRDialog("CIRWon_ImmacPrison", 1, 13, 6);
+DB_CIRDialog("CIRWon_Roy", 1, 15, 3);
+DB_CIRDialog("CIRWon_Worshipper", 1, 14, 3);
+DB_CIRDialog("CIRWon_Grumble", 1, 10, 3);
+DB_CIRDialog("CIRWon_ShadowFight", 1, 10, 5);
+DB_CIRDialog("CIRWon_SpiderQueen", 1, 14, 7);
+DB_CIRDialog("CIRWon_ZandalorHouse", 1, 16, 3);
+DB_CIRDialog("CIRWon_KnightGuard", 1, 16, 3);
+DB_CIRDialog("CIRWon_KnightStatue", 1, 16, 3);
+DB_CIRDialog("CIRWon_DAFGate", 1, 16, 3);
+DB_CIRDialog("CIRWon_EvelynOrc", 1, 6, 3);
+DB_CIRDialog("CIRWon_Nozgoth1", 1, 6, 3);
+DB_CIRDialog("CIRWon_Nozgoth2", 1, 6, 4);
+DB_CIRDialog("CIRWon_Nozgoth3", 1, 6, 5);
+KBSECTION
+
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

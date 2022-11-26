@@ -1,0 +1,40 @@
+#TEMPLATE "_POTION_Base" : CON_Potion_Poison_Res_Large_A
+
+INIT
+CHARACTER:__Me
+// [GLOBAL_VARS]
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_CON_Potion_Poison_Res_Large_A
+VARS
+	// [CALC_VARS]
+	FLOAT:_StatPoisonResistance
+	FLOAT:_Score
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_CON_Potion_Poison_Res_Large_A")
+ACTIONS		
+	// [CALC_ACTIONS_PRE]
+	Set(_Score, 0.0)
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	IF "(((c1)|c2)|c3)&(!(c4&c5))"
+	    CharacterHasBeenHitBy(__Me, Earth) // c1
+	    CharacterHasStatus(__Me, POISONED) // c2
+	    CharacterHasHadStatus(__Me, POISONED) // c3
+	    CharacterGetStat(_StatPoisonResistance, __Me, PoisonResistance) // c4
+	    IsGreaterThen(_StatPoisonResistance, 50) // c5
+	THEN
+	    Add(_Score, %ActionScore_CON_Potion_Poison_Res_Large_A)
+	ENDIF
+	// [~CALC_ACTIONS]
+
+	Cast(%ActionScore_CON_Potion_Poison_Res_Large_A, _Score)
+
+

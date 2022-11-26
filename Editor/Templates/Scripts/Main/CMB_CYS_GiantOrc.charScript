@@ -1,0 +1,48 @@
+INIT
+CHARACTER:__Me
+FLOAT:%MySightRange
+FLOAT:%DistanceBetwMeAndTarget
+
+//------------------
+BEHAVIOUR 
+REACTION CheckDistanceToTargetAndDrawCorrespWeapon,1000
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+CHECK "c1&c2"
+	CharacterGet(_Target,__Me,%MySightRange,Lowest,Distance,Enemy)
+	GetDistance(%DistanceBetwMeAndTarget,__Me,_Target)
+ACTIONS
+	IF "c1&c2"
+		IsLessThen(%DistanceBetwMeAndTarget,6)	
+		CharacterHasWeaponType(__Me,CrossBow)
+	THEN
+		CharacterSwitchWeaponType(OneHanded)
+	ELIF "c1&c2"
+		IsGreaterThen(%DistanceBetwMeAndTarget,6)
+		CharacterHasWeaponType(__Me,OneHanded)
+	THEN
+		CharacterSwitchWeaponType(CrossBow)
+	ENDIF
+	SetPriority("CheckDistanceToTargetAndDrawCorrespWeapon",0)	
+INTERRUPT
+	Reset()
+
+//------------------
+EVENTS
+EVENT OnInitGetMySightRange
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%MySightRange,__Me,Sight)
+	THEN
+	ENDIF
+	
+EVENT OnTurnRaisePriorityForDistanceChecks
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("CheckDistanceToTargetAndDrawCorrespWeapon",1000)	
+	
+	

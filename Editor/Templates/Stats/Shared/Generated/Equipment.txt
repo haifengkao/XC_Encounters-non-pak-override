@@ -1,0 +1,1394 @@
+new equipment "MaleHero"
+add equipmentgroup 
+add equipment entry "POTION_Large_Healing_Potion"
+add equipmentgroup 
+add equipment entry "POTION_Large_Healing_Potion"
+new equipment "FemaleHero"
+add equipmentgroup 
+add equipment entry "POTION_Large_Healing_Potion"
+add equipmentgroup 
+add equipment entry "POTION_Large_Healing_Potion"
+new equipment "Class_Fighter"
+add equipmentgroup 
+add equipment entry "WPN_Sword_A_Training_Sword"
+add equipmentgroup 
+add equipment entry "WPN_SourceHunter_Shield"
+add equipmentgroup 
+add equipment entry "GRN_Grenade_Molotov_A"
+add equipmentgroup 
+add equipment entry "POTION_Minor_Healing_Potion"
+add equipmentgroup 
+add equipment entry "SCROLL_Resurrect_1"
+add equipmentgroup 
+add equipment entry "CONT_Backpack_A_SourceHunter"
+new equipment "Class_Ranger"
+add equipmentgroup 
+add equipment entry "WPN_StandardIssueBow"
+add equipmentgroup 
+add equipment entry "POTION_Minor_Healing_Potion"
+add equipmentgroup 
+add equipment entry "WPN_Arrow_Fire_A"
+add equipmentgroup 
+add equipment entry "WPN_Arrow_Fire_A"
+add equipmentgroup 
+add equipment entry "SCROLL_Resurrect_1"
+add equipmentgroup 
+add equipment entry "CONT_Backpack_A_SourceHunter"
+new equipment "Class_Knight"
+add equipmentgroup 
+add equipment entry "WPN_KnightlySourceHunter_2H"
+add equipmentgroup 
+add equipment entry "POTION_Minor_Healing_Potion"
+add equipmentgroup 
+add equipment entry "GRN_Grenade_Molotov_A"
+add equipmentgroup 
+add equipment entry "SCROLL_Resurrect_1"
+add equipmentgroup 
+add equipment entry "CONT_Backpack_A_SourceHunter"
+new equipment "Class_Cleric"
+add equipmentgroup 
+add equipment entry "WPN_SourceHunter_Mace"
+add equipmentgroup 
+add equipment entry "WPN_SourceHunter_Shield"
+add equipmentgroup 
+add equipment entry "POTION_Minor_Healing_Potion"
+add equipmentgroup 
+add equipment entry "SCROLL_Resurrect_1"
+add equipmentgroup 
+add equipment entry "CONT_Backpack_A_SourceHunter"
+add equipmentgroup 
+add equipment entry "GRN_Grenade_Holy_A"
+new equipment "Class_Rogue"
+add equipmentgroup 
+add equipment entry "WPN_FightingKnife_B"
+add equipmentgroup 
+add equipment entry "WPN_FightingKnife_B"
+add equipmentgroup 
+add equipment entry "POTION_Minor_Healing_Potion"
+add equipmentgroup 
+add equipment entry "SCROLL_Resurrect_1"
+add equipmentgroup 
+add equipment entry "CONT_Backpack_A_SourceHunter"
+add equipmentgroup 
+add equipment entry "GRN_Grenade_SmokeBomb_A"
+new equipment "Class_Witch"
+add equipmentgroup 
+add equipment entry "WPN_Quarterstaff_Sourcehunter_Earth"
+add equipmentgroup 
+add equipment entry "POTION_Minor_Healing_Potion"
+add equipmentgroup 
+add equipment entry "SCROLL_Resurrect_1"
+add equipmentgroup 
+add equipment entry "SCROLL_CreateUndead"
+add equipmentgroup 
+add equipment entry "CONT_Backpack_A_SourceHunter"
+new equipment "Class_Wizard"
+add equipmentgroup 
+add equipment entry "WPN_Quarterstaff_Sourcehunter_Fire"
+add equipmentgroup 
+add equipment entry "POTION_Minor_Healing_Potion"
+add equipmentgroup 
+add equipment entry "SCROLL_Resurrect_1"
+add equipmentgroup 
+add equipment entry "SCROLL_Fireball_1"
+add equipmentgroup 
+add equipment entry "CONT_Backpack_A_SourceHunter"
+new equipment "Class_Enchanter"
+add equipmentgroup 
+add equipment entry "WPN_Wand_Water"
+add equipmentgroup 
+add equipment entry "POTION_Minor_Healing_Potion"
+add equipmentgroup 
+add equipment entry "SCROLL_Resurrect_1"
+add equipmentgroup 
+add equipment entry "SCROLL_BlitzBoltStart"
+add equipmentgroup 
+add equipment entry "CONT_Backpack_A_SourceHunter"
+new equipment "Class_Battlemage"
+add equipmentgroup 
+add equipment entry "WPN_Sword_A_Training_Sword"
+add equipmentgroup 
+add equipment entry "WPN_SourceHunter_Shield"
+add equipmentgroup 
+add equipment entry "POTION_Minor_Healing_Potion"
+add equipmentgroup 
+add equipment entry "SCROLL_Resurrect_1"
+add equipmentgroup 
+add equipment entry "SCROLL_Fireball_1"
+add equipmentgroup 
+add equipment entry "CONT_Backpack_A_SourceHunter"
+new equipment "Class_Wayfarer"
+add equipmentgroup 
+add equipment entry "WPN_Lightcrossbow"
+add equipmentgroup 
+add equipment entry "POTION_Minor_Healing_Potion"
+add equipmentgroup 
+add equipment entry "GRN_Grenade_OilFlask_A"
+add equipmentgroup 
+add equipment entry "SCROLL_Resurrect_1"
+add equipmentgroup 
+add equipment entry "CONT_Backpack_A_SourceHunter"
+new equipment "Class_Shadowblade"
+add equipmentgroup 
+add equipment entry "WPN_Sword_A_Training_Sword"
+add equipmentgroup 
+add equipment entry "WPN_FightingKnife_B"
+add equipmentgroup 
+add equipment entry "POTION_Minor_Healing_Potion"
+add equipmentgroup 
+add equipment entry "GRN_Grenade_MustardGas_A"
+add equipmentgroup 
+add equipment entry "SCROLL_Resurrect_1"
+add equipmentgroup 
+add equipment entry "CONT_Backpack_A_SourceHunter"
+new equipment "Class_Inquisitor"
+add equipmentgroup 
+add equipment entry "WPN_Wand_Air"
+add equipmentgroup 
+add equipment entry "WPN_Wand_Fire"
+add equipmentgroup 
+add equipment entry "POTION_Minor_Healing_Potion"
+add equipmentgroup 
+add equipment entry "SCROLL_Resurrect_1"
+add equipmentgroup 
+add equipment entry "CONT_Backpack_A_SourceHunter"
+new equipment "Summon_Ice_Elemental"
+add equipmentgroup 
+add equipment entry "_Summon_IceElementalAttack"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Summon_Air_Elemental"
+add equipmentgroup 
+add equipment entry "_Summon_AirElementalAttack"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Summon_Fire_Elemental"
+add equipmentgroup 
+add equipment entry "_Summon_FireElementalAttack"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Summon_Earth_Elemental"
+add equipmentgroup 
+add equipment entry "_Summon_EarthElementalAttack"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Summon_Earth_Wolf"
+add equipmentgroup 
+add equipment entry "_Summon_Earth_Wolf"
+new equipment "Summon_Earth_Bloodswarm"
+add equipmentgroup 
+add equipment entry "_Summon_Earth_Bloodswarm"
+new equipment "Summon_Earth_Spider"
+add equipmentgroup 
+add equipment entry "_Summon_Earth_Spider"
+new equipment "Summon_Earth_Ooze"
+add equipmentgroup 
+add equipment entry "_Summon_Earth_Ooze"
+new equipment "Summon_Source_Undead"
+add equipmentgroup 
+add equipment entry "_Summon_Source_Undead"
+new equipment "Summon_Source_GreaterUndead"
+add equipmentgroup 
+add equipment entry "_Summon_Source_GreaterUndead"
+new equipment "Summon_Rock_Fire"
+add equipmentgroup 
+add equipment entry "_Summon_Rock_Fire"
+new equipment "Summon_Rock_Ice"
+add equipmentgroup 
+add equipment entry "_Summon_Rock_Ice"
+new equipment "Summon_Rock_Air"
+add equipmentgroup 
+add equipment entry "_Summon_Rock_Air"
+new equipment "Summon_Rock_Earth"
+add equipmentgroup 
+add equipment entry "_Summon_Rock_Earth"
+new equipment "Henchman_Alfred_Fighter"
+add equipmentgroup 
+add equipment entry "WPN_ShortSword"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Henchman_Frank_Archer"
+add equipmentgroup 
+add equipment entry "WPN_ShortBow"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Beetle_A"
+add equipmentgroup 
+add equipment entry "_Animals_Beetle_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_BoarWild_A"
+add equipmentgroup 
+add equipment entry "_Animals_BoarWild_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_BoarWild_A_Strong"
+add equipmentgroup 
+add equipment entry "_Animals_BoarWild_A_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_BoarWild_A_Zombie_A"
+add equipmentgroup 
+add equipment entry "_Animals_BoarWild_A_Zombie_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_BoarWild_A_Zombie_A_Strong"
+add equipmentgroup 
+add equipment entry "_Animals_BoarWild_A_Zombie_A_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Boar_A"
+add equipmentgroup 
+add equipment entry "_Animals_Boar_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Boar_A_Strong"
+add equipmentgroup 
+add equipment entry "_Animals_Boar_A_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Boar_A_Zombie_A"
+add equipmentgroup 
+add equipment entry "_Animals_Boar_A_Zombie_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Boar_A_Zombie_A_Strong"
+add equipmentgroup 
+add equipment entry "_Animals_Boar_A_Zombie_A_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Bull_A"
+add equipmentgroup 
+add equipment entry "_Animals_Bull_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Bull_B"
+add equipmentgroup 
+add equipment entry "_Animals_Bull_B"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Cat_A"
+add equipmentgroup 
+add equipment entry "_Animals_Cat_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Chicken_A"
+add equipmentgroup 
+add equipment entry "_Animals_Chicken_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Cow_A"
+add equipmentgroup 
+add equipment entry "_Animals_Cow_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Cow_B"
+add equipmentgroup 
+add equipment entry "_Animals_Cow_B"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Cow_C"
+add equipmentgroup 
+add equipment entry "_Animals_Cow_C"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Cow_D"
+add equipmentgroup 
+add equipment entry "_Animals_Cow_D"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Crab_A"
+add equipmentgroup 
+add equipment entry "_Animals_Crab_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_BurrowedCrab_A"
+add equipmentgroup 
+add equipment entry "_Animals_BurrowedCrab_A"
+add equipmentgroup 
+add equipment entry "_Animals_BurrowedCrab_A"
+new equipment "Animals_Crab_Giant_A"
+add equipmentgroup 
+add equipment entry "_Animals_Crab_Giant_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Crab_Giant_A_Strong"
+add equipmentgroup 
+add equipment entry "_Animals_Crab_Giant_A_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Slug_Poison"
+add equipmentgroup 
+add equipment entry "_Animals_Slug_Poison"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Slug_Water"
+add equipmentgroup 
+add equipment entry "_Animals_Slug_Water"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Deer_A"
+add equipmentgroup 
+add equipment entry "_Animals_Deer_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Dog_A"
+add equipmentgroup 
+add equipment entry "_Animals_Dog_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_AttackDog_A"
+add equipmentgroup 
+add equipment entry "_Animals_AttackDog_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Dog_A_Zombie_A"
+add equipmentgroup 
+add equipment entry "_Animals_Dog_A_Zombie_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Dog_A_Zombie_A_Strong"
+add equipmentgroup 
+add equipment entry "_Animals_Dog_A_Zombie_A_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Dog_Labrador_A"
+add equipmentgroup 
+add equipment entry "_Animals_Dog_Labrador_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Pig_A"
+add equipmentgroup 
+add equipment entry "_Animals_Pig_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Rabbit_A"
+add equipmentgroup 
+add equipment entry "_Animals_Rabbit_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Rat_A"
+add equipmentgroup 
+add equipment entry "_Animals_Rat_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Rat_A_Strong"
+add equipmentgroup 
+add equipment entry "_Animals_Rat_A_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Rat_King_A"
+add equipmentgroup 
+add equipment entry "_Animals_Rat_King_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Rat_King_A_Strong"
+add equipmentgroup 
+add equipment entry "_Animals_Rat_King_A_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_RatMechanic_Alpha"
+add equipmentgroup 
+add equipment entry "_Animals_RatMechanic_Alpha"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_RatMechanic_Beta"
+add equipmentgroup 
+add equipment entry "_Animals_RatMechanic_Beta"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_RoosterMechanic_A"
+add equipmentgroup 
+add equipment entry "_Animals_RoosterMechanic_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_RoosterMechanic_B"
+add equipmentgroup 
+add equipment entry "_Animals_RoosterMechanic_B"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Rooster_A"
+add equipmentgroup 
+add equipment entry "_Animals_Rooster_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Sheep_A"
+add equipmentgroup 
+add equipment entry "_Animals_Sheep_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Sheep_B"
+add equipmentgroup 
+add equipment entry "_Animals_Sheep_B"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_WereSheep_A"
+add equipmentgroup 
+add equipment entry "_Animals_WereSheep_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_WereSheep_A_Strong"
+add equipmentgroup 
+add equipment entry "_Animals_WereSheep_A_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Wolf_A"
+add equipmentgroup 
+add equipment entry "_Animals_Wolf_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Wolf_A_Strong"
+add equipmentgroup 
+add equipment entry "_Animals_Wolf_A_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Wolf_A_Black"
+add equipmentgroup 
+add equipment entry "_Animals_Wolf_A_Black"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Wolf_A_Black_Strong"
+add equipmentgroup 
+add equipment entry "_Animals_Wolf_A_Black_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Wolf_A_Black_StrongBoss"
+add equipmentgroup 
+add equipment entry "_Animals_Wolf_A_Black_StrongBoss"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Wolf_A_White"
+add equipmentgroup 
+add equipment entry "_Animals_Wolf_A_White"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Wolf_A_White_Strong"
+add equipmentgroup 
+add equipment entry "_Animals_Wolf_A_White_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Wolf_A_Zombie_A"
+add equipmentgroup 
+add equipment entry "_Animals_Wolf_A_Zombie_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Wolf_A_Zombie_A_Strong"
+add equipmentgroup 
+add equipment entry "_Animals_Wolf_A_Zombie_A_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Spider"
+add equipmentgroup 
+add equipment entry "_Animals_Spider"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Spider_Poison"
+add equipmentgroup 
+add equipment entry "_Animals_Spider_Poison"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Sea_Spider_Boss"
+add equipmentgroup 
+add equipment entry "_Animals_Sea_Spider_Boss"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Cyclops_BoneCasterSkeleton_A"
+add equipmentgroup 
+add equipment entry "_Cyclops_BoneCasterSkeleton_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Cyclops_BoneCasterSkeleton_A_Strong"
+add equipmentgroup 
+add equipment entry "_Cyclops_BoneCasterSkeleton_A_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Cyclops_BoneCaster_Fem_A"
+add equipmentgroup 
+add equipment entry "_Cyclops_BoneCaster_Fem_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Cyclops_BoneCaster_Fem_A_Strong"
+add equipmentgroup 
+add equipment entry "_Cyclops_BoneCaster_Fem_A_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Cyclops_BoneFanatic_A"
+add equipmentgroup 
+add equipment entry "_Cyclops_BoneFanatic_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Cyclops_BoneFanatic_A_Strong"
+add equipmentgroup 
+add equipment entry "_Cyclops_BoneFanatic_A_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Cyclops_BoneFighter_A"
+add equipmentgroup 
+add equipment entry "_Cyclops_BoneFighter_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Cyclops_BoneFighter_A_Strong"
+add equipmentgroup 
+add equipment entry "_Cyclops_BoneFighter_A_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Cyclops_Floater_A"
+add equipmentgroup 
+add equipment entry "_Cyclops_Floater_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Cyclops_Floater_A_Strong"
+add equipmentgroup 
+add equipment entry "_Cyclops_Floater_A_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Cyclops_Warrior_A"
+add equipmentgroup 
+add equipment entry "_Cyclops_Warrior_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Cyclops_Warrior_A_Strong"
+add equipmentgroup 
+add equipment entry "_Cyclops_Warrior_A_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Cyclops_Wizard_A"
+add equipmentgroup 
+add equipment entry "_Cyclops_Wizard_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Cyclops_Wizard_A_Strong"
+add equipmentgroup 
+add equipment entry "_Cyclops_Wizard_A_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Goblins_Catapult_A"
+add equipmentgroup 
+add equipment entry "_Goblins_Catapult_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Goblins_Catapult_A_Strong"
+add equipmentgroup 
+add equipment entry "_Goblins_Catapult_A_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Goblins_Mage"
+add equipmentgroup 
+add equipment entry "_Goblins_Mage"
+add equipmentgroup 
+add equipment entry "_Goblins_Ranger_A_Dagger"
+new equipment "Goblins_Elite_A_C"
+add equipmentgroup 
+add equipment entry "_Goblins_Elite_A_C"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Goblins_Elite_A_C_Strong"
+add equipmentgroup 
+add equipment entry "_Goblins_Elite_A_C_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Goblins_Elite_A_S"
+add equipmentgroup 
+add equipment entry "_Goblins_Elite_A_S"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Goblins_Elite_A_S_Strong"
+add equipmentgroup 
+add equipment entry "_Goblins_Elite_A_S_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Goblins_Greater_A_C"
+add equipmentgroup 
+add equipment entry "_Goblins_Greater_A_C"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Goblins_Greater_A_C_Strong"
+add equipmentgroup 
+add equipment entry "_Goblins_Greater_A_C_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Goblins_Greater_A_S"
+add equipmentgroup 
+add equipment entry "_Goblins_Greater_A_S"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Goblins_Greater_A_S_Strong"
+add equipmentgroup 
+add equipment entry "_Goblins_Greater_A_S_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Goblins_Grunt_A_C"
+add equipmentgroup 
+add equipment entry "_Goblins_Grunt_A_C"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Goblins_Grunt_A_C_Strong"
+add equipmentgroup 
+add equipment entry "_Goblins_Grunt_A_C_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Goblins_Grunt_A_S"
+add equipmentgroup 
+add equipment entry "_Goblins_Grunt_A_S"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Goblins_Grunt_A_S_Strong"
+add equipmentgroup 
+add equipment entry "_Goblins_Grunt_A_S_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Goblins_Ranger_A"
+add equipmentgroup 
+add equipment entry "_Goblins_Ranger_A"
+add equipmentgroup 
+add equipment entry "_Goblins_Ranger_A_Dagger"
+new equipment "Goblins_Ranger_A_Strong"
+add equipmentgroup 
+add equipment entry "_Goblins_Ranger_A_Strong"
+add equipmentgroup 
+add equipment entry "_Goblins_Ranger_A_Dagger"
+new equipment "Goblins_Tank_A"
+add equipmentgroup 
+add equipment entry "_Goblins_Tank_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Goblins_Tank_A_Strong"
+add equipmentgroup 
+add equipment entry "_Goblins_Tank_A_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Goblins_TrapDropper_A"
+add equipmentgroup 
+add equipment entry "_Goblins_TrapDropper_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Goblins_TrapDropper_A_Strong"
+add equipmentgroup 
+add equipment entry "_Goblins_TrapDropper_A_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Goblins_Warrior_A_C"
+add equipmentgroup 
+add equipment entry "_Goblins_Warrior_A_C"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Goblins_Warrior_A_C_Strong"
+add equipmentgroup 
+add equipment entry "_Goblins_Warrior_A_C_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Goblins_Warrior_A_S"
+add equipmentgroup 
+add equipment entry "_Goblins_Warrior_A_S"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Goblins_Warrior_A_S_Strong"
+add equipmentgroup 
+add equipment entry "_Goblins_Warrior_A_S_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Imps_Spear"
+add equipmentgroup 
+add equipment entry "_Imps_Spear"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "ENV_Artillery_Flower_A"
+add equipmentgroup 
+add equipment entry "_ENV_Artillery_Flower_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "ENV_Artillery_Flower_A_Strong"
+add equipmentgroup 
+add equipment entry "_ENV_Artillery_Flower_A_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "ENV_Evil_Mushroom_A"
+add equipmentgroup 
+add equipment entry "_ENV_Evil_Mushroom_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "ENV_Evil_Mushroom_A_Strong"
+add equipmentgroup 
+add equipment entry "_ENV_Evil_Mushroom_A_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Shadows_Caster_A"
+add equipmentgroup 
+add equipment entry "_Shadows_Caster_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Shadows_Caster_A_Strong"
+add equipmentgroup 
+add equipment entry "_Shadows_Caster_A_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Shadows_Grunt_Immaculate_Trap"
+add equipmentgroup 
+add equipment entry "_Shadows_Grunt_Immaculate_Trap"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Shadows_FloatingLight_A"
+add equipmentgroup 
+add equipment entry "_Shadows_FloatingLight_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Shadows_FloatingLight_A_Strong"
+add equipmentgroup 
+add equipment entry "_Shadows_FloatingLight_A_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Shadows_Ghoul_A"
+add equipmentgroup 
+add equipment entry "_Shadows_Ghoul_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Shadows_Ghoul_A_Strong"
+add equipmentgroup 
+add equipment entry "_Shadows_Ghoul_A_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Shadows_Mage_A"
+add equipmentgroup 
+add equipment entry "_Shadows_Mage_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Shadows_Mage_A_Strong"
+add equipmentgroup 
+add equipment entry "_Shadows_Mage_A_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Shadows_Spider_A"
+add equipmentgroup 
+add equipment entry "_Shadows_Spider_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Shadows_Spider_A_Strong"
+add equipmentgroup 
+add equipment entry "_Shadows_Spider_A_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Shadows_Shrike"
+add equipmentgroup 
+add equipment entry "_Shadows_Shrike"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Trolls_Grunt"
+add equipmentgroup 
+add equipment entry "_Trolls_Grunt"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Trolls_Grunt_Zombie"
+add equipmentgroup 
+add equipment entry "_Trolls_Grunt_Zombie"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Trolls_Grunt_Strong"
+add equipmentgroup 
+add equipment entry "_Trolls_Grunt_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Trolls_Grunt_Snow"
+add equipmentgroup 
+add equipment entry "_Trolls_Grunt_Snow"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Trolls_Grunt_SnowTrolls_Grunt_Snow_Strong"
+add equipmentgroup 
+add equipment entry "_Trolls_Grunt_Snow_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Trolls_DarkForest"
+add equipmentgroup 
+add equipment entry "_Trolls_DarkForest"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Undead_Zombie_A_Headless_A"
+add equipmentgroup 
+add equipment entry "_Undead_Zombie_A_Headless_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Undead_Zombie_A_Headless_A_Strong"
+add equipmentgroup 
+add equipment entry "_Undead_Zombie_A_Headless_A_Strong"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Undead_Skeleton_Grunt_ALW"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_ALW"
+new equipment "Undead_Skeleton_Grunt_ALS"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_ALS"
+new equipment "Undead_Skeleton_Grunt_ALSS"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_ALSS"
+add equipmentgroup 
+add equipment entry "_Shield_Undead_Skeleton_Grunt_ALSS"
+new equipment "Undead_Skeleton_Grunt_AMW"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_AMW"
+new equipment "Undead_Skeleton_Grunt_AMS"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_AMS"
+new equipment "Undead_Skeleton_Grunt_AMSS"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_AMSS"
+add equipmentgroup 
+add equipment entry "_Shield_Undead_Skeleton_Grunt_AMSS"
+new equipment "Undead_Skeleton_Grunt_AMSH"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_AMSH"
+new equipment "Undead_Skeleton_Grunt_AMSSH"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_AMSSH"
+add equipmentgroup 
+add equipment entry "_Shield_Undead_Skeleton_Grunt_AMSSH"
+new equipment "Undead_Skeleton_Grunt_MageWeakFire"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_MageWeakFire"
+new equipment "Undead_Skeleton_Grunt_MageNormalFire"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_MageNormalFire"
+new equipment "Undead_Skeleton_Grunt_MageStrongFire"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_MageStrongFire"
+new equipment "Undead_Skeleton_Grunt_MageWeakWater"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_MageWeakWater"
+new equipment "Undead_Skeleton_Grunt_MageNormalWater"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_MageNormalWater"
+new equipment "Undead_Skeleton_Grunt_MageStrongWater"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_MageStrongWater"
+new equipment "Undead_Skeleton_Grunt_MageWeakAir"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_MageWeakAir"
+new equipment "Undead_Skeleton_Grunt_MageNormalAir"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_MageNormalAir"
+new equipment "Undead_Skeleton_Grunt_MageStrongAir"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_MageStrongAir"
+new equipment "Undead_Skeleton_Grunt_MageWeakEarth"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_MageWeakEarth"
+new equipment "Undead_Skeleton_Grunt_MageNormalEarth"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_MageNormalEarth"
+new equipment "Undead_Skeleton_Grunt_MageStrongEarth"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_MageStrongEarth"
+new equipment "Undead_Skeleton_Grunt_SLW"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_SLW"
+new equipment "Undead_Skeleton_Grunt_SLS"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_SLS"
+new equipment "Undead_Skeleton_Grunt_SLSS"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_SLSS"
+add equipmentgroup 
+add equipment entry "_Shield_Undead_Skeleton_Grunt_SLSS"
+new equipment "Undead_Skeleton_Grunt_SMW"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_SMW"
+new equipment "Undead_Skeleton_Grunt_SMS"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_SMS"
+new equipment "Undead_Skeleton_Grunt_SMSS"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_SMSS"
+add equipmentgroup 
+add equipment entry "_Shield_Undead_Skeleton_Grunt_SMSS"
+new equipment "Undead_Skeleton_Grunt_SMSH"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_SMSH"
+new equipment "Undead_Skeleton_Grunt_SMSSH"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_SMSSH"
+add equipmentgroup 
+add equipment entry "_Shield_Undead_Skeleton_Grunt_SMSSH"
+new equipment "Undead_Skeleton_Grunt_CLW"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_CLW"
+new equipment "Undead_Skeleton_Grunt_CLS"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_CLS"
+new equipment "Undead_Skeleton_Grunt_CLSS"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_CLSS"
+add equipmentgroup 
+add equipment entry "_Shield_Undead_Skeleton_Grunt_CLSS"
+new equipment "Undead_Skeleton_Grunt_CMW"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_CMW"
+new equipment "Undead_Skeleton_Grunt_CMS"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_CMS"
+new equipment "Undead_Skeleton_Grunt_CMSS"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_CMSS"
+add equipmentgroup 
+add equipment entry "_Shield_Undead_Skeleton_Grunt_CMSS"
+new equipment "Undead_Skeleton_Grunt_CMSH"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_CMSH"
+new equipment "Undead_Skeleton_Grunt_CMSSH"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_CMSSH"
+add equipmentgroup 
+add equipment entry "_Shield_Undead_Skeleton_Grunt_CMSSH"
+new equipment "Undead_Skeleton_Grunt_BLW"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_BLW"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_BLW_Dagger"
+new equipment "Undead_Skeleton_Grunt_BLS"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_BLS"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_BLS_Dagger"
+new equipment "Undead_Skeleton_Grunt_BMW"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_BMW"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_BMW_Dagger"
+new equipment "Undead_Skeleton_Grunt_BMS"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_BMS"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_BMS_Dagger"
+new equipment "Undead_Skeleton_Grunt_BMSH"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_BMSH"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_BMSH_Dagger"
+new equipment "Undead_Skeleton_Grunt_2SMS"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_2SMS"
+new equipment "Undead_Skeleton_Grunt_2AMS"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_2AMS"
+new equipment "Undead_Skeleton_Grunt_Pirate"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_Pirate"
+new equipment "Undead_Skeleton_Grunt_Boss"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_Boss"
+new equipment "Undead_Skeleton_Grunt_Pirate_Archer"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_Pirate_Archer"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_Pirate_Archer_Dagger"
+new equipment "Undead_Skeleton_Grunt_PirateMage"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Grunt_PirateMage"
+new equipment "Undead_Skeleton_Fire_A"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Fire_A"
+new equipment "Undead_SkeletonBard_A"
+add equipmentgroup 
+add equipment entry "_Undead_SkeletonBard_A"
+new equipment "Undead_Infernal_Boss"
+add equipmentgroup 
+add equipment entry "_Undead_Infernal_Boss"
+new equipment "Undead_Infernal_A"
+add equipmentgroup 
+add equipment entry "_Undead_Infernal_A"
+new equipment "Undead_Infernal_A_Mini"
+add equipmentgroup 
+add equipment entry "_Undead_Infernal_A_Mini"
+new equipment "Undead_FireSkeleton_Pikeman"
+add equipmentgroup 
+add equipment entry "_Undead_FireSkeleton_Pikeman"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Undead_FireSkeleton_Sword_Shield"
+add equipmentgroup 
+add equipment entry "_Undead_FireSkeleton_Sword_Shield"
+add equipmentgroup 
+add equipment entry "_Shield_Undead_Skeleton_Grunt_CMSSH"
+new equipment "Undead_FireSkeleton_2HAxe"
+add equipmentgroup 
+add equipment entry "_Undead_FireSkeleton_2HAxe"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Undead_FireSkeleton_2HSword"
+add equipmentgroup 
+add equipment entry "_Undead_FireSkeleton_2HSword"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Undead_FireSkeleton_Mage"
+add equipmentgroup 
+add equipment entry "_Undead_FireSkeleton_Mage"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Undead_FireSkeleton_Ranger"
+add equipmentgroup 
+add equipment entry "_Undead_FireSkeleton_Ranger"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Fire_Dagger"
+new equipment "Undead_SkeletonKing_Ranger"
+add equipmentgroup 
+add equipment entry "_Undead_SkeletonKing_Ranger"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Fire_Dagger"
+new equipment "Undead_Skeleton_Metal_A"
+add equipmentgroup 
+add equipment entry "_Undead_Skeleton_Metal_A"
+new equipment "Undead_Zombie_A"
+add equipmentgroup 
+add equipment entry "_Undead_Zombie_A"
+new equipment "Undead_Zombie_Electrified"
+add equipmentgroup 
+add equipment entry "_Undead_Zombie_Electrified"
+new equipment "Orc_WeakLeather_C"
+add equipmentgroup 
+add equipment entry "_Orc_WeakLeather_C"
+new equipment "Orc_StrongLeather_C"
+add equipmentgroup 
+add equipment entry "_Orc_StrongLeather_C"
+new equipment "Orc_StrongLeather_CH"
+add equipmentgroup 
+add equipment entry "_Orc_StrongLeather_CH"
+new equipment "Orc_WeakLeather_1A"
+add equipmentgroup 
+add equipment entry "_Orc_WeakLeather_1A"
+new equipment "Orc_StrongLeather_1A"
+add equipmentgroup 
+add equipment entry "_Orc_StrongLeather_1A"
+new equipment "Orc_StrongLeather_1AH"
+add equipmentgroup 
+add equipment entry "_Orc_StrongLeather_1AH"
+new equipment "Orc_WeakLeather_1S"
+add equipmentgroup 
+add equipment entry "_Orc_WeakLeather_1S"
+new equipment "Orc_StrongLeather_1S"
+add equipmentgroup 
+add equipment entry "_Orc_StrongLeather_1S"
+new equipment "Orc_StrongLeather_1SH"
+add equipmentgroup 
+add equipment entry "_Orc_StrongLeather_1SH"
+new equipment "Orc_WeakLeather_2A"
+add equipmentgroup 
+add equipment entry "_Orc_WeakLeather_2A"
+new equipment "Orc_StrongLeather_2A"
+add equipmentgroup 
+add equipment entry "_Orc_StrongLeather_2A"
+new equipment "Orc_StrongLeather_2AH"
+add equipmentgroup 
+add equipment entry "_Orc_StrongLeather_2AH"
+new equipment "Orc_WeakLeather_2S"
+add equipmentgroup 
+add equipment entry "_Orc_WeakLeather_2S"
+new equipment "Orc_StrongLeather_2S"
+add equipmentgroup 
+add equipment entry "_Orc_StrongLeather_2S"
+new equipment "Orc_StrongLeather_2SH"
+add equipmentgroup 
+add equipment entry "_Orc_StrongLeather_2SH"
+new equipment "Orc_WeakLeather_B"
+add equipmentgroup 
+add equipment entry "_Orc_WeakLeather_B"
+add equipmentgroup 
+add equipment entry "_Orc_WeakLeather_BDagger"
+new equipment "Orc_StrongLeather_B"
+add equipmentgroup 
+add equipment entry "_Orc_StrongLeather_B"
+add equipmentgroup 
+add equipment entry "POTION_Medium_Healing_Potion"
+add equipmentgroup 
+add equipment entry "_Orc_StrongLeather_BDagger"
+new equipment "Orc_StrongLeather_BH"
+add equipmentgroup 
+add equipment entry "_Orc_StrongLeather_BH"
+add equipmentgroup 
+add equipment entry "_Orc_StrongLeather_BHDagger"
+new equipment "Orc_Female_Normal"
+add equipmentgroup 
+add equipment entry "_Orc_Female_Normal"
+new equipment "Orc_Female_Strong"
+add equipmentgroup 
+add equipment entry "_Orc_Female_Strong"
+new equipment "Orc_Shaman_Weak"
+add equipmentgroup 
+add equipment entry "_Orc_Shaman_Weak"
+new equipment "Orc_Shaman_Normal"
+add equipmentgroup 
+add equipment entry "_Orc_Shaman_Normal"
+new equipment "Orc_Shaman_Strong"
+add equipmentgroup 
+add equipment entry "_Orc_Shaman_Strong"
+new equipment "Orc_Shaman_Strong2"
+add equipmentgroup 
+add equipment entry "_Orc_Shaman_Strong2"
+new equipment "Orc_Drummer_Normal"
+add equipmentgroup 
+add equipment entry "_Orc_Drummer_Normal"
+new equipment "Orc_Drummer_Strong"
+add equipmentgroup 
+add equipment entry "_Orc_Drummer_Strong"
+new equipment "Orc_Bruiser_Normal"
+add equipmentgroup 
+add equipment entry "_Orc_Bruiser_Normal"
+new equipment "Orc_Bruiser_Strong"
+add equipmentgroup 
+add equipment entry "_Orc_Bruiser_Strong"
+new equipment "Orc_CYS_GiantOrc"
+add equipmentgroup 
+add equipment entry "_Orc_CYS_GiantOrc"
+add equipmentgroup 
+add equipment entry "POTION_Medium_Healing_Potion"
+new equipment "Orc_Female_Assassin"
+add equipmentgroup 
+add equipment entry "_Orc_Female_Assassin_Crossbow"
+add equipmentgroup 
+add equipment entry "_Orc_Female_Assassin"
+new equipment "Orc_Female_RangerBoss"
+add equipmentgroup 
+add equipment entry "_Orc_Female_RangerBoss"
+add equipmentgroup 
+add equipment entry "_Orc_StrongLeather_BDagger"
+new equipment "Orc_Female_Ranger"
+add equipmentgroup 
+add equipment entry "_Orc_Female_Ranger"
+add equipmentgroup 
+add equipment entry "_Orc_StrongLeather_BDagger"
+new equipment "Orc_Giant_Orc"
+add equipmentgroup 
+add equipment entry "_Orc_StrongLeather_B"
+add equipmentgroup 
+add equipment entry "_Orc_StrongLeather_1A"
+add equipmentgroup 
+add equipment entry "_Orc_StrongLeather_BDagger"
+new equipment "DarkMinions_EnchantedArmor_Sword"
+add equipmentgroup 
+add equipment entry "_DarkMinions_EnchantedArmor_Sword"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "DarkMinions_EnchantedArmor_Axe"
+add equipmentgroup 
+add equipment entry "_DarkMinions_EnchantedArmor_Axe"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "DarkMinions_EnchantedArmor"
+add equipmentgroup 
+add equipment entry "_DarkMinions_EnchantedArmor"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "DarkMinions_DeathKnight"
+add equipmentgroup 
+add equipment entry "_DarkMinions_DeathKnight"
+new equipment "DarkMinions_DeathLord"
+add equipmentgroup 
+add equipment entry "_DarkMinions_DeathLord"
+add equipmentgroup 
+add equipment entry "_DarkMinions_DeathLord_Xbow"
+new equipment "DarkMinions_DreadKnight"
+add equipmentgroup 
+add equipment entry "_DarkMinions_DreadKnight"
+new equipment "DarkMinions_DreadLord"
+add equipmentgroup 
+add equipment entry "_DarkMinions_DreadLord"
+add equipmentgroup 
+add equipment entry "_DarkMinions_DreadLord_Xbow"
+new equipment "DarkMinions_DeathPrince"
+add equipmentgroup 
+add equipment entry "_DarkMinions_DeathPrince"
+new equipment "DarkMinions_Eden_Blue"
+add equipmentgroup 
+add equipment entry "_DarkMinions_Eden_Blue"
+new equipment "DarkMinions_Eden_Regular"
+add equipmentgroup 
+add equipment entry "_DarkMinions_Eden_Regular"
+new equipment "DarkMinions_Eden_Green"
+add equipmentgroup 
+add equipment entry "_DarkMinions_Eden_Green"
+new equipment "DarkMinions_Eden_Orange"
+add equipmentgroup 
+add equipment entry "_DarkMinions_Eden_Orange"
+new equipment "DarkMinions_Eden_Pink"
+add equipmentgroup 
+add equipment entry "_DarkMinions_Eden_Pink"
+new equipment "Demons_SandDemon"
+add equipmentgroup 
+add equipment entry "_Demons_SandDemon"
+new equipment "Demons_SandDevil"
+add equipmentgroup 
+add equipment entry "_Demons_SandDevil"
+new equipment "Demons_SandHorror"
+add equipmentgroup 
+add equipment entry "_Demons_SandHorror"
+new equipment "Demons_SandMinion"
+add equipmentgroup 
+add equipment entry "_Demons_SandMinion"
+new equipment "Crab"
+add equipmentgroup 
+add equipment entry "_Crab"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "GiantCrab"
+add equipmentgroup 
+add equipment entry "_GiantCrab"
+new equipment "Wollocks_Shaman_A"
+add equipmentgroup 
+add equipment entry "_Wollocks_Shaman_A"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Wollocks_Clubber_A"
+add equipmentgroup 
+add equipment entry "_Wollock_Clubber"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Orc_Male_A"
+add equipmentgroup 
+add equipment entry "_Cyseal_Orc_CrushingFists"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Wollocks_Mount_A"
+add equipmentgroup 
+add equipment entry "_Wollock_Mount"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Wollocks_Octoped_A"
+add equipmentgroup 
+add equipment entry "WPN_Sword_A_Training_Sword"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Wollocks_Octoped_Mine_A"
+add equipmentgroup 
+add equipment entry "WPN_Sword_A_Training_Sword"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Wolf_Disease"
+add equipmentgroup 
+add equipment entry "_Animals_Wolf_Disease"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Wolf_Blind"
+add equipmentgroup 
+add equipment entry "_Animals_Wolf_Blind"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Wolf_Fear"
+add equipmentgroup 
+add equipment entry "_Animals_Wolf_Fear"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Animals_Wolf_Freeze"
+add equipmentgroup 
+add equipment entry "_Animals_Wolf_Freeze"
+add equipmentgroup 
+add equipment entry "NoShield"
+new equipment "Undead_Braccus"
+add equipmentgroup 
+add equipment entry "_WPN_Undead_2H_Axe_Braccus_A"
+add equipmentgroup 
+add equipment entry "POTION_Large_Healing_Potion"
+new equipment "Undead_ZombieCrawler_B"
+add equipmentgroup 
+add equipment entry "_Undead_ZombieCrawler_B"
+new equipment "Wollock_Bard"
+add equipmentgroup 
+add equipment entry "WPN_Wollocks_Guitar_A"
+new equipment "Chest_Animated"
+add equipmentgroup 
+add equipment entry "_Chest_Animated"
+new equipment "GEN_Bodyguard"
+add equipmentgroup 
+add equipment entry "_GEN_Bodyguard"
+add equipmentgroup 
+add equipment entry "_Shield_GEN_Bodyguard"
+new equipment "GEN_Butcher"
+add equipmentgroup 
+add equipment entry "_GEN_Butcher"
+new equipment "KickstarterPetBlackboar"
+add equipmentgroup 
+add equipment entry "_KickstarterPetBlackboar"
+new equipment "KickstarterPetBrownboar"
+add equipmentgroup 
+add equipment entry "_KickstarterPetBrownboar"
+new equipment "KickstarterPetBlackcat"
+add equipmentgroup 
+add equipment entry "_KickstarterPetBlackcat"
+new equipment "KickstarterPetGreycat"
+add equipmentgroup 
+add equipment entry "_KickstarterPetGreycat"
+new equipment "KickstarterPetWhitecat"
+add equipmentgroup 
+add equipment entry "_KickstarterPetWhitecat"
+new equipment "KickstarterPetBrowncow"
+add equipmentgroup 
+add equipment entry "_KickstarterPetBrowncow"
+new equipment "KickstarterPetCowwithspots"
+add equipmentgroup 
+add equipment entry "_KickstarterPetCowwithspots"
+new equipment "KickstarterPetBrowndeer"
+add equipmentgroup 
+add equipment entry "_KickstarterPetBrowndeer"
+new equipment "KickstarterPetWhitedeer"
+add equipmentgroup 
+add equipment entry "_KickstarterPetWhitedeer"
+new equipment "KickstarterPetChicken"
+add equipmentgroup 
+add equipment entry "_KickstarterPetChicken"
+new equipment "KickstarterPetBlagdog"
+add equipmentgroup 
+add equipment entry "_KickstarterPetBlagdog"
+new equipment "KickstarterPetBrowndog"
+add equipmentgroup 
+add equipment entry "_KickstarterPetBrowndog"
+new equipment "KickstarterPetShepherd"
+add equipmentgroup 
+add equipment entry "_KickstarterPetShepherd"
+new equipment "KickstarterPetWhitewolf"
+add equipmentgroup 
+add equipment entry "_KickstarterPetWhitewolf"
+new equipment "KickstarterPetBlackwolf"
+add equipmentgroup 
+add equipment entry "_KickstarterPetBlackwolf"
+new equipment "KickstarterPetGiantblackrat"
+add equipmentgroup 
+add equipment entry "_KickstarterPetGiantblackrat"
+new equipment "KickstarterPetGiantgreyrat"
+add equipmentgroup 
+add equipment entry "_KickstarterPetGiantgreyrat"
+new equipment "KickstarterPetPig"
+add equipmentgroup 
+add equipment entry "_KickstarterPetPig"
+new equipment "KickstarterPetGreyrabbit"
+add equipmentgroup 
+add equipment entry "_KickstarterPetGreyrabbit"
+new equipment "KickstarterPetWhiterabbit"
+add equipmentgroup 
+add equipment entry "_KickstarterPetWhiterabbit"
+new equipment "KickstarterPetSmallrat"
+add equipmentgroup 
+add equipment entry "_KickstarterPetSmallrat"
+new equipment "KickstarterPetRobotrat"
+add equipmentgroup 
+add equipment entry "_KickstarterPetRobotrat"
+new equipment "KickstarterPetRooster"
+add equipmentgroup 
+add equipment entry "_KickstarterPetRooster"
+new equipment "KickstarterPetRobotrooster"
+add equipmentgroup 
+add equipment entry "_KickstarterPetRobotrooster"
+new equipment "KickstarterPetMalesheep"
+add equipmentgroup 
+add equipment entry "_KickstarterPetMalesheep"
+new equipment "KickstarterPetFemalesheep"
+add equipmentgroup 
+add equipment entry "_KickstarterPetFemalesheep"
+new equipment "KickstarterPetFleshyspider"
+add equipmentgroup 
+add equipment entry "_KickstarterPetFleshyspider"
+new equipment "KickstarterPetVilespider"
+add equipmentgroup 
+add equipment entry "_KickstarterPetVilespider"
+new equipment "KickstarterPetPlantspider"
+add equipmentgroup 
+add equipment entry "_KickstarterPetPlantspider"
+new equipment "KickstarterPetBlackspider"
+add equipmentgroup 
+add equipment entry "_KickstarterPetBlackspider"

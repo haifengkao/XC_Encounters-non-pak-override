@@ -1,0 +1,29 @@
+#INCLUDE Base
+
+INIT
+USING Base
+CHARACTER:__Me
+INT:%State = 0
+
+BEHAVIOUR
+
+REACTION Cursing,1600
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%State,1)
+VARS
+	FIXEDSTRING:_Text
+ACTIONS
+	GetRandom(_Text,"LUC_Kolrik_1","LUC_Kolrik_2")
+	DisplayText(__Me,_Text,5)
+	Sleep(10)
+INTERRUPT
+	Reset()
+
+EVENTS
+
+EVENT LeftBehind
+ON
+	OnCharacterEvent(__Me,"Stays")
+ACTIONS
+	Set(%State,1)

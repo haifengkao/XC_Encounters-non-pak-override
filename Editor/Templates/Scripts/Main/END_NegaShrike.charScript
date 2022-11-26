@@ -1,0 +1,63 @@
+INIT
+
+CHARACTER:__Me
+
+	TRIGGER:%Bar1 = END_Point_Behavior_NegaShrike_Bartend1_3a64f190-d9b9-4c6e-998e-df3dadf24749
+	TRIGGER:%Bar2 = END_Point_Behavior_NegaShrike_Bartend2_3503474c-5c24-4a95-9c27-5ba2581a9ab2
+	
+BEHAVIOUR
+
+REACTION Bartend, 1000
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	CharacterMoveTo(%Bar1, 0, 1)
+	CharacterLookFrom(%Bar1)
+	GetRandom(_Animation, "idle1", "idle2", "idle3")
+	CharacterPlayAnimation(_Animation)
+	Sleep(3)
+	GetRandom(_Animation, "idle1", "idle2", "idle3")
+	CharacterPlayAnimation(_Animation)
+	DialogStart("END_AD_NegaKingsCrab_Shrike_Wandering", __Me)
+	GetRandom(_Animation, "idle1", "idle2", "idle3")
+	CharacterPlayAnimation(_Animation)
+	Sleep(15)
+	CharacterMoveTo(%Bar2, 0, 1)
+	CharacterLookFrom(%Bar2)
+	GetRandom(_Animation, "idle1", "idle2", "idle3")
+	CharacterPlayAnimation(_Animation)
+	DialogStart("END_AD_NegaKingsCrab_Shrike_Wandering", __Me)
+	GetRandom(_Animation, "idle1", "idle2", "idle3")
+	CharacterPlayAnimation(_Animation)
+	Sleep(5)
+	GetRandom(_Animation, "idle1", "idle2", "idle3")
+	CharacterPlayAnimation(_Animation)
+	Sleep(10)
+	Reset()
+INTERRUPT
+	Reset()
+
+
+STORY
+
+SCRIPTFRAME END_ShrikeBringDrink
+ACTIONS
+	Sleep(0.5)
+	CharacterPlayEffect(__Me, "FX_Env_Crystal_Void_Impact_A")
+	CharacterPlayEffect(__Me, "FX_Env_Crystal_Void_Explode_A")
+	CharacterPlayAnimation("cast_self_cast")
+	CharacterTeleportTo(TRIGGER:END_Point_Behavior_NegaKingsCrab_ShrikeAtCellar2_d2553558-aa57-4b8b-b563-76394528cc21)
+	CharacterLookFrom(TRIGGER:END_Point_Behavior_NegaKingsCrab_ShrikeAtCellar2_d2553558-aa57-4b8b-b563-76394528cc21)	
+	Sleep(0.3)
+	CharacterPlayAnimation("hit_magic")
+	Sleep(1)
+	CharacterPlayEffect(__Me, "FX_Env_Crystal_Void_Impact_A")
+	CharacterPlayEffect(__Me, "FX_Env_Crystal_Void_Explode_A")
+	CharacterPlayAnimation("cast_self_cast")
+	CharacterTeleportTo(TRIGGER:END_Point_Behavior_NegaShrike_91b07320-adfe-4f8c-a26b-3e39cbb6c116)
+	CharacterLookFrom(TRIGGER:END_Point_Behavior_NegaShrike_91b07320-adfe-4f8c-a26b-3e39cbb6c116)
+	Sleep(0.3)
+	CharacterPlayAnimation("block")
+	CharacterEvent(__Me, "END_Nega_SpawnDrinks")
+	DialogStart("END_AD_NegaKingsCrab_Shrike_BroughtDrinks", __Me)

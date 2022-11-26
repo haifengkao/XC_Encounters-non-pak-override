@@ -1,0 +1,45 @@
+INIT
+	CHARACTER:__Me
+	EXTERN CHARACTER:%friend=null
+
+//--------
+BEHAVIOUR
+REACTION TurnIntoZombieDog,0
+USAGE ALL
+ACTIONS
+	CharacterEvent(__Me,"TurnTrapHouseDogIntoZombieDog")
+	SetPriority("TurnIntoZombieDog",0)
+
+//--------
+EVENTS
+EVENT SomeoneAttackedMe
+ON
+	OnDamage(_,_,_,_)
+	OnMiss(_,_, __Me, _)
+ACTIONS
+	CharacterSetFaction(__Me,"Evil NPC")
+	IF "!c1"
+		IsEqual(%friend,null)
+	THEN
+		CharacterSetFaction(%friend,"Evil NPC")
+	ENDIF
+	
+EVENT CombatStarted
+ON
+	OnCombatStarted()
+ACTIONS
+	SetPriority("TurnIntoZombieDog",5000)
+	
+EVENT GotSpawnIt
+VARS
+	FLOAT3:_position
+	CHARACTER:_char
+ON
+	OnCharacterEvent(__Me,"TurnTrapHouseDogIntoZombieDog") 
+ACTIONS
+	GetPosition(__Me, _position)
+	PlayEffectAt(_position,"FX_GP_TeleportSmoke_A")
+	SpawnCharacter(_char,"Animals_Dog_A_Zombie_A_e618f6cd-7b6b-48b3-a2d2-a00c18e5fe2e",_position,0)
+	CombatLogText(__Me,"CMB_InfectedDogTransforms",0,1)
+	SetPriority("TurnIntoZombieDog",0)
+	CharacterSetOffStage()

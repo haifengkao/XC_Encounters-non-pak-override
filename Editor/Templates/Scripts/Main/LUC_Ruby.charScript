@@ -1,0 +1,41 @@
+#INCLUDE Prostitute
+
+INIT
+USING Prostitute
+CHARACTER:%Troll = LUC_BrokenBridgeTroll02_ec9f5796-130f-457b-8e3c-82ed58fe8b99
+CHARACTER:%Miner1 = LUC_Miner1_d90cb74f-cf6f-4ebc-b6f8-e913b24f5f66
+
+BEHAVIOUR
+REACTION State_WaitingForClients, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction,"Action_AttractClients","Action_GoToMiners")
+	SetPriority(%currentAction,1100)
+
+REACTION State_Troll, 0
+USAGE PEACE
+ACTIONS
+	IF "!c1&!c2&!c3"
+		IsInDialog(%Troll)
+		IsInDialog(__Me)
+		CharacterIsDead(%Troll)
+	THEN
+		CharacterLookAt(%Troll)
+		DialogStart("LUC_AD_RubyTroll",__Me,%Troll)
+	ENDIF
+	Sleep(25)
+
+REACTION Action_GoToMiners, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	CharacterMoveTo(%Miner1, 0, 1, 1)
+	CharacterLookAt(%Miner1)
+	GetRandom(_Animation,"Chuckle_01","Chuckle_02","Flirt_01","Pst_01","Pst_04")
+	CharacterPlayAnimation(_Animation)
+	Sleep(15)
+	DialogStart("LUC_AD_Prostitute",__Me)
+	SetPriority(%currentAction,0)
+INTERRUPT
+	SetPriority(%currentAction,0)

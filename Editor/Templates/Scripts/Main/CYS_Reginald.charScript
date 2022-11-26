@@ -1,0 +1,119 @@
+#INCLUDE CYS_FairPeople
+
+INIT
+USING CYS_FairPeople
+CHARACTER:__Me
+CHARACTER:%PlayerInTrigger
+TRIGGER:%Trigger1 = CYS_Point_Reginald1_a82ac998-68fc-43e8-b1e0-269fffb85749
+TRIGGER:%Trigger2 = CYS_Point_Reginald2_55cf9617-3200-4f53-8f40-58e0a9fea03a
+TRIGGER:%Trigger3 = CYS_Point_Reginald3_41f80e51-312e-4ff3-af28-cc3d16a7d0e1
+FIXEDSTRING:%CurrentlyDoing = "State_GivingShow"
+INT:%HeadStolen = 0
+ITEM:%NickHead = CYS_NickHead_1ac7d885-6d01-45b4-aa32-fbed0ee4f0a7
+
+
+BEHAVIOUR
+
+REACTION State_GivingShow, 0
+USAGE PEACE
+ACTIONS
+	IF "c1"
+		IsEqual(%HeadStolen, 0)
+	THEN
+		GetRandom(%currentAction, "Action_CallPeople")
+		SetPriority(%currentAction, 1100)
+	ELSE
+		CharacterEvent(__Me, "removeDialog")
+		Set(%CanGoToShow, 0)
+		SetPriority(Action_FreakingOut, 3200)
+	ENDIF
+
+REACTION State_WithCedric, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, "Action_WithCedric")
+	SetPriority(%currentAction, 1100)
+
+REACTION State_GuardingHead, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, "Action_StopPlayers")
+	SetPriority(%currentAction, 1100)
+	
+REACTION Action_CallPeople, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	CharacterMoveTo(%Trigger1,0)
+	CharacterLookFrom(%Trigger1)
+	GetRandom(_Animation,"Attention_01","Attention_02","Attention_03","Wave_01","Wave_02","Wave_03")
+	CharacterPlayAnimation(_Animation)
+	Sleep(1)
+	IF "!c1"
+		IsInDialog(%NickHead)
+	THEN
+		DialogStart("CYS_AD_Reginald",__Me)
+	ENDIF
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)
+
+REACTION Action_StopPlayers, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Text
+	FIXEDSTRING:_Animation
+ACTIONS
+	CharacterMoveTo(%Trigger2,1)
+	CharacterLookAt(%PlayerInTrigger)
+	GetRandom(_Animation,"Halt_01","Annoyed_01","Intimidate_01","Intimidate_02")
+	CharacterPlayAnimation(_Animation)
+	DialogStart("CYS_AD_Reginald",__Me)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)
+	
+REACTION Action_FreakingOut, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Text
+	FIXEDSTRING:_Animation
+ACTIONS
+	CharacterWander(FLOAT:7,7,1,%Trigger2)
+	DialogStart("CYS_AD_ReginaldFreaks",__Me)
+	CharacterWander(FLOAT:7,7,1,%Trigger2)
+	DialogStart("CYS_AD_ReginaldFreaks",__Me)
+	CharacterWander(FLOAT:7,7,1,%Trigger2)
+	DialogStart("CYS_AD_ReginaldFreaks",__Me)
+	GlobalSetEvent("CYS_HN_ReginaldGaveUp")
+	CharacterMoveTo(%Trigger2)
+	CharacterLookFrom(%Trigger2)
+	CharacterSetAnimationOverride(__Me, "Loop_Insane_01")
+	SetPriority(Action_GivingUp, 3201)
+	SetPriority(Action_FreakingOut, 0)
+		
+REACTION Action_GivingUp, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Text
+	FIXEDSTRING:_Animation
+ACTIONS
+	DialogStart("CYS_AD_ReginaldFreaks",__Me)
+	Sleep(15)
+
+REACTION Action_WithCedric, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+	FIXEDSTRING:_Text
+ACTIONS
+	CharacterMoveTo(%Trigger3,0)
+	CharacterLookFrom(%Trigger3)
+	GetRandom(_Animation,"Annoyed_01","Halt_01","Sigh_01","Depressed_01","No_01","No_02","No_03")
+	CharacterPlayAnimation(_Animation)
+	Sleep(1)
+	DialogStart("CYS_AD_Reginald",__Me)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)

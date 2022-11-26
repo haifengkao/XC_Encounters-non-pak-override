@@ -1,0 +1,123 @@
+#TEMPLATE "_SKILL_Base" : Target_EnemyFingerOfDeath
+
+INIT
+CHARACTER:__Me
+FLOAT:%SkillTargetScore_Target_EnemyFingerOfDeath=-1000000
+// [GLOBAL_VARS]
+INT:%ClassScore_Target_EnemyFingerOfDeath
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_Target_EnemyFingerOfDeath
+VARS
+	// [CALC_VARS]
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_Target_EnemyFingerOfDeath")
+ACTIONS
+	Set(%SkillTargetScore_Target_EnemyFingerOfDeath, -1000000)
+
+	// [CALC_ACTIONS_PRE]
+	Set(%ClassScore_Target_EnemyFingerOfDeath, 0)
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	IterateCharactersInCombat(__Me, "CalculateTarget_Target_EnemyFingerOfDeath", Random, Vitality)
+	IF "!c1"
+		IsEqual(%SkillTargetChar_Target_EnemyFingerOfDeath, null)
+	THEN
+		Add(%ActionScore_Target_EnemyFingerOfDeath, %SkillTargetScore_Target_EnemyFingerOfDeath)
+	ENDIF
+	// [~CALC_ACTIONS]
+
+	
+
+	
+// Calculate the character we should attack
+EVENT CalculateTarget_Target_EnemyFingerOfDeath
+VARS	
+	CHARACTER:_Char
+	// [CALC_TARGET_VARS]
+	INT:_ClassScore_Target_EnemyFingerOfDeath
+	FLOAT:_StatVitality
+	FLOAT:_Score
+	FLOAT:_SkillRangeMin
+	FLOAT:_SkillRangeMax
+	FLOAT:_DistanceToChar
+	FLOAT:_DistanceScore
+	// [~CALC_TARGET_VARS]
+ON
+	OnIterateCharacter(_Char, "CalculateTarget_Target_EnemyFingerOfDeath")	
+ACTIONS
+	// [CALC_CHAR_TARGET_ACTIONS_PRE]
+	Set(_ClassScore_Target_EnemyFingerOfDeath, %ClassScore_Target_EnemyFingerOfDeath)
+	Set(_Score, 0.0)
+	// [~CALC_CHAR_TARGET_ACTIONS_PRE]
+	// [CALC_CHAR_TARGET_ACTIONS]
+	IF "(!c1&!c2&!c3)&((c4)|c5)&((c6&c7)|c8)&(!(c9))&(c10)&(c11)&(c12)"
+	    CharacterIsDead(_Char) // c1
+	    CharacterHasStatus(_Char, INVISIBLE) // c2
+	    CharacterHasStatus(_Char, SNEAKING) // c3
+	    CharacterHasStatus(_Char, FORTIFIED) // c4
+	    CharacterIsBetterOrEqualClass(_Char, %ClassScore_Target_EnemyFingerOfDeath, _ClassScore_Target_EnemyFingerOfDeath, 5, 3, 1, 4, 2) // c5
+	    CharacterGetStat(_StatVitality, _Char, Vitality) // c6
+	    IsLessThen(_StatVitality, 0.3) // c7
+	    IsLessThen(_StatVitality, 0.6) // c8
+	    IsGreaterThen(_StatVitality, 0.8) // c9
+	    CharacterIsEnemy(__Me, _Char) // c10
+	    CharacterGetSkillRange(_SkillRangeMin, _SkillRangeMax, __Me, Target_EnemyFingerOfDeath) // c11
+	    GetDistance(_DistanceToChar, __Me, _Char) // c12
+	THEN
+	    Set(%ClassScore_Target_EnemyFingerOfDeath, _ClassScore_Target_EnemyFingerOfDeath)
+	    IF "(c1)"
+	        CharacterHasStatus(_Char, FORTIFIED) // c1
+	    THEN
+	        Add(_Score, 5.0)
+	    ENDIF
+	    // Hostile count score calculation
+	    Add(_Score, 10.0) // HostileWeight
+	    
+	    // Range score calculation
+	    Set(_DistanceScore, _DistanceToChar)
+	    IF "(c1)"
+	        IsGreaterThen(_DistanceScore, _SkillRangeMax) // c1
+	    THEN
+	        Subtract(_DistanceScore, _SkillRangeMax)
+	        Multiply(_DistanceScore, -1.0)
+	    ELIF "(c1)"
+	        IsLessThen(_DistanceScore, _SkillRangeMin) // c1
+	    THEN
+	        Subtract(_DistanceScore, _SkillRangeMin)
+	        Multiply(_DistanceScore, 1.0)
+	    ELSE 
+	        Set(_DistanceScore, 0.0)
+	    ENDIF
+	    Add(_Score, _DistanceScore)
+	    
+	    // Can see score calculation
+	    IF "!c1"
+	    	CharacterCanSee(__Me, _Char)
+	    THEN
+	    	Add(_Score, -10.0)
+	    ENDIF
+	    
+	    IF "c1"
+	    	IsGreaterThen(_Score, %SkillTargetScore_Target_EnemyFingerOfDeath)
+	    THEN
+	    	Set(%SkillTargetChar_Target_EnemyFingerOfDeath, _Char)
+	    	Set(%SkillTargetScore_Target_EnemyFingerOfDeath, _Score)
+	    ENDIF	
+	ENDIF
+	// [~CALC_CHAR_TARGET_ACTIONS]
+	
+	
+	
+	
+	
+	
+	
+	

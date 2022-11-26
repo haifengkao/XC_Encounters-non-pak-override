@@ -1,0 +1,14 @@
+INIT
+	ITEM:__Me
+	EXTERN ITEM:%Door = null
+	EXTERN ITEM:%Light = null
+	
+EVENTS
+
+EVENT destroy
+	ON
+		OnItemEvent(%Door,"unlocked")
+	ACTIONS
+		PlayEffectAt(__Me,"FX_GP_TeleportSmoke_A")
+		ItemSetOnStage(%Light, 0)
+		ItemSetOnStage(__Me, 0)

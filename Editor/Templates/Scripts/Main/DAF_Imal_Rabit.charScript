@@ -1,0 +1,40 @@
+INIT
+
+CHARACTER:__Me
+CHARACTER:%Imal = DAF_Imal_33538f2a-bf68-4296-9fe8-0c5c9b155025
+INT:%Handle = null
+
+BEHAVIOUR
+
+REACTION moving, 0
+USAGE ALL
+ACTIONS
+	CharacterMoveTo(ITEM:CONT_Nature_RabbitHole_A_000_0da4976b-3d3a-4c9b-a9db-24be9cfd3c95, 1)
+	CharacterSetOffStage()
+	
+EVENTS
+
+EVENT dialog
+ON
+	OnCharacterEvent(%Imal, "stopEvent")
+ACTIONS
+	StopLoopEffect(%Handle)
+	SetPriority(moving, 1500)
+		
+EVENT OnInit_StartTimerForFX
+ON
+	OnInit()
+ACTIONS
+	StartTimer("DAF_Imal_Rabbit_PlayFX",0.2,0)				//added by Edouard on May 19, 2015
+
+EVENT OnTimer_PlayLoopFX
+ON
+	OnTimer("DAF_Imal_Rabbit_PlayFX")
+ACTIONS		
+	CharacterPlayLoopEffect(%Handle, __Me, "FX_Skills_WitchCraft_BasicSigil_A")
+	
+EVENT OnDeactivate_StopLoopFX
+ON
+	OnDeactivate()
+ACTIONS
+	StopLoopEffect(%Handle)

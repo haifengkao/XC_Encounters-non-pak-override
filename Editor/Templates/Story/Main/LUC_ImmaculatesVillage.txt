@@ -1,0 +1,924 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+//REGION Databases
+DB_LUC_IT_SkillBooks(ITEM_LUC_IT_RangerReward, "FX_Env_Fire_Green_A", TRIGGER_LUC_IT_RangerTrigger, TRIGGER_LUC_IT_RangerTriggerArea);
+DB_LUC_IT_SkillBooks(ITEM_LUC_IT_WarriorReward, "FX_Env_Fire_Red_A", TRIGGER_LUC_IT_WarriorTrigger, TRIGGER_LUC_IT_WarriorTriggerArea);
+DB_LUC_IT_SkillBooks(ITEM_LUC_IT_WizardReward, "FX_Env_Fire_Blue_B", TRIGGER_LUC_IT_WizzardTrigger, TRIGGER_LUC_IT_MageTriggerArea);
+
+DB_LUC_IV_ImmaculateVillager(CHARACTER_LUC_IV_Attenberah, "LUC_ImmaculateVillageGeomancer");
+DB_LUC_IV_ImmaculateVillager(CHARACTER_LUC_IV_GeomancerApprentice, "LUC_ImmaculateVillageGeomancer");
+DB_LUC_IV_ImmaculateVillager(CHARACTER_LUC_IV_Tundrin, "LUC_ImmaculateVillageGeomancer");
+DB_LUC_IV_ImmaculateVillager(CHARACTER_LUC_IV_Seargiu, "LUC_ImmaculateVillageGeomancer");
+DB_LUC_IV_ImmaculateVillager(CHARACTER_LUC_IV_BlacksmithApprentice, "LUC_ImmaculateVillage");
+DB_LUC_IV_ImmaculateVillager(CHARACTER_LUC_IV_Blacksmith, "LUC_ImmaculateVillage");
+DB_LUC_IV_ImmaculateVillager(CHARACTER_LUC_IV_PatrolLead, "LUC_ImmaculateVillage");
+DB_LUC_IV_ImmaculateVillager(CHARACTER_LUC_IV_PatrolFollow, "LUC_ImmaculateVillage");
+DB_LUC_IV_ImmaculateVillager(CHARACTER_LUC_IV_Teacher, "LUC_ImmaculateVillage");
+DB_LUC_IV_ImmaculateVillager(CHARACTER_LUC_IV_Student1, "LUC_ImmaculateVillage");
+DB_LUC_IV_ImmaculateVillager(CHARACTER_LUC_IV_Student2, "LUC_ImmaculateVillage");
+DB_LUC_IV_ImmaculateVillager(CHARACTER_LUC_IV_Student3, "LUC_ImmaculateVillage");
+DB_LUC_IV_ImmaculateVillager(CHARACTER_LUC_IV_Student4, "LUC_ImmaculateVillage");
+DB_LUC_IV_ImmaculateVillager(CHARACTER_LUC_IV_AnnoyingStudent, "LUC_ImmaculateVillage");
+
+DB_Dialogs(CHARACTER_LUC_IV_BlacksmithApprentice, "LUC_IV_BlackSmithAssistant");
+DB_Dialogs(CHARACTER_LUC_IV_Blacksmith, "LUC_IV_BlackSmith");
+DB_Dialogs(CHARACTER_LUC_IV_Teacher, "LUC_IV_Teacher");
+DB_Dialogs(CHARACTER_LUC_IV_Student1, "LUC_IV_Student");
+DB_Dialogs(CHARACTER_LUC_IV_Student2, "LUC_IV_Student");
+DB_Dialogs(CHARACTER_LUC_IV_Student3, "LUC_IV_Student");
+DB_Dialogs(CHARACTER_LUC_IV_Student4, "LUC_IV_Student");
+DB_Dialogs(CHARACTER_LUC_IV_AnnoyingStudent, "LUC_IV_Student");
+DB_Dialogs(CHARACTER_LUC_IV_Tundrin, "LUC_IV_AttenGuardsTundrin");
+DB_Dialogs(CHARACTER_LUC_IV_Seargiu, "LUC_IV_AttenGuards");
+DB_Dialogs(CHARACTER_LUC_IV_GateGuard, "LUC_IV_AngryGuards");
+DB_Dialogs(CHARACTER_LUC_IV_SecondGuard, "LUC_IV_AngryGuards");
+DB_Dialogs(CHARACTER_LUC_IV_ImpPrisoner1, "LUC_ImpPrisoner");
+DB_Dialogs(CHARACTER_LUC_IV_ImpPrisoner2, "LUC_ImpPrisoner");
+DB_Dialogs(CHARACTER_LUC_IV_HumanPrisoner1, "LUC_SilverglenPrisoner");
+DB_Dialogs(CHARACTER_LUC_IV_HumanPrisoner2, "LUC_HunterPrisoner");
+DB_Dialogs(CHARACTER_LUC_IV_HumanPrisoner3, "LUC_ImmaculatePrisoner");
+DB_Dialogs(CHARACTER_LUC_IV_OrcPrisoner, "LUC_OrcPrisoner");
+DB_Dialogs(CHARACTER_LUC_IV_Hiberian1, "LUC_IV_HiberheimCultist");
+DB_Dialogs(CHARACTER_LUC_IV_Hiberian2, "LUC_IV_HiberheimCultist");
+DB_Dialogs(CHARACTER_LUC_IV_PatrolLead, "LUC_IV_Guards");
+DB_Dialogs(CHARACTER_LUC_IV_PatrolFollow, "LUC_IV_Guards");
+
+DB_LUC_IV_PrisonerDialog(CHARACTER_LUC_IV_ImpPrisoner1, "LUC_IV_PrisonerThank_Imp1");
+DB_LUC_IV_PrisonerDialog(CHARACTER_LUC_IV_ImpPrisoner2, "LUC_IV_PrisonerThank_Imp2");
+DB_LUC_IV_PrisonerDialog(CHARACTER_LUC_IV_HumanPrisoner1, "LUC_IV_PrisonerThank");
+DB_LUC_IV_PrisonerDialog(CHARACTER_LUC_IV_HumanPrisoner2, "LUC_IV_PrisonerThank_Human2");
+DB_LUC_IV_PrisonerDialog(CHARACTER_LUC_IV_HumanPrisoner3, "LUC_IV_PrisonerThank_Human3");
+
+DB_LUC_IV_Prisoner(CHARACTER_LUC_IV_ImpPrisoner1, ITEM_LUC_IV_ImpDoor);
+DB_LUC_IV_Prisoner(CHARACTER_LUC_IV_ImpPrisoner2, ITEM_LUC_IV_ImpDoor);
+DB_LUC_IV_Prisoner(CHARACTER_LUC_IV_HumanPrisoner1, ITEM_LUC_IV_HumanDoor);
+DB_LUC_IV_Prisoner(CHARACTER_LUC_IV_HumanPrisoner2, ITEM_LUC_IV_HumanDoor);
+DB_LUC_IV_Prisoner(CHARACTER_LUC_IV_HumanPrisoner3, ITEM_LUC_IV_HumanDoor);
+DB_LUC_IV_Prisoner(CHARACTER_LUC_IV_OrcPrisoner, ITEM_LUC_IV_OrcDoor);
+
+DB_LUC_IV_TunnelStep(0);
+
+DB_LUC_GT_TunnelTeleporter(ITEM_LUC_GT_Waypoint2, TRIGGER_LUC_GT_Waypoint6Target, 0);
+DB_LUC_GT_TunnelTeleporter(ITEM_LUC_GT_Waypoint3, TRIGGER_LUC_GT_Waypoint6Target, 2);
+DB_LUC_GT_TunnelTeleporter(ITEM_LUC_GT_Waypoint4, TRIGGER_LUC_GT_Waypoint6Target, 4);
+DB_LUC_GT_TunnelTeleporter(ITEM_LUC_GT_Waypoint7, TRIGGER_LUC_GT_Waypoint1Target, 3);
+DB_LUC_GT_TunnelTeleporter(ITEM_LUC_GT_Waypoint8, TRIGGER_LUC_GT_Waypoint1Target, 1);
+DB_LUC_GT_TunnelTeleporter(ITEM_LUC_GT_Waypoint9, TRIGGER_LUC_GT_Waypoint5Target, 5);
+
+DB_LUC_GT_TunnelLights(ITEM_LUC_GT_Green2, ITEM_LUC_GT_Red2, 0);
+DB_LUC_GT_TunnelLights(ITEM_LUC_GT_Green3, ITEM_LUC_GT_Red3, 2);
+DB_LUC_GT_TunnelLights(ITEM_LUC_GT_Green4, ITEM_LUC_GT_Red4, 4);
+DB_LUC_GT_TunnelLights(ITEM_LUC_GT_Green7, ITEM_LUC_GT_Red7, 3);
+DB_LUC_GT_TunnelLights(ITEM_LUC_GT_Green8, ITEM_LUC_GT_Red8, 1);
+DB_LUC_GT_TunnelLights(ITEM_LUC_GT_Green9, ITEM_LUC_GT_Red9, 5);
+//END_REGION
+//REGION Dialog
+DB_OneShotPlayerTrigger(TRIGGER_LUC_IV_Area_Geomancer);
+SneakTriggerSpotter(TRIGGER_LUC_AtteberahSneak, CHARACTER_LUC_IV_Attenberah);
+DB_OneShot_DialogTrigger_NewSystem(TRIGGER_LUC_AtteberahSneak,"LUC_IV_IntroAttenbarah",CHARACTER_LUC_IV_Attenberah); 
+SneakTriggerSpotter(TRIGGER_LUC_IV_BlacksmithEntrance, CHARACTER_LUC_IV_BlacksmithApprentice);
+SneakTriggerSpotter(TRIGGER_LUC_IV_BlacksmithEntrance, CHARACTER_LUC_IV_Blacksmith);
+//END_REGION
+//REGION General
+KillCounter("LUC_IV_Villagers", 4);
+KillCounterDB(CHARACTER_LUC_Temple_Cultist1, "LUC_IV_Villagers");
+KillCounterDB(CHARACTER_LUC_Temple_Cultist2, "LUC_IV_Villagers");
+KillCounterDB(CHARACTER_LUC_Temple_Cultist3, "LUC_IV_Villagers");
+KillCounterDB(CHARACTER_LUC_Temple_Cultist4, "LUC_IV_Villagers");
+PROC_LUC_IV_Initialization();
+
+ItemToCharacter(ITEM_LUC_IV_PensKey, CHARACTER_LUC_IV_Teacher);
+
+ItemSetOnstage(ITEM_LUC_GT_Waypoint1After, 0);
+ItemSetOnstage(ITEM_LUC_GT_Green2, 0);
+ItemSetOnstage(ITEM_LUC_GT_Green3, 0);
+ItemSetOnstage(ITEM_LUC_GT_Green4, 0);
+ItemSetOnstage(ITEM_LUC_GT_Green7, 0);
+ItemSetOnstage(ITEM_LUC_GT_Green8, 0);
+ItemSetOnstage(ITEM_LUC_GT_Green9, 0);
+ItemToContainer(ITEM_LUC_IV_AdventurerDiary, ITEM_LUC_IV_AdventurerCorpse,-1);
+ItemSetCanInteract(ITEM_WPN_Heartseeker,0);
+
+CharacterSetOnStage(CHARACTER_LUC_IT_Spirit, 0);
+
+ProcTriggerRegisterForPlayers(TRIGGER_LUC_IV_VillageEntrance);
+ProcTriggerRegisterForPlayers(TRIGGER_LUC_IV_StartFightGuards);
+DB_OneShotPlayerTrigger(TRIGGER_LUC_IT_SpawnSpirit);
+//END_REGION
+//REGION Comments
+DB_PlayerComments("LUC_IV_CommentPrison","LUC_IV_CommentPrison_1_1",1,1);
+DB_PlayerComments("LUC_IV_CommentPrison","LUC_IV_CommentPrison_2_1",2,1);
+DB_PlayerComments("LUC_IV_CommentPrison","LUC_IV_CommentPrison_2_2",2,2);
+DB_PlayerComment_Trigger(TRIGGER_LUC_IV_CommentPrison, "LUC_IV_CommentPrison");
+
+DB_PlayerComments("LUC_IV_CommentAtten","LUC_IV_CommentAtten_1_1",1,1);
+DB_PlayerComments("LUC_IV_CommentAtten","LUC_IV_CommentAtten_2_1",2,1);
+DB_PlayerComments("LUC_IV_CommentAtten","LUC_IV_CommentAtten_2_2",2,2);
+
+DB_PlayerComments("LUC_IV_CommentTunnelVista","LUC_IV_CommentTunnelVista_1_1",1,1);
+DB_PlayerComments("LUC_IV_CommentTunnelVista","LUC_IV_CommentTunnelVista_2_1",2,1);
+DB_PlayerComments("LUC_IV_CommentTunnelVista","LUC_IV_CommentTunnelVista_2_2",2,2);
+DB_PlayerComment_Trigger(TRIGGER_LUC_IV_CommentTunnelVista, "LUC_IV_CommentTunnelVista");
+
+DB_PlayerComments("LUC_IV_CommentTunnelVillage","LUC_IV_CommentTunnelVillage_1_1",1,1);
+DB_PlayerComments("LUC_IV_CommentTunnelVillage","LUC_IV_CommentTunnelVillage_2_1",2,1);
+DB_PlayerComments("LUC_IV_CommentTunnelVillage","LUC_IV_CommentTunnelVillage_2_2",2,2);
+DB_PlayerComment_Trigger(TRIGGER_LUC_IV_CommentEntry, "LUC_IV_CommentTunnelVillage");
+
+
+DB_OneShotPlayerTrigger(TRIGGER_LUC_IV_CommentEntryDeactivate);
+
+TriggerRegisterForCharacter(TRIGGER_LUC_BoxOrcCell,CHARACTER_LUC_IV_OrcPrisoner);
+
+DB_LUCImmaculateOtherCells(TRIGGER_LUC_BoxPlayerCell,TRIGGER_LUC_OrcRunTargetPlayerCell);
+DB_LUCImmaculateOtherCells(TRIGGER_LUC_BoxEmptyCell1,TRIGGER_LUC_OrcRunTargetEmptyCell);
+DB_LUCImmaculateOtherCells(TRIGGER_LUC_BoxHumanCell,TRIGGER_LUC_OrcRunTargetHumanCell);
+DB_LUCImmaculateOtherCells(TRIGGER_LUC_BoxImpCell,TRIGGER_LUC_OrcRunTargetImpCell);
+
+//END_REGION
+
+
+//REGION Prison Guard triggers 
+
+DB_PrisonDoorCheck(TRIGGER_LUC_BoxGuardDoorCheckOrc,ITEM_LUC_IV_OrcDoor);
+DB_PrisonDoorCheck(TRIGGER_LUC_BoxGuardDoorCheckPlayer,ITEM_LUC_PrisonGate2);
+DB_PrisonDoorCheck(TRIGGER_LUC_BoxGuardDoorCheckEmpty,ITEM_LUC_IV_EmptyDoor);
+DB_PrisonDoorCheck(TRIGGER_LUC_BoxGuardDoorCheckHuman,ITEM_LUC_IV_HumanDoor);
+DB_PrisonDoorCheck(TRIGGER_LUC_BoxGuardDoorCheckImp,ITEM_LUC_IV_ImpDoor);
+
+DB_Dialogs(CHARACTER_LUC_Prison_Guard,"LUC_PrisonGuard");
+//END_REGION
+
+TriggerRegisterForItems(TRIGGER_LUC_BoxOrcCell);
+
+DB_IsNotMessingAround(CHARACTER_LUC_IV_Attenberah);
+
+DB_LUC_IV_PrisonTrigg(CHARACTER_LUC_IV_HumanPrisoner1, TRIGGER_LUC_BoxHumanCell);
+DB_LUC_IV_PrisonTrigg(CHARACTER_LUC_IV_HumanPrisoner2, TRIGGER_LUC_BoxHumanCell);
+DB_LUC_IV_PrisonTrigg(CHARACTER_LUC_IV_HumanPrisoner3, TRIGGER_LUC_BoxHumanCell);
+DB_LUC_IV_PrisonTrigg(CHARACTER_LUC_IV_ImpPrisoner1, TRIGGER_LUC_BoxImpCell);
+DB_LUC_IV_PrisonTrigg(CHARACTER_LUC_IV_ImpPrisoner2, TRIGGER_LUC_BoxImpCell);
+
+TriggerRegisterForCharacter(TRIGGER_LUC_BoxHumanCell, CHARACTER_LUC_IV_HumanPrisoner3);
+TriggerRegisterForCharacter(TRIGGER_LUC_BoxHumanCell, CHARACTER_LUC_IV_HumanPrisoner2);
+TriggerRegisterForCharacter(TRIGGER_LUC_BoxHumanCell, CHARACTER_LUC_IV_HumanPrisoner1);
+TriggerRegisterForCharacter(TRIGGER_LUC_BoxImpCell, CHARACTER_LUC_IV_ImpPrisoner1);
+TriggerRegisterForCharacter(TRIGGER_LUC_BoxImpCell, CHARACTER_LUC_IV_ImpPrisoner2);
+
+DB_LUC_PrisonGuard(CHARACTER_LUC_ImmaculateJailer1);
+DB_LUC_PrisonGuard(CHARACTER_LUC_ImmaculateJailer2);
+DB_LUC_PrisonGuard(CHARACTER_LUC_ImmaculateJailer3);
+DB_LUC_PrisonGuard(CHARACTER_LUC_ImmaculateJailer4);
+DB_LUC_PrisonGuard(CHARACTER_LUC_Prison_Guard);
+
+CharacterSetOnStage(CHARACTER_LUC_IV_SoulOfDesperation_01,0);
+CharacterSetOnStage(CHARACTER_LUC_IV_SoulOfDesperation_02,0);
+
+DB_LUC_ImmaculateOutsideStudents(CHARACTER_LUC_IV_OutsideStudent1);
+DB_LUC_ImmaculateOutsideStudents(CHARACTER_LUC_IV_OutsideStudent2);
+DB_LUC_ImmaculateOutsideStudents(CHARACTER_LUC_IV_OutsideStudent3);
+DB_LUC_ImmaculateOutsideStudents(CHARACTER_LUC_IV_OutsideStudent4);
+DB_LUC_ImmaculateOutsideStudents(CHARACTER_LUC_IV_OutsideTeacher);
+KBSECTION
+//REGION Initialization
+IF
+DB_LUC_PrisonGuard(_Guard)
+THEN
+DB_IsGuard(_Guard);
+CharacterSetFaction(_Guard,"LUC_PrisonGuard");
+
+PROC
+PROC_LUC_IV_Initialization()
+AND
+DB_LUC_IV_ImmaculateVillager(_Immaculate, _)
+THEN
+DB_DisableAttackReaction(_Immaculate);
+//END_REGION
+//REGION Geomancer
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,TRIGGER_LUC_IV_Area_Geomancer)
+THEN
+ProcCharacterMoveToTrigger(CHARACTER_LUC_IV_GeomancerApprentice, TRIGGER_LUC_IV_ApprenticeRunAway,1,"atTalkingPoint");
+ProcCharacterMoveToTrigger(CHARACTER_LUC_IV_Attenberah, TRIGGER_LUC_IV_AttenberahShootApprentice, 0, "killApprentice");
+
+IF
+CharacterEvent(CHARACTER_LUC_IV_GeomancerApprentice, "atTalkingPoint")
+THEN
+CharacterDisplayText(CHARACTER_LUC_IV_GeomancerApprentice, "LUC_IV_GeomancerApprentice_Story_1");
+ProcCharacterMoveToTrigger(CHARACTER_LUC_IV_GeomancerApprentice, TRIGGER_LUC_IV_ApprenticeEscape, 1, "");
+
+IF
+CharacterEvent(CHARACTER_LUC_IV_Attenberah, "killApprentice")
+THEN
+CharacterSetEvent(CHARACTER_LUC_IV_Attenberah, "killTheApprentice");
+
+IF
+CharacterDied(CHARACTER_LUC_IV_GeomancerApprentice)
+AND
+CharacterGetClosestPlayer(CHARACTER_LUC_IV_Attenberah, _Player)
+THEN
+CharacterSetVarFixedString(CHARACTER_LUC_IV_Attenberah, "currentState", "State_InHouse");
+Launch_PlayerComment(_Player, "LUC_IV_CommentAtten");
+
+
+IF
+GlobalEventSet("LUC_IV_ImmaculateVillageAngry")
+THEN
+CHARACTER_LUC_IV_Attenberah.willKillYou();
+
+IF
+DialogEnded("LUC_IV_IntroAttenbarah", _)
+AND
+NOT CHARACTER_LUC_IV_Attenberah.willKillYou()
+THEN
+DB_Dialogs(CHARACTER_LUC_IV_Attenberah, "LUC_IV_Attenberah");
+
+IF
+DialogEnded("LUC_IV_IntroAttenbarah", _)
+AND
+CHARACTER_LUC_IV_Attenberah.willKillYou()
+THEN
+SetRelationFactionToPlayers("LUC_ImmaculateVillageGeomancer", 0);
+
+IF
+DialogEnded("LUC_IV_Attenberah", _)
+AND
+CHARACTER_LUC_IV_Attenberah.willKillYou()
+THEN
+SetRelationFactionToPlayers("LUC_ImmaculateVillageGeomancer", 0);
+
+IF
+DialogStarted("LUC_IV_Attenberah", _ID)
+AND
+DB_DialogPlayers(_ID,_Player,1)
+THEN
+DB_AttenTrade(_Player);
+
+IF
+DialogEnded("LUC_IV_Attenberah",_)
+AND
+DB_AttenTrade(_Player)
+THEN
+NOT DB_AttenTrade(_Player);
+
+IF
+GlobalEventSet("LUC_IV_AllowTradeAtten")
+AND
+DB_AttenTrade(_Player)
+THEN
+DB_BigTrader(CHARACTER_LUC_IV_Attenberah);
+StartTrade(_Player, CHARACTER_LUC_IV_Attenberah);
+
+IF
+CharacterUsedItem(_Player, ITEM_LUC_IV_TenebriumHowTo)
+AND
+CharacterGetBaseAbility(_Player, "Blackrock", _Val)
+AND
+_Val > 0
+THEN
+CharacterDisplayText(_Player, "GEN_Skillbook_Fail");
+
+IF
+CharacterUsedItem(_Player, ITEM_LUC_IV_TenebriumHowTo)
+AND
+CharacterGetBaseAbility(CHARACTER_Player1, "Blackrock", 0)
+THEN
+CharacterUnlockAbility(CHARACTER_Player1, "Blackrock");
+CharacterAddAbility(CHARACTER_Player1, "Blackrock", 1);
+
+IF
+CharacterUsedItem(_Player, ITEM_LUC_IV_TenebriumHowTo)
+AND
+CharacterGetBaseAbility(CHARACTER_Player2, "Blackrock", 0)
+THEN
+CharacterUnlockAbility(CHARACTER_Player2, "Blackrock");
+CharacterAddAbility(CHARACTER_Player2, "Blackrock", 1);
+
+IF
+CharacterUsedItem(_Player, ITEM_LUC_IV_TenebriumHowTo)
+THEN
+DB_UnlockedBlackRock(1);
+//END_REGION	
+//REGION Attenberah - Hardcore Charming Ghosts
+IF
+CharacterEnteredCombat(CHARACTER_LUC_IV_Attenberah,_)
+AND
+IsHardcoreMode(1)
+THEN
+CharacterAppear(CHARACTER_LUC_IV_SoulOfDesperation_01,1);
+CharacterAppear(CHARACTER_LUC_IV_SoulOfDesperation_02,1);
+
+IF
+CharacterKilledByCharacter(CHARACTER_LUC_IV_SoulOfDesperation_01,(CHARACTER)_Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+CharacterApplyStatus(_Player,"FEAR",4.0,0);
+
+IF
+CharacterKilledByCharacter(CHARACTER_LUC_IV_SoulOfDesperation_02,(CHARACTER)_Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+CharacterApplyStatus(_Player,"FEAR",4.0,0);
+//END_REGION
+//REGION General
+IF
+CharacterAttackedByCharacter(_Immaculate, _Player)
+AND
+_Player.DB_IsPlayer()
+AND
+DB_LUC_IV_ImmaculateVillager(_Immaculate, _Faction)
+THEN
+SetRelationFactionToPlayers(_Faction, 0);
+
+IF
+KillCounterCounts("LUC_IV_Villagers", 4)
+THEN
+GlobalSetEvent("LUC_IV_EverybodyIsDead");
+
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,TRIGGER_LUC_IV_CommentEntryDeactivate)
+THEN
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_IV_CommentEntry);
+NOT DB_PlayerComments("LUC_IV_CommentTunnelVillage","LUC_IV_CommentTunnelVillage_1_1",1,1);
+NOT DB_PlayerComments("LUC_IV_CommentTunnelVillage","LUC_IV_CommentTunnelVillage_2_1",2,1);
+NOT DB_PlayerComments("LUC_IV_CommentTunnelVillage","LUC_IV_CommentTunnelVillage_2_2",2,2);
+NOT DB_PlayerComments("LUC_IV_CommentTunnelVista","LUC_IV_CommentTunnelVista_1_1",1,1);
+NOT DB_PlayerComments("LUC_IV_CommentTunnelVista","LUC_IV_CommentTunnelVista_2_1",2,1);
+NOT DB_PlayerComments("LUC_IV_CommentTunnelVista","LUC_IV_CommentTunnelVista_2_2",2,2);
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_IV_CommentTunnelVista);
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_IV_VillageEntrance);
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_IV_StartFightGuards);
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_IV_VillageEntrance);
+
+	
+//END_REGION
+//REGION School
+
+PROC
+ProcLUCSetPrisonGuardVariable((STRING)_Name,(INTEGER)_Val)
+AND
+DB_LUC_PrisonGuard(_Guard)
+THEN
+CharacterSetVarInteger(_Guard,_Name,_Val);
+
+IF
+RegionStarted("LucullaForest")
+AND
+NOT CHARACTER_CYS_Marcus.inSilverglen()
+AND
+NOT DB_Dead(CHARACTER_CYS_Marcus)
+THEN
+ProcRemoveDialogEntryForSpeaker(CHARACTER_CYS_Marcus, "CYS_Marcus");
+DB_Dialogs(CHARACTER_CYS_Marcus, "LUC_MarcusPrisoner");
+CharacterTeleportToTrigger(CHARACTER_CYS_Marcus, TRIGGER_LUC_MarcusInJail, "");
+CHARACTER_CYS_Marcus.inSilverglen();
+DB_LUC_IV_Prisoner(CHARACTER_CYS_Marcus, ITEM_LUC_IV_HumanDoor);
+DB_LUC_IV_PrisonerDialog(CHARACTER_CYS_Marcus, "LUC_IV_PrisonerThank_Marcus");
+CharacterSetFaction(CHARACTER_CYS_Marcus,"LUC_Prisoner");
+CharacterSetCanFight(CHARACTER_CYS_Marcus, 0);
+CharacterSetVarFixedString(CHARACTER_CYS_Marcus,"currentState","State_Wander");
+
+IF
+ItemOpened(_Door)
+AND
+DB_LUC_IV_Prisoner(_Prisoner, _Door)
+AND
+_Prisoner!=CHARACTER_LUC_IV_OrcPrisoner
+AND
+DB_LUC_IV_PrisonerDialog(_Prisoner, _Dialog)
+THEN
+ProcLUCSetPrisonGuardVariable("HadPrisonBreak",1);
+NOT DB_LUC_IV_Prisoner(_Prisoner, _Door);
+CharacterSetHasDialog(_Prisoner, 0);
+CharacterSetCanFight(_Prisoner, 1);
+CharacterDisplayText(_Prisoner, _Dialog);
+CharacterSetFaction(_Prisoner,"LUC_EscapedPrisoner");
+ProcCharacterMoveToTrigger(_Prisoner, TRIGGER_LUC_IV_PrisonersEscape, 1, "readyToGo");
+
+IF
+CharacterLeftTrigger(_Prisoner, _Trigg)
+AND
+DB_LUC_IV_PrisonTrigg(_Prisoner, _Trigg)
+AND
+DB_LUC_IV_Prisoner(_Prisoner, _Door)
+AND
+DB_LUC_IV_PrisonerDialog(_Prisoner, _Dialog)
+THEN
+ProcLUCSetPrisonGuardVariable("HadPrisonBreak",1);
+CharacterSetCanFight(_Prisoner, 1);
+NOT DB_LUC_IV_Prisoner(_Prisoner, _Door);
+CharacterSetHasDialog(_Prisoner, 0);
+CharacterSetFaction(_Prisoner,"LUC_EscapedPrisoner");
+CharacterDisplayText(_Prisoner, _Dialog);
+ProcCharacterMoveToTrigger(_Prisoner, TRIGGER_LUC_IV_PrisonersEscape, 1, "readyToGo");
+
+IF
+DB_LUC_IV_Prisoner(_Character,_)
+THEN
+DB_NoDefaultBehavior(_Character);
+
+
+IF
+CharacterEvent(_Character, "readyToGo")
+THEN
+CharacterDisappearOutOfSight(_Character, -90, 1, "", 1);
+
+//END_REGION
+//REGION Orc prisoner 
+
+IF
+DB_LUCImmaculateOtherCells(_Trigger,_)
+THEN
+TriggerRegisterForCharacter(_Trigger,CHARACTER_LUC_IV_OrcPrisoner);
+
+//some smartass players teleported the poor guy into another cell...
+//Go evil
+IF
+CharacterEnteredTrigger(CHARACTER_LUC_IV_OrcPrisoner,_Trigger)
+AND
+DB_LUCImmaculateOtherCells(_Trigger,_RunTrig)
+THEN
+DB_OrcPrisonerEvil(1);
+DialogRequestStopForCharacter(CHARACTER_LUC_IV_OrcPrisoner);
+ProcCharacterMoveToTrigger(CHARACTER_LUC_IV_OrcPrisoner,_RunTrig,1,"");
+DB_OneShot_ADTrigger(_Trigger,"LUC_AD_OrcPrisonerAngry",CHARACTER_LUC_IV_OrcPrisoner);
+
+IF
+CharacterEnteredTrigger(_Char,_Trigger)
+AND
+_Char.DB_IsPlayer()
+AND
+DB_LUCImmaculateOtherCells(_Trigger,_)
+THEN
+CharacterPurgeQueue(CHARACTER_LUC_IV_OrcPrisoner);
+
+IF
+AutomatedDialogEnded("LUC_AD_OrcPrisonerAngry",_)
+THEN
+CharacterSetFaction(CHARACTER_LUC_IV_OrcPrisoner,"Evil NPC");
+
+IF
+ItemOpened(_Door)
+AND
+DB_LUC_IV_Prisoner(CHARACTER_LUC_IV_OrcPrisoner, _Door)
+THEN
+NOT DB_LUC_IV_Prisoner(CHARACTER_LUC_IV_OrcPrisoner, _Door);
+ProcTriggerRegisterForPlayers(TRIGGER_LUC_BoxOrcCell);
+ProcCharacterMoveToTrigger(CHARACTER_LUC_IV_OrcPrisoner,TRIGGER_LUC_Point_OrcPrisonerTarget,1,"");
+CharacterSetVarFixedString(CHARACTER_LUC_IV_OrcPrisoner,"currentState","State_StuckInCell");
+DB_OneShot_DialogTrigger(TRIGGER_LUC_BoxOrcPrisonerTalkArea,"LUC_OrcPrisoner",CHARACTER_LUC_IV_OrcPrisoner);
+DB_Dialogs(CHARACTER_LUC_IV_OrcPrisoner,"LUC_OrcPrisoner");
+
+IF
+DialogStarted("LUC_OrcPrisoner",_)
+THEN
+RemoveOneShotDialog(TRIGGER_LUC_BoxOrcPrisonerTalkArea);
+
+IF
+CharacterDying(CHARACTER_LUC_IV_OrcPrisoner)
+THEN
+DB_OrcPrisonerFreed(1);	//in heaven he's finally free :'(
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_BoxOrcCell);
+
+IF
+ItemEnteredTrigger(_Item,TRIGGER_LUC_BoxOrcCell,_Mover)
+AND
+DB_TeleporterPyramid(_Item)
+AND
+NOT DB_OrcPrisonerFreed(1)
+THEN
+DB_OrcPrisonerTeleporterInCell(_Item);
+ProcLUCOrcCheckPyramidTargetToRunTo();
+
+IF
+ItemLeftTrigger(_Item,TRIGGER_LUC_BoxOrcCell,_Mover)
+AND
+DB_TeleporterPyramid(_Item)
+AND
+NOT DB_OrcPrisonerFreed(1)
+THEN
+NOT DB_OrcPrisonerTeleporterInCell(_Item);
+CharacterPurgeQueue(CHARACTER_LUC_IV_OrcPrisoner);
+ProcLUCOrcCheckPyramidTargetToRunTo();
+
+PROC
+ProcLUCOrcCheckPyramidTargetToRunTo()
+THEN
+NOT DB_OrcPrisonerMultiPyramid(1);
+
+PROC
+ProcLUCOrcCheckPyramidTargetToRunTo()
+AND
+DB_OrcPrisonerTeleporterInCell(_Item)
+AND
+DB_OrcPrisonerTeleporterInCell(_OtherItem)
+AND
+_Item!=_OtherItem
+THEN
+DB_OrcPrisonerMultiPyramid(1);
+
+//check if we have a teleporter pyramid on the ground
+//but the other one is on a player inside the cell
+//=> don't teleport because we'd still end up in the cell
+PROC
+ProcLUCOrcCheckPyramidTargetToRunTo()
+AND
+NOT DB_OrcPrisonerMultiPyramid(1)
+AND
+DB_OrcPrisonerTeleporterInCell(_Item)
+AND
+DB_TeleporterPyramid(_OtherItem)
+AND
+_Item!=_OtherItem
+AND
+_Player.DB_IsPlayer()
+AND
+DB_InRegion(_Player,TRIGGER_LUC_BoxOrcCell)
+AND
+ItemIsInCharacterInventory(_OtherItem,_Player,1)
+THEN
+//found a player with a teleporter pyramid and he's in the cell!
+DB_OrcPrisonerMultiPyramid(1);
+
+PROC
+ProcLUCOrcCheckPyramidTargetToRunTo()
+AND
+DB_OrcPrisonerTeleporterInCell(_Item)
+AND
+NOT DB_OrcPrisonerMultiPyramid(1)
+THEN
+DialogRequestStopForCharacter(CHARACTER_LUC_IV_OrcPrisoner);
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_LUC_IV_OrcPrisoner);
+CharacterSetHasDialog(CHARACTER_LUC_IV_OrcPrisoner,0);
+CharacterMoveToItem(CHARACTER_LUC_IV_OrcPrisoner,_Item,1,"TeleporterPyramid");
+
+PROC
+ImprisonPlayer(_Player,"PRISON_LUCULLA")
+THEN
+ProcLUCSetPrisonGuardVariable("PlayerInJail",1);
+
+PROC
+PlayerLeavesPrison((CHARACTER)_Player,"PRISON_LUCULLA")
+AND
+CharacterGetOtherPlayer(_Player,_OtherPlayer)
+AND
+NOT PlayerInPrison(_OtherPlayer,"PRISON_LUCULLA")
+THEN
+ProcLUCSetPrisonGuardVariable("PlayerInJail",0);
+
+IF
+CharacterEvent(CHARACTER_LUC_IV_OrcPrisoner,"TeleporterPyramid")
+AND
+DB_OrcPrisonerTeleporterInCell(_Item)
+AND
+DB_OtherPyramid(_Item,_OtherPyramid)
+AND
+ItemGetPosition(_OtherPyramid,_X,_Y,_Z)
+AND
+CharacterGetPosition(CHARACTER_LUC_IV_OrcPrisoner,_X2,_Y2,_Z2)
+THEN
+CharacterTeleportToPosition(CHARACTER_LUC_IV_OrcPrisoner,_X,_Y,_Z,"OrcTeleported");
+PlayEffectAtPosition("FX_GP_TeleportSmoke_A",_X,_Y,_Z);
+PlayEffectAtPosition("FX_GP_TeleportSmoke_A",_X2,_Y2,_Z2);
+
+IF
+CharacterEvent(CHARACTER_LUC_IV_OrcPrisoner,"OrcTeleported")
+THEN
+CharacterLeaveCombat(CHARACTER_LUC_IV_OrcPrisoner);
+
+IF
+CharacterLeftTrigger(CHARACTER_LUC_IV_OrcPrisoner,TRIGGER_LUC_BoxOrcCell)
+THEN
+ProcLUCSetPrisonGuardVariable("HadPrisonBreak",1);
+//Whohoo made it out of the cell!
+DB_OrcPrisonerFreed(1);
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_BoxOrcCell);
+CharacterSetVarFixedString(CHARACTER_LUC_IV_OrcPrisoner,"currentState","");
+ProcLUCSetPrisonGuardVariable("OrcInJail",0);
+DialogStartOneSpeakerDialog("LUC_AD_OrcPrisonerFree",CHARACTER_LUC_IV_OrcPrisoner);
+TimerLaunch("OrcPrisonerStateCheck",1000);
+
+IF
+TimerFinished("OrcPrisonerStateCheck")
+AND
+NOT DB_OrcPrisonerEvil(1)
+THEN
+CharacterSetFaction(CHARACTER_LUC_IV_OrcPrisoner,"LUC_IV_OrcOutside");
+CharacterSetVarFixedString(CHARACTER_LUC_IV_OrcPrisoner,"currentState","State_OutOfPrison");
+DB_AD_Dialog(CHARACTER_LUC_IV_OrcPrisoner,"LUC_AD_OrcPrisonerOutOfJail");
+
+//if we have a teleporter in the cell
+//and a player carrying a teleporter walks out
+//try and move to the teleporter in the cell to teleport out
+IF
+CharacterLeftTrigger(_Player,TRIGGER_LUC_BoxOrcCell)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_OrcPrisonerFreed(1)
+AND
+DB_TeleporterPyramid(_Item)
+AND
+ItemIsInCharacterInventory(_Item,_Player,1)
+AND
+NOT DB_OrcPrisonerTeleporterInCell(_Item)
+THEN
+ProcLUCOrcCheckPyramidTargetToRunTo();
+
+//END_REGION
+//REGION Blacksmith
+PROC
+ProcCharInTriggerSpotted(_Player, TRIGGER_LUC_IV_BlacksmithEntrance)
+THEN
+ProcDoThreeSpeakerDialog("LUC_IV_IntroBlacksmith", CHARACTER_LUC_IV_BlacksmithApprentice, CHARACTER_LUC_IV_Blacksmith, _Player);
+//END_REGION
+//REGION Tunnel
+IF
+CharacterUsedItem(_Player, _Item)
+AND
+NOT ITEM_LUC_GT_EndLever.puzzleOver()
+AND
+DB_LUC_GT_TunnelTeleporter(_Item, _Target, _Step)
+AND
+DB_LUC_IV_TunnelStep(_RequiredStep)
+AND
+_Step != _RequiredStep
+THEN
+CharacterTeleportToTrigger(_Player, TRIGGER_LUC_GT_Waypoint1Target,"");
+NOT DB_LUC_IV_TunnelStep(_RequiredStep);
+DB_LUC_IV_TunnelStep(0);
+PROC_ShutDownLights(_RequiredStep);
+
+PROC
+PROC_ShutDownLights((INTEGER) _Threshold)
+AND
+DB_LUC_GT_TunnelLights(_Good, _Bad, _Step)
+AND
+_Step < _Threshold
+THEN
+ItemSetOnstage(_Good, 0);
+ItemSetOnstage(_Bad, 1);
+
+IF
+CharacterUsedItem(_Player, _Item)
+AND
+NOT ITEM_LUC_GT_EndLever.puzzleOver()
+AND
+DB_LUC_GT_TunnelTeleporter(_Item, _Target, _Step)
+AND
+DB_LUC_GT_TunnelLights(_Good, _Bad, _Step)
+AND
+DB_LUC_IV_TunnelStep(_RequiredStep)
+AND
+_Step == _RequiredStep
+AND
+IntegerSum(_Step, 1, _NextStep)
+THEN
+CharacterTeleportToTrigger(_Player, _Target,"");
+ItemSetOnstage(_Good, 1);
+ItemSetOnstage(_Bad, 0);
+NOT DB_LUC_IV_TunnelStep(_RequiredStep);
+DB_LUC_IV_TunnelStep(_NextStep);
+
+IF
+CharacterUsedItem(_Player, _Item)
+AND
+ITEM_LUC_GT_EndLever.puzzleOver()
+AND
+DB_LUC_GT_TunnelTeleporter(_Item, _, _)
+THEN
+CharacterTeleportToTrigger(_Player, TRIGGER_LUC_GT_Waypoint1Target,"");
+
+IF
+CharacterItemEvent(_, ITEM_LUC_GT_EndLever, "activated")
+AND
+ItemGetClosestPlayer(ITEM_LUC_GT_EndLever, _Player)
+AND
+NOT ITEM_LUC_GT_EndLever.puzzleOver()
+THEN
+ITEM_LUC_GT_EndLever.puzzleOver();
+ItemSetOnstage(ITEM_LUC_GT_Waypoint1, 0);
+ItemSetOnstage(ITEM_LUC_GT_Waypoint1After, 1);
+ItemSetOnstage(ITEM_LUC_GT_Green2, 0);
+ItemSetOnstage(ITEM_LUC_GT_Green3, 0);
+ItemSetOnstage(ITEM_LUC_GT_Green4, 0);
+ItemSetOnstage(ITEM_LUC_GT_Green7, 0);
+ItemSetOnstage(ITEM_LUC_GT_Green8, 0);
+ItemSetOnstage(ITEM_LUC_GT_Green9, 0);
+ItemSetOnstage(ITEM_LUC_GT_Blue1, 0);
+ItemSetOnstage(ITEM_LUC_GT_Blue5, 0);
+ItemSetOnstage(ITEM_LUC_GT_Blue6, 0);
+PROC_CommentHiddenEffect(_Player);
+
+PROC
+ProcOneShotTriggerEntered(_Player, TRIGGER_LUC_IT_SpawnSpirit)
+THEN
+CharacterAppear(CHARACTER_LUC_IT_Spirit, 1);
+
+IF
+CharacterWentOnStage(CHARACTER_LUC_IT_Spirit, 1)
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_LUC_IT_Spirit, _Player)
+THEN
+PROC_MendatoryDialog("LUC_IT_Spirit", CHARACTER_LUC_IT_Spirit, _Player);
+
+IF
+DialogEnded("LUC_IT_Spirit", _)
+THEN
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_LUC_IT_Spirit);
+CharacterSetOnStage(CHARACTER_LUC_IT_Spirit, 0);
+
+IF
+ItemLeftTrigger(_Book, _Trigger, _)
+AND
+DB_LUC_IT_SkillBooks(_Book, _, _, _Trigger)
+THEN
+TimerLaunch("LUC_IT_StopBurningBook", 3000);
+
+IF
+ItemLeftTrigger(_Book, _Trigger, _)
+AND
+DB_LUC_IT_SkillBooks(_Book, _, _, _Trigger)
+AND
+DB_LUC_IT_SkillBooks(_OtherBook, _Effect, _TriggerPoint, _TriggerArea)
+AND
+_Book != _OtherBook
+AND
+PlayLoopEffectAtTrigger(_Effect, _TriggerPoint, _Handle)
+THEN
+ItemSetCanInteract(_OtherBook, 0);
+ItemSetCanPickUp(_OtherBook, 0);
+ItemSetCanMove(_OtherBook, 0);
+DB_LUC_IT_BookHandle(_OtherBook, _Handle);
+NOT DB_LUC_IT_SkillBooks(_OtherBook, _Effect, _TriggerPoint, _TriggerArea);
+
+IF
+TimerFinished("LUC_IT_StopBurningBook")
+AND
+DB_LUC_IT_BookHandle(_OtherBook, _Handle)
+THEN
+StopLoopEffect(_Handle);
+PlayEffectAtItem("FX_GP_DissolveAshes_A_Big_A", _OtherBook);
+ItemSetOnstage(_OtherBook, 0);
+NOT DB_LUC_IT_BookHandle(_OtherBook, _Handle);
+//END_REGION
+//REGION Guard reactions 
+IF
+DB_PrisonDoorCheck(_Trigger,_)
+AND
+DB_LUC_PrisonGuard(_Guard)
+THEN
+TriggerRegisterForCharacter(_Trigger,_Guard);
+
+IF
+CharacterEnteredTrigger(_Guard,_Trigger)
+AND
+DB_LUC_PrisonGuard(_Guard)
+AND
+DB_PrisonDoorCheck(_Trigger,_Door)
+AND
+NOT DB_Combat(_Guard,_)
+AND
+ItemIsOpened(_Door,1)
+THEN
+DB_LUCPrisonGuardDoor(_Guard,_Door);
+ProcCharacterMoveToItem(_Guard,_Door,1,"GuardClosesDoor");
+CharacterDisplayText(_Guard,"LUC_Prison_Guard_FoundOpenDoor");
+
+IF
+CharacterEnteredCombat(_Guard,_)
+AND
+DB_LUC_PrisonGuard(_Guard)
+AND
+DB_LUCPrisonGuardDoor(_Guard,_Door)
+THEN
+NOT DB_LUCPrisonGuardDoor(_Guard,_Door);
+CharacterPurgeQueue(_Guard);
+
+IF
+CharacterEvent(_Guard,"GuardClosesDoor")
+AND
+DB_LUCPrisonGuardDoor(_Guard,_Door)
+THEN
+NOT DB_LUCPrisonGuardDoor(_Guard,_Door);
+ItemClose(_Door);
+ItemLock(_Door,"LUC_IV_Pens");
+CharacterDisplayText(_Guard,"LUC_Prison_Guard_ClosedDoor");
+
+IF
+ItemOpened(_Door)
+AND
+DB_PrisonDoorCheck(_,_Door)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_Combat(_Player,_)
+AND
+DB_LUC_PrisonGuard(_Guard)
+AND
+CharacterCanSeeCharacter(_Guard,_Player,1)
+AND
+NOT DB_LUCPrisonGuardDoorOpeningHandled(_Door,1)
+THEN
+DB_LUCPrisonGuardDoorOpeningHandled(_Door,1);
+RemoveOneShotDialog(TRIGGER_LUC_BoxOrcPrisonerTalkArea);
+DoRevenge(_Player,_Guard,5);
+
+IF
+ItemOpened(_Door)
+THEN
+NOT DB_LUCPrisonGuardDoorOpeningHandled(_Door,1);
+
+//END_REGION
+//REGION Unique Bow
+IF
+ItemDestroyed(ITEM_LUC_IV_StatueHoldingBow)
+THEN
+ItemSetCanInteract(ITEM_WPN_Heartseeker,1);
+
+//END_REGION
+//REGION Entry guards
+IF	
+GlobalEventSet("LUC_IV_ClearEntryPassage")
+THEN
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_IV_StartFightGuards);
+ProcRemoveDialogEntryForSpeaker(CHARACTER_LUC_IV_GateGuard, "LUC_IV_AngryGuards");
+ProcRemoveDialogEntryForSpeaker(CHARACTER_LUC_IV_SecondGuard, "LUC_IV_AngryGuards");
+DB_Dialogs(CHARACTER_LUC_IV_GateGuard, "LUC_IV_Guards");
+DB_Dialogs(CHARACTER_LUC_IV_SecondGuard, "LUC_IV_Guards");
+CHARACTER_LUC_IV_Attenberah.allowAccess();
+
+IF
+CharacterEvent(_Char, "GLO_SpotterSneakerEntry")
+AND
+NOT DB_Combat(CHARACTER_LUC_IV_GateGuard, _)
+AND
+CharacterGetVarCharacter(_Char, "SpottedDude1", _Player) 
+AND
+NOT DB_OnlyOnce("lUC_SacredStoneEntry")
+THEN
+DB_OnlyOnce("lUC_SacredStoneEntry");
+ProcDoTwoSpeakerDialog("LUC_IV_AngryGuards", _Char, _Player);
+
+IF
+CharacterEvent(_Char, "GLO_SpotterSneakerFight")
+AND
+CharacterGetVarCharacter(_Char, "SpottedDude2", _Player)
+AND
+NOT 	CHARACTER_LUC_IV_Attenberah.allowAccess()
+THEN
+ProcMakeNPCHostile(_Player, CHARACTER_LUC_IV_GateGuard);
+ProcMakeNPCHostile(_Player, CHARACTER_LUC_IV_SecondGuard);
+
+IF
+CharacterSawCharacter(_Immaculate, _Player)
+AND
+_Player.DB_IsPlayer()
+AND
+DB_LUC_IV_ImmaculateVillager(_Immaculate, _)
+AND
+NOT	CHARACTER_LUC_IV_Attenberah.allowAccess()
+THEN
+SetRelationFactionToPlayers("LUC_ImmaculateVillage", 0);
+SetRelationFactionToPlayers("LUC_ImmaculateVillageGeomancer", 0);
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_IV_Area_Geomancer);
+NOT DB_OneShotPlayerTrigger(TRIGGER_LUC_IV_Area_Geomancer);
+//END_REGION
+
+IF
+DB_WarnedPlayerOfAttack(_Char,_Count)
+AND
+DB_LUC_ImmaculateOutsideStudents(_Char)
+AND
+DB_LUC_ImmaculateOutsideStudents(_OtherChar)
+AND
+_OtherChar!=_Char
+THEN
+ProcSetImmaculateVillageWarningCount(_OtherChar,_Count);
+
+PROC
+ProcSetImmaculateVillageWarningCount((CHARACTER)_OtherChar,(INTEGER)_Count)
+AND
+NOT DB_WarnedPlayerOfAttack(_OtherChar,_)
+THEN
+DB_WarnedPlayerOfAttack(_OtherChar,0);
+
+PROC
+ProcSetImmaculateVillageWarningCount((CHARACTER)_OtherChar,(INTEGER)_Count)
+AND
+DB_WarnedPlayerOfAttack(_OtherChar,_CheckCount)
+AND
+_CheckCount<_Count
+THEN
+NOT DB_WarnedPlayerOfAttack(_OtherChar,_CheckCount);
+DB_WarnedPlayerOfAttack(_OtherChar,_Count);
+
+
+
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

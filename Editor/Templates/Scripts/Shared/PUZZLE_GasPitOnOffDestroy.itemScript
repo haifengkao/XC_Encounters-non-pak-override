@@ -1,0 +1,113 @@
+#INCLUDE PressurePlate
+
+INIT
+USING PressurePlate
+
+ITEM:__Me
+INT:%SpewingGas=1
+EXTERN SURFACE:%GasType=CloudPoison
+EXTERN FLOAT:%GasRadius=2
+EXTERN SURFACE:%SurfaceCheck=Fire
+EXTERN INT:%Active=1
+EXTERN STRING:%OnEvent=null
+EXTERN STRING:%OffEvent=null
+EXTERN STRING:%DestroyEvent=null
+EXTERN INT:%AllowSingleIgnite = 0
+
+
+FLOAT:%GasRadiusCheck=null
+
+
+EVENTS
+
+
+EVENT PitInit
+
+ON
+
+	OnInit()
+
+ACTIONS
+
+	Set(%GasRadiusCheck,%GasRadius)
+
+	Add(%GasRadiusCheck,0.5)
+
+
+EVENT GasPitOn
+ON
+	OnCharacterItemEvent(_,_,%OnEvent)
+ACTIONS
+	Set(%Active,1)
+	
+EVENT GasPitOff
+ON
+	OnCharacterItemEvent(_,_,%OffEvent)
+ACTIONS
+	Set(%Active,0)	
+	CreateSurfaceAt(__Me,None,%GasRadius,-1)
+	
+EVENT GasPitOff2
+ON
+	OnItemDestroyed(__Me)
+	OnCharacterItemEvent(_,_,%DestroyEvent)
+ACTIONS
+	Set(%Active,0)	
+	CreateSurfaceAt(__Me,None,%GasRadius,-1)
+	ItemDestroy(__Me)
+
+EVENT PlateChange
+ON
+	OnItemEvent(__Me,"PressurePlateChange")
+ACTIONS
+	IF "c1"
+		IsEqual(%CurrentPercentage,1)
+	THEN
+		Set(%SpewingGas,0)
+		IF "c1"
+			ContainsSurface(__Me,%GasRadius,%GasType)
+		THEN
+			CreateSurfaceAt(__Me,None,%GasRadius,-1)
+		ENDIF
+	ELIF "c1"
+		IsEqual(%PreviousPercentage,1)
+	THEN
+		Set(%SpewingGas,1)
+	ENDIF
+	
+BEHAVIOUR
+
+REACTION SpewGas,1
+CHECK "c1&c2&!c3&(c4|c5|!c6)&(!c7|!c8)"
+	IsEqual(%Active,1)
+	IsEqual(%SpewingGas,1)
+	IsSurface(__Me,%GasRadius,%GasType)
+	IsEqual(%SurfaceCheck,None)
+	IsEqual(%AllowSingleIgnite,1)
+	ContainsSurface(__Me,%GasRadius,%SurfaceCheck)
+
+	IsEqual(%GasType,CloudPoison)	
+
+	ContainsSurface(__Me,%GasRadiusCheck,CloudExplosion)
+ACTIONS	
+	CreateSurfaceAt(__Me,%GasType,%GasRadius,-1)
+
+	IF "c1"
+
+		IsEqual(%GasType,CloudPoison)	
+
+	THEN
+
+		Sleep(0.8)
+
+	ELSE
+
+		Sleep(0.2)
+
+	ENDIF	
+	IF "c1&c2"
+		IsEqual(%AllowSingleIgnite,1)
+		ContainsSurface(__Me,%GasRadius,%SurfaceCheck)
+	THEN
+		Set(%AllowSingleIgnite,0)
+	ENDIF

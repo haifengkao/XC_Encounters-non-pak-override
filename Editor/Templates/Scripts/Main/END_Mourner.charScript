@@ -1,0 +1,55 @@
+INIT
+
+CHARACTER:__Me
+	EXTERN TRIGGER:%Point = null
+	EXTERN INT:%Skel = 0
+	
+BEHAVIOUR
+
+REACTION Moan, 1000
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+	FLOAT:_Rest
+ACTIONS
+
+	CharacterMoveTo(%Point, 0, 0)
+	CharacterLookFrom(%Point)
+	GetRandomBetween(_Rest, 1.0, 3.0)
+	Sleep(_Rest)
+	IF "!c1"
+		IsEqual(%Skel, 1)
+	THEN
+		GetRandom(_Animation, "Crying_01", "emotion_sad")		
+	ELSE
+		GetRandom(_Animation, "Worship_01", "Pray_01")
+	ENDIF
+	CharacterPlayAnimation(_Animation)
+	IF "c1"
+		IsRandom(.6)
+	THEN
+		DialogStart("END_AD_NegaKingsCrab_Mourner", __Me)
+	ENDIF
+	GetRandomBetween(_Rest, 10.0, 20.0)
+	Sleep(_Rest)
+	Reset()
+
+STORY
+
+SCRIPTFRAME Burn
+VARS
+	INT:_Handle
+	INT:_Handle2
+ACTIONS
+	CharacterApplyStatus(__Me, STATUS:BURNING, 8, 1)
+	CharacterPlayAnimation("emotion_panic_distress")
+	CharacterPlayLoopEffect(_Handle, __Me, "FX_Skills_Fire_Immolate_Prepare_A")
+	IF "c1"
+		IsRandom(.3)
+	THEN
+		DialogStart("END_AD_NegaAstarteMoaner_Die", __Me)
+	ENDIF
+	StopLoopEffect(_Handle)
+	CharacterDie(__Me, DEATH:DoT)
+
+	

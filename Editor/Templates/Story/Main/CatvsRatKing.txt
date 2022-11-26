@@ -1,0 +1,712 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Dialogs(CHARACTER_DAF_JinxikaCat,"DAF_JinxikaCat");
+DB_Dialogs(CHARACTER_DAF_Ratcatcher,"DAF_Ratcatcher");
+DB_Dialogs(CHARACTER_DAF_RatKing,"DAF_RatKing");
+ProcSetRatsOffStage();
+db_BlackOrderFactions("DAF_VillageBO_Orc");
+db_BlackOrderFactions("DAF_VillageBO_Human");
+db_FleeingRatsRatKing(CHARACTER_DAF_RatVillage1_01,TRIGGER_DAF_RatHoleHiding01,TRIGGER_DAF_Area_RatsCheese01);
+db_FleeingRatsRatKing(CHARACTER_DAF_RatVillage1_02,TRIGGER_DAF_RatHoleHiding01,TRIGGER_DAF_Area_RatsCheese01);
+db_FleeingRatsRatKing(CHARACTER_DAF_RatVillage2_01,TRIGGER_DAF_RatHoleHiding02,TRIGGER_DAF_Area_RatsCheese02);
+db_FleeingRatsRatKing(CHARACTER_DAF_RatVillage2_02,TRIGGER_DAF_RatHoleHiding02,TRIGGER_DAF_Area_RatsCheese02);
+db_FleeingRatsRatKing(CHARACTER_DAF_RatVillage3_01,TRIGGER_DAF_RatHoleHiding03,TRIGGER_DAF_Area_RatsCheese03);
+db_FleeingRatsRatKing(CHARACTER_DAF_RatVillage3_02,TRIGGER_DAF_RatHoleHiding03,TRIGGER_DAF_Area_RatsCheese03);
+db_FleeingRatsRatKing(CHARACTER_DAF_RatVillage4_01,TRIGGER_DAF_RatHoleHiding04,TRIGGER_DAF_Area_RatsCheese04);
+db_FleeingRatsRatKing(CHARACTER_DAF_RatVillage4_02,TRIGGER_DAF_RatHoleHiding04,TRIGGER_DAF_Area_RatsCheese04);
+db_FleeingRatsRatKing(CHARACTER_DAF_RatVillage5_01,TRIGGER_DAF_RatHoleHiding05,TRIGGER_DAF_Area_RatsCheese05);
+db_FleeingRatsRatKing(CHARACTER_DAF_RatVillage5_02,TRIGGER_DAF_RatHoleHiding05,TRIGGER_DAF_Area_RatsCheese05);
+db_RatKingHideTriggerHoles(TRIGGER_DAF_RatHoleHiding01,ITEM_DAF_RatKingHidingHole1);
+db_RatKingHideTriggerHoles(TRIGGER_DAF_RatHoleHiding02,ITEM_DAF_RatKingHidingHole2);
+db_RatKingHideTriggerHoles(TRIGGER_DAF_RatHoleHiding03,ITEM_DAF_RatKingHidingHole3);
+db_RatKingHideTriggerHoles(TRIGGER_DAF_RatHoleHiding04,ITEM_DAF_RatKingHidingHole4);
+db_RatKingHideTriggerHoles(TRIGGER_DAF_RatHoleHiding05,ITEM_DAF_RatKingHidingHole5);
+db_KnowAttackerRatRatking(CHARACTER_Player1);
+db_KnowHideTriggerRatRatking(TRIGGER_DAF_Area_RatsCheese01);
+DAF_RatsCanBeLured(1);
+ProcSetNoDefaultBehaviorRatsVillage();
+DB_IsNotMessingAround(CHARACTER_DAF_RatKing);
+DB_IsNotMessingAround(CHARACTER_DAF_JinxikaCat);
+ItemSetCanInteract(ITEM_DAF_DoorHiddenFamilyCellarIN,0);
+DB_PlayerComments("DAF_CommentRatKingPalaceUsed", "DAF_CommentRatKingPalaceUsed_1_1",1,1);
+DB_PlayerComments("DAF_CommentRatKingPalaceUsed", "DAF_CommentRatKingPalaceUsed_2_1",2,1);
+DB_PlayerComments("DAF_CommentRatKingPalaceUsed", "DAF_CommentRatKingPalaceUsed_2_2",2,2);
+DB_PlayerComments("DAF_KilledRatInSightOfBO", "DAF_KilledRatInSightOfBO_1_1",1,1);
+DB_PlayerComments("DAF_KilledRatInSightOfBO", "DAF_KilledRatInSightOfBO_2_1",2,1);
+DB_PlayerComments("DAF_KilledRatInSightOfBO", "DAF_KilledRatInSightOfBO_2_2",2,2);
+DB_PlayerComments("DAF_CommentRatKingKilled", "DAF_CommentRatKingKilled_1_1",1,1);
+DB_PlayerComments("DAF_CommentRatKingKilled", "DAF_CommentRatKingKilled_2_1",2,1);
+DB_PlayerComments("DAF_CommentRatKingKilled", "DAF_CommentRatKingKilled_2_2",2,2);
+DB_PlayerComments("DAF_CommentJinxikaCatKilled", "DAF_CommentJinxikaCatKilled_1_1",1,1);
+DB_PlayerComments("DAF_CommentJinxikaCatKilled", "DAF_CommentJinxikaCatKilled_2_1",2,1);
+DB_PlayerComments("DAF_CommentJinxikaCatKilled", "DAF_CommentJinxikaCatKilled_2_2",2,2);
+DB_PlayerComments("DAF_CommentFirstRatKilled", "DAF_CommentFirstRatKilled_1_1",1,1);
+DB_PlayerComments("DAF_CommentFirstRatKilled", "DAF_CommentFirstRatKilled_2_2",1,2);
+DB_PlayerComments("DAF_CommentFirstRatKilled", "DAF_CommentFirstRatKilled_2_1",2,1);
+DB_PlayerComments("DAF_CommentFirstRatKilled", "DAF_CommentFirstRatKilled_2_2",2,2);
+DB_NoDefaultBehavior(CHARACTER_DAF_RatKing);
+DB_CheeseTemplate("CON_Food_Cheese_A_dba0453f-f5bc-49ba-ab7f-7e989a745de4");
+DB_CheeseTemplate("CON_Food_Bread_Cheese_A_cc5838b7-93d9-4163-b977-18d385666bf3");
+DB_CheeseTemplate("CON_Food_Cheese_Piece_A_405d1af0-5fa9-4e3e-9d7e-0a79f6b5f564");
+DB_CheeseTemplate("Quest_Food_Cheese_Piece_A_46d0e7c7-d9f0-462d-945e-cae3bcfef28d");
+DB_CheeseTemplate("CON_Food_Poisoned_Cheese_A_8dab6b1b-d761-439f-8b7d-5ab400902e35");
+DB_Dialogs(CHARACTER_DAF_RatVillage1_01,"DAF_Rat1_01");
+DB_Dialogs(CHARACTER_DAF_RatVillage1_02,"DAF_Rat1_02");
+DB_Dialogs(CHARACTER_DAF_RatVillage2_01,"DAF_Rat2_01");
+DB_Dialogs(CHARACTER_DAF_RatVillage2_02,"DAF_Rat2_02");
+DB_Dialogs(CHARACTER_DAF_RatVillage3_01,"DAF_Rat3_01");
+DB_Dialogs(CHARACTER_DAF_RatVillage3_02,"DAF_Rat3_02");
+DB_Dialogs(CHARACTER_DAF_RatVillage4_01,"DAF_Rat4_01");
+DB_Dialogs(CHARACTER_DAF_RatVillage4_02,"DAF_Rat4_02");
+DB_Dialogs(CHARACTER_DAF_RatVillage5_01,"DAF_Rat5_01");
+DB_Dialogs(CHARACTER_DAF_RatVillage5_02,"DAF_Rat5_02");
+KBSECTION
+////// TEMPORARY!!!! ////
+
+IF
+TextEventSet("DAF_boulder")
+THEN
+DAF_BoulderHasAlreadyBeenDestroyed(1);
+ItemSetOnstage(ITEM_DAF_HiddenFamilyBoulder, 0);
+ItemSetEvent(ITEM_DAF_DoorHiddenFamilyCellarIN,"StoryReveal");
+ItemSetCanInteract(ITEM_DAF_DoorHiddenFamilyCellarIN,1);
+ItemUnLock(ITEM_DAF_DoorHiddenFamilyCellarIN);
+
+////////////////
+
+PROC
+ProcSetNoDefaultBehaviorRatsVillage()
+AND
+db_FleeingRatsRatKing(_Rat,_HideTrigger,_CheeseTrigger)
+THEN
+DB_NoDefaultBehavior(_Rat);
+
+IF
+db_FleeingRatsRatKing(_,_,_CheeseTrigger)
+THEN
+TriggerRegisterForItems(_CheeseTrigger);
+
+//REGION Cat Outside Village
+
+IF
+GlobalEventSet("DAF_JinxikaLeftForVillage")
+THEN
+CHARACTER_DAF_JinxikaCat.leavesForVillage();
+
+IF
+DialogEnded("DAF_JinxikaCat",_)
+AND
+CHARACTER_DAF_JinxikaCat.leavesForVillage()
+AND
+NOT DB_OnlyOnce("JinxInVillage")
+THEN
+CharacterDisappearOutOfSight(CHARACTER_DAF_JinxikaCat,0,1,"DAF_JinxInVillage",1);
+CharacterSetHasDialog(CHARACTER_DAF_JinxikaCat,0);
+
+IF
+CharacterEvent(CHARACTER_DAF_JinxikaCat,"DAF_JinxInVillage")
+THEN
+CharacterSetVarInteger(CHARACTER_DAF_JinxikaCat, "State", 1);
+CharacterAppearAtTrigger(CHARACTER_DAF_JinxikaCat,TRIGGER_DAF_Area_JinxikaCatInsideVillage,0);
+CharacterSetHasDialog(CHARACTER_DAF_JinxikaCat,1);
+NOT CHARACTER_DAF_JinxikaCat.leavesForVillage();
+DB_OnlyOnce("JinxInVillage");
+
+
+IF
+GlobalEventSet("DAF_JinxikaLeftForVillage")
+AND
+NOT CHARACTER_DAF_JinxikaCat.leavesForVillage()
+THEN
+CharacterDisappearOutOfSight(CHARACTER_DAF_JinxikaCat,90,1,"DAF_JinxInVillage",1);
+CharacterSetHasDialog(CHARACTER_DAF_JinxikaCat,0);
+
+IF
+CharacterDied(CHARACTER_DAF_JinxikaCat)
+THEN
+GlobalSetEvent("DAF_JinxikaCatIsDead");
+GlobalSetEvent("DAF_KnowAboutJinxikaCat");
+
+IF
+CharacterDied(CHARACTER_DAF_JinxikaCat)
+AND
+DB_GlobalEvent("DAF_KnowAboutRatKing")
+AND
+CharacterGetClosestPlayer(CHARACTER_DAF_JinxikaCat,_Player)
+THEN
+Launch_PlayerComment(_Player,"DAF_CommentJinxikaCatKilled");
+
+IF
+DialogEnded("DAF_JinxikaCat",_)
+AND
+DB_GlobalEvent("DAF_JinxikaCatIsLeaving")
+THEN
+GlobalSetEvent("DAF_JinxikaCatIsDead"); //Used in dialogs to check if cat is dead or gone
+ProcRemoveDialogEntryForSpeaker(CHARACTER_DAF_JinxikaCat,"DAF_JinxikaCat");
+CharacterSetHasDialog(CHARACTER_DAF_JinxikaCat,0);
+CharacterDisappearOutOfSight(CHARACTER_DAF_JinxikaCat,180,1,"",1);
+
+//---- Rat King Dies Comment and flags ------//
+IF
+CharacterDied(CHARACTER_DAF_RatKing)
+AND
+CharacterGetClosestPlayer(CHARACTER_DAF_RatKing,_Player)
+THEN
+GlobalSetEvent("DAF_RatKingIsDead");
+GlobalSetEvent("DAF_KnowAboutRatKing");
+NOT DAF_RatsCanBeLured(1);
+Launch_PlayerComment(_Player,"DAF_CommentRatKingKilled");
+QuestUpdate("DAF_HiddenFamily","RatkingDead");
+
+//END_REGION
+
+//REGION Killing Rats
+IF
+CharacterUsedItem(_Player,_Rathole)
+AND
+db_RatKingHideTriggerHoles(_,_Rathole)
+AND
+NOT DAF_FirstRatKilled(1)
+THEN
+ItemDisplayText(_Rathole,"DAF_Rathole1");
+
+IF
+CharacterUsedItem(_Player,_Rathole)
+AND
+db_RatKingHideTriggerHoles(_,_Rathole)
+AND
+DAF_FirstRatKilled(1)
+AND
+DAF_RatsCanBeLured(1)
+THEN
+ItemDisplayText(_Rathole,"DAF_Rathole2");
+
+IF
+CharacterDied(_Rat)
+AND
+db_FleeingRatsRatKing(_Rat,_Hole,_)
+AND
+DAF_FirstRatKilled(1)
+AND
+NOT DAF_SecondRatKilled(1)
+AND
+db_KnowHideTriggerRatRatking(_OldHole)
+THEN
+DAF_SecondRatKilled(1);
+NOT db_KnowHideTriggerRatRatking(_OldHole);
+db_KnowHideTriggerRatRatking(_Hole);
+
+IF
+CharacterDied(_Rat)
+AND
+db_FleeingRatsRatKing(_Rat,_,_)
+AND
+NOT DAF_FirstRatKilled(1)
+AND
+CharacterGetClosestPlayer(_Rat,_Player)
+THEN
+DAF_FirstRatKilled(1);
+ProcDAFMoveAllRatsInHiding();
+CharTimer(_Player,"FirstRatDeadComment",1000);
+QuestUpdate("DAF_HiddenFamily","Rats2");
+
+IF
+CharTimerFinished(_Player,"FirstRatDeadComment")
+AND
+NOT DAF_SecondRatKilled(1)
+THEN
+Launch_PlayerComment(_Player,"DAF_CommentFirstRatKilled");
+
+IF
+CharacterDied(_Rat)
+AND
+db_FleeingRatsRatKing(_Rat,_HideTrigger,_CheeseTrigger)
+AND
+db_KnowAttackerRatRatking(_Player)
+THEN
+ProcCheckVisibleBlackRing(_Player);
+ProcDecideActionBasedOnBlackOrder(_Player);
+NOT db_FleeingRatsRatKing(_Rat,_HideTrigger,_CheeseTrigger);
+NOT RatsAreEating(1);
+
+PROC
+ProcDAFMoveAllRatsInHiding()
+AND
+db_FleeingRatsRatKing(_Rat,_HideTrigger,_CheeseTrigger)
+AND
+NOT DB_Dead(_Rat)
+THEN
+ProcCharacterMoveToTrigger(_Rat,_HideTrigger,1,"DAF_MoveAllRatsInHiding");
+
+IF
+CharacterEvent(_Rat,"DAF_MoveAllRatsInHiding")
+AND
+db_FleeingRatsRatKing(_Rat,_HideTrigger,_CheeseTrigger)
+THEN
+GlobalSetEvent("DAF_RatsRatKingAreInHiding");  //See Ratcatcher Dialog
+CharacterSetEvent(_Rat,"Hiding");
+CharacterSetOnStage(_Rat,0);
+CharTimer(_Rat,"gooffstage",1000); //Sometimes the script on shutdown sets the rat on stage so a safety timer is added
+
+IF
+CharTimerFinished(_Rat,"gooffstage")
+THEN
+CharacterSetOnStage(_Rat,0);
+
+//END_REGION
+
+//REGION If Seen By BO
+
+IF
+CharacterAttackedByCharacter(_Rat,_New)  // example: Fireball can kill after attack, but with no assigned attacker ("Fire Damage")
+AND
+db_FleeingRatsRatKing(_Rat,_,_)
+AND
+db_KnowAttackerRatRatking(_Old)
+THEN
+NOT db_KnowAttackerRatRatking(_Old);
+db_KnowAttackerRatRatking(_New);
+
+PROC
+ProcCheckVisibleBlackRing((CHARACTER)_Player)
+AND
+Sees(_Player,_NPC)
+AND
+CharacterGetFaction(_NPC,_Faction)
+AND
+db_BlackOrderFactions(_Faction)
+AND
+NOT dbSpottedBlackOrder(_Player,_)
+THEN
+dbSpottedBlackOrder(_Player,_NPC);
+
+PROC
+ProcDecideActionBasedOnBlackOrder((CHARACTER)_Player)
+AND
+dbSpottedBlackOrder(_Player,_NPC)
+AND
+NOT DAF_War(1)
+THEN
+ProcDoTwoSpeakerDialog("DAF_KilledRat",_NPC,_Player);
+NOT dbSpottedBlackOrder(_Player,_NPC);
+
+IF
+DialogEnded("DAF_KilledRat",_KilledRatDialog)
+AND
+DB_DialogPlayers(_KilledRatDialog,_Player,1)
+AND
+NOT PlayersMadeCommentsAboutKilledRatAndSeenByBO(1)
+THEN
+PlayersMadeCommentsAboutKilledRatAndSeenByBO(1);
+Launch_PlayerComment(_Player,"DAF_KilledRatInSightOfBO");
+
+PROC
+ProcDecideActionBasedOnBlackOrder((CHARACTER)_Player)
+AND
+NOT dbSpottedBlackOrder(_Player,_)
+AND
+DAF_SecondRatKilled(1)
+AND
+NOT DAF_War(1)
+THEN
+ProcMoveRatKingIn();
+
+//END_REGION
+
+//REGION Not Seen By BO
+
+PROC
+ProcMoveRatKingIn()
+AND
+db_KnowAttackerRatRatking(_Player)
+AND
+db_KnowHideTriggerRatRatking(_HideTrigger)
+AND
+NOT RatKingHasAppeared(1)
+AND
+CharacterGetPosition(_Player,_X,_Y,_Z)
+THEN
+NOT DAF_RatsCanBeLured(1); // Remove cheese gathering script
+RatKingHasAppeared(1);
+QuestUpdate("DAF_HiddenFamily","Rats4");
+CharacterAppearAtTrigger(CHARACTER_DAF_RatKing,_HideTrigger,0);
+CharacterMoveToPosition(CHARACTER_DAF_RatKing,_X,_Y,_Z,1,"DAF_RatKingAppearsOutOfSight");
+
+IF
+CharacterEvent(CHARACTER_DAF_RatKing,"DAF_RatKingAppearsOutOfSight")
+THEN
+DialogStartOneSpeakerDialog("DAF_AD_RatKing_Angry",CHARACTER_DAF_RatKing);
+
+IF
+DialogEnded("DAF_RatKing",_)
+AND
+db_KnowHideTriggerRatRatking(_HideTrigger)
+AND
+NOT RatKingHasMadeFirstAppearance(1)
+THEN
+RatKingHasMadeFirstAppearance(1);
+ProcCharacterMoveToTrigger(CHARACTER_DAF_RatKing,_HideTrigger,1,"DAF_RatKingReturnsToHidingHole");
+
+IF
+CharacterEvent(CHARACTER_DAF_RatKing,"DAF_RatKingReturnsToHidingHole")
+THEN
+CharacterSetOnStage(CHARACTER_DAF_RatKing,0);
+
+//END_REGION
+
+//REGION Place Cheese At Holes
+
+IF
+ItemTemplateEnteredTrigger(_CheeseTemplate,_Cheese,_CheeseTrigger,_,_Player)
+AND
+DB_CheeseTemplate(_CheeseTemplate)
+AND
+db_FleeingRatsRatKing(_Rat,_HideTrigger,_CheeseTrigger)
+AND
+DAF_RatsCanBeLured(1)
+AND
+NOT RatsAreEating(1)
+AND
+NOT DAF_War(1)
+THEN
+ProcRatsStartEatingCheese(_Cheese,_CheeseTrigger);
+db_TempKnowWhichCheese(_Cheese);
+RatsAreEating(1);
+ProcCheckCheeseForPoison(_CheeseTemplate,_HideTrigger,_Player);
+QuestUpdate("DAF_HiddenFamily","Rats3");
+
+PROC
+ProcCheckCheeseForPoison("CON_Food_Poisoned_Cheese_A_8dab6b1b-d761-439f-8b7d-5ab400902e35",(TRIGGER)_Trigger,(CHARACTER)_Player)
+AND
+db_KnowHideTriggerRatRatking(_OldTrigger)
+AND
+db_KnowAttackerRatRatking(_OldPlayer)
+THEN
+NOT db_KnowHideTriggerRatRatking(_OldTrigger);
+db_KnowHideTriggerRatRatking(_Trigger);
+NOT db_KnowAttackerRatRatking(_OldPlayer);
+db_KnowAttackerRatRatking(_Player);
+RatsAreEatingPoisonedCheese(1);
+
+PROC
+ProcRatsStartEatingCheese((INTEGER)_Cheese,(TRIGGER)_CheeseTrigger)
+AND
+db_FleeingRatsRatKing(_Rat,_HideTrigger,_CheeseTrigger)
+THEN
+CharacterSetOnStage(_Rat,1);
+CharacterMoveToItemHandle(_Rat,_Cheese,0,"DAF_RatsEatingCheese");
+
+IF
+CharacterEvent(_Rat,"DAF_RatsEatingCheese")
+THEN
+CharTimer(_Rat,"DAF_RatsEatingCheese2",2000);
+
+IF
+CharTimerFinished(_Rat,"DAF_RatsEatingCheese2")
+AND
+db_FleeingRatsRatKing(_Rat,_HideTrigger,_)
+AND
+db_TempKnowWhichCheese(_Cheese)
+THEN
+NOT db_TempKnowWhichCheese(_Cheese);
+ItemHandleSetOnStage(_Cheese,0);
+ProcDAFRatGoBackOrDie(_Rat,_HideTrigger);
+
+PROC
+ProcDAFRatGoBackOrDie((CHARACTER)_Rat,(TRIGGER)_Trigger)
+AND
+db_FleeingRatsRatKing(_Rat,_HideTrigger,_CheeseTrigger)
+AND
+RatsAreEatingPoisonedCheese(1)
+THEN
+NOT db_FleeingRatsRatKing(_Rat,_HideTrigger,_CheeseTrigger);
+CharacterDie(_Rat,0);
+GlobalSetEvent("DAF_RatKingReactToPoison");
+ProcDAFMoveAllRatsInHiding();
+ProcMoveRatKingIn();
+NOT RatsAreEating(1);
+
+PROC
+ProcDAFRatGoBackOrDie((CHARACTER)_Rat,(TRIGGER)_Trigger)
+AND
+NOT RatsAreEatingPoisonedCheese(1)
+THEN
+NOT RatsAreEating(1);
+ProcDAFMoveAllRatsInHiding();
+
+//END_REGION
+
+//REGION Cat Has Been Killed and told Ratking
+IF
+DialogEnded("DAF_RatKing",_)
+AND
+DB_GlobalEvent("DAF_RatKingKnowsCatIsDead")
+THEN
+ProcRemoveDialogEntryForSpeaker(CHARACTER_DAF_RatKing,"DAF_RatKing");
+DB_OneShotPlayerTrigger(TRIGGER_DAF_Area_RatCatcher01);
+
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,TRIGGER_DAF_Area_RatCatcher01)
+AND
+NOT DAF_War(1)
+THEN
+PROC_MendatoryDialog("DAF_GrutildaRatcatcher",CHARACTER_DAF_Ratcatcher,_Player);
+
+IF
+DialogEnded("DAF_GrutildaRatcatcher",_)
+THEN
+CharacterSetHasDefaultDialog(CHARACTER_DAF_Ratcatcher,0);
+CharacterSetHasDialog(CHARACTER_DAF_Ratcatcher,0);
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_DAF_Ratcatcher);
+ProcCharacterMoveToTrigger(CHARACTER_DAF_Ratcatcher,TRIGGER_DAF_Point_RatCatcherCellarIn,1,"DAF_RunTowardsHiddenFamilyCellar");
+//END_REGION
+
+//REGION Cellar Check for boulder
+
+IF
+GlobalEventSet("DAF_HiddenFamilyMarker")
+THEN
+ProcShowMarker("DAF_HiddenFamily");
+
+IF
+ItemDestroyed(ITEM_DAF_HiddenFamilyBoulder)
+THEN
+DAF_BoulderHasAlreadyBeenDestroyed(1);
+ItemSetCanInteract(ITEM_DAF_DoorHiddenFamilyCellarIN,1);
+ItemSetEvent(ITEM_DAF_DoorHiddenFamilyCellarIN,"StoryReveal");
+
+IF
+CharacterEvent(_Character,"DAF_RunTowardsHiddenFamilyCellar")
+THEN
+ProcCheckIfBoulderIsStillOn();
+
+PROC
+ProcCheckIfBoulderIsStillOn()
+AND
+DAF_BoulderHasAlreadyBeenDestroyed(1)
+THEN
+ItemUnLock(ITEM_DAF_DoorHiddenFamilyCellarIN);
+CharacterTeleportToTrigger(CHARACTER_DAF_Ratcatcher,TRIGGER_DAF_PointHiddenFamilyCellarIN,"insideHiddenCellar");
+
+PROC
+ProcCheckIfBoulderIsStillOn()
+AND
+NOT DAF_BoulderHasAlreadyBeenDestroyed(1)
+THEN
+DialogStartOneSpeakerDialog("DAF_AD_GrutildaAtFamilyBoulder", CHARACTER_DAF_Ratcatcher);
+
+IF
+GlobalEventSet("DAF_GrutildaBlowsUpBoulder")
+AND
+ItemGetPosition(ITEM_DAF_HiddenFamilyBoulder,_X,_Y,_Z)
+THEN
+PlayEffectAtPosition("FX_Skills_Air_Storm_Impact_A",_X,_Y,_Z);
+TimerLaunch("DAF_2ndbolt",800);
+
+IF
+TimerFinished("DAF_2ndbolt")
+AND
+ItemGetPosition(ITEM_DAF_HiddenFamilyBoulder,_X,_Y,_Z)
+THEN
+PlayEffectAtPosition("FX_Skills_Air_Storm_Impact_A",_X,_Y,_Z);
+ItemDestroy(ITEM_DAF_HiddenFamilyBoulder);
+ItemSetCanInteract(ITEM_DAF_DoorHiddenFamilyCellarIN,1);
+ItemSetEvent(ITEM_DAF_DoorHiddenFamilyCellarIN,"StoryReveal");
+
+IF
+AutomatedDialogEnded("DAF_AD_GrutildaAtFamilyBoulder", _)
+THEN
+ItemUnLock(ITEM_DAF_DoorHiddenFamilyCellarIN);
+CharacterTeleportToTrigger(CHARACTER_DAF_Ratcatcher,TRIGGER_DAF_PointHiddenFamilyCellarIN,"insideHiddenCellar");
+
+IF
+CharacterEvent(CHARACTER_DAF_Ratcatcher,"insideHiddenCellar")
+THEN
+ProcTriggerUnregisterForPlayers(TRIGGER_DAF_Area_BO_HiddenFamilyDialog);
+ProcCharacterMoveToTrigger(CHARACTER_DAF_Ratcatcher,TRIGGER_DAF_Point_RatCatcherCellar,1,"nearFamily");
+IF
+CharacterEvent(CHARACTER_DAF_Ratcatcher,"insideHiddenCellar")
+AND
+NOT DB_GlobalEvent("DAF_HiddenFamilyLeaves")
+THEN
+CHARACTER_DAF_Ratcatcher.IsInCellar();
+DialogRequestStopForCharacter(CHARACTER_DAF_HiddenFamilyFather);
+DialogRequestStopForCharacter(CHARACTER_DAF_HiddenFamilyMother);
+DialogRequestStopForCharacter(CHARACTER_DAF_HiddenFamilyDaughter);
+CharacterSetHasDefaultDialog(CHARACTER_DAF_HiddenFamilyFather,0);
+CharacterSetHasDialog(CHARACTER_DAF_HiddenFamilyFather,0);
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_DAF_HiddenFamilyFather);
+CharacterSetHasDefaultDialog(CHARACTER_DAF_HiddenFamilyDaughter,0);
+CharacterSetHasDialog(CHARACTER_DAF_HiddenFamilyDaughter,0);
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_DAF_HiddenFamilyDaughter);
+CharacterSetHasDefaultDialog(CHARACTER_DAF_HiddenFamilyMother,0);
+CharacterSetHasDialog(CHARACTER_DAF_HiddenFamilyMother,0);
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_DAF_HiddenFamilyMother);
+
+IF
+CharacterEvent(CHARACTER_DAF_Ratcatcher,"nearFamily")
+AND
+NOT DB_GlobalEvent("DAF_HiddenFamilyLeaves")
+THEN
+GlobalSetEvent("DAF_RatcatcherKilledFamily");
+DialogStartTwoSpeakerDialog("DAF_AD_RatCatcherKillsHiddenFamily", CHARACTER_DAF_Ratcatcher,CHARACTER_DAF_HiddenFamilyFather);
+IF
+CharacterEvent(CHARACTER_DAF_Ratcatcher,"nearFamily")
+AND
+DB_GlobalEvent("DAF_HiddenFamilyLeaves")
+THEN
+GlobalSetEvent("DAF_RatcatcherMissedFamily");
+DialogStartOneSpeakerDialog("DAF_AD_RatcatcherAtEmptyFamilyCellar", CHARACTER_DAF_Ratcatcher);
+IF
+AutomatedDialogEnded("DAF_AD_RatcatcherAtEmptyFamilyCellar", _)
+THEN
+Proc_RatcatcherLeavesTown();
+IF
+CharacterEnteredCombat(CHARACTER_DAF_Ratcatcher,_)
+AND
+CHARACTER_DAF_Ratcatcher.IsInCellar()
+THEN
+PROC_DAF_RatcatcherKillsFamily();
+IF
+AutomatedDialogEnded("DAF_AD_RatCatcherKillsHiddenFamily", _)
+THEN
+PROC_DAF_RatcatcherKillsFamily();
+PROC
+PROC_DAF_RatcatcherKillsFamily()
+THEN
+PlayEffectAtCharacter("FX_Skills_Air_Storm_Impact_A",CHARACTER_DAF_HiddenFamilyFather);
+PlayEffectAtCharacter("FX_Skills_Air_Storm_Impact_A",CHARACTER_DAF_HiddenFamilyMother);
+PlayEffectAtCharacter("FX_Skills_Air_Storm_Impact_A",CHARACTER_DAF_HiddenFamilyDaughter);
+CharacterDie(CHARACTER_DAF_HiddenFamilyFather,1);
+CharacterDie(CHARACTER_DAF_HiddenFamilyMother,1);
+CharacterDie(CHARACTER_DAF_HiddenFamilyDaughter,1);
+GlobalSetEvent("DAF_BO_HiddenFamilyKilled");
+TimerLaunch("RatCatcherKilledAll",4000);
+NOT CHARACTER_DAF_Ratcatcher.IsInCellar();
+IF
+TimerFinished("RatCatcherKilledAll")
+THEN
+CharacterDisplayText(CHARACTER_DAF_Ratcatcher,"DAF_RatcatcherKilledFamily");
+QuestUpdate("DAF_HiddenFamily","FinishKill");
+QuestClose("DAF_HiddenFamily");
+IF
+CharacterDisplayTextEnded(CHARACTER_DAF_Ratcatcher,"DAF_RatcatcherKilledFamily")
+THEN
+Proc_RatcatcherLeavesTown();
+
+PROC
+Proc_RatcatcherLeavesTown()
+THEN
+ProcCharacterMoveToTrigger(CHARACTER_DAF_Ratcatcher,TRIGGER_DAF_PointHiddenFamilyCellarIN,1,"goingoutofcellar");
+
+IF
+CharacterEvent(CHARACTER_DAF_Ratcatcher,"goingoutofcellar")
+THEN
+CharacterTeleportToTrigger(CHARACTER_DAF_Ratcatcher,TRIGGER_DAF_PointHiddenFamilyCellarOUT,"teleportedtosurface");
+
+IF
+CharacterEvent(CHARACTER_DAF_Ratcatcher,"goingoutofcellar")
+THEN
+ProcCharacterMoveToTrigger(CHARACTER_DAF_Ratcatcher,TRIGGER_DAF_BO_Point_GateGuard1Inside,1,"atthegate");
+
+IF
+CharacterEvent(CHARACTER_DAF_Ratcatcher,"atthegate")
+THEN
+ItemUnlockAndOpen(ITEM_DAF_DoorVillageEntrance1);
+CharacterDisappearOutOfSight(CHARACTER_DAF_Ratcatcher,270,0,"",1);
+GlobalSetEvent("DAF_RatcatcherGone");
+NOT DB_DAF_BO_Orc(CHARACTER_DAF_Ratcatcher);
+//END_REGION
+
+//REGION RatKing Has Been Killed, Tell Grutilda
+
+//See Executioner goal
+
+//END_REGION
+
+//REGION Ratcatcher Has Been Killed, cat gives out info
+IF
+CharacterDied(CHARACTER_DAF_Ratcatcher)
+THEN
+GlobalSetEvent("DAF_RatcatcherIsDead");
+NOT DAF_RatsCanBeLured(1);
+QuestUpdate("DAF_HiddenFamily","RatcatcherDead");
+
+//END_REGION
+
+//REGION RatKing Palace
+
+// Use palace before meeting RatKing
+
+IF
+CharacterUsedItem(_Player,ITEM_DAF_RatPalace)
+AND
+_player.DB_IsPlayer()
+AND
+NOT RatKingPalacePlayerCommentDone(1)
+AND
+NOT RatKingHasMadeFirstAppearance(1)
+AND
+NOT DAF_War(1)
+THEN
+RatKingPalacePlayerCommentDone(1);
+Launch_PlayerComment(_Player,"DAF_CommentRatKingPalaceUsed");
+
+// Use Palace after meeting ratking
+
+IF
+CharacterUsedItem(_Player,ITEM_DAF_RatPalace)
+AND
+RatKingHasMadeFirstAppearance(1)
+AND
+NOT DB_Dead(CHARACTER_DAF_RatKing)
+AND
+NOT DB_Dead(CHARACTER_DAF_Ratcatcher)
+AND
+NOT CHARACTER_DAF_RatKing.AppearedAtPalace()
+AND
+NOT DB_GlobalEvent("DAF_RatKingKnowsCatIsDead")
+AND
+NOT DAF_War(1)
+THEN
+CharacterAppearAtTrigger(CHARACTER_DAF_RatKing,TRIGGER_DAF_RatHoleHidingPalace,0);
+CHARACTER_DAF_RatKing.AppearedAtPalace();
+
+IF
+DialogEnded("DAF_RatKing",_)
+AND
+CHARACTER_DAF_RatKing.AppearedAtPalace()
+THEN
+ProcCharacterMoveToTrigger(CHARACTER_DAF_RatKing,TRIGGER_DAF_RatHoleHidingPalace,1,"DAF_RatKingReturnsToPalace");
+
+IF
+CharacterEvent(CHARACTER_DAF_RatKing,"DAF_RatKingReturnsToPalace")
+THEN
+CharacterSetOnStage(CHARACTER_DAF_RatKing,0);
+NOT CHARACTER_DAF_RatKing.AppearedAtPalace();
+
+// Use Palace after Ratking knows about dead cat
+
+IF
+CharacterUsedItem(_Player,ITEM_DAF_RatPalace)
+AND
+RatKingHasMadeFirstAppearance(1)
+AND
+DB_GlobalEvent("DAF_RatKingKnowsCatIsDead")
+AND
+NOT DB_Dead(CHARACTER_DAF_RatKing)
+AND
+NOT DAF_War(1)
+THEN
+ItemDisplayText(ITEM_DAF_RatPalace,"DAF_CatvsRatKing_Story_16"); // The ratking is busy finding the villagers, he can't be disturbed.
+
+IF
+	GlobalEventSet("DAF_RatKingKnowsCatIsDead")
+THEN
+	ProcShowMarker("DAF_SecretEntranceGrutilda");
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

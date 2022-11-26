@@ -1,0 +1,3 @@
+INITCHARACTER:__Me
+BEHAVIOURREACTION guardcage, 1000USAGE PEACEVARS	FIXEDSTRING:_Animation	FIXEDSTRING:_Text	CHARACTER:_Guard = CYS_Bairdotr_Guard_F_279c08fe-030b-42e2-9475-8071e690966f	CHARACTER:_Bairdotr = Bairdotr_7294ff38-7536-496a-b754-c900021c90b8	FLOAT:_dist1	FLOAT:_dist2ACTIONS	Sleep(10)	IF "c1&c2&c3&c4&!c5&!c6"		GetDistance(_dist1,__Me,_Guard)		GetDistance(_dist2,__Me,_Bairdotr)		IsLessThen(_dist1,6.0)		IsLessThen(_dist2,6.0)		IsInDialog(_Guard)		IsInDialog(_Bairdotr)	THEN		CharacterLookAt(_Guard)		DialogStart("BRD_AD_CageGuards",_Guard,__Me,_Bairdotr)	ENDIF	Sleep(3)INTERRUPT	Reset()
+EVENTSEVENT CombatStopsDialogON	OnCombatStarted()ACTIONS	DialogRequestStop("BRD_AD_CageGuards")

@@ -1,0 +1,81 @@
+
+INIT
+
+CHARACTER:__Me
+
+CHARACTER:%bjorn = LUC_Bjorn_77bdb47f-8e36-47b2-8eac-19c53ca52b6f
+CHARACTER:%mara = LUC_Mara_7174eb04-dd44-4b7a-a698-6bb135b98964
+CHARACTER:%mount = LUC_BjornMount_7e974707-a22e-4dc7-aad0-c2ec145b62b2
+
+INT:%mountIsValidTarget = 0
+
+BEHAVIOUR 
+
+//Combat stuff
+REACTION AttackBestTarget, 1000
+USAGE COMBAT
+VARS 
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+	CHARACTER:_SelectedTarget
+	INT:_MountWeight
+	INT:_BjornWeight
+	INT:_MaraWeight
+CHECK "c1&!c2"
+	CharacterGetWeaponRange(_MinRange,_MaxRange,__Me)
+	CharacterHasStatus(__Me,CHARMED)
+ACTIONS
+	//these creatures will focus on the mount first, then on Bjorn
+	//Mara is lowest priority
+	IF "c1&!c2&!c3"
+		IsEqual(%mountIsValidTarget, 1)
+		CharacterHasStatus(%mount,DYING)
+		CharacterHasStatus(%mount,INVISIBLE)
+	THEN
+		Set(_MountWeight,70)	
+	ELSE
+		Set(_MountWeight,-1)
+	ENDIF
+	IF "c1|c2"
+		CharacterHasStatus(%bjorn,DYING)
+		CharacterHasStatus(%bjorn,INVISIBLE)
+	THEN
+		Set(_BjornWeight,-1)		
+	ELSE
+		Set(_BjornWeight,40)		
+	ENDIF
+	IF "c1|c2"
+		CharacterHasStatus(%mara,DYING)
+		CharacterHasStatus(%mara,INVISIBLE)
+	THEN
+		Set(_MaraWeight,-1)		
+	ELSE
+		Set(_MaraWeight,10)
+	ENDIF
+	
+	GetWeightedRandom(_SelectedTarget,%mount,_MountWeight,%bjorn,_BjornWeight,%mara,_MaraWeight)
+	
+	//our selected object is the mount even if it's not valid
+	//this happens when none of the targets are valid
+	IF "!(c1&c2)|c3"
+		IsEqual(_SelectedTarget,%mount)
+		IsEqual(_MountWeight,-1)
+		CharacterGet(_SelectedTarget,__Me,null,Lowest,Distance,Enemy)
+	THEN
+		CharacterMoveInRange(_SelectedTarget,_MinRange,_MaxRange,1)
+		CharacterAttack(_SelectedTarget)
+	ENDIF
+	Sleep(1)
+	CharacterEndTurn()
+INTERRUPT
+	Reset()
+
+
+
+
+
+
+
+
+
+

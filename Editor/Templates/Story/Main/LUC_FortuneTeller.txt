@@ -1,0 +1,126 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Dialogs(CHARACTER_LUC_FortuneTeller, "LUC_FortuneTeller");
+DB_Dialogs(CHARACTER_LUC_FortuneTellerHusband, "LUC_FortuneTellerHusband");
+DB_Dialogs(CHARACTER_LUC_Kirill, "LUC_Kirill");
+
+DB_LUC_TellerAnimals(CHARACTER_LUC_FortuneTellerAnimal1);
+DB_LUC_TellerAnimals(CHARACTER_LUC_FortuneTellerAnimal2);
+DB_LUC_TellerAnimals(CHARACTER_LUC_FortuneTellerAnimal3);
+DB_LUC_TellerAnimals(CHARACTER_LUC_FortuneTellerAnimal4);
+DB_LUC_TellerAnimals(CHARACTER_LUC_FortuneTellerAnimal5);
+DB_LUC_TellerAnimals(CHARACTER_LUC_FortuneTellerAnimal6);
+
+DB_LUC_TellerGroup(CHARACTER_LUC_FortuneTeller);
+DB_LUC_TellerGroup(CHARACTER_LUC_FortuneTellerHusband);
+DB_LUC_TellerGroup(CHARACTER_LUC_Kirill);
+
+DB_ShovelArea(TRIGGER_LUC_ShovelFortune1,"LUC_Fortune1",ITEM_LUC_ShovelFortune1Dirt);
+DB_ShovelArea(TRIGGER_LUC_ShovelFortune2,"LUC_Fortune2",ITEM_LUC_ShovelFortune2Dirt);
+DB_ShovelArea(TRIGGER_LUC_ShovelFortune3,"LUC_Fortune3",ITEM_LUC_ShovelFortune3Dirt);
+DB_ShovelArea(TRIGGER_LUC_ShovelFortune4,"LUC_Fortune4",ITEM_LUC_ShovelFortune4Dirt);
+DB_ShovelArea(TRIGGER_LUC_ShovelFortune5,"LUC_Fortune5",ITEM_LUC_ShovelFortune5Dirt);
+DB_ShovelArea(TRIGGER_LUC_ShovelFortune6,"LUC_Fortune6",ITEM_LUC_ShovelFortune6Dirt);
+
+DB_ShovelRewardItemAppear("LUC_Fortune1",ITEM_LUC_ShovelFortune1Chest,TRIGGER_LUC_ShovelFortune1Point);
+DB_ShovelRewardItemAppear("LUC_Fortune2",ITEM_LUC_ShovelFortune2Chest,TRIGGER_LUC_ShovelFortune2Point);
+DB_ShovelRewardItemAppear("LUC_Fortune3",ITEM_LUC_ShovelFortune3Chest,TRIGGER_LUC_ShovelFortune3Point);
+DB_ShovelRewardItemAppear("LUC_Fortune4",ITEM_LUC_ShovelFortune4Chest,TRIGGER_LUC_ShovelFortune4Point);
+DB_ShovelRewardItemAppear("LUC_Fortune5",ITEM_LUC_ShovelFortune5Chest,TRIGGER_LUC_ShovelFortune5Point);
+DB_ShovelRewardItemAppear("LUC_Fortune6",ITEM_LUC_ShovelFortune6Chest,TRIGGER_LUC_ShovelFortune6Point);
+
+DB_NoDefaultBehavior(CHARACTER_LUC_FortuneTeller);
+DB_NoDefaultBehavior(CHARACTER_LUC_FortuneTellerHusband);
+DB_NoDefaultBehavior(CHARACTER_LUC_Kirill);
+DB_NoDefaultBehavior(CHARACTER_LUC_FortuneTellerAnimal1);
+DB_NoDefaultBehavior(CHARACTER_LUC_FortuneTellerAnimal2);
+DB_NoDefaultBehavior(CHARACTER_LUC_FortuneTellerAnimal3);
+DB_NoDefaultBehavior(CHARACTER_LUC_FortuneTellerAnimal4);
+DB_NoDefaultBehavior(CHARACTER_LUC_FortuneTellerAnimal5);
+DB_NoDefaultBehavior(CHARACTER_LUC_FortuneTellerAnimal6);
+
+DB_KirillSongs("SingSong1", "Playlist_Luc_Bard_1");
+DB_KirillSongs("SingSong2", "Playlist_Luc_Bard_2");
+DB_KirillSongs("SingSong3", "Playlist_Luc_Bard_3");
+DB_KirillSongs("SingSong4", "Playlist_Luc_Bard_4");
+DB_KirillSongs("SingSong5", "Playlist_Luc_Bard_5");
+
+DB_TellerStories("Story1", "LUC_AD_TellerStory1");
+DB_TellerStories("Story2", "LUC_AD_TellerStory2");
+DB_TellerStories("Story3", "LUC_AD_TellerStory3");
+
+DB_FortuneEvent("LUC_FortuneSecret1", "LUC_SecretLow1");
+DB_FortuneEvent("LUC_FortuneSecret2", "LUC_SecretLow2");
+DB_FortuneEvent("LUC_FortuneSecret3", "LUC_SecretMedium1");
+DB_FortuneEvent("LUC_FortuneSecret4", "LUC_SecretMedium2");
+DB_FortuneEvent("LUC_FortuneSecret5", "LUC_SecretHigh1");
+DB_FortuneEvent("LUC_FortuneSecret6", "LUC_SecretHigh2");
+KBSECTION
+IF
+DialogEnded("LUC_FortuneTellerHusband", _)
+AND
+DB_TellerStories(_Var, _Text)
+AND
+CharacterGetVarInteger(CHARACTER_LUC_FortuneTellerHusband, _Var, 1)
+THEN
+CharacterSetVarInteger(CHARACTER_LUC_FortuneTellerHusband, _Var, 0);
+DialogStartOneSpeakerDialog(_Text, CHARACTER_LUC_FortuneTellerHusband);
+
+IF
+DialogEnded("LUC_Kirill", _)
+AND
+DB_KirillSongs(_Var, _Song)
+AND
+CharacterGetVarInteger(CHARACTER_LUC_Kirill, _Var, 1)
+THEN
+CharacterSetVarInteger(CHARACTER_LUC_Kirill, _Var, 0);
+MusicPlay(_Song);
+
+IF
+CharacterAttackedByCharacter(_Animal, _Player)
+AND
+DB_LUC_TellerAnimals(_Animal)
+THEN
+CharacterDisplayText(CHARACTER_LUC_FortuneTellerHusband, "LUC_TellerUpset");
+CharacterSetFaction(CHARACTER_LUC_FortuneTeller, "Evil NPC");
+CharacterSetFaction(CHARACTER_LUC_FortuneTellerHusband, "Evil NPC");
+CharacterSetFaction(CHARACTER_LUC_Kirill, "Evil NPC");
+
+IF
+CharacterAttackedByCharacter(_Animal, _Player)
+AND
+DB_LUC_TellerAnimals(_Animal)
+AND
+DB_LUC_TellerAnimals(_OtherAnimal)
+THEN
+CharacterDisappearOutOfSight(_OtherAnimal, 0,1,"", 1);
+
+IF
+CharacterAttackedByCharacter(_Dude, _Player)
+AND
+DB_LUC_TellerGroup(_Dude)
+AND
+DB_LUC_TellerAnimals(_OtherAnimal)
+THEN
+CharacterDisappearOutOfSight(_OtherAnimal, 0,1,"", 1);
+
+IF
+CharacterAttackedByCharacter(_Dude, _Player)
+AND
+DB_LUC_TellerGroup(_Dude)
+AND
+DB_LUC_TellerGroup(_OtherGuy)
+THEN
+CharacterSetFaction(_OtherGuy, "Evil NPC");
+
+IF
+GlobalEventSet(_Event)
+AND
+DB_FortuneEvent(_Event, _Secret)
+THEN
+AddSecret(_Secret);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

@@ -1,0 +1,193 @@
+INIT
+
+CHARACTER:__Me
+EXTERN INT:%Active = 1
+INT:%EffectHandle = 0
+INT:%IHaveSomeone = 0
+INT:%AlreadyWaiting = 0
+EXTERN STRING:%EventOn = "HIB_SentinelSpotted"
+EXTERN STRING:%EventOff = "HIB_SentinelSpotted"
+EXTERN STRING:%EventTurnOn = "turnMeOn"
+EXTERN STRING:%EventTurnOff = "turnMeOff"
+EXTERN INT:%MasterSwitch = 1
+FLOAT:%Range = 0
+FLOAT:%StartRange = 0
+EXTERN FLOAT:%Angle = 5
+
+BEHAVIOUR
+
+REACTION Watching, 0
+USAGE ALL
+CHECK "c1&c2"
+	IsEqual(%Active,1)
+	IsEqual(%MasterSwitch,1)
+VARS
+	CHARACTER:_Player
+	FLOAT3:_Direction
+	FLOAT3:_Pos
+ACTIONS
+    IF "c1"
+        IsEqual(%EffectHandle, 0)
+    THEN
+	    CharacterPlayLoopEffect(%EffectHandle,__Me,"FX_GP_Light_Green_A","Dummy_CastFX")
+	ENDIF
+	GetForwardDirection(__Me, _Direction)
+	GetPosition(__Me, _Pos)
+	RotateY(_Direction, %Angle)
+	Add(_Pos, _Direction)
+	CharacterLookAt(_Pos)
+INTERRUPT
+	StopLoopEffect(%EffectHandle)
+	Set(%EffectHandle, 0)
+    Reset()
+
+REACTION Alarmed, 0
+USAGE ALL
+CHECK "c1&c2"
+	IsEqual(%Active,2)
+	IsEqual(%MasterSwitch,1)
+ACTIONS
+    IF "c1"
+        IsEqual(%EffectHandle, 0)
+    THEN
+	    CharacterPlayLoopEffect(%EffectHandle,__Me,"FX_GP_Light_Red_A","Dummy_CastFX")
+	ENDIF
+    Sleep(10)
+INTERRUPT
+	StopLoopEffect(%EffectHandle)
+	Set(%EffectHandle, 0)
+    Reset()
+
+EVENTS
+
+EVENT Init
+ON
+	OnInit()
+ACTIONS
+	Set(%EffectHandle, 0)
+	IF "c1&c2"
+		IsEqual(%StartRange, 0)
+		CharacterGetSightRange(%StartRange, __Me)
+	THEN
+	ENDIF
+	IF "c1"
+		IsEqual(%MasterSwitch, 1)
+	THEN
+		CharacterApplyStatus(__Me,GALVANISED,-1)
+	ELIF "c1&c2"
+		CharacterGetSightRange(%Range, __Me)
+		IsEqual(%Range, %StartRange)
+	THEN
+		CharacterConsume(__Me, GLO_SentinelOff)
+	ENDIF
+	StartTimer("spotsneaker", 0.1, -1)
+	IF "c1"
+		IsEqual(%Active,1)
+	THEN
+		SetPriority("Watching",1000)
+		CharacterSetCanSpotSneakers(__Me,1)
+	ELSE
+		SetPriority("Alarmed",1000)
+		CharacterSetCanSpotSneakers(__Me,0)
+	ENDIF
+
+EVENT Shutdown
+ON
+	OnShutdown()
+ACTIONS
+	StopLoopEffect(%EffectHandle)
+	Set(%EffectHandle, 0)
+	StopTimer("spotsneaker")
+	
+EVENT OnDamage
+ON
+	OnDamage(_,_,_,_)
+ACTIONS
+	IF "c1&c2"
+		IsEqual(%Active,1)
+		IsEqual(%MasterSwitch,1)
+	THEN
+		Set(%Active,2)
+        SetPriority("Watching",0)
+		Interrupt("Watching")
+        SetPriority("Alarmed",1000)
+		DisplayText(__Me,"HIB_SentinelSpotted",5.0)
+		CharacterItemEvent(__Me,null,%EventOn)
+	ENDIF
+
+EVENT PartyMemberIterator
+VARS 
+	CHARACTER:_Player
+ON
+	OnIterateCharacter(_Player,"CheckForPartyMember")
+ACTIONS
+	IF "c1&c2&!c3"
+		CharacterIsPlayer(_Player)
+		CharacterCanSee(__Me,_Player,1)
+		CharacterIsDead(_Player)
+	THEN
+		Set(%IHaveSomeone, 1)
+		IF "c1"
+			IsEqual(%Active,1)
+		THEN
+			Set(%Active,2)
+			SetPriority("Watching",0)
+			Interrupt("Watching")
+            SetPriority("Alarmed",1000)
+            DisplayText(__Me,"HIB_SentinelSpotted",5.0)
+			CharacterItemEvent(__Me,null,%EventOn)
+			StopTimer("backToNormal")
+			Set(%AlreadyWaiting, 0)
+		ENDIF
+	ENDIF
+	
+	
+EVENT LaunchIterator
+ON 
+	OnTimer("spotsneaker")
+ACTIONS
+	IF "c1"
+		IsEqual(%MasterSwitch,1)
+	THEN
+		Set(%IHaveSomeone, 0)
+		IterateCharactersNear(__Me,15.0,"CheckForPartyMember")
+		IF "c1&c2&!c3"
+			IsEqual(%IHaveSomeone, 0)
+			IsEqual(%Active,2)
+			IsEqual(%AlreadyWaiting,1)
+		THEN
+			StartTimer("backToNormal", 2.0, 0)
+			Set(%AlreadyWaiting, 1)
+		ENDIF
+	ENDIF
+	
+EVENT backToNormal
+ON
+	OnTimer("backToNormal")
+ACTIONS
+	CharacterSetCanSpotSneakers(__Me,1)
+	Set(%Active,1)
+	SetPriority("Alarmed",0)
+	Interrupt("Alarmed")
+    SetPriority("Watching",1000)
+    CharacterItemEvent(__Me,null, %EventOff)
+	Set(%AlreadyWaiting, 0)
+
+EVENT SwitchOn
+ON
+	OnCharacterItemEvent(_,_,%EventTurnOn)
+ACTIONS
+	Set(%MasterSwitch, 1)
+	Set(%Active, 1)
+	CharacterConsume(__Me, GLO_SentinelOn)
+	CharacterApplyStatus(__Me, GALVANISED)
+
+EVENT SwitchOff
+ON
+	OnCharacterItemEvent(_,_,%EventTurnOff)
+ACTIONS
+	Set(%MasterSwitch, 0)
+	StopLoopEffect(%EffectHandle)
+	Set(%EffectHandle, 0)
+	CharacterRemoveStatus(__Me, GALVANISED)
+	CharacterConsume(__Me, GLO_SentinelOff)

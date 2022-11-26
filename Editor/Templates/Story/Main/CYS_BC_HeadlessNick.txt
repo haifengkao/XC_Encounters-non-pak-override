@@ -1,0 +1,1175 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+//REGION Databases
+//Database referencing the NPCs looking at the shows
+CYS_HN_FairEnthusiast(CHARACTER_CYS_FairEnthusiast1);
+CYS_HN_FairEnthusiast(CHARACTER_CYS_FairEnthusiast2);
+CYS_HN_FairEnthusiast(CHARACTER_CYS_FairEnthusiast3);
+CYS_HN_FairEnthusiast(CHARACTER_CYS_FairCrowdWarmer);
+CYS_HN_FairEnthusiast(CHARACTER_CYS_FairListener1);
+CYS_HN_FairEnthusiast(CHARACTER_CYS_FairListener2);
+CYS_HN_FairEnthusiast(CHARACTER_CYS_FairListener3);
+
+CYS_HN_FairEasyPublic(CHARACTER_CYS_FairListener1);
+CYS_HN_FairEasyPublic(CHARACTER_CYS_FairEnthusiast1);
+CYS_HN_FairEasyPublic(CHARACTER_CYS_FairListener3);
+
+CYS_HN_FairDialogs(CHARACTER_CYS_FairCrowdWarmer, "CYS_FairCrowdWarmer");
+CYS_HN_FairDialogs(CHARACTER_CYS_FairListener1, "CYS_FairListenersGeneric");
+CYS_HN_FairDialogs(CHARACTER_CYS_FairListener2, "CYS_FairListenersGeneric");
+CYS_HN_FairDialogs(CHARACTER_CYS_FairListener3, "CYS_FairListenersGeneric");
+CYS_HN_FairDialogs(CHARACTER_CYS_FairEnthusiast1, "CYS_FairListenersGeneric");
+CYS_HN_FairDialogs(CHARACTER_CYS_FairEnthusiast2, "CYS_FairListenersGeneric");
+CYS_HN_FairDialogs(CHARACTER_CYS_FairEnthusiast3, "CYS_FairListenersGeneric");
+CYS_HN_FairDialogs(CHARACTER_CYS_JonerMarketArtist, "CYS_JonerMarketArtist");
+CYS_HN_FairDialogs(CHARACTER_CYS_Reginald, "CYS_Reginald");
+
+DB_CYS_HN_PlaySuccess(0);
+
+DB_NickFieldComments("CYS_BlackCove", "GLO_PlayerInBlackCove");
+DB_NickFieldComments("Cyseal", "GLO_PlayerInCyseal");
+DB_NickFieldComments("DAF_Druid_Dungeon", "GLO_PlayerInDruidDungeon");
+DB_NickFieldComments("DAF_Inner_Sanctum", "GLO_PlayerInInnerSanctum");
+DB_NickFieldComments("DAF_King_Tomb", "GLO_PlayerInKingTomb");
+DB_NickFieldComments("DarkForest", "GLO_PlayerInDarkForest");
+DB_NickFieldComments("Homestead", "GLO_PlayerInHomestead");
+DB_NickFieldComments("LUC_BloodCave", "GLO_PlayerInBloodCave");
+DB_NickFieldComments("LUC_Mines", "GLO_PlayerInMines");
+DB_NickFieldComments("LucullaForest", "GLO_PlayerInLucullaForest");
+DB_NickFieldComments("ThePrisonGardenOfStoneKing", "GLO_PlayerInHiberheim");
+//END_REGION
+
+//REGION Triggers registration
+TriggerRegisterForItems(TRIGGER_CYS_HN_ReginaldCellar);
+ProcTriggerRegisterForPlayers(TRIGGER_CYS_PlayerPerfArea);
+//END_REGION
+
+//REGION Dialogs
+DB_Dialogs(CHARACTER_CYS_Reginald,"CYS_Reginald");
+DB_Dialogs(CHARACTER_CYS_JonerMarketArtist,"CYS_JonerMarketArtist");
+DB_Dialogs(CHARACTER_CYS_FairCrowdWarmer,"CYS_FairCrowdWarmer");
+DB_Dialogs(CHARACTER_CYS_FairListener1,"CYS_FairListenersGeneric");
+DB_Dialogs(CHARACTER_CYS_FairListener2,"CYS_FairListenersGeneric");
+DB_Dialogs(CHARACTER_CYS_FairListener3,"CYS_FairListenersGeneric");
+DB_Dialogs(CHARACTER_CYS_FairEnthusiast1,"CYS_FairListenersGeneric");
+DB_Dialogs(CHARACTER_CYS_FairEnthusiast2,"CYS_FairListenersGeneric");
+DB_Dialogs(CHARACTER_CYS_FairEnthusiast3,"CYS_FairListenersGeneric");
+DB_Dialogs(CHARACTER_CYS_FairOwner, "CYS_FairOwner");
+DB_Dialogs(CHARACTER_CYS_BC_HeadlessNick, "CYS_BC_HeadlessNick");
+DB_Dialogs(CHARACTER_CYS_Nozgoth, "CYS_Nozgoth");
+DB_Dialogs(CHARACTER_Nick, "CYS_BC_Nick");
+DB_Dialogs(CHARACTER_CYS_Brian, "CYS_Brian");
+DB_Dialogs(CHARACTER_CYS_Chaucer, "CYS_Chaucer");
+//END_REGION
+
+//REGION Story events
+GlobalSetEvent("CYS_HN_HeadOnPedestal");
+CharacterSetOnStage(CHARACTER_Nick,0);
+CharacterSetOnStage(CHARACTER_DAF_HortunGhost,0);
+CharacterSetOnStage(CHARACTER_DAF_CharlaGhost,0);
+ItemSetOnstage(ITEM_CYS_NozgothBlade, 0);
+ItemToCharacter(ITEM_DAF_DIY_AxeGrip, CHARACTER_DAF_Skeleton_Trader);
+ItemToCharacter(ITEM_CYS_DIY_Axe, CHARACTER_CYS_Brian);
+ItemToCharacter(ITEM_CYS_DIY_Staff, CHARACTER_CYS_Brian);
+ItemToCharacter(ITEM_CYS_DIY_Sword, CHARACTER_CYS_Brian);
+ItemToCharacter(ITEM_CYS_DIY_Bow, CHARACTER_CYS_Brian);
+ItemToCharacter(ITEM_CYS_ReginalHouseKey, CHARACTER_CYS_Reginald);
+ItemToContainer(ITEM_CYS_ReginaldSpareKey, ITEM_CYS_ReginaldSpareCrate);
+ItemToCharacter(ITEM_DAF_HortunCharlaTotem, CHARACTER_DAF_BeggingPriest);
+ItemSetCanPickUp(ITEM_DAF_HortunCharlaTotem, 1);
+ItemToCharacter(ITEM_CYS_BC_NickDiary, CHARACTER_CYS_BC_HeadlessNick);
+
+TriggerRegisterForItems(TRIGGER_DAF_HortunTotemArea);
+
+DB_ShovelArea(TRIGGER_HIB_DIY_ShovelBox,"HIB_DIY_Shovel",ITEM_HIB_DIY_ShovelDirt);
+DB_ShovelRewardItemAppear("HIB_DIY_Shovel",ITEM_HIB_DIY_Bow_String,TRIGGER_HIB_DIY_ShovelPoint);
+
+DB_BigTrader(CHARACTER_CYS_Brian);
+DB_CustomDontUseDialog(CHARACTER_CYS_Brian, "CYS_Brian_Gero");
+
+DB_JokeChosen("null");
+
+DB_DifferentJokes("CYS_Play_ChooseJokeA");
+DB_DifferentJokes("CYS_Play_ChooseJokeB");
+DB_DifferentJokes("CYS_Play_ChooseJokeC");
+//END_REGION
+
+DB_IsNotMessingAround(CHARACTER_CYS_Nozgoth);
+DB_IsNotMessingAround(CHARACTER_CYS_Brian_MagicWard_01);
+
+DB_PlayerComments("CYS_Comment_ReginalTellHead","CYS_Comment_ReginalTellHead_1_1",1,1);
+DB_PlayerComments("CYS_Comment_ReginalTellHead","CYS_Comment_ReginalTellHead_2_1",2,1);
+DB_PlayerComments("CYS_Comment_ReginalTellHead","CYS_Comment_ReginalTellHead_2_2",2,2);
+
+PROC_LoopEffectAtItem("FX_Skills_WitchCraft_Generic_C_Inactive_A", ITEM_DAF_HortunInvisibleHelper,"DAF_HortunEffectInactive","DarkForest");
+
+DB_CustomCompanionDialog(CHARACTER_CYS_BC_HeadlessNick,"CYS_BC_HeadlessNick_Companion");
+NeverThreatenedDialog(CHARACTER_CYS_BC_HeadlessNick);
+DB_NoRunAway(CHARACTER_CYS_BC_HeadlessNick);
+DB_CustomWarningDialog(CHARACTER_CYS_BC_HeadlessNick,"CYS_BC_HeadlessNick_please_Dont_attack");
+DB_CustomAttackDialog(CHARACTER_CYS_BC_HeadlessNick,"CYS_BC_HeadlessNick_Attacks");
+KBSECTION
+//REGION Crowd Movements
+
+//If Reginald died and the crowd didn't notice AND were watching his show, they all transit to Cedric
+IF
+CharacterDied(CHARACTER_CYS_Reginald)
+AND
+CharacterGetVarFixedString(CHARACTER_CYS_FairCrowdWarmer,"currentState","State_WatchReginald")
+AND
+CYS_HN_FairEnthusiast(_Enthusiast)
+THEN
+CharacterSetVarFixedString(_Enthusiast,"currentState","State_WatchCedric");
+
+IF
+CharacterDied(CHARACTER_CYS_Reginald)
+THEN
+CharacterSetVarFixedString(CHARACTER_CYS_JonerMarketArtist, "currentState", "State_Performing");
+CharacterSetVarFixedString(CHARACTER_CYS_FairCrowdWarmer,"CurrentlyWatching","State_WatchCedric");
+GlobalSetEvent("CYS_CedricAttractsCrowd");
+QuestUpdate("CYS_CrowdWarmer", "Update6");
+QuestClose("CYS_CrowdWarmer");
+//END_REGION
+
+//REGION Stealing the head and talking to it
+
+//If somebody sees the player trying to pick up the head, we left it there, and he might get scoled by GB
+IF
+DialogEnded("CYS_NickHead", _ID)
+AND
+DB_DialogPlayers(_ID, _Player, 1)
+AND
+DB_GlobalEvent("CYS_HN_HeadOnPedestal")
+AND
+Sees(_Dude, _Player)
+AND
+NOT DB_Dead(_Dude)
+AND
+NOT _Dude.DB_IsPlayer()
+AND
+CharacterCanSeeCharacter(CHARACTER_CYS_Reginald, _Player, 1)
+AND
+CharacterGetVarInteger(_Player, "pickUpHead", 1)
+THEN
+DB_CYS_HN_Spotted(1);
+GlobalSetEvent("CYS_SawTriedToStealHeadAtFair");
+
+IF
+DialogEnded("CYS_NickHead", _ID)
+AND
+DB_DialogPlayers(_ID, _Player, 1)
+AND
+DB_GlobalEvent("CYS_HN_HeadOnPedestal")
+AND
+DB_CYS_HN_Spotted(1)
+THEN
+ProcWarnPlayerOfUsingStuff(_Player, CHARACTER_CYS_Reginald);
+
+IF
+DialogEnded("CYS_NickHead", _ID)
+AND
+DB_DialogPlayers(_ID, _Player, 1)
+AND
+DB_GlobalEvent("CYS_HN_HeadOnPedestal")
+AND
+DB_CYS_HN_Spotted(1)
+THEN
+DialogStartOneSpeakerItemDialog("CYS_AD_PlayerSpottedInFair", ITEM_CYS_NickHead );
+
+IF
+DialogEnded("CYS_NickHead", _ID)
+AND
+DB_DialogPlayers(_ID, _Player, 1)
+AND
+DB_GlobalEvent("CYS_HN_HeadOnPedestal")
+AND
+CharacterHasStatus(_Player, "BLIND", 0)
+AND
+NOT DB_CYS_HN_Spotted(1)
+AND
+CharacterGetVarInteger(_Player, "pickUpHead", 1)
+THEN
+ItemSetCanPickUp(ITEM_CYS_NickHead, 1);
+ItemSetCanMove(ITEM_CYS_NickHead, 1);
+ItemToCharacter(ITEM_CYS_NickHead, _Player);
+ItemSetCanPickUp(ITEM_CYS_NickHead, 1);
+CharacterSetVarInteger(CHARACTER_CYS_Reginald, "HeadStolen", 1);
+GlobalSetEvent("CYS_HN_HeadTaken");
+QuestUpdate("CYS_CrowdWarmer", "Update6");
+QuestClose("CYS_CrowdWarmer");
+QuestUpdate("CYS_BC_HeadlessNick", "GrabNick");
+
+IF
+DialogEnded("CYS_NickHead", _ID)
+AND
+DB_DialogPlayers(_ID, _Player, 1)
+AND
+DB_GlobalEvent("CYS_HN_HeadOnPedestal")
+AND
+CharacterGetVarInteger(_Player, "pickUpHead", 1)
+THEN
+CharacterSetVarInteger(_Player, "pickUpHead", 0);
+NOT DB_CYS_HN_Spotted(1);
+
+IF
+CharacterUsedItem(_Char, ITEM_CYS_NickHead)
+AND
+ItemIsInCharacterInventory(ITEM_CYS_NickHead, _Char, 1)
+THEN
+ItemDrop(ITEM_CYS_NickHead);
+
+//You can talk to the head only if Reginald doesn't sees you
+IF
+CharacterUsedItem(_Char, ITEM_CYS_NickHead)
+AND
+ItemIsInCharacterInventory(ITEM_CYS_NickHead, _Char, 0)
+AND
+NOT DB_Combat(_Char, _)
+THEN
+DialogRequestStopForItem("CYS_AD_NickHeadShow", ITEM_CYS_NickHead);
+DialogRequestStopForCharacter(_Char);
+CharacterMakeStoryNpc(_Char,1);
+ITEM_CYS_NickHead.IsInItemDialog();
+_Char.DB_IsInDialog();
+CharacterLookAtItem(_Char,ITEM_CYS_NickHead,0);
+DialogStartTwoSpeakerItemDialog("CYS_NickHead", ITEM_CYS_NickHead, _Char);
+DB_ItemDialog(2,ITEM_CYS_NickHead,_Char);
+
+
+IF
+CharacterEvent(CHARACTER_CYS_Reginald, "removeDialog")
+THEN
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_CYS_Reginald);
+DB_AD_Dialog(CHARACTER_CYS_Reginald,"CYS_AD_ReginaldFreaks");
+CharacterSetVarFixedString(CHARACTER_CYS_JonerMarketArtist, "currentState", "State_Performing");
+CharacterSetVarFixedString(CHARACTER_CYS_FairCrowdWarmer,"CurrentlyWatching","State_WatchCedric");
+GlobalSetEvent("CYS_CedricAttractsCrowd");
+
+IF
+CharacterEvent(CHARACTER_CYS_Reginald, "removeDialog")
+AND
+CharacterGetVarFixedString(CHARACTER_CYS_FairCrowdWarmer,"currentState","State_WatchReginald")
+AND
+CYS_HN_FairEnthusiast(_Enthusiast)
+THEN
+CharacterSetVarFixedString(_Enthusiast,"currentState","State_WatchCedric");
+//END_REGION
+
+//REGION Checking were is the head and picking it up through dialog
+IF
+ItemEnteredTrigger(ITEM_CYS_NickHead, TRIGGER_CYS_NickHeadShowZone, _)
+THEN
+GlobalSetEvent("CYS_HN_HeadOnPedestal");
+
+IF
+ItemLeftTrigger(ITEM_CYS_NickHead, TRIGGER_CYS_NickHeadShowZone, _)
+THEN
+GlobalClearEvent("CYS_HN_HeadOnPedestal");
+
+IF
+ItemEnteredTrigger(ITEM_CYS_NickHead, TRIGGER_CYS_HN_ReginaldCellar, _)
+THEN
+GlobalSetEvent("CYS_HN_HeadAtCellar");
+
+IF
+ItemLeftTrigger(ITEM_CYS_NickHead, TRIGGER_CYS_HN_ReginaldCellar, _)
+THEN
+GlobalClearEvent("CYS_HN_HeadAtCellar");
+
+IF
+DialogEnded("CYS_NickHead", _ID)
+AND
+NOT DB_GlobalEvent("CYS_HN_HeadOnPedestal")
+AND
+DB_DialogPlayers(_ID, _Player, 1)
+AND
+CharacterGetVarInteger(_Player, "pickUpHead", 1)
+THEN
+CharacterSetVarInteger(_Player, "pickUpHead", 0);
+ItemToCharacter(ITEM_CYS_NickHead, _Player);
+ItemSetCanPickUp(ITEM_CYS_NickHead, 1);
+
+IF
+ItemDestroyed(ITEM_CYS_NickHead)
+THEN
+GlobalSetEvent("CYS_NickHeadDestroyed");
+
+//END_REGION
+
+//REGION Performing a play
+IF
+DialogCharacterEventSet("CYS_CheckOtherPlayer",_Player, _)
+THEN
+ProcDoDualDialogPlayerCheck(_Player);
+
+IF
+GameBookInterfaceClosed(ITEM_CYS_HN_CysealCreation, _Player)
+THEN
+GlobalSetEvent("CYS_HN_KnowsPlay");
+QuestAdd("CYS_BC_HeadlessNick");
+QuestUpdate("CYS_BC_HeadlessNick","FoundPlay");
+
+IF
+GameBookInterfaceClosed(ITEM_CYS_HN_CysealJokes, _Player)
+THEN
+GlobalSetEvent("CYS_HN_KnowsShow");
+QuestAdd("CYS_BC_HeadlessNick");
+QuestUpdate("CYS_BC_HeadlessNick","FoundJokes");
+
+IF
+GlobalEventSet("CYS_PerformingPlay")
+AND
+DB_CYS_HN_PlaySuccess(_Val)
+THEN
+NOT DB_CYS_HN_PlaySuccess(_Val);
+DB_CYS_HN_PlaySuccess(0);
+GlobalClearEvent("CYS_HN_FinalShunPlayer");
+CharacterSetEvent(CHARACTER_CYS_FairCrowdWarmer, "WooPlayer");
+
+IF
+DialogStarted("CYS_HN_StartPerformanceOnePlayer", _)
+THEN
+GlobalClearEvent("CYS_HN_LaunchOnePlayerShow");
+GlobalSetEvent("CYS_HN_LaunchOnePlayerShowBuffer");
+
+IF
+DialogStarted("CYS_HN_StartPerformanceOnePlayer", _)
+AND
+DB_JokeChosen(_Str)
+THEN
+NOT DB_JokeChosen(_Str);
+
+IF
+GlobalEventSet(_Event)
+AND
+DB_DifferentJokes(_Event)
+AND
+DB_JokeChosen(_Str)
+AND
+_Event != _Str
+THEN
+GlobalClearEvent("CYS_HN_PraisePlayer");
+GlobalClearEvent("CYS_HN_ShunPlayer");
+GlobalClearEvent(_Event);
+GlobalSetEvent("CYS_HN_ShunPlayer");
+
+IF
+GlobalEventSet("CYS_HN_ShunPlayer")
+AND
+DB_FairmongerAtPlayer(_Dude)
+THEN
+ProcRemoveNPCADs(_Dude);
+ProcRemoveAllDialogEntriesForSpeaker(_Dude);
+DB_AD_Dialog(_Dude,"CYS_AD_BooPlayers");
+
+IF
+GlobalEventSet("CYS_HN_PraisePlayer")
+AND
+DB_FairmongerAtPlayer(_Dude)
+THEN
+ProcRemoveNPCADs(_Dude);
+ProcRemoveAllDialogEntriesForSpeaker(_Dude);
+DB_AD_Dialog(_Dude,"CYS_AD_WooPlayers");
+
+IF
+GlobalEventSet("CYS_HN_FinalShunPlayer")
+AND
+DB_FairmongerAtPlayer(_Dude)
+THEN
+ProcRemoveNPCADs(_Dude);
+ProcRemoveAllDialogEntriesForSpeaker(_Dude);
+DB_AD_Dialog(_Dude,"CYS_AD_FinalBooPlayers");
+
+IF
+GlobalEventSet("CYS_HN_FinalPraisePlayer")
+AND
+DB_FairmongerAtPlayer(_Dude)
+THEN
+ProcRemoveNPCADs(_Dude);
+ProcRemoveAllDialogEntriesForSpeaker(_Dude);
+DB_AD_Dialog(_Dude,"CYS_AD_FinalWooPlayers");
+
+IF
+GlobalEventSet(_Event)
+AND
+DB_DifferentJokes(_Event)
+AND
+DB_JokeChosen(_Str)
+AND
+_Event == _Str
+THEN
+GlobalClearEvent("CYS_HN_PraisePlayer");
+GlobalClearEvent("CYS_HN_ShunPlayer");
+GlobalClearEvent(_Event);
+GlobalSetEvent("CYS_HN_PraisePlayer");
+
+IF
+GlobalEventSet(_Event)
+AND
+DB_DifferentJokes(_Event)
+AND
+NOT DB_JokeChosen(_)
+THEN
+DB_JokeChosen(_Event);
+GlobalClearEvent(_Event);
+GlobalClearEvent("CYS_HN_PraisePlayer");
+GlobalClearEvent("CYS_HN_ShunPlayer");
+GlobalSetEvent("CYS_HN_PraisePlayer");
+
+IF
+CharacterEvent(_Dude, "giveUpPlayerShow")
+AND
+CYS_HN_FairDialogs(_Dude, _Dialog)
+AND
+DB_FairmongerAtPlayer(_Dude)
+THEN
+ProcRemoveNPCADs(_Dude);
+ProcRemoveAllDialogEntriesForSpeaker(_Dude);
+NOT DB_FairmongerAtPlayer(_Dude);
+DB_Dialogs(_Dude, _Dialog);
+
+IF
+CharacterEvent(_Char, "WaitingPlayer")
+AND
+NOT DB_FairmongerAtPlayer(_Char)
+THEN
+ProcRemoveNPCADs(_Char);
+ProcRemoveAllDialogEntriesForSpeaker(_Char);
+DB_AD_Dialog(_Char,"CYS_AD_HN_WaitAtPlayer");
+DB_FairmongerAtPlayer(_Char);
+
+IF
+CharacterEvent(_Char, "WatchingPlayer")
+AND
+NOT DB_FairmongerAtPlayer(_Char)
+THEN
+ProcRemoveNPCADs(_Char);
+ProcRemoveAllDialogEntriesForSpeaker(_Char);
+DB_AD_Dialog(_Char,"CYS_AD_FairListeners");
+DB_FairmongerAtPlayer(_Char);
+
+IF
+GlobalEventCleared("CYS_PerformingPlay")
+AND
+NOT DB_GlobalEvent("CYS_HN_FinalShunPlayer")
+THEN
+CharacterSetEvent(CHARACTER_CYS_FairCrowdWarmer, "FinalWooPlayer");
+GlobalClearEvent("CYS_HN_CrowdIsHere");
+GlobalClearEvent("CYS_HN_CrowdWarmerToTheShow");
+
+IF
+GlobalEventCleared("CYS_PerformingPlay")
+AND
+DB_GlobalEvent("CYS_HN_FinalShunPlayer")
+THEN
+CharacterSetEvent(CHARACTER_CYS_FairCrowdWarmer, "FinalBooPlayer");
+GlobalClearEvent("CYS_HN_CrowdIsHere");
+GlobalClearEvent("CYS_HN_CrowdWarmerToTheShow");
+
+IF
+CharacterEvent(CHARACTER_CYS_FairListener1, "finishedPlay")
+AND
+CharacterGetVarFixedString(CHARACTER_CYS_FairCrowdWarmer,"CurrentlyWatching", "State_WatchCedric")
+AND
+CharacterGetVarFixedString(CHARACTER_CYS_JonerMarketArtist,"CurrentlyDoing", _String)
+THEN
+DialogRequestStopForCharacter(CHARACTER_CYS_JonerMarketArtist);
+CharacterSetVarFixedString(CHARACTER_CYS_JonerMarketArtist, "currentState", _String);
+ProcCharacterMoveToTrigger(CHARACTER_CYS_JonerMarketArtist,TRIGGER_CYS_Point_FairCedric_1,0,"CYS_MoveEverybodyToTheCurrentShow");
+
+IF
+CharacterEvent(CHARACTER_CYS_FairListener1, "finishedPlay")
+AND
+CharacterGetVarFixedString(CHARACTER_CYS_FairCrowdWarmer,"CurrentlyWatching", "State_WatchReginald")
+AND
+CharacterGetVarFixedString(CHARACTER_CYS_JonerMarketArtist,"CurrentlyDoing", _String)
+THEN
+DialogRequestStopForCharacter(CHARACTER_CYS_JonerMarketArtist);
+DialogRequestStopForCharacter(CHARACTER_CYS_Reginald);
+CharacterSetVarFixedString(CHARACTER_CYS_JonerMarketArtist, "currentState", _String);
+ProcCharacterMoveToTrigger(CHARACTER_CYS_JonerMarketArtist,TRIGGER_CYS_Point_FairCedric_1,0,"CYS_MoveEverybodyToTheCurrentShow");
+ProcCharacterMoveToTrigger(CHARACTER_CYS_Reginald,TRIGGER_CYS_Point_Reginald2,0,"CYS_MoveEverybodyToTheCurrentShow");
+
+IF
+CharacterEvent(_, "CYS_MoveEverybodyToTheCurrentShow")
+AND
+CharacterGetVarFixedString(CHARACTER_CYS_FairCrowdWarmer,"CurrentlyWatching", _String)
+AND
+CYS_HN_FairEnthusiast(_Enthusiast)
+THEN
+CharacterSetVarFixedString(_Enthusiast, "currentState",_String);
+
+IF
+CharacterEvent(_, "CYS_MoveEverybodyToTheCurrentShow")
+AND
+CYS_HN_FairDialogs(_Dude, _Dialog)
+AND
+DB_FairmongerAtPlayer(_Dude)
+THEN
+ProcRemoveNPCADs(_Dude);
+ProcRemoveAllDialogEntriesForSpeaker(_Dude);
+NOT DB_FairmongerAtPlayer(_Dude);
+DB_Dialogs(_Dude, _Dialog);
+
+IF
+CharacterEvent(_, "CYS_MoveEverybodyToTheCurrentShow")
+AND
+CharacterGetVarFixedString(CHARACTER_CYS_Reginald,"CurrentlyDoing", _String)
+THEN
+CharacterSetVarFixedString(CHARACTER_CYS_Reginald, "currentState", _String);
+CharacterSetEvent(CHARACTER_CYS_FairCrowdWarmer, "leavePlayer");
+
+IF
+GlobalEventSet("CYS_HN_PraisePlayer")
+AND
+DB_CYS_HN_PlaySuccess(_Val)
+AND
+IntegerSum(_Val, 1, _NewVal)
+THEN
+NOT DB_CYS_HN_PlaySuccess(_Val);
+DB_CYS_HN_PlaySuccess(_NewVal);
+CharacterSetEvent(CHARACTER_CYS_FairCrowdWarmer, "WooPlayer");
+
+IF
+GlobalEventSet("CYS_HN_ShunPlayer")
+AND
+DB_CYS_HN_PlaySuccess(_Val)
+AND
+IntegerSubtract(_Val, 1, _NewVal)
+THEN
+NOT DB_CYS_HN_PlaySuccess(_Val);
+DB_CYS_HN_PlaySuccess(_NewVal);
+CharacterSetEvent(CHARACTER_CYS_FairCrowdWarmer, "BooPlayer");
+GlobalSetEvent("CYS_HN_FinalShunPlayer");
+PROC_CYS_HN_CheckIfLeavePlayer(_NewVal);
+
+PROC
+PROC_CYS_HN_CheckIfLeavePlayer((INTEGER)_Value)
+AND
+_Value < 0
+THEN
+GlobalClearEvent("CYS_PerformingPlay");
+GlobalSetEvent("CYS_CrowdLeavesPlayer");
+
+IF
+DialogEnded("CYS_HN_StartPerformanceOnePlayer", _)
+THEN
+GlobalSetEvent("CYS_GoingToPerformPlay");
+GlobalClearEvent("CYS_CrowdLeavesPlayer");
+GlobalClearEvent("CYS_PerformingPlay");
+GlobalClearEvent("CYS_HN_LaunchOnePlayerShowBuffer");
+
+IF
+DialogEnded("CYS_HN_DD_CysealPlay", _)
+THEN
+GlobalSetEvent("CYS_GoingToPerformPlay");
+GlobalClearEvent("CYS_CrowdLeavesPlayer");
+GlobalClearEvent("CYS_PerformingPlay");
+
+IF
+CharacterEvent(_Player, "lookAtCrowd")
+THEN
+CharacterLookFromTrigger(_Player, TRIGGER_CYS_HN_LookTrigger, 1);
+
+IF
+DialogEnded("CYS_Chaucer", _ID)
+AND
+DB_GlobalEvent("CYS_HN_LaunchOnePlayerShow")
+AND
+DB_DialogPlayers(_ID, _Player, 1)
+THEN
+CharacterSetVarFixedString(CHARACTER_CYS_Chaucer, "currentState", "State_ShowOnBoard");
+ProcChaucerGatherEveryone();
+CharacterDetachFromGroup(_Player);
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", _Player);
+CharacterTeleportToTrigger(_Player, TRIGGER_CYS_Performance1Player, "lookAtCrowd");
+PlayEffectAtTrigger("FX_GP_TeleportSmoke_A", TRIGGER_CYS_Performance1Player);
+ProcDoTwoSpeakerItemDialog("CYS_HN_StartPerformanceOnePlayer", _Player, ITEM_CYS_PerformanceHack);
+
+IF
+DialogEnded("CYS_Chaucer", _ID)
+AND
+DB_GlobalEvent("CYS_HN_LaunchTwoPlayerShow")
+THEN
+CharacterSetVarFixedString(CHARACTER_CYS_Chaucer, "currentState", "State_ShowOnBoard");
+ProcChaucerGatherEveryone();
+CharacterDetachFromGroup(CHARACTER_Player1);
+CharacterDetachFromGroup(CHARACTER_Player2);
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_Player1);
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A", CHARACTER_Player2);
+CharacterTeleportToTrigger(CHARACTER_Player1, TRIGGER_CYS_Performance2Player1, "lookAtCrowd");
+CharacterTeleportToTrigger(CHARACTER_Player2, TRIGGER_CYS_Performance2Player2, "lookAtCrowd");
+PlayEffectAtTrigger("FX_GP_TeleportSmoke_A", TRIGGER_CYS_Performance2Player1);
+PlayEffectAtTrigger("FX_GP_TeleportSmoke_A", TRIGGER_CYS_Performance2Player2);
+ProcDoThreeSpeakerItemDialog("CYS_HN_DD_CysealPlay", CHARACTER_Player1, CHARACTER_Player2, ITEM_CYS_PerformanceHack);
+
+IF
+DialogEnded("CYS_HN_DD_CysealPlay", _)
+THEN
+GlobalSetEvent("CYS_HN_DidTwoPlayerPlay");
+
+IF
+DialogEnded("CYS_HN_StartPerformanceOnePlayer", _)
+THEN
+GlobalSetEvent("CYS_HN_DidOnePlayerPlay");
+
+IF
+DialogEnded("CYS_HN_DD_CysealPlay", _)
+AND
+NOT DB_GlobalEvent("CYS_HN_FinalShunPlayer")
+THEN
+GlobalSetEvent("CYS_HN_RewardLastTwoPlayerPlay");
+
+IF
+DialogEnded("CYS_HN_DD_CysealPlay", _)
+AND
+DB_GlobalEvent("CYS_HN_FinalShunPlayer")
+THEN
+GlobalClearEvent("CYS_HN_RewardLastTwoPlayerPlay");
+
+IF
+DialogEnded("CYS_HN_StartPerformanceOnePlayer", _)
+AND
+NOT DB_GlobalEvent("CYS_HN_FinalShunPlayer")
+THEN
+GlobalSetEvent("CYS_HN_RewardLastOnePlayerPlay");
+
+IF
+DialogEnded("CYS_HN_StartPerformanceOnePlayer", _)
+AND
+DB_GlobalEvent("CYS_HN_FinalShunPlayer")
+THEN
+GlobalClearEvent("CYS_HN_RewardLastOnePlayerPlay");
+
+IF
+DialogEnded("CYS_HN_DD_CysealPlay", _)
+THEN
+GlobalClearEvent("CYS_HN_LaunchTwoPlayerShow");
+CharacterPurgeQueue(CHARACTER_Player2);
+CharacterPurgeQueue(CHARACTER_Player1);
+CharacterSetVarFixedString(CHARACTER_CYS_Chaucer, "currentState", "State_SeekingPeople");
+
+IF
+DialogEnded("CYS_HN_StartPerformanceOnePlayer", _)
+THEN
+CharacterSetVarFixedString(CHARACTER_CYS_Chaucer, "currentState", "State_SeekingPeople");
+
+PROC
+ProcChaucerGatherEveryone()
+THEN
+ProcCharacterMoveToTrigger(CHARACTER_CYS_Chaucer,TRIGGER_CYS_ChaucerPointGatherEveryone,1,"ChaucerGatherEveryone");
+
+IF
+CharacterEvent(CHARACTER_CYS_Chaucer, "ChaucerGatherEveryone")
+THEN
+DialogStartOneSpeakerDialog("CYS_AD_ChaucerGatherEveryone", CHARACTER_CYS_Chaucer);
+
+IF
+AutomatedDialogEnded("CYS_AD_ChaucerGatherEveryone", _)
+AND
+DB_GlobalEvent("CYS_HN_LaunchOnePlayerShowBuffer")
+THEN
+CharacterSetEvent(CHARACTER_CYS_FairCrowdWarmer,"GoToPlayer");
+
+IF
+AutomatedDialogEnded("CYS_AD_ChaucerGatherEveryone", _)
+AND
+DB_GlobalEvent("CYS_HN_LaunchTwoPlayerShow")
+THEN
+CharacterSetEvent(CHARACTER_CYS_FairCrowdWarmer,"GoToPlayer");
+
+IF
+DialogEnded("CYS_FairCrowdWarmer",_)
+AND
+DB_GlobalEvent("CYS_HN_PaidCrowdWarmer")
+THEN
+CharacterSetVarInteger(CHARACTER_CYS_FairCrowdWarmer, "GallagherPaid", 1);
+GlobalSetEvent("CYS_HN_CrowdWarmerToTheShow");
+
+IF
+CharacterDied(_FairFan)
+AND
+CYS_HN_FairEnthusiast(_FairFan)
+THEN
+NOT CYS_HN_FairEnthusiast(_FairFan);
+PROC_CYS_CheckIfFairFansStillLives();
+
+PROC
+PROC_CYS_CheckIfFairFansStillLives()
+AND
+NOT CYS_HN_FairEnthusiast(_)
+THEN
+GlobalSetEvent("CYS_FairIsDead");
+
+IF
+CharacterDied(_FairFan)
+AND
+CYS_HN_FairEasyPublic(_FairFan)
+THEN
+NOT CYS_HN_FairEasyPublic(_FairFan);
+PROC_CYS_CheckIfFairEasyFansStillLives();
+
+PROC
+PROC_CYS_CheckIfFairEasyFansStillLives()
+AND
+NOT CYS_HN_FairEasyPublic(_)
+THEN
+GlobalSetEvent("CYS_EasyFairIsDead");
+//END_REGION
+
+//REGION Sending the crowd to Cedric
+IF
+DialogEnded("CYS_FairCrowdWarmer", _)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_FairCrowdWarmer, "CYS_CrowdWarmerToCedric", 1)
+THEN
+CharacterSetVarInteger(CHARACTER_CYS_FairCrowdWarmer, "CYS_CrowdWarmerToCedric", 0);
+ProcCharacterMoveToTrigger(CHARACTER_CYS_FairCrowdWarmer,TRIGGER_CYS_Point_Gallagher3,0,"CYS_CrowdWarmerAtCedric");
+
+IF
+CharacterEvent(CHARACTER_CYS_FairCrowdWarmer, "CYS_CrowdWarmerAtCedric")
+AND
+CharacterGetVarFixedString(CHARACTER_CYS_FairCrowdWarmer,"currentState","State_WatchReginald")
+AND
+CYS_HN_FairEnthusiast(_Enthusiast)
+THEN
+CharacterSetVarFixedString(_Enthusiast,"currentState","State_WatchCedric");
+
+IF
+CharacterEvent(CHARACTER_CYS_FairCrowdWarmer, "CYS_CrowdWarmerAtCedric")
+THEN
+CharacterSetVarFixedString(CHARACTER_CYS_JonerMarketArtist, "currentState", "State_Performing");
+CharacterSetVarFixedString(CHARACTER_CYS_FairCrowdWarmer,"CurrentlyWatching","State_WatchCedric");
+GlobalSetEvent("CYS_CedricAttractsCrowd");
+
+IF
+DialogEnded("CYS_Reginald", _)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_Reginald, "CYS_ReginaldToCedric", 1)
+AND
+NOT OnlyOnce("ReginaldIsAtCedric")
+THEN
+OnlyOnce("ReginaldIsAtCedric");
+ProcCharacterMoveToTrigger(CHARACTER_CYS_Reginald,TRIGGER_CYS_Point_Reginald3,1,"CYS_ReginaldAtCedric");
+
+IF
+CharacterEvent(CHARACTER_CYS_Reginald, "CYS_ReginaldAtCedric")
+THEN
+CharacterSetVarFixedString(CHARACTER_CYS_Reginald, "currentState", "State_WithCedric");
+CharacterSetVarInteger(CHARACTER_CYS_Reginald, "CYS_ReginaldWithCedric", 1);
+
+//END_REGION
+
+//REGION Creating the weapon en-Kit
+IF
+ItemTemplateCombinedWithItemTemplate("PART_DIY_Sword_Guard_04775a88-ba33-42f8-a8ee-632540c7e972", "WPN_DIY_Sword_A_d224729b-a043-4eed-8144-41cf87009dda", _Char, _)
+THEN
+ItemTemplateAddToCharacter("WPN_DIY_Sword_B_9de4e90a-2fe3-4f46-9f60-82f8624b6ed5", _Char, 1);
+
+IF
+ItemTemplateCombinedWithItemTemplate("PART_DIY_Sword_Hilt_7e641a86-3042-4c4f-88fd-7036eee96da2", "WPN_DIY_Sword_B_9de4e90a-2fe3-4f46-9f60-82f8624b6ed5", _Char, _)
+THEN
+ItemTemplateAddToCharacter("WPN_DIY_Sword_C_946d2ad9-a471-499e-8892-9d6e91c04701", _Char, 1);
+
+IF
+ItemTemplateCombinedWithItemTemplate("PART_DIY_Sword_Blade_9cac2aa2-3d91-4e6b-b2da-24caf9c77753", "WPN_DIY_Sword_C_946d2ad9-a471-499e-8892-9d6e91c04701", _Char, _)
+THEN
+ItemTemplateAddToCharacter("WPN_DIY_Sword_D_a7d327c7-18fe-4a43-b736-5cc5d5d33ed4", _Char, 1);
+
+IF
+ItemTemplateCombinedWithItemTemplate("PART_DIY_Axe_Shaft_4b1a62df-229c-43f9-921f-525498f35297", "WPN_DIY_Axe_A_5f7e8ae2-c931-4caa-80dd-e83235345a74", _Char, _)
+THEN
+ItemTemplateAddToCharacter("WPN_DIY_Axe_B_186ad8f8-8eea-4562-943a-7d8519ed6286", _Char, 1);
+
+IF
+ItemTemplateCombinedWithItemTemplate("PART_DIY_Axe_Head_09212d78-4518-4291-bdb6-71129f03a995", "WPN_DIY_Axe_B_186ad8f8-8eea-4562-943a-7d8519ed6286", _Char, _)
+THEN
+ItemTemplateAddToCharacter("WPN_DIY_Axe_C_942c9068-33f4-470e-8eaf-3329ccf25939", _Char, 1);
+
+IF
+ItemTemplateCombinedWithItemTemplate("PART_DIY_Axe_Grip_33b3fdb9-406c-4ec5-b683-848e77a3f4d4", "WPN_DIY_Axe_C_942c9068-33f4-470e-8eaf-3329ccf25939", _Char, _)
+THEN
+ItemTemplateAddToCharacter("WPN_DIY_Axe_D_a28caf1b-48bd-4429-aba8-e39a86914950", _Char, 1);
+
+IF
+ItemTemplateCombinedWithItemTemplate("PART_DIY_Bow_String_38dee022-7909-4fb3-93ce-50119b7f388e", "WPN_DIY_Bow_A_81a1a125-1130-45aa-b749-dbd0a8ab1042", _Char, _)
+THEN
+ItemTemplateAddToCharacter("WPN_DIY_Bow_B_faa760e7-ed15-4b40-aff2-0d52fa901894", _Char, 1);
+
+IF
+ItemTemplateCombinedWithItemTemplate("PART_DIY_Bow_Branch_0791d837-4669-449b-bfaf-c6b94baf5a2c", "WPN_DIY_Bow_B_faa760e7-ed15-4b40-aff2-0d52fa901894", _Char, _)
+THEN
+ItemTemplateAddToCharacter("WPN_DIY_Bow_C_e35ce8a5-11ba-477b-bc13-880c554bb14f", _Char, 1);
+
+IF
+ItemTemplateCombinedWithItemTemplate("PART_DIY_Bow_Handle_058d6a7e-84f5-4ff7-a383-4dd43665d5d0", "WPN_DIY_Bow_C_e35ce8a5-11ba-477b-bc13-880c554bb14f", _Char, _)
+THEN
+ItemTemplateAddToCharacter("WPN_DIY_Bow_D_83404081-f40d-4aba-835c-7a7b77d8942b", _Char, 1);
+
+IF
+ItemTemplateCombinedWithItemTemplate("PART_DIY_Staff_Branch_6d6e80a1-c4fc-409b-9de6-c56f1b14a7a4", "WPN_DIY_Staff_A_f76761d4-c9b1-4397-b5d5-8b077cc3c4d3", _Char, _)
+THEN
+ItemTemplateAddToCharacter("WPN_DIY_Staff_B_749596ff-c298-4896-bd4d-4f53ec445b5b", _Char, 1);
+
+IF
+ItemTemplateCombinedWithItemTemplate("PART_DIY_Staff_Carving_a8cb0975-2ff1-4aaf-a451-9a959ec33d00", "WPN_DIY_Staff_B_749596ff-c298-4896-bd4d-4f53ec445b5b", _Char, _)
+THEN
+ItemTemplateAddToCharacter("WPN_DIY_Staff_C_99b39775-109c-4d1f-a28d-b0b78d2ccf57", _Char, 1);
+
+IF
+ItemTemplateCombinedWithItemTemplate("PART_DIY_Staff_Gem_75a70a8e-2ac1-41ef-b902-e79591f52aab", "WPN_DIY_Staff_C_99b39775-109c-4d1f-a28d-b0b78d2ccf57", _Char, _)
+THEN
+ItemTemplateAddToCharacter("WPN_DIY_Staff_D_b8597941-23d1-4e8a-baa9-f17e39e99a67", _Char, 1);
+
+IF
+ItemAddedToCharacter(ITEM_CYS_DIY_Axe, _Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+GlobalSetEvent("CYS_GotBrianWeapon");
+
+IF
+ItemAddedToCharacter(ITEM_CYS_DIY_Bow, _Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+GlobalSetEvent("CYS_GotBrianWeapon");
+
+IF
+ItemAddedToCharacter(ITEM_CYS_DIY_Staff, _Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+GlobalSetEvent("CYS_GotBrianWeapon");
+
+IF
+ItemAddedToCharacter(ITEM_CYS_DIY_Sword, _Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+GlobalSetEvent("CYS_GotBrianWeapon");
+
+IF
+DialogCharacterEventSet("DAF_DIY_GiveAxeGrip", _Player, _)
+AND
+NOT OnlyOnce("DIY_AxeGrip")
+THEN
+OnlyOnce("DIY_AxeGrip");
+ItemToCharacter(ITEM_DAF_DIY_AxeGrip, _Player);
+//END_REGION
+
+//REGION Nozgoth and Brian
+IF
+DialogEnded("CYS_Nozgoth", _)
+AND
+DB_GlobalEvent("CYS_KillNozgoth")
+THEN
+SetRelationFactionToPlayers("CYS_Nozgoth",0);
+
+IF
+DialogEnded("CYS_NozgothStopPlayer", _)
+AND
+DB_GlobalEvent("CYS_KillNozgoth")
+THEN
+SetRelationFactionToPlayers("CYS_Nozgoth",0);
+
+IF
+CharacterEnteredCombat(CHARACTER_CYS_Nozgoth, _)
+AND
+ItemGetHandle(ITEM_CYS_NozgothBlade, _Blade)
+THEN
+CharacterEquipItemhandle(CHARACTER_CYS_Nozgoth, _Blade);
+
+IF
+GlobalEventSet("CYS_PaidBrian")
+THEN
+TriggerSetItemOwner(TRIGGER_CYS_Shop_Brian, CHARACTER_NULL);
+
+IF
+GameBookInterfaceClosed(ITEM_CYS_ReginaldBook, _Char)
+THEN
+GlobalSetEvent("TalkToHeadAboutWilson");
+
+IF
+CharacterDied(CHARACTER_CYS_Nozgoth)
+THEN
+GlobalSetEvent("CYS_NozgothIsDead");
+
+//END_REGION
+
+//REGION Give Head to Nozgoth
+IF
+DialogEnded("CYS_BC_HeadlessNick", _)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_BC_HeadlessNick, "GoBerserk", 1)
+THEN
+CharacterSetFaction(CHARACTER_CYS_BC_HeadlessNick, "Evil NPC");
+//END_REGION
+
+//REGION Give nick his head
+IF
+DialogEnded("CYS_BC_HeadlessNick", _ID)
+AND
+DB_DialogPlayers(_ID, _Player, 1)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_BC_HeadlessNick, "GetHeadBack", 1)
+THEN
+GlobalSetEvent("CYS_GaveNickHead");
+ItemToCharacter(ITEM_CYS_NickHead, CHARACTER_CYS_BC_HeadlessNick);
+Poof(CHARACTER_CYS_BC_HeadlessNick);
+CharacterAppearAtCharacter(CHARACTER_Nick, CHARACTER_CYS_BC_HeadlessNick, 0);
+DB_DoNickDialog(_Player);
+
+IF
+CharacterWentOnStage(CHARACTER_Nick, 1)
+AND
+DB_DoNickDialog(_Player)
+THEN
+NOT DB_DoNickDialog(_Player);
+PROC_MendatoryDialog("CYS_BC_Nick", CHARACTER_Nick, _Player);
+
+IF
+DialogEnded("CYS_BC_Nick", _ID)
+AND
+DB_DialogPlayers(_ID, _Player, _)
+THEN
+Poof(CHARACTER_Nick);
+ItemTemplateAddToCharacter("BOOK_Skill_Quest_SummonNick_a0a47c7f-1c82-4ff1-b34c-49b9b6d8eb42", _Player, 1);
+ProcDefinePartyDialog("CYS_BC_PD_AfterNick");
+UnlockAchievement("questee3");
+
+IF
+CharacterDied(CHARACTER_CYS_BC_HeadlessNick)
+THEN
+GlobalSetEvent("CYS_BC_NickIsDead");
+//END_REGION
+
+//REGION Journal Stuff
+IF
+GlobalEventSet("CYS_NickMadeHisIntentionKnown")
+AND
+NOT DB_GlobalEvent("CYS_KnowNozgothAndWilson")
+THEN
+QuestAdd("CYS_BC_HeadlessNick");
+QuestUpdate("CYS_BC_HeadlessNick", "StartNick");
+
+IF
+GlobalEventSet("TalkToHeadAboutWilson")
+AND
+DB_GlobalEvent("CYS_KnowNozgothAndWilson")
+THEN
+QuestUpdate("CYS_BC_HeadlessNick", "MetNick");
+
+IF
+GameBookInterfaceClosed(ITEM_CYS_ReginaldBook, _Char)
+THEN
+QuestAdd("CYS_BC_HeadlessNick");
+QuestUpdate("CYS_BC_HeadlessNick", "StartReginald");
+GlobalSetEvent("CYS_ReadReginaldDiary");
+
+IF
+DialogEnded("CYS_Reginald", _ID)
+AND
+DB_DialogPlayers(_ID,_Player,1)
+AND
+DB_GlobalEvent("CYS_ReginaldToldFair")
+THEN
+Launch_PlayerComment(_Player,"CYS_Comment_ReginalTellHead");
+
+//END_REGION
+
+//REGION Summon comments
+IF
+RegionEnded(_Region)
+AND
+DB_NickFieldComments((STRING)_Region, (STRING)_Flag)
+THEN
+GlobalClearEvent(_Flag);
+
+IF
+RegionStarted(_Region)
+AND
+DB_NickFieldComments((STRING)_Region, (STRING)_Flag)
+THEN
+GlobalSetEvent(_Flag);
+//END_REGION
+
+PROC
+ProcCharInTriggerSpotted(_Player, TRIGGER_CYS_RaddagothSneak)
+THEN
+ProcDoTwoSpeakerDialog("CYS_NozgothStopPlayer", CHARACTER_CYS_Nozgoth, _Player);
+
+IF
+DialogEnded("CYS_NozgothStopPlayer", _)
+AND
+DB_GlobalEvent("CYS_NozgothLetPlayer")
+THEN
+ProcRemoveDialogEntryForSpeaker(CHARACTER_CYS_Nozgoth, "CYS_NozgothStopPlayer");
+DB_Dialogs(CHARACTER_CYS_Nozgoth, "CYS_Nozgoth");
+
+IF
+CharacterUsedItem(_Char, ITEM_CYS_Evelyn_LabEntrance)
+AND
+DB_GlobalEvent("CYS_NozgothLetPlayer")
+THEN
+PROC_CYS_TeleportPartyToEvelynLair(_Char);
+
+IF
+CharacterUsedItem(_Char, ITEM_CYS_Evelyn_LabEntrance)
+AND
+NOT DB_GlobalEvent("CYS_NozgothLetPlayer")
+AND
+NOT DB_IsInDialog(CHARACTER_CYS_Nozgoth)
+AND
+CharacterCanSeeCharacter(CHARACTER_CYS_Nozgoth, _Char, 0)
+THEN
+PROC_CYS_TeleportPartyToEvelynLair(_Char);
+
+IF
+CharacterUsedItem(_Char, ITEM_CYS_Evelyn_LabEntrance)
+AND
+NOT DB_GlobalEvent("CYS_NozgothLetPlayer")
+AND
+NOT DB_IsInDialog(CHARACTER_CYS_Nozgoth)
+AND
+CharacterCanSeeCharacter(CHARACTER_CYS_Nozgoth, _Char, 1)
+THEN
+ProcDoTwoSpeakerDialog("CYS_NozgothStopPlayer", CHARACTER_CYS_Nozgoth, _Char);
+
+PROC
+PROC_CYS_TeleportPartyToEvelynLair((CHARACTER)_Char)
+THEN
+CharacterTeleportToTrigger(_Char, TRIGGER_CYS_Point_EvelynLab_IN, "");
+
+IF
+GlobalEventSet("CYS_ShowLibrary")
+THEN
+ShowMapMarker("SUBREGION_Townhall_1", 1);
+
+IF
+DialogEnded("CYS_Nozgoth", _)
+AND
+DB_GlobalEvent("CYS_NozgothLeave")
+THEN
+Poof(CHARACTER_CYS_Nozgoth);
+CharacterRemoveStatus(CHARACTER_CYS_Nozgoth, "LYING");
+GlobalSetEvent("CYS_NozgothLetPlayer");
+
+IF
+DialogEnded("CYS_NozgothStopPlayer", _)
+AND
+DB_GlobalEvent("CYS_NozgothLeave")
+THEN
+Poof(CHARACTER_CYS_Nozgoth);
+GlobalSetEvent("CYS_NozgothLetPlayer");
+CharacterRemoveStatus(CHARACTER_CYS_Nozgoth, "LYING");
+
+IF
+ItemEnteredTrigger(ITEM_DAF_HortunCharlaTotem, TRIGGER_DAF_HortunTotemArea, _)
+THEN
+ItemSetCanMove(ITEM_DAF_HortunCharlaTotem, 0);
+PROC_LoopEffectAtItem("FX_Skills_WitchCraft_Generic_C_Active_A", ITEM_DAF_HortunInvisibleHelper,"DAF_HortunEffectActive","DarkForest");
+PROC_StopEffectAtItem(ITEM_DAF_HortunInvisibleHelper, "DAF_HortunEffectInactive");
+GlobalSetEvent("DAF_CordeliaTotemInPentacle");
+QuestUpdate("DAF_HortunCharla", "PutTotemInPlace");
+
+IF
+ItemLeftTrigger(ITEM_DAF_HortunCharlaTotem, TRIGGER_DAF_HortunTotemArea, _)
+THEN
+PROC_LoopEffectAtItem("FX_Skills_WitchCraft_Generic_C_Inactive_A", ITEM_DAF_HortunInvisibleHelper,"DAF_HortunEffectInactive","DarkForest");
+PROC_StopEffectAtItem(ITEM_DAF_HortunInvisibleHelper, "DAF_HortunEffectActive");
+GlobalClearEvent("DAF_CordeliaTotemInPentacle");
+
+IF
+CharacterUsedItem(_Player, ITEM_DAF_HortunCharlaTotem)
+AND
+ItemIsInCharacterInventory(ITEM_DAF_HortunCharlaTotem, _Player, 0)
+AND
+NOT DB_Combat(_Player, _)
+AND
+DB_GlobalEvent("DAF_CordeliaTotemInPentacle")
+THEN
+ProcDoTwoSpeakerItemDialog("DAF_HortunTotem",_Player,ITEM_DAF_HortunCharlaTotem);
+
+IF
+CharacterUsedItem(_Player, ITEM_DAF_HortunCharlaTotem)
+AND
+ItemIsInCharacterInventory(ITEM_DAF_HortunCharlaTotem, _Player, 0)
+AND
+NOT DB_Combat(_Player, _)
+AND
+NOT DB_GlobalEvent("DAF_CordeliaTotemInPentacle")
+THEN
+ProcDoTwoSpeakerItemDialog("DAF_HortunTotemInert",_Player,ITEM_DAF_HortunCharlaTotem);
+
+IF
+CharacterUsedItem(_Player, ITEM_DAF_HortunCharlaTotem)
+AND
+ItemIsInCharacterInventory(ITEM_DAF_HortunCharlaTotem, _Player, 1)
+THEN
+ItemDrop(ITEM_DAF_HortunCharlaTotem);
+
+IF
+GameBookInterfaceClosed(ITEM_DAF_PriestDiary, _)
+THEN
+GlobalSetEvent("DAF_KnowsCordeliaSpell");
+
+IF
+DialogEnded("DAF_HortunTotem", _ID)
+AND
+DB_DialogPlayers(_ID, _Player, 1)
+AND
+CharacterGetVarInteger(_Player, "pickUpTotem", 1)
+THEN
+ItemToCharacter(ITEM_DAF_HortunCharlaTotem, _Player);
+ItemSetCanPickUp(ITEM_DAF_HortunCharlaTotem, 1);
+CharacterSetVarInteger(_Player, "pickUpTotem", 0);
+
+IF
+ItemDropped(ITEM_DAF_HortunCharlaTotem)
+THEN
+ItemSetCanPickUp(ITEM_DAF_HortunCharlaTotem, 0);
+
+IF
+ItemDropped(ITEM_CYS_NickHead)
+THEN
+ItemSetCanPickUp(ITEM_CYS_NickHead, 0);
+
+IF
+DialogEnded("DAF_HortunTotemInert", _ID)
+AND
+DB_DialogPlayers(_ID, _Player, 1)
+AND
+CharacterGetVarInteger(_Player, "pickUpTotem", 1)
+THEN
+ItemToCharacter(ITEM_DAF_HortunCharlaTotem, _Player);
+CharacterSetVarInteger(_Player, "pickUpTotem", 0);
+ItemSetCanPickUp(ITEM_DAF_HortunCharlaTotem, 1);
+
+IF
+DialogEnded("DAF_HortunTotem", _)
+AND
+DB_GlobalEvent("DAF_KillHortun")
+THEN
+PlayEffectAtItem("FX_GP_StarStone_Up_B", ITEM_DAF_HortunInvisibleHelper);
+ItemDestroy(ITEM_DAF_HortunCharlaTotem);
+PROC_LoopEffectAtItem("FX_Skills_WitchCraft_Generic_C_Inactive_A", ITEM_DAF_HortunInvisibleHelper,"DAF_HortunEffectInactive","DarkForest");
+PROC_StopEffectAtItem(ITEM_DAF_HortunInvisibleHelper, "DAF_HortunEffectActive");
+GlobalClearEvent("DAF_CordeliaTotemInPentacle");
+QuestUpdate("DAF_HortunCharla", "ReunitedThem");
+QuestClose("DAF_HortunCharla");
+
+IF
+DialogEnded("CYS_BC_HeadlessNick", _ID)
+AND
+DB_DialogPlayers(_ID, _Player, 1)
+AND
+CharacterGetVarInteger(_Player, "CYS_NickGiveDiary", 1)
+THEN
+CharacterSetVarInteger(_Player, "CYS_NickGiveDiary", 1);
+ItemToCharacter(ITEM_CYS_BC_NickDiary, _Player);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

@@ -1,0 +1,53 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+CHARACTER:%Friend = CYS_WarehouseGuard1_c38279da-902c-4cdb-a8ee-bb60bceab35e
+TRIGGER:%Trigger1 = CYS_PointWarehouseGuard1_1_f38da14d-8dd6-44c1-99d8-e53de5ceb2ad
+TRIGGER:%Trigger2 = CYS_Forbidden_WarehouseNormalRoom_Exit_e831ab42-0b47-4751-b5fe-72d26fa19321
+	
+BEHAVIOUR
+
+REACTION State_GuardingDoor, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, "Action_LookAround")
+	SetPriority(%currentAction, 1100)
+
+REACTION State_Talking, 0
+USAGE PEACE
+CHECK "!c1&!c2&!c3"
+	CharacterIsDead(%Friend)
+	IsInDialog(%Friend)
+	IsInDialog(__Me)
+ACTIONS
+	CharacterLookAt(%Friend)
+	DialogStart("CYS_AD_Warehouse_FloriusCurtius",__Me,%Friend)
+	Set(%currentState,"State_GuardingDoor")
+
+REACTION Action_LookAround,0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	CharacterLookAt(%Trigger1)
+	Sleep(2)
+	GetRandom(_Animation,"Attentive_01","Listen_01","Look_Left_Short_01","Look_Right_Short_01")
+	CharacterPlayAnimation(_Animation)
+	Sleep(2)
+	CharacterLookAt(%Trigger2)
+	Sleep(2)
+	GetRandom(_Animation,"Attentive_01","Listen_01","Look_Left_Short_01","Look_Right_Short_01")
+	CharacterPlayAnimation(_Animation)
+	SetPriority(%currentAction,0)
+INTERRUPT
+	Reset()
+
+EVENTS
+
+EVENT StartDialog
+ON
+	OnCharacterEvent(__Me,"DialogRequest")
+ACTIONS
+	Set(%currentState,"State_Talking")

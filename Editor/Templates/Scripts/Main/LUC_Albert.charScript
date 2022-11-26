@@ -1,0 +1,15 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter
+CHARACTER:__Me
+TRIGGER:%Trigger1 = LUC_PointAlbertPickaxe_e5370269-4586-47a1-96a2-38ebe86635b9
+
+BEHAVIOUR
+
+REACTION PickAxe, 1000
+USAGE PEACE
+ACTIONS
+	CharacterLookFrom(%Trigger1)
+	CharacterPlayAnimation("Repairman_01")
+	CharacterPlayAnimation("Shrug_01")

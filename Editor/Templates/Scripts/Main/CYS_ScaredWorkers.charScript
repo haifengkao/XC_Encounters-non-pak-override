@@ -1,0 +1,38 @@
+#INCLUDE CYS_BurningShipHelper
+
+INIT
+USING CYS_BurningShipHelper
+FIXEDSTRING:%questAction = "Action_Cry"
+
+BEHAVIOUR
+
+REACTION State_ActionManager, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, %questAction)
+	SetPriority(%currentAction, 1100)
+	
+REACTION Action_Cry, 0
+USAGE PEACE
+VARS 
+	FIXEDSTRING:_currentAnimation
+	FLOAT:_SleepTime
+ACTIONS
+	GetRandom(_currentAnimation, "Crying_01", "Beg_01", "Sigh_01")
+	CharacterPlayAnimation(_currentAnimation)
+	GetRandom(_SleepTime,0,0.5,1.2,1.5,3,4)
+	Sleep(_SleepTime)
+	SetPriority(%currentAction, 0)
+	
+REACTION Action_Happy, 0
+USAGE PEACE
+VARS 
+	FIXEDSTRING:_animation
+	FLOAT:_SleepTime
+ACTIONS
+	GetRandom(_animation, "clap_01", "clap_02", "clap_03", "clap_04", "cheer_01", "cheer_02", "cheer_03")
+	CharacterPlayAnimation(_animation)
+	GetRandom(_SleepTime,0,0.5,1.2,1.5,3,4)
+	Sleep(_SleepTime)
+	CharacterWander(FLOAT:4.0f, 15)
+	SetPriority(%currentAction, 0)

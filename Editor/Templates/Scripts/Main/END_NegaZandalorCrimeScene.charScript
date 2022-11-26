@@ -1,0 +1,51 @@
+INIT 
+
+CHARACTER:__Me
+
+	FIXEDSTRING:%Anim = ""
+	CHARACTER:%Lover = END_NegaLeandraCrime_ba9fa52f-8d06-4146-a829-7aa2f67378be
+	
+BEHAVIOUR
+
+REACTION Idle, 900
+USAGE PEACE
+ACTIONS
+	CharacterLookAt(%Lover)
+	CharacterPlayAnimation("emotion_normal_looping1", 0, 1)
+
+REACTION Door, 0
+USAGE PEACE
+ACTIONS
+	CharacterLookAt(ITEM:END_NegaKingsCrab_CrimeSceneDoor_d5336d29-86e0-46cd-b05b-025af0801e47)
+	Sleep(5)
+	SetPriority("Door", 0)
+
+INTERRUPT
+	SetPriority("Door", 0)
+	
+REACTION DoorDialog, 0
+USAGE PEACE
+ACTIONS
+	CharacterLookAt(ITEM:END_NegaKingsCrab_CrimeSceneDoor_d5336d29-86e0-46cd-b05b-025af0801e47)
+	Sleep(2.0)
+	SetVar(%Lover, "DialogLookAtChar", __Me)
+	CharacterLookAt(%Lover)
+	Sleep(.3)
+	DialogStart("END_AD_NegaKingsCrab_ZandalorLeandra_CrimeScene",CHARACTER:END_NegaZandalorCrime_ed853add-52e9-4609-b1d1-ea3843a875af,CHARACTER:END_NegaLeandraCrime_ba9fa52f-8d06-4146-a829-7aa2f67378be)
+	Sleep(.3)
+	SetPriority("DoorDialog", 0)
+		
+EVENTS
+
+EVENT Door
+ON
+	OnCharacterEvent(__Me, "END_NegaCrimeDoor")
+ACTIONS
+	SetPriority("Door", 1100)
+	
+EVENT DoorDialog
+ON
+	OnCharacterEvent(__Me, "END_NegaCrimeDoorDialog")
+ACTIONS
+	SetPriority("DoorDialog", 1100)
+	

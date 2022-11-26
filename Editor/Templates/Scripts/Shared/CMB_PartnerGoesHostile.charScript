@@ -1,0 +1,9 @@
+INIT
+CHARACTER:__Me
+
+EVENTS
+EVENT PartnerGoesHostile
+ON
+	OnCharacterEvent(__Me,"PartnerGoesHostile")
+ACTIONS
+	DisplayText(__Me,"GEN_PartnerGoesHostile_1",5)

@@ -1,0 +1,16 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter
+
+CHARACTER:__Me
+
+FLOAT:%Range = 10
+EXTERN TRIGGER:%Anchor = ""
+
+BEHAVIOUR
+
+REACTION Wander,1000
+USAGE PEACE
+ACTIONS
+	CharacterWander(%Range,15,0,%Anchor)

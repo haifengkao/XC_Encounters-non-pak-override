@@ -1,0 +1,19 @@
+INIT
+
+CHARACTER:__Me
+
+	INT:%End = 0
+	
+BEHAVIOUR
+
+REACTION EndBehavior, 1000
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%End, 1)
+VARS
+	TRIGGER:_Wait
+ACTIONS
+	GetRandom(_Wait, TRIGGER:SAC_Behavior_Bairodotr_1_8a8fa157-3b94-4732-9131-8c0f3d7f6ade, TRIGGER:SAC_Behavior_Bairodotr_2_8bf9d7b7-6782-40e6-ad2e-09432d93616e, TRIGGER:SAC_Behavior_Bairodotr_3_b1cacc2c-37ed-4042-8e5f-6736e7f07b75)
+	CharacterMoveTo(_Wait)
+	CharacterLookFrom(_Wait)
+	Sleep(7)

@@ -1,0 +1,180 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Dialogs(CHARACTER_CYS_Bellegar,"CYS_Bellegar");
+DB_Dialogs(CHARACTER_CYS_Beggar,"CYS_Beggar");
+DB_Dialogs(CHARACTER_CYS_Pincer,"CYS_Pincer");
+DB_ItemDialogs(ITEM_CYS_Chrysolytha,"CYS_Chrysolytha");
+DB_ItemDialogs(ITEM_CYS_Adamas,"CYS_Adamas");
+DB_ItemDialogs(ITEM_CYS_Statue3,"CYS_Statue3");
+DB_ItemDialogs(ITEM_CYS_Statue4,"CYS_Statue4");
+
+DB_ItemGivesPartyDialog(ITEM_CYS_SkeletonBook,"CYS_DD_AfterVictim1Book");
+DB_EventGivesPartyDialog("CYS_KnowsVictim2","CYS_DD_AfterVictim2Body");
+DB_EventGivesPartyDialog("CYS_KnowsVictim3","CYS_DD_AfterVictim3");
+DB_NoRunAway(CHARACTER_CYS_Bellegar);
+ItemSetCanInteract(ITEM_CYS_Bellegar_Entrance,0);
+ProcTriggerRegisterForPlayers(TRIGGER_CYS_AreaBellegarUnlock);
+TriggerRegisterForCharacter(TRIGGER_CYS_AreaBellegarUnlock,CHARACTER_CYS_Demon_Fire);
+TriggerRegisterForCharacter(TRIGGER_CYS_AreaBellegarUnlock,CHARACTER_CYS_Demon_Air);
+TriggerRegisterForCharacter(TRIGGER_CYS_AreaBellegarUnlock,CHARACTER_CYS_Demon_Water);
+TriggerRegisterForCharacter(TRIGGER_CYS_AreaBellegarUnlock,CHARACTER_CYS_Demon_Earth);
+ProcTriggerRegisterForPlayers(TRIGGER_CYS_BellegarCave);
+
+CharacterSetOnStage(CHARACTER_CYS_Demon_Fire,0);
+CharacterSetOnStage(CHARACTER_CYS_Demon_Air,0);
+CharacterSetOnStage(CHARACTER_CYS_Demon_Water,0);
+CharacterSetOnStage(CHARACTER_CYS_Demon_Earth,0);
+
+DB_BellegarDemons(CHARACTER_CYS_Demon_Fire,"Update1");
+DB_BellegarDemons(CHARACTER_CYS_Demon_Air,"Update3");
+DB_BellegarDemons(CHARACTER_CYS_Demon_Water,"Update2");
+DB_BellegarDemons(CHARACTER_CYS_Demon_Earth,"Update4");
+
+KillCounter("CYS_BellegarDemons",4);
+KillCounterDB(CHARACTER_CYS_Demon_Fire,"CYS_BellegarDemons");
+KillCounterDB(CHARACTER_CYS_Demon_Air,"CYS_BellegarDemons");
+KillCounterDB(CHARACTER_CYS_Demon_Water,"CYS_BellegarDemons");
+KillCounterDB(CHARACTER_CYS_Demon_Earth,"CYS_BellegarDemons");
+
+DB_PlayerComments("CYS_CommentUnlockedBellegar","CYS_CommentUnlockedBellegar_1_1",1,1);
+DB_PlayerComments("CYS_CommentUnlockedBellegar","CYS_CommentUnlockedBellegar_2_1",2,1);
+DB_PlayerComments("CYS_CommentUnlockedBellegar","CYS_CommentUnlockedBellegar_2_2",2,2);
+
+ItemToContainer(ITEM_CYS_SkeletonBook,ITEM_CYS_WatchersVictim1,-1);
+
+DB_CYS_BellegarStatue(ITEM_CYS_Statue4, "CYS_Bellegar_SummonedWaterDemon", CHARACTER_CYS_Demon_Water, "CYS_Statue4", "CYS_Bellegar_SummonedWaterDemon2", "CYS_AD_Statue1");
+DB_CYS_BellegarStatue(ITEM_CYS_Adamas, "CYS_Bellegar_SummonedEarthDemon", CHARACTER_CYS_Demon_Earth, "CYS_Adamas", "CYS_Bellegar_SummonedEarthDemon2", "CYS_AD_Statue4");
+DB_CYS_BellegarStatue(ITEM_CYS_Chrysolytha, "CYS_Bellegar_SummonedAirDemon", CHARACTER_CYS_Demon_Air, "CYS_Chrysolytha", "CYS_Bellegar_SummonedAirDemon2", "CYS_AD_Statue3");
+DB_CYS_BellegarStatue(ITEM_CYS_Statue3, "CYS_Bellegar_SummonedFireDemon", CHARACTER_CYS_Demon_Fire, "CYS_Statue3", "CYS_Bellegar_SummonedFireDemon2", "CYS_AD_Statue2");
+KBSECTION
+IF
+CharacterUsedItem(_,ITEM_CYS_SkeletonBook)
+THEN
+GlobalSetEvent("CYS_WatcherStatues");
+GlobalSetEvent("CYS_KnowsBodyBook");
+QuestAdd("CYS_Statues");
+QuestUpdate("CYS_Statues", "Update5");
+
+///////////////////////////////////////////////////////////////
+/////////////////////UNLOCKING THE CAVE////////////////////////
+///////////////////////////////////////////////////////////////
+
+IF
+ItemEvent(_Statue,"MakeDemonAppear")
+AND
+DB_CYS_BellegarStatue(_Statue, _DemonTimer, _, _, _, _)
+THEN
+TimerLaunch(_DemonTimer,2000);
+
+IF
+TimerFinished(_DemonTimer)
+AND
+DB_CYS_BellegarStatue(_Statue, _DemonTimer, _Demon, _StatueDial, _DemonTimer2, _)
+THEN
+CharacterSetOnStage(_Demon,1);
+CharacterPlayEffect(_Demon,"FX_GP_TeleportSmoke_A");
+TimerLaunch(_DemonTimer2,1000);
+NOT DB_ItemDialogs(_Statue, _StatueDial);
+ItemSetCanInteract(_Statue,0);
+
+IF
+TimerFinished(_DemonTimer2)
+AND
+DB_CYS_BellegarStatue(_Statue, _DemonTimer, _Demon, _StatueDial, _DemonTimer2, _DemonDial)
+THEN
+DialogStartOneSpeakerDialog(_DemonDial, _Demon);
+NOT DB_CYS_BellegarStatue(_Statue, _DemonTimer, _Demon, _StatueDial, _DemonTimer2, _DemonDial);
+
+IF
+CharacterDied(_Character)
+AND
+DB_BellegarDemons(_Character,_QuestStatus)
+THEN
+QuestAdd("CYS_Statues");
+QuestUpdate("CYS_Statues",_QuestStatus);
+
+IF
+KillCounterCounts("CYS_BellegarDemons",4)
+AND
+ItemGetPosition(ITEM_CYS_Bellegar_Block,_X,_Y,_Z)
+THEN
+ItemSetCanInteract(ITEM_CYS_Bellegar_Entrance,1);
+ItemSetOnstage(ITEM_CYS_Bellegar_Block,0);
+PlayScaledEffectAtPosition("FX_Creatures_Undead_Skeleton_Fire_A_Death",1.0,_X,_Y,_Z);
+TimerLaunch("CYS_BellegarFreed",2000);
+QuestUpdate("CYS_Statues","Update8");
+QuestClose("CYS_Statues");
+BellegarIsFreed(1);
+TimerLaunch("CYS_BellegarFreed_JahanComment",7000);
+
+IF
+TimerFinished("CYS_BellegarFreed_JahanComment")
+AND
+ItemGetClosestPlayer(ITEM_CYS_Bellegar_Block,_Player)
+THEN
+Proc_CompanionComment(CHARACTER_Jahan,"JAH_CYS_Demons",_Player);
+
+IF
+TimerFinished("CYS_BellegarFreed")
+AND
+DB_InRegion(_Player,TRIGGER_CYS_AreaBellegarUnlock)
+AND
+NOT DB_OnlyOnce("CYS_BellegarFreed")
+THEN
+Launch_PlayerComment(_Player,"CYS_CommentUnlockedBellegar");
+DB_OnlyOnce("CYS_BellegarFreed");
+
+IF
+DialogEnded("CYS_Bellegar",_)
+AND
+NOT DB_OnlyOnce("CYS_AD_Bellegar2")
+THEN
+DB_OnlyOnce("CYS_AD_Bellegar2");
+DialogStartOneSpeakerDialog("CYS_AD_Bellegar2",CHARACTER_CYS_Bellegar);
+
+IF
+CharacterLeftTrigger(_Player1,TRIGGER_CYS_BellegarCave)
+AND
+DB_OnlyOnce("CYS_AD_Bellegar2")
+THEN
+ProcCheckOtherPlayersInTrigger(_Player1,TRIGGER_CYS_BellegarCave);
+
+PROC
+ProcCheckOtherPlayersInTrigger(_Player,TRIGGER_CYS_BellegarCave)
+AND
+NOT DB_OtherPlayersInRegion(TRIGGER_CYS_BellegarCave,1)
+THEN
+CharacterSetOnStage(CHARACTER_CYS_Bellegar,0);
+CharacterSetOnStage(CHARACTER_CYS_BellegarWoman1,0);
+CharacterSetOnStage(CHARACTER_CYS_BellegarWoman2,0);
+GlobalSetEvent("CYS_Bellegar_Freed");
+
+IF
+TextEventSet("PopDemons")
+THEN
+CharacterSetOnStage(CHARACTER_CYS_Demon_Air,1);
+CharacterSetOnStage(CHARACTER_CYS_Demon_Water,1);
+CharacterSetOnStage(CHARACTER_CYS_Demon_Fire,1);
+CharacterSetOnStage(CHARACTER_CYS_Demon_Earth,1);
+
+
+IF
+GlobalEventSet("CYS_LaunchCredit")
+THEN
+ITEM_CYS_Adamas.prepforCredit();
+
+IF
+DialogEnded("CYS_Adamas", _ID)
+AND
+DB_DialogPlayers(_ID, _Player, 1)
+AND
+ITEM_CYS_Adamas.prepforCredit()
+THEN
+NOT ITEM_CYS_Adamas.prepforCredit();
+GlobalClearEvent("CYS_LaunchCredit");
+ShowCredits(_Player);
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

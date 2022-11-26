@@ -1,0 +1,71 @@
+INIT
+
+CHARACTER:__Me
+
+	EXTERN INT:%Return = 0
+	EXTERN FIXEDSTRING:%TimerName = ""
+	EXTERN FLOAT:%Delay = 60
+	EXTERN TRIGGER:%ReturnPos = null
+	EXTERN TRIGGER:%PoofPoint = END_Point_NegaKingsCrabPoof_64b33cdf-a307-408b-a2bb-9de220be8ff1
+	EXTERN FIXEDSTRING:%ReturnState = ""
+
+EVENTS 
+
+EVENT Poof
+ON
+	OnCharacterEvent(__Me, "END_NegaKingsCrabPoof")
+VARS
+	FIXEDSTRING:_Space = ""
+ACTIONS
+	IF "!c1"
+		IsEqual(%ReturnState, "")
+	THEN
+		SetPriority(%ReturnState, 0)
+	ENDIF
+	
+	PlayEffectAt(__Me, "FX_GP_TeleportSmoke_A")
+	TeleportTo(__Me, %PoofPoint, 1)
+	IF "c1&!c2"
+		IsEqual(%Return, 1)
+		IsEqual(%TimerName, "")
+	THEN
+		StartTimer(%TimerName, %Delay, 1)
+	ENDIF
+	
+EVENT Return
+ON
+	OnTimer(%TimerName)
+ACTIONS
+	IF "!c1"
+		IsEqual(%ReturnPos, "")
+	THEN
+		TeleportTo(__Me, %ReturnPos, 1)
+		IF "!c1"
+			IsEqual(%ReturnState, "")
+		THEN
+			SetPriority(%ReturnState, 1000)
+		ENDIF
+	ENDIF
+	
+EVENT Init
+ON
+	OnInit()
+ACTIONS
+	CharacterSetInvulnerable(__Me, 1)
+	
+/*	
+EVENTS
+
+EVENT RestartBehavior
+ON
+	OnCharacterEvent(__Me, "END_NegaKingsCrabResetBehavior")
+ACTIONS
+	SetPriority(%ReturnState, 1000)
+	
+EVENT StopBehavior
+ON
+	OnCharacterEvent(__Me, "END_NegaKingsCrabStopBehavior")
+ACTIONS
+	SetPriority(%ReturnState, 0)
+	
+*/

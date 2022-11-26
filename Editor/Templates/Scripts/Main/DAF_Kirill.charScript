@@ -1,0 +1,8 @@
+INIT
+CHARACTER:__Me
+
+STORY
+
+SCRIPTFRAME TryToPlaySong
+ACTIONS
+	CharacterPlayAnimation("attack1")

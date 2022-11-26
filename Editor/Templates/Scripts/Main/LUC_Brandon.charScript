@@ -1,0 +1,39 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+CHARACTER:%Ramon = LUC_Ramon_67004566-fd44-432f-867c-2dbfe80eef43
+TRIGGER:%PointVillage = LUC_PointBrandon_29c4026f-9b67-42ef-a946-90745cc84f66
+INT:%RamonAvailable = 1
+
+BEHAVIOUR
+
+REACTION State_ActionManager, 0
+USAGE PEACE
+ACTIONS
+	GetWeightedRandom(%currentAction,"Action_WanderAroundVillage",FLOAT:2,"Action_GoToRamon",FLOAT:1)
+	SetPriority(%currentAction,1100)
+
+REACTION Action_GoToRamon, 0
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%RamonAvailable,1)
+ACTIONS
+	CharacterMoveTo(%Ramon)
+	CharacterLookAt(%Ramon)
+	Sleep(1)
+	CharacterEvent(%Ramon,"DialogRequest")
+	SetPriority(%currentAction,0)
+INTERRUPT
+	SetPriority(%currentAction,0)
+
+REACTION Action_WanderAroundVillage, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%PointVillage)
+	CharacterWander(FLOAT:5,4,0,%PointVillage)
+	Sleep(1)
+	SetPriority(%currentAction,0)
+INTERRUPT
+	SetPriority(%currentAction,0)

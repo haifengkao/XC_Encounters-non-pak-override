@@ -1,0 +1,34 @@
+INIT
+
+CHARACTER:__Me
+
+	CHARACTER:%Guardian = END_ThirdGuardian_f97b1f24-1f3b-4040-ba24-75782f6844ce
+
+STORY
+
+SCRIPTFRAME StartBattle
+ACTIONS
+	CharacterAppearAt(TRIGGER:END_Point_Behavior_NegaVoidDragonSpawn_f0e75d10-dc55-4f23-8ac2-b105c3e3d88b,1)
+	//CharacterPlayAnimation("cast_shout_cast")
+	CharacterEvent(__Me, "END_NegaBattleThirdGuardian")
+	GlobalSetEvent("END_NegaStartCombat")
+	
+
+
+	
+EVENTS
+
+EVENT StartHit
+ON
+	OnCharacterEvent(__Me, "END_NegaBattleStartHit")
+ACTIONS
+	SetPriority("StartCast", 1100)
+	
+BEHAVIOUR
+
+REACTION StartCast, 0
+USAGE ALL
+ACTIONS
+	CharacterLookAt(%Guardian)
+	CharacterPlayAnimation("cast_self_cast")
+	SetPriority("StartCast", 0)

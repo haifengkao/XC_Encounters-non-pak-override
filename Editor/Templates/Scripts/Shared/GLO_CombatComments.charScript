@@ -1,0 +1,349 @@
+INIT
+CHARACTER:__Me
+
+EXTERN FLOAT:%SkillCommentFrequency = 0.2
+EXTERN FLOAT:%MissCommentFrequency = 0.2
+EXTERN FLOAT:%RareCommentFrequency = 0.2
+EXTERN FLOAT:%JunkCommentFrequency = 0.2
+EXTERN FLOAT:%StatusCommentFrequency = 0.2
+EXTERN FLOAT:%LowHealthCommentThreshold = 0.2
+EXTERN FLOAT:%DeathCommentFrequency = 0.2
+EXTERN FLOAT:%BlockCommentFrequency = 0.2
+EXTERN FLOAT:%CriticalCommentFrequency = 0.2
+EXTERN FLOAT:%LockCommentFrequency = 0.2
+EXTERN INT:%CanSpeak = 1
+EXTERN FLOAT:%MasterTimer = 5.0
+INT:%MasterSwitch = 1
+
+EVENTS
+
+EVENT CommentWhenKilling
+VARS
+	FIXEDSTRING:_Comment
+	CHARACTER:_Char
+	STRING:_CommentStr
+	INT:_Number
+ON
+	OnDie(_Char, _, __Me, _)
+ACTIONS
+	IF "c1&!c2&c3&!c4&c5"
+		IsEqual(%CanSpeak, 1)
+		CharacterHasStatus(__Me, MUTED)
+		IsRandom(%DeathCommentFrequency)
+		IsEqual(_Char, __Me)
+		IsEqual(%MasterSwitch, 1)
+	THEN
+		GetRandomBetween(_Number, 1, 10)
+		Print(_CommentStr, "COMBAT_Comment_DEATH_1_[1]", _Number)
+		Cast(_Comment, _CommentStr)
+		IF "c1"
+			TranslatedStringKeyExists(_Comment)
+		THEN
+			DisplayText(__Me, _Comment, 5.0)
+		ENDIF
+		Set(%MasterSwitch, 0)
+		StartTimer("MasterTimer", %MasterTimer, 0)
+	ENDIF	
+		
+EVENT CommentWhenMissing
+VARS
+	FIXEDSTRING:_Comment
+	STRING:_CommentStr
+	INT:_Number
+ON
+	OnMiss(__Me, _, _, _)
+ACTIONS
+	IF "c1&!c2&c3&c4"
+		IsEqual(%CanSpeak, 1)
+		CharacterHasStatus(__Me, MUTED)
+		IsRandom(%MissCommentFrequency)
+		IsEqual(%MasterSwitch, 1)
+	THEN
+		GetRandomBetween(_Number, 1, 10)
+		Print(_CommentStr, "COMBAT_Comment_MISSEDMELEE_1_[1]", _Number)
+		Cast(_Comment, _CommentStr)
+		IF "c1"
+			TranslatedStringKeyExists(_Comment)
+		THEN
+			DisplayText(__Me, _Comment, 5.0)
+		ENDIF
+		Set(%MasterSwitch, 0)
+		StartTimer("MasterTimer", %MasterTimer, 0)
+	ENDIF
+		
+EVENT CommentWhenAOO
+ON
+	OnAttackOfOpportunity(_)
+VARS
+	FIXEDSTRING:_Comment
+	STRING:_CommentStr
+	INT:_Number
+ACTIONS
+	IF "c1&!c2&c3&c4"
+		IsEqual(%CanSpeak, 1)
+		CharacterHasStatus(__Me, MUTED)
+		IsRandom(%StatusCommentFrequency)
+		IsEqual(%MasterSwitch, 1)
+	THEN
+		GetRandomBetween(_Number, 1, 10)
+		Print(_CommentStr, "STAT_Comment_AOO_1_[1]", _Number)
+		Cast(_Comment, _CommentStr)
+		IF "c1"
+			TranslatedStringKeyExists(_Comment)
+		THEN
+			DisplayText(__Me, _Comment, 5.0)
+		ENDIF
+		Set(%MasterSwitch, 0)
+		StartTimer("MasterTimer", %MasterTimer, 0)
+	ENDIF
+	
+EVENT CommentWhenBlocking
+ON
+	OnBlock(_, _, __Me, _)
+VARS
+	FIXEDSTRING:_Comment
+	STRING:_CommentStr
+	INT:_Number
+ACTIONS
+	IF "c1&!c2&c3&c4"
+		IsEqual(%CanSpeak, 1)
+		CharacterHasStatus(__Me, MUTED)
+		IsRandom(%BlockCommentFrequency)
+		IsEqual(%MasterSwitch, 1)
+	THEN
+		GetRandomBetween(_Number, 1, 10)
+		Print(_CommentStr, "COMBAT_Comment_BLOCK_1_[1]", _Number)
+		Cast(_Comment, _CommentStr)
+		IF "c1"
+			TranslatedStringKeyExists(_Comment)
+		THEN
+			DisplayText(__Me, _Comment, 5.0)
+		ENDIF
+		Set(%MasterSwitch, 0)
+		StartTimer("MasterTimer", %MasterTimer, 0)
+	ENDIF
+		
+EVENT CommentWhenCriting
+ON
+	OnCriticalHit(__Me, _, _, _)
+VARS
+	FIXEDSTRING:_Comment
+	STRING:_CommentStr
+	INT:_Number
+ACTIONS
+	IF "c1&!c2&c3&c4"
+		IsEqual(%CanSpeak, 1)
+		CharacterHasStatus(__Me, MUTED)
+		IsRandom(%CriticalCommentFrequency)
+		IsEqual(%MasterSwitch, 1)
+	THEN
+		GetRandomBetween(_Number, 1, 10)
+		Print(_CommentStr, "COMBAT_Comment_EvilLaugh_1_[1]", _Number)
+		Cast(_Comment, _CommentStr)
+		IF "c1"
+			TranslatedStringKeyExists(_Comment)
+		THEN
+			DisplayText(__Me, _Comment, 5.0)
+		ENDIF
+		Set(%MasterSwitch, 0)
+		StartTimer("MasterTimer", %MasterTimer, 0)
+	ENDIF
+	
+EVENT CommentWhenHaveStatus
+VARS
+	STATUS:_Status
+	FIXEDSTRING:_Comment
+	STRING:_CommentStr
+	INT:_Number
+ON
+	OnCharacterStatus(__Me, _Status)
+ACTIONS
+	IF "c1&!c2&c3&c4"
+		IsEqual(%CanSpeak, 1)
+		CharacterHasStatus(__Me, MUTED)
+		IsRandom(%StatusCommentFrequency)
+		IsEqual(%MasterSwitch, 1)
+	THEN
+		IF "(!c1|!(c2|c3))&(!c4|!c3)"
+			IsEqual(_Status, STATUS:HEAL)
+			CharacterHasStatus(__Me, DECAYING_TOUCH)
+			CharacterHasTalent(__Me, Zombie)
+			IsEqual(_Status, STATUS:POISONED)
+		THEN
+			GetRandomBetween(_Number, 1, 10)
+			Print(_CommentStr, "STAT_Comment_[1]_1_[2]", _Status, _Number)
+			Cast(_Comment, _CommentStr)
+			IF "c1"
+				TranslatedStringKeyExists(_Comment)
+			THEN
+				DisplayText(__Me, _Comment, 5.0)
+			ENDIF
+		ENDIF
+		Set(%MasterSwitch, 0)
+		StartTimer("MasterTimer", %MasterTimer, 0)
+	ENDIF
+	
+EVENT CommentWhenCastSpell
+VARS
+	SKILL:_Skill
+	FIXEDSTRING:_Comment
+	STRING:_CommentStr
+	INT:_Number
+ON
+	OnSkillCombatComment(__Me, _Skill)
+ACTIONS
+	IF "c1&!c2&c3&c4"
+		IsEqual(%CanSpeak, 1)
+		CharacterHasStatus(__Me, MUTED)
+		IsRandom(%SkillCommentFrequency)
+		IsEqual(%MasterSwitch, 1)
+	THEN
+		GetRandomBetween(_Number, 1, 10)
+		Print(_CommentStr, "COMBAT_PlayerComment_[1]_1_[2]", _Skill, _Number)
+		Cast(_Comment, _CommentStr)
+		IF "c1"
+			TranslatedStringKeyExists(_Comment)
+		THEN
+			DisplayText(__Me, _Comment, 5.0)
+		ENDIF
+		Set(%MasterSwitch, 0)
+		StartTimer("MasterTimer", %MasterTimer, 0)
+	ENDIF
+	
+EVENT CommentLowHealth
+VARS
+	FLOAT:_Vitality
+	INT:_Check = 0
+	FIXEDSTRING:_Comment
+	STRING:_CommentStr
+	INT:_Number
+ON
+	OnVitalityChanged(_Vitality)
+ACTIONS
+	IF "c1&c2&c3"
+		IsLessThen(_Vitality, %LowHealthCommentThreshold)
+		IsGreaterThen(_Vitality, 0.01)
+		IsEqual(_Check, 0)
+	THEN
+		Set(_Check, 1)
+		IF "c1&!c2&c3"
+			IsEqual(%CanSpeak, 1)
+			CharacterHasStatus(__Me, MUTED)
+			IsEqual(%MasterSwitch, 1)
+		THEN
+			GetRandomBetween(_Number, 1, 10)
+			Print(_CommentStr, "COMBAT_Comment_LowHealth_1_[1]", _Number)
+			Cast(_Comment, _CommentStr)
+			IF "c1"
+				TranslatedStringKeyExists(_Comment)
+			THEN
+				DisplayText(__Me, _Comment, 5.0)
+			ENDIF
+			Set(%MasterSwitch, 0)
+			StartTimer("MasterTimer", %MasterTimer, 0)
+		ENDIF
+	ELIF "c1"
+		IsGreaterThen(_Vitality, %LowHealthCommentThreshold)
+	THEN
+		Set(_Check, 0)
+	ENDIF
+
+EVENT CommentWhenUsingLockedDoor
+VARS
+	FIXEDSTRING:_Comment
+	ITEM:_Item
+	STRING:_CommentStr
+	INT:_Number
+ON
+	OnUseItem(__Me, _Item)
+ACTIONS
+	IF "c1&!c2&c3&c4&c5&!c6"
+		IsEqual(%CanSpeak, 1)
+		CharacterHasStatus(__Me, MUTED)
+		ItemCanBeLockPicked(_Item)
+		IsEqual(%MasterSwitch, 1)
+		IsRandom(%LockCommentFrequency)
+		CharacterCanUnlock(__Me, _Item)
+	THEN
+		GetRandomBetween(_Number, 1, 10)
+		Print(_CommentStr, "COMBAT_PlayerComment_Locked_1_[1]", _Number)
+		Cast(_Comment, _CommentStr)
+		IF "c1"
+			TranslatedStringKeyExists(_Comment)
+		THEN
+			DisplayText(__Me, _Comment, 5.0)
+		ENDIF
+		Set(%MasterSwitch, 0)
+		StartTimer("MasterTimer", %MasterTimer, 0)
+	ENDIF
+
+EVENT CommentWhenPickipItems
+VARS
+	FIXEDSTRING:_Comment
+	ITEM:_Item
+	FIXEDSTRING:_ItemType
+	FLOAT:_Value
+	ITEMTEMPLATE:_Template
+	STRING:_CommentStr
+	INT:_Number
+ON
+	OnPickupItem(__Me, _Item)
+ACTIONS
+	IF "c1&!c2"
+		IsEqual(%CanSpeak, 1)
+		CharacterHasStatus(__Me, MUTED)
+	THEN
+		IF "c1&((c2&c3)|c4|c5|c6)&c7"
+			ItemGetItemType(_Item, _ItemType)
+			IsEqual(_ItemType, "Rare")
+			IsRandom(%RareCommentFrequency)
+			IsEqual(_ItemType, "Legendary")
+			IsEqual(_ItemType, "Unique")
+			IsStoryItem(_Item)
+			IsEqual(%MasterSwitch, 1)
+		THEN
+			GetRandomBetween(_Number, 1, 10)
+			Print(_CommentStr, "COMBAT_PlayerComment_Treasure_1_[1]", _Number)
+			Cast(_Comment, _CommentStr)
+			IF "c1"
+				TranslatedStringKeyExists(_Comment)
+			THEN
+				DisplayText(__Me, _Comment, 5.0)
+			ENDIF
+			Set(%MasterSwitch, 0)
+			StartTimer("MasterTimer", %MasterTimer, 0)
+		ELIF "c1&!c2&c3&c4&!c5&!c6&!c7&!c8&!c9&!c10&!c11&!c12&!c13&!c14&c15"
+			ItemGetStat(_Value, _Item, Value)
+			IsGreaterThen(_Value, 5)
+			IsRandom(%JunkCommentFrequency)
+			ItemGetTemplate(_Item, _Template)
+			IsEqual(_Template, ITEMTEMPLATE:LOOT_Gold_Big_A_1c3c9c74-34a1-4685-989e-410dc080be6f)
+			IsEqual(_Template, ITEMTEMPLATE:LOOT_Gold_Coin_A_f99231ed-4e41-4d7e-8a3f-4175e1b1ded5)
+			IsTagged(_Item, "Book")
+			IsTagged(_Item, "Key")
+			IsTagged(_Item, "Food")
+			IsTagged(_Item, "Herb")
+			IsTagged(_Item, "Potion")
+			IsTagged(_Item, "Ingredient")
+			IsTagged(_Item, "Drink")
+			IsTagged(_Item, "Utility")
+			IsEqual(%MasterSwitch, 1)
+		THEN
+			GetRandomBetween(_Number, 1, 10)
+			Print(_CommentStr, "COMBAT_PlayerComment_Trash_1_[1]", _Number)
+			Cast(_Comment, _CommentStr)
+			IF "c1"
+				TranslatedStringKeyExists(_Comment)
+			THEN
+				DisplayText(__Me, _Comment, 5.0)
+			ENDIF
+			Set(%MasterSwitch, 0)
+			StartTimer("MasterTimer", %MasterTimer, 0)
+		ENDIF
+	ENDIF
+	
+EVENT MasterTimer
+ON
+	OnTimer("MasterTimer")
+ACTIONS
+	Set(%MasterSwitch, 1)

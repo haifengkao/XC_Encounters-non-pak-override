@@ -1,0 +1,58 @@
+INIT
+CHARACTER:__Me
+TRIGGER:%Point1 = DAF_Pondering1_e66d89e6-dace-4f1d-8851-fd8c3a1c390d
+TRIGGER:%Point2 = DAF_Pondering2_6094e2c0-f705-4e6f-8c1f-5991019ab882
+TRIGGER:%Point3 = DAF_Pondering3_4ff49a47-6ca0-4290-b896-195a22456bcd
+ITEM:%Bench = DAF_PonderingBench_358d97c1-66f6-4cb7-bf66-b316e5b5223e
+INT:%HasNewSkull = 0
+INT:%Sitting = 0
+
+BEHAVIOUR
+REACTION Custom_AutomatedDialog_Interrupt, 1701
+USAGE PEACE
+CHECK "c1&c2"
+	IsInDialog(__Me)
+	IsEqual(%HasNewSkull,1)
+ACTIONS
+	Sleep(2.0)
+INTERRUPT
+	Set(%Sitting,1)
+
+REACTION NewSkull, 600
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%HasNewSkull,1)
+ACTIONS
+	IF "c1"
+		IsEqual(%Sitting,0)
+	THEN
+		CharacterUseItem(%Bench)
+		Set(%Sitting,1)
+	ENDIF
+	Sleep(3)
+INTERRUPT
+	Set(%Sitting,0)
+
+REACTION Main, 500
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Point1)
+	CharacterLookFrom(%Point1)
+	CharacterPlayAnimation("Fidget_Low_02")
+	DisplayText(__Me,"DAF_Pondering1",3)
+	CharacterPlayAnimation("Think_02")
+	
+	CharacterMoveTo(%Point2)
+	CharacterLookFrom(%Point2)
+	CharacterPlayAnimation("Fidget_Low_01")
+	DisplayText(__Me,"DAF_Pondering2",3)
+	CharacterPlayAnimation("Sigh_01")
+	
+	CharacterMoveTo(%Point3)
+	CharacterLookFrom(%Point3)
+	CharacterPlayAnimation("Fidget_Low_01")
+	DisplayText(__Me,"DAF_Pondering3",3)
+	CharacterPlayAnimation("Think_01")
+	
+	CharacterUseItem(%Bench)
+	Sleep(10)

@@ -1,0 +1,48 @@
+INIT
+ITEM:__Me
+
+INT:%CurrentState = 0
+INT:%WantedState = 0
+EXTERN INT:%IsLocked = 0
+
+EVENTS
+
+EVENT LeverUse
+VARS
+CHARACTER:_Char
+ON
+	OnUseItem(_Char,__Me)
+ACTIONS
+	Set(%WantedState,1)
+	
+BEHAVIOUR
+
+REACTION GoOn,10
+CHECK "c1&!c2"
+	IsEqual(%WantedState,1)
+	IsEqual(%CurrentState,%WantedState)
+ACTIONS
+	IF "c1"
+		IsEqual(%IsLocked,0)
+	THEN
+		ItemPlayAnimationTo("Lever",1)
+		Set(%CurrentState,%WantedState)
+	ELSE
+		Set(%WantedState,0)
+	ENDIF
+	
+REACTION AutoTurnOff,1
+CHECK "c1"
+	IsEqual(%CurrentState,1)
+ACTIONS
+	Set(%WantedState,0)
+	
+REACTION GoOff,5
+CHECK "c1&!c2"
+	IsEqual(%WantedState,0)
+	IsEqual(%CurrentState,%WantedState)
+ACTIONS
+	Set(%CurrentState,%WantedState)
+	ItemPlayAnimationTo("Lever",0)	
+INTERRUPT
+	Reset()

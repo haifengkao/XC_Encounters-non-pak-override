@@ -1,0 +1,51 @@
+#INCLUDE Base
+
+INIT
+USING Base
+CHARACTER:__Me
+CHARACTER:%ShowOffToCharacter
+CHARACTER:%PreviousShowOff
+
+BEHAVIOUR
+
+REACTION FindCharToShowOff, 3
+USAGE PEACE
+VARS 
+	CHARACTER:_Target
+	FLOAT:_Range = 10
+CHECK "c1&c2&!c3"
+	IsEqual(%ShowOffToCharacter,null)	
+	CharacterGet(_Target,__Me,_Range,Random,Distance,Ally)
+	IsEqual(%PreviousShowOff,_Target)
+ACTIONS
+	Set(%ShowOffToCharacter,_Target)
+
+REACTION ShowOff,5
+USAGE PEACE
+CHECK "!c1" 
+	IsEqual(%ShowOffToCharacter,null)
+ACTIONS
+	CharacterMoveTo(%ShowOffToCharacter)
+	CharacterLookAt(%ShowOffToCharacter)
+	DisplayText(__Me,"Stand in awe by my magic!")
+	Sleep(1)
+	PlayEffectAt(%ShowOffToCharacter,"FX_GP_Earthquake_Cast")
+	Sleep(2)
+	Set(%PreviousShowOff,%ShowOffToCharacter)
+	Set(%ShowOffToCharacter,null)
+INTERRUPT
+	Set(%PreviousShowOff,null)
+	Set(%ShowOffToCharacter,null)	
+	Reset()
+
+REACTION Idling, 1
+USAGE PEACE
+ACTIONS
+	Sleep(4)
+	IF "c1"
+		IsRandom(0.5)
+	THEN
+		DisplayText(__Me,"Aargh, what should I do with my life!")
+	ELSE
+		DisplayText(__Me,"I need to practice my spells!")
+	ENDIF

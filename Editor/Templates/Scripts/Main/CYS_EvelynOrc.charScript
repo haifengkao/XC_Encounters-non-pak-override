@@ -1,0 +1,16 @@
+INIT
+
+	CHARACTER:__Me 
+	CHARACTER:%OrcLeader = CYS_EvelynOrc4_ceac691b-3bc9-4306-a59b-c252a6b44e15
+		
+BEHAVIOUR
+
+REACTION YellAtDoor, 500
+USAGE PEACE
+ACTIONS
+	IF "!c1"
+		IsInDialog(%OrcLeader)
+	THEN
+		DisplayText(%OrcLeader, "CYS_EvelynOrcShout", 4)
+	ENDIF
+	Sleep(10)

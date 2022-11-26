@@ -1,0 +1,107 @@
+INIT
+
+CHARACTER:__Me
+CHARACTER:%Exploskeleton1=0fca8b81-a95a-458b-b95d-1a512eb4637f
+CHARACTER:%Exploskeleton2=3b994b8c-926f-4eb6-8425-7da110de149c
+CHARACTERTEMPLATE:%ExploskeletonRT=Undead_SkeletonBaby_A_a3589365-c556-4e2f-ab11-801c86077470
+EXTERN FLOAT:%ExplosionRange=3
+
+//-----------------------
+BEHAVIOUR
+REACTION BlowUpSkeleton1,0
+USAGE COMBAT
+CHECK "c1&c2&!c3&!c4&!c5&!c6&!c7"
+	CharacterCanCast(__Me,Projectile_EnemyFlare)
+	CharacterCanSee(__Me,%Exploskeleton1)
+	CharacterIsDead(%Exploskeleton1)
+	CharacterHasStatus(__Me,CHARMED)
+	CharacterHasStatus(__Me,FEAR)
+	CharacterHasStatus(__Me,STUNNED)
+	CharacterHasStatus(__Me,FROZEN)
+ACTIONS
+	CharacterMoveInRange(%Exploskeleton1,5,10,1)
+		IF "c1"
+			CharacterCanCast(__Me,Projectile_EnemyFlare)
+		THEN
+			CharacterUseSkill(Projectile_EnemyFlare,%Exploskeleton1)
+			SetPriority("BlowUpSkeleton1",0)
+			CharacterEndTurn()	
+		ELSE
+			CharacterEndTurn()
+		ENDIF
+
+REACTION BlowUpSkeleton2,0
+USAGE COMBAT
+CHECK "c1&c2&!c3&!c4&!c5&!c6&!c7"
+	CharacterCanCast(__Me,Projectile_EnemyFlare)
+	CharacterCanSee(__Me,%Exploskeleton2)
+	CharacterIsDead(%Exploskeleton2)	
+	CharacterHasStatus(__Me,CHARMED)
+	CharacterHasStatus(__Me,FEAR)
+	CharacterHasStatus(__Me,STUNNED)
+	CharacterHasStatus(__Me,FROZEN)	
+ACTIONS
+	CharacterMoveInRange(%Exploskeleton2,5,10,1)
+		IF "c1"
+			CharacterCanCast(__Me,Projectile_EnemyFlare)
+		THEN
+			CharacterUseSkill(Projectile_EnemyFlare,%Exploskeleton2)
+			SetPriority("BlowUpSkeleton2",0)
+			CharacterEndTurn()	
+		ELSE
+			CharacterEndTurn()
+		ENDIF
+
+//-----------------------
+EVENTS
+EVENT StartProximityTimer
+VARS
+	CHARACTERTEMPLATE:_MyCharacterTemplate
+ON
+	OnInit()
+ACTIONS	
+	IF "c1&c2"
+		CharacterGetTemplate(__Me,_MyCharacterTemplate)
+		IsEqual(_MyCharacterTemplate,%ExploskeletonRT)
+	THEN
+		StartTimer("CMB_CYS_UndeadHouse_ProximityTimer",2,0)
+	ELSE
+		CharacterAddSkill(Projectile_EnemyFlare)
+	ENDIF
+
+EVENT ProximityTimerEnds
+VARS
+	CHARACTER:_Player
+	FLOAT:_ExploToPlayerDistance
+ON
+	OnTimer("CMB_CYS_UndeadHouse_ProximityTimer")
+ACTIONS
+	IF "c1&c2&c3&c4"
+		CharacterGet(_Player,__Me,20,Lowest,Distance,Enemy,null,null,null,1)
+		CharacterIsPlayer(_Player)		
+		GetDistance(_ExploToPlayerDistance,__Me,_Player)
+		IsLessThen(_ExploToPlayerDistance,%ExplosionRange)
+	THEN
+		IF "c1"
+			IsEqual(__Me,%Exploskeleton1)
+		THEN
+			CharacterEvent(__Me,"TimeToBlowUpSkeleton1")
+		ELIF "c1"
+			IsEqual(__Me,%Exploskeleton2)
+		THEN
+			CharacterEvent(__Me,"TimeToBlowUpSkeleton2")
+		ENDIF
+	ENDIF
+		StartTimer("CMB_CYS_UndeadHouse_ProximityTimer",2,0)
+		
+EVENT Skeleton1EventReceived	
+ON
+	OnCharacterEvent(%Exploskeleton1,"TimeToBlowUpSkeleton1")
+ACTIONS	
+	SetPriority("BlowUpSkeleton1",1400)
+	
+EVENT Skeleton2EventReceived	
+ON
+	OnCharacterEvent(%Exploskeleton2,"TimeToBlowUpSkeleton2")
+ACTIONS	
+	SetPriority("BlowUpSkeleton2",1500)

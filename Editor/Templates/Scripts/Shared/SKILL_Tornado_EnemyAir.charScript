@@ -1,0 +1,61 @@
+#TEMPLATE "_SKILL_Base" : Tornado_EnemyAir
+
+INIT
+CHARACTER:__Me
+// [GLOBAL_VARS]
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_Tornado_EnemyAir
+VARS
+	// [CALC_VARS]
+	FLOAT:_Score
+	FLOAT:_WeaponRangeMin
+	FLOAT:_WeaponRangeMax
+	FLOAT:_DistanceToChar
+	FLOAT:_DistanceScore
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_Tornado_EnemyAir")
+ACTIONS	
+	// [CALC_ACTIONS_PRE]
+	Set(_Score, 0.0)
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	IF "(c1)&(c2)"
+	    CharacterGetWeaponRange(_WeaponRangeMin, _WeaponRangeMax, __Me) // c1
+	    GetDistance(_DistanceToChar, __Me, __Me) // c2
+	THEN
+	    // Hostile count score calculation
+	    Add(_Score, 10.0) // HostileWeight
+	    
+	    // Range score calculation
+	    Set(_DistanceScore, _DistanceToChar)
+	    IF "(c1)"
+	        IsGreaterThen(_DistanceScore, _WeaponRangeMax) // c1
+	    THEN
+	        Subtract(_DistanceScore, _WeaponRangeMax)
+	        Multiply(_DistanceScore, -1.0)
+	    ELIF "(c1)"
+	        IsLessThen(_DistanceScore, _WeaponRangeMin) // c1
+	    THEN
+	        Subtract(_DistanceScore, _WeaponRangeMin)
+	        Multiply(_DistanceScore, 1.0)
+	    ELSE 
+	        Set(_DistanceScore, 0.0)
+	    ENDIF
+	    Add(_Score, _DistanceScore)
+	    
+	    Set(%SkillTargetChar_Tornado_EnemyAir, __Me)
+	    Add(%ActionScore_Tornado_EnemyAir, _Score)
+	ENDIF
+	// [~CALC_ACTIONS]
+
+	
+
+	

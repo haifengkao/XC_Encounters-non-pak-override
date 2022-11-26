@@ -1,0 +1,110 @@
+#TEMPLATE "_SKILL_Base" : Target_EnemyPetrifyingTouch
+
+INIT
+CHARACTER:__Me
+FLOAT:%SkillTargetScore_Target_EnemyPetrifyingTouch=-1000000
+// [GLOBAL_VARS]
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_Target_EnemyPetrifyingTouch
+VARS
+	// [CALC_VARS]
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_Target_EnemyPetrifyingTouch")
+ACTIONS
+	Set(%SkillTargetScore_Target_EnemyPetrifyingTouch, -1000000)
+
+	// [CALC_ACTIONS_PRE]
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	IterateCharactersInCombat(__Me, "CalculateTarget_Target_EnemyPetrifyingTouch", Random, Vitality)
+	IF "!c1"
+		IsEqual(%SkillTargetChar_Target_EnemyPetrifyingTouch, null)
+	THEN
+		Add(%ActionScore_Target_EnemyPetrifyingTouch, %SkillTargetScore_Target_EnemyPetrifyingTouch)
+	ENDIF
+	// [~CALC_ACTIONS]
+
+	
+
+	
+// Calculate the character we should attack
+EVENT CalculateTarget_Target_EnemyPetrifyingTouch
+VARS	
+	CHARACTER:_Char
+	// [CALC_TARGET_VARS]
+	FLOAT:_Score
+	FLOAT:_WeaponRangeMin
+	FLOAT:_WeaponRangeMax
+	FLOAT:_DistanceToChar
+	FLOAT:_DistanceScore
+	// [~CALC_TARGET_VARS]
+ON
+	OnIterateCharacter(_Char, "CalculateTarget_Target_EnemyPetrifyingTouch")	
+ACTIONS
+	// [CALC_CHAR_TARGET_ACTIONS_PRE]
+	Set(_Score, 0.0)
+	// [~CALC_CHAR_TARGET_ACTIONS_PRE]
+	// [CALC_CHAR_TARGET_ACTIONS]
+	IF "(!c1&!c2&!c3)&(!((((c4)|c5)|c6)|c7))&(c8)&(c9)&(c10)"
+	    CharacterIsDead(_Char) // c1
+	    CharacterHasStatus(_Char, INVISIBLE) // c2
+	    CharacterHasStatus(_Char, SNEAKING) // c3
+	    CharacterHasStatus(_Char, KNOCKED_DOWN) // c4
+	    CharacterHasStatus(_Char, PETRIFIED) // c5
+	    CharacterHasStatus(_Char, STUNNED) // c6
+	    CharacterHasStatus(_Char, FROZEN) // c7
+	    CharacterIsEnemy(__Me, _Char) // c8
+	    CharacterGetWeaponRange(_WeaponRangeMin, _WeaponRangeMax, __Me) // c9
+	    GetDistance(_DistanceToChar, __Me, _Char) // c10
+	THEN
+	    // Hostile count score calculation
+	    Add(_Score, 10.0) // HostileWeight
+	    
+	    // Range score calculation
+	    Set(_DistanceScore, _DistanceToChar)
+	    IF "(c1)"
+	        IsGreaterThen(_DistanceScore, _WeaponRangeMax) // c1
+	    THEN
+	        Subtract(_DistanceScore, _WeaponRangeMax)
+	        Multiply(_DistanceScore, -1.0)
+	    ELIF "(c1)"
+	        IsLessThen(_DistanceScore, _WeaponRangeMin) // c1
+	    THEN
+	        Subtract(_DistanceScore, _WeaponRangeMin)
+	        Multiply(_DistanceScore, 1.0)
+	    ELSE 
+	        Set(_DistanceScore, 0.0)
+	    ENDIF
+	    Add(_Score, _DistanceScore)
+	    
+	    // Can see score calculation
+	    IF "!c1"
+	    	CharacterCanSee(__Me, _Char)
+	    THEN
+	    	Add(_Score, -10.0)
+	    ENDIF
+	    
+	    IF "c1"
+	    	IsGreaterThen(_Score, %SkillTargetScore_Target_EnemyPetrifyingTouch)
+	    THEN
+	    	Set(%SkillTargetChar_Target_EnemyPetrifyingTouch, _Char)
+	    	Set(%SkillTargetScore_Target_EnemyPetrifyingTouch, _Score)
+	    ENDIF	
+	ENDIF
+	// [~CALC_CHAR_TARGET_ACTIONS]
+	
+	
+	
+	
+	
+	
+	
+	

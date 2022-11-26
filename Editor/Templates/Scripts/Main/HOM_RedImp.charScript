@@ -1,0 +1,147 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+CHARACTER:%TalkPartner = null
+INT:%HandShake = 0
+INT:%DoDialog = 1INT:%StopBothering = 0
+
+EXTERN STRING:%BanterDialog = ""
+
+BEHAVIOUR
+
+REACTION Cutscene, 0
+USAGE PEACE
+ACTIONS
+	Sleep(5)
+
+REACTION State_BotherZixzax, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(CHARACTER:CYS_Zixzax_53517245-3121-4190-a1fc-afc36524f165,1,1)
+	CharacterLookAt(CHARACTER:CYS_Zixzax_53517245-3121-4190-a1fc-afc36524f165)
+	DialogStart("HOM_AD_ImpBothersZixzax",__Me)
+	Set(%currentState,"State_RunningAround")
+	
+REACTION State_Lead, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction,"Action_InspectTroops")
+	SetPriority(%currentAction,1100)
+
+REACTION State_RunningAround, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction,"Action_WalkAround")
+	SetPriority(%currentAction,1100)
+	
+REACTION Action_InspectTroops, 0
+USAGE PEACE 
+VARS
+	CHARACTER:_Imp
+ACTIONS
+	Sleep(10)
+	IF "c1&!c2"
+		IsRandom(0.3)
+		IsEqual(%BanterDialog,"")
+	THEN
+		Label("SelectPartner")
+		Set(%TalkPartner,null)
+		IterateCharactersNear(__Me,4.0,"TalkPartnerCheck")
+		IF "!c1"
+			IsEqual(%TalkPartner,null)
+		THEN
+			//it's possible that this partner was selected by multiple guys last frame
+			//so add a check to make sure we can use him, if not select another
+			IF "c1"
+				IsInDialog(%TalkPartner)
+			THEN
+				Goto("SelectPartner")
+			ELSE
+				DialogStart(%BanterDialog,%TalkPartner,__Me)
+			ENDIF
+		ENDIF
+	ENDIF
+	SetPriority(%currentAction,0)
+INTERRUPT
+	SetPriority(%currentAction,0)
+	
+
+REACTION Action_WalkAround, 0
+USAGE PEACE
+VARS
+	CHARACTER:_Imp
+	CHARACTER:_Player
+	FLOAT:_Sleep
+ACTIONS
+	IF "c1&c2&c3"
+		IsEqual(%StopBothering,0)
+		GetClosestPlayer(_Player,__Me)
+		CharacterIsInTrigger(_Player,TRIGGER:HOM_MainHallTrigger_ee14cc04-b54b-4d77-a83b-d5d64c29b208)
+	THEN
+		CharacterMoveInRange(_Player,1.5,3.0,1)
+	ELSE
+		CharacterWander(FLOAT:10,3,0,CHARACTER:HOM_RedImpLeader_589cdecd-5719-45a6-b91c-c522f9f5c9a7)
+	ENDIF
+	Sleep(1.5)
+	IF "c1&!c2&c3"
+		IsRandom(0.2)
+		IsEqual(%BanterDialog,"")
+		IsEqual(%DoDialog,1)
+	THEN
+		DialogStart(%BanterDialog,__Me)
+		Set(%DoDialog,0)
+		GetRandomBetween(_Sleep, 30, 180)
+		StartTimer("ClearDialog",_Sleep,0)
+	ENDIF
+	SetPriority(%currentAction,0)
+INTERRUPT
+	SetPriority(%currentAction,0)
+	
+EVENTS
+
+EVENT Initialize
+ON
+	OnInit()
+VARS
+	FLOAT:_Sleep
+ACTIONS
+	Set(%DoDialog,0)
+	GetRandomBetween(_Sleep, 30, 180)
+	StartTimer("ClearDialog",_Sleep,0)
+	
+EVENT UpdateFoodCheck
+ON
+	OnTimer("ClearDialog")
+ACTIONS 
+	Set(%DoDialog,1)
+
+EVENT Shutdown
+ON
+	OnShutdown()
+ACTIONS
+	StopTimer("ClearDialog")
+
+EVENT Iterator
+VARS 
+	CHARACTER:_Char
+	FIXEDSTRING:_Fact
+ON
+	OnIterateCharacter(_Char,"TalkPartnerCheck")
+ACTIONS
+	IF "c1&c2&!c3&c4&!c5"
+		CharacterIsAlly(__Me,_Char)
+		IsTagged(_Char,"Imps")
+		IsInDialog(_Char)
+		IsEqual(%TalkPartner,null)
+		IsEqual(_Char,__Me)
+	THEN
+		Set(%TalkPartner,_Char)
+	ENDIF
+	
+EVENT StopBotheringPlayers
+ON
+	OnGlobalEventSet("HOM_ImpsStopFollow")
+ACTIONS
+	Set(%StopBothering,1)

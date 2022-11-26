@@ -1,0 +1,68 @@
+INIT
+
+CHARACTER:__Me
+CHARACTER:%Friend = DAF_BO_ArmoryKeyGuard_7e27579f-3bc5-4dee-964a-00ff07804fe0
+INT:%State = 0
+
+BEHAVIOUR
+REACTION Searching,1050
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%State,0)
+VARS
+	FIXEDSTRING:_Animation
+	FIXEDSTRING:_Text
+ACTIONS
+	
+	IF "c1"
+		IsRandom(0.2)
+	THEN
+
+		CharacterLookAt(%Friend)
+		CharacterEvent(%Friend,"DAF_ArgueOverKey")
+		GetRandom(_Animation,"emotion_insulting","emotion_angry")
+		CharacterPlayAnimation(_Animation)
+		Sleep(12)
+		
+		ELSE
+	    CharacterWander(TRIGGER:DAF_Area_ArmoryKeySearch_1089a101-f4cf-4837-8cdc-05e567e2cdce,5,0,__Me)
+		GetRandom(_Animation,"idle1","dodge")
+		CharacterPlayAnimation(_Animation)
+		GetRandom(_Text,"DAF_ArmoryKeyOrc_1","DAF_ArmoryKeyOrc_2")
+		DisplayText(__Me,_Text,5)
+		Sleep(6)
+		
+	ENDIF	
+INTERRUPT
+	Reset()
+	
+REACTION GaveKeyToOrc,2000
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%State,1)
+ACTIONS
+	CharacterWander(TRIGGER:DAF_Area_ArmoryKeySearch_1089a101-f4cf-4837-8cdc-05e567e2cdce,1,0,__Me)
+	Sleep(12)
+INTERRUPT
+	Reset()
+
+
+EVENTS
+
+EVENT GaveKeyToGruthilda
+ON
+	OnGlobalEventSet("DAF_GaveGruthildaArmoryKey")
+ACTIONS
+	Set(%State,2)
+	
+EVENT GaveKeyToOrc
+ON
+	OnGlobalEventSet("DAF_GaveOrcArmoryKey")
+ACTIONS
+	Set(%State,1)
+
+
+
+
+
+

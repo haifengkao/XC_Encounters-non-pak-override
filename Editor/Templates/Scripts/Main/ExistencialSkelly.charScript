@@ -1,0 +1,36 @@
+#INCLUDE DefaultCharacter
+
+INIT
+USING DefaultCharacter
+CHARACTER:__Me
+INT:%MeetingHasStarted = 0
+
+BEHAVIOUR
+
+REACTION GoToMeeting, 2000
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%MeetingHasStarted,1)
+VARS
+	FIXEDSTRING:_Animation
+	FIXEDSTRING:_Shout
+	FLOAT:_Sleep
+ACTIONS
+	GetRandom(_Animation,"Cheer_01","Cheer_02","Cheer_03")
+	CharacterPlayAnimation(_Animation)
+	IF "c1"
+		IsRandom(0.2)
+	THEN
+		GetRandom(_Shout,"LUC_M_SkellyShout1","LUC_M_SkellyShout2","LUC_M_SkellyShout3","LUC_M_SkellyShout4")
+		DisplayText(__Me,_Shout,3.0)
+	ENDIF
+INTERRUPT
+	Reset()
+
+EVENTS
+
+EVENT GoToMeetingSpot
+ON
+	OnCharacterEvent(__Me,"GoToMeetingSpot")
+ACTIONS
+	Set(%MeetingHasStarted,1)

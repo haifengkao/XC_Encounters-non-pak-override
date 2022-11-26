@@ -1,0 +1,56 @@
+#INCLUDE Base
+INIT
+USING Base
+EXTERN TRIGGER:%WanderPoint1 = null
+EXTERN TRIGGER:%WanderPoint2 = null
+EXTERN TRIGGER:%WindowPoint1 = null
+EXTERN TRIGGER:%DoorPoint1 = null
+CHARACTER:__Me
+
+FIXEDSTRING:%CurrentAction = "ChooseAction"
+
+BEHAVIOUR 
+
+REACTION ChooseAction, 1060
+USAGE PEACE
+ACTIONS
+	GetRandom(%CurrentAction,"WalkAround","GoToDoor","GoToWindow")
+	SetPriority(%CurrentAction, 1070)
+
+REACTION WalkAround, 0
+USAGE PEACE
+VARS
+	TRIGGER:%MovePoint = null
+ACTIONS
+	GetRandom(%MovePoint,%WanderPoint1,%WanderPoint2,%WindowPoint1,%DoorPoint1)
+	CharacterMoveTo(%MovePoint,0)
+		IF "c1"
+			IsRandom(0.5)
+		THEN
+			DisplayText(__Me,"CYS_FishThief2_Script_0",3)
+			CharacterPlayAnimation("No_04")
+		ENDIF
+	Sleep(3)
+	SetPriority(%CurrentAction, 0)
+
+REACTION GoToDoor, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%DoorPoint1,0)
+	CharacterLookFrom(%DoorPoint1)
+	DisplayText(__Me,"CYS_FishThief2_Script_1",3)
+	CharacterPlayAnimation("BehindBars_01")
+	Sleep(3)
+	SetPriority(%CurrentAction, 0)	
+	
+	
+REACTION GoToWindow, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%WindowPoint1,0)
+	CharacterLookFrom(%WindowPoint1)
+	CharacterPlayAnimation("Chicken_Idle_01")
+	Sleep(3)
+	SetPriority(%CurrentAction, 0)
+	
+	

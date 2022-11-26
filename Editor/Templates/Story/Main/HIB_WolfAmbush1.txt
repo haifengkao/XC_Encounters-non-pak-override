@@ -1,0 +1,200 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+//REGION WolfAmbush Initial Triggers
+DB_HIB_WolfAmbushTriggers(TRIGGER_HIB_WolfAmbush3_T01,"NoGroup");
+//END_REGION
+
+//REGION Ambush Characters
+DB_HIB_RoosterAmbush(CHARACTER_HIB_RoosterAmbush1_Rooster01);
+DB_HIB_RoosterAmbush(CHARACTER_HIB_RoosterAmbush1_Rooster02);
+DB_HIB_RoosterAmbush(CHARACTER_HIB_RoosterAmbush1_Rooster03);
+DB_HIB_RoosterAmbush(CHARACTER_HIB_RoosterAmbush1_AlphaRat01);
+DB_HIB_RoosterAmbush(CHARACTER_HIB_RoosterAmbush1_AlphaRat02);
+DB_HIB_RoosterAmbush(CHARACTER_HIB_RoosterAmbush1_AlphaRat03);
+DB_HIB_RoosterAmbush(CHARACTER_HIB_RoosterAmbush1_BetaRat01);
+DB_HIB_RoosterAmbush(CHARACTER_HIB_RoosterAmbush1_BetaRat02);
+DB_HIB_RoosterAmbush(CHARACTER_HIB_RoosterAmbush1_BetaRat03);
+DB_HIB_RoosterAmbush(CHARACTER_HIB_RoosterAmbush1_BetaRat04);
+DB_HIB_WolfAmbush(CHARACTER_HIB_WolfAmbush3_AlphaWolf01,TRIGGER_HIB_WolfAmbush3_D08);
+DB_HIB_WolfAmbush(CHARACTER_HIB_WolfAmbush3_AlphaWolf02,TRIGGER_HIB_WolfAmbush3_D07);
+DB_HIB_WolfAmbush(CHARACTER_HIB_WolfAmbush3_Wolf01,TRIGGER_HIB_WolfAmbush3_D01);
+DB_HIB_WolfAmbush(CHARACTER_HIB_WolfAmbush3_Wolf02,TRIGGER_HIB_WolfAmbush3_D04);
+DB_HIB_WolfAmbush(CHARACTER_HIB_WolfAmbush3_Wolf03,TRIGGER_HIB_WolfAmbush3_D03);
+DB_HIB_WolfAmbush(CHARACTER_HIB_WolfAmbush3_Wolf04,TRIGGER_HIB_WolfAmbush3_D02);
+DB_HIB_WolfAmbush(CHARACTER_HIB_WolfAmbush3_Wolf05,TRIGGER_HIB_WolfAmbush3_D02);
+DB_HIB_WolfAmbush(CHARACTER_HIB_SnowShaman,TRIGGER_HIB_WolfAmbush3_D06);
+//END_REGION
+
+//REGION Rooster Ambush Killcount
+KillCounter("HIB_KillCount_RoosterAmbush",10);
+KillCounterDB(CHARACTER_HIB_RoosterAmbush1_Rooster01,"HIB_KillCount_RoosterAmbush");
+KillCounterDB(CHARACTER_HIB_RoosterAmbush1_Rooster02,"HIB_KillCount_RoosterAmbush");
+KillCounterDB(CHARACTER_HIB_RoosterAmbush1_Rooster03,"HIB_KillCount_RoosterAmbush");
+KillCounterDB(CHARACTER_HIB_RoosterAmbush1_AlphaRat01,"HIB_KillCount_RoosterAmbush");
+KillCounterDB(CHARACTER_HIB_RoosterAmbush1_AlphaRat02,"HIB_KillCount_RoosterAmbush");
+KillCounterDB(CHARACTER_HIB_RoosterAmbush1_AlphaRat03,"HIB_KillCount_RoosterAmbush");
+KillCounterDB(CHARACTER_HIB_RoosterAmbush1_BetaRat01,"HIB_KillCount_RoosterAmbush");
+KillCounterDB(CHARACTER_HIB_RoosterAmbush1_BetaRat02,"HIB_KillCount_RoosterAmbush");
+KillCounterDB(CHARACTER_HIB_RoosterAmbush1_BetaRat03,"HIB_KillCount_RoosterAmbush");
+KillCounterDB(CHARACTER_HIB_RoosterAmbush1_BetaRat04,"HIB_KillCount_RoosterAmbush");
+//END_REGION
+
+//REGION WolfAmbush3 Killcount
+KillCounter("HIB_KillCount_WolfAmbush3",7);
+KillCounterDB(CHARACTER_HIB_WolfAmbush3_AlphaWolf01,"HIB_KillCount_WolfAmbush3");
+KillCounterDB(CHARACTER_HIB_WolfAmbush3_AlphaWolf02,"HIB_KillCount_WolfAmbush3");
+KillCounterDB(CHARACTER_HIB_WolfAmbush3_Wolf01,"HIB_KillCount_WolfAmbush3");
+KillCounterDB(CHARACTER_HIB_WolfAmbush3_Wolf02,"HIB_KillCount_WolfAmbush3");
+KillCounterDB(CHARACTER_HIB_WolfAmbush3_Wolf03,"HIB_KillCount_WolfAmbush3");
+KillCounterDB(CHARACTER_HIB_WolfAmbush3_Wolf04,"HIB_KillCount_WolfAmbush3");
+KillCounterDB(CHARACTER_HIB_WolfAmbush3_Wolf05,"HIB_KillCount_WolfAmbush3");
+//END_REGION
+
+//REGION WolfAmbush Player Comments
+DB_PlayerComments("HIB_CaveAmbush","HIB_CaveAmbush_1_1",1,1);
+DB_PlayerComments("HIB_CaveAmbush","HIB_CaveAmbush_2_1",2,1);
+DB_PlayerComments("HIB_CaveAmbush","HIB_CaveAmbush_2_2",2,2);
+DB_PlayerComments("HIB_WolfAmbush3","HIB_WolfAmbush3_1_1",1,1);
+DB_PlayerComments("HIB_WolfAmbush3","HIB_WolfAmbush3_2_1",2,1);
+DB_PlayerComments("HIB_WolfAmbush3","HIB_WolfAmbush3_2_2",2,2);
+//END_REGION
+
+PROC_HIB_WolfAmbushInit();
+PROC_HIB_WolfAmbushTriggersInit();
+KBSECTION
+//REGION INIT - WolfAmbushInit - Set Robots & Wolves off stage
+PROC
+PROC_HIB_WolfAmbushInit()
+AND
+DB_HIB_RoosterAmbush(_Robot)
+THEN
+CharacterSetOnStage(_Robot,0);
+
+PROC
+PROC_HIB_WolfAmbushInit()
+AND
+DB_HIB_WolfAmbush(_Wolf,_)
+THEN
+CharacterSetOnStage(_Wolf,0);
+CharacterSetOnStage(CHARACTER_HIB_WolfAmbush3_FireWard,0);
+CharacterSetCanFight(_Wolf, 0);
+//END_REGION
+
+//REGION INIT - WolfAmbushTriggerInit - Register triggers for player
+PROC
+PROC_HIB_WolfAmbushTriggersInit()	
+AND
+DB_HIB_WolfAmbushTriggers(_Trigger,_)
+THEN
+DB_OneShotPlayerTrigger(_Trigger);	
+//END_REGION
+ 
+//REGION Rooster Ambush - Activated when a player entered TRIGGER_HIB_WolfAmbush1_T02 (near the lever)
+IF 
+CharacterEnteredTrigger(_,TRIGGER_HIB_WolfAmbush1_T02)
+AND
+NOT DB_RobotAmbushTriggerCheck(1)
+THEN
+DB_RobotAmbushTriggerCheck(1);
+AmbushTrigger(TRIGGER_HIB_WolfAmbush1_T01,ITEM_HIB_RoosterAmbush_InvisibleHelper_01);
+//END_REGION
+
+//REGION Rooster Ambush - Robots appear & move
+PROC
+ProcLaunchAmbush(TRIGGER_HIB_WolfAmbush1_T01, _Player)
+THEN	
+TimerLaunch("HIB_RobotAmbush_SpawnTimer_01",600);
+
+IF
+TimerFinished("HIB_RobotAmbush_SpawnTimer_01")
+THEN
+CharacterAppear(CHARACTER_HIB_RoosterAmbush1_Rooster01,1);
+CharacterAppear(CHARACTER_HIB_RoosterAmbush1_Rooster02,1);
+TimerLaunch("HIB_RobotAmbush_SpawnTimer_02",600);
+
+IF
+TimerFinished("HIB_RobotAmbush_SpawnTimer_02")
+THEN
+CharacterAppear(CHARACTER_HIB_RoosterAmbush1_AlphaRat01,1);
+CharacterAppear(CHARACTER_HIB_RoosterAmbush1_AlphaRat02,1);
+CharacterAppear(CHARACTER_HIB_RoosterAmbush1_AlphaRat03,1);
+TimerLaunch("HIB_RobotAmbush_SpawnTimer_03",800);
+
+IF
+TimerFinished("HIB_RobotAmbush_SpawnTimer_03")
+THEN
+CharacterAppear(CHARACTER_HIB_RoosterAmbush1_BetaRat01,1);
+CharacterAppear(CHARACTER_HIB_RoosterAmbush1_BetaRat02,1);
+CharacterAppear(CHARACTER_HIB_RoosterAmbush1_BetaRat03,1);
+CharacterAppear(CHARACTER_HIB_RoosterAmbush1_BetaRat04,1);
+TimerLaunch("HIB_RobotAmbush_SpawnTimer_04",1500);
+
+IF
+TimerFinished("HIB_RobotAmbush_SpawnTimer_04")
+THEN
+CharacterAppear(CHARACTER_HIB_RoosterAmbush1_Rooster03,1);
+
+IF
+TimerFinished("HIB_RobotAmbush_SpawnTimer_04")
+AND
+DB_HIB_RoosterAmbush(_Robot)
+THEN
+NOT DB_HIB_RoosterAmbush(_Robot);
+//END_REGION
+
+//REGION Rooster Ambush - PlayerComment
+PROC
+ReactOnKillCounter("HIB_KillCount_RoosterAmbush")
+AND
+CharacterGetClosestPlayer(CHARACTER_HIB_RoosterAmbush1_Rooster01,_Player)
+THEN
+Launch_PlayerComment(_Player,"HIB_CaveAmbush");
+//END_REGION
+
+//REGION Crystal Wolf Ambush - Register 2nd trigger
+IF
+CharacterEnteredTrigger(_Player,TRIGGER_HIB_WolfAmbush3_T01)
+THEN
+AmbushTrigger(TRIGGER_HIB_WolfAmbush3_T02,ITEM_HIB_WolfAmbush_InvisibleHelper_01);
+//END_REGION
+
+//REGION Crystal Wolf Ambush - Wolves appear & move
+PROC
+ProcLaunchAmbush(TRIGGER_HIB_WolfAmbush3_T02, _Player)
+AND
+DB_HIB_WolfAmbushTriggers(_WolfAmbushTrigger,_ID)
+AND
+DB_HIB_WolfAmbush(_Wolf,_Trigger)
+THEN	
+CharacterAppear(_Wolf,0);
+ProcCharacterMoveToTrigger(_Wolf,_Trigger,1,"wolfAtTrigger");
+CharacterLookAtCharacter(_Wolf,_Player,0);
+NOT DB_HIB_WolfAmbush(_Wolf,_Trigger,_ID);
+NOT DB_HIB_WolfAmbushTriggers(_WolfAmbushTrigger,_ID);
+
+PROC
+ProcLaunchAmbush(TRIGGER_HIB_WolfAmbush3_T02, _Player)
+AND
+IsHardcoreMode(1)
+THEN
+CharacterAppear(CHARACTER_HIB_WolfAmbush3_FireWard,0);
+
+IF
+CharacterEvent(_Wolf, "wolfAtTrigger")
+THEN
+CharacterSetCanFight(_Wolf, 1);
+//END_REGION
+
+//REGION Crystal Wolf Ambush - PlayerComment
+PROC
+ReactOnKillCounter("HIB_KillCount_WolfAmbush3")
+AND
+CharacterGetClosestPlayer(CHARACTER_HIB_WolfAmbush3_AlphaWolf01,_Player)
+THEN
+Launch_PlayerComment(_Player, "HIB_WolfAmbush3");
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

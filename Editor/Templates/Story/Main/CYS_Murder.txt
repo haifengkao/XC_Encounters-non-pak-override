@@ -1,0 +1,784 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_Dialogs(CHARACTER_CYS_ZombieJake,"CYS_Jake");
+CharacterSetHasDialog(CHARACTER_CYS_ZombieJake, 0);
+DB_Dialogs(CHARACTER_CYS_CrimeSceneGuard, "CYS_CrimeSceneGuard");
+DB_Dialogs(CHARACTER_CYS_JakeDog, "CYS_JakeDog");
+DB_OneShotPlayerTrigger(TRIGGER_CYS_StartEvelynLeandraScene);
+DB_CYS_EvelynFight(CHARACTER_CYS_Evelyn);
+
+ItemToContainer(ITEM_CYS_JakeDogItem_Cecil,ITEM_CYS_CecilCupboard1,-1);
+ItemToContainer(ITEM_CYS_JakeDogItem_Evelyn,ITEM_CYS_EvelynCupboard,-1);
+ItemToContainer(ITEM_CYS_JakeDogItem_Esmeralda,ITEM_CYS_EsmeChest,-1);
+ItemToContainer(ITEM_CYS_JakeDogItem_Aureus,ITEM_CYS_AureusCupboard,-1);
+
+ItemToCharacter(ITEM_CYS_JakeDogItem_Aureus2, CHARACTER_CYS_Aureus);
+ItemToCharacter(ITEM_CYS_JakeDogItem_Esme2,CHARACTER_CYS_Esmeralda);
+ItemToCharacter(ITEM_CYS_JakeDogItem_Evelyn2, CHARACTER_CYS_Evelyn);
+ItemToCharacter(ITEM_CYS_JakeDogItem_Cecil2, CHARACTER_CYS_Cecil);
+
+ProcTriggerRegisterForPlayers(TRIGGER_CYS_CrimeScene);
+
+DB_CYS_JakeDog_SuspectItems("HasAureusItem", ITEM_CYS_JakeDogItem_Aureus, "CYS_TakeAureusDogItem");
+DB_CYS_JakeDog_SuspectItems("HasCecilItem", ITEM_CYS_JakeDogItem_Cecil, "CYS_TakeCecilDogItem");
+DB_CYS_JakeDog_SuspectItems("HasEsmeraldaItem", ITEM_CYS_JakeDogItem_Esmeralda, "CYS_TakeEsmeDogItem");
+DB_CYS_JakeDog_SuspectItems("HasEvelynItem", ITEM_CYS_JakeDogItem_Evelyn, "CYS_TakeEvelynDogItem");
+DB_CYS_JakeDog_SuspectItems("HasAureusItem2", ITEM_CYS_JakeDogItem_Aureus2, "CYS_TakeAureusDogItem");
+DB_CYS_JakeDog_SuspectItems("HasCecilItem2", ITEM_CYS_JakeDogItem_Cecil2, "CYS_TakeCecilDogItem");
+DB_CYS_JakeDog_SuspectItems("HasEsmeraldaItem2", ITEM_CYS_JakeDogItem_Esme2, "CYS_TakeEsmeDogItem");
+DB_CYS_JakeDog_SuspectItems("HasEvelynItem2", ITEM_CYS_JakeDogItem_Evelyn2, "CYS_TakeEvelynDogItem");
+
+ProcTriggerRegisterForPlayers(TRIGGER_CYS_Area_RevealEvelynLabEntrance);
+ItemSetOnstage(ITEM_CYS_Evelyn_LabEntrance, 0);
+
+ItemToCharacter(ITEM_CYS_Key_CrimeScene, CHARACTER_CYS_CrimeSceneGuard);
+ItemToCharacter(ITEM_CYS_Evelyn_DoorKey,CHARACTER_CYS_Evelyn);
+ItemToContainer(ITEM_CYS_Book_DiaryEvelyn, ITEM_CYS_EvelynBookshelf,-1);
+ItemToContainer(ITEM_CYS_Evelyn_RevealSpell, ITEM_CYS_EvelynChest,-1);
+ItemToCharacter(ITEM_CYS_EvelynLabKey, CHARACTER_CYS_BlackCultist_Evelyn_02);
+
+DB_CYS_CurrentJakeZombie(0);
+
+ItemSetOnstage(ITEM_CYS_Evelyn_Backpack, 0);
+DB_BloodDrainedCultist(CHARACTER_CYS_BlackCultist_Evelyn_02);
+
+SneakTriggerSpotter(TRIGGER_CYS_OrcTalk, CHARACTER_CYS_EvelynsOrc);
+SneakTriggerSpotter(TRIGGER_CYS_OrcTalk, CHARACTER_CYS_EvelynOrc4);
+SneakTriggerSpotter(TRIGGER_CYS_OrcTalk, CHARACTER_CYS_EvelynOrc2);
+SneakTriggerSpotter(TRIGGER_CYS_OrcTalk, CHARACTER_CYS_EvelynOrc3);
+/*
+SneakTriggerSpotter(TRIGGER_CYS_AreaEvelynFight, CHARACTER_CYS_EvelynsCultist1);
+SneakTriggerSpotter(TRIGGER_CYS_AreaEvelynFight, CHARACTER_CYS_EvelynsCultist2);
+SneakTriggerSpotter(TRIGGER_CYS_AreaEvelynFight, CHARACTER_CYS_EvelynsCultist3);
+SneakTriggerSpotter(TRIGGER_CYS_AreaEvelynFight, CHARACTER_CYS_EvelynsCultist4);
+SneakTriggerSpotter(TRIGGER_CYS_AreaEvelynFight, CHARACTER_CYS_EvelynsCultist5);
+SneakTriggerSpotter(TRIGGER_CYS_AreaEvelynFight, CHARACTER_CYS_EvelynsCultist6);
+SneakTriggerSpotter(TRIGGER_CYS_AreaEvelynFight, CHARACTER_CYS_EvelynsCultist7);
+SneakTriggerSpotter(TRIGGER_CYS_AreaEvelynFight, CHARACTER_CYS_EvelynsCultist8);*/
+SneakTriggerSpotter(TRIGGER_CYS_AreaEvelynFight, CHARACTER_CYS_Evelyn);
+SneakTriggerSpotter(TRIGGER_CYS_AreaEvelynFight, CHARACTER_CYS_ZombieJake);
+SneakTriggerSpotter(TRIGGER_CYS_AreaEvelynFight, CHARACTER_CYS_ZombieEvelyn);
+SneakTriggerSpotter(TRIGGER_CYS_AreaEvelynFight, CHARACTER_CYS_EvelynJakeScene_Leandra);
+
+//REGION EVELYNS ANEMIC CULTISTS
+DB_EvelynAnemicCultists(CHARACTER_CYS_EvelynsCultist_1);
+DB_EvelynAnemicCultists(CHARACTER_CYS_EvelynsCultist_2);
+DB_EvelynAnemicCultists(CHARACTER_CYS_EvelynsCultist_3);
+DB_EvelynAnemicCultists(CHARACTER_CYS_EvelynsCultist_4);
+DB_EvelynAnemicCultists(CHARACTER_CYS_EvelynsCultist_5);
+DB_EvelynAnemicCultists(CHARACTER_CYS_EvelynsCultist_6);
+DB_EvelynAnemicCultists(CHARACTER_CYS_EvelynsCultist_7);
+DB_EvelynAnemicCultists(CHARACTER_CYS_EvelynsCultist_8);
+DB_EvelynAnemicCultists(CHARACTER_CYS_EvelynsCultist_9);
+//END_REGION
+
+//REGION PLAYER COMMENTS
+DB_PlayerComments("CYS_CommentZombieJakeDead","CYS_CommentZombieJakeDead1_1",1,1);
+DB_PlayerComments("CYS_CommentZombieJakeDead","CYS_CommentZombieJakeDead2_1",2,1);
+DB_PlayerComments("CYS_CommentZombieJakeDead","CYS_CommentZombieJakeDead2_2",2,2);
+
+ProcTriggerRegisterForPlayers(TRIGGER_CYS_Comment_MurderScene);
+DB_PlayerComments("CYS_CommentCrimeScene","CYS_CommentCrimeScene_1_1",1,1);
+DB_PlayerComments("CYS_CommentCrimeScene","CYS_CommentCrimeScene_2_1",2,1);
+DB_PlayerComments("CYS_CommentCrimeScene","CYS_CommentCrimeScene_2_2",2,2);
+
+DB_PlayerComment_Trigger(TRIGGER_CYS_CommentBloodDrained, "CYS_CommentBloodDrained");
+DB_PlayerComments("CYS_CommentBloodDrained","CYS_CommentBloodDrained_1_1",1,1);
+DB_PlayerComments("CYS_CommentBloodDrained","CYS_CommentBloodDrained_2_1",2,1);
+DB_PlayerComments("CYS_CommentBloodDrained","CYS_CommentBloodDrained_2_2",2,2);
+
+DB_PlayerComments("CYS_CommentCrimeSceneAfterBody","CYS_CommentCrimeSceneAfterBody_1_1",1,1);
+DB_PlayerComments("CYS_CommentCrimeSceneAfterBody","CYS_CommentCrimeSceneAfterBody_2_1",2,1);
+DB_PlayerComments("CYS_CommentCrimeSceneAfterBody","CYS_CommentCrimeSceneAfterBody_2_2",2,2);
+
+DB_PlayerComments("CYS_Comment_EvelynsDiary","CYS_Comment_EvelynsDiary_1_1",1,1);
+DB_PlayerComments("CYS_Comment_EvelynsDiary","CYS_Comment_EvelynsDiary_2_1",2,1);
+DB_PlayerComments("CYS_Comment_EvelynsDiary","CYS_Comment_EvelynsDiary_2_2",2,2);
+
+DB_PlayerComments("CYS_Comment_EvelynsDiary_NoBody","CYS_Comment_EvelynsDiary_NoBody_1_1",1,1);
+DB_PlayerComments("CYS_Comment_EvelynsDiary_NoBody","CYS_Comment_EvelynsDiary_NoBody_2_1",2,1);
+DB_PlayerComments("CYS_Comment_EvelynsDiary_NoBody","CYS_Comment_EvelynsDiary_NoBody_2_2",2,2);
+
+DB_PlayerComments("CYS_Comment_EvelynsCaveLocation","CYS_Comment_EvelynsCaveLocation_1_1",1,1);
+DB_PlayerComments("CYS_Comment_EvelynsCaveLocation","CYS_Comment_EvelynsCaveLocation_2_1",2,1);
+DB_PlayerComments("CYS_Comment_EvelynsCaveLocation","CYS_Comment_EvelynsCaveLocation_2_2",2,2);
+
+DB_PlayerComments("CYS_Comment_EvelynCaveEntranceAppeared","CYS_Comment_EvelynCaveEntranceAppeared_1_1",1,1);
+DB_PlayerComments("CYS_Comment_EvelynCaveEntranceAppeared","CYS_Comment_EvelynCaveEntranceAppeared_2_1",2,1);
+DB_PlayerComments("CYS_Comment_EvelynCaveEntranceAppeared","CYS_Comment_EvelynCaveEntranceAppeared_2_2",2,2);
+
+DB_PlayerComments("CYS_Evelyn_CommentAfterFirstFight","CYS_Evelyn_CommentAfterFirstFight_1_1",1,1);
+DB_PlayerComments("CYS_Evelyn_CommentAfterFirstFight","CYS_Evelyn_CommentAfterFirstFight_2_1",2,1);
+DB_PlayerComments("CYS_Evelyn_CommentAfterFirstFight","CYS_Evelyn_CommentAfterFirstFight_2_2",2,2);
+
+DB_PlayerComments("CYS_CommentOnAgitatedDog","CYS_CommentOnAgitatedDog_1_1",1,1);
+DB_PlayerComments("CYS_CommentOnAgitatedDog","CYS_CommentOnAgitatedDog_2_1",2,1);
+DB_PlayerComments("CYS_CommentOnAgitatedDog","CYS_CommentOnAgitatedDog_2_2",2,2);
+
+DB_PlayerComments("CYS_CommentEveleynCultist","CYS_CommentEveleynCultist_1_1",1,1);
+DB_PlayerComments("CYS_CommentEveleynCultist","CYS_CommentEveleynCultist_2_1",2,1);
+DB_PlayerComments("CYS_CommentEveleynCultist","CYS_CommentEveleynCultist_2_2",2,2);
+//END_REGION
+NoReflectionDialogOnKill(CHARACTER_CYS_Dietmar);
+NoReflectionDialogOnKill(CHARACTER_CYS_DietmarThug1);
+NoReflectionDialogOnKill(CHARACTER_CYS_DietmarThug2);
+
+DB_CYSTriggerEvelynLabComment(1); 
+
+DB_IsGuard(CHARACTER_CYS_CrimeSceneGuard);
+
+CharacterSetOnStage(CHARACTER_CYS_ZombieEvelyn, 0);
+//CharacterSetImmortal(CHARACTER_CYS_EvelynJakeScene_Leandra,1);
+
+DB_EvelynDialogs("CYS_Evelyn",CHARACTER_CYS_Evelyn);
+DB_EvelynDialogs("CYS_ZombieEvelyn",CHARACTER_CYS_ZombieEvelyn);
+
+DB_CYS_EvelynOrcs(CHARACTER_CYS_EvelynOrc2);
+DB_CYS_EvelynOrcs(CHARACTER_CYS_EvelynOrc3);
+DB_CYS_EvelynOrcs(CHARACTER_CYS_EvelynOrc4);
+DB_CYS_EvelynOrcs(CHARACTER_CYS_EvelynsOrc);
+
+KillCounter("CYS_EvelynFightKillCounter",1);
+
+CharacterSetOnStage(CHARACTER_CYS_EvelynsOrc_Hardcore_Ranger_01,0);
+CharacterSetOnStage(CHARACTER_CYS_EvelynsOrc_Hardcore_Ranger_02,0);
+CharacterSetOnStage(CHARACTER_CYS_EvelynsOrc_Hardcore_Shaman_01,0);
+
+DB_CYS_EvelynJakeLeandraScene_Member(CHARACTER_CYS_EvelynJakeScene_Leandra);
+DB_CYS_EvelynJakeLeandraScene_Member(CHARACTER_CYS_Evelyn);
+DB_CYS_EvelynJakeLeandraScene_Member(CHARACTER_CYS_ZombieEvelyn);
+DB_CYS_EvelynJakeLeandraScene_Member(CHARACTER_CYS_ZombieJake);
+KBSECTION
+IF
+CharacterSpottedItemUsed_Redhanded(_Player,CHARACTER_CYS_Evelyn,CHARACTER_CYS_Evelyn,ITEM_CYS_Evelyn_Backpack,_)
+THEN
+CharacterDisplayText(CHARACTER_CYS_Evelyn,"CYS_Evelyn_Shout_0");
+ItemClose(ITEM_CYS_Evelyn_Backpack);
+ 
+//REGION CRIME SCENE
+
+IF
+CharacterUsedItem(_player, ITEM_CYS_Door_CrimeScene)
+AND
+ItemIsLocked(ITEM_CYS_Door_CrimeScene, 1)
+THEN
+CharacterSetVarInteger(CHARACTER_CYS_CrimeSceneGuard, "reactOnLockedDoorUse", 1);
+ProcDoTwoSpeakerDialog("CYS_CrimeSceneGuard", CHARACTER_CYS_CrimeSceneGuard, _player);
+
+IF
+CharacterLeftTrigger(_Player,TRIGGER_CYS_CrimeScene)
+THEN
+ProcCheckOtherPlayersInTrigger(_Player,TRIGGER_CYS_CrimeScene);
+
+PROC
+ProcCheckOtherPlayersInTrigger(_Player,TRIGGER_CYS_CrimeScene)
+AND
+NOT DB_OtherPlayersInRegion(TRIGGER_CYS_CrimeScene,1)
+THEN
+ProcCYSLaunchCrimeSceneComment(_Player);
+
+PROC
+ProcCYSLaunchCrimeSceneComment((CHARACTER)_Player)
+AND
+NOT ITEM_CYS_JakeCoffin.AlreadyUsed()
+THEN
+Launch_PlayerComment(_Player,"CYS_CommentCrimeScene");
+GlobalSetEvent("CYS_MurderSceneVisited");
+
+PROC
+ProcCYSLaunchCrimeSceneComment((CHARACTER)_Player)
+AND
+ITEM_CYS_JakeCoffin.AlreadyUsed()
+THEN
+Launch_PlayerComment(_Player,"CYS_CommentCrimeSceneAfterBody");
+GlobalSetEvent("CYS_MurderSceneVisited");
+
+IF
+DialogEnded("CYS_CrimeSceneGuard", _)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_CrimeSceneGuard, "openLockedDoor", 1)
+THEN
+ItemUnLock(ITEM_CYS_Door_CrimeScene);
+
+IF
+CharacterEnteredTrigger(_Player,TRIGGER_CYS_Comment_MurderScene)
+AND
+NOT DB_DefinedCompanions(_Player)
+AND
+NOT DB_OnlyOnce("CYS_MurderScene_Zapping")
+THEN
+DB_OnlyOnce("CYS_MurderScene_Zapping");
+
+IF
+CharacterResurrected(CHARACTER_CYS_ZombieJake)
+THEN
+DB_Dialogs(CHARACTER_CYS_ZombieJake,"CYS_Jake");
+
+//END_REGION
+
+//REGION Questlog Update
+
+IF
+GlobalEventSet("CYS_ArhuToldMurderStory")
+THEN
+QuestUpdate("CYS_JakesMurder", "Update1c1");
+
+IF
+GlobalEventSet("CYS_RobertMarkerAndLog")
+THEN
+QuestUpdate("CYS_JakesMurder", "Update1d");
+ProcShowMarker("SUBREGION_Mortician_0");
+
+IF
+CharacterEnteredTrigger(_Player,TRIGGER_CYS_Comment_MurderScene)
+THEN
+QuestUpdate("CYS_JakesMurder","Update2");
+
+//END_REGION
+
+//REGION JAKE DOG
+
+IF
+ItemAddedToCharacter(_item, _player)
+AND
+_player.DB_IsPlayer()
+AND
+DB_CYS_JakeDog_SuspectItems(_owner, _item, _)
+AND
+_item.notAlreadyCaught()
+THEN
+_item.notAlreadyCaught();
+Proc_AddExplorationEvent("CYS_SmellyItem");
+
+IF
+ItemAddedToCharacter(_item, _player)
+AND
+_player.DB_IsPlayer()
+AND
+DB_CYS_JakeDog_SuspectItems(_owner, _item, _)
+THEN
+GlobalSetEvent(_owner);
+
+IF
+ItemRemovedFromCharacter(_item, _player)
+AND
+_player.DB_IsPlayer()
+AND
+DB_CYS_JakeDog_SuspectItems(_owner, _item, _)
+THEN
+GlobalClearEvent(_owner);
+
+IF
+DialogCharacterEventSet(_Event,_Player,_)
+AND
+DB_CYS_JakeDog_SuspectItems(_, _Item, _Event)
+AND
+ItemIsInPartyInventory(_Item,_Player,1,_)
+THEN
+NOOP(1);
+
+PROC
+ProcCYSMoveEvelyn()
+AND
+NOT DB_Dead(CHARACTER_CYS_Evelyn)
+AND
+NOT CHARACTER_CYS_Evelyn.HasBeenMoved()
+THEN
+CHARACTER_CYS_Evelyn.HasBeenMoved();
+CharacterSetHasDialog(CHARACTER_CYS_Evelyn, 0);
+DialogRequestStopForCharacter(CHARACTER_CYS_Evelyn);
+CharacterDisappearOutOfSight(CHARACTER_CYS_Evelyn, 0, 1, "disappearedOutOfSight",1);
+CharacterSetVarFixedString(CHARACTER_CYS_Evelyn,"currentState","State_Idle");
+QuestUpdate("HOM_Starstones", "AfterEvelynDisappearing");
+
+PROC
+ProcCYSMoveEvelyn()
+AND
+DB_Dead(CHARACTER_CYS_Evelyn)
+AND
+NOT CHARACTER_CYS_Evelyn.hasBeenDealtWith()
+AND
+NOT CHARACTER_CYS_Evelyn.HasBeenMoved()
+THEN
+CHARACTER_CYS_Evelyn.HasBeenMoved();
+GlobalSetEvent("CYS_EvelynDisappeared");
+CharacterSetOnStage(CHARACTER_CYS_ZombieEvelyn, 1);
+NOT DB_CYS_EvelynFight(CHARACTER_CYS_Evelyn);
+KillCounterDB(CHARACTER_CYS_ZombieEvelyn,"CYS_EvelynFightKillCounter");
+DB_CYS_EvelynFight(CHARACTER_CYS_ZombieEvelyn);
+QuestUpdate("HOM_Starstones", "AfterEvelynDisappearing");
+
+IF
+GlobalEventSet("CYS_EvelynCaught")
+THEN
+ProcCYSMoveEvelyn();
+CharacterSetVarInteger(CHARACTER_CYS_Dietmar, "isHostile", 1);
+ProcCYSMoveEvelynKey();
+ItemSetOnstage(ITEM_CYS_Evelyn_Backpack, 1);
+SneakTriggerSpotter(TRIGGER_CYS_Area_DialogDietmar, CHARACTER_CYS_Dietmar);
+SneakTriggerSpotter(TRIGGER_CYS_Area_DialogDietmar, CHARACTER_CYS_DietmarThug1);
+SneakTriggerSpotter(TRIGGER_CYS_Area_DialogDietmar, CHARACTER_CYS_DietmarThug2);
+ProcDisablePlayerTrade(CHARACTER_CYS_Dietmar);
+
+PROC
+ProcCharInTriggerSpotted(_Player, TRIGGER_CYS_Area_DialogDietmar)
+AND
+NOT DB_Combat(CHARACTER_CYS_Dietmar, _)
+THEN
+ProcDoTwoSpeakerDialog("CYS_Dietmar",CHARACTER_CYS_Dietmar,_Player);
+
+
+PROC
+ProcCYSMoveEvelynKey()
+AND
+ItemIsInCharacterInventory(ITEM_CYS_Evelyn_DoorKey,CHARACTER_CYS_Evelyn,1)
+THEN
+ItemToContainer( ITEM_CYS_Evelyn_DoorKey,ITEM_CYS_Evelyn_Backpack,-1);
+
+IF
+DialogEnded("CYS_JakeDog", _)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_JakeDog, "Caught_Evelyn", 1)
+THEN
+GlobalSetEvent("CYS_EvelynCaught");
+QuestUpdate("CYS_JakesMurder","Update11");
+
+IF
+DialogEnded("CYS_JakeDog", _)
+THEN
+Proc_CompanionDialog(CHARACTER_Jahan,"JAH_CD_Murphy",CHARACTER_CYS_JakeDog);
+
+IF
+CharacterEnteredTrigger(_Player,TRIGGER_CYS_GraveyardEnter)
+AND
+NOT ITEM_CYS_JakeCoffin.hasTriggeredDialog()
+AND
+CharacterGetClosestPlayer(CHARACTER_CYS_JakeDog,_Player)
+THEN
+ITEM_CYS_JakeCoffin.hasTriggeredDialog();
+ProcCYSLaunchMurphyText(_Player);
+
+PROC
+ProcCYSLaunchMurphyText((CHARACTER)_Player)
+AND
+NOT DB_Dead(CHARACTER_CYS_JakeDog)
+THEN
+CharacterDisplayText(CHARACTER_CYS_JakeDog,"CYS_JakeDog_Agitated");
+Launch_PlayerComment(_Player,"CYS_CommentOnAgitatedDog");
+
+//END_REGION
+
+//REGION DIETMAR FIGHT
+
+IF
+DialogEnded("CYS_Dietmar", _)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_Dietmar, "isHostile", 1)
+THEN
+SetRelationFactionToPlayers("CYS_Dietmar",0);
+
+IF
+DialogEnded("CYS_Dietmar", _)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_Dietmar, "isHostile", 1)
+AND
+DB_GlobalEvent("CYS_ReadEvelynDiary")
+THEN
+QuestUpdate("CYS_JakesMurder", "Update8");
+
+//END_REGION
+
+//REGION EVELYN CAVE
+IF
+CharacterEvent(CHARACTER_CYS_BlackCultist_Evelyn_02, "caughtUpOrcs")
+AND
+CharacterGetClosestPlayer(CHARACTER_CYS_BlackCultist_Evelyn_02, _Player)
+THEN
+CharacterSetFaction(CHARACTER_CYS_EvelynOrc4, "Evil NPC");
+CharacterSetFaction(CHARACTER_CYS_EvelynOrc3, "Evil NPC");
+CharacterSetFaction(CHARACTER_CYS_EvelynOrc2, "Evil NPC");
+CharacterSetFaction(CHARACTER_CYS_EvelynsOrc, "Evil NPC");
+CharacterSetEvent(CHARACTER_CYS_BlackCultist_Evelyn_02, "ClearPeaceReturn");
+CharacterRemoveStatus(CHARACTER_CYS_BlackCultist_Evelyn_02, "WEAK");
+CharacterLeaveCombat(CHARACTER_CYS_BlackCultist_Evelyn_02);
+Launch_PlayerComment(_Player, "CYS_CommentEveleynCultist");
+
+IF
+DB_BloodDrainedCultist(_Cultist)
+THEN
+CharacterSetHitpointsPercentage(_Cultist, 10);
+CharacterApplyStatus(_Cultist, "WEAK", -1.0,1);
+
+IF
+GameBookInterfaceClosed(ITEM_CYS_Book_DiaryEvelyn, _player)
+AND
+NOT ITEM_CYS_Book_DiaryEvelyn.triggeredComment()
+THEN
+ITEM_CYS_Book_DiaryEvelyn.triggeredComment();
+ProcCYSLaunchEvelynDiaryComment(_player);
+GlobalSetEvent("CYS_PlayerDiscoveredEvelynsLab");
+GlobalSetEvent("CYS_EvelynPatientsDie");
+GlobalSetEvent("CYS_EvelynCaught");
+GlobalSetEvent("CYS_ReadEvelynDiary");
+QuestUpdate("CYS_JakesMurder", "Update7");
+ProcShowMarker("CYS_Evelyn_LabEntrance");
+
+PROC
+ProcCYSLaunchEvelynDiaryComment((CHARACTER)_player)
+AND
+ITEM_CYS_JakeCoffin.AlreadyUsed()
+THEN
+Launch_PlayerComment(_player, "CYS_Comment_EvelynsDiary");
+
+PROC
+ProcCYSLaunchEvelynDiaryComment((CHARACTER)_player)
+AND
+NOT ITEM_CYS_JakeCoffin.AlreadyUsed()
+THEN
+Launch_PlayerComment(_player, "CYS_Comment_EvelynsDiary_NoBody");
+
+IF
+CharacterEnteredTrigger(_Player,TRIGGER_CYS_Area_RevealEvelynLabEntrance)
+AND
+ITEM_CYS_Book_DiaryEvelyn.triggeredComment()
+AND
+DB_CYSTriggerEvelynLabComment(1)
+THEN
+NOT DB_CYSTriggerEvelynLabComment(1);
+Launch_PlayerComment(_Player,"CYS_Comment_EvelynsCaveLocation");
+
+IF
+GameBookInterfaceClosed(ITEM_CYS_Evelyn_RevealSpell, _player)
+AND
+DB_InRegion(_player, TRIGGER_CYS_Area_RevealEvelynLabEntrance)
+AND
+ItemGetPosition(ITEM_CYS_Evelyn_LabEntrance,_X,_Y,_Z)
+AND
+NOT 	DB_OnlyOnce("EvelynLabOpen")
+THEN
+PlayScaledEffectAtPosition("FX_GP_TeleportSmoke_A",4.0,_X,_Y,_Z);
+ItemSetOnstage(ITEM_CYS_Evelyn_LabEntrance, 1);
+Proc_AddExplorationEvent("CYS_EvelynLab");
+GlobalSetEvent("CYS_PlayerDiscoveredEvelynsLab");
+GlobalSetEvent("CYS_EvelynPatientsDie");
+GlobalSetEvent("CYS_EvelynCaught");
+QuestUpdate("CYS_JakesMurder", "Update9");
+TimerLaunch("EvelynCaveEntranceAppeared",500);
+DB_OnlyOnce("EvelynLabOpen");
+SneakTriggerSpotter(TRIGGER_CYS_RaddagothSneak, CHARACTER_CYS_Nozgoth);
+CharacterSetVarInteger(CHARACTER_CYS_Nozgoth, "isHostile", 1);
+DialogRequestStopForCharacter(CHARACTER_CYS_Nozgoth);
+ProcRemoveDialogEntryForSpeaker(CHARACTER_CYS_Nozgoth, "CYS_Nozgoth");
+DB_Dialogs(CHARACTER_CYS_Nozgoth, "CYS_NozgothStopPlayer");
+
+IF
+ItemAddedToCharacter(ITEM_CYS_Evelyn_RevealSpell,_Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+QuestUpdate("CYS_JakesMurder","Update13");
+
+IF
+TimerFinished("EvelynCaveEntranceAppeared")
+AND
+ItemGetClosestPlayer(ITEM_CYS_Evelyn_LabEntrance,_Player)
+THEN
+Launch_PlayerComment(_Player,"CYS_Comment_EvelynCaveEntranceAppeared");
+
+IF
+GameBookInterfaceClosed(ITEM_CYS_Evelyn_RevealSpell, _player)
+AND
+NOT DB_InRegion(_player, TRIGGER_CYS_Area_RevealEvelynLabEntrance)
+THEN
+CharacterDisplayText(_player, "GLO_FailedUse");
+
+IF
+CharacterUsedItem(_player, ITEM_CYS_Evelyn_LabEntrance)
+THEN
+CharacterSetVarInteger(CHARACTER_CYS_Evelyn, "caveDiscovered", 1);
+
+IF
+CharacterEvent(CHARACTER_CYS_Evelyn, "disappearedOutOfSight")
+THEN
+CharacterTeleportToTrigger(CHARACTER_CYS_Evelyn, TRIGGER_CYS_Point_Evelyn_SecretLab,"");
+CharacterSetIsBoss(CHARACTER_CYS_Evelyn, 1);
+CharacterSetFaction(CHARACTER_CYS_Evelyn, "Evil NPC");
+CharacterSetOnStage(CHARACTER_CYS_Evelyn, 1);
+ProcDisablePlayerTrade(CHARACTER_CYS_Evelyn);
+KillCounterDB(CHARACTER_CYS_Evelyn,"CYS_EvelynFightKillCounter");
+CharacterSetVarFixedString(CHARACTER_CYS_Evelyn, "currentState", "State_YellAtJake");
+GlobalSetEvent("CYS_EvelynDisappeared");
+CharacterSetCanFight(CHARACTER_CYS_Evelyn, 0);
+
+IF
+CharacterDied(CHARACTER_CYS_Evelyn)
+AND
+DB_GlobalEvent("CYS_EvelynCaught")
+THEN
+Proc_CompanionDialog(CHARACTER_Jahan,"JAH_CD_Evelyn",CHARACTER_CYS_Evelyn);
+
+PROC
+ProcCharInTriggerSpotted(_Player,TRIGGER_CYS_OrcTalk)
+THEN
+PROC_MendatoryDialog("CYS_EvelynsOrc", CHARACTER_CYS_EvelynOrc4, _Player);
+
+IF
+DialogEnded("CYS_EvelynsOrc", _)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_EvelynOrc4, "goBack", 1)
+THEN
+ProcCharacterMoveToTrigger(CHARACTER_CYS_EvelynOrc2, TRIGGER_CYS_Point_EvelynLab_IN, 0, "EvelynOrcAtExit");
+ProcCharacterMoveToTrigger(CHARACTER_CYS_EvelynOrc3, TRIGGER_CYS_Point_EvelynLab_IN, 0, "EvelynOrcAtExit");
+ProcCharacterMoveToTrigger(CHARACTER_CYS_EvelynOrc4, TRIGGER_CYS_Point_EvelynLab_IN, 0, "EvelynOrcAtExit");
+ProcCharacterMoveToTrigger(CHARACTER_CYS_EvelynsOrc, TRIGGER_CYS_Point_EvelynLab_IN, 0, "EvelynOrcAtExit");
+
+IF
+CharacterEvent(_Orc, "EvelynOrcAtExit")
+THEN
+CharacterSetOnStage(_Orc, 0);
+
+IF
+DialogEnded("CYS_EvelynsOrc", _)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_EvelynOrc4, "fightParty", 1)
+THEN
+SetRelationFactionToPlayers("CYS_EvelynsOrc", 0);
+
+IF
+CharacterAttackedByCharacter(_Orc, _Player)
+AND
+DB_CYS_EvelynOrcs(_Orc)
+THEN
+CharacterPurgeQueue(CHARACTER_CYS_EvelynOrc2);
+CharacterPurgeQueue(CHARACTER_CYS_EvelynOrc3);
+CharacterPurgeQueue(CHARACTER_CYS_EvelynOrc4);
+CharacterPurgeQueue(CHARACTER_CYS_EvelynsOrc);
+//END_REGION
+
+//REGION EVELYN FIGHT
+PROC
+ProcOneShotTriggerEntered(_,TRIGGER_CYS_StartEvelynLeandraScene)
+AND
+DB_CYS_EvelynFight(_Evelyn)
+THEN
+DialogStartThreeSpeakerDialog("CYS_AD_LeandraEvelyn",CHARACTER_CYS_EvelynJakeScene_Leandra,_Evelyn,CHARACTER_CYS_ZombieJake);
+
+PROC
+ProcCharInTriggerSpotted(_, TRIGGER_CYS_AreaEvelynFight)
+THEN
+GlobalSetEvent("CYS_EvelynFaced");
+
+PROC
+ProcCharInTriggerSpotted(_Player, TRIGGER_CYS_AreaEvelynFight)
+AND
+DB_CYS_EvelynFight(_Evelyn)
+AND
+DB_EvelynDialogs(_Dialog,_Evelyn)
+THEN
+PROC_MendatoryDialogThreeSpeaker(_Dialog,_Evelyn, CHARACTER_CYS_EvelynJakeScene_Leandra, _Player);
+
+IF
+DialogStarted(_Dialog,_ID)
+AND
+DB_EvelynDialogs(_Dialog,_Evelyn)
+AND
+DB_DialogPlayers(_ID,_Player,1)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_Evelyn, "caveDiscovered", 1)
+THEN
+CharacterLookAtCharacter(_Evelyn,CHARACTER_CYS_EvelynJakeScene_Leandra,0);
+DB_MurderCave_Evelyn_And_Player_In_Dialog(_Evelyn,_Player);
+
+IF
+GlobalEventSet("CYS_EvelynLeandraPoof")
+AND
+DB_MurderCave_Evelyn_And_Player_In_Dialog(_Evelyn,_Player)
+THEN
+Proc_PoofOnce(CHARACTER_CYS_EvelynJakeScene_Leandra,"CYS_EvelynLeandraPoof");
+CharacterLookAtCharacter(_Evelyn,_Player,0);
+NOT DB_MurderCave_Evelyn_And_Player_In_Dialog(_Evelyn,_Player);
+
+IF
+DialogEnded(_Diag, _)
+AND
+DB_EvelynDialogs(_Diag,_Evelyn)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_Evelyn, "caveDiscovered", 1)
+THEN
+Proc_PoofOnce(CHARACTER_CYS_EvelynJakeScene_Leandra,"CYS_EvelynLeandraPoof");
+DB_OnlyOnce("PoofJake");
+CharacterSetCanFight(_Evelyn, 1);
+CharacterPlayAnimation(CHARACTER_CYS_ZombieJake, "Custom_Burrow", "goOffStage");
+
+IF
+CharacterEvent(CHARACTER_CYS_ZombieJake, "goOffStage")
+THEN
+CharacterSetOnStage(CHARACTER_CYS_ZombieJake, 0);
+
+IF
+CharacterAttackedByCharacter(_Char, _)
+AND
+DB_CYS_EvelynJakeLeandraScene_Member(_Char)
+AND
+DB_CYS_EvelynFight(_Evelyn)
+AND
+CharacterGetVarInteger(CHARACTER_CYS_Evelyn, "caveDiscovered", 1)
+AND
+NOT DB_OnlyOnce("PoofJake")
+AND
+CharacterConsume(_Evelyn, "GLO_SentinelOn", _)
+THEN
+DialogRequestStopForCharacter(CHARACTER_CYS_EvelynJakeScene_Leandra);
+CharacterSetCanFight(_Evelyn, 1);	
+DB_OnlyOnce("PoofJake");
+ProcTriggerUnregisterForPlayers(TRIGGER_CYS_AreaEvelynFight);
+CharacterPlayAnimation(CHARACTER_CYS_ZombieJake, "Custom_Burrow", "goOffStage");
+Proc_PoofOnce(CHARACTER_CYS_EvelynJakeScene_Leandra,"CYS_EvelynLeandraPoof");
+
+PROC
+ReactOnKillCounter("CYS_EvelynFightKillCounter")
+AND
+CharacterGetVarInteger(CHARACTER_CYS_Evelyn, "caveDiscovered", 1)
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_CYS_ZombieJake, _Player)
+THEN
+CHARACTER_CYS_Evelyn.hasBeenDealtWith();
+CharacterSetEvent(CHARACTER_CYS_ZombieJake, "EvelynGangDead");
+CharacterSetHasDialog(CHARACTER_CYS_ZombieJake, 1);
+CharacterSetCanFight(CHARACTER_CYS_ZombieJake, 1);
+CharacterAppear(CHARACTER_CYS_ZombieJake,1);
+GlobalSetEvent("CYS_EvelynKilledInCave");
+DB_DoJakeDialog(_Player);
+
+IF
+CharacterWentOnStage(CHARACTER_CYS_ZombieJake,1)
+AND
+DB_DoJakeDialog(_Player)
+THEN
+NOT DB_DoJakeDialog(_Player);
+PROC_MendatoryDialog("CYS_Jake", CHARACTER_CYS_ZombieJake, _Player);
+
+//END_REGION
+
+//REGION ZOMBIE JAKE
+
+PROC
+ProcCYSCheckEsmeraldaQuest()
+AND
+NOT DB_GlobalEvent("CYS_EsmeraldaInJail")
+THEN
+QuestUpdate("CYS_Esmeralda","Update11");
+QuestClose("CYS_Esmeralda");
+
+IF
+DialogEnded("CYS_Jake",_Inst)
+AND
+NOT 	DB_OnlyOnce("JakeMeeting")
+THEN
+DB_OnlyOnce("JakeMeeting");
+QuestUpdate("CYS_JakesMurder","Update10");
+QuestClose("CYS_JakesMurder");
+Proc_AddExplorationEvent("CYS_MetJake");
+ProcCYSCheckEsmeraldaQuest();
+CharacterSetHasDialog(CHARACTER_CYS_ZombieJake, 0);
+CharacterPlayAnimation(CHARACTER_CYS_ZombieJake, "Custom_Burrow", "JakeAtGrave");
+TimerLaunch("EvelynFightOver",5000);
+
+IF
+TimerFinished("EvelynFightOver")
+AND
+CharacterGetClosestAlivePlayer(CHARACTER_CYS_EvelynJakeScene_Leandra,_Player)
+AND
+NOT DB_GlobalEvent("CYS_BraccusFightDone")
+THEN
+DB_Singleton("IsArhuCat",0);
+PROC_Delayed_ArhuExMachina(_Player,"CYS_Arhu_AfterJake");
+
+IF
+DialogEnded("CYS_Arhu_AfterJake",_)
+THEN
+ProcDefinePartyDialog("CYS_DD_Arhu_AfterJake");
+QuestAdd("CYS_Cassandra");
+QuestUpdate("CYS_Cassandra","Update1");
+
+IF
+DialogCharacterEventSet("JakeGivesAmulet",_Player,_)
+THEN
+ItemToCharacter(ITEM_DAF_Immaculate_Token_Evelyn,_Player);
+
+IF
+CharacterEvent(CHARACTER_CYS_ZombieJake, "JakeAtGrave")
+THEN
+CharacterSetOnStage(CHARACTER_CYS_ZombieJake,0);
+CharacterSetHasDialog(CHARACTER_CYS_ZombieJake, 1);
+CHARACTER_CYS_ZombieJake.available();
+
+IF
+CharacterUsedItem(_Player, ITEM_CYS_JakesGrave)
+AND
+CHARACTER_CYS_ZombieJake.available()
+THEN
+CharacterAppearAtTrigger(CHARACTER_CYS_ZombieJake, TRIGGER_CYS_ShovelJakeDogPoint, 1);
+DB_ZJakeDialog(_Player);
+
+IF
+CharacterWentOnStage(CHARACTER_CYS_ZombieJake, 1)
+AND
+DB_ZJakeDialog(_Player)
+THEN
+NOT DB_ZJakeDialog(_Player);
+ProcDoTwoSpeakerDialog("CYS_Jake", CHARACTER_CYS_ZombieJake, _Player);
+
+IF
+DialogEnded("CYS_Jake", _)
+AND
+CHARACTER_CYS_ZombieJake.available()
+THEN
+CharacterSetHasDialog(CHARACTER_CYS_ZombieJake, 0);
+CharacterPlayAnimation(CHARACTER_CYS_ZombieJake, "Custom_Burrow", "burrowed");
+
+IF
+CharacterEvent(CHARACTER_CYS_ZombieJake, "burrowed")
+THEN
+CharacterSetOnStage(CHARACTER_CYS_ZombieJake, 0);
+CharacterSetHasDialog(CHARACTER_CYS_ZombieJake, 1);
+
+
+//END_REGION
+
+//REGION ANEMIC CULTISTS
+IF 
+DB_EvelynAnemicCultists(_Cultist)
+AND
+IsHardcoreMode(0)
+THEN
+CharacterApplyStatus(_Cultist,"WEAK",-1.0,1);
+CharacterSetHitpointsPercentage(_Cultist,60);
+//END_REGION
+
+//REGION HARDCORE EVELYN
+IF
+CharacterEnteredCombat(CHARACTER_CYS_EvelynsOrc,_)
+THEN
+CharacterSetOnStage(CHARACTER_CYS_EvelynsOrc_Hardcore_Ranger_01,1);
+ProcCharacterMoveToTrigger(CHARACTER_CYS_EvelynsOrc_Hardcore_Ranger_01,TRIGGER_CYS_EvelynOrcs_Hardcore_RallyPoint_01,1,"");
+CharacterSetOnStage(CHARACTER_CYS_EvelynsOrc_Hardcore_Ranger_02,1);                                                  
+ProcCharacterMoveToTrigger(CHARACTER_CYS_EvelynsOrc_Hardcore_Ranger_02,TRIGGER_CYS_EvelynOrcs_Hardcore_RallyPoint_02,1,"");
+CharacterSetOnStage(CHARACTER_CYS_EvelynsOrc_Hardcore_Shaman_01,1);                                                  
+ProcCharacterMoveToTrigger(CHARACTER_CYS_EvelynsOrc_Hardcore_Shaman_01,TRIGGER_CYS_EvelynOrcs_Hardcore_RallyPoint_03,1,"");
+//END_REGION
+
+IF
+GlobalEventSet("CYS_ThelyronGivesEvelynLocation")
+THEN
+ProcShowMarker("05m_Citizen_A_Door_A_Item_001");
+
+IF
+ItemAddedToCharacter(ITEM_CYS_JakeDogItem_Esmeralda, _Player)
+THEN
+UnlockAchievement("questee23");
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

@@ -1,0 +1,83 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+// (INTEGER)_GuardType,(LOCATION)_PrisonCell,(LOCATION)_ReleaseLocation,(OBJECT)_Door,(OBJECT)_Chest,(INTEGER)_TradeImage
+//PrisonData(CHARACTER_Player1,"PRISON_WATCH_RIVERTOWN", TRIGGER_Test_Prison_Cell,TRIGGER_Test_Prison_Exit, ITEM_Test_Prison_Door,ITEM_Test_Prison_Chest/*,        962*/);
+//PrisonData(CHARACTER_Player2,"PRISON_WATCH_RIVERTOWN", TRIGGER_Test_Prison_Cell2,TRIGGER_Test_Prison_Exit2, ITEM_Test_Prison_Door2,ITEM_Test_Prison_Chest2/*,        962*/);
+
+//TODO: commented block, beds?
+/*
+PrisonBed(PRISON_CASTLE,OBJECT_bed_prison_sfcastle1);
+PrisonBed(PRISON_CASTLE,OBJECT_bed_prison_sfcastle2);
+PrisonBed(PRISON_WATCH_RIVERTOWN,OBJECT_bed_prison_watch_riv);
+PrisonBed(PRISON_WATCH_VERDISTIS,OBJECT_bed_prison_watch_verd);
+PrisonBed(PRISON_GLENBORUS,OBJECT_bed_prison_glenborus);
+// I was falling asleep I guess, but the object is for sure the bed of the dwarven halls prison:
+PrisonBed(PRISON_DWARVEN_HALLS,OBJECT_bed_glenborus_prison);
+*/
+
+//_PrisonID,_Region,_ProhibitedRegion,_Guard,_Script
+//PrisonEscapeData("PRISON_WATCH_RIVERTOWN",TRIGGER_Test_Prison_Prohibited,CHARACTER_Prison_Guard, "prison guard riv take a leak",TRIGGER_Test_Prison);
+
+// GuardedRegion(_GuardedRegion,_QuitChaseRegion,_GuardType,_Prison)
+//GuardedRegion(TRIGGER_Test_Prison,TRIGGER_Test_Prison,"GUARD_TYPE_WATCH_RIVERTOWN_LANCE","PRISON_WATCH_RIVERTOWN");
+
+//GuardTypeNpc("GUARD_TYPE_WATCH_RIVERTOWN_LANCE",CHARACTER_Prison_Patrol1,"Guard_1_to_hero",1);
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Cyseal prison 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+PrisonData(CHARACTER_Player1,"PRISON_CYSEAL", TRIGGER_CYS_Prison_DestPlayer1,TRIGGER_CYS_Prison_Exit1, ITEM_CYS_PlayerJailDoor,ITEM_CYS_ChestPrison1);
+PrisonData(CHARACTER_Player2,"PRISON_CYSEAL", TRIGGER_CYS_Prison_DestPlayer2,TRIGGER_CYS_Prison_Exit2, ITEM_CYS_PlayerJailDoor,ITEM_CYS_ChestPrison2);
+
+DB_CompanionChest("PRISON_CYSEAL", ITEM_CYS_ChestPrison3,CHARACTER_NULL);
+DB_CompanionChest("PRISON_CYSEAL", ITEM_CYS_ChestPrison4,CHARACTER_NULL);
+
+PrisonDataDoorKeys(ITEM_CYS_PlayerJailDoor,"CYS_CysealJailPlayer");
+ItemToCharacter(ITEM_CYS_JailKeyPlayer, CHARACTER_CYS_Prison_Guard);
+
+
+PrisonEscapeData("PRISON_CYSEAL",TRIGGER_CYS_Prison_Prohibited,CHARACTER_CYS_Prison_Guard, "TakeLeak",TRIGGER_CYS_REGION_Barracks_Prison);
+
+GuardedRegion(TRIGGER_CYS_Ownership_Cyseal_Barracks_Prison,TRIGGER_CYS_REGION_Barracks_Prison,"GUARD_TYPE_WATCH_CYSEAL_PRISON","PRISON_CYSEAL");
+
+GuardTypeNpc("GUARD_TYPE_WATCH_CYSEAL_PRISON",CHARACTER_CYS_Prison_Patrol1,"Guard_1_to_hero",1);
+DB_NumGuards("GUARD_TYPE_WATCH_CYSEAL_PRISON",1);
+DB_RemoveNpc(CHARACTER_CYS_Prison_Patrol1);
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Luculla prison
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+PrisonData(CHARACTER_Player1,"PRISON_LUCULLA", TRIGGER_LUC_Point_Prison_DestPlayer2,TRIGGER_LUC_Point_Prison_Exit1, ITEM_LUC_PrisonGate2,ITEM_LUC_ChestPrison1);
+PrisonData(CHARACTER_Player2,"PRISON_LUCULLA", TRIGGER_LUC_Point_Prison_DestPlayer2,TRIGGER_LUC_Point_Prison_Exit2, ITEM_LUC_PrisonGate2,ITEM_LUC_ChestPrison2);
+
+DB_CompanionChest("PRISON_LUCULLA", ITEM_LUC_ChestPrison3,CHARACTER_NULL);
+DB_CompanionChest("PRISON_LUCULLA", ITEM_LUC_ChestPrison4,CHARACTER_NULL);
+
+PrisonDataDoorKeys(ITEM_LUC_PrisonGate2,"LUC_IV_Pens");
+
+PrisonEscapeData("PRISON_LUCULLA",TRIGGER_LUC_Prison_Prohibited,CHARACTER_LUC_Prison_Guard, "TakeLeak",TRIGGER_LUC_REGION_ImmaculatePrison);
+
+GuardedRegion(TRIGGER_LUC_REGION_ImmaculatePrison,TRIGGER_LUC_REGION_ImmaculatePrison,"GUARD_TYPE_WATCH_LUCULLA_PRISON","");
+DB_NumGuards("GUARD_TYPE_WATCH_LUCULLA_PRISON",1);
+
+GuardTypeNpc("GUARD_TYPE_WATCH_LUCULLA_PRISON",CHARACTER_LUC_Prison_Patrol1,"Guard_1_to_hero",1);
+DB_RemoveNpc(CHARACTER_LUC_Prison_Patrol1);
+
+
+DB_IsGuard(CHARACTER_LUC_Prison_Guard);
+
+DB_PrisonStatues(ITEM_CYS_Prison_DemonStatue,CHARACTER_CYS_Prison_Demon,"Generic_PrisonDemon",TRIGGER_CYS_Prison_Demon_Spot);
+
+DB_PrisonStatues(ITEM_LUC_Prison_DemonStatueA,CHARACTER_CYS_Prison_Demon,"Generic_PrisonDemon",TRIGGER_LUC_Prison_Demon_SpotA);
+DB_PrisonStatues(ITEM_LUC_Prison_DemonStatueB,CHARACTER_CYS_Prison_Demon,"Generic_PrisonDemon",TRIGGER_LUC_Prison_Demon_SpotB);
+
+ItemToCharacter(ITEM_LUC_PrisonKey,CHARACTER_LUC_Prison_Guard);
+KBSECTION
+
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

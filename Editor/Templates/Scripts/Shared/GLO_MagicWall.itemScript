@@ -1,0 +1,34 @@
+INIT
+	ITEM:__Me
+	INT:%Handle = 0
+	EXTERN STRING:%FX = "FX_GP_Quest_Wall_Magic_A"
+	
+EVENTS
+
+EVENT Startup
+ON
+	OnActivate()
+	OnItemEvent(__Me, "playFX")
+ACTIONS
+	ItemPlayLoopEffect(%Handle, __Me, %FX)
+		
+EVENT OsirisShutDown
+ON
+	OnItemEvent(__Me, "shutDown")
+ACTIONS
+	StopLoopEffect(%Handle)
+	Set(%Handle,0)
+	StartTimer("setOffStage", 2.0,0)
+
+EVENT ShutDown
+ON
+	OnDeactivate()
+ACTIONS
+	StopLoopEffect(%Handle)
+	Set(%Handle,0)
+	
+EVENT OffStage
+	ON
+		OnTimer("setOffStage")
+	ACTIONS
+		ItemSetOnStage(__Me, 0)

@@ -1,0 +1,69 @@
+#INCLUDE PUZZLE_GasPit
+
+INIT
+USING PUZZLE_GasPit
+
+ITEM:__Me
+EXTERN FLOAT:%TimeOn = 5
+EXTERN FLOAT:%TimeOff = 5
+EXTERN FLOAT:%DelayTime = 0
+
+EVENTS
+
+EVENT Initialize OVERRIDE
+ON
+	OnInit
+ACTIONS
+	IF "!c1"
+		IsEqual(%DelayTime,0)
+	THEN
+		StartTimer("StartDelay",%DelayTime,0)
+	ELSE
+		StartTimer("StopSpewing",%TimeOn,0)
+	ENDIF
+	StartTimer("UpdatePressurePlate",0.1,-1)
+
+EVENT Shutdown OVERRIDE
+ON
+	OnShutdown
+ACTIONS
+	StopTimer("UpdatePressurePlate")
+	StopTimer("LaunchSpewing")
+	StopTimer("StopSpewing")
+
+EVENT LaunchSpewing
+ON
+	OnTimer("LaunchSpewing")
+ACTIONS	
+	IF "!c1"
+		IsEqual(%CurrentPercentage,1)
+	THEN
+		Set(%SpewingGas,1)
+		StartTimer("StopSpewing",%TimeOn,0)
+	ELSE
+		StartTimer("LaunchSpewing",%TimeOff,0)
+	ENDIF
+	
+EVENT StopSpewing
+ON
+	OnTimer("StopSpewing")
+ACTIONS	
+	IF "!c1"
+		IsEqual(%CurrentPercentage,1)
+	THEN
+		Set(%SpewingGas,0)
+		IF "c1"
+			ContainsSurface(__Me,%GasRadius,%GasType)
+		THEN
+			CreateSurfaceAt(__Me,None,%GasRadius,-1)
+		ENDIF
+		StartTimer("LaunchSpewing",%TimeOff,0)
+	ELSE
+		StartTimer("StopSpewing",%TimeOn,0)
+	ENDIF
+
+EVENT StartDelay
+ON
+	OnTimer("StartDelay")
+ACTIONS
+	StartTimer("StopSpewing",%TimeOn,0)

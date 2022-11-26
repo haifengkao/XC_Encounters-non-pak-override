@@ -1,0 +1,29 @@
+INIT
+CHARACTER:__Me
+CHARACTER:%Bellegar = CYS_Bellegar_a370f6d5-4d18-4305-82ec-3f4013c5ae69
+TRIGGER:%WanderArea = CYS_BellegarWomanWanderArea_52de4cb6-3c7f-4a94-9998-9f344bb08b0b
+
+BEHAVIOUR
+
+REACTION Wander, 1050
+USAGE PEACE
+ACTIONS
+	CharacterWander(%WanderArea,10,0)
+	Sleep(5)
+INTERRUPT
+	Reset()
+
+REACTION BowForBellegar, 1080
+USAGE PEACE
+CHECK "c1"
+	CharacterInTouchRange(__Me,CYS_Bellegar_a370f6d5-4d18-4305-82ec-3f4013c5ae69)
+VARS
+	FIXEDSTRING:_Text
+	FIXEDSTRING:_Animation
+ACTIONS
+	GetRandom(_Text,"CYS_BellegarWoman_1","CYS_BellegarWoman_2","CYS_BellegarWoman_3","CYS_BellegarWoman_4")
+	GetRandom(_Animation,"Worship_01","Flirt_01","Cheer_01","Cheer_02","Cheer_03")
+	CharacterLookAt(%Bellegar)
+	CharacterPlayAnimation(_Animation)
+	DisplayText(__Me,_Text,5)
+	Sleep(10)

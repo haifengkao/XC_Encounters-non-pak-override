@@ -1,0 +1,2289 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+GuardDialog("Thievery_PayFine",1);
+GuardDialog("Thievery_PayFine_RifRaf",1);
+GuardDialog("Vandalism_PayFine",0);
+GuardDialog("Trespassing_PayFine",2);
+
+// Define amount to pay:
+ThieveryFine("EVENT_thievery_fine_low",250);
+ThieveryFine("EVENT_thievery_fine_medium",1000);
+ThieveryFine("EVENT_thievery_fine_high",5000);
+
+VandalismFine("EVENT_vandalism_fine_low",250);
+VandalismFine("EVENT_vandalism_fine_medium",1000);
+VandalismFine("EVENT_vandalism_fine_high",5000);
+
+TrespassingFine("EVENT_trespassing_fine_low",250);
+TrespassingFine("EVENT_trespassing_fine_medium",1000);
+TrespassingFine("EVENT_trespassing_fine_high",5000);
+
+// Guarded regions: (check also Shop regions)
+// GuardedRegion(_GuardedRegion,_QuitChaseRegion,_GuardType,_Prison)
+//		_GuardedRegion: region in which guards of _GuardType operate.
+//		If they imprison you (in case of thievery behaviour), it'll be in the prison with ID _Prison.
+//		_QuitChaseRegion can be = _GuardedRegion but can be a bigger region to. When the player runs outside
+//		this region, the guards quit following him. (Useful to prevent the guards to be lured in monster regions.)
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+DB_PrisonDemonStats("Strength","PrisonDemon_UseStrength");
+DB_PrisonDemonStats("Intelligence","PrisonDemon_UseIntelligence");
+DB_PrisonDemonStats("Dexterity","PrisonDemon_UseDexterity");
+DB_PrisonDemonStats("Constitution","PrisonDemon_UseConstitution");
+DB_PrisonDemonStats("Speed","PrisonDemon_UseSpeed");
+DB_PrisonDemonStats("Perception","PrisonDemon_UsePerception");
+KBSECTION
+IF
+GuardTypeNpc((STRING)_Type,(CHARACTER)_Guard,(STRING)_Script,(INTEGER)_Index)
+THEN
+ArrestThiefDialog(_Guard,"Thievery_PayFine");
+DB_RemoveNpc(_Guard);
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// Some general rules about the "guard" npcs:
+//
+
+// Determine who is a guard:
+IF
+NpcFollowsAlignment((CHARACTER)_Npc,(STRING)_Alignment) 
+AND
+IsGuardAlignment(_Alignment)
+THEN
+DB_IsGuard(_Npc);
+
+IF
+GuardTypeNpc(_,_Npc,_,_)
+THEN
+DB_IsGuard(_Npc);
+
+// Make their tolerance against thievery very low (such that they will arrest immediately
+// if they spot a theft):
+IF
+DB_IsGuard(_Npc)
+AND
+DB_CharacterStats(_Npc,_ToleranceThievery,_Cheap,_Expensive)
+AND
+_ToleranceThievery > -50
+THEN
+NOT DB_CharacterStats(_Npc,_ToleranceThievery,_Cheap,_Expensive);
+DB_CharacterStats(_Npc,-50,_Cheap,_Expensive);
+
+PROC
+PreStartDialog(_,_Npc,_) 
+AND
+DB_IsGuard(_Npc)
+THEN
+SetAndRememberDialogEvent(_Npc,"EVENT_npc_is_a_guard",1);
+
+PROC
+PreStartDialog(_,_Npc,_)
+AND
+NOT DB_IsGuard(_Npc)
+THEN
+SetAndRememberDialogEvent(_Npc,"EVENT_npc_is_a_guard",0);
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// TryCallGuards((NPC)_Npc,(INTEGER)_Reason)
+//
+//		Try get help from guards. Successful if we are in a GuardedRegion (see GuardedRegion/4).
+//		_Reason should be the player's action that caused the NPC to call for help.
+//		It determines the action of the guards (see GuardAction/2).
+//
+PROC
+TryCallGuards((CHARACTER)_Player,(CHARACTER)_NpcCallingGuards,(INTEGER)_Reason) 
+THEN
+NOT DB_GotActualGuardHelp(_Player,1);
+
+PROC
+TryCallGuards((CHARACTER)_Player,(CHARACTER)_NpcCallingGuards,(INTEGER)_Reason) 
+AND
+NOT NoGuards(_Player,1) 
+AND
+NOT DB_NpcCannotCallGuards(_NpcCallingGuards) 
+AND
+NOT DB_EvilDude(_NpcCallingGuards) 
+AND
+NOT DB_NpcGotHelp(_NpcCallingGuards) 
+AND
+DB_InRegion(_Player,_Region) 
+AND
+GuardedRegion((TRIGGER)_Region,(TRIGGER)_,(STRING)_,(STRING)_)
+THEN	
+CallGuards(_Player,_Region,_Reason);
+DB_NpcGotHelp(_NpcCallingGuards);		// nuance: _NpcCallingGuards THINKS he will get help (so will start yelling)
+															// but it could be that they are not yet available
+
+// Call the guards of _Type only if they are not yet patrolling:
+PROC	
+CallGuards((CHARACTER)_Player,(TRIGGER)_Region,(INTEGER)_Reason) 
+AND
+NOT NoGuards(_Player,1)
+THEN
+CallGuards_1(_Player,_Region,_Reason);
+
+PROC	
+CallGuards_1((CHARACTER)_Player,(TRIGGER)_Region,(INTEGER)_Reason) 
+AND
+GuardedRegion(_Region,_,_Type,_) 
+AND
+NOT SummonedGuards(_,_Type) 		// prevent _Npcs from summoning a patrol from the same type twice
+THEN
+SummonedGuards(_Player,_Type);
+// Remember that SummonGuards/3 needs to be called if the "Help me" dialog ends
+SummonGuardsAfterCallDialog(_Player,_Region,_Type,_Reason);
+
+PROC	
+CallGuards_1((CHARACTER)_Player,(TRIGGER)_Region,(INTEGER)_Reason) 
+AND
+GuardedRegion(_Region,_,_Type,_) 
+AND		// still summoned, i.e. still not left sight of hero
+SummonedGuards(_OtherPlayer,_Region,_Type,_N,5,_)
+THEN
+//these guys came to fight. check if they're dead or belong to another player
+ProcCheckSummonNewGuards(_Player,_Region,_Reason,_OtherPlayer);
+
+PROC
+ProcCheckSummonNewGuards((CHARACTER)_Player,(TRIGGER)_Region,(INTEGER)_Reason,(CHARACTER)_OtherPlayer)
+AND
+_OtherPlayer!=_Player
+AND
+GuardedRegion(_Region,_,_Type,_) 
+THEN	
+SummonedGuards(_Player,_Type);
+// Remember that SummonGuards/3 needs to be called if the "Help me" dialog ends
+SummonGuardsAfterCallDialog(_Player,_Region,_Type,_Reason);
+
+PROC
+ProcCheckSummonNewGuards((CHARACTER)_Player,(TRIGGER)_Region,(INTEGER)_Reason,(CHARACTER)_OtherPlayer)
+AND
+_OtherPlayer==_Player
+AND
+GuardedRegion(_Region,_,_Type,_) 
+AND
+SummonedGuards(_OtherPlayer,_Region,_Type,_N,5,_SummonID)
+THEN
+ProcCheckSummonedGuardsDead(_Player,_SummonID,_Type,_Region,_Reason);
+
+PROC
+ProcDoCheckSummonedGuardsDead((CHARACTER)_Player)
+AND
+DB_GuardSummonPool(_Player,_Guard,_SummonID)
+AND
+CharacterIsDead(_Guard,0)
+AND
+Sees(_Guard,_Player)	//if they're aliev, but they do'nt see us, we're good to summon more
+THEN
+DB_TempSummonedGuardAlive(_Player,1);
+
+PROC
+ProcCheckSummonedGuardsDead((CHARACTER)_Player,(INTEGER)_ID,(STRING)_Type,(TRIGGER)_Region,(INTEGER)_Reason)
+THEN
+ProcDoCheckSummonedGuardsDead(_Player);
+
+PROC
+ProcCheckSummonedGuardsDead((CHARACTER)_Player,(INTEGER)_ID,(STRING)_Type,(TRIGGER)_Region,(INTEGER)_Reason)
+AND
+NOT DB_TempSummonedGuardAlive(_Player,1)
+THEN	
+SummonedGuards(_Player,_Type);
+// Remember that SummonGuards/3 needs to be called if the "Help me" dialog ends
+SummonGuardsAfterCallDialog(_Player,_Region,_Type,_Reason);
+
+PROC
+ProcCheckSummonedGuardsDead((CHARACTER)_Player,(INTEGER)_ID,(STRING)_Type,(TRIGGER)_Region,(INTEGER)_Reason)
+THEN
+NOT DB_TempSummonedGuardAlive(_Player,1);
+
+
+//Make the guards hostile to both players if we're comitting an offense while the guards are busy but can see it (ie player1 is talking to guards, player2 steals something)
+PROC	
+CallGuards_1((CHARACTER)_Player,(TRIGGER)_Region,(INTEGER)_Reason) 
+AND
+GuardedRegion(_Region,_,_Type,_) 
+AND		// still summoned, i.e. still not left sight of hero
+SummonedGuards(_OtherPlayer,_Region,_Type,_N,_OldReason,_ID)
+AND
+NOT RemoveNpcGroup(_OtherPlayer,_,_ID) //they left peacefully!
+AND
+_OldReason != 5		// reason was not to fight //TODO define ACTION_ALIGNMENT_CHANGE_TO_ENEMY
+AND
+_OtherPlayer!=_Player
+AND
+Sees(_Player,_OtherPlayer)
+THEN	
+AbortRemoveGuards(_OtherPlayer,_ID);
+CallGuards_2(_Player,_Region,_Reason);
+
+//we're busy with one player 
+//and the other player causes guards to CharacterAppear//We're not aroudn the firstp layer though, so summon a new batch
+PROC	
+CallGuards_1((CHARACTER)_Player,(TRIGGER)_Region,(INTEGER)_Reason) 
+AND
+GuardedRegion(_Region,_,_Type,_) 
+AND		// still summoned, i.e. still not left sight of hero
+SummonedGuards(_OtherPlayer,_Region,_Type,_N,_OldReason,_ID)
+AND
+NOT RemoveNpcGroup(_OtherPlayer,_,_ID) //they left peacefully!
+AND
+_OldReason != 5		// reason was not to fight //TODO define ACTION_ALIGNMENT_CHANGE_TO_ENEMY
+AND
+_OtherPlayer!=_Player
+AND
+NOT Sees(_Player,_OtherPlayer)
+AND
+NOT SummonedGuards(_Player,_Region,_Type,_,_,_)		//if we have summoned cards still around, don't summon new ones
+THEN	
+ProcSummonGuardsFromPool(_Player,_region,_Reason);
+
+// DO call the guards of _Type if they are already patrolling in the special case when
+//		- they were not there to attack, AND
+//		- they are not yet gone (i.e. on of them is still in sight of the hero - see GuardsStayAndLeaveInGroup(1))
+
+//prefer using our own
+PROC	
+CallGuards_1((CHARACTER)_Player,(TRIGGER)_Region,(INTEGER)_Reason) 
+AND
+GuardedRegion(_Region,_,_Type,_) 
+AND
+SummonedGuards(_,_Type) 
+AND		// still summoned, i.e. still not left sight of hero
+SummonedGuards(_Player,_Region,_Type,_N,_OldReason,_ID)
+AND
+_OldReason != 5		// reason was not to fight //TODO define ACTION_ALIGNMENT_CHANGE_TO_ENEMY
+AND
+CleaningUpGuards(_Player,_ID)
+THEN	
+DB_UsedOwnGuards(1);
+ProcCheckResummonGuards_1(_Player,_Player,_Region,_Reason);
+
+PROC	
+CallGuards_1((CHARACTER)_Player,(TRIGGER)_Region,(INTEGER)_Reason) 
+AND
+NOT DB_UsedOwnGuards(1)
+AND
+GuardedRegion(_Region,_,_Type,_) 
+AND
+SummonedGuards(_,_Type) 
+AND		// still summoned, i.e. still not left sight of hero
+SummonedGuards(_SummonPlayer,_Region,_Type,_N,_OldReason,_ID)
+AND
+_Player!=_SummonPlayer
+AND
+_OldReason != 5		// reason was not to fight //TODO define ACTION_ALIGNMENT_CHANGE_TO_ENEMY
+AND
+CleaningUpGuards(_SummonPlayer,_ID)
+THEN	
+ProcCheckResummonGuards_1(_Player,_SummonPlayer,_Region,_Reason);
+
+PROC	
+CallGuards_1((CHARACTER)_Player,(TRIGGER)_Region,(INTEGER)_Reason) 
+THEN
+NOT DB_UsedOwnGuards(1);
+
+PROC
+ProcCheckResummonGuards_1((CHARACTER)_Player,(CHARACTER)_SummonPlayer,(TRIGGER)_region,(INTEGER)_Reason)
+THEN
+ProcDoCheckSummonedGuardsDead(_SummonPlayer);
+
+PROC
+ProcCheckResummonGuards_1((CHARACTER)_Player,(CHARACTER)_SummonPlayer,(TRIGGER)_region,(INTEGER)_Reason)
+AND
+DB_TempSummonedGuardAlive(_SummonPlayer,1)
+THEN
+ProcCheckResummonGuards(_Player,_SummonPlayer,_region,_Reason);
+
+PROC
+ProcCheckResummonGuards_1((CHARACTER)_Player,(CHARACTER)_SummonPlayer,(TRIGGER)_region,(INTEGER)_Reason)
+AND
+NOT DB_TempSummonedGuardAlive(_SummonPlayer,1)
+THEN
+//all dead, summon new ones
+ProcSummonGuardsFromPool(_Player,_region,_Reason);
+
+PROC
+ProcCheckResummonGuards_1((CHARACTER)_Player,(CHARACTER)_SummonPlayer,(TRIGGER)_region,(INTEGER)_Reason)
+THEN
+NOT DB_TempSummonedGuardAlive(_SummonPlayer,1);
+
+PROC
+ProcCheckResummonGuards((CHARACTER)_Player,(CHARACTER)_SummonPlayer,(TRIGGER)_region,(INTEGER)_Reason)
+AND
+_Player==_SummonPlayer
+THEN
+ProcResummonGuards(_Player,_SummonPlayer,_Region,_Reason);
+
+PROC
+ProcCheckResummonGuards((CHARACTER)_Player,(CHARACTER)_SummonPlayer,(TRIGGER)_region,(INTEGER)_Reason)
+AND
+_Player!=_SummonPlayer
+AND
+Sees(_Player,_SummonPlayer)
+THEN
+ProcCopySummonedGuards(_SummonPlayer,_Player);
+ProcResummonGuards(_Player,_SummonPlayer,_Region,_Reason);
+
+PROC
+ProcCheckResummonGuards((CHARACTER)_Player,(CHARACTER)_SummonPlayer,(TRIGGER)_region,(INTEGER)_Reason)
+AND
+_Player!=_SummonPlayer
+AND
+NOT Sees(_Player,_SummonPlayer)
+THEN
+//TODO summon more guards of this type if we still have any
+ProcSummonGuardsFromPool(_Player,_region,_Reason);
+
+PROC
+ProcResummonGuards((CHARACTER)_Player,(CHARACTER)_SummonPlayer,(TRIGGER)_Region,(INTEGER)_Reason)
+AND
+SummonedGuards(_SummonPlayer,_Region,_Type,_N,_OldReason,_ID)
+AND
+DB_PlayerSummonID(_Player,_PlayerID)
+THEN
+NOT SummonedGuards(_SummonPlayer,_Region,_Type,_N,_OldReason,_ID);
+NOT SummonedGuards(_SummonPlayer,_Type); 
+SummonedGuards(_Player,_Region,_Type,_N,_Reason,_PlayerID);
+SummonedGuards(_Player,_Type); 
+AbortRemoveGuards(_SummonPlayer,_ID);		// prevent the guards from being removed
+// Remember that GuardsGoTalkToHero/3 needs to be called if the "Help me" dialog ends
+GuardsGoTalkToHeroAfterCallDialog(_Player,_Type,_N,_Reason);
+
+
+PROC
+CallGuards_2((CHARACTER)_Player,(TRIGGER)_Region,(INTEGER)_Reason) 
+AND
+GuardedRegion(_Region,_,_Type,_) 
+AND		
+SummonedGuards(_OtherPlayer,_Region,_Type,_N,_OldReason,_ID)
+THEN
+SetStoryNpcStatus(_Player);
+SummonedGuards(_Player,_Region,_Type,_N,5,_ID);
+NOT SummonedGuards(_OtherPlayer,_Region,_Type,_N,_OldReason,_ID);
+SummonedGuards(_OtherPlayer,_Region,_Type,_N,5,_ID);
+CharacterUnfreeze(_OtherPlayer);
+SetFightEvent(_Player,_Reason);
+NOT DoNotStartDialogsDueToGenericRules(_Player,1);
+NOT DoNotStartDialogsDueToGenericRules(_OtherPlayer,1);
+NOT DialogRunning(_Player,1);
+NOT DialogRunning(_OtherPlayer,1);
+NOT _Player.DB_IsInDialog();
+NOT _OtherPlayer.DB_IsInDialog();
+DialogRequestStopForCharacter(_Player);
+DialogRequestStopForCharacter(_OtherPlayer);
+ClearDialogQueue(_Player);
+ClearDialogQueue(_OtherPlayer);
+ProcSetupOtherPlayerGuards(_OtherPlayer);
+ProcCopySummonedGuards(_OtherPlayer,_Player);
+ProcClearCrimesFor(_Player);
+ProcClearCrimesFor(_OtherPlayer);
+GuardsGoTalkToHeroAfterCallDialog(_Player,_Type,_N,5);
+ProcCheckIfHadActualHelp(_Player);
+
+PROC
+ProcCheckIfHadActualHelp((CHARACTER)_Player)
+AND
+DB_PlayerSummonID(_Player,_PlayerSummonID)
+AND
+DB_GuardSummonPool(_Player,_Guard,_PlayerSummonID)
+THEN
+ProcFlagGotActualGuardGelp(_Player,_Guard);
+
+
+PROC
+ProcCopySummonedGuards((CHARACTER)_OtherPlayer,(CHARACTER)_Player)
+AND
+NOT DB_PlayerSummonID(_Player,_)
+THEN
+DB_PlayerSummonID(_Player,0);
+
+PROC
+ProcCopySummonedGuards((CHARACTER)_OtherPlayer,(CHARACTER)_Player)
+AND
+DB_PlayerSummonID(_Player,_PlayerSummonID)
+AND
+DB_PlayerSummonID(_OtherPlayer,_SummonID)
+AND
+DB_GuardSummonPool(_OtherPlayer,_Guard,_SummonID)
+THEN
+DB_GuardSummonPool(_Player,_Guard,_PlayerSummonID);
+
+PROC
+ProcSetupOtherPlayerGuards((CHARACTER)_Player)
+AND
+DB_PlayerSummonID(_Player,_SummonID)
+AND
+DB_GuardSummonPool(_Player,_Guard,_SummonID)
+THEN
+SetStoryNpcStatus(_Guard);
+
+PROC
+ProcSummonGuardsFromPool((CHARACTER)_Player,(TRIGGER)_Region,(INTEGER)_Reason)
+AND
+GuardedRegion(_Region,_,_Type,_) 
+THEN
+SummonedGuards(_Player,_Type);
+// Remember that SummonGuards/3 needs to be called if the "Help me" dialog ends
+SummonGuardsAfterCallDialog(_Player,_Region,_Type,_Reason);
+
+PROC
+DoRemoveNpc((CHARACTER)_Guard)
+AND
+DB_GuardSummonPool(_Player,_Guard,_ID)
+THEN
+NOT DB_GuardSummonPool(_Player,_Guard,_ID);
+
+PROC
+ClearDialogQueue((CHARACTER)_Player)
+AND
+QueueDialog(_Player,_Npc,_Dialog,_Mode)
+THEN
+NOT QueueDialog(_Player,_Npc,_Dialog,_Mode);
+
+PROC
+SetFightEvent((CHARACTER)_Player,4)
+THEN
+DialogSetCharacterEvent("EVENT_vandalism_player_fights",_Player,0);
+
+PROC
+SetFightEvent((CHARACTER)_Player,(INTEGER)_Reason)
+AND
+_Reason!=4
+THEN
+DialogSetCharacterEvent("EVENT_thievery_player_fights",_Player,0);
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// GetGuardsPronto
+//
+// Silly proc, introduced to allow dialogs to be started AFTER it is decided that guards can come to help
+// (see rules above) but BEFORE the guards are actually moving to the player.
+// Since there are 2 possible cases where the guards can come to help, we need to assert in the rules above
+// how we get the guards:
+PROC	
+GetGuardsPronto((CHARACTER)_Player,1) 
+AND 
+NOT NoGuards(_Player,1)
+THEN
+GetGuardsPronto_1(_Player,1);
+
+PROC
+GetGuardsPronto((CHARACTER)_Player,1)
+AND
+NoGuards(_Player,1) 
+AND
+SummonGuardsAfterCallDialog(_Player,_Region,_Type,_Reason)
+THEN
+NOT SummonGuardsAfterCallDialog(_Player,_Region,_Type,_Reason);		// cleanup
+
+PROC	
+GetGuardsPronto((CHARACTER)_Player,1) 
+AND
+NoGuards(_Player,1)
+AND
+GuardsGoTalkToHeroAfterCallDialog(_Player,_Type,_N,_Reason)
+THEN 
+NOT GuardsGoTalkToHeroAfterCallDialog(_Player,_Type,_N,_Reason);		// cleanup
+
+PROC	
+GetGuardsPronto_1((CHARACTER)_Player,1) 
+AND 
+SummonGuardsAfterCallDialog(_Player,_Region,_Type,_Reason)
+THEN	
+SummonGuards(_Player,_Region,_Type,_Reason);		// this proc asserts how many of which type guards we summoned where and for what reason: SummonedGuards/4
+NOT SummonGuardsAfterCallDialog(_Player,_Region,_Type,_Reason);		// cleanup
+ProcCheckGoHostile(_Player,_Reason);
+
+PROC
+GetGuardsPronto_1((CHARACTER)_Player,1)
+AND
+GuardsGoTalkToHeroAfterCallDialog(_Player,_Type,_N,_Reason)
+THEN	
+GuardsGoTalkToHero(_Player,_Type,_N,_Reason);
+NOT GuardsGoTalkToHeroAfterCallDialog(_Player,_Type,_N,_Reason);	// cleanup
+ProcCheckGoHostile(_Player,_Reason);
+
+PROC
+ProcCheckGoHostile((CHARACTER)_Player,5)
+AND
+DB_GoHostileAfterDialog(_Npc,_Player)
+THEN
+NOT DB_GoHostileAfterDialog(_Npc,_Player);
+ProcMakeNPCHostile(_Player,_Npc);
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// Removal of the guards
+//
+
+//
+// 1) If we called guards for attack:
+//				remove them if the player leaves the guard quit chase region
+IF
+CharacterLeftTrigger((CHARACTER)_Player,_GuardsQuitChaseRegion)
+AND
+_Player.DB_IsPlayer()
+AND
+GuardedRegion(_,_GuardsQuitChaseRegion,_Type,_)
+THEN
+ProcRemoveGuardsFromRegionIfPossible(_GuardsQuitChaseRegion);
+
+PROC
+ProcRemoveGuardsFromRegionIfPossible((TRIGGER)_GuardsQuitChaseRegion)
+AND
+DB_InRegion(_Check,_GuardsQuitChaseRegion)
+AND
+NOT DB_Dead(_Check)
+THEN
+DB_RegionHasAliveSummonPlayer(_GuardsQuitChaseRegion,1);
+
+PROC
+ProcRemoveGuardsFromRegionIfPossible((TRIGGER)_GuardsQuitChaseRegion)
+AND
+NOT DB_RegionHasAliveSummonPlayer(_GuardsQuitChaseRegion,1)
+AND
+// check if summoned for attack and get which type and how many guards we did summon for this reagion:
+SummonedGuards(_PlayerSummoner,_GuardsQuitChaseRegion,_Type,_N,5,_ID) //TODO define ACTION_ALIGNMENT_CHANGE_TO_ENEMY
+THEN
+GuardsQuitChase(_PlayerSummoner,_GuardsQuitChaseRegion,_Type,_ID);
+
+PROC
+ProcRemoveGuardsFromRegionIfPossible((TRIGGER)_GuardsQuitChaseRegion)
+THEN
+NOT DB_RegionHasAliveSummonPlayer(_GuardsQuitChaseRegion,1);
+
+//				remove them if they become friendly
+PROC	
+MakeGuardsFriendlyOnMap((CHARACTER)_Player,(STRING)_Map)
+AND
+GuardTypeData((STRING)_Type,(STRING)_,(STRING)_,(STRING)_Map) 
+AND
+// check if summoned for attack and get which type and how many guards we did summon for this reagion:
+SummonedGuards(_Player,_Region,_Type,_N,5,_ID) //TODO define ACTION_ALIGNMENT_CHANGE_TO_ENEMY
+THEN
+GuardsQuitChase(_Player,_Region,_Type,_ID);
+
+// FRED - calling GuardsStayAndLeaveInGroup_1 now because otherwise guards may disappear when the playeer still sees them.
+// DANTE: fixed stuff such that it works like Fred wants ;)
+PROC
+GuardsQuitChase((CHARACTER)_Player,(TRIGGER)_Region,(STRING)_Type,(INTEGER)_ID)
+THEN
+GuardsStayAndLeaveInGroup_1(_Player,_Type,_ID);		// guards will still pursue the hero, but they will disappear if the player gets out of sight of ALL of them
+
+//
+// 2) If we called guards NOT for attack, they stay where they are
+//				remove them if the player leaves the guard region AND if he outruns them (out of sight).
+//
+PROC	
+GuardsStayAndLeaveInGroup((CHARACTER)_Player,(INTEGER)_ID)
+AND
+DB_InRegion(_Player,_Region)
+AND
+SummonedGuards(_Player,_Region,_Type,_N,_,_ID) 
+AND
+NOT CleaningUpGuards(_Player,_ID)					// prevent from executing this twice
+THEN	
+CleaningUpGuards(_Player,_ID);
+GuardsStayAndLeaveInGroup_1(_Player,_Type,_ID);
+
+PROC	
+GuardsStayAndLeaveInGroup_1((CHARACTER)_Player,(STRING)_Type,(INTEGER)_SummonID)
+AND
+DB_PlayerSummonID(_Player,_SummonID)
+AND 
+DB_GuardSummonPool(_Player,_Guard,_SummonID)
+THEN
+SetDefaultDialog(_Guard,"Called_Guard_Default",0);		// could be made different depending on the type.
+RemoveNpcGroup(_Player,_Guard,_SummonID);		// use _Type as group ID
+
+PROC
+GuardsStayAndLeaveInGroup_1((CHARACTER)_Player,_Type,_ID)
+THEN	
+RemoveNpcGroupComplete(_Player,_ID);		// assert that we are ready adding facts for all guards to be removed in group
+
+// cleanup after having removed the guards:
+PROC
+NpcGroupRemoved((CHARACTER)_Player,(INTEGER)_ID)
+THEN
+MakeGuardsAvailable(_Player,_ID);
+
+PROC
+MakeGuardsAvailable((CHARACTER)_Player,(INTEGER)_ID) 
+AND
+SummonedGuards(_Player,_Region,_Type,_N,_Reason,_ID)
+AND
+GuardTypeData(_Type,_,_Alignment,_)
+THEN	
+NOT SummonedGuards(_Player,_Region,_Type,_N,_Reason,_ID);
+NOT SummonedGuards(_Player,_Type);		// allow again that guards of _Type are summoned
+NOT CleaningUpGuards(_Player,_ID);	// allow timer to be used again
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// immediately remove all summoned guards of given _Type:
+PROC	
+DoRemoveGuards((CHARACTER)_Player,(INTEGER)_ID) 
+AND
+SummonedGuards(_Player,_,_Type,_N,_,_ID) 
+AND
+DB_GuardSummonPool(_Player,_Guard,_ID)
+THEN
+DoRemoveNpc(_Guard);
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// when a guard is actually removed, restore him:
+PROC
+ProcSetPlayerAttitudeToAtLeast((CHARACTER)_Npc)
+AND
+_Player.DB_IsPlayer()
+THEN
+SetAttitudeToAtLeast(_Player,_Npc,0);
+
+PROC
+ProcSetPlayerAttitudeToAtLeast((CHARACTER)_Npc)
+AND
+DB_DefinedCompanions(_Player)
+THEN
+SetAttitudeToAtLeast(_Player,_Npc,0);
+
+PROC	
+NpcRemoved((CHARACTER)_Npc) 
+AND
+GuardTypeNpc(_Type,_Npc,_,_) 
+AND
+GuardTypeData(_Type,_,_,_Map)
+AND
+GuardTeleportDest((STRING)_Map,(TRIGGER)_Dest)
+THEN
+CharacterResurrect(_Npc);
+ProcSetPlayerAttitudeToAtLeast(_Npc,0);
+NOT DB_Dead(_Npc);
+CharacterSetHitpointsPercentage(_Npc,100);
+SetRunning(_Npc,0);
+CharacterTeleportToTrigger(_Npc,_Dest,"");
+
+
+// remove his default dialog such that he will be determined (and non-distractable by starting a talk)
+// when coming for his next assignment:
+PROC
+NpcRemoved((CHARACTER)_Npc) 
+AND
+GuardTypeNpc(_Type,_Npc,_,_) 
+AND
+DefaultDialog(_Npc,_Dialog,_Mode)
+THEN	
+NOT DefaultDialog(_Npc,_Dialog,_Mode);
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// Abort removing the guards (applicable only for guards instructed to StayAndLeaveInGroup):
+PROC
+AbortRemoveGuards((CHARACTER)_Player,(INTEGER)_ID)
+AND
+RemoveNpcGroup(_Player,_Guard,_ID)
+THEN
+NOT RemoveNpcGroup(_Player,_Guard,_ID);
+NOT CleaningUpGuards(_Player,_ID);
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// just summon the guards, calculating how many we need
+PROC	
+SummonGuards((CHARACTER)_Player,(TRIGGER)_Region,(STRING)_Type,(INTEGER)_Reason)
+AND
+NOT NoGuards(_Player,1)
+THEN
+SummonGuards_0(_Player,_Region,_Type,_Reason);
+
+PROC
+SummonGuards_0((CHARACTER)_Player,(TRIGGER)_Region,(STRING)_Type,(INTEGER)_Reason) 
+AND
+GuardTypeNpc(_Type,_Guard,_,1) 
+AND
+CharacterGetLevel(_Guard,_LevelGuard) 
+AND
+CharacterGetLevel(_Player,_LevelPlayer)
+AND
+IntegerProduct(_LevelPlayer,2,_SumGuardLevels) 
+AND
+IntegerDivide(_SumGuardLevels,_LevelGuard,_N)
+THEN	
+SummonGuards_1(_Player,_Region,_Type,_N,_Reason);
+
+// Helper function 1: change the reason to fighting if the guards and the hero are
+// already at war with each other:
+// this means that once the player fought against the guards, each time they are
+// summoned again, they will come to fight, not to ask for a fine or to arrest.
+PROC
+SummonGuards_1((CHARACTER)_Player,(TRIGGER)_Region,(STRING)_Type,(INTEGER)_N,(INTEGER)_Reason) 
+AND
+GuardTypeNpc(_Type,_Guard,_,1) 
+AND
+CharacterGetRelationToCharacter(_Guard,_Player,_Alignment)
+AND
+ _Alignment < 25
+THEN
+SummonGuards_1Done(_Player,1);
+SummonGuards_2(_Player,_Region,_Type,_N,5); //TODO define ACTION_ALIGNMENT_CHANGE_TO_ENEMY
+
+// same if the guards called are not taking prisoners:
+PROC
+SummonGuards_1((CHARACTER)_Player,(TRIGGER)_Region,(STRING)_Type,(INTEGER)_N,(INTEGER)_Reason)
+AND
+NOT SummonGuards_1Done(_Player,1) 
+AND
+GuardedRegion(_Region,_,_,"PRISON_NONE")
+THEN
+SummonGuards_1Done(_Player,1);
+SummonGuards_2(_Player,_Region,_Type,_N,5); //TODO define ACTION_ALIGNMENT_CHANGE_TO_ENEMY
+
+PROC
+SummonGuards_1((CHARACTER)_Player,(TRIGGER)_Region,(STRING)_Type,(INTEGER)_N,(INTEGER)_Reason) 
+AND
+NOT SummonGuards_1Done(_Player,1)
+THEN
+SummonGuards_2(_Player,_Region,_Type,_N,_Reason);
+
+PROC
+SummonGuards_1((CHARACTER)_Player,(TRIGGER)_Region,(STRING)_Type,(INTEGER)_N,(INTEGER)_Reason)
+THEN
+NOT SummonGuards_1Done(_Player,1);		// cleanup
+
+// Helper function 2: make sure that at least 4 and max 10 guards come:
+PROC	
+SummonGuards_2((CHARACTER)_Player,(TRIGGER)_Region,(STRING)_Type,(INTEGER)_N,(INTEGER)_Reason) 
+AND
+_N < 2
+THEN
+DoSummonGuards(_Player,_Region,_Type,2,_Reason);
+
+PROC
+SummonGuards_2((CHARACTER)_Player,(TRIGGER)_Region,(STRING)_Type,(INTEGER)_N,(INTEGER)_Reason) 
+AND
+_N > 4
+THEN
+DoSummonGuards(_Player,_Region,_Type,4,_Reason);
+
+PROC	
+SummonGuards_2((CHARACTER)_Player,(TRIGGER)_Region,(STRING)_Type,(INTEGER)_N,(INTEGER)_Reason) 
+AND 
+_N >= 2
+AND
+_N <= 4
+THEN
+DoSummonGuards(_Player,_Region,_Type,_N,_Reason);
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+
+// Cleanup previous stuff (if existent)
+PROC
+DoSummonGuards((CHARACTER)_Player,(TRIGGER)_Region,(STRING)_Type,(INTEGER)_N,(INTEGER)_Reason)
+AND
+SummonedGuardsDirection(_Player,_Angle)
+THEN
+NOT SummonedGuardsDirection(_Player,_Angle);
+
+PROC
+DoSummonGuards((CHARACTER)_Player,(TRIGGER)_,(STRING)_Type,(INTEGER)_N,(INTEGER)_Reason) 
+AND
+NOT DB_PlayerSummonID(_Player,_)
+THEN
+DB_PlayerSummonID(_Player,0);
+
+PROC
+DoSummonGuards((CHARACTER)_Player,(TRIGGER)_,(STRING)_Type,(INTEGER)_N,(INTEGER)_Reason) 
+AND
+DB_PlayerSummonID(_Player,_ID)
+AND
+IntegerSum(_ID,1,_New)
+THEN
+NOT DB_PlayerSummonID(_Player,_ID);
+DB_PlayerSummonID(_Player,_New);
+
+PROC	
+DoSummonGuards((CHARACTER)_Player,(TRIGGER)_Region,(STRING)_Type,(INTEGER)_N,(INTEGER)_Reason)
+AND
+DB_PlayerSummonID(_Player,_ID)
+THEN
+SummonedGuards(_Player,_Region,_Type,_N,_Reason,_ID);		// remember how many and of which type we summoned where
+
+// choose and remember a random angle from which the guards come:
+PROC
+DoSummonGuards((CHARACTER)_Player,(TRIGGER)_Region,(STRING)_Type,(INTEGER)_N,(INTEGER)_Reason)
+AND
+Random(360,_IAngle) 
+AND
+Real(_IAngle,_Angle)
+THEN
+SummonedGuardsDirection(_Player,_Angle);
+
+// each guard appears at a random distance and angle, but they still DO come as a group:
+PROC
+DoSummonGuards((CHARACTER)_Player,(TRIGGER)_,(STRING)_Type,(INTEGER)_N,(INTEGER)_Reason) 
+THEN
+DB_NumSummonedGuards(_Player,0);
+ProcSummonGuardsForPlayer(_Player,_Type,_N);
+
+PROC
+ProcSummonGuardsForPlayer((CHARACTER)_Player,(STRING)_Type,(INTEGER)_N)
+AND
+GuardTypeNpc(_Type,_Guard,_Script,_Index) 
+AND
+NOT DB_GuardSummonPool(_,_Guard,_)
+THEN
+ProcDoSummonGuardForPlayer(_Player,_Guard,_N);
+
+PROC
+ProcDoSummonGuardForPlayer((CHARACTER)_Player,(CHARACTER)_Guard,(INTEGER)_N)
+AND
+DB_NumSummonedGuards(_Player,_Nr)
+AND
+_Nr<_N
+AND
+IntegerSum(_Nr,1,_NewNr)
+AND
+DB_PlayerSummonID(_Player,_ID)
+AND
+// calculate distance (in pixels): always sight range of the guards - a random distance
+// (hence they are never outside their own sight range and will be able to attack you - if so needed)
+Random(80,_Rnd) 
+AND
+IntegerSubtract(384,_Rnd,_Distance) //TODO define CSIGHT_GUARDS_PIXEL
+AND
+// calculate angle (in degrees): always a random deviation to the general direction chosen above
+SummonedGuardsDirection(_Player,_AngleGeneralDirection)
+AND		// get general direction
+Random(60,_IDeviation) 
+AND
+Real(_IDeviation,_Deviation) 
+AND
+RealSum(_AngleGeneralDirection,_Deviation,_Angle)
+AND
+Integer(_Angle,_IntAngle)
+THEN
+NOT DB_NumSummonedGuards(_Player,_Nr);
+DB_NumSummonedGuards(_Player,_NewNr);
+DB_TempGuardSummonData(_Player,_Guard);
+DB_GuardSummonPool(_Player,_Guard,_ID);
+CharacterAppearOutOfSightTo(_Guard,_Player,_IntAngle,0,"GuardOnStaged"); //TODO distance? Appear(_Guard,_Player,_Distance,_Angle);
+CharacterMakeStoryNpc(_Guard,0);
+ProcFlagGotActualGuardGelp(_Player,_Guard);
+
+PROC
+DoSummonGuards((CHARACTER)_Player,(TRIGGER)_,(STRING)_Type,(INTEGER)_N,(INTEGER)_Reason) 
+AND
+DB_NumSummonedGuards(_Player,_Nr)
+THEN
+NOT DB_NumSummonedGuards(_Player,_Nr);
+
+PROC
+ProcFlagGotActualGuardGelp((CHARACTER)_Player,(CHARACTER)_Guard)
+AND
+CharacterIsDead(_Guard,0)
+THEN
+DB_GotActualGuardHelp(_Player,1);
+
+//We wait till at least one guard is onstage, the CharacterAppearOutOfSightTo will complete for all of them in the same CharacterClearScriptframe
+//so we can get away with doing it on the first CallbackEvent
+IF
+CharacterEvent(_Guard,"GuardOnStaged")
+AND
+DB_TempGuardSummonData(_Player,_Guard)
+AND
+DB_GuardSummonPool(_Player,_Guard, _ID ) 
+AND
+SummonedGuards(_Player,_Region,_Type,_N,_Reason,_ID)
+THEN
+DoSummonGuards_2(_Player,_Region,_Type,_N,_Reason);
+
+//clear so we don't do this multiple times
+IF
+CharacterEvent(_Guard,"GuardOnStaged")
+AND
+DB_TempGuardSummonData(_Player,_Guard)
+THEN
+ProcCleanGuardSummon(_Player);
+
+PROC
+ProcCleanGuardSummon((CHARACTER)_Player)
+AND
+DB_TempGuardSummonData(_Player,_Guard)
+THEN
+NOT DB_TempGuardSummonData(_Player,_Guard);
+
+// if reason is fighting, start fight immediately. Player can try to run away
+PROC
+DoSummonGuards_2((CHARACTER)_Player,(TRIGGER)_,(STRING)_Type,(INTEGER)_N,5) //TODO define ACTION_ALIGNMENT_CHANGE_TO_ENEMY
+THEN	
+GuardsDoAttack(_Player,_Type,_N);
+
+// if reason is not fighting: walk towards player (player frozen) and "Act" when at player (see below)
+PROC
+DoSummonGuards_2((CHARACTER)_Player,(TRIGGER)_,(STRING)_Type,(INTEGER)_N,(INTEGER)_Reason) 
+AND
+_Reason != 5 //TODO ACTION_ALIGNMENT_CHANGE_TO_ENEMY
+THEN
+GuardsGoTalkToHero(_Player,_Type,_N,_Reason);
+
+
+PROC
+GuardsGoTalkToHero((CHARACTER)_Player,(STRING)_Type,(INTEGER)_N,5)
+THEN	
+GuardsDoAttack(_Player,_Type,_N);
+
+// Helper function: starts script frames
+PROC
+GuardsGoTalkToHero((CHARACTER)_Player,(STRING)_Type,(INTEGER)_N,(INTEGER)_Reason)
+AND
+_Reason!=5
+THEN	
+//InterfaceDisabled(ENGINE_GAME,0);		// prevent player from running away TODO
+Hold(_Player);
+InterfaceDisabledBecauseOfGuards(_Player,1);
+
+PROC
+GuardsGoTalkToHero((CHARACTER)_Player,(STRING)_,(INTEGER)_,(INTEGER)_Reason) 
+AND
+_Reason!=5
+AND
+PlayerIsInvisible(_Player,1)
+THEN
+CharacterDispelMagic(_Player);		// make hero visible if invisible
+
+PROC	
+GuardsGoTalkToHero((CHARACTER)_Player,(STRING)_Type,(INTEGER)_N,(INTEGER)_Reason) 
+AND
+_Reason!=5
+AND
+DB_PlayerSummonID(_Player,_SummonID)
+AND
+DB_GuardSummonPool(_Player,_Guard,_SummonID)
+AND
+GuardTypeNpc(_Type,_Guard,_Script,_)
+AND
+CharacterIsDead(_Guard,0)
+THEN
+GuardTargetChar(_Guard,_Player);
+CharacterSetFightMode(_Guard,0,0);
+CharacterMoveToCharacter(_Guard,_Player,1,"GuardRunTarget",1);
+ProcFlagGotActualGuardGelp(_Player,_Guard);
+
+// If guards have arrived, do stuff (check on the guard that talks - i.e. the one with index==1):
+IF
+CharacterEvent(_Npc,"GuardRunTarget")
+AND
+GuardTypeNpc(_Type,_Npc,_ScriptID,_)
+AND
+GuardTargetChar(_Npc,_Player)
+THEN
+ProcRemoveOtherGuardTargets(_Npc,_Player);
+SummonedGuardsAct(_Player,1);
+
+PROC
+ProcRemoveOtherGuardTargets((CHARACTER)_Npc,(CHARACTER)_Player)
+AND
+GuardTargetChar(_Check,_Player)
+AND
+_Check!=_Npc
+THEN
+NOT GuardTargetChar(_Check,_Player);
+
+PROC
+SummonedGuardsAct((CHARACTER)_Player,1) 
+AND
+NOT NoGuards(_Player,1)
+THEN
+SummonedGuardsAct_1(_Player,1);
+
+// This is an abrupt stop, but hey, this is what the main story wants:
+PROC 
+SummonedGuardsAct((CHARACTER)_Player,1) 
+AND 
+NoGuards(_Player,1) 
+AND
+SummonedGuards(_Player,_Region,_Type,_N,5,_ID) //TODO define ACTION_ALIGNMENT_CHANGE_TO_ENEMY
+THEN
+GuardsQuitChase(_Player,_Region,_Type,_ID);		// teleports them away
+
+PROC 
+SummonedGuardsAct((CHARACTER)_Player,1)
+AND
+NoGuards(_Player,1) 
+AND
+SummonedGuards(_Player,_Region,_Type,_N,_Reason,_ID) 
+AND
+_Reason != 5		// makes them stop and wait 'till the hero leaves to leave themselves too //TODO define ACTION_ALIGNMENT_CHANGE_TO_ENEMY
+THEN
+GuardsStayAndLeaveInGroup(_Player,_ID);
+
+PROC 
+SummonedGuardsAct((CHARACTER)_Player,_)
+AND
+GuardTargetChar(_Check,_Player)
+THEN
+NOT GuardTargetChar(_Check,_Player);
+
+PROC 
+SummonedGuardsAct_1((CHARACTER)_Player,1) 
+AND
+DB_InRegion(_Player,_Region)
+AND
+SummonedGuards(_Player,_Region,_Type,_,_Reason,_) 
+AND
+_Reason ==  6	 //TODO define ACTION_DESTROY_PROPERTY
+AND
+GuardTargetChar(_Guard,_Player)
+THEN	
+SetAndStartDialog(_Player,_Guard,"Trespassing_PayFine",0);	// Let him start talking
+
+PROC 
+SummonedGuardsAct_1((CHARACTER)_Player,1) 
+AND
+DB_InRegion(_Player,_Region)
+AND
+SummonedGuards(_Player,_Region,_Type,_,_Reason,_) 
+AND
+_Reason ==  4	 //TODO define ACTION_DESTROY_PROPERTY
+AND
+GuardTargetChar(_Guard,_Player)
+THEN	
+SetAndStartDialog(_Player,_Guard,"Vandalism_PayFine",0);	// Let him start talking
+
+PROC 
+SummonedGuardsAct_1((CHARACTER)_Player,1) 
+AND
+DB_InRegion(_Player,_Region)
+AND
+SummonedGuards(_Player,_Region,_Type,_,_Reason,_) 
+AND
+_Reason <=  2	//TODO define ACTION_THEFT_NOT_FROM_ME
+AND
+GuardTargetChar(_Guard,_Player)
+THEN	
+SummonedGuardsAct_2(_Player,_Guard);		// Let him start talking
+
+// if OverrideGuardDialog is asserted, this dialog is taken instead of the default one:
+PROC
+SummonedGuardsAct_2((CHARACTER)_Player,(CHARACTER)_PatrolSeargent)
+AND
+OverrideGuardDialog(_Player,_Dialog)
+THEN	
+DisableTradeForDialog(_Player,_Dialog);
+SetAndStartDialog(_Player,_PatrolSeargent,_Dialog,0);
+NOT OverrideGuardDialog(_Player,_Dialog);		// OverrideGuardDialogis one-time use, such that future interventions
+					// of the guards use the default dialog again.
+SummonedGuardsAct_2Done(_Player,1);
+
+
+// OverrideGuardDialog was not defined, so we take the default dialog:
+
+PROC	
+SummonedGuardsAct_2((CHARACTER)_Player,(CHARACTER)_PatrolSeargent) 
+AND 
+NOT SummonedGuardsAct_2Done(_Player,1) 
+AND
+NOT ArrestThiefDialog(_PatrolSeargent,_)
+THEN
+ArrestThiefDialog(_PatrolSeargent,"Thievery_PayFine");
+
+PROC	
+SummonedGuardsAct_2((CHARACTER)_Player,(CHARACTER)_PatrolSeargent) 
+AND 
+NOT SummonedGuardsAct_2Done(_Player,1) 
+AND
+ArrestThiefDialog(_PatrolSeargent,_Dialog)
+THEN
+DisableTradeForDialog(_Player,_Dialog);
+SetAndStartDialog(_Player,_PatrolSeargent,_Dialog,0);
+
+PROC	
+SummonedGuardsAct_2((CHARACTER)_Player,(CHARACTER)_) 
+THEN
+NOT SummonedGuardsAct_2Done(_Player,1);
+
+PROC	
+ClearOverrideGuardDialog((CHARACTER)_Player,1)
+AND
+OverrideGuardDialog(_Player,_Dialog)
+THEN	
+NOT OverrideGuardDialog(_Player,_Dialog);
+
+//////////////////////////////////////////////////////////////////////////////////////
+// all summoned guards attack
+PROC
+GuardsDoAttack((CHARACTER)_Player,(STRING)_Type,(INTEGER)_N)
+AND
+DB_PlayerSummonID(_Player,_SummonID)
+AND
+DB_GuardSummonPool(_Player,_Guard,_SummonID)
+AND
+CharacterIsDead(_Guard,0)
+THEN
+CharacterSetFightMode(_Guard,1,0);
+//Attack(_Guard,_Player); //Keep them friendly
+
+PROC	
+GuardsDoAttack((CHARACTER)_Player,(STRING)_,(INTEGER)_)
+THEN	
+ProcClearOtherAttackersForPlayer(_Player);
+DecreaseReputation(_Player,1);		// every time you fight against guards, rep goes a little down
+PROC	
+GuardsDoAttack((CHARACTER)_Player,(STRING)_Type,(INTEGER)_N)
+THEN
+NOT DB_PlayerAdjustedGuardRep(_Player);
+
+// all guards of same alignment attack too from now on
+PROC	
+GuardsDoAttack((CHARACTER)_Player,(STRING)_Type,(INTEGER)_N)
+AND
+DB_PlayerSummonID(_Player,_SummonID)
+AND
+DB_GuardSummonPool(_Player,_Guard,_SummonID)
+AND
+GuardTypeNpc(_Type,_Guard,_Script,_)
+AND
+CharacterIsDead(_Guard,0)
+THEN
+DB_AttackPlayer(_Guard,_Player);
+CharacterMoveToCharacter(_Guard,_Player,1,"GuardAttack",1);
+
+IF
+CharacterSawCharacter(_Guard,_Player)
+AND
+DB_AttackPlayer(_Guard,_Player)
+THEN
+ProcTurnGuardHostile(_Guard,_Player);
+
+PROC
+ProcTurnGuardHostile((CHARACTER)_Guard,(CHARACTER)_Player)
+AND
+NOT _Player.DB_IsInDialog()
+THEN
+ProcClearGoHostileDB(_Player);
+NOT DB_AttackPlayer(_Guard,_Player);
+CharacterPurgeQueue(_Guard);
+DB_AlignmentChangedByStory(_Player,_Guard);
+CharacterSetTemporaryHostileRelation(_Guard,_Player);
+ProcClearOtherAttackersForPlayer(_Player);
+
+PROC
+ProcSelectAlliedAttackTarget((CHARACTER)_Guard,(CHARACTER)_Player)
+AND
+_OtherPlayer.DB_IsPlayer()
+AND
+_Player!=_OtherPlayer
+AND
+NOT _OtherPlayer.DB_IsInDialog()
+AND
+NOT DB_TempSelectedAlliedTarget(_Guard,_)
+AND
+CharacterCanSeeCharacter(_Guard,_OtherPlayer,1)
+THEN
+DB_TempSelectedAlliedTarget(_Guard,_OtherPlayer);
+
+PROC
+ProcHandleSelectedAlliedTarget((CHARACTER)_Guard,(CHARACTER)_Player)
+AND
+DB_TempSelectedAlliedTarget(_Guard,_OtherPlayer)
+THEN
+ProcClearGoHostileDB(_Player);
+NOT DB_AttackPlayer(_Guard,_Player);
+CharacterPurgeQueue(_Guard);
+DB_AlignmentChangedByStory(_OtherPlayer,_Guard);
+CharacterSetTemporaryHostileRelation(_Guard,_OtherPlayer);
+ProcClearOtherAttackersForPlayer(_Player);
+
+PROC
+ProcHandleSelectedAlliedTarget((CHARACTER)_Guard,(CHARACTER)_Player)
+AND
+NOT DB_TempSelectedAlliedTarget(_Guard,_)
+AND
+NOT DB_GoHostileAfterDialogEnds(_,_Player)
+THEN
+DB_GoHostileAfterDialogEnds(_Guard,_Player);
+
+PROC
+ProcClearGoHostileDB((CHARACTER)_Player)
+AND
+DB_GoHostileAfterDialogEnds(_Guard,_Player)
+THEN
+NOT DB_GoHostileAfterDialogEnds(_Guard,_Player);
+
+IF
+DialogEnded(_,_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_GoHostileAfterDialogEnds(_Guard,_Player)
+THEN
+DB_AlignmentChangedByStory(_Player,_Guard);
+NOT DB_GoHostileAfterDialogEnds(_Guard,_Player);
+//No check for dead because the code call should do that 
+CharacterSetTemporaryHostileRelation(_Guard,_Player);
+
+PROC
+ProcHandleSelectedAlliedTarget((CHARACTER)_Guard,(CHARACTER)_Player)
+AND
+DB_TempSelectedAlliedTarget(_Guard,_OtherPlayer)
+THEN
+NOT DB_TempSelectedAlliedTarget(_Guard,_OtherPlayer);
+
+PROC
+ProcTurnGuardHostile((CHARACTER)_Guard,(CHARACTER)_Player)
+AND
+_Player.DB_IsInDialog()
+THEN
+//this guy is in dialog, see if there's someone else we can use
+ProcSelectAlliedAttackTarget(_Guard,_Player);
+ProcHandleSelectedAlliedTarget(_Guard,_Player);
+
+
+PROC
+ProcClearOtherAttackersForPlayer((CHARACTER)_Player)
+AND
+DB_AttackPlayer(_Guard,_Player)
+THEN
+NOT DB_AttackPlayer(_Guard,_Player);
+
+IF
+CharacterEvent(_Guard,"GuardAttack")
+AND
+GuardTypeNpc(_Type,_Guard,_,_)
+AND
+DB_AttackPlayer(_Guard,_Player)
+THEN
+ProcTurnGuardHostile(_Guard,_Player);
+
+// first time you fight against any type of guards (i.e. when the alignment with the 
+// patrol leader changes to 0), decrease reputation extra:
+IF
+CharacterRelationChangedTo(_Guard,_Player,0) 
+AND
+DB_PlayerSummonID(_Player,_ID)
+AND
+DB_GuardSummonPool(_Player,_Guard,_ID)
+AND
+NOT DB_HandledGuardRepChange(_Player,_ID)
+THEN
+DB_HandledGuardRepChange(_Player,_ID);
+DecreaseReputation(_Player,1);
+//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+// Handle DIALOG_Thievery_PayFine
+//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////////////
+// Set dialog events:
+PROC
+ClearDialogEvents((CHARACTER)_Player,"Thievery_PayFine")
+THEN
+Thievery_ClearGeneralDialogEvents(_Player,1);
+SetAndRememberDialogEvent(_Player,"EVENT_thievery_fine_low",0);
+SetAndRememberDialogEvent(_Player,"EVENT_thievery_fine_medium",0);
+SetAndRememberDialogEvent(_Player,"EVENT_thievery_fine_high",0);
+SetAndRememberDialogEvent(_Player,"EVENT_thievery_player_can_pay_fine",0);
+SetAndRememberDialogEvent(_Player,"EVENT_thievery_player_to_prison",0);
+SetAndRememberDialogEvent(_Player,"EVENT_thievery_player_fights",0);
+SetAndRememberDialogEvent(_Player,"EVENT_thievery_player_pays_fine",0);
+SetAndRememberDialogEvent(_Player,"EVENT_thievery_guards_leave_peacefully",0);
+
+PROC
+ClearDialogEvents((CHARACTER)_Player,"Vandalism_PayFine")
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_vandalism_fine_low",0);
+SetAndRememberDialogEvent(_Player,"EVENT_vandalism_fine_medium",0);
+SetAndRememberDialogEvent(_Player,"EVENT_vandalism_fine_high",0);
+SetAndRememberDialogEvent(_Player,"EVENT_vandalism_player_can_pay_fine",0);
+SetAndRememberDialogEvent(_Player,"EVENT_vandalism_player_to_prison",0);
+SetAndRememberDialogEvent(_Player,"EVENT_vandalism_player_fights",0);
+SetAndRememberDialogEvent(_Player,"EVENT_vandalism_player_pays_fine",0);
+SetAndRememberDialogEvent(_Player,"EVENT_vandalism_guards_leave_peacefully",0);
+
+PROC
+ClearDialogEvents((CHARACTER)_Player,"Trespassing_PayFine")
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_trespassing_fine_low",0);
+SetAndRememberDialogEvent(_Player,"EVENT_trespassing_fine_medium",0);
+SetAndRememberDialogEvent(_Player,"EVENT_trespassing_fine_high",0);
+SetAndRememberDialogEvent(_Player,"EVENT_trespassing_player_can_pay_fine",0);
+SetAndRememberDialogEvent(_Player,"EVENT_trespassing_player_to_prison",0);
+SetAndRememberDialogEvent(_Player,"EVENT_trespassing_player_fights",0);
+SetAndRememberDialogEvent(_Player,"EVENT_trespassing_player_pays_fine",0);
+SetAndRememberDialogEvent(_Player,"EVENT_trespassing_guards_leave_peacefully",0);
+
+PROC
+ClearDialogEvents((CHARACTER)_Player,"Thievery_PayFine_RifRaf")
+THEN
+Thievery_ClearGeneralDialogEvents(_Player,1);
+SetAndRememberDialogEvent(_Player,"EVENT_thievery_fine_low",0);
+SetAndRememberDialogEvent(_Player,"EVENT_thievery_fine_medium",0);
+SetAndRememberDialogEvent(_Player,"EVENT_thievery_fine_high",0);
+SetAndRememberDialogEvent(_Player,"EVENT_thievery_player_can_pay_fine",0);
+SetAndRememberDialogEvent(_Player,"EVENT_thievery_player_to_prison",0);
+SetAndRememberDialogEvent(_Player,"EVENT_thievery_player_fights",0);
+SetAndRememberDialogEvent(_Player,"EVENT_thievery_player_pays_fine",0);
+SetAndRememberDialogEvent(_Player,"EVENT_thievery_guards_leave_peacefully",0);
+
+// Clear all to start with:
+PROC	
+PreStartDialog((CHARACTER)_Player,_Npc,_Dialog) 
+AND
+GuardDialog(_Dialog,_)
+THEN
+PrestartGuardsDialog(_Player,_Npc,_Dialog);
+
+PROC
+PrestartGuardsDialog((CHARACTER)_Player,(CHARACTER)_,(STRING)_Dialog)
+AND
+GuardDialog(_Dialog,1)
+THEN	
+ClearDialogEvents(_Player,_Dialog);
+Thievery_SetGeneralDialogEvents(_Player,1);
+
+PROC
+PrestartGuardsDialog((CHARACTER)_Player,(CHARACTER)_,(STRING)_Dialog)
+AND
+GuardDialog(_Dialog,0)
+THEN	
+ClearDialogEvents(_Player,_Dialog);
+
+PROC
+PrestartGuardsDialog((CHARACTER)_Player,(CHARACTER)_,(STRING)_Dialog)
+AND
+GuardDialog(_Dialog,2)
+THEN	
+ClearDialogEvents(_Player,_Dialog);
+
+// SetAndRememberDialogEvent(DIALOG_EVENT_thievery_fine_low,...);
+// SetAndRememberDialogEvent(DIALOG_EVENT_thievery_fine_medium,...);
+// SetAndRememberDialogEvent(DIALOG_EVENT_thievery_fine_high,...);
+// SetAndRememberDialogEvent(DIALOG_EVENT_thievery_player_can_pay_fine,...);
+//
+// Note: we check on the fact whether a captain of the guard (guard_1,_11,_21,...) already
+// talked to the player to decide whether or not to fine the player. Hence, the player has
+// 1 chance to walk out freely with every patrol.
+PROC 
+PrestartGuardsDialog((CHARACTER)_Player,_Npc,_Dialog)
+AND
+GuardDialog(_Dialog,1)
+AND
+GuardTypeNpc((STRING)_Type,(CHARACTER)_Npc,_,_)
+AND
+RanThieveryDialog(_Player,_Type) 
+AND
+DB_ValueStolen(_Player,_Value)
+THEN
+DetermineThieveryFine(_Player,_Value);
+
+PROC
+PrestartGuardsDialog((CHARACTER)_Player,_Npc,_Dialog) 
+AND
+GuardDialog(_Dialog,1)
+AND
+GuardTypeNpc((STRING)_Type,(CHARACTER)_Npc,_,_)
+THEN
+RanThieveryDialog(_Player,_Type);
+
+PROC 
+PrestartGuardsDialog((CHARACTER)_Player,_Npc,_Dialog)
+AND
+GuardDialog(_Dialog,0)
+AND
+RanVandalismDialog(_Player,_Npc) 
+AND
+ValueDestroyed(_Player,_Value)
+THEN
+DetermineVandalismFine(_Player,_Value);
+
+PROC
+PrestartGuardsDialog((CHARACTER)_Player,_Npc,_Dialog) 
+AND
+GuardDialog(_Dialog,0)
+THEN
+RanVandalismDialog(_Player,_Npc);
+
+
+PROC 
+PrestartGuardsDialog((CHARACTER)_Player,_Npc,_Dialog)
+AND
+GuardDialog(_Dialog,2)
+AND
+RanTrespassingDialog(_Player,_Npc) 
+THEN
+DetermineTrespassingFine(_Player,_Npc);
+
+PROC
+PrestartGuardsDialog((CHARACTER)_Player,_Npc,_Dialog) 
+AND
+GuardDialog(_Dialog,2)
+THEN
+RanTrespassingDialog(_Player,_Npc);
+
+////////////
+
+// The fine will always be >= the value stolen:
+PROC	
+DetermineThieveryFine((CHARACTER)_Player,(INTEGER)_ValueStolen) 
+AND
+ThieveryFine("EVENT_thievery_fine_medium",_Fine) 
+AND
+_ValueStolen > _Fine
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_thievery_fine_high",1);
+
+PROC	
+DetermineThieveryFine((CHARACTER)_Player,_ValueStolen) 
+AND
+NOT DialogConditionTrue(_Player,"EVENT_thievery_fine_high") 
+AND
+ThieveryFine("EVENT_thievery_fine_low",_Fine) 
+AND
+_ValueStolen > _Fine
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_thievery_fine_medium",1);
+
+PROC	
+DetermineThieveryFine((CHARACTER)_Player,_ValueStolen) 
+AND
+NOT DialogConditionTrue(_Player,"EVENT_thievery_fine_medium")
+THEN	
+SetAndRememberDialogEvent(_Player,"EVENT_thievery_fine_low",1);
+
+////////////
+
+// The fine will always be >= the value stolen:
+PROC	
+DetermineVandalismFine((CHARACTER)_Player,(INTEGER)_ValueStolen) 
+AND
+VandalismFine("EVENT_vandalism_fine_medium",_Fine) 
+AND
+_ValueStolen > _Fine
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_vandalism_fine_high",1);
+
+PROC	
+DetermineVandalismFine((CHARACTER)_Player,_ValueStolen) 
+AND
+NOT DialogConditionTrue(_Player,"EVENT_vandalism_fine_high") 
+AND
+VandalismFine("EVENT_vandalism_fine_low",_Fine) 
+AND
+_ValueStolen > _Fine
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_vandalism_fine_medium",1);
+
+PROC	
+DetermineVandalismFine((CHARACTER)_Player,_ValueStolen) 
+AND
+NOT DialogConditionTrue(_Player,"EVENT_vandalism_fine_medium")
+THEN	
+SetAndRememberDialogEvent(_Player,"EVENT_vandalism_fine_low",1);
+
+//**************************
+
+PROC	
+DetermineTrespassingFine((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+DB_PlayerWarnings(_Npc,_Player,_Warnings)
+AND
+_Warnings >= 7
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_trespassing_fine_high",1);
+
+PROC	
+DetermineTrespassingFine((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+NOT DialogConditionTrue(_Player,"EVENT_vandalism_fine_high") 
+AND
+DB_PlayerWarnings(_Npc,_Player,_Warnings)
+AND
+_Warnings >= 4
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_trespassing_fine_medium",1);
+
+PROC	
+DetermineTrespassingFine((CHARACTER)_Player,(CHARACTER)_Npc) 
+AND
+NOT DialogConditionTrue(_Player,"EVENT_vandalism_fine_medium")
+THEN	
+SetAndRememberDialogEvent(_Player,"EVENT_trespassing_fine_low",1);
+
+/////////
+IF
+DialogConditionTrue(_Player,_DC)
+AND
+ThieveryFine(_DC,_Fine)
+AND
+CharacterGetGold(_Player,_Gold)
+AND
+_Gold >= _Fine
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_thievery_player_can_pay_fine",1);
+
+IF
+DialogConditionTrue(_Player,_DC)
+AND
+VandalismFine(_DC,_Fine)
+AND
+CharacterGetGold(_Player,_Gold)
+AND
+_Gold >= _Fine
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_vandalism_player_can_pay_fine",1);
+
+IF
+DialogConditionTrue(_Player,_DC)
+AND
+TrespassingFine(_DC,_Fine)
+AND
+CharacterGetGold(_Player,_Gold)
+AND
+_Gold >= _Fine
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_trespassing_player_can_pay_fine",1);
+
+//////////////////////////////////////////////////////////////////////////////////////
+// Handle decisions of the player
+IF	
+DialogEnded(_,_Instance)
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+AND
+ DialogConditionTrue(_Player,"EVENT_thievery_player_to_prison") 
+AND
+NoGuards(_Player,1)
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_thievery_player_to_prison",0);
+SetAndRememberDialogEvent(_Player,"EVENT_thievery_guards_leave_peacefully",1);
+// This causes them to walk away, although the dialog said different.
+// But this is then really a story bug: the guards dialog was started and WHILE THIS
+// DIALOG WAS RUNNING, the story asserted NoGuards(1).
+
+IF	
+DialogEnded(_,_Instance)
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+AND
+ DialogConditionTrue(_Player,"EVENT_vandalism_player_to_prison") 
+AND
+NoGuards(_Player,1)
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_vandalism_player_to_prison",0);
+SetAndRememberDialogEvent(_Player,"EVENT_vandalism_guards_leave_peacefully",1);
+// This causes them to walk away, although the dialog said different.
+// But this is then really a story bug: the guards dialog was started and WHILE THIS
+// DIALOG WAS RUNNING, the story asserted NoGuards(1).
+
+IF	
+DialogEnded(_,_Instance)
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+AND
+ DialogConditionTrue(_Player,"EVENT_trespassing_player_to_prison") 
+AND
+NoGuards(_Player,1)
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_trespassing_player_to_prison",0);
+SetAndRememberDialogEvent(_Player,"EVENT_trespassing_guards_leave_peacefully",1);
+// This causes them to walk away, although the dialog said different.
+// But this is then really a story bug: the guards dialog was started and WHILE THIS
+// DIALOG WAS RUNNING, the story asserted NoGuards(1).
+
+
+IF		
+DialogEnded(_Dialog,_Instance)
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+AND
+DialogConditionTrue(_Player,"EVENT_thievery_player_to_prison")
+AND 
+NOT NoGuards(_Player,1)
+AND
+_Dialog != "Called_Guard_Disturb_Peace"
+THEN
+GiveBackStolenStuff(_Player,1);
+
+
+IF
+DialogEnded(_,_Instance) 
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+AND
+DialogConditionTrue(_Player,"EVENT_vandalism_player_to_prison")
+AND
+NOT NoGuards(_Player,1)
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_vandalism_player_to_prison",0);
+//Bert - used procedure instead of timer, because of MP issues with fades
+ExecutePrison(_Player);
+
+IF
+DialogEnded(_,_Instance) 
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+AND
+DialogConditionTrue(_Player,"EVENT_trespassing_player_to_prison")
+AND
+NOT NoGuards(_Player,1)
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_trespassing_player_to_prison",0);
+//Bert - used procedure instead of timer, because of MP issues with fades
+ExecutePrison(_Player);
+
+IF
+DialogEnded(_,_Instance) 
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+AND
+DialogConditionTrue(_Player,"EVENT_thievery_player_to_prison")
+AND
+NOT NoGuards(_Player,1)
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_thievery_player_to_prison",0);
+//Bert - used procedure instead of timer, because of MP issues with fades
+ExecutePrison(_Player);
+/*TimerLaunch(_Timer,1);
+
+
+IF
+TimerFinished(_Timer)
+*/
+PROC
+ExecutePrison((CHARACTER)_Player)
+AND
+DB_InRegion(_Player,_Region) 
+AND
+GuardedRegion(_Region,_,_,_Prison) 
+AND
+GuardedRegion(_Region,_,_Type,_)
+THEN	
+ImprisonPlayer(_Player,_Prison);
+ProcRemoveGuardsForPlayer(_Player,_Region,_Type);
+
+PROC
+ProcRemoveGuardsForPlayer((CHARACTER)_Player,(TRIGGER)_Region,(STRING)_Type)
+AND
+SummonedGuards(_Player,_Region,_Type,_,_,_ID) 
+THEN
+// If player is put in prison, the guards immediately return to their quarters.
+// (this is not only logical, but necessary too for in case the player tries to
+// escape from prison and is detected)
+DoRemoveGuards(_Player,_ID);
+MakeGuardsAvailable(_Player,_ID);
+
+// if player decides to attack the guards, we change the reason for which they came (because this reason defines how they are leaving)
+IF
+DialogEnded(_,_Instance)
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+AND
+DialogConditionTrue(_Player,"EVENT_thievery_player_fights") 
+AND
+DB_InRegion(_Player,_Region) 
+AND
+SummonedGuards(_Player,_Region,_Type,_N,_Reason,_ID)
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_thievery_player_fights",0);
+NOT SummonedGuards(_Player,_Region,_Type,_N,_Reason,_ID);
+SummonedGuards(_Player,_Region,_Type,_N,5,_ID);		// they came to fight - asserting this ensures that the guards	//TODO define ACTION_ALIGNMENT_CHANGE_TO_ENEMY
+									// will be removed when player leaves region (see above)
+ShiftToNpc(_Player,0);		// free npc
+NOT InterfaceDisabledBecauseOfGuards(_Player,1);
+GuardsDoAttack(_Player,_Type,_N);	// make them attack
+
+
+IF
+DialogEnded(_,_Instance)
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+AND
+DialogConditionTrue(_Player,"EVENT_vandalism_player_fights") 
+AND
+DB_InRegion(_Player,_Region) 
+AND
+SummonedGuards(_Player,_Region,_Type,_N,_Reason,_ID)
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_vandalism_player_fights",0);
+NOT SummonedGuards(_Player,_Region,_Type,_N,_Reason,_ID);
+SummonedGuards(_Player,_Region,_Type,_N,5,_ID);		// they came to fight - asserting this ensures that the guards	//TODO define ACTION_ALIGNMENT_CHANGE_TO_ENEMY
+									// will be removed when player leaves region (see above)
+ShiftToNpc(_Player,0);		// free npc
+NOT InterfaceDisabledBecauseOfGuards(_Player,1);
+GuardsDoAttack(_Player,_Type,_N);	// make them attack
+
+IF
+DialogEnded(_,_Instance)
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+AND
+DialogConditionTrue(_Player,"EVENT_trespassing_player_fights") 
+AND
+DB_InRegion(_Player,_Region) 
+AND
+SummonedGuards(_Player,_Region,_Type,_N,_Reason,_ID)
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_trespassing_player_fights",0);
+NOT SummonedGuards(_Player,_Region,_Type,_N,_Reason,_ID);
+SummonedGuards(_Player,_Region,_Type,_N,5,_ID);		// they came to fight - asserting this ensures that the guards	//TODO define ACTION_ALIGNMENT_CHANGE_TO_ENEMY
+									// will be removed when player leaves region (see above)
+ShiftToNpc(_Player,0);		// free npc
+NOT InterfaceDisabledBecauseOfGuards(_Player,1);
+GuardsDoAttack(_Player,_Type,_N);	// make them attack
+ProcMakeReportingNPCHostile(_Player);
+
+PROC
+ProcMakeReportingNPCHostile((CHARACTER)_Player)
+AND
+DB_CrimeInProgress(_Player,_Npc,_)
+THEN
+Attack(_Npc,_Player);
+
+IF
+DialogEnded("Trespassing_PayFine",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DialogConditionTrue(_Player,"EVENT_trespassing_guards_leave_peacefully")
+AND
+DB_InRegion(_Player,_Area)
+AND
+DB_ForbiddenAreaTriggers(_ID,_Area,_Teleport)
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_trespassing_guards_leave_peacefully",0);
+CharacterTeleportToTrigger(_Player,_Teleport,"");
+
+IF
+DialogEnded("Trespassing_PayFine",_Inst)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_CrimeInProgress(_Player,_Npc,"Trespassing")
+THEN
+NOT DB_CrimeInProgress(_Player,_Npc,"Trespassing");
+
+// FRED TODO GUARD FINE
+IF	
+DialogConditionTrue(_Player,"EVENT_thievery_player_pays_fine") 
+AND
+ThieveryFine(_DC,_Fine)
+AND
+DialogConditionTrue(_Player,_DC)
+AND
+IntegerProduct(_Fine,-1,_RemoveFine)
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_thievery_player_pays_fine",0);
+CharacterAddGold(_Player,_RemoveFine);
+//	The rest happens when DIALOG_EVENT_thievery_guards_leave_peacefully is set.
+//	This event is also set in the dialog if you follow the "pay fine" path.
+
+
+IF	
+DialogConditionTrue(_Player,"EVENT_vandalism_player_pays_fine") 
+AND
+VandalismFine(_DC,_Fine)
+AND
+DialogConditionTrue(_Player,_DC)
+AND
+IntegerProduct(_Fine,-1,_RemoveFine)
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_vandalism_player_pays_fine",0);
+CharacterAddGold(_Player,_RemoveFine);
+
+IF	
+DialogConditionTrue(_Player,"EVENT_trespassing_player_pays_fine") 
+AND
+TrespassingFine(_DC,_Fine)
+AND
+DialogConditionTrue(_Player,_DC)
+AND
+IntegerProduct(_Fine,-1,_RemoveFine)
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_trespassing_player_pays_fine",0);
+CharacterAddGold(_Player,_RemoveFine);
+
+IF
+DialogConditionTrue(_Player,"EVENT_thievery_guards_leave_peacefully")
+AND
+DB_PlayerSummonID(_Player,_SummonID)
+AND
+SummonedGuards(_Player,_Region,_Type,_N,_Reason,_SummonID) 
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_thievery_guards_leave_peacefully",0);
+GiveBackStolenStuff(_Player,1);
+ShiftToNpc(_Player,0);
+NOT InterfaceDisabledBecauseOfGuards(_Player,1);
+GuardsStayAndLeaveInGroup(_Player,_SummonID);
+//do nothing else... the guards just stay there and are automatically removed
+//when the player leaves sight
+
+IF
+DialogConditionTrue(_Player,"EVENT_vandalism_guards_leave_peacefully")
+AND
+DB_PlayerSummonID(_Player,_SummonID)
+AND
+SummonedGuards(_Player,_Region,_Type,_N,_Reason,_SummonID) 
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_vandalism_guards_leave_peacefully",0);
+ShiftToNpc(_Player,0);
+NOT InterfaceDisabledBecauseOfGuards(_Player,1);
+GuardsStayAndLeaveInGroup(_Player,_SummonID);
+//do nothing else... the guards just stay there and are automatically removed
+//when the player leaves sight
+
+
+IF
+DialogConditionTrue(_Player,"EVENT_trespassing_guards_leave_peacefully")
+AND
+DB_PlayerSummonID(_Player,_SummonID)
+AND
+SummonedGuards(_Player,_Region,_Type,_N,_Reason,_SummonID) 
+THEN
+ShiftToNpc(_Player,0);
+NOT InterfaceDisabledBecauseOfGuards(_Player,1);
+GuardsStayAndLeaveInGroup(_Player,_SummonID);
+//do nothing else... the guards just stay there and are automatically removed
+//when the player leaves sight
+
+PROC
+GiveBackStolenStuff((CHARACTER)_Player,1)
+AND
+OwnerStolenGoods(_Player,_Owner)
+THEN
+ProcGivebackStolenItems(_Player,_Owner);
+
+PROC
+ProcGivebackStolenItems((CHARACTER)_Player,(CHARACTER)_Owner)
+AND
+NOT DB_ShopRegion(_,_,_Owner,_)
+AND
+DB_ObjectStolen(_Player,_Object,_Handle,_Container)
+THEN
+ProcMoveItemToContainerOrTransform(_Object,_Handle,_Container,_Owner);
+
+PROC
+ProcMoveItemToContainerOrTransform((ITEM)_Object,(INTEGER)_Handle,0,(CHARACTER)_Owner)
+AND
+DB_StolenObjectOriginalTransform(_Object,_X,_Y,_Z,_Pitch,_Yaw,_Roll)
+THEN
+NOT DB_StolenObjectOriginalTransform(_Object,_X,_Y,_Z,_Pitch,_Yaw,_Roll);
+ItemHandleToTransform(_Handle,_X,_Y,_Z,_Pitch,_Yaw,_Roll,1,_Owner);
+
+PROC
+ProcMoveItemToContainerOrTransform((ITEM)_Object,(INTEGER)_Handle,(INTEGER)_Container,(CHARACTER)_Owner)
+AND
+_Container!=0
+AND
+DB_StolenObjectOriginalTransform(_Object,_X,_Y,_Z,_Pitch,_Yaw,_Roll)
+THEN
+NOT DB_StolenObjectOriginalTransform(_Object,_X,_Y,_Z,_Pitch,_Yaw,_Roll);
+ItemHandleToContainerHandle(_Handle,_Container,1);
+
+
+PROC
+ProcGivebackStolenItems((CHARACTER)_Player,(CHARACTER)_Owner)
+AND
+DB_ShopRegion(_,_,_Owner,_)
+AND
+DB_ObjectStolen(_Player,_Object,_Handle,_Container)
+AND
+DB_StolenObjectOriginalTransform(_Object,_X,_Y,_Z,_Pitch,_Yaw,_Roll)
+THEN
+NOT DB_StolenObjectOriginalTransform(_Object,_X,_Y,_Z,_Pitch,_Yaw,_Roll);
+ItemHandleToCharacter(_Handle,_Owner,1);
+
+//TODO: Generated stuff ?
+/*
+PROC
+GiveBackStolenStuff((CHARACTER)_Player,1)
+AND
+GeneratedObjectStolen(_Player,_ObjectID)
+AND
+OwnerStolenGoods(_Player,_Owner)
+THEN	
+TransferGeneratedBetweenInventories(_Player,_Owner,_ObjectID);
+*/
+
+PROC
+GiveBackStolenStuff((CHARACTER)_Player,1)
+AND
+OwnerStolenGoods(_Player,_Owner)
+THEN
+ProcGiveBackStolenItemTemplates(_Player,_Owner);
+
+PROC
+ProcGiveBackStolenItemTemplates((CHARACTER)_Player,(CHARACTER)_Owner)
+AND
+NOT DB_ShopRegion(_,_,_Owner,_)
+AND
+ObjectClassStolen(_Player,_ObjectClass,_Amount,_Handle,_Container)
+THEN
+ProcMoveItemTemplateToContainerOrTransform(_ObjectClass,_Handle,_Container,_Amount,_Owner);
+
+PROC
+ProcMoveItemTemplateToContainerOrTransform((STRING)_ObjectClass,(INTEGER)_Handle,0,(INTEGER)_Amount,(CHARACTER)_Owner)
+AND
+DB_StolenObjectClassOriginalTransform(_ObjectClass,_X,_Y,_Z,_Pitch,_Yaw,_Roll)
+THEN
+NOT DB_StolenObjectClassOriginalTransform(_ObjectClass,_X,_Y,_Z,_Pitch,_Yaw,_Roll);
+ItemHandleToTransform(_Handle,_X,_Y,_Z,_Pitch,_Yaw,_Roll,_Amount,_Owner);
+
+PROC
+ProcMoveItemTemplateToContainerOrTransform((STRING)_ObjectClass,(INTEGER)_Handle,(INTEGER)_Container,(INTEGER)_Amount,(CHARACTER)_Owner)
+AND
+_Container!=0
+AND
+DB_StolenObjectClassOriginalTransform(_ObjectClass,_X,_Y,_Z,_Pitch,_Yaw,_Roll)
+THEN
+NOT DB_StolenObjectClassOriginalTransform(_ObjectClass,_X,_Y,_Z,_Pitch,_Yaw,_Roll);
+ItemHandleToContainerHandle(_Handle,_Container,_Amount);
+
+PROC
+ProcGiveBackStolenItemTemplates((CHARACTER)_Player,(CHARACTER)_Owner)
+AND
+DB_ShopRegion(_,_,_Owner,_)
+AND
+ObjectClassStolen(_Player,_ObjectClass,_Amount,_Handle,_Container)
+AND
+DB_StolenObjectClassOriginalTransform(_ObjectClass,_X,_Y,_Z,_Pitch,_Yaw,_Roll)
+THEN
+NOT DB_StolenObjectClassOriginalTransform(_ObjectClass,_X,_Y,_Z,_Pitch,_Yaw,_Roll);
+ItemHandleToCharacter(_Handle,_Owner,_Amount);
+
+//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+// Handle DIALOG_EVENT_call_guards_disturb_peace
+//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
+IF		
+DialogEnded(_,_Instance)
+AND
+DB_DialogPlayers(_Instance,_Player,1)
+AND
+DialogConditionTrue(_Player,"EVENT_call_guards_disturb_peace")
+AND
+DB_DialogNPCs(_Instance,_Npc,1)
+THEN
+SetAndRememberDialogEvent(_Player,"EVENT_call_guards_disturb_peace",0);
+ProcCheckIfHostile(_Player,_Npc);
+ProcCheckDisturbanceGuards(_Player,_Npc);
+
+PROC
+ProcCheckDisturbanceGuards((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+DB_IsHostile(_Player,_Npc)
+THEN
+Story_CallGuards(_Player,5);		// reason is not really so important here //TODO define ACTION_THEFT_FROM_ME
+
+
+PROC
+ProcCheckDisturbanceGuards((CHARACTER)_Player,(CHARACTER)_Npc)
+AND
+NOT DB_IsHostile(_Player,_Npc)
+THEN
+OverrideGuardDialog(_Player,"Called_Guard_Disturb_peace");		// override the default guard dialog
+Story_CallGuards(_Player,1);		// reason is not really so important here //TODO define ACTION_THEFT_FROM_ME
+
+
+//REGION prison demon 
+
+IF
+DB_PrisonStatues((ITEM)_Item,(CHARACTER)_Demon,(STRING)_Dialog,(TRIGGER)_Trigger)
+THEN
+SetStoryNpc(_Demon,1);
+CharacterSetOnStage(_Demon,0);
+
+IF
+CharacterUsedItem(_Player,_Item)
+AND
+_Player.DB_IsPlayer()
+AND
+DB_PrisonStatues(_Item,_Demon,_,_)
+AND
+DB_PrisonStatueInUse(_,_Demon,_)	//if the demon is already busy, don't 
+THEN
+DialogStartOneSpeakerItemDialog("Generic_AD_PrisonDemonBusy",_Item);
+
+IF
+CharacterUsedItem(_Player,_Item)
+AND
+_Player.DB_IsPlayer()
+AND
+DB_PrisonStatues(_Item,_,_,_)
+AND
+NOT PlayerInPrison(_Player,_)
+THEN
+CharacterDisplayText(_Player,"Generic_DemonStatue_NotAvaialble");
+
+IF
+CharacterUsedItem(_Player,_Item)
+AND
+_Player.DB_IsPlayer()
+AND
+DB_PrisonStatues(_Item,_Demon,_Dialog,_)
+AND
+PlayerInPrison(_Player,_)
+AND
+NOT DB_PrisonStatueInUse(_,_Demon,_)	//if the demon is already busy, don't 
+THEN
+DB_PrisonStatueInUse(_Item,_Demon,_Player);
+ProcSummonPrisonDemon(_Player);
+
+PROC
+ProcSummonPrisonDemon((CHARACTER)_Player)
+AND
+DB_PrisonStatueInUse(_Item,_Demon,_Player)
+AND
+DB_PrisonStatues(_Item,_Demon,_,_Trigger)
+THEN
+DB_PrisonDemonAppear(_Item,_Demon);
+PlayEffectAtItem("FX_GP_TeleportSmoke_A",_Item);
+PlayEffectAtTrigger("FX_GP_TeleportSmoke_A",_Trigger);
+CharacterAppearAtTrigger(_Demon,_Trigger,1);
+TimerLaunch("_PrisonDemonAppear",500);
+ItemSetCanInteract(_Item,0);
+
+IF
+TimerFinished("_PrisonDemonAppear")
+AND
+DB_PrisonDemonAppear(_Item,_Demon)
+AND
+DB_PrisonStatueInUse(_Item,_Demon,_Player)
+AND
+DB_PrisonStatues(_Item,_Demon,_Dialog,_)
+THEN
+CharacterLookAtCharacter(_Demon,_Player,0);
+NOT DB_PrisonDemonAppear(_Item,_Demon);
+DialogRequestStopForCharacter(_Player);
+ProcSetPrisonDemonEvents(_Demon,_Player);
+DialogStartTwoSpeakerDialog(_Dialog,_Demon,_Player);
+
+PROC
+ProcSetPrisonDemonEvents((CHARACTER)_Demon,(CHARACTER)_Player)
+THEN
+CharacterSetVarCharacter(_Demon,"InterestedParty",_Player);
+
+PROC
+ProcSetPrisonDemonEvents((CHARACTER)_Demon,(CHARACTER)_Player)
+AND
+DB_DemonUses(_Demon,_Player,0)
+THEN
+DialogSetCharacterEvent("PrisonDemon_PlayerFirstTimeUse",_Player,0);
+DialogClearCharacterEvent("PrisonDemon_PlayerRepeatOffender",_Player,0);
+
+PROC
+ProcSetPrisonDemonEvents((CHARACTER)_Demon,(CHARACTER)_Player)
+AND
+NOT DB_DemonUses(_Demon,_Player,_)
+THEN
+DialogSetCharacterEvent("PrisonDemon_PlayerFirstTimeUse",_Player,0);
+DialogClearCharacterEvent("PrisonDemon_PlayerRepeatOffender",_Player,0);
+
+PROC
+ProcSetPrisonDemonEvents((CHARACTER)_Demon,(CHARACTER)_Player)
+AND
+DB_DemonUses(_Demon,_Player,_Nr)
+AND
+_Nr>0
+THEN
+DialogSetCharacterEvent("PrisonDemon_PlayerRepeatOffender",_Player,0);
+DialogClearCharacterEvent("PrisonDemon_PlayerFirstTimeUse",_Player,0);
+
+PROC
+ProcSetPrisonDemonEvents((CHARACTER)_Demon,(CHARACTER)_Player)
+AND
+DB_PrisonDemonStats(_Stat,_)
+AND
+CharacterGetBaseAttribute(_Player,_Stat,_Str)
+AND
+StringConcatenate("PrisonDemon_PlayerHas_",_Stat,_Result)
+THEN
+ProcSetPrisonDemonStatEvent(_Demon,_Str,_Result,_Player);
+
+PROC
+ProcSetPrisonDemonStatEvent((CHARACTER)_Demon,(INTEGER)_StatPoints,(STRING)_Event,(CHARACTER)_Player)
+AND
+NOT DB_PrisonDemonMinStatRequirement(_Demon,_)
+THEN
+DB_PrisonDemonMinStatRequirement(_Demon,1);
+
+PROC
+ProcSetPrisonDemonStatEvent((CHARACTER)_Demon,(INTEGER)_StatPoints,(STRING)_Event,(CHARACTER)_Player)
+AND
+DB_PrisonDemonMinStatRequirement(_Demon,_Min)
+AND
+_StatPoints>_Min
+THEN
+DialogSetCharacterEvent(_Event,_Player,0);
+
+PROC
+ProcSetPrisonDemonStatEvent((CHARACTER)_Demon,(INTEGER)_StatPoints,(STRING)_Event,(CHARACTER)_Player)
+AND
+DB_PrisonDemonMinStatRequirement(_Demon,_Min)
+AND
+_StatPoints<=_Min
+THEN
+DialogClearCharacterEvent(_Event,_Player,0);
+
+IF
+DialogCharacterEventSet(_Flag,_Player,_)
+AND
+DB_PrisonDemonStats(_Stat,_Flag)
+THEN
+DialogClearCharacterEvent(_Flag,_Player,0);
+DB_SelectedStatPoint(_Player,_Stat);
+
+PROC
+ProcBumpDemonUseForPlayer((CHARACTER)_Demon,(CHARACTER)_Player)
+AND
+NOT DB_DemonUses(_Demon,_Player,_)
+THEN
+DB_DemonUses(_Demon,_Player,0);
+
+PROC
+ProcBumpDemonUseForPlayer((CHARACTER)_Demon,(CHARACTER)_Player)
+AND
+DB_DemonUses(_Demon,_Player,_Count)
+AND
+IntegerSum(_Count,1,_New)
+THEN
+NOT DB_DemonUses(_Demon,_Player,_Count);
+DB_DemonUses(_Demon,_Player,_New);
+
+
+IF
+DialogCharacterEventSet("PlayerUsesDemon",_Player,_)
+AND
+DB_PrisonStatueInUse(_,_Demon,_Player)
+THEN
+ProcBumpDemonUseForPlayer(_Demon,_Player);
+DialogClearCharacterEvent("PlayerUsesDemon",_Player,0);
+ProcPrisonDemonTakeStatPoint(_Demon,_Player);
+DB_PlayerLeavingPrison(_Player,_Demon);
+
+PROC
+ProcPrisonDemonTakeStatPoint((CHARACTER)_Demon,(CHARACTER)_Player)
+AND
+DB_PrisonDemonMinStatRequirement(_Demon,_Min)
+AND
+IntegerProduct(_Min,-1,_Sub)
+AND
+DB_SelectedStatPoint(_Player,_Stat)
+THEN
+NOT DB_SelectedStatPoint(_Player,_Stat);
+CharacterAddAttribute(_Player,_Stat,_Sub);
+
+IF
+DialogEnded(_Dialog,_Inst)
+AND
+DB_DialogNPCs(_Inst,_Demon,1)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+DB_PrisonStatueInUse(_Item,_Demon,_Player)
+THEN
+PlayEffectAtCharacter("FX_GP_TeleportSmoke_A",_Demon);
+DB_PrisonDemonVanish(_Item,_Demon);
+TimerLaunch("_PrisonDemonVanish",500);
+
+IF
+TimerFinished("_PrisonDemonVanish")
+AND
+DB_PrisonDemonVanish(_Item,_Demon)
+THEN
+NOT DB_PrisonDemonVanish(_Item,_Demon);
+PlayEffectAtItem("FX_GP_TeleportSmoke_A",_Item);
+DB_PrisonFreeObjects(_Item,_Demon);
+TimerLaunch("_PrisonDoFree",500);
+
+IF
+TimerFinished("_PrisonDoFree")
+AND
+DB_PrisonFreeObjects(_Item,_Demon)
+AND
+DB_PrisonStatueInUse(_Item,_Demon,_Player)
+THEN
+NOT DB_PrisonStatueInUse(_Item,_Demon,_Player);
+NOT DB_PrisonFreeObjects(_Item,_Demon);
+ProcFreePlayerFromPrison(_Demon);
+ItemSetCanInteract(_Item,1);
+CharacterSetOnStage(_Demon,0);
+
+PROC
+ProcFreePlayerFromPrison((CHARACTER)_Demon)
+AND
+DB_PlayerLeavingPrison(_Player,_Demon)
+AND
+PlayerInPrison(_Player,_Prison) 
+AND
+PrisonData(_Player,_Prison,_,_ExitLocation,_,_Chest/*,_*/)
+THEN
+NOT DB_PlayerLeavingPrison(_Player,_Demon);
+CharacterDetachFromGroup(_Player);
+CharacterTeleportToTrigger(_Player,_ExitLocation,"");
+ContainerMoveAllItemsToCharacter(_Chest,_Player);
+DecreaseReputation(_Player,1);
+PlayerLeavesPrison(_Player,_Prison);
+CharacterFlushQueue(_Player);
+CharacterLeaveCombat(_Player);	//make them leave combat when they teleport out of the prison
+//END_REGION
+
+QRY
+QryGenericsBlockedForItem((INTEGER)_Handle)
+AND
+DB_ItemBlockGenerics((ITEM)_Item)
+AND
+ItemGetHandle(_Item,_Han)
+AND
+_Handle == _Han
+THEN
+DB_Noop(1);
+
+IF
+ItemHandleAttackedByCharacter(_Handle,_Player,_)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT QryGenericsBlockedForItem(_Handle)
+AND
+DB_IsGuard(_Guard)
+AND
+CharacterCanSeeCharacter(_Guard,_Player,1)
+AND
+ItemHandleGetHealthPoints(_Handle,_HP)
+AND
+_HP>0
+AND
+NOT DB_GenericsBlockedFor(_Player)
+AND
+NOT _Player.DB_IsInDialog()
+AND
+DB_InRegion(_Player,(TRIGGER)_Region)
+AND
+GuardedRegion(_Region,(TRIGGER)_,(STRING)_,(STRING)_)
+THEN
+ProcCheckIfPlayerIsInCombat(_Player,_Guard);
+
+PROC
+ProcCheckIfPlayerIsInCombat((CHARACTER)_Player,(CHARACTER)_Guard)
+AND
+DB_Combat(_Player,_)
+AND
+NOT DB_Combat(_Guard,_)
+THEN
+ProcMakeNPCHostile(_Player,_Guard);
+
+PROC
+ProcCheckIfPlayerIsInCombat((CHARACTER)_Player,(CHARACTER)_Guard)
+AND
+NOT DB_Combat(_Player,_)
+THEN
+DB_GenericsBlockedFor(_Player);
+ClearVandalismValue(_Player);
+DeleteVandalismFacts(_Player);
+ValueDestroyed(_Player,666666666666);	//make it high so you can't pay for it
+DisapproveVandalism(_Player,_Guard,_Guard,666666666666);
+
+EXITSECTION
+
+ENDEXITSECTION

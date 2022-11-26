@@ -1,0 +1,115 @@
+#TEMPLATE "_SKILL_Base" : Shout_EnemyPurifyingShout
+
+INIT
+CHARACTER:__Me
+FLOAT:%SkillTargetScore_Shout_EnemyPurifyingShout=-1000000
+// [GLOBAL_VARS]
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_Shout_EnemyPurifyingShout
+VARS
+	// [CALC_VARS]
+	FLOAT:_SkillRangeMin
+	FLOAT:_SkillRangeMax
+	FLOAT:_SkillImpactRange
+	FLOAT3:_TargetPos
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_Shout_EnemyPurifyingShout")
+ACTIONS
+	Set(%SkillTargetScore_Shout_EnemyPurifyingShout, -1000000)
+
+	// [CALC_ACTIONS_PRE]
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	IF "(c1)&(c2)&(c3)"
+	    CharacterGetSkillRange(_SkillRangeMin, _SkillRangeMax, __Me, Shout_EnemyPurifyingShout) // c1
+	    CharacterGetSkillImpactRange(_SkillImpactRange, __Me, Shout_EnemyPurifyingShout) // c2
+	    FindPosition(_TargetPos, __Me, _SkillRangeMax, _SkillImpactRange, __Me, 2, -1, -1, -1) // c3
+	THEN
+	    Set(%SkillTargetPos_Shout_EnemyPurifyingShout, _TargetPos)
+	    Add(%ActionScore_Shout_EnemyPurifyingShout, 20.0)
+	ELSE 
+	    IterateCharactersInCombat(__Me, "CalculateTarget_Shout_EnemyPurifyingShout", Random, Vitality)
+	    IF "!c1"
+	    	IsEqual(%SkillTargetChar_Shout_EnemyPurifyingShout, null)
+	    THEN
+	    	Add(%ActionScore_Shout_EnemyPurifyingShout, %SkillTargetScore_Shout_EnemyPurifyingShout)
+	    ENDIF
+	ENDIF
+	// [~CALC_ACTIONS]
+
+	
+
+	
+// Calculate the character we should attack
+EVENT CalculateTarget_Shout_EnemyPurifyingShout
+VARS	
+	CHARACTER:_Char
+	// [CALC_TARGET_VARS]
+	FLOAT:_StatVitality
+	FLOAT:_Score
+	INT:_FriendsInRange
+	// [~CALC_TARGET_VARS]
+ON
+	OnIterateCharacter(_Char, "CalculateTarget_Shout_EnemyPurifyingShout")	
+ACTIONS
+	// [CALC_CHAR_TARGET_ACTIONS_PRE]
+	Set(_Score, 0.0)
+	// [~CALC_CHAR_TARGET_ACTIONS_PRE]
+	// [CALC_CHAR_TARGET_ACTIONS]
+	IF "(!c1&!c2&!c3)&((((((c4)|c5)|c6)|c7)|c8)|c9)&(!(c10&c11))&(!c12&c13)&(c14)"
+	    CharacterIsDead(_Char) // c1
+	    CharacterHasStatus(_Char, INVISIBLE) // c2
+	    CharacterHasStatus(_Char, SNEAKING) // c3
+	    CharacterHasStatus(_Char, BURNING) // c4
+	    CharacterHasStatus(_Char, FROZEN) // c5
+	    CharacterHasStatus(_Char, STUNNED) // c6
+	    CharacterHasStatus(_Char, CHARMED) // c7
+	    CharacterHasStatus(_Char, PETRIFIED) // c8
+	    CharacterHasStatus(_Char, FEAR) // c9
+	    CharacterGetStat(_StatVitality, _Char, Vitality) // c10
+	    IsLessThen(_StatVitality, 0.2) // c11
+	    IsEqual(__Me, _Char) // c12
+	    CharacterIsAlly(__Me, _Char) // c13
+	    CharacterCount(_FriendsInRange, _Char, 5, Ally, null) // c14
+	THEN
+	    // Hostile count score calculation
+	    Add(_Score, 10.0) // HostileWeight
+	    
+	    // SeveralFriendsInRange score calculation
+	    IF "(!c1)"
+	        IsLessThen(_FriendsInRange, 2) // c1
+	    THEN
+	        Add(_Score, 5.0)
+	    ENDIF
+	    
+	    // Can see score calculation
+	    IF "!c1"
+	    	CharacterCanSee(__Me, _Char)
+	    THEN
+	    	Add(_Score, -10.0)
+	    ENDIF
+	    
+	    IF "c1"
+	    	IsGreaterThen(_Score, %SkillTargetScore_Shout_EnemyPurifyingShout)
+	    THEN
+	    	Set(%SkillTargetChar_Shout_EnemyPurifyingShout, _Char)
+	    	Set(%SkillTargetScore_Shout_EnemyPurifyingShout, _Score)
+	    ENDIF	
+	ENDIF
+	// [~CALC_CHAR_TARGET_ACTIONS]
+	
+	
+	
+	
+	
+	
+	
+	

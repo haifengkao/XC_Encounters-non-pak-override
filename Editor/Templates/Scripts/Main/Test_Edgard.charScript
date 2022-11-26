@@ -1,0 +1,11 @@
+INIT
+CHARACTER:__Me
+
+BEHAVIOUR
+REACTION Test,5000
+USAGE ALL
+ACTIONS
+	CharacterSetAnimationOverride(__Me,"knockdown_loop")
+	Sleep(10)
+	CharacterMoveTo(TRIGGER:StartPoint_000_80f0b990-798a-4eac-a961-d79f2df8458d)
+	CharacterMoveTo(TRIGGER:StartPoint_003_a2e7c367-3464-4b47-a469-a9d83d081f68)

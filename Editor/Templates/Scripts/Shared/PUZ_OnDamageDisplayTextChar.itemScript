@@ -1,0 +1,29 @@
+INIT
+	ITEM:__Me
+	EXTERN FIXEDSTRING:%DialogKey = null
+	EXTERN FLOAT:%DisplayTime = 5
+	EXTERN DAMAGE:%DamageType = null
+	EXTERN INT:%TextRepeat=0
+	INT:%DamCounter=0
+	
+EVENTS
+
+EVENT OnDamage
+	VARS
+		CHARACTER:_Source
+	ON
+		OnDamage(%DamageType,_,_Source,_)
+	ACTIONS
+		IF "c1&c2"  //if damaged first time and no repeat
+			IsEqual(%DamCounter,0)
+			IsEqual(%TextRepeat,0)
+		THEN
+			DisplayText(_Source, %DialogKey, %DisplayTime)
+			Add(%DamCounter,1)
+		ENDIF
+		IF "c1&!c2" //if damaged first time and repeat
+			IsEqual(%DamCounter,0)
+			IsEqual(%TextRepeat,0)
+		THEN
+			DisplayText(_Source, %DialogKey, %DisplayTime)	
+		ENDIF

@@ -1,0 +1,237 @@
+#INCLUDE DefaultCharacter
+INIT
+	USING DefaultCharacter	//required for OVERRIDE below
+	CHARACTER:__Me
+	EXTERN INT:%MeteorShower_Current=0
+	EXTERN INT:%MeteorShower_Desired=3
+	EXTERN FLOAT:%EmergencyThreshold=0.15
+	FLOAT:%MySightRange
+	FLOAT:%MyActionPoints
+	INT:%Bool_ChargingMode=0
+	INT:%EmergencyModeCountdown=0
+	INT:%CountdownFXHandle
+	INT:%MeteorShowerCountdown=0
+
+//------------------------
+BEHAVIOUR
+REACTION InfChimera_Cast_Fireball, 400
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+	FLOAT:_CharFireRes
+CHECK "c1&c2&c3&!c4&!c5"
+	IsEqual(%Bool_ChargingMode,0)														//c1
+	CharacterGet(_Enemy,__Me,%MySightRange,Highest,Distance,Enemy)						//c2
+	CharacterCanCast(__Me,"Projectile_EnemyFireball",1)									//c3
+	CharacterHasStatus(_Enemy,"FROZEN")													//!c4
+	IsHardcore()																		//c5
+ACTIONS
+	CharacterUseSkill("Projectile_EnemyFireball",_Enemy)	
+	
+REACTION InfChimera_Cast_Fireball_Hardcore, 400
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+	FLOAT:_CharFireRes
+CHECK "c1&c2&c3&!c4&c5&c6&!c7"
+	IsEqual(%Bool_ChargingMode,0)														//c1
+	CharacterGet(_Enemy,__Me,%MySightRange,Highest,Distance,Enemy)						//c2
+	CharacterCanCast(__Me,"Projectile_EnemyFireball",1)									//c3
+	CharacterHasStatus(_Enemy,"FROZEN")													//!c4
+	IsHardcore()																		//c5
+	CharacterGetStat(_CharFireRes,_Enemy,FireResistance)								//c6
+	IsGreaterThen(_CharFireRes,1.0)														//c7
+ACTIONS
+	CharacterUseSkill("Projectile_EnemyFireball",_Enemy)	
+	
+REACTION InfChimera_Cast_BurningTouch, 300	
+USAGE COMBAT
+VARS
+	FLOAT:_MyVitality
+CHECK "c1&c2&c3&c4"
+	CharacterGetStat(_MyVitality,__Me,Vitality)											//c3
+	IsLessThen(_MyVitality,0.7)															//c4
+	IsEqual(%Bool_ChargingMode,0)														//c1
+	CharacterCanCast(__Me,"Target_EnemyBurningTouch",1)									//c2
+ACTIONS
+	CharacterUseSkill("Target_EnemyBurningTouch",__Me)		
+
+REACTION InfChimera_Cast_MeteorShower, 0
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+CHECK "c1"
+	IsEqual(%Bool_ChargingMode,1)
+ACTIONS
+	SetPriority("Combat_AttackSetEnemy",0)
+	SetPriority("Combat_MoveToSetEnemy",0)	
+	SetPriority("Idle_PlayChargeAnimation",1500)
+	IF "c1|c2"															
+		CharacterHasStatus(__Me,"FROZEN")
+		CharacterHasStatus(__Me,"WET")
+	THEN
+		SetPriority("Idle_PlayChargeAnimation",0)		
+		CharacterRemoveStatus(__Me,"FROZEN")	
+		CharacterRemoveStatus(__Me,"WET")	
+		DisplayText(__Me,"CYS_InfernalChimera_Countdown_Cancel",2)		
+		CharacterSetAttackOfOpportunity(__Me,1)
+		SetPriority("Combat_AttackSetEnemy",8)
+		SetPriority("Combat_MoveToSetEnemy",7)						//resetting normal values for default attack			
+		Set(%Bool_ChargingMode,0)			
+		Set(%MeteorShower_Current,0)
+		Set(%MeteorShowerCountdown,0)
+		SetPriority("InfChimera_Cast_MeteorShower",0)		
+	ELIF "c1"
+		IsEqual(%MeteorShowerCountdown,0)								//CHARGE STEP 1
+	THEN		
+		DisplayText(__Me,"CYS_InfernalChimera_Countdown_01",2)
+		Add(%MeteorShowerCountdown,1)
+		CharacterEndTurn()		
+	ELIF "c1"
+		IsEqual(%MeteorShowerCountdown,1)								//CHARGE STEP 2
+	THEN	
+		DisplayText(__Me,"CYS_InfernalChimera_Countdown_02",2)
+		Add(%MeteorShowerCountdown,1)
+		CharacterEndTurn()		
+	ELIF "c1&c2&c3"
+		IsEqual(%MeteorShowerCountdown,2)		
+		CharacterCanCast(__Me,"ProjectileStrike_EnemyMeteorShower_Chimera")		
+		CharacterGet(_Enemy,__Me,%MySightRange,Highest,Distance,Enemy)
+	THEN
+		DisplayText(__Me,"CYS_InfernalChimera_Countdown_Unleash",2)		//CHARGE ENDS: CASTING SPELL
+		SetPriority("Idle_PlayChargeAnimation",0)	
+		CharacterUseSkill("ProjectileStrike_EnemyMeteorShower_Chimera",_Enemy)		
+		Set(%Bool_ChargingMode,0)			
+		Set(%MeteorShower_Current,0)
+		Set(%MeteorShowerCountdown,0)
+		CharacterSetAttackOfOpportunity(__Me,1)		
+		SetPriority("Combat_AttackSetEnemy",8)
+		SetPriority("Combat_MoveToSetEnemy",7)		
+		SetPriority("InfChimera_Cast_MeteorShower",0)
+	ELIF "c1&(!c2|!c3)"													//CHARGE ENDS: CAN'T SEE TARGET	/ CAN'T CAST SPELL
+		IsEqual(%MeteorShowerCountdown,2)		
+		CharacterGet(_Enemy,__Me,%MySightRange,Lowest,Distance,Enemy)
+		CharacterCanCast(__Me,"ProjectileStrike_EnemyMeteorShower_Chimera")	
+	THEN	
+		DisplayText(__Me,"CYS_InfernalChimera_WhereDidYouGo",2)
+		SetPriority("Idle_PlayChargeAnimation",0)	
+		Set(%Bool_ChargingMode,0)			
+		Set(%MeteorShower_Current,0)
+		Set(%MeteorShowerCountdown,0)
+		CharacterSetAttackOfOpportunity(__Me,1)
+		SetPriority("Combat_AttackSetEnemy",8)
+		SetPriority("Combat_MoveToSetEnemy",7)				
+		SetPriority("InfChimera_Cast_MeteorShower",0)	
+	ELSE																//CHARGE ENDS: FALLBACK		
+		SetPriority("Idle_PlayChargeAnimation",0)	
+		Set(%Bool_ChargingMode,0)			
+		Set(%MeteorShower_Current,0)
+		Set(%MeteorShowerCountdown,0)
+		CharacterSetAttackOfOpportunity(__Me,1)
+		SetPriority("Combat_AttackSetEnemy",8)
+		SetPriority("Combat_MoveToSetEnemy",7)			
+		SetPriority("InfChimera_Cast_MeteorShower",0)	
+	ENDIF
+INTERRUPT
+	Reset()
+
+REACTION Idle_PlayChargeAnimation, 0
+USAGE WAITING
+ACTIONS
+	CharacterPlayAnimation("cast_self_loop",0,1)
+	
+//------------------------
+EVENTS
+EVENT DontAttackAlliesOrInvisibles OVERRIDE 			//nor will you attack anything that has > 100 fire resist
+VARS
+	CHARACTER:_Target
+	FLOAT:_FireRes
+ON
+	OnTurn()
+ACTIONS
+	IF "c1&(c2|c3|(c4&c5))"
+		CharacterGetEnemy(_Target,__Me)
+		CharacterIsAlly(__Me,_Target)
+		CharacterHasStatus(_Target,"INVISIBLE")
+		CharacterGetStat(_FireRes,_Target,"FireResistance")
+		IsGreaterThen(_FireRes,100)
+	THEN
+		CharacterSetEnemy(__Me,null)
+		Set(%defaultEvaluateTarget,1)
+	ENDIF
+
+EVENT OnInit_GetMySightRange_FXRestore
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%MySightRange,__Me,Sight)
+	THEN
+		CharacterAddSkill("Projectile_EnemyFireball")
+		CharacterAddSkill("Target_EnemyBurningTouch")			
+		CharacterAddSkill("ProjectileStrike_EnemyMeteorShower_Chimera")
+	ENDIF
+	IF "c1"
+		IsEqual(%Bool_ChargingMode,1)
+	THEN
+		CharacterPlayLoopEffect(%CountdownFXHandle,__Me,"FX_Env_LavaFountain_A","Dummy_BodyFX")
+	ENDIF
+		
+EVENT OnCombatStarted_PlayText
+ON
+	OnCombatStarted()
+ACTIONS
+	CharacterSetCanFight(__Me,1,1)						//infiltration creatures in the same combatgroup will now attack on sight
+	DisplayText(__Me,"CYS_InfernalChimera_CombatStarted",2)
+	
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	IF "c1&!(c2|c3)&c4" 						//CHARGE MODE
+		IsEqual(%Bool_ChargingMode,0)	
+		CharacterHasStatus(__Me,"FROZEN")
+		CharacterHasStatus(__Me,"WET")
+		IsLessThen(%MeteorShower_Current,%MeteorShower_Desired)
+	THEN		
+		Add(%MeteorShower_Current,1)
+	ELIF "c1&c2&!(c3|c4)"
+		IsEqual(%Bool_ChargingMode,0)
+		IsEqual(%MeteorShower_Current,%MeteorShower_Desired)
+		CharacterHasStatus(__Me,"FROZEN")
+		CharacterHasStatus(__Me,"WET")
+	THEN	
+		Set(%Bool_ChargingMode,1)
+		CharacterSetAttackOfOpportunity(__Me,0)
+		SetPriority("InfChimera_Cast_MeteorShower",600)
+	ENDIF
+	
+EVENT OnDie_Explode
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	ExplodeAt(__Me,"Projectile_EnemyFireball",-1,__Me)
+
+EVENT OnCombatEnded_ResetEverything
+ON
+	OnCombatEnded()
+ACTIONS
+	SetPriority("InfChimera_EmergencyModeActions",0)
+	SetPriority("Idle_PlayChargeAnimation",0)
+	CharacterSetAttackOfOpportunity(__Me,1)
+	SetPriority("Combat_AttackSetEnemy",8)
+	SetPriority("Combat_MoveToSetEnemy",7)							//resetting normal values for default attack	
+	Set(%Bool_ChargingMode,0)
+	Set(%EmergencyModeCountdown,0)
+	IF "c1|!c2"
+		IsGreaterThen(%CountdownFXHandle,0)
+		IsEqual(%CountdownFXHandle,null)
+	THEN
+		StopLoopEffect(%CountdownFXHandle)	
+	ENDIF
+	
+EVENT OnDeactivate_StopLoopingFX
+ON
+	OnDeactivate()
+ACTIONS
+	StopLoopEffect(%CountdownFXHandle)

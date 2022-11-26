@@ -1,0 +1,73 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_PlayerComments("CYS_CommentThelyronStudy","CYS_CommentThelyronStudy_1_1",1,1);
+DB_PlayerComments("CYS_CommentThelyronStudy","CYS_CommentThelyronStudy_2_1",2,1);
+DB_PlayerComments("CYS_CommentThelyronStudy","CYS_CommentThelyronStudy_2_2",2,2);
+DB_PlayerComment_Trigger(TRIGGER_CYS_CommentThelyronStudy,"CYS_CommentThelyronStudy");
+DB_Dialogs(CHARACTER_CYS_Thelyron,"CYS_Thelyron");
+ItemToContainer(ITEM_CYS_ThelyronDiary_1, ITEM_CYS_ThelyronBookShelve,-1);
+ItemToContainer(ITEM_CYS_ThelyronLetter1, ITEM_CYS_ThelyronBookShelve,-1);
+ItemToContainer(ITEM_CYS_THelyronLetter2, ITEM_CYS_Chest_ThelyronsLab,-1);
+/*********************/
+/*** Thelyron Diary ***/
+/*********************/
+
+DB_PlayerComments("CYS_CommentThelyronDiary","CYS_CommentThelyronDiary_1_1",1,1); //(He is behind all this, we should confront him!)
+DB_PlayerComments("CYS_CommentThelyronDiary","CYS_CommentThelyronDiary_2_1",2,1); //(Thelyron is the man behind all this!)
+DB_PlayerComments("CYS_CommentThelyronDiary","CYS_CommentThelyronDiary_2_2",2,2); //(We should confront Thelyron! )
+KBSECTION
+IF
+GameBookInterfaceClosed(ITEM_CYS_ThelyronDiary_1,_Player)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT CHARACTER_CYS_Thelyron.alreadyFled()
+THEN
+Proc_ThelyronRunAway();
+
+IF
+GameBookInterfaceClosed(ITEM_CYS_ThelyronDiary_1,_Player)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT CHARACTER_CYS_Evelyn.HasBeenMoved()
+THEN
+ProcCYSMoveEvelyn();
+ProcCYSMoveEvelynKey();
+ItemSetOnstage(ITEM_CYS_Evelyn_Backpack, 1);
+ProcTriggerUnregisterForPlayers(TRIGGER_CYS_Area_StartDialogEvelyn);
+
+IF
+GameBookInterfaceClosed(ITEM_CYS_ThelyronDiary_1,_)
+THEN
+GlobalSetEvent("CYS_KnowsAbout_SkeletonKingThelyron");
+GlobalSetEvent("CYS_KnowsThelyronUndead");
+
+IF
+GameBookInterfaceClosed(ITEM_CYS_ThelyronDiary_1,_Player)
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_Dead(CHARACTER_CYS_Thelyron)
+THEN
+Launch_PlayerComment(_Player,"CYS_CommentThelyronDiary");
+
+IF
+GameBookInterfaceClosed(ITEM_CYS_ThelyronLetter1,_Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+GlobalSetEvent("CYS_KnowsThelyronBraccusLetter");
+
+IF
+GameBookInterfaceClosed(ITEM_CYS_ThelyronLetter2,_Player)
+AND
+_Player.DB_IsPlayer()
+THEN
+GlobalSetEvent("CYS_KnowsThelyronBraccusApprenticeLetter");
+
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

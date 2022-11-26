@@ -1,0 +1,48 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_ShovelArea(TRIGGER_LUC_M_Grave1_Box,"LUC_M_Grave1",ITEM_LUC_M_Grave1);
+DB_ShovelArea(TRIGGER_LUC_M_Grave2_Box,"LUC_M_Grave2",ITEM_LUC_M_Grave2);
+DB_ShovelArea(TRIGGER_LUC_M_Grave3_Box,"LUC_M_Grave3",ITEM_LUC_M_Grave3);
+
+DB_ShovelRewardEvent("LUC_M_Grave1","LUC_M_Grave1");
+DB_ShovelRewardEvent("LUC_M_Grave2","LUC_M_Grave2");
+DB_ShovelRewardEvent("LUC_M_Grave3","LUC_M_Grave3");
+
+ItemSetOnstage(ITEM_LUC_M_Skillbook1,0);
+ItemSetOnstage(ITEM_LUC_M_Skillbook2,0);
+ItemSetOnstage(ITEM_LUC_M_Skillbook3,0);
+
+DB_ShovelArea(TRIGGER_LUC_M_ShovelDiggingSpot1,"LUC_M_DiggingSpot1",ITEM_LUC_M_ShovelDiggingSpot1Pile);
+DB_ShovelRewardItemAppear("LUC_M_DiggingSpot1",ITEM_LUC_M_ShovelDiggingSpot1Chest,TRIGGER_LUC_M_ShovelDiggingSpot1Point);
+DB_ShovelArea(TRIGGER_LUC_M_ShovelDiggingSpot2,"LUC_M_DiggingSpot2",ITEM_LUC_M_ShovelDiggingSpot2Pile);
+DB_ShovelRewardItemAppear("LUC_M_DiggingSpot2",ITEM_LUC_M_ShovelDiggingSpot2Chest,TRIGGER_LUC_M_ShovelDiggingSpot2Point);
+KBSECTION
+IF
+CharacterUsedItem(_,ITEM_LUC_M_CryptButton)
+THEN
+NOT DB_ShovelRewardEvent("LUC_M_Grave1","LUC_M_Grave1");
+NOT DB_ShovelRewardEvent("LUC_M_Grave2","LUC_M_Grave2");
+NOT DB_ShovelRewardEvent("LUC_M_Grave3","LUC_M_Grave3");
+DB_ShovelRewardItemAppear("LUC_M_Grave1",ITEM_LUC_M_Skillbook1,TRIGGER_LUC_M_Grave1_Box);
+DB_ShovelRewardItemAppear("LUC_M_Grave2",ITEM_LUC_M_Skillbook2,TRIGGER_LUC_M_Grave2_Box);
+DB_ShovelRewardItemAppear("LUC_M_Grave3",ITEM_LUC_M_Skillbook3,TRIGGER_LUC_M_Grave3_Box);
+
+IF
+GlobalEventSet("LUC_M_Grave1")
+THEN
+ItemSetEvent(ITEM_LUC_M_CryptPlate1,"explode");
+
+IF
+GlobalEventSet("LUC_M_Grave2")
+THEN
+ItemSetEvent(ITEM_LUC_M_CryptPlate2,"explode");
+
+IF
+GlobalEventSet("LUC_M_Grave3")
+THEN
+ItemSetEvent(ITEM_LUC_M_CryptPlate3,"explode");
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

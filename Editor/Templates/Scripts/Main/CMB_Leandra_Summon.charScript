@@ -1,0 +1,179 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%Leandra="HOM_Leandra_111ff690-48fc-4341-909e-815fd4e16936"
+	CHARACTER:%VoidAuraTarget_Earth=null
+	CHARACTER:%VoidAuraTarget_Air=null	
+	INT:%Bool_Phase1Complete=0
+	CHARACTERTEMPLATE:%Demon_Brown_RT="Leandra_Demon_Brown_f0c7c995-142f-4483-9bff-4d42126c5cfc"
+	CHARACTERTEMPLATE:%Demon_Red_RT="Leandra_Demon_Red_e9d9a55b-9b73-4def-a26d-19cd52a35ee4"
+	CHARACTERTEMPLATE:%Demon_Yellow_RT="Leandra_Demon_Yellow_9f8f7fda-9ff3-4915-94fb-05f2ad9f03c5"
+	CHARACTERTEMPLATE:%ArcaneVortex_RT="Leandra_Elemental_Arcane_6db254a8-356d-4e6f-b518-846b064f5f4e"
+	CHARACTERTEMPLATE:%VoidKnight_RT="Leandra_VoidKnight_3a45be85-f2b0-45cb-bcca-80c3dfdfd323"	
+	
+	//water makes earth invulnerable
+	//earth makes air invulnerable
+	//air makes leandra invulnerable
+	
+//-------
+BEHAVIOUR
+REACTION LeandraSummon_Phase1_MakeFriendInvulnerable,600
+USAGE COMBAT
+VARS
+	CHARACTERTEMPLATE:_MyTemplate
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2"
+	CharacterGetTemplate(__Me,_MyTemplate)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Target_EnemyVoidAura_Leandra")
+ACTIONS
+	Set(%VoidAuraTarget_Earth,null)
+	Set(%VoidAuraTarget_Air,null)
+	IF "c1"
+		IsEqual(_MyTemplate,%Demon_Brown_RT)
+	THEN
+		IterateCharacters("CMB_LeandraSummon_IterateForDemon_Red",Lowest,Distance)
+		IF "!c1&c2"
+			IsEqual(%VoidAuraTarget_Earth,null)
+			CharacterCanSee(__Me,%VoidAuraTarget_Earth)
+		THEN
+			CharacterMoveInRange(%VoidAuraTarget_Earth,_MinRange,_MaxRange,1)
+			CharacterUseSkill("Target_EnemyVoidAura_Leandra",%VoidAuraTarget_Earth)
+		ELSE
+			SetPriority("LeandraSummon_Phase1_MakeFriendInvulnerable",0)
+		ENDIF
+	ELIF "c1"
+		IsEqual(_MyTemplate,%Demon_Red_RT)
+	THEN
+		IterateCharacters("CMB_LeandraSummon_IterateForDemon_Yellow",Lowest,Distance)
+		IF "!c1&c2"
+			IsEqual(%VoidAuraTarget_Air,null)
+			CharacterCanSee(__Me,%VoidAuraTarget_Air)
+		THEN
+			CharacterMoveInRange(%VoidAuraTarget_Air,_MinRange,_MaxRange,1)
+			CharacterUseSkill("Target_EnemyVoidAura_Leandra",%VoidAuraTarget_Air)
+		ELSE
+			SetPriority("LeandraSummon_Phase1_MakeFriendInvulnerable",0)			
+		ENDIF
+	ELIF "c1&!c2&c3&!c4"
+		IsEqual(_MyTemplate,%Demon_Yellow_RT)
+		CharacterIsDead(%Leandra)
+		CharacterCanSee(__Me,%Leandra)
+		CharacterHasStatus(%Leandra,"VOID_AURA")
+	THEN
+		CharacterMoveInRange(%Leandra,_MinRange,_MaxRange,1)
+		CharacterUseSkill("Target_EnemyVoidAura_Leandra",%Leandra)
+	ELSE
+		SetPriority("LeandraSummon_Phase1_MakeFriendInvulnerable",0)		
+	ENDIF
+	SetPriority("LeandraSummon_Phase1_MakeFriendInvulnerable",0)
+INTERRUPT
+	Reset()
+	
+REACTION LeandraSummon_Phase1_UseVoidShard,600
+USAGE COMBAT
+VARS
+	CHARACTER:_Player
+	CHARACTERTEMPLATE:_MyTemplate
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "c1&c2&c3&c4&c5&c6&c7&c8"
+	IsEqual(%Bool_Phase1Complete,0)													//c1
+	CharacterGetTemplate(__Me,_MyTemplate)											//c2
+	IsEqual(_MyTemplate,%VoidKnight_RT)												//c3
+	CharacterCanCast(__Me,"Projectile_EnemyVoidShard")								//c4
+	CharacterGet(_Player,__Me,50,Random,Distance,Enemy)								//c5
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,"Projectile_EnemyVoidShard")	//c6
+	CharacterCanSee(__Me,_Player)													//c7
+	IsRandom(0.5)																	//c8
+ACTIONS
+	CharacterUseSkill("Projectile_EnemyVoidShard",_Player)
+	CharacterEndTurn()
+
+//-------
+EVENTS
+EVENT OnInit_GiveSpells
+VARS
+	CHARACTERTEMPLATE:_MyTemplate
+ON
+	OnInit()
+ACTIONS
+	//CharacterApplyStatus(__Me,"SUMMONING",-1)
+	IF "c1"
+		CharacterGetTemplate(__Me,_MyTemplate)
+	THEN
+		IF "c1|c2|c3"
+			IsEqual(_MyTemplate,%Demon_Brown_RT)
+			IsEqual(_MyTemplate,%Demon_Yellow_RT)
+			IsEqual(_MyTemplate,%Demon_Red_RT)
+		THEN
+			CharacterAddSkill("Target_EnemyVoidAura_Leandra")
+		ELIF "c1"
+			IsEqual(_MyTemplate,%ArcaneVortex_RT)
+		THEN
+			CharacterApplyStatus(__Me,"ELEMENTAL_IMMUNITY_AURA",1)
+		ELIF "c1"
+			IsEqual(_MyTemplate,%VoidKnight_RT)
+		THEN
+			//SetMaterial(__Me,b5641870-6213-481f-9b3b-8004faba7bcc,-1,1,1,1)
+			CharacterAddSkill("Projectile_EnemyVoidShard")
+		ENDIF
+	ENDIF
+
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("LeandraSummon_Phase1_MakeFriendInvulnerable",600)
+	
+EVENT OnIterateCharacter_ScanForRedDemon
+VARS
+	CHARACTER:_Character
+	CHARACTERTEMPLATE:_CharacterTemplate
+ON
+	OnIterateCharacter(_Character,"CMB_LeandraSummon_IterateForDemon_Red")
+ACTIONS
+	IF "c1&c2&!c3&!c4"
+		CharacterGetTemplate(_Character,_CharacterTemplate)
+		IsEqual(_CharacterTemplate,%Demon_Red_RT)
+		CharacterIsDead(_Character)
+		CharacterHasStatus(_Character,"VOID_AURA")
+	THEN
+		Set(%VoidAuraTarget_Earth,_Character)
+	ENDIF
+
+EVENT OnIterateCharacter_ScanForYellowDemon
+VARS
+	CHARACTER:_Character
+	CHARACTERTEMPLATE:_CharacterTemplate
+ON
+	OnIterateCharacter(_Character,"CMB_LeandraSummon_IterateForDemon_Yellow")
+ACTIONS
+	IF "c1&c2&!c3&!c4"
+		CharacterGetTemplate(_Character,_CharacterTemplate)
+		IsEqual(_CharacterTemplate,%Demon_Yellow_RT)
+		CharacterIsDead(_Character)
+		CharacterHasStatus(_Character,"VOID_AURA")
+	THEN
+		Set(%VoidAuraTarget_Air,_Character)
+	ENDIF		
+
+EVENT OnCharacterEvent_DisablePhase1Functionalities
+ON
+	OnCharacterEvent(%Leandra,"CMB_HOM_Leandra_EnteredPhase2_Event")
+ACTIONS
+	Set(%Bool_Phase1Complete,1)
+
+/*EVENT OnDie_PlayCoolFX
+VARS
+	CHARACTERTEMPLATE:_MyTemplate
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	IF "c1&c2"
+		CharacterGetTemplate(__Me,_MyTemplate)
+		IsEqual(_MyTemplate,%VoidKnight_RT)
+	THEN
+		PlayEffectAt(__Me,"FX_Creatures_Undead_Skeleton_Grunt_Death_A")
+		PlayEffectAt(__Me,"FX_Creatures_Shadow_Death_A")
+		CharacterSetOffStage()		
+	ENDIF*/

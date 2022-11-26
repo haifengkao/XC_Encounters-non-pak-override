@@ -1,0 +1,69 @@
+INIT
+	CHARACTER:__Me		
+	EXTERN SKILL:%SkillInQuestion=null
+	EXTERN INT:%RangeAdjustment=5																						
+	FLOAT:%MaxRange
+	FLOAT:%CautiousMagesSightRange																				
+
+//------------------------
+BEHAVIOUR
+REACTION DefaultCharacter_KillNoSetEnemy, 5000
+USAGE COMBAT
+ACTIONS	
+	SetPriority("Combat_NoSetEnemy",0)
+	//DebugText(__Me,"Cautious Mage does not get near the closest target if he can't find any! It just waits!")
+	SetPriority("DefaultCharacter_KillNoSetEnemy",0)	
+	
+REACTION KeepYourDistance, 0
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+CHECK "c1&!c2"
+	CharacterGet(_Enemy,__Me,%CautiousMagesSightRange,Lowest,Distance,Enemy)
+	CharacterHasStatus(__Me,"CHARMED")
+ACTIONS
+	DebugText(__Me,"CautMage: keeping my distances!")
+	CharacterFleeFrom(Enemy,%MaxRange)
+	SetPriority(KeepYourDistance, 0)
+INTERRUPT
+ON
+	OnMovementFailed(_)
+ACTIONS
+	SetPriority(KeepYourDistance, 0)
+
+//------------------------
+EVENTS
+EVENT InitializeCautiousMage
+ON
+	OnInit()
+ACTIONS
+	IF "c1&c2"	
+		CharacterGetSkillRange(_,%MaxRange,__Me,%SkillInQuestion)
+		CharacterGetSightRange(%CautiousMagesSightRange,__Me)
+	THEN
+		SetPriority("Combat_AttackSetEnemy",0) //the Cautious Mage does not use their weapon, they prefer to skip their turn
+		SetPriority("Combat_MoveToSetEnemy",0)
+		Subtract(%MaxRange,%RangeAdjustment)
+	ENDIF
+
+EVENT CheckDistance
+ON
+	OnTurn()
+VARS
+	FLOAT:_DistanceToEnemy
+	FLOAT:_MySightRange		
+	CHARACTER:_ClosestEnemy		
+ACTIONS
+	IF "!c1"
+		CharacterHasStatus(__Me,"CHARMED")
+	THEN
+		SetPriority("DefaultCharacter_KillNoSetEnemy",5000)
+		IF "c1&!c2&c3&c4"
+			CharacterGet(_ClosestEnemy,__Me,%CautiousMagesSightRange,Lowest,Distance,Enemy)
+			CharacterIsDead(_ClosestEnemy)
+			GetDistance(_DistanceToEnemy,__Me,_ClosestEnemy)
+			IsLessThen(_DistanceToEnemy,%MaxRange)
+		THEN
+			SetPriority("KeepYourDistance",600)
+		ENDIF
+	ENDIF

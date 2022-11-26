@@ -1,0 +1,34 @@
+INIT
+CHARACTER:__Me
+EXTERN FLOAT:%WanderRange1 = 10
+EXTERN FLOAT:%WanderRange2 = 5
+EXTERN FLOAT:%WanderDuration1 = 5
+EXTERN FLOAT:%WanderDuration2 = 3
+EXTERN FLOAT:%Sleep1 = 3
+EXTERN FLOAT:%Sleep2 = 2
+EXTERN INT:%Run = 0
+EXTERN TRIGGER:%Anchor = null
+
+BEHAVIOUR
+
+REACTION Wandering,1500
+USAGE PEACE
+ACTIONS
+	IF "c1"
+	IsRandom(0.5)
+	THEN
+	CharacterWander(%WanderRange1,%WanderDuration1,%Run,%Anchor)
+	Sleep(%Sleep1)
+	ELSE
+	CharacterWander(%WanderRange2,%WanderDuration2,%Run,%Anchor)
+	Sleep(%Sleep2)	
+	ENDIF
+	
+REACTION FleeFromPlayer,1600
+USAGE PEACE
+VARS
+	CHARACTER:_char
+CHECK "c1"
+	CharacterGet(_char,__Me,7,Random,null,Player)
+ACTIONS
+	CharacterFleeFrom(Player,12)

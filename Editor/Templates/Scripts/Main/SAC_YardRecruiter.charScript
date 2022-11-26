@@ -1,0 +1,86 @@
+#INCLUDE State_Manager
+
+INIT
+
+CHARACTER:__Me
+
+USING State_Manager
+
+	EXTERN TRIGGER:%Rest = null
+	EXTERN TRIGGER:%Practice = null
+	EXTERN ITEM:%Dummy = null
+	INT:%Train = 0
+
+BEHAVIOUR
+
+REACTION State_Rest, 0
+USAGE PEACE
+ACTIONS
+	IF "c1"
+		IsEqual(%Train, 0)
+	THEN
+		Set(%currentAction, "Action_Rest")
+	ELSE
+		Set(%currentAction, "Action_Practice")	
+	ENDIF
+	SetPriority(%currentAction, 1100)
+
+REACTION Action_Rest, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Rest, 0, 1)
+	Sleep(5)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)
+
+REACTION LookAtCap, 0
+USAGE PEACE
+ACTIONS
+	CharacterLookFrom(%Rest)
+	SetPriority("LookAtCap",0)
+	
+REACTION Action_Practice, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Anim
+ACTIONS
+	IF "c1"
+		IsEqual(%Dummy, null)
+	THEN	
+		CharacterLookFrom(%Practice)
+		GetRandom(_Anim, "attack1", "attack2", "attack3", "block")
+		CharacterPlayAnimation(_Anim)
+	ELSE
+		CharacterAttack(%Dummy)
+	ENDIF
+	Sleep(1)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	SetPriority(%currentAction, 0)
+	
+
+EVENTS
+
+EVENT StartPractice
+ON
+	OnGlobalEventSet("SAC_YardInstructor_StartTraining")
+ACTIONS
+	DialogStart("SAC_AD_YardRecruit_Yes", __Me)
+	SetPriority(%currentAction, 0)
+	Set(%Train, 1)
+
+	
+EVENT StopPractice
+ON
+	OnGlobalEventCleared("SAC_YardInstructor_StartTraining")
+ACTIONS
+	Set(%Train, 0)
+	SetPriority(%currentAction, 0)
+	
+EVENT LookAtCap
+ON
+	OnGlobalEventSet("SAC_LookAtYardInstructor")
+ACTIONS
+	SetPriority("LookAtCap", 1200)
+	

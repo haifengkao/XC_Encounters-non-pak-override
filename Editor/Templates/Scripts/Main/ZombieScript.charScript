@@ -1,0 +1,69 @@
+/*
+
+		/!\ This script isn't used anymore /!\ 
+		
+		
+INIT
+	CHARACTER:__Me
+	FLOAT:%ZombieSightRange
+
+//-------	
+BEHAVIOUR	
+REACTION Zombie_AttacksEnemyWhenRealClose,100
+USAGE COMBAT
+VARS
+	CHARACTER:_Player
+	FLOAT:_ZombieAP
+	FLOAT:_DistanceBetwMeAndPlayer	
+CHECK "c1&c2&!c3&c4&!c5&c6"
+	CharacterGet(_Player,__Me,2,Lowest,Distance,Enemy)		//c1
+	GetDistance(_DistanceBetwMeAndPlayer,__Me,_Player)		//c2
+	IsGreaterThen(_DistanceBetwMeAndPlayer,2)				//!c3
+	CharacterGetStat(_ZombieAP,__Me,ActionPoints)			//c4
+	IsLessThen(_ZombieAP,3)									//!c5
+	CharacterCanSee(__Me,_Player)							//c6
+ACTIONS
+	//SetPriority("Combat_AttackSetEnemy",15)
+	//SetPriority("Combat_MoveToSetEnemy",15)
+	CharacterAttack(_Player)
+INTERRUPT
+	Reset()
+	
+REACTION Zombie_MovesToEnemy,50
+USAGE COMBAT
+VARS
+	CHARACTER:_Player
+	FLOAT:_DistanceBetwMeAndPlayer
+CHECK "c1&c2&c3"
+	CharacterGet(_Player,__Me,%ZombieSightRange,Lowest,Distance,Enemy)
+	GetDistance(_DistanceBetwMeAndPlayer,__Me,_Player)
+	IsGreaterThen(_DistanceBetwMeAndPlayer,4)
+ACTIONS
+	CharacterMoveTo(_Player,0,0,0,0.5,1)
+
+REACTION Zombie_Fallback,10
+USAGE COMBAT
+ACTIONS
+	CharacterEndTurn()
+	
+//-------	
+EVENTS
+EVENT OnInit_KillDefaultAttack
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%ZombieSightRange,__Me,Sight)
+	THEN
+		SetPriority("Combat_AttackSetEnemy",0)
+		SetPriority("Combat_MoveToSetEnemy",0)
+	ENDIF
+
+EVENT OnTurn_KillDefaultAttackAgain
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("Combat_AttackSetEnemy",0)
+	SetPriority("Combat_MoveToSetEnemy",0)
+	
+*/

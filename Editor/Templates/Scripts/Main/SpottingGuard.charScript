@@ -1,0 +1,59 @@
+INIT
+CHARACTER:__Me
+EXTERN STRING:%PlayerOneSpottedFlag = ""
+EXTERN STRING:%PlayerTwoSpottedFlag = ""
+EXTERN STRING:%PlayersOutOfSightFlag = ""
+INT:%SpottedPlayer1 = 0
+INT:%SpottedPlayer2 = 0
+FIXEDSTRING:%PlayerOneSpottedFlagFIXED = ""
+FIXEDSTRING:%PlayerTwoSpottedFlagFIXED = ""
+FIXEDSTRING:%PlayersOutOfSightFlagFIXED = ""
+
+BEHAVIOUR
+
+REACTION SpottedPlayerOne, 1050
+USAGE PEACE
+CHECK c1&!c2&c3
+	CharacterCanSee(__Me, CHARACTER:Player1_dac1443f-a866-4ab3-b240-e705c0b20ec5)
+	IsEqual(%PlayerOneSpottedFlag, "")
+	IsEqual(%SpottedPlayer1, 0)
+ACTIONS
+	GlobalSetEvent(%PlayerOneSpottedFlagFIXED)
+	SetPriority(PlayersOutOfSight, 1050)
+	GlobalClearEvent(%PlayersOutOfSightFlagFIXED)
+	
+REACTION SpottedPlayerTwo, 1050
+USAGE PEACE
+CHECK c1&!c2&c3
+	CharacterCanSee(__Me, CHARACTER:Player2_a0af7520-57ac-4f1c-b9d7-197bceebeade)
+	IsEqual(%PlayerTwoSpottedFlag, "")
+	IsEqual(%SpottedPlayer2, 0)
+ACTIONS
+	GlobalSetEvent(%PlayerTwoSpottedFlagFIXED)
+	SetPriority(PlayersOutOfSight, 1050)
+	GlobalClearEvent(%PlayersOutOfSightFlagFIXED)
+	
+REACTION PlayersOutOfSight, 1050
+USAGE PEACE
+CHECK !c1&!c2&!c3
+	CharacterCanSee(__Me, CHARACTER:Player1_dac1443f-a866-4ab3-b240-e705c0b20ec5)
+	CharacterCanSee(__Me, CHARACTER:Player2_a0af7520-57ac-4f1c-b9d7-197bceebeade)
+	IsEqual(%PlayersOutOfSightFlag, "")
+ACTIONS
+	CharacterEvent(__Me, %PlayersOutOfSightFlag)
+	
+EVENTS
+
+EVENT PlayersOutOfSight
+ON
+	OnCharacterEvent(__Me, %PlayersOutOfSightFlag)
+ACTIONS
+	SetPriority(PlayersOutOfSight, 0)
+	
+EVENT CastOnInit
+ON
+	OnInit()
+ACTIONS
+	Cast(%PlayerOneSpottedFlagFIXED, %PlayerOneSpottedFlag)
+	Cast(%PlayerTwoSpottedFlagFIXED, %PlayerTwoSpottedFlag)
+	Cast(%PlayersOutOfSightFlagFIXED, %PlayersOutOfSightFlag)

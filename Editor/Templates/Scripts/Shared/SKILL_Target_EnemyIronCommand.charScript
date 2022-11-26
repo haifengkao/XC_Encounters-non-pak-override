@@ -1,0 +1,99 @@
+#TEMPLATE "_SKILL_Base" : Target_EnemyIronCommand
+
+INIT
+CHARACTER:__Me
+FLOAT:%SkillTargetScore_Target_EnemyIronCommand=-1000000
+// [GLOBAL_VARS]
+// [~GLOBAL_VARS]
+
+EVENTS
+
+// [EVENTS]
+// [~EVENTS]
+
+// Calculate the priority of the skill
+EVENT CalculateScore_Target_EnemyIronCommand
+VARS
+	// [CALC_VARS]
+	// [~CALC_VARS]
+ON
+	OnFunction("CalculateScore_Target_EnemyIronCommand")
+ACTIONS
+	Set(%SkillTargetScore_Target_EnemyIronCommand, -1000000)
+
+	// [CALC_ACTIONS_PRE]
+	// [~CALC_ACTIONS_PRE]
+	// [CALC_ACTIONS]
+	IterateCharactersInCombat(__Me, "CalculateTarget_Target_EnemyIronCommand", Random, Vitality)
+	IF "!c1"
+		IsEqual(%SkillTargetChar_Target_EnemyIronCommand, null)
+	THEN
+		Add(%ActionScore_Target_EnemyIronCommand, %SkillTargetScore_Target_EnemyIronCommand)
+	ENDIF
+	// [~CALC_ACTIONS]
+
+	
+
+	
+// Calculate the character we should attack
+EVENT CalculateTarget_Target_EnemyIronCommand
+VARS	
+	CHARACTER:_Char
+	// [CALC_TARGET_VARS]
+	FLOAT:_Score
+	// [~CALC_TARGET_VARS]
+ON
+	OnIterateCharacter(_Char, "CalculateTarget_Target_EnemyIronCommand")	
+ACTIONS
+	// [CALC_CHAR_TARGET_ACTIONS_PRE]
+	Set(_Score, 0.0)
+	// [~CALC_CHAR_TARGET_ACTIONS_PRE]
+	// [CALC_CHAR_TARGET_ACTIONS]
+	IF "(!c1&!c2&!c3)&(!(c4))&(c5)"
+	    CharacterIsDead(_Char) // c1
+	    CharacterHasStatus(_Char, INVISIBLE) // c2
+	    CharacterHasStatus(_Char, SNEAKING) // c3
+	    CharacterHasStatus(_Char, CHARMED) // c4
+	    CharacterIsEnemy(__Me, _Char) // c5
+	THEN
+	    IF "(c1)"
+	        CharacterHasStatus(_Char, KNOCKED_DOWN) // c1
+	    THEN
+	        Add(_Score, 5.0)
+	    ENDIF
+	    IF "(c1)"
+	        CharacterHasStatus(_Char, PETRIFIED) // c1
+	    THEN
+	        Add(_Score, 5.0)
+	    ENDIF
+	    IF "(c1)"
+	        CharacterHasStatus(_Char, STUNNED) // c1
+	    THEN
+	        Add(_Score, 5.0)
+	    ENDIF
+	    // Hostile count score calculation
+	    Add(_Score, 10.0) // HostileWeight
+	    
+	    // Can see score calculation
+	    IF "!c1"
+	    	CharacterCanSee(__Me, _Char)
+	    THEN
+	    	Add(_Score, -10.0)
+	    ENDIF
+	    
+	    IF "c1"
+	    	IsGreaterThen(_Score, %SkillTargetScore_Target_EnemyIronCommand)
+	    THEN
+	    	Set(%SkillTargetChar_Target_EnemyIronCommand, _Char)
+	    	Set(%SkillTargetScore_Target_EnemyIronCommand, _Score)
+	    ENDIF	
+	ENDIF
+	// [~CALC_CHAR_TARGET_ACTIONS]
+	
+	
+	
+	
+	
+	
+	
+	

@@ -1,0 +1,36 @@
+INIT
+	CHARACTER:__Me
+	TRIGGER:%Point1 = CYS_PointBrian1_fde4764f-92d6-4c13-a740-ade5d17666b9
+	TRIGGER:%Point2 = CYS_PointBrian2_0a105ab4-bfbd-443c-9621-57b13c3e27be
+	TRIGGER:%Point3 = CYS_PointBrian3_7d5d96b7-27bd-43e3-98b4-d22c14beee23
+	TRIGGER:%Point4 = CYS_PointBrian4_3216bdc9-386e-4221-af94-946d88be7d2f
+	TRIGGER:%PrevPoint = null
+	TRIGGER:%NextPoint = null
+
+//-------
+BEHAVIOUR
+REACTION Main, 500
+USAGE PEACE
+VARS
+	INT:_i
+	FLOAT:_Time
+ACTIONS
+	Set(_i,0)
+	WHILE "c1"
+		IsLessThen(_i,20)
+	DO
+		GetRandom(%NextPoint, %Point1, %Point2, %Point3, %Point4)
+		IF "!c1"
+			IsEqual(%PrevPoint, %NextPoint)
+		THEN
+			Set(_i,20)
+		ELSE
+			Add(_i,1)
+		ENDIF
+	ENDWHILE
+	CharacterMoveTo(%NextPoint)
+	CharacterLookFrom(%NextPoint)
+	CharacterPlayAnimation("Fidget_Low_01")
+	GetRandomBetween(_Time,5,15)
+	Sleep(_Time)
+	Set(%PrevPoint,%NextPoint)

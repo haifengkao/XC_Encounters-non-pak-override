@@ -1,0 +1,158 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_PlayerComments("CYS_ShovelCecilia","CYS_ShovelCecilia_1",1,1);
+DB_PlayerComments("CYS_ShovelCecilia","CYS_ShovelCecilia_1",2,1);
+DB_PlayerComments("LUC_CommentDeadLegion","LUC_CommentDeadLegion_1_1",1,1);
+DB_PlayerComments("LUC_CommentDeadLegion","LUC_CommentDeadLegion_2_1",2,1);
+DB_PlayerComments("LUC_CommentDeadLegion","LUC_CommentDeadLegion_2_2",2,2);
+DB_PlayerComments("LUC_CommentMineEntrance","LUC_CommentMineEntrance_1_1",1,1);
+DB_PlayerComments("LUC_CommentMineEntrance","LUC_CommentMineEntrance_2_1",2,1);
+DB_PlayerComments("LUC_CommentMineEntrance","LUC_CommentMineEntrance_2_2",2,2);
+DB_PlayerComments("LUC_CommentMinersNotResponding","LUC_CommentMinersNotResponding_1_1",1,1);
+DB_PlayerComments("LUC_CommentMinersNotResponding","LUC_CommentMinersNotResponding_2_1",2,1);
+DB_PlayerComments("LUC_CommentMinersNotResponding","LUC_CommentMinersNotResponding_2_2",2,2);
+DB_PlayerComments("LUC_CommentOrcAmbush","LUC_CommentOrcAmbush_1",1,1);
+DB_PlayerComments("LUC_CommentOrcAmbush","LUC_CommentOrcAmbush_1",2,1);
+DB_PlayerComments("LUC_CommentGoblinVillageAssitant","LUC_CommentGoblinVillageAssitant_1",1,1);
+DB_PlayerComments("LUC_CommentGoblinVillageAssitant","LUC_CommentGoblinVillageAssitant_1",2,1);
+DB_PlayerComments("LUC_NearGoblinTotems","LUC_NearGoblinTotems_1_1",1,1);
+DB_PlayerComments("LUC_NearGoblinTotems","LUC_NearGoblinTotems_2_1",2,1);
+DB_PlayerComments("LUC_NearGoblinTotems","LUC_NearGoblinTotems_2_2",2,2);
+DB_PlayerComments("LUC_CommentDeadTroll", "LUC_CommentDeadTroll_1_1",1,1);
+DB_PlayerComments("LUC_CommentDeadTroll", "LUC_CommentDeadTroll_2_1",2,1);
+DB_PlayerComments("LUC_CommentDeadTroll", "LUC_CommentDeadTroll_2_2",2,2);
+DB_PlayerComments("LUC_Comment_DiscoveredLeandraDiary", "LUC_Comment_DiscoveredLeandraDiary_1_1",1,1);
+DB_PlayerComments("LUC_Comment_DiscoveredLeandraDiary", "LUC_Comment_DiscoveredLeandraDiary_2_1",2,1);
+DB_PlayerComments("LUC_Comment_DiscoveredLeandraDiary", "LUC_Comment_DiscoveredLeandraDiary_2_2",2,2);
+DB_PlayerComments("CYS_CommentArhuScared", "CYS_CommentArhuScared_1_1",1,1);
+DB_PlayerComments("CYS_CommentArhuScared", "CYS_CommentArhuScared_2_1",2,1);
+DB_PlayerComments("CYS_CommentArhuScared", "CYS_CommentArhuScared_2_2",2,2);
+DB_PlayerComments("DAF_CommentTortureRoom","DAF_CommentTortureRoom_1_1",1,1);
+DB_PlayerComments("DAF_CommentTortureRoom","DAF_CommentTortureRoom_2_1",2,1);
+DB_PlayerComments("DAF_CommentTortureRoom","DAF_CommentTortureRoom_2_2",2,2);
+DB_PlayerComments("DAF_CommentDFTree", "DAF_CommentDFTree_1_1",1,1);
+DB_PlayerComments("DAF_CommentDFTree", "DAF_CommentDFTree_2_1",2,1);
+DB_PlayerComments("DAF_CommentDFTree", "DAF_CommentDFTree_2_2",2,2);
+DB_PlayerComments("DAF_Comment_RoadWashedAway", "DAF_Comment_RoadWashedAway_1_1",1,1);
+DB_PlayerComments("DAF_Comment_RoadWashedAway", "DAF_Comment_RoadWashedAway_2_1",2,1);
+DB_PlayerComments("DAF_Comment_RoadWashedAway", "DAF_Comment_RoadWashedAway_2_2",2,2);
+DB_PlayerComments("DAF_Comment_DarkForest", "DAF_Comment_DarkForest_1_1",1,1);
+DB_PlayerComments("DAF_Comment_DarkForest", "DAF_Comment_DarkForest_2_1",2,1);
+DB_PlayerComments("DAF_Comment_DarkForest", "DAF_Comment_DarkForest_2_2",2,2);
+DB_PlayerComments("DAF_Comment_BodyTeleporter", "DAF_Comment_BodyTeleporter_1_1",1,1);
+DB_PlayerComments("DAF_Comment_BodyTeleporter", "DAF_Comment_BodyTeleporter_2_1",2,1);
+DB_PlayerComments("DAF_Comment_BodyTeleporter", "DAF_Comment_BodyTeleporter_2_2",2,2);
+DB_PlayerComments("DAF_CommentDontUnderstandTitan", "DAF_CommentDontUnderstandTitan_1_1",1,1);
+DB_PlayerComments("DAF_CommentDontUnderstandTitan", "DAF_CommentDontUnderstandTitan_2_1",2,1);
+DB_PlayerComments("DAF_CommentDontUnderstandTitan", "DAF_CommentDontUnderstandTitan_2_2",2,2);
+DB_PlayerComments("DAF_Comment_TavernKill1", "DAF_Comment_TavernKill1_1_1",1,1);
+DB_PlayerComments("DAF_Comment_TavernKill1", "DAF_Comment_TavernKill1_2_1",2,1);
+DB_PlayerComments("DAF_Comment_TavernKill1", "DAF_Comment_TavernKill1_2_2",2,2);
+DB_PlayerComments("DAF_Comment_TavernKill2", "DAF_Comment_TavernKill2_1_1",1,1);
+DB_PlayerComments("DAF_Comment_TavernKill2", "DAF_Comment_TavernKill2_2_1",2,1);
+DB_PlayerComments("DAF_Comment_TavernKill2", "DAF_Comment_TavernKill2_2_2",2,2);
+DB_PlayerComments("DAF_Comment_Trunk3", "DAF_Comment_Trunk3_1_1",1,1);
+DB_PlayerComments("DAF_Comment_Trunk3", "DAF_Comment_Trunk3_2_1",2,1);
+DB_PlayerComments("DAF_Comment_Trunk3", "DAF_Comment_Trunk3_2_2",2,2);
+DB_PlayerComments("DAF_Comment_JahrlMentionsZandalor","DAF_Comment_JahrlMentionsZandalor_1_1",1,1);
+DB_PlayerComments("DAF_Comment_JahrlMentionsZandalor","DAF_Comment_JahrlMentionsZandalor_2_1",2,1);
+DB_PlayerComments("DAF_Comment_JahrlMentionsZandalor","DAF_Comment_JahrlMentionsZandalor_2_2",2,2);
+DB_PlayerComments("DFD_Druid_Comment_Lab","DFD_Druid_Comment_Lab_1_1",1,1);
+DB_PlayerComments("DFD_Druid_Comment_Lab","DFD_Druid_Comment_Lab_2_1",2,1);
+DB_PlayerComments("DFD_Druid_Comment_Lab","DFD_Druid_Comment_Lab_2_2",2,2);
+DB_PlayerComments("DFD_Druid_Comment_MustBurn","DFD_Druid_Comment_MustBurn_1_1",1,1);
+DB_PlayerComments("DFD_Druid_Comment_MustBurn","DFD_Druid_Comment_MustBurn_2_1",2,1);
+DB_PlayerComments("DFD_Druid_Comment_MustBurn","DFD_Druid_Comment_MustBurn_2_2",2,2);
+DB_PlayerComments("DFD_Druid_Comment_BodyBurnt","DFD_Druid_Comment_BodyBurnt_1_1",1,1);
+DB_PlayerComments("DFD_Druid_Comment_BodyBurnt","DFD_Druid_Comment_BodyBurnt_2_1",2,1);
+DB_PlayerComments("DFD_Druid_Comment_BodyBurnt","DFD_Druid_Comment_BodyBurnt_2_2",2,2);
+
+DB_PlayerComments("HOM_Comment_ThirdGuardianGrave","HOM_Comment_ThirdGuardianGrave_1_1",1,1);
+DB_PlayerComments("HOM_Comment_ThirdGuardianGrave","HOM_Comment_ThirdGuardianGrave_2_1",2,1);
+DB_PlayerComments("HOM_Comment_ThirdGuardianGrave","HOM_Comment_ThirdGuardianGrave_2_2",2,2);
+DB_PlayerComments("HOM_Comment_ThirdGuardian","HOM_Comment_ThirdGuardian_1_1",1,1);
+DB_PlayerComments("HOM_Comment_ThirdGuardian","HOM_Comment_ThirdGuardian_2_1",2,1);
+DB_PlayerComments("HOM_Comment_ThirdGuardian","HOM_Comment_ThirdGuardian_2_2",2,2);
+
+DB_PlayerComments("END_Comment_RoomA","END_Comment_RoomA_1_1",1,1);
+DB_PlayerComments("END_Comment_RoomA","END_Comment_RoomA_2_1",2,1);
+DB_PlayerComments("END_Comment_RoomA","END_Comment_RoomA_2_2",2,2);
+
+DB_PlayerComments("END_Comment_BeforeNegaCrab","END_Comment_BeforeNegaCrab_1_1",1,1);
+DB_PlayerComments("END_Comment_BeforeNegaCrab","END_Comment_BeforeNegaCrab_2_1",2,1);
+DB_PlayerComments("END_Comment_BeforeNegaCrab","END_Comment_BeforeNegaCrab_2_2",2,2);
+
+DB_PlayerComments("END_Comment_EnteredNegaKingCrab","END_Comment_EnteredNegaKingCrab_1_1",1,1);
+DB_PlayerComments("END_Comment_EnteredNegaKingCrab","END_Comment_EnteredNegaKingCrab_2_1",2,1);
+DB_PlayerComments("END_Comment_EnteredNegaKingCrab","END_Comment_EnteredNegaKingCrab_2_2",2,2);
+
+DB_PlayerComments("END_Comment_NegaKingsCrabShrikeBartender","END_Comment_NegaKingsCrabShrikeBartender_1_1",1,1);
+DB_PlayerComments("END_Comment_NegaKingsCrabShrikeBartender","END_Comment_NegaKingsCrabShrikeBartender_2_1",2,1);
+DB_PlayerComments("END_Comment_NegaKingsCrabShrikeBartender","END_Comment_NegaKingsCrabShrikeBartender_2_2",2,2);
+
+DB_PlayerComments("END_Comment_NegaKingsCrabDrinks","END_Comment_NegaKingsCrabDrinks_1_1",1,1);
+DB_PlayerComments("END_Comment_NegaKingsCrabDrinks","END_Comment_NegaKingsCrabDrinks_2_1",2,1);
+DB_PlayerComments("END_Comment_NegaKingsCrabDrinks","END_Comment_NegaKingsCrabDrinks_2_2",2,2);
+
+DB_PlayerComments("END_Comment_NegaKingsCrabCellarLovelyPlace","END_Comment_NegaKingsCrabCellarLovelyPlace_1_1",1,1);
+DB_PlayerComments("END_Comment_NegaKingsCrabCellarLovelyPlace","END_Comment_NegaKingsCrabCellarLovelyPlace_2_1",2,1);
+DB_PlayerComments("END_Comment_NegaKingsCrabCellarLovelyPlace","END_Comment_NegaKingsCrabCellarLovelyPlace_2_2",2,2);
+
+DB_PlayerComments("END_Comment_FoundBookOfImmaculates","END_Comment_FoundBookOfImmaculates_1_1",1,1);
+DB_PlayerComments("END_Comment_FoundBookOfImmaculates","END_Comment_FoundBookOfImmaculates_2_1",2,1);
+DB_PlayerComments("END_Comment_FoundBookOfImmaculates","END_Comment_FoundBookOfImmaculates_2_2",2,2);
+
+DB_PlayerComments("END_Comment_NegaThelyronClinic","END_Comment_NegaThelyronClinic_1_1",1,1);
+DB_PlayerComments("END_Comment_NegaThelyronClinic","END_Comment_NegaThelyronClinic_2_1",2,1);
+DB_PlayerComments("END_Comment_NegaThelyronClinic","END_Comment_NegaThelyronClinic_2_2",2,2);
+
+DB_PlayerComments("END_Comment_NegaThief","END_Comment_NegaThief_1_1",1,1);
+DB_PlayerComments("END_Comment_NegaThief","END_Comment_NegaThief_2_1",2,1);
+DB_PlayerComments("END_Comment_NegaThief","END_Comment_NegaThief_2_2",2,2);
+
+DB_PlayerComments("END_Comment_NegaCellarBlood","END_CommentNegaCellarBlood_1_1",1,1);
+DB_PlayerComments("END_Comment_NegaCellarBlood","END_CommentNegaCellarBlood_2_1",2,1);
+DB_PlayerComments("END_Comment_NegaCellarBlood","END_CommentNegaCellarBlood_2_2",2,2);
+
+DB_PlayerComments("SAC_Comment_SourceAcademy","SAC_Comment_SourceAcademy_1_1",1,1);
+DB_PlayerComments("SAC_Comment_SourceAcademy","SAC_Comment_SourceAcademy_2_1",2,1);
+DB_PlayerComments("SAC_Comment_SourceAcademy","SAC_Comment_SourceAcademy_2_2",2,2);
+
+//REGION COMMENT TRIGGERS
+
+DB_PlayerComment_Trigger(TRIGGER_LUC_CommentDeadLegion,"LUC_CommentDeadLegion");
+DB_PlayerComment_Trigger(TRIGGER_LUC_CommentDeadTroll,"LUC_CommentDeadTroll");
+DB_PlayerComment_Trigger(TRIGGER_LUC_CommentMineEntrance,"LUC_CommentMineEntrance");
+DB_PlayerComment_Trigger(TRIGGER_DAF_CommentTortureRoom,"DAF_CommentTortureRoom");
+DB_PlayerComment_Trigger(TRIGGER_DAF_CommentDruidHouseExplosion,"DAF_CommentDruidHouseExplosion");
+DB_PlayerComment_Trigger(TRIGGER_DAF_Comment_RoadWashedAway,"DAF_Comment_RoadWashedAway");
+DB_PlayerComment_Trigger(TRIGGER_DAF_Comment_DarkForest,"DAF_Comment_DarkForest");
+DB_PlayerComment_Trigger(TRIGGER_DAF_Comment_TavernKill1,"DAF_Comment_TavernKill1");
+DB_PlayerComment_Trigger(TRIGGER_DAF_Comment_TavernKill2,"DAF_Comment_TavernKill2");
+DB_PlayerComment_Trigger(TRIGGER_DFD_Druid_Comment_Lab,"DFD_Druid_Comment_Lab");
+
+DB_PlayerComment_Trigger(TRIGGER_HOM_Comment_ThirdGuardianTomb,"HOM_Comment_ThirdGuardianGrave");
+
+//DB_PlayerComment_Trigger(TRIGGER_END_RoomA_PC,"END_Comment_RoomA");
+DB_PlayerComment_Trigger(TRIGGER_END_Comment_EnteredNegaKingsCrab,"END_Comment_EnteredNegaKingCrab");
+DB_PlayerComment_Trigger(TRIGGER_END_Comment_FoundBookOfImmaculates,"END_Comment_FoundBookOfImmaculates");
+DB_PlayerComment_Trigger(TRIGGER_END_Comment_NegaKingsCrab_CellarLovelyPlace,"END_Comment_NegaKingsCrabCellarLovelyPlace");
+DB_PlayerComment_Trigger(TRIGGER_END_Comment_NegaKingsCrab_ShrikeBartender,"END_Comment_NegaKingsCrabShrikeBartender");
+DB_PlayerComment_Trigger(TRIGGER_END_Comment_NegaThief,"END_Comment_NegaThief");
+DB_PlayerComment_Trigger(TRIGGER_END_Comment_NegaThelyronClinic,"END_Comment_NegaThelyronClinic");
+DB_PlayerComment_Trigger(TRIGGER_END_Comment_NegaKingCrab,"END_Comment_BeforeNegaCrab");
+
+DB_PlayerComment_Trigger(TRIGGER_SAC_Comment_SourceAcademy,"SAC_Comment_SourceAcademy");
+
+//END_REGION
+
+//REGION COMMENT EVENTS
+DB_PlayerComment_Event("DAF_HeardGrutildaExecutions","DAF_CommentGrutildaExecutions");
+//END_REGION
+KBSECTION
+
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

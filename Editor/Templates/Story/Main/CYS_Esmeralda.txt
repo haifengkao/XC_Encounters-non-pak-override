@@ -1,0 +1,249 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_CYS_JakeClue(ITEM_CYS_JakeClue1,"CYS_HasJakeClue1","CYS_GaveJakeClue1","CYS_CommentJakeClue1", "Update1");
+DB_CYS_JakeClue(ITEM_CYS_JakeClue2,"CYS_HasJakeClue2","CYS_GaveJakeClue2","CYS_CommentJakeClue2", "Update7");
+DB_CYS_JakeClue(ITEM_CYS_JakeClue3,"CYS_HasJakeClue3","CYS_GaveJakeClue3","CYS_CommentJakeClue3", "Update9");
+ItemToContainer(ITEM_CYS_JakeClue3,ITEM_CYS_MurderScene_Chest,-1);
+DB_BigTrader(CHARACTER_CYS_Esmeralda);
+
+DB_PlayerComments("CYS_CommentJakeClue1","CYS_CommentJakeClue1_1_1",1,1);
+DB_PlayerComments("CYS_CommentJakeClue1","CYS_CommentJakeClue1_2_1",2,1);
+DB_PlayerComments("CYS_CommentJakeClue1","CYS_CommentJakeClue1_2_2",2,2);
+DB_PlayerComments("CYS_CommentJakeClue2","CYS_CommentJakeClue2_1_1",1,1);
+DB_PlayerComments("CYS_CommentJakeClue2","CYS_CommentJakeClue2_2_1",2,1);
+DB_PlayerComments("CYS_CommentJakeClue2","CYS_CommentJakeClue2_2_2",2,2);
+DB_PlayerComments("CYS_CommentJakeClue3","CYS_CommentJakeClue3_1_1",1,1);
+DB_PlayerComments("CYS_CommentJakeClue3","CYS_CommentJakeClue3_2_1",2,1);
+DB_PlayerComments("CYS_CommentJakeClue3","CYS_CommentJakeClue3_2_2",2,2);
+
+DB_PlayerComments("CYS_CommentEsmeralda","CYS_CommentEsmeralda_1_1",1,1);
+DB_PlayerComments("CYS_CommentEsmeralda","CYS_CommentEsmeralda_2_1",2,1);
+DB_PlayerComments("CYS_CommentEsmeralda","CYS_CommentEsmeralda_2_2",2,2);
+
+DB_Dialogs(CHARACTER_CYS_Septimus,"CYS_Septimus");
+DB_Dialogs(CHARACTER_CYS_Esmeralda,"CYS_Esmeralda");
+
+DB_CYS_SeptimusLeavingEvent("CYS_EsmeraldaInJail");
+DB_CYS_SeptimusLeavingEvent("CYS_ToldJakeTruth");
+KBSECTION
+//REGION FINDING EVIDENCE
+IF
+GlobalEventSet("CYS_DoEsmeraldaEvidenceStart")
+THEN
+DB_DoEvelynComment(1);
+
+IF
+DialogEnded("CYS_Esmeralda",_Inst)
+AND
+DB_DoEvelynComment(1)
+AND
+DB_DialogPlayers(_Inst,_Player,1)
+AND
+NOT DB_GlobalEvent("CYS_EvelynCaught")
+THEN
+Launch_PlayerComment(_Player, "CYS_CommentEsmeralda");
+QuestAdd("CYS_Esmeralda");
+QuestUpdate("CYS_Esmeralda","Update12");
+
+IF
+DialogEnded("CYS_Esmeralda",_)
+THEN
+NOT DB_DoEvelynComment(1);
+
+IF
+CharacterItemEvent(_Player, ITEM_CYS_EsmeraldaCellarHiddenWallSwitch, "activated")
+THEN
+ItemMoveToTrigger(ITEM_CYS_EsmeraldaCase, TRIGGER_CYS_EsmeraldaSecretCase, 0.75,0.0,0);
+ItemMoveToTrigger(ITEM_CYS_EsmeraldaBooks, TRIGGER_CYS_EsmeraldaSecretBooks, 0.75,0.0,0);
+CharacterDisplayText(_Player, "GLO_ObviousActivated");
+ItemSetCanInteract(ITEM_CYS_EsmeraldaCellarHiddenWallSwitch, 0);
+
+IF
+ItemAddedToCharacter(_Item,_Player)
+AND
+DB_CYS_JakeClue(_Item,_Event,_,_Comment, _Update)
+AND
+_Player.DB_IsPlayer()
+THEN
+QuestAdd("CYS_Esmeralda");
+QuestUpdate("CYS_Esmeralda",_Update);
+GlobalSetEvent(_Event);
+Launch_PlayerComment(_Player,_Comment);
+
+IF
+GlobalEventSet(_gaveClue)
+AND
+DB_CYS_JakeClue(_Item,_Event,_gaveClue,_Message, _Update)
+THEN
+NOT DB_CYS_JakeClue(_Item,_Event,_gaveClue,_Message, _Update);
+
+IF
+CharacterEvent(CHARACTER_CYS_Esmeralda,"CYS_ArrestNPC_NPCToJail")
+THEN
+HostileDialog(CHARACTER_CYS_Esmeralda, "CYS_Esmeralda");
+//END_REGION
+
+//REGION SEPTIMUS LEAVING
+IF
+GlobalEventSet(_Event)
+AND
+DB_CYS_SeptimusLeavingEvent(_Event)
+THEN
+NOT DB_CYS_SeptimusLeavingEvent("CYS_EsmeraldaInJail");
+NOT DB_CYS_SeptimusLeavingEvent("CYS_ToldJakeTruth");
+DialogRequestStopForCharacter(CHARACTER_CYS_Septimus);
+CharacterSetHasDialog(CHARACTER_CYS_Septimus,0);
+ProcRemoveDialogEntryForSpeaker(CHARACTER_CYS_Septimus,"CYS_Septimus");
+CharacterDisappearOutOfSight(CHARACTER_CYS_Septimus,270,0,"SeptimusGone",1);
+
+IF
+GlobalEventSet("CYS_EsmeraldaInJail")
+THEN
+CHARACTER_CYS_Esmeralda_Bodyguard.WillLeave();
+
+IF
+CharacterEvent(CHARACTER_CYS_Septimus,"SeptimusGone")
+THEN
+CHARACTER_CYS_Septimus.SeptimusGone();
+
+IF
+CHARACTER_CYS_Esmeralda_Bodyguard.WillLeave()
+AND
+CHARACTER_CYS_Septimus.SeptimusGone()
+AND
+NOT DB_Combat(CHARACTER_CYS_Esmeralda_Bodyguard,_)
+AND
+NOT CHARACTER_CYS_Esmeralda_Bodyguard.DB_IsInDialog()
+THEN
+DialogRequestStopForCharacter(CHARACTER_CYS_Esmeralda_Bodyguard);
+CharacterSetHasDialog(CHARACTER_CYS_Esmeralda_Bodyguard,0);
+CharacterDisappearOutOfSight(CHARACTER_CYS_Esmeralda_Bodyguard,270,0,"BodyGuardGone",1);
+
+IF
+CharacterEvent(CHARACTER_CYS_Esmeralda_Bodyguard,"BodyGuardGone")
+THEN
+DB_CYSCloseEsmeraldaDoor(1);
+ProcCYSCloseEsmeraldaDoor();
+
+IF
+CharacterLeftTrigger(_,TRIGGER_CYS_REGION_Esmeralda_Shop)
+THEN
+ProcCYSCloseEsmeraldaDoor();
+
+PROC
+ProcCYSCloseEsmeraldaDoor()
+AND
+NOT DB_InRegion(_,TRIGGER_CYS_REGION_Esmeralda_Shop)
+AND
+DB_CYSCloseEsmeraldaDoor(1)
+THEN
+NOT DB_CYSCloseEsmeraldaDoor(1);
+ItemClose(ITEM_CYS_Esmeralda_Door);
+ItemLock(ITEM_CYS_Esmeralda_Door,"StoryLock");
+
+//END_REGION
+
+//REGION FREE ESMERALDA
+IF
+GlobalEventSet("CYS_AureusFreeEsme")
+THEN
+CHARACTER_CYS_Aureus.willFreeEsme();
+
+IF
+DialogEnded("CYS_Aureus",_)
+AND
+CHARACTER_CYS_Aureus.willFreeEsme()
+THEN
+NOT CHARACTER_CYS_Aureus.willFreeEsme();
+CharacterSetHasDialog(CHARACTER_CYS_Aureus,0);
+ProcCharacterMoveToTrigger(CHARACTER_CYS_Aureus,TRIGGER_CYS_Point_BasementPrisonUp,1,"CYS_AureusFreesEsme");
+
+IF
+CharacterEvent(CHARACTER_CYS_Aureus,"CYS_AureusFreesEsme")
+THEN
+CharacterTeleportToTrigger(CHARACTER_CYS_Aureus,TRIGGER_CYS_Point_PrisonBasementDown,"");
+ProcCharacterMoveToTrigger(CHARACTER_CYS_Aureus, TRIGGER_CYS_Point_AureusJail,1, "AtEsme");
+
+IF
+CharacterEvent(CHARACTER_CYS_Aureus, "AtEsme")
+THEN
+CharacterSetHasDialog(CHARACTER_CYS_Esmeralda,0);
+DialogRequestStopForCharacter(CHARACTER_CYS_Esmeralda);
+ProcFaceEachother(CHARACTER_CYS_Aureus,CHARACTER_CYS_Esmeralda);
+DialogStartTwoSpeakerDialog("CYS_AD_AureusEsmeralda",CHARACTER_CYS_Aureus,CHARACTER_CYS_Esmeralda);
+
+IF
+AutomatedDialogEnded("CYS_AD_AureusEsmeralda",_)
+THEN
+ProcCharacterMoveToTrigger(CHARACTER_CYS_Aureus,TRIGGER_CYS_Point_PrisonBasementDown,0,"CYS_AureusIsBack");
+CharacterSetVarInteger(CHARACTER_CYS_Esmeralda, "inJail", 0);
+ItemOpen(ITEM_CYS_EsmeraldaJailDoor);
+ProcCharacterMoveToTrigger(CHARACTER_CYS_Esmeralda,TRIGGER_CYS_Point_PrisonBasementDown,1,"CYS_EsmeIsBack");
+
+IF
+CharacterEvent(CHARACTER_CYS_Aureus,"CYS_AureusIsBack")
+THEN
+CharacterAppearAtTrigger(CHARACTER_CYS_Aureus,TRIGGER_CYS_Point_AureusOffice,0);
+CharacterSetHasDialog(CHARACTER_CYS_Aureus,1);
+
+IF
+GlobalEventSet("CYS_EsmeraldaInJail")
+THEN
+ProcDisablePlayerTrade(CHARACTER_CYS_Esmeralda);
+CharacterClearTradeGeneratedItems(CHARACTER_CYS_Esmeralda);
+CharacterSetVarFixedString(CHARACTER_CYS_Esmeralda,"currentState","State_InJail");
+
+IF
+CharacterEvent(CHARACTER_CYS_Esmeralda,"CYS_EsmeIsBack")
+THEN
+ItemUnLock(ITEM_CYS_Esmeralda_Door);
+CharacterAppearAtTrigger(CHARACTER_CYS_Esmeralda_Bodyguard,TRIGGER_CYS_PointEsmeBodyGuard,0);
+CharacterSetHasDialog(CHARACTER_CYS_Esmeralda_Bodyguard,1);
+
+IF
+CharacterEvent(CHARACTER_CYS_Esmeralda,"CYS_EsmeIsBack")
+THEN
+CharacterTeleportToTrigger(CHARACTER_CYS_Esmeralda,TRIGGER_CYS_Point_EsmeOutJail,"");
+CharacterSetOnStage(CHARACTER_CYS_Esmeralda,1);
+NOT DB_NoDefaultBehavior(CHARACTER_CYS_Esmeralda);
+CharacterSetHasDialog(CHARACTER_CYS_Esmeralda,1);
+GlobalSetEvent("CYS_EsmeraldaOutJail");
+GlobalClearEvent("CYS_EsmeraldaInJail");
+NOT HostileDialog(CHARACTER_CYS_Esmeralda, "CYS_Esmeralda");
+ProcClearTradeFacts(CHARACTER_CYS_Esmeralda);
+DB_Trader(CHARACTER_CYS_Esmeralda);
+CharacterSetCanFight(CHARACTER_CYS_Esmeralda,1);
+CharacterSetVarFixedString(CHARACTER_CYS_Esmeralda,"currentState","State_AtShopNoSeptimus");
+IncreaseAttitude(CHARACTER_Player1, CHARACTER_CYS_Esmeralda, 25);
+IncreaseAttitude(CHARACTER_Player2, CHARACTER_CYS_Esmeralda, 25);
+
+IF
+CharacterDied(CHARACTER_CYS_Esmeralda)
+THEN
+GlobalSetEvent("CYS_EsmeIsDead");
+
+//END_REGION
+
+IF
+TextEventSet("freeEsme")
+THEN
+CHARACTER_CYS_Esmeralda.InJail();
+GlobalSetEvent("CYS_ToldJakeTruth");
+GlobalSetEvent("CYS_EsmeraldaInJail");
+CharacterSetHasDialog(CHARACTER_CYS_Esmeralda,1);
+CharacterAppearAtTrigger(CHARACTER_CYS_Esmeralda,TRIGGER_CYS_Point_EsmeInJail,0);
+CharacterSetCanFight(CHARACTER_CYS_Esmeralda, 0);
+CharacterSetVarInteger(CHARACTER_CYS_Esmeralda, "inJail", 1);
+ProcDisablePlayerTrade(CHARACTER_CYS_Esmeralda);
+CharacterClearTradeGeneratedItems(CHARACTER_CYS_Esmeralda);
+ItemClose(ITEM_CYS_EsmeraldaJailDoor);
+
+IF
+GlobalEventSet("CYS_EsmeMarker")
+THEN
+ProcShowMarker("CYS_Esmeralda");
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

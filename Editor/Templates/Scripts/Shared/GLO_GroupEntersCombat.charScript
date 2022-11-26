@@ -1,0 +1,11 @@
+INIT
+
+CHARACTER:__Me
+
+//------------------------
+EVENTS
+EVENT OnCombatStartedEveryoneCanFight
+ON
+	OnCombatStarted()
+ACTIONS
+	CharacterSetCanFight(__Me,1,1)

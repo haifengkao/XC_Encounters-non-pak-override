@@ -1,0 +1,657 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+CharacterSetOnStage(CHARACTER_HOM_Icara,0);
+
+DB_Dialogs(CHARACTER_HOM_Icara,"HOM_Icara");
+
+DB_HOMEndGameDialog("HOM_Endgame_TwoPlayer");
+DB_HOMEndGameDialog("HOM_Endgame");
+
+DB_HOM_EdenPortal_Dialog("HOM_Zixzax_AtEdenShrine");
+
+DB_Endgame_LeandraIsHere_Bool(0);		//a boolean to keep track of whether Leandra is taking part (1) or not (0)
+DB_Endgame_AstarteIsReady_Bool(0);		//a boolean to keep track of whether the first endfight is over (1) or not (0)
+
+DB_NoInitialTrade(CHARACTER_HOM_Shrike);
+DB_NoInitialTrade(CHARACTER_HOM_Astarte_SecondFight);
+DB_NoInitialTrade(CHARACTER_HOM_Astarte);
+
+DB_SpecialCompanionTrigger(TRIGGER_END_CC_1,"END_CC_1_Leandra");
+DB_SpecialCompanionTrigger(TRIGGER_END_CC_2,"END_CC_2_Astarte");
+DB_SpecialCompanionTrigger(TRIGGER_HOM_CC_EnterEden,"HOM_CC_EnterEden");
+KBSECTION
+//REGION Global Flags for ending
+IF
+DialogStartRequested(CHARACTER_HOM_Icara,_Player)
+AND
+ItemIsInPartyInventory(ITEM_LUC_M_LeandraSpell,_Player,1,1)
+THEN
+GlobalSetEvent("GLO_CompletedMines");
+
+IF
+DialogStartRequested(CHARACTER_HOM_Icara,_Player)
+AND
+ItemIsInPartyInventory(ITEM_LUC_IC_LeandraBlood,_Player,1,1)
+THEN
+GlobalSetEvent("GLO_CompletedInnerSanctum");
+
+IF
+DialogStarted("HOM_Icara",_)
+THEN
+DB_TalkedToIcara(1);
+
+IF
+ItemTemplateCombinedWithItemTemplate("Quest_Vial_LeandraBlood_385d4f75-93d2-42f5-88b4-cdf54ccd5fdd","Quest_LeandraSpell_6e26d7bc-1298-4afa-ba94-6b3d0b9f979b",_,_)
+THEN
+GlobalSetEvent("HOM_CombinedSpellAndBlood");
+GlobalSetEvent("GLO_CompletedInnerSanctum");
+GlobalSetEvent("GLO_CompletedMines");
+ProcGiveLeandraQuestUpdate();
+QuestUpdate("LUC_SacredStone","CraftedDKSpell");
+QuestClose("LUC_SacredStone");
+UnlockAchievement("quest49");
+
+PROC
+ProcGiveLeandraQuestUpdate()
+AND
+DB_TalkedToIcara(1)
+THEN
+QuestUpdate("HOM_Starstones","CombinedSpell");
+
+IF
+DialogStarted("DAF_BO_HiddenFamily",_)
+THEN
+GlobalSetEvent("HOM_MetHiddenFamily");
+
+IF
+GlobalEventSet("DAF_HiddenFamilyAggro")
+THEN
+GlobalClearEvent("HOM_MetHiddenFamily");
+//END_REGION
+
+//REGION Icara died -> Leandra Weakened
+IF
+DB_Dead(CHARACTER_HIB_Icara)
+THEN
+NOT DB_HOMZandyIcara(CHARACTER_HOM_Icara);
+GlobalSetEvent("HOM_Icara_Dead");
+ProcAdjustLeandraHealth();
+
+IF
+DB_Dead(CHARACTER_HOM_Icara)
+THEN
+NOT DB_HOMZandyIcara(CHARACTER_HOM_Icara);
+GlobalSetEvent("HOM_Icara_Dead");
+ProcAdjustLeandraHealth();
+
+PROC
+ProcAdjustLeandraHealth()
+AND
+NOT DB_OnlyOnce("AdjustedLeandraHealth")		//just in case
+THEN
+DB_OnlyOnce("AdjustedLeandraHealth");
+CharacterApplyStatus(CHARACTER_HOM_Leandra,"WEAK",-1.0,1);
+ProcHOMAdjustHitpointsIfNeeded();
+
+PROC
+ProcHOMAdjustHitpointsIfNeeded()
+AND
+CharacterGetHitpointsPercentage(CHARACTER_HOM_Leandra,_Perc)
+AND
+_Perc>10
+THEN
+CharacterSetHitpointsPercentage(CHARACTER_HOM_Leandra,10);
+//END_REGION
+
+//REGION Set up of the end
+PROC
+ProcEnableEndgamePortal()
+THEN
+CharacterSetVarInteger(CHARACTER_CYS_Zixzax,"DoWalkAbout",0);
+DB_EndGameStarted(1);
+GlobalSetEvent("HOM_EndGame_Started");
+ProcHOMDisableRoomUnlocking();
+DB_HOM_UnlockTeleporter(ITEM_HOM_EdenShrine_Inactive);
+DB_AutoSaveTrigger(TRIGGER_HOM_AutoSave_BoxEndgame);
+
+PROC
+ProcEnableEndgamePortal()
+THEN
+DB_HOM_ProximityFire(TRIGGER_HOM_EndStairs_Trigger1,ITEM_HOM_EndStairs_01);
+DB_HOM_ProximityFire(TRIGGER_HOM_EndStairs_Trigger1,ITEM_HOM_EndStairs_02);
+DB_HOM_ProximityFire(TRIGGER_HOM_EndStairs_Trigger2,ITEM_HOM_EndStairs_03);
+DB_HOM_ProximityFire(TRIGGER_HOM_EndStairs_Trigger2,ITEM_HOM_EndStairs_04);
+DB_HOM_ProximityFire(TRIGGER_HOM_EndStairs_Trigger3,ITEM_HOM_EndStairs_05);
+DB_HOM_ProximityFire(TRIGGER_HOM_EndStairs_Trigger3,ITEM_HOM_EndStairs_06);
+DB_HOM_ProximityFire(TRIGGER_HOM_EndStairs_Trigger4,ITEM_HOM_EndStairs_07);
+DB_HOM_ProximityFire(TRIGGER_HOM_EndStairs_Trigger4,ITEM_HOM_EndStairs_08);
+DB_HOM_ProximityFire(TRIGGER_HOM_EndStairs_Trigger5,ITEM_HOM_EndStairs_09);
+DB_HOM_ProximityFire(TRIGGER_HOM_EndStairs_Trigger5,ITEM_HOM_EndStairs_10);
+DB_HOM_ProximityFire(TRIGGER_HOM_EndStairs_Trigger6,ITEM_HOM_EndStairs_11);
+DB_HOM_ProximityFire(TRIGGER_HOM_EndStairs_Trigger6,ITEM_HOM_EndStairs_12);
+DB_HOM_ProximityFire(TRIGGER_HOM_EndStairs_Trigger7,ITEM_HOM_EndStairs_13);
+DB_HOM_ProximityFire(TRIGGER_HOM_EndStairs_Trigger7,ITEM_HOM_EndStairs_14);
+DB_HOM_ProximityFire(TRIGGER_HOM_EndStairs_Trigger8,ITEM_HOM_EndStairs_15);
+DB_HOM_ProximityFire(TRIGGER_HOM_EndStairs_Trigger8,ITEM_HOM_EndStairs_16);
+
+IF
+CharacterEnteredTrigger(_Player,TRIGGER_HOM_EndStairs_Trigger1)
+AND
+DB_HOMZandyIcara(CHARACTER_HOM_Icara)
+THEN
+ProcDoThreeSpeakerDialog("END_AD_ZandalorIcaraStairs",CHARACTER_Zandalor,CHARACTER_HOM_Icara,_Player);
+
+IF
+DialogStarted("END_AD_ZandalorIcaraStairs",_)
+THEN
+CharacterLookAtCharacter(CHARACTER_Zandalor,CHARACTER_HOM_Icara);
+
+IF
+DialogEnded("END_AD_ZandalorIcaraStairs",_)
+THEN
+ProcCharacterMoveToTrigger(CHARACTER_HOM_Icara,TRIGGER_HOM_IcaraDialogDest,1,"");
+ProcCharacterMoveToTrigger(CHARACTER_Zandalor,TRIGGER_HOM_ZandalorDialogDest,1,"HOM_ZandalorAtPortal");
+DB_Dialogs(CHARACTER_HOM_Icara,"HOM_Icara_Portal");
+
+IF
+CharacterEvent(CHARACTER_Zandalor,"HOM_ZandalorAtPortal")
+THEN
+DB_Dialogs(CHARACTER_CYS_Zixzax, CHARACTER_Zandalor, "HOM_Zixzax_AtEdenShrine");
+ItemSetCanInteract(ITEM_HOM_EdenShrine,1);
+
+IF
+RegionStarted("Homestead")
+AND
+DB_EndGameStarted(1)
+THEN
+ProcSetupEndgameFinalFight();
+ProcSetupEndgameAllies();
+ProcSetupEndgameShrike();
+NOT DB_EndGameStarted(1);
+
+PROC
+ProcSetupEndgameShrike()
+THEN
+CharacterSetHasDialog(CHARACTER_HOM_Shrike,0);
+CharacterSetOnStage(CHARACTER_HOM_Shrike,0);
+DB_NoDefaultBehavior(CHARACTER_HOM_Shrike);
+NOT IsStoryNpc(CHARACTER_HOM_Shrike);
+SetStoryNpcStatus(CHARACTER_HOM_Shrike);
+CharacterTeleportToTrigger(CHARACTER_HOM_Shrike,TRIGGER_END_Point_NKCI_ShrikeSpawn,"");
+CHARACTER_HOM_Shrike.HOMWaitingForEndgameDialog();
+CharacterClearVar(CHARACTER_HOM_Astarte,"Seat");
+NOT IsStoryNpc(CHARACTER_HOM_Astarte);
+SetStoryNpcStatus(CHARACTER_HOM_Astarte);
+Poof(CHARACTER_HOM_Astarte);
+DB_OnlyOnce("HOM_AstarteSinging");
+
+//Zixzax
+PROC
+ProcSetupEndgameAllies()
+THEN
+CharacterSetVarItem(CHARACTER_CYS_Zixzax,"Seat",ITEM_NULL);
+CharacterTeleportToTrigger(CHARACTER_CYS_Zixzax,TRIGGER_HOM_ZixzaxTalk,"");
+DB_OneShot_DialogTrigger(TRIGGER_HOM_BoxZixZaxTalkArea, "HOM_Zixzax_Endgame", CHARACTER_CYS_Zixzax);
+
+//Icara
+PROC
+ProcSetupEndgameAllies()
+AND
+DB_HOMZandyIcara(CHARACTER_HOM_Icara)
+THEN
+CharacterSetVarItem(CHARACTER_HOM_Icara,"Seat",ITEM_NULL);
+CharacterSetVarFixedString(CHARACTER_HOM_Icara,"currentState","State_IdleAtPortal");
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_HOM_Icara);
+CharacterTeleportToTrigger(CHARACTER_HOM_Icara,TRIGGER_HOM_Icara_Argue,"");
+CharacterSetOnStage(CHARACTER_HOM_Icara,1);
+CharacterSetVarInteger(CHARACTER_Zandalor,"IcaraAlive",1);
+CharacterSetVarInteger(CHARACTER_CYS_Zixzax,"IcaraAlive",1);
+ItemSetCanInteract(ITEM_HOM_EdenShrine,0);
+
+//Zandalor
+PROC
+ProcSetupEndgameAllies()
+AND
+DB_HOMZandyIcara(CHARACTER_HOM_Icara)
+THEN
+CharacterTeleportToTrigger(CHARACTER_Zandalor,TRIGGER_HOM_Zandalor_Argue,"");
+
+PROC
+ProcSetupEndgameAllies()
+AND
+NOT DB_HOMZandyIcara(CHARACTER_HOM_Icara)
+THEN
+CharacterTeleportToTrigger(CHARACTER_Zandalor,TRIGGER_HOM_ZandalorDialogDest,"");
+
+PROC
+ProcSetupEndgameAllies()
+THEN
+CharacterSetOnStage(CHARACTER_Zandalor,1);
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_Zandalor);
+DB_OnlyOnce("ZandyWakes");
+CharacterSetVarInteger(CHARACTER_HOM_Icara,"ZandalorInHomestead",1);
+CharacterSetVarInteger(CHARACTER_HOM_Icara,"ZandalorAlive",1);
+CharacterSetVarInteger(CHARACTER_CYS_Zixzax,"ZandalorAlive",1);
+GlobalSetEvent("GLO_CompletedDruidQuest");
+DB_HOMZandyIcara(CHARACTER_Zandalor);
+
+//Weaver
+PROC
+ProcSetupEndgameAllies()
+THEN
+CharacterSetVarItem(CHARACTER_HOM_Weaver,"Seat",ITEM_NULL);
+CharacterSetVarFixedString(CHARACTER_HOM_Weaver,"currentState","State_IdleAtPortal");
+CharacterTeleportToTrigger(CHARACTER_HOM_Weaver,TRIGGER_HOM_Weaver_AtGate,"");
+CharacterLookAtCharacter(CHARACTER_HOM_Weaver,CHARACTER_CYS_Zixzax,0);
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_HOM_Weaver);
+DB_Dialogs(CHARACTER_HOM_Weaver,"HOM_Weaver_Portal");
+
+//Arhu
+PROC
+ProcSetupEndgameAllies()
+AND
+NOT DB_GlobalEvent("ArhuPermaHuman")
+AND
+NOT DB_GlobalEvent("ArhuInDAFCage")
+THEN
+CharacterSetVarItem(CHARACTER_CYS_Arhu,"Seat",ITEM_NULL);
+CharacterSetVarFixedString(CHARACTER_CYS_Arhu,"currentState","State_IdleAtPortal");
+CharacterTeleportToTrigger(CHARACTER_CYS_Arhu,TRIGGER_HOM_Arhu_AtGate,"");
+CharacterLookAtCharacter(CHARACTER_CYS_Arhu,CHARACTER_CYS_Zixzax,0);
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_CYS_Arhu);
+DB_Dialogs(CHARACTER_CYS_Arhu,"HOM_Arhu_Portal");
+
+PROC
+ProcHOMSetIcaraInHomestead()
+THEN
+GlobalSetEvent("HOM_IcaraInHomestead");
+DB_HOMZandyIcara(CHARACTER_HOM_Icara);
+CharacterAppearAtTrigger(CHARACTER_HOM_Icara,TRIGGER_HOM_PointIcaraWeaverDest,0);
+CharacterSetVarItem(CHARACTER_HOM_Icara,"Seat",ITEM_HOM_Chair_Icara);
+
+IF
+DialogEnded("HOM_Zixzax_Endgame",_)
+THEN
+CharacterSetHasDialog(CHARACTER_CYS_Zixzax,0);
+ProcCharacterMoveToTrigger(CHARACTER_CYS_Zixzax,TRIGGER_HOM_TeleportFromEdenDest,1,"ZixzaxArrivedAtEndGame");
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_CYS_Zixzax);
+QuestUpdate("HOM_Starstones","FinalPortal");
+
+IF
+CharacterEvent(CHARACTER_CYS_Zixzax,"ZixzaxArrivedAtEndGame")
+THEN
+CharacterLookFromTrigger(CHARACTER_CYS_Zixzax,TRIGGER_HOM_TeleportFromEdenDest,0);
+
+IF
+CharacterEvent(CHARACTER_CYS_Zixzax,"ZixzaxArrivedAtEndGame")
+AND
+NOT DB_HOMZandyIcara(CHARACTER_HOM_Icara)
+THEN
+DB_Dialogs(CHARACTER_CYS_Zixzax, CHARACTER_Zandalor, "HOM_Zixzax_AtEdenShrine");
+
+IF
+CharacterUsedItem(_Player,ITEM_HOM_EdenShrine)
+AND
+DB_HOM_EdenPortal_Dialog("HOM_Zixzax_AtEdenShrine")
+THEN
+DialogRequestStopForCharacter(CHARACTER_CYS_Zixzax);
+NOT CHARACTER_CYS_Zixzax.DB_IsInDialog();
+ProcDoDualDialogPlayerCheck(_Player);
+ProcDoThreeSpeakerDialog("HOM_Zixzax_AtEdenShrine", CHARACTER_CYS_Zixzax, CHARACTER_Zandalor, _Player);
+
+IF
+CharacterUsedItem(_Player,ITEM_HOM_EdenShrine)
+AND
+DB_HOM_EdenPortal_Dialog("HOM_Zixzax_AtEdenShrine2")
+THEN
+DialogRequestStopForCharacter(CHARACTER_CYS_Zixzax);
+NOT CHARACTER_CYS_Zixzax.DB_IsInDialog();
+ProcDoDualDialogPlayerCheck(_Player);
+ProcDoTwoSpeakerDialog("HOM_Zixzax_AtEdenShrine2", CHARACTER_CYS_Zixzax, _Player);
+//END_REGION
+
+//REGION Enter eden 
+IF
+DialogEnded(_Dialog,_ID)
+AND
+DB_HOM_EdenPortal_Dialog(_Dialog)
+AND
+DB_DialogPlayers(_ID, _Player, 1)
+AND
+DB_GlobalEvent("HOM_DD_EndGame_Start")
+AND
+DB_HOMZandyIcara(CHARACTER_HOM_Icara)
+AND
+NOT DB_GlobalEvent("HOM_HasSoulForgeRepair")
+THEN
+ProcDoDualDialogPlayerCheck(_Player);
+ProcDoTwoSpeakerDialog("HOM_LeandraSoulForgeReminder", CHARACTER_HOM_Icara, _Player);
+
+IF
+DialogEnded(_Dialog,_)
+AND
+DB_HOM_EdenPortal_Dialog(_Dialog)
+AND
+DB_GlobalEvent("HOM_DD_EndGame_Start")
+AND
+DB_HOMZandyIcara(CHARACTER_HOM_Icara)
+AND
+DB_GlobalEvent("HOM_HasSoulForgeRepair")
+THEN
+Proc_Endgame_Dreamsequence_Start();
+
+IF
+DialogEnded(_Dialog,_)
+AND
+DB_HOM_EdenPortal_Dialog(_Dialog)
+AND
+DB_GlobalEvent("HOM_DD_EndGame_Start")
+AND
+NOT DB_HOMZandyIcara(CHARACTER_HOM_Icara)
+THEN
+Proc_Endgame_Dreamsequence_Start();
+
+IF
+DialogEnded("HOM_LeandraSoulForgeReminder",_)
+AND
+DB_GlobalEvent("HOM_DD_Ignore_Start")
+THEN
+Proc_Endgame_Dreamsequence_Start();
+
+PROC
+Proc_Endgame_Dreamsequence_Start()
+THEN
+SetHomesteadKeyState(0);
+EnableSendToHomestead(0);
+PROC_TeleportingRegionBlockOn();
+CharacterTeleportPartyToTrigger(TRIGGER_END_RoomA_Entrance,"");
+DB_AD_Dialog(CHARACTER_Zandalor,"HOM_AD_Zandalor_PortalWait");
+CharacterSetOnStage(CHARACTER_Zandalor,1);
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_Zandalor);
+Proc_END_PrepRoomB();
+IgnoreOnlyCompanionDialogs(1);
+ProcCancelAllCompanionDialogs(CHARACTER_Madoc);
+ProcCancelAllCompanionDialogs(CHARACTER_Jahan);
+ProcCancelAllCompanionDialogs(CHARACTER_Wolgraff);
+ProcCancelAllCompanionDialogs(CHARACTER_Bairdotr);
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_Madoc);
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_Jahan);
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_Wolgraff);
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_Bairdotr);
+DB_AD_Dialog(CHARACTER_Madoc,"END_AD_Madora");
+DB_AD_Dialog(CHARACTER_Jahan,"END_AD_Jahan");
+DB_AD_Dialog(CHARACTER_Wolgraff,"END_AD_Wolgraff");
+DB_AD_Dialog(CHARACTER_Bairdotr,"END_AD_Bairdotr");
+DB_EndLevelStarted(1);
+
+IF
+DialogEnded("HOM_Zixzax_AtEdenShrine",_)
+AND
+QueryOnlyOnce("HOM_SplitZZZandyDialog")
+AND
+NOT DB_EndLevelStarted(1)
+THEN
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_CYS_Zixzax);
+ProcRemoveAllDialogEntriesForSpeaker(CHARACTER_Zandalor);
+DB_Dialogs(CHARACTER_CYS_Zixzax,"HOM_Zixzax_AtEdenShrine2");
+DB_Dialogs(CHARACTER_Zandalor,"HOM_Zandalor_AtEdenShrine");
+NOT DB_HOM_EdenPortal_Dialog("HOM_Zixzax_AtEdenShrine");
+DB_HOM_EdenPortal_Dialog("HOM_Zixzax_AtEdenShrine2");
+
+IF
+DialogEnded("HOM_LeandraSoulForgeReminder",_)
+AND
+NOT DB_GlobalEvent("HOM_DD_Ignore_Start")
+THEN
+GlobalClearEvent("HOM_DD_EndGame_Start");
+//END_REGION
+
+//REGION Test commands 
+
+IF
+TextEventSet("TempUnlockEndgame")
+THEN
+ProcMetZZ();
+ProcHOMSetIcaraInHomestead();
+CharacterSetHasDialog(CHARACTER_Zandalor, 1);
+GlobalSetEvent("DFD_IS_ZandalorIcaraFree");
+DB_Dialogs(CHARACTER_CYS_Arhu,"CYS_Arhu");
+CharacterSetImmortal(CHARACTER_CYS_Arhu,0);
+NOT DB_IsNotMessingAround(CHARACTER_CYS_Arhu);
+NOT DB_NoDefaultBehavior(CHARACTER_CYS_Arhu);
+CharacterTeleportToTrigger(CHARACTER_CYS_Arhu,TRIGGER_HOM_Arhu,"");
+CharacterSetVarFixedString(CHARACTER_CYS_Arhu,"currentState","");
+GlobalSetEvent("HOM_ArhuInHomestead");
+CharacterSetVarItem(CHARACTER_CYS_Arhu,"Seat",ITEM_Hom_Chair_Arhu);
+CharacterTeleportPartyToTrigger(TRIGGER_DAF_IS_IcaraSpawn,"");
+
+
+IF
+TextEventSet("sf")
+THEN
+ItemToCharacter(ITEM_DAF_Soulforge_Repair_Ritual,CHARACTER_Player1);
+
+IF
+TextEventSet("UnlockEndgame")
+THEN 
+ProcEnableEndgamePortal();
+
+IF
+TextEventSet("UnlockEndgameNow")
+THEN 
+ProcEnableEndgamePortal();
+ProcSetupEndgameFinalFight();
+ProcSetupEndgameAllies();
+ProcSetupEndgameShrike();
+NOT DB_EndGameStarted(1);
+
+IF
+TextEventSet("Icara")
+THEN
+ProcHOMSetIcaraInHomestead();
+CharacterSetHasDialog(CHARACTER_Zandalor, 1);
+GlobalSetEvent("DFD_IS_ZandalorIcaraFree");
+
+IF
+TextEventSet("StartNegaNoIcara")
+THEN
+ProcSetupEndgameFinalFight();
+ProcSetupEndgameAllies();
+ProcSetupEndgameShrike();
+NOT DB_NoDefaultBehavior(CHARACTER_Zandalor);
+CharacterPlayAnimation(CHARACTER_Zandalor,"knockdown_getup");
+CharacterSetVarInteger(CHARACTER_Zandalor,"State",0);
+Proc_FinishSourceTemple();
+Proc_END_PrepRoomB();
+CharacterTeleportPartyToTrigger(TRIGGER_END_Nega_Entrance,"");
+
+IF
+TextEventSet("StartNegaWithIcara")
+THEN
+ProcHOMSetIcaraInHomestead();
+GlobalSetEvent("DFD_IS_ZandalorIcaraFree");
+CharacterSetVarItem(CHARACTER_HOM_Icara,"Seat",ITEM_HOM_Chair_Icara);
+Poof(CHARACTER_HOM_Icara);
+CharacterSetHasDialog(CHARACTER_HOM_Icara, 1);
+ProcSetupEndgameFinalFight();
+ProcSetupEndgameAllies();
+ProcSetupEndgameShrike();
+NOT DB_NoDefaultBehavior(CHARACTER_Zandalor);
+CharacterPlayAnimation(CHARACTER_Zandalor,"knockdown_getup");
+CharacterSetVarInteger(CHARACTER_Zandalor,"State",0);
+Proc_FinishSourceTemple();
+Proc_END_PrepRoomB();
+CharacterTeleportPartyToTrigger(TRIGGER_END_Nega_Entrance,"");
+
+IF
+TextEventSet("BeforeShrikeNoIcara")
+THEN
+ProcSetupEndgameFinalFight();
+ProcSetupEndgameAllies();
+ProcSetupEndgameShrike();
+NOT DB_NoDefaultBehavior(CHARACTER_Zandalor);
+CharacterPlayAnimation(CHARACTER_Zandalor,"knockdown_getup");
+CharacterSetVarInteger(CHARACTER_Zandalor,"State",0);
+Proc_FinishSourceTemple();
+Proc_END_PrepRoomB();
+CharacterTeleportPartyToTrigger(TRIGGER_END_Box_NegaKingsCrabBattleSceneStart,"");
+
+IF
+TextEventSet("BeforeShrikeIcara")
+THEN
+ProcHOMSetIcaraInHomestead();
+GlobalSetEvent("DFD_IS_ZandalorIcaraFree");
+CharacterSetVarItem(CHARACTER_HOM_Icara,"Seat",ITEM_HOM_Chair_Icara);
+Poof(CHARACTER_HOM_Icara);
+CharacterSetHasDialog(CHARACTER_HOM_Icara, 1);
+ProcSetupEndgameFinalFight();
+ProcSetupEndgameAllies();
+ProcSetupEndgameShrike();
+NOT DB_NoDefaultBehavior(CHARACTER_Zandalor);
+CharacterPlayAnimation(CHARACTER_Zandalor,"knockdown_getup");
+CharacterSetVarInteger(CHARACTER_Zandalor,"State",0);
+Proc_FinishSourceTemple();
+Proc_END_PrepRoomB();
+CharacterTeleportPartyToTrigger(TRIGGER_END_Box_NegaKingsCrabBattleSceneStart,"");
+
+IF
+TextEventSet("NegaDoneNoIcara")
+THEN
+ProcSetupEndgameFinalFight();
+ProcSetupEndgameAllies();
+ProcSetupEndgameShrike();
+NOT DB_NoDefaultBehavior(CHARACTER_Zandalor);
+CharacterPlayAnimation(CHARACTER_Zandalor,"knockdown_getup");
+CharacterSetVarInteger(CHARACTER_Zandalor,"State",0);
+Proc_FinishSourceTemple();
+Proc_END_PrepRoomB();
+GlobalSetEvent("END_LaunchRoomB");
+
+IF
+TextEventSet("NegaDoneIcara")
+THEN
+ProcHOMSetIcaraInHomestead();
+GlobalSetEvent("DFD_IS_ZandalorIcaraFree");
+CharacterSetVarItem(CHARACTER_HOM_Icara,"Seat",ITEM_HOM_Chair_Icara);
+Poof(CHARACTER_HOM_Icara);
+CharacterSetHasDialog(CHARACTER_HOM_Icara, 1);
+ProcSetupEndgameFinalFight();
+ProcSetupEndgameAllies();
+ProcSetupEndgameShrike();
+NOT DB_NoDefaultBehavior(CHARACTER_Zandalor);
+CharacterPlayAnimation(CHARACTER_Zandalor,"knockdown_getup");
+CharacterSetVarInteger(CHARACTER_Zandalor,"State",0);
+Proc_FinishSourceTemple();
+Proc_END_PrepRoomB();
+GlobalSetEvent("END_LaunchRoomB");
+
+IF
+TextEventSet("LeandraDeadIcara")
+THEN
+ProcHOMSetIcaraInHomestead();
+GlobalSetEvent("DFD_IS_ZandalorIcaraFree");
+CharacterSetVarItem(CHARACTER_HOM_Icara,"Seat",ITEM_HOM_Chair_Icara);
+Poof(CHARACTER_HOM_Icara);
+CharacterSetHasDialog(CHARACTER_HOM_Icara, 1);
+ProcSetupEndgameFinalFight();
+ProcSetupEndgameAllies();
+ProcSetupEndgameShrike();
+NOT DB_NoDefaultBehavior(CHARACTER_Zandalor);
+CharacterPlayAnimation(CHARACTER_Zandalor,"knockdown_getup");
+CharacterSetVarInteger(CHARACTER_Zandalor,"State",0);
+Proc_FinishSourceTemple();
+CharacterSetFollowCharacter(CHARACTER_Zandalor, CHARACTER_Player1);
+DB_END_EndDudeFollows(CHARACTER_Zandalor, CHARACTER_Player1);
+GlobalSetEvent("END_ZandalorIsFollowing");
+DB_AD_Dialog(CHARACTER_Zandalor, "END_AD_Zandalor");
+CharacterSetOnStage(CHARACTER_Zandalor, 1);
+CharacterSetOnStage(CHARACTER_HOM_Icara, 1);
+CharacterSetFollowCharacter(CHARACTER_HOM_Icara, CHARACTER_Player2);
+DB_END_EndDudeFollows(CHARACTER_HOM_Icara, CHARACTER_Player2);
+GlobalSetEvent("END_IcaraIsFollowing");
+DB_AD_Dialog(CHARACTER_HOM_Icara, "END_AD_Icara");
+ItemToCharacter(ITEM_END_DeathKnightKillWand, CHARACTER_Player1);
+ItemSetOnstage(ITEM_END_DeathKnightKillWand, 1);
+CharacterTeleportPartyToTrigger(TRIGGER_HOM_Eden_EntranceComment, "");
+
+IF
+TextEventSet("LeandraDeadIcandra")
+THEN
+ProcHOMSetIcaraInHomestead();
+GlobalSetEvent("DFD_IS_ZandalorIcaraFree");
+CharacterSetVarItem(CHARACTER_HOM_Icara,"Seat",ITEM_HOM_Chair_Icara);
+Poof(CHARACTER_HOM_Icara);
+CharacterSetHasDialog(CHARACTER_HOM_Icara, 1);
+ProcSetupEndgameFinalFight();
+ProcSetupEndgameAllies();
+ProcSetupEndgameShrike();
+NOT DB_NoDefaultBehavior(CHARACTER_Zandalor);
+CharacterPlayAnimation(CHARACTER_Zandalor,"knockdown_getup");
+CharacterSetVarInteger(CHARACTER_Zandalor,"State",0);
+Proc_FinishSourceTemple();
+CharacterSetFollowCharacter(CHARACTER_Zandalor, CHARACTER_Player1);
+DB_END_EndDudeFollows(CHARACTER_Zandalor, CHARACTER_Player1);
+GlobalSetEvent("END_ZandalorIsFollowing");
+DB_AD_Dialog(CHARACTER_Zandalor, "END_AD_Zandalor");
+CharacterSetFollowCharacter(CHARACTER_HOM_Icara, CHARACTER_Player2);
+DB_END_EndDudeFollows(CHARACTER_HOM_Icara, CHARACTER_Player2);
+GlobalSetEvent("END_IcaraIsFollowing");
+DB_AD_Dialog(CHARACTER_HOM_Icara, "END_AD_Icara");
+CharacterSetOnStage(CHARACTER_END_Icandra, 1);
+CharacterSetFollowCharacter(CHARACTER_END_Icandra, CHARACTER_Player2);
+DB_END_EndDudeFollows(CHARACTER_END_Icandra, CHARACTER_Player2);
+GlobalSetEvent("END_IcandraIsFollowing");
+CharacterStopFollow(CHARACTER_HOM_Icara);
+NOT DB_END_EndDudeFollows(CHARACTER_HOM_Icara, CHARACTER_Player2);
+GlobalClearEvent("END_IcaraIsFollowing");
+ItemToCharacter(ITEM_END_DeathKnightKillWand, CHARACTER_Player1);
+ItemSetOnstage(ITEM_END_DeathKnightKillWand, 1);
+CharacterTeleportPartyToTrigger(TRIGGER_HOM_Eden_EntranceComment, "");
+CharacterSetOnStage(CHARACTER_Zandalor, 1);
+CharacterSetOnStage(CHARACTER_END_Icandra, 1);
+
+IF
+TextEventSet("LeandraDeadNoIcara")
+THEN
+ProcSetupEndgameFinalFight();
+ProcSetupEndgameAllies();
+ProcSetupEndgameShrike();
+NOT DB_NoDefaultBehavior(CHARACTER_Zandalor);
+CharacterPlayAnimation(CHARACTER_Zandalor,"knockdown_getup");
+CharacterSetVarInteger(CHARACTER_Zandalor,"State",0);
+Proc_FinishSourceTemple();
+CharacterSetFollowCharacter(CHARACTER_Zandalor, CHARACTER_Player1);
+DB_END_EndDudeFollows(CHARACTER_Zandalor, CHARACTER_Player1);
+GlobalSetEvent("END_ZandalorIsFollowing");
+DB_AD_Dialog(CHARACTER_Zandalor, "END_AD_Zandalor");
+ItemToCharacter(ITEM_END_DeathKnightKillWand, CHARACTER_Player1);
+ItemSetOnstage(ITEM_END_DeathKnightKillWand, 1);
+CharacterTeleportPartyToTrigger(TRIGGER_HOM_Eden_EntranceComment, "");
+CharacterSetOnStage(CHARACTER_Zandalor, 1);
+
+IF
+TextEventSet("BeforeVoidDragonIcara")
+THEN
+CharacterSetOnStage(CHARACTER_HOM_Icara, 1);
+CharacterTeleportToTrigger(CHARACTER_HOM_Icara, TRIGGER_HOM_EndFight_Astarte, "");
+CharacterTeleportPartyToTrigger(TRIGGER_HOM_EndFight_Astarte, "");
+
+IF
+TextEventSet("BeforeVoidDragonNoIcara")
+THEN
+CharacterTeleportPartyToTrigger(TRIGGER_HOM_EndFight_Astarte, "");
+
+IF
+TextEventSet("BeforeVoidDragonIcandra")
+THEN
+CharacterSetOnStage(CHARACTER_END_Icandra, 1);
+GlobalSetEvent("END_IcandraIsFollowing");
+CharacterSetOnStage(CHARACTER_HOM_Icara, 0);
+CharacterTeleportToTrigger(CHARACTER_END_Icandra, TRIGGER_HOM_EndFight_Astarte, "");
+CharacterTeleportPartyToTrigger(TRIGGER_HOM_EndFight_Astarte, "");
+//END_REGION
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

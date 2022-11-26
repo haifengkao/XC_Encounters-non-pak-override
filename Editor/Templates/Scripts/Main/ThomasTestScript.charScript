@@ -1,0 +1,38 @@
+/*//INIT
+
+//CHARACTER:__Me
+EXTERN FLOAT:%SleepTime = 0.0
+
+BEHAVIOUR
+
+REACTION doNothing,2
+USAGE ALL
+VARS
+	INT:_testInt(0)
+ACTIONS
+	Add(_testInt,1)
+	//DebugText(__Me,"[1]",_testInt)
+	Sleep(%SleepTime)
+	CharacterEndTurn()
+	
+*/
+
+INIT
+
+CHARACTER:__Me								
+		
+//------------------------
+BEHAVIOUR
+
+REACTION Combat_CharmAttack, 1000000
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+CHECK "c1&c2&c3"
+	CharacterGetEnemy(_Enemy,__Me) // returns false if null
+	CharacterCanSee(__Me,_Enemy)
+	CharacterCanCast(__Me,Projectile_Charm,1)
+ACTIONS
+	CharacterAddSkill(Projectile_Charm)
+	CharacterUseSkill(Projectile_Charm,_Enemy)
+	

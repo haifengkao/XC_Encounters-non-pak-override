@@ -1,0 +1,29 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+TRIGGER:%Anchor = HIB_Point_PrisonRat2_326aeabc-1d6a-45cb-8570-7520d3e45c17
+ITEM:%Gate = HIB_PrisonDoor4_9ae57eca-e4b4-40d2-95bc-cd08785efe0f
+
+BEHAVIOUR
+
+REACTION State_CallingPlayer, 0
+USAGE PEACE
+ACTIONS
+	CharacterLookAt(%Gate)
+	CharacterPlayAnimation("idle1")
+	Sleep(4)
+	DialogStart("HIB_AD_PrisonRat",__Me)
+INTERRUPT
+	Reset()
+
+REACTION State_Wander, 0
+USAGE PEACE
+ACTIONS
+	CharacterWander(FLOAT:6,4,0,%Anchor)
+	Sleep(2)
+	CharacterPlayAnimation("idle1")
+	Sleep(2)
+INTERRUPT
+	Reset()

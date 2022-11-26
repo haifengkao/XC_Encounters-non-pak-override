@@ -1,0 +1,19 @@
+INIT
+CHARACTER:__Me
+
+//-------------
+BEHAVIOUR
+REACTION inJail, 1100
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Anim
+	FIXEDSTRING:_Text
+	FLOAT:_Sleep
+ACTIONS
+	GetRandomBetween(_Sleep, 1, 5)
+	Sleep(_Sleep)
+	GetRandom(_Anim, "Talk_Sad", "Talk_Angry")
+	CharacterPlayAnimation(_Anim, 1, 0)
+	GetRandom(_Text, "LUC_ImpPrisoner1", "LUC_ImpPrisoner3", "LUC_ImpPrisoner2")
+	DisplayText(__Me, _Text, 5)
+	Sleep(15)

@@ -1,0 +1,35 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	INT:%DoTalk = 0
+
+BEHAVIOUR
+
+REACTION State_IdleInEden, 0
+USAGE PEACE
+ACTIONS
+	Set(%currentAction,"Action_IdleInEden")
+	SetPriority(%currentAction, 1100)
+	
+REACTION Action_IdleInEden,0
+USAGE PEACE
+VARS
+	FLOAT:_Dist
+	CHARACTER:_Player
+ACTIONS
+	IF "c1&c2&c3"
+		GetClosestPlayer(_Player,__Me)
+		GetDistance(_Dist,__Me,_Player)
+		IsLessThen(_Dist,6.0)
+	THEN
+		CharacterLookAt(_Player)
+		IF "c1&c2"
+			IsRandom(0.2)
+			IsEqual(%DoTalk,1)
+		THEN
+			DialogStart("HOM_AD_ZandalorEden",__Me)
+		ENDIF
+	ENDIF
+	Sleep(2.0)

@@ -1,0 +1,87 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+CHARACTER:%Friend = CYS_LighthouseDare1_2f9f9cc7-c9e5-4620-ae50-5ddb5bbff37d
+CHARACTER:%Friend2 = CYS_Selenia_60d4208e-2647-4c96-b20f-2cd0af558d53
+TRIGGER:%Point = CYS_PointLighthouseDaring6_fa8cc52f-53b2-46ad-a3b7-0392690f4f97
+
+BEHAVIOUR
+
+REACTION State_AtLighthouse, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	GetRandom(_Animation,"Cower_01","Cower_02")
+	CharacterLookFrom(TRIGGER:CYS_PointLighthouseDaring3_3e03dcbc-9225-43b7-8409-8344be1f931c)
+	CharacterPlayAnimation(_Animation)
+	Sleep(7)
+
+REACTION State_Dialog, 0
+USAGE PEACE
+CHECK "!c1&!c2"
+	IsInDialog(%Friend)
+	IsInDialog(__Me)
+ACTIONS
+	IF "!c1"
+		CharacterIsDead(%Friend)
+	THEN
+		CharacterLookAt(%Friend)
+		DialogStart("CYS_AD_LighthouseDaring",%Friend,__Me)
+	ENDIF
+	Set(%currentState,"State_AtLighthouse")
+INTERRUPT
+	Set(%currentState,"State_AtLighthouse")
+
+REACTION State_WaitWithSelenia, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	GetRandom(_Animation,"Flex_01","Cheer_01")
+	CharacterLookAt(%Friend2)
+	CharacterPlayAnimation(_Animation)
+	Sleep(7)
+
+REACTION State_AfterSelenia, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	CharacterMoveTo(%Point)
+	CharacterLookFrom(%Point)
+	GetWeightedRandom(_Animation,"Annoyed_01",FLOAT:1,"Bored_03",FLOAT:1,"Fidget_Low_01",FLOAT:2,"Fidget_Low_02",FLOAT:2)
+	CharacterPlayAnimation(_Animation)
+	Sleep(10)
+
+REACTION State_DialogAfterSelenia, 0
+USAGE PEACE
+CHECK "!c1&!c2"
+	IsInDialog(%Friend)
+	IsInDialog(__Me)
+ACTIONS
+	IF "!c1"
+		CharacterIsDead(%Friend)
+	THEN
+		CharacterLookAt(%Friend)
+		DialogStart("CYS_AD_LighthouseDaring",%Friend,__Me)
+	ENDIF
+	Set(%currentState,"State_AfterSelenia")
+INTERRUPT
+	Set(%currentState,"State_AfterSelenia")
+
+EVENTS
+
+EVENT StartDialog
+ON
+	OnCharacterEvent(__Me,"DialogRequest")
+ACTIONS
+	Set(%currentState,"State_Dialog")
+
+EVENT StartDialog_AfterAureus
+ON
+	OnCharacterEvent(__Me,"DialogRequest_AfterSelenia")
+ACTIONS
+	Set(%currentState,"State_DialogAfterSelenia")

@@ -1,0 +1,34 @@
+#INCLUDE State_Manager
+#INCLUDE DefaultCharacter
+
+INIT
+
+USING State_Manager
+USING DefaultCharacter
+CHARACTER:__Me
+TRIGGER:%SellingPlace  	= LUC_Ownership_Silverglen_Nadia_Shop_1e61fc49-886b-4ff0-8394-89b077b7d00a						
+TRIGGER:%PointRead		= LUC_Point_BrianRead_c3e09248-3414-4e58-82b1-9e9e3a66a128
+TRIGGER:%PointChest		= LUC_Point_BrianChest_04c3d909-a9bc-4ea3-a1e5-4857e2205127
+TRIGGER:%PointEat		= LUC_Point_BrianEat_9693a230-9f4e-4aa5-8fdb-723e2d945733
+TRIGGER:%PointShelf_01	= LUC_Point_Nadia_Shelf_01_85c6f814-4bb5-4b9a-8053-19d7c7a68c5d
+TRIGGER:%PointShelf_02 	= LUC_Point_Nadia_Shelf_02_01d5c613-c2d6-4376-a989-6c5bd57dbcd0
+TRIGGER:%PointShelf_03 	= LUC_Point_Nadia_Shelf_03_02c0e474-1f00-400b-b446-e5e20efd5e86
+ITEM:%Chest				= FUR_Rich_Chest_A_003_b312afb8-057e-4469-9726-7d33e0d8b522
+CHARACTER:%Mother		= LUC_Nadia_bfa657f0-2815-4fb6-a2bb-168fa4094416
+
+BEHAVIOUR
+	
+REACTION State_ActionManager_Shop, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, "Action_WanderInShop")
+	SetPriority(%currentAction, 1100)
+	
+REACTION Action_WanderInShop, 0
+USAGE PEACE
+ACTIONS
+	CharacterWander(%SellingPlace,4, 0)
+	SetPriority(%currentAction, 0)
+INTERRUPT
+	Reset()
+	Set(%currentState, "State_ActionManager_Shop")

@@ -1,0 +1,272 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%Assistant1="LUC_IC_TheKeeper_Ghost_01_ab705ad7-7f2b-4b46-88d9-10049bdb7acc"
+	CHARACTER:%Assistant2="LUC_IC_TheKeeper_Ghost_02_076421a2-57bb-42f4-b4a3-6e25ece50df9"
+	CHARACTER:%Assistant3="LUC_IC_TheKeeper_Ghost_03_c1c3ee8a-ac1a-4d72-8f2d-ab6194ab8bbe"
+	CHARACTER:%Assistant4="LUC_IC_TheKeeper_Ghost_04_4da7f10f-efd8-4d73-af19-406752517bce"
+	TRIGGER:%TeleportTrigger="LUC_TheKeeper_TeleportTrigger_ab8cca9c-3e67-47d4-a83a-3bc2522f93c1"
+	INT:%DeadAssistants=0
+	INT:%Bool_PoofHasPlayed=0
+	FLOAT:%MySightRange
+
+//------------------------------
+BEHAVIOUR
+REACTION CastNullResistanceOnEnemy,1200
+USAGE COMBAT
+VARS
+	CHARACTER:_Target
+	FLOAT:_DistanceBetwMeAndClosest
+CHECK "!c1&c2&!c3&c4"
+	CharacterHasStatus(__Me,INVISIBLE)
+	CharacterCanCast(__Me,Shout_EnemyNullResistance)
+	IsGreaterThen(%DeadAssistants,3)
+	CharacterGet(_Target,__Me,30,Lowest,Distance,Enemy)
+ACTIONS
+	IF "c1&c2"
+		GetDistance(_DistanceBetwMeAndClosest,__Me,_Target)
+		IsGreaterThen(_DistanceBetwMeAndClosest,2)
+	THEN
+		CharacterPlayEffect(__Me,"FX_GP_TeleportSmoke_A")
+		CharacterTeleportTo(_Target)
+		CharacterPlayEffect(__Me,"FX_GP_TeleportSmoke_A")	
+	ENDIF
+	CharacterUseSkill(Shout_EnemyNullResistance,__Me)
+	SetPriority("CastInvisibilityOnMyself",900)
+	DisplayText(__Me,"CMB_LUC_Librarian_Threat_01",3)	//You... have overstayed your welcome.
+INTERRUPT
+	Reset()
+	
+REACTION CastInvisibilityOnMyself,0
+USAGE COMBAT
+VARS
+	FLOAT:_DistanceBetwMeAndTrigger
+CHECK "!c1&c2&!c3"
+	CharacterHasStatus(__Me,INVISIBLE)
+	CharacterCanCast(__Me,Target_EnemyInvisibilityTarget)
+	IsGreaterThen(%DeadAssistants,3)
+ACTIONS
+	CharacterUseSkill(Target_EnemyInvisibilityTarget,__Me)
+	IF "c1&!c2"
+		GetDistance(_DistanceBetwMeAndTrigger,__Me,%TeleportTrigger)
+		IsGreaterThen(_DistanceBetwMeAndTrigger,20)
+	THEN
+		SetPriority("WhenInvisibleTeleportToTrigger",800)
+	ELSE
+		SetPriority("CastInvisibilityOnMyself",0)		
+	ENDIF
+INTERRUPT
+	Reset()
+	
+REACTION WhenInvisibleTeleportToTrigger,0
+USAGE COMBAT
+CHECK "c1"
+	CharacterHasStatus(__Me,INVISIBLE)
+ACTIONS
+	TeleportTo(__Me,%TeleportTrigger)	
+	SetPriority("CastInvisibilityOnMyself",0)	
+	SetPriority("WhenInvisibleTeleportToTrigger",0)	
+	CharacterEndTurn()
+INTERRUPT
+	Reset()
+
+REACTION CastBlindOnEnemy,600
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange	
+CHECK "!c1&c2&c3&c4"
+	CharacterHasStatus(__Me,INVISIBLE)
+	CharacterCanCast(__Me,Target_EnemyBlind)
+	CharacterGet(_ChosenTarget,__Me,%MySightRange,Highest,Dexterity,Enemy)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,Target_EnemyBlind)
+ACTIONS
+	IF "c1"
+		IsRandom(0.6)
+	THEN
+		DisplayText(__Me,"CMB_LUC_Librarian_Threat_02",3)	//Let's see how well you can read... in the dark!	
+	ENDIF
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)	
+	CharacterUseSkill(Target_EnemyBlind,_ChosenTarget)	
+
+REACTION CastSilenceOnEnemy,600
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "!c1&c2&c3&c4"
+	CharacterHasStatus(__Me,INVISIBLE)
+	CharacterCanCast(__Me,Projectile_EnemySilence)
+	CharacterGet(_ChosenTarget,__Me,%MySightRange,Highest,Intelligence,Enemy)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,Projectile_EnemySilence)	
+ACTIONS
+	IF "c1"
+		IsRandom(0.6)
+	THEN
+		DisplayText(__Me,"CMB_LUC_Librarian_Threat_03",3)	//I said SILENCE in the Library!
+	ENDIF
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill(Projectile_EnemySilence,_ChosenTarget)			
+
+REACTION AssistantsAreDead_UseFireBall,500
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "!c1&c2&!c3&c4&c5"
+	CharacterHasStatus(__Me,INVISIBLE)
+	CharacterCanCast(__Me,Projectile_EnemyFireball)
+	IsLessThen(%DeadAssistants,4)
+	CharacterGet(_ChosenTarget,__Me,%MySightRange,Lowest,Vitality,Enemy)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,Projectile_EnemyFireball)	
+ACTIONS
+	IF "c1"
+		IsRandom(0.6)
+	THEN
+		DisplayText(__Me,"CMB_LUC_Librarian_Threat_04",3)
+	ENDIF
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill(Projectile_EnemyFireball,_ChosenTarget)
+
+REACTION AssistantsAreDead_UseIceShard,500
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "!c1&c2&!c3&c4&c5"
+	CharacterHasStatus(__Me,INVISIBLE)
+	CharacterCanCast(__Me,Projectile_EnemyIceShard)
+	IsLessThen(%DeadAssistants,4)
+	CharacterGet(_ChosenTarget,__Me,%MySightRange,Lowest,Vitality,Enemy)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,Projectile_EnemyIceShard)	
+ACTIONS
+	IF "c1"
+		IsRandom(0.6)
+	THEN
+		DisplayText(__Me,"CMB_LUC_Librarian_Threat_05",3)
+	ENDIF
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill(Projectile_EnemyIceShard,_ChosenTarget)
+
+REACTION AssistantsAreDead_UseBlitzBolt,500
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "!c1&c2&!c3&c4&c5"
+	CharacterHasStatus(__Me,INVISIBLE)
+	CharacterCanCast(__Me,Projectile_EnemyBlitzBolt)
+	IsLessThen(%DeadAssistants,4)
+	CharacterGet(_ChosenTarget,__Me,%MySightRange,Lowest,Vitality,Enemy)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,Projectile_EnemyBlitzBolt)	
+ACTIONS
+	IF "c1"
+		IsRandom(0.6)
+	THEN
+		DisplayText(__Me,"CMB_LUC_Librarian_Threat_06",3)
+	ENDIF
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill(Projectile_EnemyBlitzBolt,_ChosenTarget)	
+
+REACTION CastStaffOfMagusOnEnemy,200
+USAGE COMBAT
+VARS
+	CHARACTER:_ChosenTarget
+	FLOAT:_MinRange
+	FLOAT:_MaxRange
+CHECK "!c1&c2&c3&c4"
+	CharacterHasStatus(__Me,INVISIBLE)
+	CharacterCanCast(__Me,Projectile_EnemyStaffOfMagusAir)
+	CharacterGet(_ChosenTarget,__Me,%MySightRange,Lowest,Vitality,Enemy)
+	CharacterGetSkillRange(_MinRange,_MaxRange,__Me,Projectile_EnemyStaffOfMagusAir)	
+ACTIONS
+	CharacterMoveInRange(_ChosenTarget,_MinRange,_MaxRange,1)
+	CharacterUseSkill(Projectile_EnemyStaffOfMagusAir,_ChosenTarget)
+	
+//------------------------------
+EVENTS	
+EVENT OnInit_GetSightRange_GiveSkills
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		CharacterGetStat(%MySightRange,__Me,Sight)
+	THEN
+		CharacterAddSkill(Shout_EnemyNullResistance)
+		CharacterAddSkill(Target_EnemyInvisibilityTarget)	
+		CharacterAddSkill(Target_EnemyBlind)
+		CharacterAddSkill(Projectile_EnemySilence)
+		CharacterAddSkill(Projectile_EnemyFireball)
+		CharacterAddSkill(Projectile_EnemyIceShard)
+		CharacterAddSkill(Projectile_EnemyBlitzBolt)
+		CharacterAddSkill(Projectile_EnemyStaffOfMagusAir)		
+	ENDIF
+	
+EVENT OnEnterCombat_DisplayCoolText
+ON
+	OnCombatStarted()
+ACTIONS
+	DisplayText(__Me,"CMB_LUC_Librarian_CallsForHelp",3)	//Assistants! Our Library needs cleaning!
+	
+EVENT OnDie_Assistant1_UpdateVariable
+ON
+	OnDie(%Assistant1,_,_,_)
+ACTIONS
+	Add(%DeadAssistants,1)
+	
+EVENT OnDie_Assistant2_UpdateVariable
+ON
+	OnDie(%Assistant2,_,_,_)
+ACTIONS
+	Add(%DeadAssistants,1)
+	
+EVENT OnDie_Assistant3_UpdateVariable
+ON
+	OnDie(%Assistant3,_,_,_)
+ACTIONS
+	Add(%DeadAssistants,1)
+	
+EVENT OnDie_Assistant4_UpdateVariable
+ON
+	OnDie(%Assistant4,_,_,_)
+ACTIONS
+	Add(%DeadAssistants,1)
+	
+EVENT OnTurn_IfAssistantsDead_RemoveInvis
+ON
+	OnTurn()
+ACTIONS
+	IF "c1&c2&!c3"
+		CharacterHasStatus(__Me,INVISIBLE)
+		IsEqual(%DeadAssistants,4)
+		IsEqual(%Bool_PoofHasPlayed,1)
+	THEN
+		CharacterPlayEffect(__Me,"FX_GP_TeleportSmoke_A")
+		CharacterRemoveStatus(__Me,INVISIBLE)
+		Add(%DeadAssistants,1)		
+		Set(%Bool_PoofHasPlayed,1)
+	ELIF "c1&c2"
+		IsEqual(%DeadAssistants,4)
+		IsEqual(%Bool_PoofHasPlayed,1)
+	THEN
+		Add(%DeadAssistants,1)		
+		Set(%Bool_PoofHasPlayed,1)		
+	ENDIF
+
+EVENT OnStatusInvisible_DeactivateDefaultAttack
+ON
+	OnCharacterStatus(__Me,INVISIBLE)
+ACTIONS
+	SetPriority("Combat_MoveToSetEnemy",0)
+	SetPriority("Combat_AttackSetEnemy",0)
+
+EVENT OnStatusInvisibleRemoved_ReactivateDefaultAttack
+ON
+	OnCharacterStatusRemoved(__Me,INVISIBLE)
+ACTIONS
+	SetPriority("Combat_MoveToSetEnemy",7)
+	SetPriority("Combat_AttackSetEnemy",7)

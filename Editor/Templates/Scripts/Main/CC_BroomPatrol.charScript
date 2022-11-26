@@ -1,0 +1,40 @@
+#INCLUDE State_Manager
+
+INIT 
+USING State_Manager
+
+	CHARACTER:__Me
+	TRIGGER:%Waypoint1 = CC_Broom_W01_753a6498-454a-4980-8d2a-026a780f3ece
+	TRIGGER:%Waypoint2 = CC_Broom_W02_a3555037-a9f9-4586-86db-7b35afc24f07
+	TRIGGER:%Waypoint3 = CC_Broom_W03_e863602a-49e8-4903-8cb1-4c6e133a386e
+	TRIGGER:%Waypoint4 = CC_Broom_W04_c91b215b-88da-413f-b4c5-b54cb5914e03
+	FLOAT:%BroomSleep
+	EXTERN FIXEDSTRING:%Action = null
+	EXTERN FLOAT:%float_BroomSleepMinValue=1
+	EXTERN FLOAT:%float_BroomSleepMaxValue=6
+	
+//------------------------
+BEHAVIOUR
+REACTION State_Patrolling, 0
+	USAGE PEACE
+	ACTIONS
+	GetRandom(%currentAction,%Action)
+	SetPriority(%currentAction,1100)
+
+REACTION Action_BroomPatrol, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterMoveTo(%Waypoint2)
+		GetRandomBetween(%BroomSleep,%float_BroomSleepMinValue,%float_BroomSleepMaxValue)
+		Sleep(%BroomSleep)		
+		CharacterMoveTo(%Waypoint3)
+		GetRandomBetween(%BroomSleep,%float_BroomSleepMinValue,%float_BroomSleepMaxValue)
+		Sleep(%BroomSleep)		
+		CharacterMoveTo(%Waypoint4)
+		GetRandomBetween(%BroomSleep,%float_BroomSleepMinValue,%float_BroomSleepMaxValue)
+		Sleep(%BroomSleep)		
+		CharacterMoveTo(%Waypoint1)
+		GetRandomBetween(%BroomSleep,%float_BroomSleepMinValue,%float_BroomSleepMaxValue)
+		Sleep(%BroomSleep)
+		SetPriority(%currentAction,0)
+	

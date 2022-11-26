@@ -1,0 +1,70 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+CHARACTER:%turkey = CYS_ChickenRockey_116ecea1-2c28-4b8f-98ae-c452346dde82
+TRIGGER:%Oven = CYS_CookOven_fe609c6e-510d-47bf-87ca-06eb8048d367
+TRIGGER:%Chimney = CYS_CookChimney_5ceee28d-64cd-4536-badc-97fc9c52eb8d
+TRIGGER:%Closet = CYS_CookCloset_05f0bd9b-e25e-4093-9c88-d0b19e24d950
+
+BEHAVIOUR
+
+REACTION State_FollowTurkey, 0
+USAGE PEACE
+ACTIONS
+	IF "c1"
+		IsRandom(0.3)
+	THEN
+		DisplayText(__Me, "CYS_CookMorris_Story_2", 3)
+	ENDIF
+	CharacterFollow(%turkey, 10, 1)
+	
+REACTION State_AfterQuest, 0
+	USAGE PEACE
+	ACTIONS
+		GetWeightedRandom(%currentAction,"Action_Wander", INT:3, "Action_AtOven", INT:1, "Action_AtChimney", INT:1, "Action_AtCloset", INT:1)
+		SetPriority(%currentAction, 1100)
+		
+REACTION Action_AtOven, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterMoveTo(%Oven)
+		CharacterLookFrom(%Oven)
+		CharacterPlayAnimation("use_inspect")
+		CharacterPlayAnimation("use_activate")
+		SetPriority(%currentAction, 0)
+			
+REACTION Action_AtChimney, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterMoveTo(%Chimney)
+		CharacterLookFrom(%Chimney)
+		CharacterPlayAnimation("Warm_Hands_01")
+		SetPriority(%currentAction, 0)
+			
+					
+REACTION Action_AtCloset, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterMoveTo(%Closet)
+		CharacterLookFrom(%Closet)
+		CharacterPlayAnimation("Fidget_Forward_01")
+		SetPriority(%currentAction, 0)
+					
+REACTION Action_Wander, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterWander(FLOAT:5,5.0,0)
+		SetPriority(%currentAction, 0)
+
+STORY
+
+SCRIPTFRAME killTurkey
+	ACTIONS
+		CharacterMoveTo(%turkey)
+		CharacterAttack(%turkey, 1)
+		CharacterDie(%turkey)
+		CharacterPlayAnimation("Fidget_Low_01")
+		CharacterEvent(__Me, "removeChicken")
+		

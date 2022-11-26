@@ -1,0 +1,37 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+Proc_ResetCompanions();
+
+Proc_ExclamationMarkCleanup();
+KBSECTION
+IF
+GameEventSet("GAMEEVENT_GameStarted")
+THEN
+InitStory();
+GoalCompleted;
+
+PROC
+Proc_ExclamationMarkCleanup()
+AND
+_Player.DB_IsPlayer()
+THEN
+CharacterStopAllEffectsWithName(_Player,"FX_GP_ExclamationMark_A");
+CharacterSetHasDialog(_Player,0);
+EXITSECTION
+
+ENDEXITSECTION
+TargetEdge "__GLO_PlayerComments"
+TargetEdge "__GLO_Shovel"
+TargetEdge "__GLOBAL_CIRBonus"
+TargetEdge "__GLOBAL_ExplorationBonus"
+TargetEdge "__GLOBAL_ForbiddenAreas"
+TargetEdge "__OneshotDialogs"
+TargetEdge "__PROC"
+TargetEdge "_Global_Autosave"
+TargetEdge "_Global_Henchman"
+TargetEdge "_GLOBAL_Subregions"
+TargetEdge "_GLOBAL_TeleporterPyramids"
+TargetEdge "_Prison_Init"
+TargetEdge "_Shroud"
+TargetEdge "_Waypoints"

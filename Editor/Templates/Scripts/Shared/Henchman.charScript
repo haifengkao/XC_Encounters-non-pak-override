@@ -1,0 +1,19 @@
+INIT
+
+CHARACTER:__Me
+
+BEHAVIOUR
+
+REACTION Idle_Henchman, 6
+USAGE PEACE
+VARS	
+	CHARACTER:_Owner
+CHECK "(!c1|!c2)&!c3" 
+	CharacterGetFollow(_Owner,__Me)
+	CharacterGetOwner(_Owner,__Me)
+	CharacterIsPlayer(__Me)
+ACTIONS
+	CharacterWander(FLOAT:2.0,3.0)
+	Sleep(4.0)
+	
+	

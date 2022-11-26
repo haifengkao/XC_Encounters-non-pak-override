@@ -1,0 +1,178 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+DB_PlayerComments("LUC_CommentCrossedBridge","LUC_CommentCrossedBridge_1_1",1,1);
+DB_PlayerComments("LUC_CommentCrossedBridge","LUC_CommentCrossedBridge_2_1",2,1);
+DB_PlayerComments("LUC_CommentCrossedBridge","LUC_CommentCrossedBridge_2_2",2,2);
+DB_PlayerComment_Trigger(TRIGGER_LUC_CommentBridge, "LUC_CommentCrossedBridge");
+
+DB_Dialogs(CHARACTER_LUC_ImmaculateBridge1, "LUC_ImmaculateBridge");
+DB_Dialogs(CHARACTER_LUC_ImmaculateBridge3, "LUC_ImmaculateBridge2");
+DB_Dialogs(CHARACTER_LUC_ImmaculateBridge4, "LUC_ImmaculateBridge2");
+DB_Dialogs(CHARACTER_LUC_ImmaculateBridge5, "LUC_ImmaculateBridge2");
+DB_Dialogs(CHARACTER_LUC_ImmaculateBridge2, "LUC_ImmaculateBridge");
+DB_Dialogs(CHARACTER_LUC_OrcGoblinsSlave, "LUC_OrcGoblinsSlave");
+DB_Dialogs(CHARACTER_LUC_Caravaneer, "LUC_Caravaneer");
+SneakTriggerSpotter(TRIGGER_LUC_ImmaculateBridgeAttack, CHARACTER_LUC_ImmaculateBridge3);
+SneakTriggerSpotter(TRIGGER_LUC_ImmaculateBridgeAttack, CHARACTER_LUC_ImmaculateBridge4);
+SneakTriggerSpotter(TRIGGER_LUC_ImmaculateBridgeAttack, CHARACTER_LUC_ImmaculateBridge5);
+SneakTriggerSpotter(TRIGGER_LUC_ImmaculateBridgeTalk, CHARACTER_LUC_ImmaculateBridge1);
+SneakTriggerSpotter(TRIGGER_LUC_ImmaculateBridgeTalk, CHARACTER_LUC_ImmaculateBridge2);
+SneakTriggerSpotter(TRIGGER_LUC_SpiderBossDialog, CHARACTER_LUC_SpiderBoss);
+DB_OneShot_DialogTrigger_NewSystem(TRIGGER_LUC_SpiderBossDialog, "LUC_SpiderMatriarch", CHARACTER_LUC_SpiderBoss);
+
+DB_LUC_Spiders(CHARACTER_LUC_Spider1);
+DB_LUC_Spiders(CHARACTER_LUC_Spider2);
+DB_LUC_Spiders(CHARACTER_LUC_Spider3);
+
+DB_Dialogs(CHARACTER_LUC_Arhu_Cat, "LUC_Arhu");
+CharacterSetOnStage(CHARACTER_LUC_Arhu, 0);
+
+DB_Dialogs(CHARACTER_LUC_MagicTrader, "LUC_MagicSeller");
+DB_Dialogs(CHARACTER_LUC_PotionTrader, "LUC_PotionSeller");
+DB_Dialogs(CHARACTER_LUC_IngredientTrader, "LUC_IngredientSeller");
+DB_Dialogs(CHARACTER_LUC_ArrowTrader, "LUC_ArrowSeller");
+DB_Dialogs(CHARACTER_LUC_RangerTrader, "LUC_RangerSelle");
+DB_Dialogs(CHARACTER_LUC_WarriorTrader, "LUC_WarriorSeller");
+DB_Dialogs(CHARACTER_LUC_SourceTrader, "LUC_SourceSeller");
+DB_Dialogs(CHARACTER_LUC_FireEarthTrader, "LUC_FireEarthSeller");
+DB_Dialogs(CHARACTER_LUC_WindWaterTrader, "LUC_WindWaterSeller");
+
+
+DB_AttackDogs(CHARACTER_LUC_WitchCave_Dog03);
+DB_AttackDogs(CHARACTER_HIB_DemonGate_ImmaculateWolf_02);
+DB_AttackDogs(CHARACTER_HIB_DemonGate_ImmaculateWolf_01);
+DB_AttackDogs(CHARACTER_HIB_TamedWolf1);
+DB_AttackDogs(CHARACTER_HIB_TamedWolf2);
+
+DB_EvilDude(CHARACTER_LUC_SpiderBoss);
+DB_IsNotMessingAround(CHARACTER_LUC_SpiderBoss);
+
+ItemSetOnstage(ITEM_LUC_TavernCellar2, 0);
+
+DB_ShovelArea(TRIGGER_LUC_ShovelMendius,"LUC_MendiusChest",ITEM_LUC_ShovelMendiusDirt);
+DB_ShovelRewardItemAppear("LUC_MendiusChest",ITEM_LUC_ShovelMendiusChest,TRIGGER_LUC_ShovelMendiusPoint);
+
+DB_BigTrader(CHARACTER_LUC_Arhu);
+DB_BigTrader(CHARACTER_LUC_ArrowTrader);
+DB_BigTrader(CHARACTER_LUC_FireEarthTrader);
+DB_BigTrader(CHARACTER_LUC_Kadraskaz);
+DB_BigTrader(CHARACTER_LUC_Arhu_Cat);
+DB_BigTrader(CHARACTER_LUC_Brian);
+DB_BigTrader(CHARACTER_LUC_IngredientTrader);
+DB_BigTrader(CHARACTER_LUC_MagicTrader);
+DB_BigTrader(CHARACTER_LUC_IV_Teacher);
+DB_BigTrader(CHARACTER_LUC_IV_BlacksmithApprentice);
+DB_BigTrader(CHARACTER_LUC_RangerTrader);
+DB_BigTrader(CHARACTER_HIB_ImmaculateBarter2);
+DB_BigTrader(CHARACTER_LUC_WindWaterTrader);
+DB_BigTrader(CHARACTER_LUC_PotionTrader);
+DB_BigTrader(CHARACTER_LUC_SourceTrader);
+DB_BigTrader(CHARACTER_LUC_Nadia);
+
+CharacterSetOnStage(CHARACTER_LUC_Arhu_Cat, 0);
+KBSECTION
+PROC
+ProcCharInTriggerSpotted(_Player,TRIGGER_LUC_ImmaculateBridgeAttack)
+THEN
+ProcSetRelationToPlayers(CHARACTER_LUC_ImmaculateBridge1, 0);
+ProcSetRelationToPlayers(CHARACTER_LUC_ImmaculateBridge2, 0);
+ProcSetRelationToPlayers(CHARACTER_LUC_ImmaculateBridge3, 0);
+ProcSetRelationToPlayers(CHARACTER_LUC_ImmaculateBridge4, 0);
+ProcSetRelationToPlayers(CHARACTER_LUC_ImmaculateBridge5, 0);
+CharacterDisplayText(CHARACTER_LUC_ImmaculateBridge1, "LUC_ImmaculateBridgeAttack");
+
+PROC
+ProcCharInTriggerSpotted(_Player, TRIGGER_LUC_ImmaculateBridgeTalk)
+THEN
+ProcDoTwoSpeakerDialog("LUC_ImmaculateBridge", CHARACTER_LUC_ImmaculateBridge2, _Player);
+
+IF
+GlobalEventSet("LUC_ImmaculateHaveAllowedTravel")
+THEN
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_ImmaculateBridgeAttack);
+
+IF
+DialogEnded("LUC_ImmaculateBridge", _)
+AND
+CharacterGetVarInteger(CHARACTER_LUC_ImmaculateBridge2, "willattack", 1)
+THEN
+ProcSetRelationToPlayers(CHARACTER_LUC_ImmaculateBridge1, 0);
+ProcSetRelationToPlayers(CHARACTER_LUC_ImmaculateBridge2, 0);
+ProcSetRelationToPlayers(CHARACTER_LUC_ImmaculateBridge3, 0);
+ProcSetRelationToPlayers(CHARACTER_LUC_ImmaculateBridge4, 0);
+ProcSetRelationToPlayers(CHARACTER_LUC_ImmaculateBridge5, 0);
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_ImmaculateBridgeAttack);
+
+IF
+DialogEnded("LUC_ImmaculateBridge", _)
+AND
+CharacterGetVarInteger(CHARACTER_LUC_ImmaculateBridge1, "willattack", 1)
+THEN
+ProcSetRelationToPlayers(CHARACTER_LUC_ImmaculateBridge1, 0);
+ProcSetRelationToPlayers(CHARACTER_LUC_ImmaculateBridge2, 0);
+ProcSetRelationToPlayers(CHARACTER_LUC_ImmaculateBridge3, 0);
+ProcSetRelationToPlayers(CHARACTER_LUC_ImmaculateBridge4, 0);
+ProcSetRelationToPlayers(CHARACTER_LUC_ImmaculateBridge5, 0);
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_ImmaculateBridgeAttack);
+
+IF
+DialogEnded("LUC_OrcGoblinsSlave", _)
+THEN
+CharacterSetHasDialog(CHARACTER_LUC_OrcGoblinsSlave, 0);
+CharacterDisappearOutOfSight(CHARACTER_LUC_OrcGoblinsSlave, 0,1,"", 1);
+
+IF
+CharacterEnteredCombat(CHARACTER_LUC_OrcAmbush3,_)
+THEN
+DialogRequestStopForCharacter(CHARACTER_LUC_OrcAmbush3);
+
+IF
+CharacterEnteredCombat(CHARACTER_LUC_SpiderBoss, _)
+THEN
+CharacterSetFaction(CHARACTER_LUC_SpiderBoss, "LUC_Spider");
+ProcTriggerUnregisterForPlayers(TRIGGER_LUC_SpiderBossDialog);
+
+IF
+DialogEnded("LUC_SpiderMatriarch", _)
+AND
+NOT CharacterGetVarInteger(CHARACTER_LUC_SpiderBoss, "isHappy", 1)
+THEN
+CharacterSetFaction(CHARACTER_LUC_SpiderBoss, "LUC_Spider");
+
+IF
+DialogEnded("LUC_Arhu", _)
+THEN
+CharacterSetHasDialog(CHARACTER_LUC_Arhu_Cat, 0);
+CharacterDisappearOutOfSight(CHARACTER_LUC_Arhu_Cat, 0, 1, "", 1);
+
+IF
+CharacterItemEvent(_Player, ITEM_LUC_TavernButton, "moveBarrel")
+THEN
+ItemSetOnstage(ITEM_LUC_TavernCellar2, 1);
+ItemPlayEffect(ITEM_LUC_TavernCellar2, "FX_GP_TeleportSmoke_A");
+PROC_CommentHiddenEffect(_Player);
+
+IF
+CharacterEvent(_Dog, "IAmWeeping")
+AND
+DB_AttackDogs(_Dog)
+THEN
+CharacterLeaveCombat(_Dog);
+CharacterSetHasDefaultDialog(_Dog, 0);
+CharacterSetHasDialog(_Dog, 0);
+SetAttitudeToAtLeast(CHARACTER_Player1,_Dog,50);
+SetAttitudeToAtLeast(CHARACTER_Player2,_Dog,50);
+DB_AD_Dialog(_Dog, "GLO_AD_DogSad");
+
+IF
+CharacterEvent(CHARACTER_CYS_Arhu, "AEM_Done")
+AND
+DB_GlobalEvent("LUC_AEM_Start")
+THEN
+Foop(CHARACTER_LUC_Arhu_Cat);
+GlobalClearEvent("LUC_AEM_Start");
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

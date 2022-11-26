@@ -1,0 +1,69 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%MirrorPlayer_Male="CYS_MD_MirrorPlayer1_b82e8ddc-9e9d-42ea-892d-a5e882dbe6ad"
+	CHARACTER:%MirrorPlayer_Female="CYS_MD_MirrorPlayer2_083d3106-0b44-4471-8bd7-2fbf461765e8"
+	
+//------
+BEHAVIOUR
+REACTION MirrorPlayer_CastRain, 1300
+USAGE COMBAT
+CHECK "c1&c2"
+	IsEqual(__Me,%MirrorPlayer_Male)
+	CharacterCanCast(__Me,"Rain_EnemyWater_Mirror")
+ACTIONS
+	CharacterUseSkill("Rain_EnemyWater_Mirror",__Me)
+	
+REACTION MirrorPlayer_SummonIce, 700
+USAGE COMBAT
+CHECK "c1&c2&c3"
+	IsEqual(__Me,%MirrorPlayer_Male)
+	CharacterCanCast(__Me,"Summon_EnemyMirror_Ice")
+	IsHardcore()
+ACTIONS
+	CharacterUseSkill("Summon_EnemyMirror_Ice",__Me)
+	
+REACTION MirrorPlayer_SummonEnchantedArmor, 600
+USAGE COMBAT
+CHECK "c1&c2&c3"
+	IsEqual(__Me,%MirrorPlayer_Male)
+	CharacterCanCast(__Me,"Summon_EnemyMirror_EnchantedArmor")
+	IsHardcore()
+ACTIONS
+	CharacterUseSkill("Summon_EnemyMirror_EnchantedArmor",__Me)
+
+REACTION MirrorPlayer_SummonSpider, 500
+USAGE COMBAT
+CHECK "c1&c2&c3"
+	IsEqual(__Me,%MirrorPlayer_Female)
+	CharacterCanCast(__Me,"Summon_EnemyMirror_Spider")
+	IsHardcore()
+ACTIONS
+	CharacterUseSkill("Summon_EnemyMirror_Spider",__Me)
+	
+REACTION MirrorPlayer_SummonEnchantedSkeleton, 500
+USAGE COMBAT
+CHECK "c1&c2&c3"
+	IsEqual(__Me,%MirrorPlayer_Female)
+	CharacterCanCast(__Me,"Summon_EnemyMirror_Skeleton")
+	IsHardcore()
+ACTIONS
+	CharacterUseSkill("Summon_EnemyMirror_Skeleton",__Me)	
+	
+//------
+EVENTS
+EVENT OnInit_AddSpells
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		IsEqual(__Me,%MirrorPlayer_Male)
+	THEN
+		CharacterAddSkill("Rain_EnemyWater_Mirror")
+		CharacterAddSkill("Summon_EnemyMirror_Ice")
+		CharacterAddSkill("Summon_EnemyMirror_EnchantedArmor")
+	ELIF "c1"
+		IsEqual(__Me,%MirrorPlayer_Female)
+	THEN
+		CharacterAddSkill("Summon_EnemyMirror_Spider")
+		CharacterAddSkill("Summon_EnemyMirror_Skeleton"
+	ENDIF

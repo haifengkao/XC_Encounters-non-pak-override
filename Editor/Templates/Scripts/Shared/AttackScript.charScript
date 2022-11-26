@@ -1,0 +1,17 @@
+#INCLUDE Base
+INIT
+USING Base
+CHARACTER:__Me
+
+BEHAVIOUR 
+
+REACTION Attack,2
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+CHECK "c1"
+	CharacterGet(_Enemy,__Me,null,Lowest,Distance,Enemy)
+ACTIONS 
+	CharacterAttack(_Enemy)	
+	Check()
+	Goto(Start)

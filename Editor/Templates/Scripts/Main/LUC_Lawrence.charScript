@@ -1,0 +1,89 @@
+#INCLUDE State_Manager
+
+INIT
+USING State_Manager
+CHARACTER:__Me
+TRIGGER:%Point1 = LUC_PointLawrence1_ef37aab4-8b98-4efb-a979-98abf3e6c445
+TRIGGER:%Point2 = LUC_PointLawrence2_066491b1-76af-43f3-b385-dae373794ca3
+TRIGGER:%Point3 = LUC_PointLawrence3_3460fb43-33ec-4f41-8b3a-f9742bd7852f
+TRIGGER:%Point4 = LUC_PointLawrence4_1ae2bb1b-8047-478e-9c10-a6c4aae9f75a
+
+BEHAVIOUR
+
+REACTION State_ActionManager, 0
+USAGE PEACE
+ACTIONS
+	GetRandom(%currentAction, "Action_Eat", "Action_Read", "Action_Wander", "Action_Think")
+	SetPriority(%currentAction, 1100)
+
+REACTION State_DuringNadiaSpeech, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	CharacterMoveTo(%Point4,1)
+	CharacterLookFrom(%Point4)
+	GetWeightedRandom(_Animation,"Beg_01",FLOAT:1,"Halt_01",FLOAT:1,"Sooth_01",FLOAT:2)
+	CharacterPlayAnimation(_Animation)
+	DialogStart("LUC_AD_LawrenceMiners",__Me)
+	Sleep(4)
+
+REACTION Action_Eat, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Text
+	FIXEDSTRING:_Animation
+ACTIONS
+	CharacterMoveTo(%Point2)
+	CharacterLookFrom(%Point2)
+	GetRandom(%animationLoopCount, 1, 2, 3)
+	Set(%currentAnimation, "Fidget_Forward_01")
+	Set(%previousAction, "Action_Eat")
+	Set(%currentState, "State_LoopAnimation")
+	SetPriority(%currentAction,0)
+INTERRUPT
+	SetPriority(%currentAction,0)
+	
+REACTION Action_Read, 0
+USAGE PEACE
+ACTIONS
+	CharacterMoveTo(%Point1)
+	CharacterLookFrom(%Point1)
+	CharacterPlayAnimation("Fidget_High_01")
+	GetRandom(%animationLoopCount, 1, 2)
+	Set(%currentAnimation, "Stand_Read_01")
+	Set(%currentState, "State_LoopAnimation")
+	CharacterPlayAnimation("Fidget_High_01")
+	SetPriority(%currentAction,0)
+INTERRUPT
+	SetPriority(%currentAction,0)
+	
+REACTION Action_Think, 0
+USAGE PEACE
+VARS
+	FIXEDSTRING:_Animation
+ACTIONS
+	CharacterMoveTo(%Point3)
+	CharacterLookFrom(%Point3)
+	GetRandom(_Animation, "Think_01", "Think_02")
+	CharacterPlayAnimation(_Animation)
+	Sleep(5)
+	SetPriority(%currentAction,0)
+INTERRUPT
+	SetPriority(%currentAction,0)
+	
+REACTION Action_Wander, 0
+USAGE PEACE
+ACTIONS
+	CharacterWander(TRIGGER:LUC_AreaLawrence_1bc3f44c-51d8-4ee2-b2f8-5a7e8f6555f3, 5)
+	SetPriority(%currentAction,0)
+INTERRUPT
+	SetPriority(%currentAction,0)
+	
+EVENTS
+
+EVENT combat
+ON
+	OnCombatStarted()
+ACTIONS
+	DialogRequestStop("LUC_AD_LawrenceBrandon")

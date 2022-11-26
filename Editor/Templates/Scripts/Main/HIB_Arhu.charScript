@@ -1,0 +1,84 @@
+INIT
+CHARACTER:__Me
+TRIGGER:%Point1 = HIB_Arhu_Crystal1_e2227dc1-a26a-4822-98d5-781e70a6c8e8
+TRIGGER:%Point2 = HIB_Arhu_Crystal2_b4eee3d6-8b3e-416d-8a79-272246b349cd
+TRIGGER:%Point3 = HIB_Arhu_Crystal3_654d05e5-02d5-487c-aa6b-6d0881a52d21
+TRIGGER:%HitSparkSpot = HIB_Arhu_Hitspark_fa3bbb96-c631-4f4e-9cb0-9e48acca08b6
+INT:%PlayersInSafeArea = 0
+INT:%SuaArrived = 0
+
+BEHAVIOUR
+REACTION AfterSuaArrived, 501
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%SuaArrived,1)
+ACTIONS
+	CharacterMoveTo(%Point3)
+	CharacterLookFrom(%Point3)
+	Sleep(20.0)
+	
+REACTION Main, 500
+USAGE PEACE
+ACTIONS
+	IF "c1"
+		IsEqual(%PlayersInSafeArea,1)
+	THEN
+		Sleep(10.0)
+	ELSE
+		CharacterMoveTo(%Point1)
+		CharacterLookFrom(%Point1)
+		IF "c1"
+			IsEqual(%PlayersInSafeArea,0)
+		THEN
+			StartTimer("HIB_ArhuAttack1",0.7,0)
+			StartTimer("HIB_ArhuAttack2",1.0,0)
+			StartTimer("HIB_ArhuAttack3",2.34,0)
+			CharacterAttackWithoutMove(CHARACTER:HIB_Icara_28395996-f175-4982-be2e-6e274add3042)
+			DisplayText(__Me,"HIB_Arhu_Crystal1",3)
+			CharacterPlayAnimation("emotion_sad")
+			Sleep(1.0)
+		
+			CharacterMoveTo(%Point2)
+			CharacterLookFrom(%Point2)
+			IF "c1"
+				IsEqual(%PlayersInSafeArea,0)
+			THEN
+				CharacterUseSkill(SKILL:Projectile_Quest_ArhuFakeFireball,ITEM:HIB_IcePrisonIcara_e3877cec-44bb-4a03-a92e-aca8611270ff)
+				DisplayText(__Me,"HIB_Arhu_Crystal2",3)
+				CharacterPlayAnimation("emotion_sad")
+				Sleep(1.0)
+			ENDIF
+		ENDIF
+	ENDIF
+	
+	CharacterMoveTo(%Point3)
+	CharacterLookFrom(%Point3)
+	DisplayText(__Me,"HIB_Arhu_Crystal3",3)
+	CharacterPlayAnimation("emotion_sad")
+	Sleep(2.0)
+
+
+EVENTS
+EVENT Init
+ON
+	OnInit()
+ACTIONS
+	CharacterAddSkill(Projectile_Quest_ArhuFakeFireball)
+	
+EVENT Hitspark1
+ON
+	OnTimer("HIB_ArhuAttack1")
+ACTIONS
+	PlayEffectAt(%HitSparkSpot,"FX_GP_Hit_Bone_A_Medium")
+
+EVENT Hitspark2
+ON
+	OnTimer("HIB_ArhuAttack2")
+ACTIONS
+	PlayEffectAt(%HitSparkSpot,"FX_GP_Hit_Bone_A_Medium")
+
+EVENT Hitspark3
+ON
+	OnTimer("HIB_ArhuAttack3")
+ACTIONS
+	PlayEffectAt(%HitSparkSpot,"FX_GP_Hit_Bone_A_Medium")

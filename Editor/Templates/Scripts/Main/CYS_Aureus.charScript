@@ -1,0 +1,68 @@
+#INCLUDE State_Manager
+
+INIT
+	USING State_Manager
+	CHARACTER:__Me
+	TRIGGER:%Bookcase = CYS_Point_AureusLibrary_e82c884a-d4cc-4abd-bf71-7a981c9f10b9
+	TRIGGER:%Window = CYS_Point_AureusWindow_4c81d657-47eb-4cdb-a53c-08c93ce5309e
+	TRIGGER:%Office = CYS_Point_AureusOffice_f99f3ddf-cdb5-465f-aaf9-299f067da68f
+	INT:%Dialog = 0
+BEHAVIOUR
+
+REACTION State_WanderingInRoom, 0
+	USAGE PEACE
+	ACTIONS
+		GetWeightedRandom(%currentAction, "Action_WanderAround", INT:4, "Action_SitAtDesk", INT:1, "Action_ReadABook", INT:1, "Action_PlayAnimation", INT:3, "Action_StareAtWindow", INT:2)
+		SetPriority(%currentAction, 1100)
+
+REACTION Action_WanderAround, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterWander(FLOAT:3.0,5,0,%Office)
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)
+		
+REACTION Action_SitAtDesk, 0
+	USAGE PEACE
+	ACTIONS
+		//succession of actions that allows Aureus to sit at his desk
+		// Will need Sit animation
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)
+		
+REACTION Action_ReadABook, 0
+	USAGE PEACE
+	VARS
+		FIXEDSTRING:_Animation
+	ACTIONS
+		CharacterMoveTo(%Bookcase,0)
+		CharacterLookFrom(%Bookcase)
+		GetRandom(_Animation, "Fidget_Forward_01", "Fidget_High_02", "Fidget_Low_01")
+		CharacterPlayAnimation(_Animation,0)
+		CharacterPlayAnimation("Stand_Read_01")
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)
+
+REACTION Action_PlayAnimation, 0
+	USAGE PEACE
+	VARS
+		FIXEDSTRING:_Animation
+	ACTIONS
+		GetRandom(_Animation, "Dust_Off_01", "Think_01", "Tired_01")
+		CharacterPlayAnimation(_Animation)
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)
+		
+REACTION Action_StareAtWindow, 0
+	USAGE PEACE
+	ACTIONS
+		CharacterMoveTo(%Window,0)
+		CharacterLookFrom(%Window)
+		CharacterPlayAnimation("Think_02")
+		SetPriority(%currentAction, 0)
+	INTERRUPT
+		SetPriority(%currentAction, 0)

@@ -1,0 +1,26 @@
+INIT
+CHARACTER:__Me
+
+BEHAVIOUR
+
+REACTION IdleScene, 1100
+USAGE PEACE
+ACTIONS
+	CharacterLookAt(CHARACTER:HOM_EndSceneZixZax_b1f72e8d-0618-4d71-8a4a-61baa88c78da)
+	Sleep(1)
+
+REACTION DoPanic, 0
+USAGE PEACE
+ACTIONS
+	CharacterFleeFrom(RELATION:All,12.0)
+	
+EVENTS
+
+EVENT Panic
+ON
+	OnGlobalEventSet("HOM_EndGame_Panic")
+ACTIONS
+	SetPriority("IdleScene", 0)
+	SetPriority("DoPanic", 1100)
+	
+

@@ -1,0 +1,97 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+//REGION CYSEAL
+DB_AutoSaveTrigger(TRIGGER_CYS_AUTOSAVE_ArhuGate);
+DB_AutoSaveTrigger(TRIGGER_CYS_AUTOSAVE_CysealGate);
+DB_AutoSaveTrigger(TRIGGER_CYS_AUTOSAVE_BlackCoveGate);
+DB_AutoSaveTrigger(TRIGGER_CYS_AUTOSAVE_BlackCoveEntrance);
+DB_AutoSaveTrigger(TRIGGER_CYS_AUTOSAVE_EastGate);
+DB_AutoSaveTrigger(TRIGGER_CYS_AUTOSAVE_NorthGateLeft);
+DB_AutoSaveTrigger(TRIGGER_CYS_AUTOSAVE_NorthGateRight);
+DB_AutoSaveTrigger(TRIGGER_CYS_AUTOSAVE_WestGate);
+DB_AutoSaveTrigger(TRIGGER_CYS_AUTOSAVE_Lighthouse);
+DB_AutoSaveTrigger(TRIGGER_CYS_AUTOSAVE_NorthBeachTunnelEntrance);
+DB_AutoSaveTrigger(TRIGGER_CYS_AUTOSAVE_AbandonedHouseCellar);
+DB_AutoSaveTrigger(TRIGGER_CYS_AUTOSAVE_WellTunnel_1);
+DB_AutoSaveTrigger(TRIGGER_CYS_AUTOSAVE_WellTunnel_2);
+DB_AutoSaveTrigger(TRIGGER_CYS_AUTOSAVE_WellTunnel_3);
+DB_AutoSaveTrigger(TRIGGER_CYS_AUTOSAVE_WellTunnel_4);
+DB_AutoSaveTrigger(TRIGGER_CYS_AUTOSAVE_EvelynHideout);
+DB_AutoSaveTrigger(TRIGGER_CYS_AUTOSAVE_EvelynLastRoom);
+DB_AutoSaveTrigger(TRIGGER_CYS_AUTOSAVE_BraccusEntry);
+DB_AutoSaveTrigger(TRIGGER_CYS_AUTOSAVE_TavernCellar);
+DB_AutoSaveTrigger(TRIGGER_CYS_AUTOSAVE_TavernTopFloor);
+DB_AutoSaveTrigger(TRIGGER_CYS_AUTOSAVE_EsmeraldaCellar);
+DB_AutoSaveTrigger(TRIGGER_CYS_AUTOSAVE_TrapHouse_1);
+DB_AutoSaveTrigger(TRIGGER_CYS_AUTOSAVE_TrapHouse_2);
+DB_AutoSaveTrigger(TRIGGER_CYS_AUTOSAVE_SkeletonKing);
+DB_AutoSaveTrigger(TRIGGER_CYS_AUTOSAVE_Graveyard);
+DB_AutoSaveTrigger(TRIGGER_CYS_AUTOSAVE_ChurchEntrance);
+DB_AutoSaveTrigger(TRIGGER_CYS_AUTOSAVE_FireLake);
+DB_AutoSaveTrigger(TRIGGER_CYS_AUTOSAVE_ThelyronShack);
+DB_AutoSaveTrigger(TRIGGER_CYS_AUTOSAVE_Statues);
+DB_AutoSaveTrigger(TRIGGER_CYS_AUTOSAVE_EvelynHouse);
+DB_AutoSaveTrigger(TRIGGER_CYS_TUT_AUTOSAVE_Ragequin);
+DB_AutoSaveTrigger(TRIGGER_CYS_AUTOSAVE_OrcBeach);
+DB_AutoSaveTrigger(TRIGGER_CYS_AUTOSAVE_OozeField);
+DB_AutoSaveTrigger(TRIGGER_CYS_TUT_AutoSave);
+//END_REGION
+
+//REGION Dark Forest
+DB_AutoSaveTrigger(TRIGGER_DAF_AUTOSAVE_Log);
+DB_AutoSaveTrigger(TRIGGER_DAF_AUTOSAVE_KT_Approach);
+DB_AutoSaveTrigger(TRIGGER_DAF_AUTOSAVE_Druid_Dungeon);
+DB_AutoSaveTrigger(TRIGGER_DAF_AUTOSAVE_Knights_Tomb);
+DB_AutoSaveTrigger(TRIGGER_DAF_AUTOSAVE_Torture);
+DB_AutoSaveTrigger(TRIGGER_DAF_AUTOSAVE_DruidEntry);
+DB_AutoSaveTrigger(TRIGGER_DAF_AUTOSAVE_DruidHouse);
+DB_AutoSaveTrigger(TRIGGER_DAF_AUTOSAVE_Fort_PuzRoute);
+DB_AutoSaveTrigger(TRIGGER_DAF_AUTOSAVE_Fort_SneakRoute);
+DB_AutoSaveTrigger(TRIGGER_DAF_AUTOSAVE_Fort_TrapRoute);
+//END_REGION
+
+//REGION Dark Forest Inner Sanctum
+DB_AutoSaveTrigger(TRIGGER_DFD_IS_AUTOSAVE_InnerSanctum);
+//END_REGION
+
+//REGION Luculla Forest
+DB_AutoSaveTrigger(TRIGGER_LUC_AUTOSAVE_ChurchInnerLibrary);
+DB_AutoSaveTrigger(TRIGGER_LUC_AUTOSAVE_GoblinBridges);
+DB_AutoSaveTrigger(TRIGGER_LUC_AUTOSAVE_GoblinCave);
+DB_AutoSaveTrigger(TRIGGER_LUC_AUTOSAVE_HIghPlains);
+DB_AutoSaveTrigger(TRIGGER_LUC_AUTOSAVE_ImmaculateBridge);
+DB_AutoSaveTrigger(TRIGGER_LUC_AUTOSAVE_ImmaculateForest);
+DB_AutoSaveTrigger(TRIGGER_LUC_AUTOSAVE_ImmaculateTeleportDone);
+DB_AutoSaveTrigger(TRIGGER_LUC_AUTOSAVE_ImmaculateTeleporterDungeon);
+DB_AutoSaveTrigger(TRIGGER_LUC_AUTOSAVE_ImmaculateTrial);
+DB_AutoSaveTrigger(TRIGGER_LUC_AUTOSAVE_LoicFight);
+DB_AutoSaveTrigger(TRIGGER_LUC_AUTOSAVE_Maradino);
+DB_AutoSaveTrigger(TRIGGER_LUC_AUTOSAVE_TKCaveFake);
+DB_AutoSaveTrigger(TRIGGER_LUC_AUTOSAVE_TKCaveReal);
+DB_AutoSaveTrigger(TRIGGER_LUC_AUTOSAVE_WitchCabin);
+DB_AutoSaveTrigger(TRIGGER_LUC_AUTOSAVE_WitchCEllar);
+DB_AutoSaveTrigger(TRIGGER_LUC_AUTOSAVE_Vaelanna);
+DB_AutoSaveTrigger(TRIGGER_HOM_AUTOSAVE_EdenFight);
+DB_AutoSaveTrigger(TRIGGER_LUC_AUTOSAVE_ImmaculateCathedral);
+DB_AutoSaveTrigger(TRIGGER_LUC_AUTOSAVE_PavilionDeath);
+//END_REGION
+
+//REGION Hiberheim
+DB_AutoSaveTrigger(TRIGGER_HIB_AUTOSAVE_Almina);
+DB_AutoSaveTrigger(TRIGGER_HIB_AUTOSAVE_Boreas);
+DB_AutoSaveTrigger(TRIGGER_HIB_AUTOSAVE_CaveExit);
+DB_AutoSaveTrigger(TRIGGER_HIB_AUTOSAVE_JailPassage);
+DB_AutoSaveTrigger(TRIGGER_HIB_AUTOSAVE_JailTrap);
+DB_AutoSaveTrigger(TRIGGER_HIB_AUTOSAVE_Massacre);
+DB_AutoSaveTrigger(TRIGGER_HIB_AUTOSAVE_TreasureTrap);
+//END_REGION
+
+DB_AutoSaveTrigger(TRIGGER_END_AUTOSAVE_NegaCombat);
+DB_AutoSaveTrigger(TRIGGER_END_AUTOSAVE_NegaCellar);
+KBSECTION
+
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "DOSStart"

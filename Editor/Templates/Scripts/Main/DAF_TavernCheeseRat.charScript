@@ -1,0 +1,24 @@
+INIT
+CHARACTER:__Me
+
+ITEM:%Cheese = DAF_TavernCheese_72119197-6aea-406f-bc36-c221f6de721d
+
+TRIGGER:%Point1 = DAF_Point_TavernCheeseRat1_d44bc1cc-7138-494e-a781-45fc515fb690
+TRIGGER:%Point2 = DAF_Point_TavernCheeseRat2_ac749d21-0d9d-4198-abae-af2e4c3bc900
+INT:%CheesePlace = 1
+
+BEHAVIOUR
+REACTION GoToCheese, 1050
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%CheesePlace,1)
+ACTIONS
+	DisplayText(__Me,"DAF_TavernCheeseRat_Script_00",3) // Cheese! Need more cheese!
+	Check()
+	CharacterMoveTo(%Cheese,1)
+	DisplayText(__Me,"DAF_TavernCheeseRat_Script_01",3) // More! More! MORE!
+	CharacterPlayAnimation("idle1")
+	Sleep(2)
+	CharacterMoveTo(%Point1,1)
+	CharacterLookFrom(%Point1)
+	CharacterEvent(__Me,"DAF_CheeseRatSetOffStageTimer")

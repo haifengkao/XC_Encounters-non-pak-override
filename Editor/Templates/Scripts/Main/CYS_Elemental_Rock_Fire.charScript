@@ -1,0 +1,67 @@
+INIT
+	CHARACTER:__Me
+	CHARACTER:%IncandWander="CYS_Shambling_Mound_Lava_000_8a67274f-cc7a-4d7b-bfb8-1195edfb0201"
+	INT:%Bool_AlreadyExploded=0
+
+//----------------
+BEHAVIOUR
+REACTION FireRock_ExplodeOnEnemy,50
+USAGE COMBAT
+VARS
+	CHARACTER:_Enemy
+	FLOAT:_Distance
+CHECK "c1"
+	CharacterGet(_Enemy,__Me,30,Random,Vitality,Enemy)
+ACTIONS
+	CharacterMoveTo(_Enemy,1)
+	IF "!(c1|c2)"
+		CharacterHasStatus(__Me,"FROZEN")
+		CharacterHasStatus(__Me,"WET")
+	THEN
+		ExplodeAt(_Enemy,"Projectile_SuicideBomberExplosion",5)
+		Set(%Bool_AlreadyExploded,1)
+		CharacterDie(__Me)
+	ELSE
+		SetPriority("FireRock_ExplodeOnEnemy",0)
+	ENDIF
+	
+REACTION FireRock_ExplodeOnIncandWander,500
+USAGE COMBAT
+VARS
+	FLOAT:_IncandWander_Health
+CHECK "c1&c2&c3"
+	IsHardcore()
+	CharacterGetStat(_IncandWander_Health,%IncandWander,Vitality)
+	IsLessThen(_IncandWander_Health,0.2)
+ACTIONS
+	IF "!(c1|c2)"
+		CharacterHasStatus(__Me,"FROZEN")
+		CharacterHasStatus(__Me,"WET")
+	THEN
+		ExplodeAt(%IncandWander,"Projectile_SuicideBomberExplosion",5)
+		Set(%Bool_AlreadyExploded,1)
+		CharacterDie(__Me)
+	ELSE
+		SetPriority("FireRock_ExplodeOnIncandWander",0)
+	ENDIF
+
+//----------------	
+EVENTS
+EVENT OnTurn_GeneralControl
+ON
+	OnTurn()
+ACTIONS
+	SetPriority("FireRock_ExplodeOnEnemy",50)
+	SetPriority("FireRock_ExplodeOnIncandWander",500)
+
+EVENT OnDie_Explode
+ON
+	OnDie(__Me,_,_,_)
+ACTIONS
+	IF "c1&!(c2|c3)"
+		IsEqual(%Bool_AlreadyExploded,0)
+		CharacterHasStatus(__Me,"FROZEN")
+		CharacterHasStatus(__Me,"WET")
+	THEN
+		ExplodeAt(__Me,"Projectile_SuicideBomberExplosion",5)
+	ENDIF

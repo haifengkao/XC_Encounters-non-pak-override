@@ -1,0 +1,63 @@
+INIT
+CHARACTER:__Me
+TRIGGER:%Point1 = DAF_HouseSearch1_815d0e96-4c1f-48f3-bed3-14f467c7ed69
+TRIGGER:%Point2 = DAF_HouseSearch2_e5c6f6d1-2634-4eeb-a87f-3407fc8c09e2
+TRIGGER:%Point3 = DAF_HouseSearch3_6b10bd8b-9176-4600-9465-b21d94b129da
+TRIGGER:%Point4 = DAF_HouseSearch4_874460b0-2414-4028-99de-3aa6b94eeb26
+CHARACTER:%Colleague = DAF_BO_FamilyHouseGuard_02_7012cac9-4051-4b59-b451-cb1d8f0d8bc6
+INT:%State = 0
+
+
+BEHAVIOUR
+
+REACTION Main, 130
+USAGE PEACE
+VARS
+	FLOAT:_dist
+CHECK "c1"
+	IsEqual(%State,1)
+ACTIONS
+	CharacterMoveTo(%Point1)
+	CharacterLookFrom(%Point1)
+	CharacterPlayAnimation("Cooking_01")
+	DisplayText(__Me,"DAF_HouseSearch1",3)
+	Sleep(3)
+	
+	CharacterMoveTo(%Point2)
+	CharacterLookFrom(%Point2)
+	CharacterPlayAnimation("Fidget_Low_02")
+	DisplayText(__Me,"DAF_HouseSearch2",3)
+	Sleep(3)
+	
+	IF "!c1&c2&c3"
+		CharacterIsDead(%Colleague)
+		GetDistance(_dist,__Me,%Colleague)
+		IsLessThen(_dist,6.0)
+	THEN
+		DialogStart("DAF_AD_FamilyHouseGuards2",__Me,%Colleague)
+		Sleep(3)
+	ENDIF
+	
+	CharacterMoveTo(%Point3)
+	CharacterLookFrom(%Point3)
+	CharacterPlayAnimation("Pst_04")
+	DisplayText(__Me,"DAF_HouseSearch3",3)
+	Sleep(3)
+	
+	CharacterMoveTo(%Point4)
+	CharacterLookFrom(%Point4)
+	CharacterPlayAnimation("Sigh_01")
+	DisplayText(__Me,"DAF_HouseSearch4",3)
+	Sleep(3)
+
+STORY
+SCRIPTFRAME DialogDone
+ACTIONS	
+	Set(%State,1)
+	
+EVENTS
+EVENT CombatStopsDialog
+ON
+	OnCombatStarted()
+ACTIONS
+	DialogRequestStop("DAF_AD_FamilyHouseGuards2")

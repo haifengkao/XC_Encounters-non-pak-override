@@ -1,0 +1,62 @@
+
+INIT
+	CHARACTER:__Me
+	EXTERN ITEM:%Seat = null
+	INT:%Sitting = 0
+BEHAVIOUR
+
+REACTION Sitting, 130
+	USAGE PEACE
+	CHECK "!c1"
+		IsInDialog(__Me)
+	VARS
+		FIXEDSTRING:_Anim
+		FLOAT:_Wait
+	ACTIONS
+		GetRandom(_Anim, "Sit_Tired_01", "Sit_Idle_01", "Sit_Idle_02", "Sit_Idle_03")
+		GetRandomBetween(_Wait, 3, 6)
+		CharacterPlayAnimation(_Anim)
+		Sleep(_Wait)
+
+REACTION Custom_AutomatedDialog_Interrupt, 1701
+USAGE PEACE
+CHECK "c1"
+	IsInDialog(__Me)
+ACTIONS
+	Sleep(2.0)
+INTERRUPT
+	Set(%Sitting,1)
+	
+REACTION WalkToBench, 150
+	VARS
+		FLOAT:_dist
+	USAGE PEACE
+	CHECK "!c1&c2&c3"
+		IsEqual(%Seat,null)
+		GetDistance(_dist,__Me,%Seat)
+		IsGreaterThen(_dist,2.0)
+	ACTIONS
+		CharacterMoveTo(%Seat)
+		CharacterUseItem(%Seat)
+		Set(%Sitting,1)
+		
+REACTION Sit, 140
+	USAGE PEACE
+	CHECK "c1"
+		IsEqual(%Sitting,0)
+	ACTIONS
+		CharacterUseItem(%Seat)
+		Set(%Sitting,1)
+		Sleep(3)
+		
+EVENTS 
+
+EVENT FightStart
+ON
+	OnCombatStarted()
+ACTIONS
+	IF "c1"
+		CharacterHasStatus(__Me, SITTING)
+	THEN
+		CharacterRemoveStatus(__Me, SITTING)
+	ENDIF

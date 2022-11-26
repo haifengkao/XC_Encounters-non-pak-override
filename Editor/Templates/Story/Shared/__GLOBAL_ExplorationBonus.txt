@@ -1,0 +1,93 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+
+KBSECTION
+IF
+DB_ExplorationZones((TRIGGER)_Trigger,(INTEGER)_Act,(INTEGER)_ActPArt,(INTEGER)_Gain)
+THEN
+DB_OneShotPlayerTrigger(_Trigger);
+
+PROC
+ProcOneShotTriggerEntered((CHARACTER)_Player,(TRIGGER)_Trigger)
+AND
+DB_ExplorationZones((TRIGGER)_Trigger,(INTEGER)_Act,(INTEGER)_ActPart,(INTEGER)_Gain)
+THEN
+NOT DB_ExplorationZones(_Trigger,_Act,_ActPart,_Gain);
+PartyAddExplorationExperience(_Act,_ActPart,_Gain);
+
+PROC
+Proc_AddExplorationEvent((STRING)_String)
+AND
+DB_ExplorationEvents((STRING)_String,(INTEGER)_Act,(INTEGER)_ActPart,(INTEGER)_Gain)
+THEN
+PartyAddExplorationExperience(_Act,_ActPart,_Gain);
+
+PROC
+ProcGetAveragePlayerLevel()
+THEN
+DB_AveragePlayerLevel(0,0);
+
+PROC
+ProcGetAveragePlayerLevel()
+AND
+_Player.DB_IsPlayer()
+AND
+NOT DB_Companion(_Player)
+AND
+DB_AveragePlayerLevel(_LevelSum,_Count)
+AND
+CharacterGetLevel(_Player, _Lvl)
+AND
+IntegerSum(_Count,1,_New)
+AND
+IntegerSum(_LevelSum,_Lvl,_NewLevelSum)
+THEN
+NOT DB_AveragePlayerLevel(_LevelSum,_Count);
+DB_AveragePlayerLevel(_NewLevelSum,_New);
+
+PROC
+ProcGetAveragePlayerLevel()
+AND
+DB_AveragePlayerLevel(_LevelSum,_Count)
+AND  
+Real(_LevelSum,_LevelReal)
+AND
+Real(_Count,_RealCount)
+AND
+RealDivide(_LevelReal,_RealCount,_RealAvgLevel)
+AND
+Integer(_RealAvgLevel,_AvgLevel)
+THEN
+DB_AvgPlayerLevel(_AvgLevel);
+
+PROC
+ProcGetAveragePlayerLevel()
+AND
+DB_AveragePlayerLevel(_LevelSum,_Count)
+THEN
+NOT DB_AveragePlayerLevel(_LevelSum,_Count);
+
+PROC
+ProcAwardExplorationXPFromAveragePlayerLevel()
+AND
+DB_AvgPlayerLevel(_AvgLevel)
+THEN
+PartyAddExplorationExperience(1,_AvgLevel,1);
+NOT DB_AvgPlayerLevel(_AvgLevel);
+
+PROC
+Proc_AddExplorationEvent("GLO_Starstone")
+THEN
+ProcGetAveragePlayerLevel();
+ProcAwardExplorationXPFromAveragePlayerLevel();
+
+PROC
+Proc_AddExplorationEvent("GLO_Waypoint")
+THEN
+ProcGetAveragePlayerLevel();
+ProcAwardExplorationXPFromAveragePlayerLevel();
+EXITSECTION
+
+ENDEXITSECTION
+ParentTargetEdge "__Start"
