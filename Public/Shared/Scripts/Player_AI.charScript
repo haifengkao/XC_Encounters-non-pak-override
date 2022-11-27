@@ -1,0 +1,1156 @@
+INIT
+
+CHARACTER:__Me
+
+INT:%CureWounds = 1
+INT:%MassHeal = 1
+FLOAT:%ClosestNonZombie
+CHARACTER:%CharToHeal
+CHARACTER:%CharPlAI
+INT:%PlayerChar
+//FIXEDSTRING:%SpeedPotionPl
+FIXEDSTRING:%DisplayTextSAM
+INT:%UseSoothe
+
+INT:%BurningChars = 0
+INT:%KnockedChars = 0
+CHARACTER:%DeadPlayer
+INT:%DeadPlayers = 0
+CHARACTER:%GroupLeader
+FLOAT3:%PrevTravelPos
+ITEM:%LockedItem
+
+FIXEDSTRING:%AICommand
+EXTERN FLOAT:%TimerOffTime = 0
+INT:%GlobalCommandOn = 0
+INT:%GlobalCommandOff = 0
+
+
+INT:%COMM_Heal = 0
+INT:%COMM_Destroy = 0
+INT:%COMM_HelpGetUp = 0
+INT:%COMM_Haste = 0
+INT:%COMM_RemoveBurning = 0
+INT:%COMM_ClearFireSurfaces = 0
+INT:%COMM_Resurrect = 0
+
+BEHAVIOUR
+
+REACTION COMM_Heal, 0
+USAGE PEACE
+VARS
+	CHARACTER:_Target
+	FLOAT3:_Pos
+	FLOAT:_Float
+CHECK "!c1&!c2&c3&!c4"	
+	IsEqual(%CharToHeal,null)	
+	IsInDangerousSurface(__Me)
+	CharacterCanSee(__Me,%CharToHeal)
+	CharacterIsDead(%CharToHeal)
+ACTIONS
+	Set(_Target,%CharToHeal)
+	IF "!c1"
+		CharacterHasTalent(_Target,Zombie)
+	THEN
+		IF "c1&c2&!c3&(!c4|(c5&!c6))"
+			CharacterCanCast(__Me,Target_MassHeal)
+			IsEqual(%MassHeal,1)
+			CharacterGet(_,_Target,10,Random,null,Player,null,null,Zombie)
+			CharacterHasTalent(__Me,Zombie)
+			GetDistance(_Float,__Me,_Target)
+			IsLessThen(_Float,10)
+		THEN
+			CharacterUseSkill(Target_MassHeal,_Target)
+			//StartTimer("MassHealAgain",30,0)
+			//Set(%MassHeal,0)
+		ELIF "c1&c2&c3&c4&!c5&!c6"
+			IsEqual(%UseSoothe,1)
+			CharacterCanCast(__Me,AMER_SKILL_Soothe)
+			GetDistance(_Float,__Me,_Target)
+			IsLessThen(_Float,5)
+			CharacterGet(_,_Target,4.5,Random,null,Player,null,null,Zombie)
+			IsInDangerousSurface(_Target)
+		THEN
+			CharacterMoveTo(_Target,1)
+			CharacterUseSkill(AMER_SKILL_Soothe,_Target)
+		ELIF "c1"
+			CharacterCanCast(__Me,Heal_RegenerateStart)
+		THEN
+			CharacterUseSkill(Heal_RegenerateStart,_Target)
+		ELIF "c1"
+			CharacterCanCast(__Me,Target_FirstAid)
+		THEN
+			CharacterUseSkill(Target_FirstAid,_Target)
+		ELIF "c1"
+			CharacterCanCast(__Me,AMER_SKILL_Attonement)
+		THEN
+			CharacterUseSkill(AMER_SKILL_Attonement,_Target)
+		ELIF "c1&!c2&c3"
+			CharacterCanCast(__Me,Heal_CureWoundsKnight)
+			IsInDangerousSurface(_Target)
+			IsEqual(%CureWounds,1)			
+		THEN
+			IF "!c1"
+				IsEqual(_Target,__Me)
+			THEN
+				CharacterMoveTo(_Target,1)
+			ENDIF			
+			CharacterUseSkill(Heal_CureWoundsKnight,_Target)
+			//StartTimer("CureWoundsAgain",30,0)
+			//Set(%CureWounds,0)
+		ELSE
+			DelayReaction("COMM_Heal",5)
+			SetPriority("COMM_Heal",0)
+		ENDIF
+	ELSE
+		Set(%ClosestNonZombie,null)
+		Set(%CharPlAI,_Target)
+		IterateCharactersNear(_Target,10,"ZombieCheck",Lowest,Distance) //includes Me
+		IF "c1"
+			IsEqual(%ClosestNonZombie,null)
+		THEN
+			Set(%ClosestNonZombie,50)
+		ENDIF
+		IF "c1&!c2"
+			CharacterCanCast(__Me,Projectile_DeadlySpores)
+			IsLessThen(%ClosestNonZombie,10)
+		THEN
+			GetPosition(_Target,_Pos)
+			CharacterUseSkill(Projectile_DeadlySpores,_Pos)
+		ELIF "c1&!c2"
+			CharacterCanCast(__Me,AMER_SKILL_CreepingOoze)
+			IsLessThen(%ClosestNonZombie,5)	
+		THEN
+			GetPosition(_Target,_Pos)
+			CharacterUseSkill(AMER_SKILL_CreepingOoze,_Pos)
+		ELIF "c1&!c2"
+			CharacterCanCast(__Me,Projectile_PoisonDartStart)
+			IsLessThen(%ClosestNonZombie,1.5)
+		THEN
+			IF "c1"
+				IsEqual(_Target,__Me)
+			THEN
+				GetPosition(__Me,_Pos)
+				CharacterUseSkill(Projectile_PoisonDartStart,_Pos)
+			ELSE
+				CharacterUseSkill(Projectile_PoisonDartStart,_Target)
+			ENDIF
+		ELSE
+			DelayReaction("COMM_Heal",5)
+			SetPriority("COMM_Heal",0)
+		ENDIF	
+	ENDIF
+	Set(%CharToHeal,null)
+	SetPriority("COMM_Heal",0)
+INTERRUPT
+	Reset()
+	SetPriority("COMM_Heal",0)
+	DelayReaction("COMM_Heal",3)
+	
+REACTION COMM_HelpGetUp, 0
+USAGE PEACE
+VARS
+	CHARACTER:_Char
+CHECK "c1&c2&!c3"
+	CharacterGet(_Char,__Me,10,Random,null,null,null,KNOCKED_DOWN,null,__Me)
+	CharacterCanCast(__Me,Target_HelpingHand)
+	CharacterIsEnemy(__Me,_Char)
+ACTIONS
+	CharacterUseSkill(Target_HelpingHand,_Char)
+INTERRUPT
+	Reset()
+	DelayReaction("COMM_HelpGetUp",5)
+	
+REACTION COMM_RemoveBurning, 0
+USAGE PEACE
+VARS
+	CHARACTER:_Ally
+	CHARACTER:_Ally2
+	CHARACTER:_Target
+CHECK "c1&(c2|c3)&(c4|c5|c6|c7|c8|(c9&!c10))&(!c11|c12)"
+	IsEqual(%COMM_RemoveBurning,1)
+	CharacterGet(_Ally,__Me,10,Random,null,Ally,null,BURNING,null,__Me)
+	CharacterHasStatus(__Me,BURNING)
+	CharacterCanCast(__Me,Rain_Water)   
+	CharacterCanCast(__Me,Target_PurifyingFire)
+	CharacterCanCast(__Me,Target_ImmuneToBurning)
+	CharacterCanCast(__Me,Shield_Fire)
+	CharacterCanCast(__Me,Target_HelpingHand)
+	CharacterCanCast(__Me,Target_FirstAid)
+	CharacterHasTalent(_Ally,Zombie)
+	IsInDangerousSurface(__Me)
+	IsInSurface(__Me,Fire)
+ACTIONS
+	IF "c1"
+		CharacterHasStatus(__Me,BURNING)
+	THEN
+		Set(_Target,__Me)
+	ELSE
+		Set(_Target,_Ally)
+	ENDIF
+	IF "c1&c2&((c3&!c4)|c5)"
+		CharacterCanCast(__Me,Rain_Water)
+		CharacterGet(_Ally,__Me,12,Lowest,Distance,Ally,null,BURNING)
+		CharacterGet(_Ally2,__Me,12,Highest,Distance,Ally,null,BURNING) //if at least two characters burn use rain
+		IsEqual(_Ally,_Ally2)
+		CharacterHasStatus(__Me,BURNING)
+	THEN
+		CharacterUseSkill(Rain_Water,_Target)
+	ELIF "c1"
+		CharacterCanCast(__Me,Shield_Fire)
+	THEN
+		CharacterUseSkill(Shield_Fire,_Target)
+	ELIF "c1"
+		CharacterCanCast(__Me,Target_PurifyingFire)
+	THEN
+		CharacterUseSkill(Target_PurifyingFire,_Target)
+	ELIF "c1"
+		CharacterCanCast(__Me,Rain_Water)
+	THEN
+		CharacterUseSkill(Rain_Water,_Target)
+	ELIF "c1"
+		CharacterCanCast(__Me,Target_HelpingHand)
+	THEN	
+		IF "!c1"
+			IsEqual(__Me,_Target) //helping hand is NonSelf
+		THEN
+			CharacterUseSkill(Target_HelpingHand,_Target)
+		ELIF "c1&!c2"
+			CharacterCanCast(__Me,Target_ImmuneToBurning)
+			IsInDangerousSurface(_Target)
+		THEN			
+			CharacterUseSkill(Target_ImmuneToBurning,_Target)
+		ELSE
+			DelayReaction("COMM_RemoveBurning",6)
+		ENDIF
+	ELIF "c1&!c2
+		CharacterCanCast(__Me,Target_FirstAid)
+		CharacterHasTalent(_Target,Zombie)
+	THEN
+		CharacterUseSkill(Target_FirstAid,_Target)
+	ELIF "c1&!c2"
+		CharacterCanCast(__Me,Target_ImmuneToBurning)
+		IsInDangerousSurface(_Target)//besser noch skillrange benutzen und nach surface checken
+	THEN
+		CharacterMoveTo(_Target,1,0,0,3,4.5)
+		CharacterUseSkill(Target_ImmuneToBurning,_Target)
+	ELSE
+		DelayReaction("COMM_RemoveBurning",7)
+	ENDIF
+	Sleep(1)
+	SetPriority("COMM_RemoveBurning",0)
+INTERRUPT
+	Reset()
+	IF "!c1&!c2"
+		CharacterHasStatus(__Me,BURNING)
+		IsInSurface(__Me,Fire)
+	THEN
+		SetPriority("COMM_RemoveBurning",0)
+		DelayReaction("COMM_RemoveBurning",4)
+	ENDIF
+	
+REACTION COMM_ClearFireSurfaces, 0
+USAGE PEACE
+VARS
+	FLOAT3:_FireSurface
+	ITEM:_Bucket
+CHECK "c1&(c2|(c3&!c4))&c5"
+	FindSurface(_FireSurface,__Me,0,10,Fire)
+	CharacterCanCast(__Me,Rain_Water)
+	CharacterCanCast(__Me,AMER_SKILL_Deluge)
+	CharacterGet(_,_FireSurface,4,Lowest,Distance)
+	CanSee(__Me,_FireSurface)
+ACTIONS
+	IF "c1"
+		CharacterCanCast(__Me,Rain_Water)
+	THEN
+		CharacterUseSkill(Rain_Water,_FireSurface)
+	ELIF "c1"
+		CharacterCanCast(__Me,AMER_SKILL_Deluge)
+	THEN
+		CharacterUseSkill(AMER_SKILL_Deluge,_FireSurface)
+	ENDIF
+	Sleep(1)
+	SetPriority("COMM_ClearFireSurfaces",0)
+INTERRUPT	
+	Reset()
+	IF "!c1&!c2"
+		CharacterHasStatus(__Me,BURNING)
+		IsInSurface(__Me,Fire)
+	THEN
+		SetPriority("COMM_ClearFireSurfaces",0)
+		DelayReaction("COMM_ClearFireSurfaces",3)
+	ENDIF
+	
+REACTION COMM_Haste, 0
+USAGE PEACE
+VARS
+	CHARACTER:_Player
+	FLOAT:_dist
+CHECK "c1&c2&!c3&!c4&c5&c6"
+	CharacterCanCast(__Me,Target_Haste)
+	CharacterGetFollow(_Player,__Me)
+	CharacterHasStatus(_Player,HASTED)
+	CharacterHasStatus(_Player,WARM)
+	GetDistance(_dist,__Me,_Player)
+	IsLessThen(_dist,12)
+ACTIONS
+	CharacterUseSkill(Target_Haste,_Player)
+	SetPriority("COMM_Haste",0)
+INTERRUPT
+	Reset()
+	DelayReaction("COMM_Haste",5)
+	SetPriority("COMM_Haste",0)
+	
+REACTION COMM_Resurrect, 0
+USAGE PEACE
+VARS
+	FLOAT:_dist
+	FLOAT:_Wait
+	ITEM:_Scroll
+	FLOAT3:_Pos
+	CHARACTER:_Target
+	INT:_Int
+CHECK "!c1&(c2|(c3&!c4))&!c5&c6&c7&!c8"
+	IsEqual(%DeadPlayer,null)
+	CharacterCanCast(__Me,Teleportation_Resurrect)	
+	ItemGetFromInventory(_,__Me,"XC_Scroll_Source_A_Resurrect") //original: "SCROLL_Resurrect_1"
+	CharacterCanCast(__Me,Teleportation_Resurrect,1)
+	GlobalGetEvent("BlockResurrection")
+	GetDistance(_dist,__Me,%DeadPlayer)
+	IsLessThen(_dist,12)
+	IsInDangerousSurface(__Me)	
+ACTIONS
+	Set(_Target,%DeadPlayer)
+	GetRandom(_Wait,0,1,2,3)
+	Sleep(_Wait)
+	CharacterLookAt(_Target)
+	GetRandom(_Wait,0,1,2,3)
+	Sleep(_Wait)
+	GetPosition(__Me,_Pos)
+	Add(_Pos,FLOAT3:{1.5;0;1.5})
+	IF "c1&c2&!c3"
+		CharacterIsDead(_Target)
+		FindValidPosition(_Pos,8,_Target)
+		GlobalGetEvent("BlockResurrection")
+	THEN
+		IF "c1|c2|c3|c4"
+			IsSurface(_Pos,2,Fire)
+			IsSurface(_Pos,2,Lava)
+			IsSurface(_Pos,2,Ooze)
+			IsSurface(_Pos,2,CloudPoison)
+		THEN
+			GetPosition(__Me,_Pos) //if there are dangerous surfaces at position, choose Me's position for happy clipping
+		ENDIF
+		IF "c1"
+			CharacterCanCast(__Me,Teleportation_Resurrect)	
+		THEN
+			GlobalSetEvent("BlockResurrection")
+			CharacterUseSkill(Teleportation_Resurrect,_Target,_Pos)
+		ELIF "c1&c2"
+			ItemGetFromInventory(_Scroll,__Me,"XC_Scroll_Source_A_Resurrect") //original: "SCROLL_Resurrect_1"
+			CharacterCanCastFromItem(__Me,_Scroll)			
+		THEN
+			GlobalSetEvent("BlockResurrection")
+			CharacterUseSkillFromItem(_Scroll,_Target,_Pos)			
+		ENDIF
+	ELSE
+		DelayReaction("COMM_Resurrect",6)
+	ENDIF
+	Sleep(2)
+	SetPriority("COMM_Resurrect",0)
+INTERRUPT
+	Reset()
+	DelayReaction("COMM_Resurrect",5)
+	SetPriority("COMM_Resurrect",0)
+	
+REACTION COMM_Destroy, 0
+USAGE PEACE
+VARS
+	FLOAT:_dist
+	INT:_Counter
+	FLOAT:_dist2
+	INT:_Unsheathed = 0
+CHECK "!c1&c2&c3&c4"
+	IsEqual(%LockedItem,null)
+	GetDistance(_dist,__Me,%LockedItem)
+	IsLessThen(_dist,7)
+	ItemIsLocked(%LockedItem)
+ACTIONS
+	//CharacterMoveTo(%LockedItem,1,0,0,4,6)
+	Set(_Counter,0)
+	WHILE "!c1&c2&c3"
+		ItemIsDestroyed(%LockedItem)
+		IsLessThen(_Counter,6)
+		ItemIsLocked(%LockedItem)
+	DO
+		IF "c1"
+			CharacterCanCast(__Me,Projectile_FlareStart)
+		THEN
+			CharacterUseSkill(Projectile_FlareStart,%LockedItem)
+		ELIF "c1"
+			CharacterCanCast(__Me,Projectile_BlitzBoltStart)
+		THEN
+			CharacterUseSkill(Projectile_BlitzBoltStart,%LockedItem)
+		ELIF "c1"
+			CharacterCanCast(__Me,Target_BurningTouch)
+		THEN
+			CharacterUseSkill(Target_BurningTouch,%LockedItem)
+		ELSE			
+			IF "!c1"
+				CharacterHasStatus(__Me,UNSHEATHED)
+			THEN
+				Set(_Unsheathed,1)
+				CharacterApplyStatus(__Me,UNSHEATHED,6)
+				Set(_Unsheathed,0)
+			ENDIF
+			IF "c1"
+				CharacterCanCast(__Me,Projectile_StaffOfJahan)
+			THEN
+				CharacterUseSkill(Projectile_StaffOfJahan,%LockedItem)
+			ELIF "c1"
+				CharacterCanCast(__Me,Projectile_StaffOfMagus)
+			THEN
+				CharacterUseSkill(Projectile_StaffOfMagus,%LockedItem)
+			ELSE
+				IF "!c1&!c2&!c3"
+					IsInSurface(%LockedItem,Fire)
+					IsInSurface(%LockedItem,Ooze)
+					IsInSurface(%LockedItem,Lava)
+				THEN
+					IF "c1"
+						CharacterCanCast(__Me,Rush_RushStart)
+					THEN
+						CharacterUseSkill(Rush_RushStart,%LockedItem)
+					ENDIF
+					IF "c1&!c2"						
+						CharacterGetWeaponRange(_,_dist,__Me)
+						IsGreaterThen(_dist,3)
+					THEN						
+						CharacterMoveTo(%LockedItem,1,0,0,2,3)
+					ENDIF
+					CharacterAttackWithoutMove(%LockedItem)
+				ELSE
+					DelayReaction("COMM_Destroy",7)
+					SetPriority("COMM_Destroy",0)
+				ENDIF
+			ENDIF
+		ENDIF		
+		Add(_Counter,1)
+	ENDWHILE
+	CharacterRemoveStatus(__Me,UNSHEATHED)
+	Set(%LockedItem,null)
+	Sleep(1)
+	SetPriority("COMM_Destroy",0)
+INTERRUPT
+	IF "c1"
+		IsEqual(_Unsheathed,0) //applying the unsheathed status interrupts the reaction, so we would create an endless loop otherwise
+	THEN
+		Reset()
+		IF "!c1"
+			IsInCombat(__Me)
+		THEN
+			CharacterRemoveStatus(__Me,UNSHEATHED)
+		ENDIF
+		Set(%LockedItem,null)
+		DelayReaction("COMM_Destroy",4)
+		SetPriority("COMM_Destroy",0)
+	ENDIF
+	
+EVENTS
+
+//Activate AI
+////////////////
+
+EVENT SamaritanInit
+VARS
+	INT:_FirstTime = 1
+ON
+	OnInit()
+ACTIONS
+	IF "c1"
+		IsEqual(__Me,CHARACTER:Player1_dac1443f-a866-4ab3-b240-e705c0b20ec5)
+	THEN
+		Set(%TimerOffTime,0.1)
+	ELIF "c1"
+		IsEqual(__Me,CHARACTER:Player2_a0af7520-57ac-4f1c-b9d7-197bceebeade)
+	THEN
+		Set(%TimerOffTime,0.2)
+	ELIF "c1"
+		IsEqual(__Me,CHARACTER:Jahan_80240f83-778e-4753-850b-48b05729589c)
+	THEN
+		Set(%TimerOffTime,-0.2)
+	ELIF "c1"
+		IsEqual(__Me,CHARACTER:Bairdotr_7294ff38-7536-496a-b754-c900021c90b8)
+	THEN
+		Set(%TimerOffTime,0.3)
+	ELIF "c1"
+		IsEqual(__Me,CHARACTER:Wolgraff_d46c5acb-2835-4f6b-b484-47afc1183e8a)
+	THEN
+		Set(%TimerOffTime,0.4)
+	ELIF "c1"
+		IsEqual(__Me,CHARACTER:Madoc_5c5447e5-c1cf-4677-b84b-006d9be3f075)
+	THEN
+		Set(%TimerOffTime,-0.1)
+	ELSE //Henchmen
+		Set(%TimerOffTime,-0.3)
+	ENDIF
+	IF "c1"
+		IsEqual(_FirstTime,1)
+	THEN
+		SetVar(__Me,"AMER_OoCHealingEnabled",INT:0)
+		Set(_FirstTime,0)
+	ENDIF
+	IF "!c1"
+		CharacterInCreation(__Me, _)
+	THEN
+		CharacterAddSkill(COMM_Heal)
+		CharacterAddSkill(COMM_Haste)
+		CharacterAddSkill(COMM_ClearFireSurfaces)
+		CharacterAddSkill(COMM_Resurrect)
+		CharacterAddSkill(COMM_HelpGetUp)
+		CharacterAddSkill(COMM_RemoveBurning)
+		CharacterAddSkill(COMM_Destroy)
+		CharacterAddSkill(COMM_AIGlobalOn)
+		CharacterAddSkill(COMM_AIGlobalOff)
+		CharacterAddSkill(COMM_AutoHeal)
+	ENDIF
+
+EVENT AIActivation
+VARS
+	SKILL:_Skill
+	INT:_Command
+	FIXEDSTRING:_Text
+ON
+	OnSkillCast(__Me,_Skill)
+ACTIONS
+	IF "c1"
+		IsEqual(_Skill,COMM_AIGlobalOn)
+	THEN
+		StopTimer("GlobalCommands")
+		Set(%GlobalCommandOff,0)
+		Set(%GlobalCommandOn,1)
+		StartTimer("GlobalCommands",7,0)
+		IF "c1"
+			IsEqual(__Me,CHARACTER:Wolgraff_d46c5acb-2835-4f6b-b484-47afc1183e8a)
+		THEN
+			DisplayText(__Me,"BL_PartyCommand_WOL",7)
+		ELSE
+			GetRandom(_Text,"BL_PartyCommand1","BL_PartyCommand2")
+			DisplayText(__Me,_Text,7)
+		ENDIF
+	ELIF "c1"
+		IsEqual(_Skill,COMM_AIGlobalOff)
+	THEN
+		StopTimer("GlobalCommands")
+		Set(%GlobalCommandOn,0)
+		Set(%GlobalCommandOff,1)
+		StartTimer("GlobalCommands",7,0)
+		IF "c1"
+			IsEqual(__Me,CHARACTER:Wolgraff_d46c5acb-2835-4f6b-b484-47afc1183e8a)
+		THEN
+			DisplayText(__Me,"BL_PartyCommand_WOL",7)
+		ELSE
+			GetRandom(_Text,"BL_PartyCommand1","BL_PartyCommand2")
+			DisplayText(__Me,_Text,7)
+		ENDIF
+	ELIF "c1"
+		IsEqual(_Skill,COMM_Heal)
+	THEN
+		Set(%AICommand,"COMM_Heal")
+	ELIF "c1"
+		IsEqual(_Skill,COMM_Haste)
+	THEN
+		Set(%AICommand,"COMM_Haste")
+	ELIF "c1"
+		IsEqual(_Skill,COMM_ClearFireSurfaces)
+	THEN
+		Set(%AICommand,"COMM_ClearFireSurfaces")
+	ELIF "c1"
+		IsEqual(_Skill,COMM_Resurrect)
+	THEN
+		Set(%AICommand,"COMM_Resurrect")
+	ELIF "c1"
+		IsEqual(_Skill,COMM_HelpGetUp)
+	THEN
+		Set(%AICommand,"COMM_HelpGetUp")
+	ELIF "c1"
+		IsEqual(_Skill,COMM_RemoveBurning)
+	THEN
+		Set(%AICommand,"COMM_RemoveBurning")	
+	ELIF "c1"
+		IsEqual(_Skill,COMM_Destroy)
+	THEN
+		Set(%AICommand,"COMM_Destroy")
+	ENDIF		
+	IF "!c1"
+		IsEqual(%AICommand,null)
+	THEN
+		IF "c1"
+			IsEqual(%GlobalCommandOn,1)
+		THEN
+			IF "c1"
+				IsEqual(__Me,CHARACTER:Wolgraff_d46c5acb-2835-4f6b-b484-47afc1183e8a)
+			THEN
+				DisplayText(__Me,"COMM_Party_WOL",3)
+			ELSE
+				DisplayText(__Me,%AICommand,3)
+			ENDIF
+			IterateParty("CommandedPlayerOn",Lowest,null,__Me)
+			CallFunction("SetPlayerAI") //to activate AI for Me
+			Set(%GlobalCommandOn,0)
+			StopTimer("GlobalCommands")
+		ELIF "c1"
+			IsEqual(%GlobalCommandOff,1)
+		THEN
+			IF "c1"
+				IsEqual(__Me,CHARACTER:Wolgraff_d46c5acb-2835-4f6b-b484-47afc1183e8a)
+			THEN
+				DisplayText(__Me,"COMM_PartyOff_WOL",3)
+			ELSE
+				GetRandom(_Text,"Party_StopAI1","Party_StopAI2","Party_StopAI3")
+				DisplayText(__Me,_Text,3)
+			ENDIF
+			IterateParty("CommandedPlayerOff",Lowest,null,__Me)
+			CallFunction("SetOffPlayerAI") //to deactivate AI for Me
+			Set(%GlobalCommandOff,0)
+			StopTimer("GlobalCommands")
+		ELSE //to activate AI for Me when it's not a global command
+			IF "c1&c2"
+				GetVar(_Command,__Me,%AICommand)
+				IsEqual(_Command,0)
+			THEN
+				CallFunction("SetPlayerAI")
+			ELSE
+				CallFunction("SetOffPlayerAI")
+			ENDIF
+		ENDIF		
+	ENDIF
+
+EVENT GlobalCommandPlayerOn
+VARS
+	CHARACTER:_Player
+ON
+	OnIterateCharacter(_Player,"CommandedPlayerOn")
+ACTIONS
+	IF "!c1"
+		IsEqual(_Player,__Me)
+	THEN
+		SetVar(_Player,"AICommand",%AICommand) 
+		CharacterEvent(_Player,"SetPlayerAI")
+	ENDIF
+	
+EVENT GlobalCommandPlayerOff
+VARS
+	CHARACTER:_Player
+ON
+	OnIterateCharacter(_Player,"CommandedPlayerOff")
+ACTIONS
+	IF "!c1"
+		IsEqual(_Player,__Me)
+	THEN
+		SetVar(_Player,"AICommand",%AICommand) 
+		CharacterEvent(_Player,"SetOffPlayerAI")
+	ENDIF
+	
+EVENT GlobalCommandsTimer
+ON
+	OnTimer("GlobalCommands")
+ACTIONS
+	Set(%GlobalCommandOn,0)
+	Set(%GlobalCommandOff,0)		
+	
+EVENT PlayerAICommands
+VARS
+	FLOAT:_Time
+	FIXEDSTRING:_Text
+ON
+	OnCharacterEvent(__Me,"SetPlayerAI") //set by player after COMM_AIGlobalOn-Skill use (also set by Osiris, from dialog; not in this version though)
+	OnFunction("SetPlayerAI")
+ACTIONS
+	IF "c1"
+		IsEqual(%AICommand,"COMM_Heal")
+	THEN
+		Set(_Time,3)
+		Add(_Time,%TimerOffTime) //to desynchronize characters
+		StartTimer("CheckWoundedChars",_Time,-1)		
+	ELIF "c1"
+		IsEqual(%AICommand,"COMM_Haste")
+	THEN
+		IF "c1"
+			CharacterGetFollow(%GroupLeader,__Me)
+		THEN
+			GetPosition(%GroupLeader,%PrevTravelPos)
+		ENDIF
+		Set(_Time,7)
+		Add(_Time,%TimerOffTime)
+		StartTimer("TravelCheck",_Time,-1)
+	ELIF "c1"
+		IsEqual(%AICommand,"COMM_ClearFireSurfaces")
+	THEN
+		Set(_Time,5)
+		Add(_Time,%TimerOffTime)
+		StartTimer("CheckFireSurface",_Time,-1)
+	ELIF "c1"
+		IsEqual(%AICommand,"COMM_Resurrect")
+	THEN	
+		Set(_Time,8)
+		Add(_Time,%TimerOffTime)
+		StartTimer("CheckDeadPlayer",_Time,-1)
+	ENDIF
+	SetVar(__Me,%AICommand,INT:1) //AI integer has the same name as AICommand, so we can use it
+	IF "!c1&!c2"
+		IsEqual(%GlobalCommandOn,1)
+		IsEqual(%GlobalCommandOff,1)
+	THEN
+		IF "c1"
+			IsEqual(__Me,CHARACTER:Wolgraff_d46c5acb-2835-4f6b-b484-47afc1183e8a)
+		THEN
+			Set(%DisplayTextSAM,"COMM_Active_WOL")
+		ELSE
+			GetRandom(%DisplayTextSAM,"COMM_Active1","COMM_Active2","COMM_Active3")
+		ENDIF
+		GetRandomBetween(_Time,1,2.5)
+		StartTimer("DisplayTextSAM",_Time,0)
+	ENDIF
+	Set(%AICommand,null)
+
+EVENT PlayerAICommandsOff
+VARS
+	FIXEDSTRING:_Text
+	FLOAT:_Time
+ON
+	OnCharacterEvent(__Me,"SetOffPlayerAI")
+	OnFunction("SetOffPlayerAI")
+ACTIONS
+	IF "c1"
+		IsEqual(%AICommand,"COMM_Heal")
+	THEN
+		StopTimer("CheckWoundedChars")
+		SetPriority("COMM_Heal",0)
+	ELIF "c1"
+		IsEqual(%AICommand,"COMM_Haste")
+	THEN
+		StopTimer("TravelCheck")
+		SetPriority("COMM_Haste",0)	
+	ELIF "c1"
+		IsEqual(%AICommand,"COMM_ClearFireSurfaces")	
+	THEN
+		StopTimer("CheckFireSurface")
+		SetPriority("COMM_ClearFireSurfaces",0)
+	ELIF "c1"
+		IsEqual(%AICommand,"COMM_Resurrect")
+	THEN
+		StopTimer("CheckDeadPlayer")
+		SetPriority("COMM_Resurrect",0)
+	ELSE
+		SetPriority(%AICommand,0)
+	ENDIF	
+	SetVar(__Me,%AICommand,INT:0)
+	IF "!c1&!c2"
+		IsEqual(%GlobalCommandOn,1)
+		IsEqual(%GlobalCommandOff,1)
+	THEN
+		IF "c1"
+			IsEqual(__Me,CHARACTER:Wolgraff_d46c5acb-2835-4f6b-b484-47afc1183e8a)
+		THEN
+			Set(%DisplayTextSAM,"COMM_Inactive_WOL")
+		ELSE
+			GetRandom(%DisplayTextSAM,"COMM_Inactive1","COMM_Inactive2","COMM_Inactive3")
+		ENDIF
+		GetRandomBetween(_Time,2,3.5)
+		StartTimer("DisplayTextSAM",_Time,0)
+	ENDIF
+	Set(%AICommand,null)
+
+EVENT DisplayTextSAM
+ON
+	OnTimer("DisplayTextSAM")
+ACTIONS
+	DisplayText(__Me,%DisplayTextSAM,3)
+	
+///////////////////////////////
+	
+EVENT CheckWoundedChars
+VARS
+	FLOAT3:_Pos
+	FLOAT3:_PrevPos
+	FLOAT:_dist
+ON
+	OnTimer("CheckWoundedChars")
+ACTIONS
+	Set(%CharToHeal,null)
+	IF "!c1&!c2"
+		CharacterIsDead(__Me)
+		IsInCombat(__Me)
+	THEN
+		IF "c1"
+			CharacterCanCast(__Me,AMER_SKILL_Soothe)
+		THEN
+			GetPosition(__Me,_Pos)
+			IF "c1&c2"
+				GetDistance(_dist,_PrevPos,_Pos)
+				IsLessThen(_dist,1.5)
+			THEN
+				Set(%UseSoothe,1) //due to the low range of the skill it should only be used when the character can be assumed to stand still
+			ELSE
+				Set(%UseSoothe,0)
+			ENDIF
+			Set(_PrevPos,_Pos)
+		ENDIF
+		IterateParty("CheckHealTarget",Lowest,Vitality,__Me)
+		IF "!c1"
+			IsEqual(%CharToHeal,null)			
+		THEN
+			SetPriority("COMM_Heal",500)
+		ENDIF
+	ENDIF
+	
+EVENT CheckCharHealth
+VARS
+	CHARACTER:_Player
+	FLOAT:_Float
+ON
+	OnIterateCharacter(_Player,"CheckHealTarget") //can also be Me!
+ACTIONS
+	IF "c1&c2&c3&!c4&c5"
+		IsEqual(%CharToHeal,null)
+		CharacterGetStat(_Float,_Player,Vitality)	
+		IsLessThen(_Float,1)
+		CharacterIsDead(_Player)
+		CharacterCanSee(__Me,_Player)
+	THEN
+		IF "c1&!c2&!c3"
+			CharacterHasTalent(_Player,Zombie)
+			CharacterHasStatus(_Player,BURNING)
+			IsInSurface(_Player,Fire)
+		THEN
+			IF "c1"
+				CharacterCanCast(__Me,Projectile_PoisonDartStart)
+			THEN
+				Set(%CharToHeal,_Player)
+			ELIF "c1"
+				CharacterCanCast(__Me,Projectile_DeadlySpores)
+			THEN
+				Set(%ClosestNonZombie,null)
+				Set(%CharPlAI,_Player)
+				IterateCharactersNear(_Player,10,"ZombieCheck",Lowest,Distance)
+				IF "c1"
+					IsEqual(%ClosestNonZombie,null)
+				THEN
+					Set(%CharToHeal,_Player)
+				ENDIF
+			ENDIF
+			IF "c1&c2"
+				IsEqual(%CharToHeal,null)
+				CharacterCanCast(__Me,AMER_SKILL_CreepingOoze)
+			THEN
+				Set(%ClosestNonZombie,null)
+				Set(%CharPlAI,_Player)
+				IterateCharactersNear(_Player,5,"ZombieCheck",Lowest,Distance)
+				IF "c1"
+					IsEqual(%ClosestNonZombie,null)
+				THEN
+					Set(%CharToHeal,_Player)
+				ENDIF
+			ENDIF
+		ELIF "!c1&(c2|c3|(c4&c5&c6&c7)|(c8&c9)|(c10&c11&!c12&(!c13|(c14&!c15)))|c16)"
+			CharacterHasTalent(_Player,Zombie)
+			CharacterCanCast(__Me,Heal_RegenerateStart)
+			CharacterCanCast(__Me,Target_FirstAid)
+			IsEqual(%UseSoothe,1)
+			CharacterCanCast(__Me,AMER_SKILL_Soothe)
+			GetDistance(_Float,__Me,_Player)
+			IsLessThen(_Float,5)
+			CharacterCanCast(__Me,Heal_CureWoundsKnight)
+			IsEqual(%CureWounds,1)
+			CharacterCanCast(__Me,Target_MassHeal)
+			IsEqual(%MassHeal,1)
+			CharacterGet(_,_Player,10,Random,null,Player,null,null,Zombie)
+			CharacterHasTalent(__Me,Zombie)
+			GetDistance(_Float,__Me,_Player)
+			IsLessThen(_Float,10)
+			CharacterCanCast(__Me,AMER_SKILL_Attonement)
+		THEN
+			Set(%CharToHeal,_Player)			
+		ENDIF
+	ENDIF
+	
+/*EVENT CureWoundsTimer
+ON
+	OnTimer("CureWoundsAgain")
+ACTIONS
+	Set(%CureWounds,1)
+	
+EVENT MassHealTimer
+ON
+	OnTimer("MassHealAgain")
+ACTIONS
+	Set(%MassHeal,1)*/
+	
+EVENT CheckNonZombies
+VARS
+	CHARACTER:_Char
+	FLOAT:_dist
+ON
+	OnIterateCharacter(_Char,"ZombieCheck")
+ACTIONS
+	IF "!c1&c2"
+		CharacterHasTalent(_Char,Zombie)
+		GetDistance(_dist,%CharPlAI,_Char) //CharPlAI is CharToHeal
+	THEN
+		IF "c1"
+			IsEqual(%ClosestNonZombie,null)			
+		THEN
+			Set(%ClosestNonZombie,_dist)
+		ENDIF
+	ENDIF
+	
+EVENT CheckTravel
+VARS
+	FLOAT:_dist
+ON
+	OnTimer("TravelCheck")
+ACTIONs
+	IF "c1&c2&c3&!c4&!c5&!c6"
+		CharacterGetFollow(%GroupLeader,__Me)
+		GetDistance(_dist,%GroupLeader,%PrevTravelPos)
+		IsGreaterThen(_dist,14)
+		IsInCombat(__Me)
+		CharacterHasStatus(%GroupLeader,HASTED)
+		CharacterHasStatus(%GroupLeader,WARM)
+	THEN
+		SetPriority("COMM_Haste",200)	
+	ELSE
+		SetPriority("COMM_Haste",0)	
+	ENDIF
+	GetPosition(%GroupLeader,%PrevTravelPos)	
+	
+EVENT Destruction
+VARS
+	ITEM:_Item
+	CHARACTER:_Player
+	CHARACTER:_Leader
+	FLOAT:_dist
+ON
+	OnItemStatus(_Item,HIT)
+ACTIONS
+	IF "c1&c2&c3&!c4&c5&c6&!c7&c8&c9&c10&c11"
+		IsEqual(%COMM_Destroy,1)
+		ItemIsLocked(_Item)
+		IsEqual(%LockedItem,null)
+		IsInCombat(__Me)
+		ItemGetStatusSourceCharacter(_Item,HIT,_Player)
+		CharacterIsPlayer(_Player)
+		IsEqual(_Player,__Me)
+		CharacterGetFollow(_Leader,__Me)
+		IsEqual(_Leader,_Player)
+		GetDistance(_dist,__Me,_Player)
+		IsLessThen(_dist,7)
+	THEN
+		Set(%LockedItem,_Item)
+		SetPriority("COMM_Destroy",400)
+	ENDIF
+	
+EVENT CheckDeadPlayers
+ON
+	OnTimer("CheckDeadPlayer")
+ACTIONS
+	Set(%DeadPlayer,null)
+	IF "!c1"
+		IsInCombat(__Me)
+	THEN
+		IterateParty("DeadPlayer",Lowest,null,__Me)	
+	ENDIF
+	IF "!c1&!c2"
+		IsEqual(%DeadPlayer,null)
+		GlobalGetEvent("BlockResurrection")
+	THEN
+		SetPriority("COMM_Resurrect",420)
+	ELSE
+		SetPriority("COMM_Resurrect",0)
+	ENDIF
+	
+EVENT IterateDeadPlayers
+VARS
+	CHARACTER:_Player
+	FLOAT:_dist
+	INT:_Int
+ON
+	OnIterateCharacter(_Player,"DeadPlayer")
+ACTIONS
+	IF "c1&!c2&c3&c4&!c5"
+		CharacterIsDead(_Player)
+		GlobalGetEvent("BlockResurrection")
+		GetDistance(_dist,__Me,_Player)
+		IsLessThen(_dist,12)
+		IsEqual(_Player,__Me)
+	THEN					
+		Set(%DeadPlayer,_Player)	
+	ENDIF
+	
+EVENT ResurrectTimer
+ON
+	OnGlobalEventSet("BlockResurrection")
+ACTIONS
+	IF "c1"
+		IsEqual(__Me,CHARACTER:Player1_dac1443f-a866-4ab3-b240-e705c0b20ec5)
+	THEN
+		StartTimer("EnableResurrection",6,0)
+	ENDIF
+
+EVENT ReenableResurrect
+ON
+	OnTimer("EnableResurrection")
+ACTIONS
+	GlobalClearEvent("BlockResurrection")
+
+	
+EVENT ActivateStatusRemoveAI
+VARS
+	CHARACTER:_Player
+	STATUS:_Status
+ON
+	OnCharacterStatus(_Player,_Status)
+ACTIONS
+	IF "c1"		
+		GetVar(INT:,_Player,"PlayerChar")
+	THEN
+		IF "c1"
+			IsEqual(_Status,BURNING)
+		THEN
+			Add(%BurningChars,1)
+			IF "c1"
+				IsEqual(%COMM_RemoveBurning,1)
+			THEN
+				SetPriority("COMM_RemoveBurning",510)
+			ENDIF
+		ELIF "c1"
+			IsEqual(_Status,KNOCKED_DOWN)
+		THEN
+			Add(%KnockedChars,1)
+			IF "c1"
+				IsEqual(%COMM_HelpGetUp,1)
+			THEN
+				SetPriority("COMM_HelpGetUp",450)
+			ENDIF
+		ENDIF
+	ENDIF
+	
+EVENT DeactivateStatusRemoveAI
+VARS
+	CHARACTER:_Player
+	STATUS:_Status
+ON
+	OnCharacterStatusRemoved(_Player,_Status)
+ACTIONS
+	IF "c1"		
+		GetVar(INT:,_Player,"PlayerChar") //false if var doesnt exist
+	THEN
+		IF "c1"
+			IsEqual(_Status,BURNING)
+		THEN
+			Subtract(%BurningChars,1)
+			IF "c1"
+				IsLessThen(%BurningChars,1)
+			THEN
+				Set(%BurningChars,0)
+				SetPriority("COMM_RemoveBurning",0)
+			ENDIF
+		ELIF "c1"
+			IsEqual(_Status,KNOCKED_DOWN)
+		THEN
+			Subtract(%KnockedChars,1)
+			IF "c1"
+				IsLessThen(%KnockedChars,1)
+			THEN
+				Set(%KnockedChars,0)
+				SetPriority("COMM_HelpGetUp",0)
+			ENDIF
+		ENDIF
+	ENDIF
+	
+EVENT CheckSurfaces //Cannot cast Path skills from scripts at the moment. If you need it, ask a programmer very kindly (this is A LOT OF WORK) 
+VARS
+	FLOAT3:_FireSurface
+ON
+	OnTimer("CheckFireSurface")
+ACTIONS
+	IF "!c1&c2&(c3|(c4&!c5))&c6"
+		IsInCombat(__Me)
+		FindSurface(_FireSurface,__Me,0,10,Fire)
+		CharacterCanCast(__Me,Rain_Water)
+		CharacterCanCast(__Me,AMER_SKILL_Deluge)
+		CharacterGet(_,_FireSurface,4,Lowest,Distance)
+		CanSee(__Me,_FireSurface)
+	THEN
+		SetPriority("COMM_ClearFireSurfaces",440)
+	ENDIF
+	
+EVENT AutoHealDeActivation
+ON
+	OnSkillCast(__Me,"COMM_AutoHeal")
+ACTIONS
+	IF "c1"
+		GlobalGetEvent("AutoHealActive")
+	THEN
+		GlobalClearEvent("AutoHealActive")
+		DisplayText(__Me,"AutoHealInactive",3)
+	ELSE
+		GlobalSetEvent("AutoHealActive")
+		DisplayText(__Me,"AutoHealActive",3)		
+	ENDIF
+	
+EVENT ActivateAutoHealing
+ON
+	OnGlobalEventSet("AutoHealActive")
+ACTIONS
+	SetVar(__Me,"AMER_OoCHealingEnabled",INT:1)
+	
+EVENT DeactivateAutoHealing
+ON
+	OnGlobalEventCleared("AutoHealActive")
+ACTIONS
+	SetVar(__Me,"AMER_OoCHealingEnabled",INT:0)
+	
+//Other Stuff
+//////////////
+
+/*EVENT ThrowWaterBucket
+ON
+	OnSkillCast(__Me,Cone_ThrowWater)
+ACTIONS
+	CharacterAddToInventory(__Me,"FUR_Bucket_A",1)
+	
+EVENT SpeedUpPlayer
+VARS
+	STRING:_Event
+ON
+	OnGlobalEventSet(_Event)
+ACTIONS
+	IF "c1|c2|c3|c4|c5|c6"
+		IsEqual(_Event,"Speed_0")
+		IsEqual(_Event,"Speed_15")
+		IsEqual(_Event,"Speed_25")
+		IsEqual(_Event,"Speed_35")
+		IsEqual(_Event,"Speed_45")
+		IsEqual(_Event,"Speed_55")
+	THEN
+		IF "!c1"
+			IsEqual(%SpeedPotionPl,null)
+		THEN
+			RemoveStatusInfluence(__Me,CONSUME,20,%SpeedPotionPl,0)
+			GlobalClearEvent(%SpeedPotionPl)//weird, this is a fixedstring, not a string as the event; Potion has the same name as event
+		ENDIF
+		IF "c1"
+			IsEqual(_Event,"Speed_0")
+		THEN
+			GlobalClearEvent("Speed_0")
+			Set(%SpeedPotionPl,null)
+		ELSE
+			Cast(%SpeedPotionPl,_Event)
+			AddStatusInfluence(__Me,CONSUME,20,%SpeedPotionPl,0)
+		ENDIF
+	ENDIF*/
+
+	
