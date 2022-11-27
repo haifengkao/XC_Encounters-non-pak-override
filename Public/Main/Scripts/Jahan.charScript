@@ -1,0 +1,205 @@
+INIT
+	CHARACTER:__Me
+	TRIGGER:%CurrentTrigger = null
+	TRIGGER:%TalkingPoint_1 = CYS_JAH_Wander1_e3a575f1-2a89-49ef-801d-8fc17162cde1
+	TRIGGER:%TalkingPoint_2 = CYS_JAH_Wander2_02f30587-416c-4b6c-b5bf-920d448a752e
+	TRIGGER:%TalkingPoint_3 = CYS_JAH_Wander3_d38ccbef-509d-428e-bbed-56b260a58b25
+	INT:%index = 0
+	INT:%Active = 1
+	
+BEHAVIOUR
+
+REACTION ChooseAction, 1060
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%Active,1)
+ACTIONS
+	GetElement(%CurrentTrigger,%index,%TalkingPoint_1,%TalkingPoint_2,%TalkingPoint_3)
+	SetPriority("GoToSpot", 1070)
+	Add(%index,1)
+	IF "c1"
+		IsEqual(%index,3)
+	THEN
+		Set(%index,0)
+	ENDIF
+	
+REACTION GoToSpot, 0
+USAGE PEACE
+VARS
+	FLOAT:_Wait
+ACTIONS
+	CharacterMoveTo(%CurrentTrigger, 0)
+	CharacterLookFrom(%CurrentTrigger)
+	CharacterPlayAnimation("Fidget_Forward_01")
+	CharacterPlayAnimation("Stand_Read_01")
+	Sleep(3)
+		IF "c1"
+			IsRandom(0.3)
+		THEN
+			DialogStart("CYS_AD_JAH",__Me)
+		ENDIF
+	GetRandomBetween(_Wait,2,30)
+	Sleep(_Wait)
+	SetPriority("GoToSpot", 0)
+INTERRUPT
+	SetPriority("GoToSpot", 0)
+
+REACTION SourceAcademy, 0
+USAGE PEACE
+ACTIONS
+	CharacterWander(TRIGGER:SAC_Behavior_JahanWander_d6c08f03-a5de-4284-9395-c012df1649a5, 3.0)
+	Sleep(3)
+
+REACTION HealNormalPlayer, 500
+USAGE PEACE
+VARS
+	FLOAT:_vitality
+	CHARACTER:_Player
+	CHARACTER:_Zombie
+CHECK "c1&c2&c3&(c4|c5|c6|c7|c8|c9|(c10&c11))&!c12"
+	CharacterGet(_Player,__Me,12,Lowest,Vitality,Player,null,null,null,__Me)
+	CharacterGetStat(_vitality,_Player,Vitality)
+	IsLessThen(_vitality,0.99)
+	CharacterCanCast(__Me,Heal_RegenerateStart)
+	CharacterCanCast(__Me,Target_MassHeal)
+	CharacterCanCast(__Me,Target_FirstAid)
+	CharacterCanCast(__Me,AMER_SKILL_Attonement)
+	CharacterCanCast(__Me,AMER_SKILL_Cauterize)
+	CharacterCanCast(__Me,AMER_SKILL_Soothe)
+	CharacterCanCast(__Me,Heal_CureWoundsKnight)
+	IsEqual(%CureWounds,1)
+	CharacterHasTalent(_Player,Zombie)
+ACTIONS
+	IF "c1&!(c2&c3)"
+		IsInDangerousSurface(__Me)
+		IsInSurface(__Me,Ooze)
+		CharacterHasTalent(__Me,Zombie)
+	THEN
+		DelayReaction("HealNormalPlayer",10)
+		Goto("End")
+	ENDIF
+	IF "c1&!c2"
+		CharacterCanCast(__Me,Target_MassHeal)
+		CharacterGet(_Zombie,_Player,10,Random,null,Player,null,null,Zombie)
+	THEN
+		CharacterUseSkill(Target_MassHeal,_Player)
+	ELIF "c1&!c2"	
+		CharacterCanCast(__Me,AMER_SKILL_Soothe)
+		CharacterGet(_Zombie,_Player,10,Random,null,Player,null,null,Zombie)
+	THEN
+		CharacterUseSkill(AMER_SKILL_Soothe,_Player)		
+	ELIF "c1"
+		CharacterCanCast(__Me,Heal_RegenerateStart)
+	THEN
+		CharacterUseSkill(Heal_RegenerateStart,_Player)	
+	ELIF "c1"
+		CharacterCanCast(__Me,Target_FirstAid)
+	THEN
+		CharacterUseSkill(Target_FirstAid,_Player)	
+	ELIF "c1"
+		CharacterCanCast(__Me,AMER_SKILL_Cauterize)
+	THEN
+		CharacterUseSkill(AMER_SKILL_Cauterize,_Player)
+	ELIF "c1"
+		CharacterCanCast(__Me,AMER_SKILL_Attonement)
+	THEN
+		CharacterUseSkill(AMER_SKILL_Attonement,_Player)
+	ELIF "c1&!c2&c3"
+		CharacterCanCast(__Me,Heal_CureWoundsKnight)
+		IsInDangerousSurface(_Player)
+		IsEqual(%CureWounds,1)
+	THEN
+		CharacterMoveTo(_Player,1)
+		CharacterUseSkill(Heal_CureWoundsKnight,_Player)
+		StartTimer("CureWoundsAgain",40,0)
+		Set(%CureWounds,0)
+	ENDIF
+	Label("End")
+INTERRUPT
+	Reset()
+	DelayReaction("HealNormalPlayer",10)
+	
+REACTION HealMyselfNormal, 490
+USAGE PEACE
+VARS
+	FLOAT:_vitality
+	CHARACTER:_Zombie
+CHECK "c1&c2&(c3|c4|c5|c6|c7|c8|(c9&c10))&!c11"
+	CharacterGetStat(_vitality,__Me,Vitality)
+	IsLessThen(_vitality,0.99)
+	CharacterCanCast(__Me,Heal_RegenerateStart)
+	CharacterCanCast(__Me,Target_MassHeal)
+	CharacterCanCast(__Me,Target_FirstAid)
+	CharacterCanCast(__Me,AMER_SKILL_Attonement)
+	CharacterCanCast(__Me,AMER_SKILL_Cauterize)
+	CharacterCanCast(__Me,AMER_SKILL_Soothe)
+	CharacterCanCast(__Me,Heal_CureWoundsKnight)
+	IsEqual(%CureWounds,1)
+	CharacterHasTalent(__Me,Zombie)
+ACTIONS
+	IF "c1&!(c2&c3)"
+		IsInDangerousSurface(__Me)
+		IsInSurface(__Me,Ooze)
+		CharacterHasTalent(__Me,Zombie)
+	THEN
+		DelayReaction("HealMyselfNormal",10)
+		Goto("End")
+	ENDIF
+	IF "c1&!c2"
+		CharacterCanCast(__Me,Target_MassHeal)
+		CharacterGet(_Zombie,__Me,10,Random,null,Player,null,null,Zombie)
+	THEN
+		CharacterUseSkill(Target_MassHeal,__Me)
+	ELIF "c1&!c2"
+		CharacterCanCast(__Me,AMER_SKILL_Soothe)
+		CharacterGet(_Zombie,__Me,10,Random,null,Player,null,null,Zombie)
+	THEN
+		CharacterUseSkill(AMER_SKILL_Soothe,__Me)	
+	ELIF "c1"
+		CharacterCanCast(__Me,Heal_RegenerateStart)
+	THEN
+		CharacterUseSkill(Heal_RegenerateStart,__Me)
+	ELIF "c1"
+		CharacterCanCast(__Me,Target_FirstAid)
+	THEN
+		CharacterUseSkill(Target_FirstAid,__Me)
+		
+	ELIF "c1"
+		CharacterCanCast(__Me,AMER_SKILL_Cauterize)
+	THEN
+		CharacterUseSkill(AMER_SKILL_Cauterize,__Me)
+	ELIF "c1"
+		CharacterCanCast(__Me,AMER_SKILL_Attonement)
+	THEN
+		CharacterUseSkill(AMER_SKILL_Attonement,__Me)	
+	ELIF "c1&c2"
+		CharacterCanCast(__Me,Heal_CureWoundsKnight)
+		IsEqual(%CureWounds,1)
+	THEN
+		CharacterUseSkill(Heal_CureWoundsKnight,__Me)
+		StartTimer("CureWoundsAgain",40,0)
+		Set(%CureWounds,0)
+	ENDIF
+	Label("End")
+INTERRUPT
+	Reset()
+	DelayReaction("HealMyselfNormal",10)
+	
+EVENTS
+EVENT Hired
+ON
+	OnCharacterEvent(__Me,"Hired")
+ACTIONS
+	Set(%Active,0)
+	
+EVENT SAC
+ON
+	OnCharacterEvent(__Me, "END")
+ACTIONS
+	SetPriority("SourceAcademy", 1100)	
+	
+EVENT CureWoundsTimer
+ON
+	OnTimer("CureWoundsAgain")
+ACTIONS
+	Set(%CureWounds,1)	

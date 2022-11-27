@@ -1,0 +1,240 @@
+INIT
+	CHARACTER:__Me
+	TRIGGER:%TalkingPoint_1 = CYS_MAD_Wander_Novak_243674b5-ab2d-4e25-aaa9-84034100e043
+	TRIGGER:%TalkingPoint_2 = CYS_MAD_Wander_Duke_daeb9a22-ea5c-49fd-8985-9a28d5484d48
+	TRIGGER:%TalkingPoint_3 = CYS_MAD_Wander_Fire_8914fccc-eebb-4cdd-82dc-4f3c3f02c8c4
+	CHARACTER:%Novak = CYS_Fab_Novak_6f446c6f-b967-4524-824b-e788a4e55227
+	CHARACTER:%Ferol = CYS_Duke_dce2893c-c0b0-4422-9380-d25da779d5ce
+	INT:%Active = 1
+	FLOAT:%Dist = 0
+	TRIGGER:%Madora = SAC_Behavior_Madora_f2d776c3-ff8a-455c-8175-f7cb99365a12
+	CHARACTER:%MadoraLookAt = null
+	INT:%End = 0
+	
+BEHAVIOUR
+
+REACTION ChooseAction, 1060
+USAGE PEACE
+VARS
+	FLOAT:_Wait
+CHECK "c1"
+	IsEqual(%Active,1)
+ACTIONS
+	CharacterMoveTo(%TalkingPoint_1, 0)
+	CharacterLookFrom(%TalkingPoint_1)
+	IF "!c1&!c2&c3&c4&c5"
+		CharacterIsDead(%Novak)
+		IsInDialog(%Novak)
+		GetDistance(%Dist,%Novak,__Me)
+		IsLessThen(%Dist,5)
+		IsRandom(0.3)
+	THEN
+		DialogStart("CYS_AD_MAD_Novak_Present",__Me,%Novak)
+	ELSE
+		IF "c1"
+			IsRandom(0.3)
+		THEN
+			DialogStart("CYS_AD_MAD_Novak_Gone",__Me)
+		ENDIF
+	ENDIF
+	GetRandomBetween(_Wait,3,50)
+	Sleep(_Wait)
+
+	CharacterMoveTo(%TalkingPoint_2, 0)
+	CharacterLookFrom(%TalkingPoint_2)
+	IF "!c1&!c2&c3&c4&c5"
+		CharacterIsDead(%Ferol)
+		IsInDialog(%Ferol)
+		GetDistance(%Dist,%Ferol,__Me)
+		IsLessThen(%Dist,5)
+		IsRandom(0.3)
+	THEN
+		DialogStart("CYS_AD_MAD_Ferol_Present",__Me,%Ferol)
+	ELSE
+		IF "c1"
+			IsRandom(0.3)
+		THEN
+			DialogStart("CYS_AD_MAD_Ferol_Gone",__Me)
+		ENDIF
+	ENDIF
+	GetRandomBetween(_Wait,3,50)
+	Sleep(_Wait)
+	CharacterMoveTo(%TalkingPoint_3, 0)
+	CharacterLookFrom(%TalkingPoint_3)
+	CharacterPlayAnimation("Fidget_Forward_01")
+	GetRandomBetween(_Wait,3,50)
+	Sleep(_Wait)
+
+REACTION End, 1100
+USAGE PEACE
+CHECK "c1"
+	IsEqual(%End, 1)
+ACTIONS
+	CharacterMoveTo(%Madora)
+	CharacterLookFrom(%Madora)
+	IterateCharactersNear(__Me, 3.0, "END_Madora_Iterate", COMPARE:Lowest, COMPAREFUNC:Distance)
+	Sleep(1)
+	IF "!c1"
+		IsEqual(%MadoraLookAt, null)
+	THEN
+		CharacterLookAt(%MadoraLookAt)
+	ENDIF
+	DialogStart("SAC_AD_Madora", __Me)
+	Sleep(15)
+	
+REACTION HealNormalPlayer, 500
+USAGE PEACE
+VARS
+	FLOAT:_vitality
+	CHARACTER:_Player
+	CHARACTER:_Zombie
+CHECK "c1&c2&c3&(c4|c5|c6|c7|c8|c9|(c10&c11))&!c12"
+	CharacterGet(_Player,__Me,12,Lowest,Vitality,Player,null,null,null,__Me)
+	CharacterGetStat(_vitality,_Player,Vitality)
+	IsLessThen(_vitality,0.99)
+	CharacterCanCast(__Me,Heal_RegenerateStart)
+	CharacterCanCast(__Me,Target_MassHeal)
+	CharacterCanCast(__Me,Target_FirstAid)
+	CharacterCanCast(__Me,AMER_SKILL_Attonement)
+	CharacterCanCast(__Me,AMER_SKILL_Cauterize)
+	CharacterCanCast(__Me,AMER_SKILL_Soothe)
+	CharacterCanCast(__Me,Heal_CureWoundsKnight)
+	IsEqual(%CureWounds,1)
+	CharacterHasTalent(_Player,Zombie)
+ACTIONS
+	IF "c1&!(c2&c3)"
+		IsInDangerousSurface(__Me)
+		IsInSurface(__Me,Ooze)
+		CharacterHasTalent(__Me,Zombie)
+	THEN
+		DelayReaction("HealNormalPlayer",10)
+		Goto("End")
+	ENDIF
+	IF "c1&!c2"
+		CharacterCanCast(__Me,Target_MassHeal)
+		CharacterGet(_Zombie,_Player,10,Random,null,Player,null,null,Zombie)
+	THEN
+		CharacterUseSkill(Target_MassHeal,_Player)
+	ELIF "c1&!c2"	
+		CharacterCanCast(__Me,AMER_SKILL_Soothe)
+		CharacterGet(_Zombie,_Player,10,Random,null,Player,null,null,Zombie)
+	THEN
+		CharacterUseSkill(AMER_SKILL_Soothe,_Player)		
+	ELIF "c1"
+		CharacterCanCast(__Me,Heal_RegenerateStart)
+	THEN
+		CharacterUseSkill(Heal_RegenerateStart,_Player)	
+	ELIF "c1"
+		CharacterCanCast(__Me,Target_FirstAid)
+	THEN
+		CharacterUseSkill(Target_FirstAid,_Player)	
+	ELIF "c1"
+		CharacterCanCast(__Me,AMER_SKILL_Cauterize)
+	THEN
+		CharacterUseSkill(AMER_SKILL_Cauterize,_Player)
+	ELIF "c1"
+		CharacterCanCast(__Me,AMER_SKILL_Attonement)
+	THEN
+		CharacterUseSkill(AMER_SKILL_Attonement,_Player)
+	ELIF "c1&!c2&c3"
+		CharacterCanCast(__Me,Heal_CureWoundsKnight)
+		IsInDangerousSurface(_Player)
+		IsEqual(%CureWounds,1)
+	THEN
+		CharacterMoveTo(_Player,1)
+		CharacterUseSkill(Heal_CureWoundsKnight,_Player)
+		StartTimer("CureWoundsAgain",40,0)
+		Set(%CureWounds,0)
+	ENDIF
+	Label("End")
+INTERRUPT
+	Reset()
+	DelayReaction("HealNormalPlayer",10)
+	
+REACTION HealMyselfNormal, 490
+USAGE PEACE
+VARS
+	FLOAT:_vitality
+	CHARACTER:_Zombie
+CHECK "c1&c2&(c3|c4|c5|c6|c7|c8|(c9&c10))&!c11"
+	CharacterGetStat(_vitality,__Me,Vitality)
+	IsLessThen(_vitality,0.99)
+	CharacterCanCast(__Me,Heal_RegenerateStart)
+	CharacterCanCast(__Me,Target_MassHeal)
+	CharacterCanCast(__Me,Target_FirstAid)
+	CharacterCanCast(__Me,AMER_SKILL_Attonement)
+	CharacterCanCast(__Me,AMER_SKILL_Cauterize)
+	CharacterCanCast(__Me,AMER_SKILL_Soothe)
+	CharacterCanCast(__Me,Heal_CureWoundsKnight)
+	IsEqual(%CureWounds,1)
+	CharacterHasTalent(__Me,Zombie)
+ACTIONS
+	IF "c1&!(c2&c3)"
+		IsInDangerousSurface(__Me)
+		IsInSurface(__Me,Ooze)
+		CharacterHasTalent(__Me,Zombie)
+	THEN
+		DelayReaction("HealMyselfNormal",10)
+		Goto("End")
+	ENDIF
+	IF "c1&!c2"
+		CharacterCanCast(__Me,Target_MassHeal)
+		CharacterGet(_Zombie,__Me,10,Random,null,Player,null,null,Zombie)
+	THEN
+		CharacterUseSkill(Target_MassHeal,__Me)
+	ELIF "c1&!c2"
+		CharacterCanCast(__Me,AMER_SKILL_Soothe)
+		CharacterGet(_Zombie,__Me,10,Random,null,Player,null,null,Zombie)
+	THEN
+		CharacterUseSkill(AMER_SKILL_Soothe,__Me)	
+	ELIF "c1"
+		CharacterCanCast(__Me,Heal_RegenerateStart)
+	THEN
+		CharacterUseSkill(Heal_RegenerateStart,__Me)
+	ELIF "c1"
+		CharacterCanCast(__Me,Target_FirstAid)
+	THEN
+		CharacterUseSkill(Target_FirstAid,__Me)
+		
+	ELIF "c1"
+		CharacterCanCast(__Me,AMER_SKILL_Cauterize)
+	THEN
+		CharacterUseSkill(AMER_SKILL_Cauterize,__Me)
+	ELIF "c1"
+		CharacterCanCast(__Me,AMER_SKILL_Attonement)
+	THEN
+		CharacterUseSkill(AMER_SKILL_Attonement,__Me)	
+	ELIF "c1&c2"
+		CharacterCanCast(__Me,Heal_CureWoundsKnight)
+		IsEqual(%CureWounds,1)
+	THEN
+		CharacterUseSkill(Heal_CureWoundsKnight,__Me)
+		StartTimer("CureWoundsAgain",40,0)
+		Set(%CureWounds,0)
+	ENDIF
+	Label("End")
+INTERRUPT
+	Reset()
+	DelayReaction("HealMyselfNormal",10)
+
+EVENTS
+EVENT Hired
+ON
+	OnCharacterEvent(__Me,"Hired")
+
+ACTIONS
+	Set(%Active,0)
+	
+EVENT Iterate
+VARS
+	CHARACTER:_Char
+ON
+	OnIterateCharacter(_Char, "END_Madora_Iterate")
+ACTIONS
+	Set(%MadoraLookAt, _Char)
+	
+EVENT CureWoundsTimer
+ON
+	OnTimer("CureWoundsAgain")
+ACTIONS
+	Set(%CureWounds,1)	
