@@ -1,0 +1,116 @@
+INIT
+CHARACTER:__Me
+
+BEHAVIOUR
+
+REACTION FleeFromPlayer, 100
+USAGE PEACE
+VARS
+	CHARACTER:_char
+	CHARACTER:_char2
+CHECK "c1&!c2&!c3"
+	CharacterGet(_char,__Me,5,Random,null,Player)
+	CharacterHasTalent(_char, AnimalEmpathy)
+	CharacterGet(_char2,__Me,10,Random,null,Player,null,null,AnimalEmpathy)
+ACTIONS
+	CharacterLookAt(_char,1)
+	Sleep(0.2)
+	CharacterFleeFrom(Player,10)
+	CharacterLookAt(_char)
+	Sleep(5.0)
+INTERRUPT
+ON
+	OnMovementFailed(_)
+ACTIONS
+	//DebugText(__Me,"MOVING FAILED!")
+	SetPriority("FleeFromPlayer",0)
+	
+REACTION WanderAbout, 50
+USAGE PEACE
+VARS
+	FLOAT:_Range=10
+	FLOAT:_Float
+	FIXEDSTRING:_Anim
+	CHARACTER:_Char
+ACTIONS
+	//DebugText(__Me,"Wandering for a bit...")
+	GetRandomBetween(_Float,1,10)
+	CharacterWander(_Range,_Float,1)
+	WHILE "c1"
+		IsRandom(0.5)
+	DO
+		GetRandomBetween(_Float,0,7)
+		Sleep(_Float)
+		GetRandom(_Anim,"","idle1","idle2","idle3","use_eat","cower")
+		IF "c1&c2"
+			IsEqual(_Anim,"cower")
+			IsRandom(0.3)
+		THEN
+			CharacterPlayAnimation(_Anim,0)
+		ELSE
+			CharacterPlayAnimation(_Anim)
+		ENDIF
+		IF "c1&c2&c3"
+			IsRandom(0.3)
+			CharacterGet(_Char,__Me,10,Lowest,Distance)
+			IsFacing(__Me,_Char)
+		THEN
+			IF "c1"
+				IsRandom(0.2)
+			THEN
+				CharacterLookAt(_Char)
+			ELSE
+				CharacterLookAt(_Char,0,1)
+			ENDIF
+		ENDIF
+	ENDWHILE  
+INTERRUPT
+	Reset()
+	
+REACTION BeAGoodPet, 101
+USAGE PEACE
+VARS
+	CHARACTER:_Player
+	FIXEDSTRING:_Anim
+	FLOAT:_Float
+CHECK "c1"
+	CharacterGet(_Player,__Me,3.5,Lowest,Distance,Player)
+ACTIONS
+	IF "c1"
+		IsRandom(0.8)
+	THEN
+		IF "c1"
+			IsRandom(0.2)
+		THEN
+			CharacterLookAt(_Player)
+		ELSE
+			CharacterLookAt(_Player,0,1)
+		ENDIF
+		IF "c1"
+			CharacterHasTalent(_Player,AnimalEmpathy)
+		THEN
+			GetRandom(_Anim,"","idle1","idle2","idle3","use_eat","hit_magic","cower")			
+		ELSE
+			GetRandom(_Anim,"cower","hit")
+		ENDIF
+		IF "c1&c2"
+			IsEqual(_Anim,"cower")
+			IsRandom(0.5)
+		THEN
+			CharacterPlayAnimation(_Anim,0)
+		ELSE
+			CharacterPlayAnimation(_Anim)
+		ENDIF
+	ENDIF
+	GetRandomBetween(_Float,3,8)
+	Sleep(_Float)
+	DelayReaction("BeAGoodPet",10)
+	
+	
+EVENTS
+
+EVENT DeactivateFleeing
+ON
+	OnInit()
+ACTIONS
+	SetPriority("FleeFromPlayer",0)
